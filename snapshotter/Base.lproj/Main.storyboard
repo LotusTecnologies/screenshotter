@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_0" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap to pick a photo from your camera roll to upload and search for a match." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uOF-WF-9fP" userLabel="Instructions">
+                                <rect key="frame" x="16" y="20" width="288" height="42"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="42" id="glz-tf-Eor"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jal-h1-fcp" userLabel="Pick Photo Button">
+                                <rect key="frame" x="16" y="70" width="73" height="30"/>
+                                <state key="normal" title="Pick photo"/>
+                                <connections>
+                                    <action selector="pickPhoto" destination="BYZ-38-t0r" eventType="touchUpInside" id="nJ7-dh-MTy"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ifC-Sf-Cnd" userLabel="Open URL Button">
+                                <rect key="frame" x="234" y="70" width="70" height="30"/>
+                                <state key="normal" title="Open URL"/>
+                                <connections>
+                                    <action selector="openURL" destination="BYZ-38-t0r" eventType="touchUpInside" id="oeI-kI-jU5"/>
+                                </connections>
+                            </button>
+                            <activityIndicatorView hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="gEb-uG-F8d">
+                                <rect key="frame" x="141.5" y="108" width="37" height="37"/>
+                                <color key="color" red="0.92941176469999998" green="0.078431372550000003" blue="0.35294117650000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZH7-EC-lCF">
+                                <rect key="frame" x="16" y="153" width="288" height="395"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uUI-Dx-oo3" userLabel="Resultant json Label">
+                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="uUI-Dx-oo3" secondAttribute="trailing" id="9Ps-fu-ioU"/>
+                                    <constraint firstItem="uUI-Dx-oo3" firstAttribute="top" secondItem="ZH7-EC-lCF" secondAttribute="top" id="A2X-cE-uY2"/>
+                                    <constraint firstAttribute="bottom" secondItem="uUI-Dx-oo3" secondAttribute="bottom" id="a2k-RO-rdN"/>
+                                    <constraint firstItem="uUI-Dx-oo3" firstAttribute="leading" secondItem="ZH7-EC-lCF" secondAttribute="leading" id="pt1-FX-Za4"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="gEb-uG-F8d" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="00v-LF-qxn"/>
+                            <constraint firstItem="ZH7-EC-lCF" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="5fs-OT-c9e"/>
+                            <constraint firstItem="ZH7-EC-lCF" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="6Lo-ct-ETn"/>
+                            <constraint firstItem="jal-h1-fcp" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="9bP-YH-wif"/>
+                            <constraint firstItem="ZH7-EC-lCF" firstAttribute="top" secondItem="gEb-uG-F8d" secondAttribute="bottom" constant="8" id="G6L-07-emR"/>
+                            <constraint firstItem="ifC-Sf-Cnd" firstAttribute="top" secondItem="jal-h1-fcp" secondAttribute="top" id="SgQ-Xq-oBn"/>
+                            <constraint firstItem="uOF-WF-9fP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Wdc-XT-bqW"/>
+                            <constraint firstItem="uOF-WF-9fP" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="d50-2I-4hE"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="ZH7-EC-lCF" secondAttribute="bottom" constant="20" id="glz-Fw-2Sd"/>
+                            <constraint firstItem="gEb-uG-F8d" firstAttribute="top" secondItem="jal-h1-fcp" secondAttribute="bottom" constant="8" id="kPc-JN-3x2"/>
+                            <constraint firstItem="ifC-Sf-Cnd" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="r2L-87-Gen"/>
+                            <constraint firstItem="jal-h1-fcp" firstAttribute="top" secondItem="uOF-WF-9fP" secondAttribute="bottom" constant="8" id="ugh-T1-1gk"/>
+                            <constraint firstItem="uOF-WF-9fP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="x5O-fy-MKW"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="activityIndicator" destination="gEb-uG-F8d" id="K7A-e8-egx"/>
+                        <outlet property="openURLButton" destination="ifC-Sf-Cnd" id="6t9-vM-b0P"/>
+                        <outlet property="pickPhotoButton" destination="jal-h1-fcp" id="cGO-wQ-cow"/>
+                        <outlet property="resultantJsonLabel" destination="uUI-Dx-oo3" id="SzD-mT-s8m"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="135" y="138.38028169014083"/>
+        </scene>
+    </scenes>
+</document>
