@@ -14,6 +14,7 @@
 
 +(instancetype)shared;
 
+-(void)latestScreenshotWithCallback:(void (^)(UIImage *))callback;
 -(void)matchImage:(UIImage *)image completion:(ClarifaiSearchCompletion)completion;
 
 @end
