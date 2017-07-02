@@ -30,12 +30,18 @@ NSString *imageMediaType;
 - (void)viewDidLoad {
     [super viewDidLoad];
     imageMediaType = (NSString *)kUTTypeImage;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uploadLastScreenshot) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self uploadLastScreenshot];
+}
+
+-(void)uploadLastScreenshot {
     self.topMediaURLString = nil;
     self.openURLButton.hidden = YES;
+    _resultantJsonLabel.text = nil;
     [_activityIndicator startAnimating];
     MatchModel *matchModel = [MatchModel shared];
     [matchModel latestScreenshotWithCallback:^(UIImage *pickedImage) {
@@ -60,6 +66,10 @@ NSString *imageMediaType;
             }];
         }
     }];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 // MARK: - Handlers
