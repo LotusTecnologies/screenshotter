@@ -15,6 +15,6 @@ end
 #    shared_pods
 #end
 
-target 'snapshotter' do
+target 'screenshot' do
     shared_pods
 end
