@@ -365,11 +365,13 @@
 			baseConfigurationReference = A876FB250F1D7FE8A41B8A8F /* Pods-screenshot.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				INFOPLIST_FILE = screenshot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VERSIONING_SYSTEM = "Apple Generic";
 			};
 			name = Debug;
 		};
@@ -378,11 +380,13 @@
 			baseConfigurationReference = DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				INFOPLIST_FILE = screenshot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VERSIONING_SYSTEM = "Apple Generic";
 			};
 			name = Release;
 		};
