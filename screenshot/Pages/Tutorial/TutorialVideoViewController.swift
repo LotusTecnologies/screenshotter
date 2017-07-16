@@ -77,8 +77,7 @@ class TutorialVideoViewController : UIViewController {
     }
     
     deinit {
-        player.currentItem?.removeObserver(self, forKeyPath: "status")
-        NotificationCenter.default.removeObserver(self)
+        endObserving()
     }
     
     // MARK: - UIViewController
@@ -86,9 +85,10 @@ class TutorialVideoViewController : UIViewController {
     override var prefersStatusBarHidden: Bool {
         return true
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
         playerLayer.frame = view.bounds
     }
     
@@ -103,22 +103,25 @@ class TutorialVideoViewController : UIViewController {
         overlayViewController.didMove(toParentViewController: self)
         view.addSubview(overlayViewController.view)
         
+        overlayViewController.replayButtonTapped = replayButtonTapped
         overlayViewController.doneButtonTapped = {
             self.delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
         }
-
+        
         // Add tap gesture recognizer
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
+        
+        if self.player.playbackState == .paused {
+            self.player.play()
+            self.delegate?.tutorialVideoViewControllerDidPlay?(self)
+        }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
-        if player.rate == 0 {
-            player.playImmediately(atRate: 1)
-            delegate?.tutorialVideoViewControllerDidPlay?(self)
-        }
+        player.pause()
     }
     
     // MARK: - Player state observation
@@ -143,7 +146,7 @@ class TutorialVideoViewController : UIViewController {
             let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
             player.replaceCurrentItem(with: standardPlayerItem)
             beginObserving(playerItem: standardPlayerItem)
-            player.playImmediately(atRate: 1)
+            player.play()
             delegate?.tutorialVideoViewControllerDidPlay?(self)
         }
     }
@@ -155,6 +158,11 @@ class TutorialVideoViewController : UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
         
         item.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
+    }
+    
+    private func endObserving() {
+        player.currentItem?.removeObserver(self, forKeyPath: "status")
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Actions
@@ -176,7 +184,6 @@ class TutorialVideoViewController : UIViewController {
     @objc private func playerDidFinishPlaying() {
         ended = true
         
-        overlayViewController.replayButtonTapped = replayButtonTapped
         overlayViewController.showReplayButton()
         
         delegate?.tutorialVideoViewControllerDidEnd?(self)

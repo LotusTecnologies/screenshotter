@@ -129,8 +129,8 @@ class TutorialViewController : UIViewController {
     
     func presentVideo(_ video: TutorialVideo) {
         let vc = TutorialVideoViewController(video: video)
-        vc.delegate = self
         vc.modalTransitionStyle = .crossDissolve
+        vc.delegate = self
         present(vc, animated: true, completion: nil)
     }
     

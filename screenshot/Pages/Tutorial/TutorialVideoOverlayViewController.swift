@@ -21,7 +21,16 @@ class TutorialVideoOverlayViewController : UIViewController {
     
     // MARK: - UIViewController
     override func viewDidLoad() {
-        setupDoneButton()
+        // delayed "pop" animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.setupDoneButton()
+            self.doneButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            
+            UIView.animateKeyframes(withDuration: 0.2, delay: 0, options: [.calculationModeCubic], animations: {
+                self.doneButton.transform = .identity
+            }, completion: nil)
+        }
+        
         setupReplayButton()
         setupPauseButton()
     }
@@ -32,10 +41,10 @@ class TutorialVideoOverlayViewController : UIViewController {
         pauseButton.alpha = 0
         pauseButton.isHidden = false
         
-        UIView.animate(withDuration: 0.1, animations: {
+        UIView.animate(withDuration: 0.15, animations: {
             self.pauseButton.alpha = 1
         }, completion: { finished in
-            UIView.animate(withDuration: 0.2, animations: {
+            UIView.animate(withDuration: 0.35, animations: {
                 self.pauseButton.alpha = 0.0
             }, completion: { finished in
                 self.pauseButton.isHidden = true
@@ -47,7 +56,7 @@ class TutorialVideoOverlayViewController : UIViewController {
         replayButton.alpha = 0
         replayButton.isHidden = false
         
-        UIView.animate(withDuration: 0.5) {
+        UIView.animate(withDuration: 0.35) {
             self.replayButton.alpha = 1
         }
     }
@@ -111,6 +120,7 @@ class TutorialVideoOverlayViewController : UIViewController {
     }
 
     private func setupDoneButton() {
+        // blur effect
         let effect = UIBlurEffect(style: .dark)
         let blurView = UIVisualEffectView(effect: effect)
         blurView.alpha = 0.6
