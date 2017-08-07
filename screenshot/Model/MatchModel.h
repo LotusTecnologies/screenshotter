@@ -16,5 +16,6 @@
 
 -(void)latestScreenshotWithCallback:(void (^)(UIImage *))callback;
 -(void)matchImage:(UIImage *)image completion:(ClarifaiSearchCompletion)completion;
+-(void)isFashion:(UIImage *)image completion:(ClarifaiPredictionsCompletion)completion;
 
 @end

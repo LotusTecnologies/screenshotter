@@ -49,20 +49,23 @@ NSString *imageMediaType;
             [self finishWithText:@"ERROR latestScreenshotWithCallback returned nothing" hideOpen:YES];
         } else {
             _resultantJsonLabel.text = [NSString stringWithFormat:@"image size:%@  scale:%.1f\n", NSStringFromCGSize(pickedImage.size), pickedImage.scale];
-            [matchModel matchImage:pickedImage completion:^(NSArray<ClarifaiSearchResult *> *results, NSError *error) {
-                ClarifaiSearchResult *topResult = results.firstObject;
-                if (topResult && topResult.mediaURL) {
-                    self.topMediaURLString = topResult.mediaURL;
-                } else {
-                    self.topMediaURLString = nil;
-                }
+            [matchModel isFashion:pickedImage completion:^(NSArray<ClarifaiOutput *> *outputs, NSError *error) {
+                BOOL isFashion = NO;
+                NSInteger j = 0;
                 NSMutableString *outputString = [[NSMutableString alloc] initWithCapacity:1024];
                 [outputString setString:_resultantJsonLabel.text];
-                [outputString appendFormat:@"%@\nerror:%@\nresults:%@\n", _resultantJsonLabel.text, error, results];
-                for (ClarifaiSearchResult *searchResult in results) {
-                    [outputString appendFormat:@"score:%@  inputID:%@  concepts:%@  mediaURL:%@  creationDate:%@  mediaData:%@  location:%@  metadata:%@\n", searchResult.score, searchResult.inputID, searchResult.concepts, searchResult.mediaURL, searchResult.creationDate, searchResult.mediaData, searchResult.location, searchResult.metadata];
+                for (ClarifaiOutput *output in outputs) {
+                    for (ClarifaiConcept *concept in output.concepts) {
+                        if (   [concept.conceptName isEqualToString:@"woman"]
+                            || [concept.conceptName isEqualToString:@"fashion"]
+                            || [concept.conceptName isEqualToString:@"beauty"]) {
+                            isFashion = YES;
+                        }
+                        [outputString appendFormat:@"%.2ld  %f  %@\n", (long)++j, concept.score * 100.0f, concept.conceptName];
+                    }
                 }
-                [self finishWithText:outputString hideOpen:self.topMediaURLString == nil];
+                [outputString appendFormat:@"isFashion:%@\n", (isFashion ? @"YES" : @"NO")];
+                [self finishWithText:outputString hideOpen:YES];
             }];
         }
     }];
