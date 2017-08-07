@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -35,7 +36,7 @@
                                 <color key="color" red="0.92941176469999998" green="0.078431372550000003" blue="0.35294117650000001" alpha="1" colorSpace="calibratedRGB"/>
                             </activityIndicatorView>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZH7-EC-lCF">
-                                <rect key="frame" x="16" y="153" width="288" height="395"/>
+                                <rect key="frame" x="16" y="153" width="288" height="351"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uUI-Dx-oo3" userLabel="Resultant json Label">
                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -59,24 +60,31 @@
                                     <action selector="openURL" destination="BYZ-38-t0r" eventType="touchUpInside" id="oeI-kI-jU5"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NgF-3h-zGQ">
+                                <rect key="frame" x="143" y="518" width="35" height="30"/>
+                                <state key="normal" title="open"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="gEb-uG-F8d" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="00v-LF-qxn"/>
+                            <constraint firstItem="NgF-3h-zGQ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="3Wq-1F-h1z"/>
                             <constraint firstItem="ZH7-EC-lCF" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="5fs-OT-c9e"/>
                             <constraint firstItem="ZH7-EC-lCF" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="6Lo-ct-ETn"/>
+                            <constraint firstItem="NgF-3h-zGQ" firstAttribute="top" secondItem="ZH7-EC-lCF" secondAttribute="bottom" constant="14" id="MEa-NU-mcP"/>
                             <constraint firstItem="ifC-Sf-Cnd" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Nno-AL-u5T"/>
                             <constraint firstItem="uOF-WF-9fP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Wdc-XT-bqW"/>
                             <constraint firstItem="gEb-uG-F8d" firstAttribute="top" secondItem="uOF-WF-9fP" secondAttribute="bottom" constant="8" id="Y0i-zM-rYi"/>
                             <constraint firstItem="uOF-WF-9fP" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="d50-2I-4hE"/>
                             <constraint firstItem="ifC-Sf-Cnd" firstAttribute="top" secondItem="gEb-uG-F8d" secondAttribute="bottom" constant="8" id="dO3-hk-Aqy"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="ZH7-EC-lCF" secondAttribute="bottom" constant="20" id="glz-Fw-2Sd"/>
                             <constraint firstItem="ZH7-EC-lCF" firstAttribute="top" secondItem="ifC-Sf-Cnd" secondAttribute="bottom" constant="8" id="ioQ-0Q-VhJ"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="NgF-3h-zGQ" secondAttribute="bottom" constant="20" id="uqE-rv-NsK"/>
                             <constraint firstItem="uOF-WF-9fP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="x5O-fy-MKW"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="activityIndicator" destination="gEb-uG-F8d" id="K7A-e8-egx"/>
+                        <outlet property="openButton" destination="NgF-3h-zGQ" id="4SQ-HW-V7f"/>
                         <outlet property="openURLButton" destination="ifC-Sf-Cnd" id="6t9-vM-b0P"/>
                         <outlet property="resultantJsonLabel" destination="uUI-Dx-oo3" id="SzD-mT-s8m"/>
                     </connections>
