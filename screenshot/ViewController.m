@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 #import "MatchModel.h"
-#import "MainNavigationController.h"
+#import "MainTabBarController.h"
 @import MobileCoreServices;
 
 NSString *imageMediaType;
@@ -104,9 +104,9 @@ NSString *imageMediaType;
 }
 
 - (void)openButtonClick {
-    MainNavigationController *navController = [[MainNavigationController alloc] init];
+    MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
     
-    [self presentViewController:navController animated:YES completion:nil];
+    [self presentViewController:tabBarController animated:YES completion:nil];
 }
 
 @end

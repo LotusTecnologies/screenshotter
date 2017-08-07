@@ -1,5 +1,5 @@
 //
-//  MainNavigationController.h
+//  ScreenShotsViewController.h
 //  screenshot
 //
 //  Created by Corey Werner on 8/7/17.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MainNavigationController : UINavigationController
+@interface ScreenShotsViewController : UIViewController
 
 @end
