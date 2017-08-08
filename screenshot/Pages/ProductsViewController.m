@@ -112,6 +112,7 @@
     cell.backgroundColor = [UIColor cyanColor];
     cell.title = @"cool product";
     cell.price = @"99";
+    [cell.favoriteButton addTarget:self action:@selector(favoriteButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
     return cell;
 }
 
@@ -122,6 +123,13 @@
     size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
     size.height = size.width + [ProductCollectionViewCell labelsHeight];
     return size;
+}
+
+
+#pragma mark - Favorites
+
+- (void)favoriteButtonTouchUpInside:(UIButton *)button {
+    
 }
 
 @end

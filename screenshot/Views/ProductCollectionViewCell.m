@@ -7,12 +7,14 @@
 //
 
 #import "ProductCollectionViewCell.h"
+#import "FavoriteButton.h"
 
 @interface ProductCollectionViewCell ()
 
 @property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *priceLabel;
+@property (nonatomic, strong) FavoriteButton *favoriteButton;
 
 @end
 
@@ -65,6 +67,15 @@
             [label.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
             label;
         });
+        
+        _favoriteButton = ({
+            FavoriteButton *button = [FavoriteButton buttonWithType:UIButtonTypeCustom];
+            button.translatesAutoresizingMaskIntoConstraints = NO;
+            [self.contentView addSubview:button];
+            [button.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
+            [button.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            button;
+        });
     }
     return self;
 }
@@ -93,16 +104,22 @@
 }
 
 
-#pragma mark - Setting
+#pragma mark - Labels
 
 - (void)setTitle:(NSString *)title {
-    _title = title;
     self.titleLabel.text = title;
 }
 
+- (NSString *)title {
+    return self.titleLabel.text;
+}
+
 - (void)setPrice:(NSString *)price {
-    _price = price;
     self.priceLabel.text = price;
+}
+
+- (NSString *)price {
+    return self.priceLabel.text;
 }
 
 @end

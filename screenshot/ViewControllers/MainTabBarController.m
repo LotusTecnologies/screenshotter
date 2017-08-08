@@ -56,9 +56,4 @@
     return self;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-}
-
 @end

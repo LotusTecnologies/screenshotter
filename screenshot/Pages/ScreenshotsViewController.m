@@ -75,7 +75,11 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.backgroundColor = [UIColor greenColor];
-    cell.imageView = nil; // TODO: set this
+    cell.image = nil; // TODO: set this
+    cell.shareButtonItem.target = self;
+    cell.shareButtonItem.action = @selector(shareAction:);
+    cell.trashButtonItem.target = self;
+    cell.trashButtonItem.action = @selector(trashAction:);
     return cell;
 }
 
@@ -90,6 +94,17 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
+}
+
+
+#pragma mark - Actions
+
+- (void)shareAction:(UIBarButtonItem *)item {
+    
+}
+
+- (void)trashAction:(UIBarButtonItem *)item {
+    
 }
 
 @end

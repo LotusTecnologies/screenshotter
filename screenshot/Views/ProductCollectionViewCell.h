@@ -14,6 +14,8 @@
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *price;
 
+@property (nonatomic, strong, readonly) UIButton *favoriteButton;
+
 + (CGFloat)labelsHeight;
 
 @end
