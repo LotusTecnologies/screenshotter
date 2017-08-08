@@ -1,5 +1,5 @@
 //
-//  SettingsViewController.h
+//  UIColor+Appearance.h
 //  screenshot
 //
 //  Created by Corey Werner on 8/8/17.
@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SettingsViewController : UIViewController
+@interface UIColor (Appearance)
+
++ (UIColor *)backgroundColor;
++ (UIColor *)crazeRedColor;
 
 @end
