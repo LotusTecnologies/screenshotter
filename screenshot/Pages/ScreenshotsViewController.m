@@ -94,14 +94,14 @@
 }
 
 
-#pragma mark - Actions
+#pragma mark - Screenshot Cell
 
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
-    
+//    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
-    
+//    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
 }
 
 @end

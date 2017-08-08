@@ -8,7 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+@class ProductCollectionViewCell;
+
+@protocol ProductCollectionViewCellDelegate <NSObject>
+@required
+
+- (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell;
+
+@end
+
 @interface ProductCollectionViewCell : UICollectionViewCell
+
+@property (nonatomic, weak) id<ProductCollectionViewCellDelegate> delegate;
 
 @property (nonatomic, copy) UIImage *image;
 @property (nonatomic, copy) NSString *title;

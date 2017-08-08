@@ -11,7 +11,7 @@
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate, ProductCollectionViewCellDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIToolbar *segmentToolbar;
@@ -109,10 +109,10 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    cell.delegate = self;
     cell.backgroundColor = [UIColor cyanColor];
     cell.title = @"cool product";
     cell.price = @"99";
-    [cell.favoriteButton addTarget:self action:@selector(favoriteButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
     return cell;
 }
 
@@ -126,10 +126,10 @@
 }
 
 
-#pragma mark - Favorites
+#pragma mark - Product Cell
 
-- (void)favoriteButtonTouchUpInside:(UIButton *)button {
-    
+- (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
+//    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
 }
 
 @end

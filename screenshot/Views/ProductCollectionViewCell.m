@@ -26,7 +26,7 @@
         _imageView = ({
             UIImageView *imageView = [[UIImageView alloc] init];
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
-            imageView.backgroundColor = [UIColor redColor];
+            imageView.backgroundColor = [UIColor lightGrayColor];
             imageView.contentMode = UIViewContentModeScaleAspectFit;
             [self.contentView addSubview:imageView];
             [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
@@ -40,8 +40,9 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.backgroundColor = [UIColor yellowColor];
-            label.numberOfLines = 2;
+            label.numberOfLines = [[self class] titleLabelNumberOfLines];
             label.textAlignment = NSTextAlignmentCenter;
+            label.font = [[self class] labelFont];
             [self.contentView addSubview:label];
             
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] titleLableHeight]].active = YES;
@@ -57,6 +58,7 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.backgroundColor = [UIColor orangeColor];
             label.textAlignment = NSTextAlignmentCenter;
+            label.font = [[self class] labelFont];
             [self.contentView addSubview:label];
 
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;
@@ -71,6 +73,7 @@
         _favoriteButton = ({
             FavoriteButton *button = [FavoriteButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
+            [button addTarget:self action:@selector(favoriteAction) forControlEvents:UIControlEventTouchUpInside];
             [self.contentView addSubview:button];
             [button.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
             [button.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
@@ -91,12 +94,24 @@
 
 #pragma mark - Layout
 
++ (UIFont *)labelFont {
+    return [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+}
+
++ (CGFloat)labelVerticalPadding {
+    return 6.f;
+}
+
++ (NSInteger)titleLabelNumberOfLines {
+    return 2;
+}
+
 + (CGFloat)titleLableHeight {
-    return 80.f;
+    return ceil([self labelFont].lineHeight + [self labelVerticalPadding]) * [self titleLabelNumberOfLines];
 }
 
 + (CGFloat)priceLabelHeight {
-    return 40.f;
+    return ceil([self labelFont].lineHeight + [self labelVerticalPadding]);
 }
 
 + (CGFloat)labelsHeight {
@@ -120,6 +135,13 @@
 
 - (NSString *)price {
     return self.priceLabel.text;
+}
+
+
+#pragma mark - Actions
+
+- (void)favoriteAction {
+    [self.delegate productCollectionViewCellDidTapFavorite:self];
 }
 
 @end
