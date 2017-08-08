@@ -13,6 +13,8 @@
 @interface MatchModel : NSObject
 
 +(instancetype)shared;
+-(void)logClarifaiSyteInitial:(NSMutableString *)logString completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler;
+
 
 -(void)latestScreenshotWithCallback:(void (^)(UIImage *))callback;
 -(void)matchImage:(UIImage *)image completion:(ClarifaiSearchCompletion)completion;

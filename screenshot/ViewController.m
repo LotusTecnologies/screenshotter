@@ -43,32 +43,19 @@ NSString *imageMediaType;
     self.openURLButton.hidden = YES;
     _resultantJsonLabel.text = nil;
     [_activityIndicator startAnimating];
+    
+    NSMutableString *logString = [[NSMutableString alloc] initWithString:@""];
     MatchModel *matchModel = [MatchModel shared];
-    [matchModel latestScreenshotWithCallback:^(UIImage *pickedImage) {
-        if (pickedImage == nil) {
-            [self finishWithText:@"ERROR latestScreenshotWithCallback returned nothing" hideOpen:YES];
-        } else {
-            _resultantJsonLabel.text = [NSString stringWithFormat:@"image size:%@  scale:%.1f\n", NSStringFromCGSize(pickedImage.size), pickedImage.scale];
-            [matchModel isFashion:pickedImage completion:^(NSArray<ClarifaiOutput *> *outputs, NSError *error) {
-                BOOL isFashion = NO;
-                NSInteger j = 0;
-                NSMutableString *outputString = [[NSMutableString alloc] initWithCapacity:1024];
-                [outputString setString:_resultantJsonLabel.text];
-                for (ClarifaiOutput *output in outputs) {
-                    for (ClarifaiConcept *concept in output.concepts) {
-                        if (   [concept.conceptName isEqualToString:@"woman"]
-                            || [concept.conceptName isEqualToString:@"fashion"]
-                            || [concept.conceptName isEqualToString:@"beauty"]) {
-                            isFashion = YES;
-                        }
-                        [outputString appendFormat:@"%.2ld  %f  %@\n", (long)++j, concept.score * 100.0f, concept.conceptName];
-                    }
-                }
-                [outputString appendFormat:@"isFashion:%@\n", (isFashion ? @"YES" : @"NO")];
-                [self finishWithText:outputString hideOpen:YES];
-            }];
-        }
-    }];
+    [matchModel logClarifaiSyteInitial:logString
+               completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+                   if (error) {
+                       [logString appendFormat:@"logClarifaiSyteInitial error:%@", error];
+                   } else {
+                       [logString appendFormat:@"logClarifaiSyteInitial response:%@\nresponseObject:%@", response, responseObject];
+                   }
+                   [self finishWithText:logString hideOpen:YES];
+               }
+     ];
 }
 
 - (void)dealloc {

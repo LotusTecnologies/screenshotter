@@ -7,6 +7,7 @@
 //
 
 #import "MatchModel.h"
+#import "NetworkingModel.h"
 @import Photos;
 @import UserNotifications;
 
@@ -101,6 +102,41 @@
     }];
 }
 
+-(void)logClarifaiSyteInitial:(NSMutableString *)logString completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
+    [self latestScreenshotWithCallback:^(UIImage *pickedImage) {
+        if (pickedImage == nil) {
+            [logString appendString:@"ERROR latestScreenshotWithCallback returned nothing"];
+            NSURLResponse *resp = [[NSURLResponse alloc] init];
+            completionhandler(resp, nil, nil);
+        } else {
+            [logString appendFormat:@"image size:%@  scale:%.1f\n", NSStringFromCGSize(pickedImage.size), pickedImage.scale];
+            [self isFashion:pickedImage completion:^(NSArray<ClarifaiOutput *> *outputs, NSError *error) {
+                BOOL isFashion = NO;
+                NSInteger j = 0;
+                for (ClarifaiOutput *output in outputs) {
+                    for (ClarifaiConcept *concept in output.concepts) {
+                        if (   [concept.conceptName isEqualToString:@"woman"]
+                            || [concept.conceptName isEqualToString:@"fashion"]
+                            || [concept.conceptName isEqualToString:@"beauty"]
+                            || [concept.conceptName isEqualToString:@"glamour"]
+                            || [concept.conceptName isEqualToString:@"dress"]) {
+                            isFashion = YES;
+                        }
+                        [logString appendFormat:@"%.2ld  %f  %@\n", (long)++j, concept.score * 100.0f, concept.conceptName];
+                    }
+                }
+                [logString appendFormat:@"isFashion:%@\n", (isFashion ? @"YES" : @"NO")];
+                if (isFashion) {
+                    [NetworkingModel uploadToSyte:pickedImage completionHandler:completionhandler];
+                } else {
+                    NSURLResponse *resp = [[NSURLResponse alloc] init];
+                    completionhandler(resp, nil, nil);
+                }
+            }];
+        }
+    }];
+}
+
 #pragma mark - PHPhotoLibraryChangeObserver
 
 -(void)photoLibraryDidChange:(PHChange *)changeInfo {
@@ -108,30 +144,17 @@
     PHFetchResultChangeDetails *collectionChanges = [changeInfo changeDetailsForFetchResult:self.assets];
     if (collectionChanges.hasIncrementalChanges && collectionChanges.insertedIndexes.count > 0) {
         NSLog(@"photoLibraryDidChange hasIncrementalChanges and insertedIndexes");
-        [self latestScreenshotWithCallback:^(UIImage *pickedImage) {
-            if (pickedImage == nil) {
-                NSLog(@"ERROR latestScreenshotWithCallback returned nothing");
-            } else {
-                NSLog(@"image size:%@  scale:%.1f\n", NSStringFromCGSize(pickedImage.size), pickedImage.scale);
-                [self isFashion:pickedImage completion:^(NSArray<ClarifaiOutput *> *outputs, NSError *error) {
-                    BOOL isFashion = NO;
-                    NSInteger j = 0;
-                    for (ClarifaiOutput *output in outputs) {
-                        for (ClarifaiConcept *concept in output.concepts) {
-                            if (   [concept.conceptName isEqualToString:@"woman"]
-                                || [concept.conceptName isEqualToString:@"fashion"]
-                                || [concept.conceptName isEqualToString:@"beauty"]
-                                || [concept.conceptName isEqualToString:@"glamour"]
-                                || [concept.conceptName isEqualToString:@"dress"]) {
-                                isFashion = YES;
-                            }
-                            NSLog(@"%.2ld  %f  %@\n", (long)++j, concept.score * 100.0f, concept.conceptName);
-                        }
-                    }
-                    NSLog(@"isFashion:%@\n", (isFashion ? @"YES" : @"NO"));
-                }];
-            }
-        }];
+        NSMutableString *logString = [[NSMutableString alloc] initWithString:@""];
+        [self logClarifaiSyteInitial:logString
+                   completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+                       if (error) {
+                           [logString appendFormat:@"logClarifaiSyteInitial error:%@", error];
+                       } else {
+                           [logString appendFormat:@"logClarifaiSyteInitial response:%@\nresponseObject:%@", response, responseObject];
+                       }
+                       NSLog(@"%@", logString);
+                   }
+        ];
     }
 }
 
