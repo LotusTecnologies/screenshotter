@@ -75,8 +75,8 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
-    cell.backgroundColor = [UIColor greenColor];
-    cell.image = nil; // TODO: set this
+    cell.backgroundColor = [UIColor lightGrayColor];
+    cell.image = nil;
     return cell;
 }
 
