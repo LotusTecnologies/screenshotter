@@ -20,6 +20,7 @@
 		C5278F921F399E360090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F911F399E360090E422 /* Geometry.m */; };
 		C5278F951F39A23C0090E422 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F941F39A23C0090E422 /* ProductCollectionViewCell.m */; };
 		C5278F981F39BD920090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F971F39BD920090E422 /* FavoriteButton.m */; };
+		C5278F9C1F3A3FAE0090E422 /* PermissionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F9B1F3A3FAE0090E422 /* PermissionsManager.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D4A1F09083B00E8A53B /* ViewController.m */; };
@@ -56,6 +57,8 @@
 		C5278F941F39A23C0090E422 /* ProductCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCollectionViewCell.m; sourceTree = "<group>"; };
 		C5278F961F39BD920090E422 /* FavoriteButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoriteButton.h; sourceTree = "<group>"; };
 		C5278F971F39BD920090E422 /* FavoriteButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoriteButton.m; sourceTree = "<group>"; };
+		C5278F9A1F3A3FAE0090E422 /* PermissionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PermissionsManager.h; sourceTree = "<group>"; };
+		C5278F9B1F3A3FAE0090E422 /* PermissionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PermissionsManager.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -147,6 +150,15 @@
 			path = Appearance;
 			sourceTree = "<group>";
 		};
+		C5278F991F3A3F940090E422 /* Singletons */ = {
+			isa = PBXGroup;
+			children = (
+				C5278F9A1F3A3FAE0090E422 /* PermissionsManager.h */,
+				C5278F9B1F3A3FAE0090E422 /* PermissionsManager.m */,
+			);
+			path = Singletons;
+			sourceTree = "<group>";
+		};
 		E4139D371F09083B00E8A53B = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +183,7 @@
 				C5278F8A1F399E0A0090E422 /* Appearance */,
 				E45AC71F1F090BC800F82CE7 /* Model */,
 				C5278F631F3986B00090E422 /* Pages */,
+				C5278F991F3A3F940090E422 /* Singletons */,
 				C5278F741F3988040090E422 /* ViewControllers */,
 				C5278F701F3986CD0090E422 /* Views */,
 				E4139D461F09083B00E8A53B /* AppDelegate.h */,
@@ -360,6 +373,7 @@
 				C5278F6D1F3986B00090E422 /* ScreenshotsViewController.m in Sources */,
 				C5278F731F3986CD0090E422 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278F951F39A23C0090E422 /* ProductCollectionViewCell.m in Sources */,
+				C5278F9C1F3A3FAE0090E422 /* PermissionsManager.m in Sources */,
 				C5278F6E1F3986B00090E422 /* SettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
