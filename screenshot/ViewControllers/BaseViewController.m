@@ -21,4 +21,8 @@
     self.view.backgroundColor = [UIColor backgroundColor];
 }
 
+- (void)addNavigationItemLogo {
+    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Logo"]];
+}
+
 @end

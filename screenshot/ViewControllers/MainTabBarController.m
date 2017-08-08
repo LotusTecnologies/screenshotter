@@ -14,9 +14,9 @@
 
 @interface MainTabBarController ()
 
-@property (nonatomic, strong) FavoritesViewController *favoritesViewController;
+@property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
-@property (nonatomic, strong) SettingsViewController *settingsViewController;
+@property (nonatomic, strong) UINavigationController *settingsNavigationController;
 
 @end
 
@@ -25,12 +25,13 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.favoritesViewController = ({
+        self.favoritesNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarHeart"];
             
             FavoritesViewController *viewController = [[FavoritesViewController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Favorites" image:image tag:0];
-            viewController;
+            
+            [[UINavigationController alloc] initWithRootViewController:viewController];
         });
         
         self.screenshotsNavigationController = ({
@@ -41,15 +42,16 @@
             viewController;
         });
         
-        self.settingsViewController = ({
+        self.settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarGear"];
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:2];
-            viewController;
+            
+            [[UINavigationController alloc] initWithRootViewController:viewController];
         });
         
-        self.viewControllers = @[self.screenshotsNavigationController, self.favoritesViewController, self.settingsViewController];
+        self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
     }
     return self;
 }
