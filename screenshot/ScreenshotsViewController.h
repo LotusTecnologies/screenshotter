@@ -1,5 +1,5 @@
 //
-//  ScreenShotsViewController.h
+//  ScreenshotsViewController.h
 //  screenshot
 //
 //  Created by Corey Werner on 8/7/17.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ScreenShotsViewController : UIViewController
+@interface ScreenshotsViewController : UIViewController
 
 @end

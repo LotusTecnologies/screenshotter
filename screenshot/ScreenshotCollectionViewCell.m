@@ -1,14 +1,14 @@
 //
-//  ScreenShotCollectionViewCell.m
+//  ScreenshotCollectionViewCell.m
 //  screenshot
 //
 //  Created by Corey Werner on 8/7/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import "ScreenShotCollectionViewCell.h"
+#import "ScreenshotCollectionViewCell.h"
 
-@implementation ScreenShotCollectionViewCell
+@implementation ScreenshotCollectionViewCell
 
 - (UIImageView *)imageView {
     if (!_imageView) {

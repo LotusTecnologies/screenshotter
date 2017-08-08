@@ -1,21 +1,21 @@
 //
-//  ScreenShotsViewController.m
+//  ScreenshotsViewController.m
 //  screenshot
 //
 //  Created by Corey Werner on 8/7/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import "ScreenShotsViewController.h"
-#import "ScreenShotCollectionViewCell.h"
+#import "ScreenshotsViewController.h"
+#import "ScreenshotCollectionViewCell.h"
 
-@interface ScreenShotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 
 @end
 
-@implementation ScreenShotsViewController
+@implementation ScreenshotsViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -34,7 +34,7 @@
     self.collectionView.dataSource = self;
     
     
-    [self.collectionView registerClass:[ScreenShotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+    [self.collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
     [self.collectionView setBackgroundColor:[UIColor redColor]];
     
     [self.view addSubview:self.collectionView];
@@ -61,7 +61,7 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    ScreenShotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.backgroundColor = [UIColor greenColor];
     cell.imageView = nil; // TODO: set this
     return cell;

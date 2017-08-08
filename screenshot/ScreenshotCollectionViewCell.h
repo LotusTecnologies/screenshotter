@@ -1,5 +1,5 @@
 //
-//  ScreenShotCollectionViewCell.h
+//  ScreenshotCollectionViewCell.h
 //  screenshot
 //
 //  Created by Corey Werner on 8/7/17.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ScreenShotCollectionViewCell : UICollectionViewCell
+@interface ScreenshotCollectionViewCell : UICollectionViewCell
 
 @property (nonatomic, strong) UIImageView *imageView;
 

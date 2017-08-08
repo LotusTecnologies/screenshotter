@@ -7,11 +7,13 @@
 //
 
 #import "MainTabBarController.h"
-#import "ScreenShotsViewController.h"
+#import "FavoritesViewController.h"
+#import "ScreenshotsViewController.h"
+#import "SettingsViewController.h"
 
 @interface MainTabBarController ()
 
-@property (nonatomic, strong) ScreenShotsViewController *screenShotsViewController;
+@property (nonatomic, strong) ScreenshotsViewController *screenshotsViewController;
 
 @end
 
@@ -20,11 +22,11 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        ScreenShotsViewController *viewController = [[ScreenShotsViewController alloc] init];
-        viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Screen Shots" image:nil tag:0];
-        self.screenShotsViewController = viewController;
+        ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
+        viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Screenshots" image:[UIImage imageNamed:@"TabBarScreens"] tag:0];
+        self.screenshotsViewController = viewController;
         
-        self.viewControllers = @[self.screenShotsViewController];
+        self.viewControllers = @[self.screenshotsViewController];
     }
     return self;
 }
