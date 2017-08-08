@@ -64,13 +64,15 @@ class OldViewController: UIViewController {
             self.view.addSubview(imageView)
             for shoppable in shoppables {
                 guard let b0 = shoppable["b0"] as? [Any],
+                  b0.count >= 2,
                   let b1 = shoppable["b1"] as? [Any],
+                  b1.count >= 2,
                   let b0x = b0[0] as? CGFloat,
                   let b0y = b0[1] as? CGFloat,
                   let b1x = b1[0] as? CGFloat,
                   let b1y = b1[1] as? CGFloat else {
                     logString.append("logClarifaiSyteInitial error parsing b0, b1")
-                    break
+                    continue
                 }
                 print("b0x:\(b0x)  b0y:\(b0y)  b1x:\(b1x)  b1y:\(b1y)");
                 let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
