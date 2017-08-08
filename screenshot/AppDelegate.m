@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "UIColor+Appearance.h"
 
 @interface AppDelegate ()
 
@@ -18,7 +19,11 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
+    
+//    UIColor *a = [[UIColor whiteColor] colorWithAlphaComponent:0.9];
+//    [[UIView appearanceWhenContainedInInstancesOfClasses:@[[UIViewController class]]] setBackgroundColor:a];
+    
     return YES;
 }
 
@@ -57,8 +62,10 @@
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
     NSLog(@"application performFetchWithCompletionHandler");
-    if (completionHandler)
+    
+    if (completionHandler) {
         completionHandler(UIBackgroundFetchResultNoData);
+    }
 }
 
 @end
