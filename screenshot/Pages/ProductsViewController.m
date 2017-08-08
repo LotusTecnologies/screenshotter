@@ -7,6 +7,7 @@
 //
 
 #import "ProductsViewController.h"
+#import "ProductCollectionViewCell.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 
@@ -34,6 +35,7 @@
     segmentedControl.backgroundColor = [UIColor whiteColor];
     segmentedControl.tintColor = [UIColor crazeRedColor];
     segmentedControl.selectedSegmentIndex = 0;
+    [segmentedControl addTarget:self action:@selector(segmentedControlChanged:) forControlEvents:UIControlEventValueChanged];
     
     self.segmentToolbar = ({
         UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -65,7 +67,7 @@
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.segmentToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         
-        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
@@ -84,7 +86,18 @@
 }
 
 
+#pragma mark - Segmented Control
+
+- (void)segmentedControlChanged:(UISegmentedControl *)segmentedControl {
+    [self reloadCollectionViewForIndex:segmentedControl.selectedSegmentIndex];
+}
+
+
 #pragma mark - Collection View
+
+- (void)reloadCollectionViewForIndex:(NSInteger)index {
+    // TODO:
+}
 
 - (NSInteger)numberOfCollectionViewColumns {
     return 2;
@@ -95,8 +108,10 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.backgroundColor = [UIColor cyanColor];
+    cell.title = @"cool product";
+    cell.price = @"99";
     return cell;
 }
 
@@ -105,7 +120,7 @@
     
     CGSize size = CGSizeZero;
     size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
-    size.height = size.width;
+    size.height = size.width + [ProductCollectionViewCell labelsHeight];
     return size;
 }
 
