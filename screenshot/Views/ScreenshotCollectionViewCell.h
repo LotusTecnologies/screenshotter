@@ -20,7 +20,7 @@
 
 @interface ScreenshotCollectionViewCell : UICollectionViewCell
 
-@property (nonatomic, weak) id<ScreenshotsViewControllerDelegate> delegate;
+@property (nonatomic, weak) id<ScreenshotCollectionViewCellDelegate> delegate;
 
 @property (nonatomic, copy) UIImage *image;
 

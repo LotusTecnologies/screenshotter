@@ -34,11 +34,9 @@
             imageView;
         });
         
-        _shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Share"] style:UIBarButtonItemStylePlain target:nil action:nil];
-        
-        _trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Trash"] style:UIBarButtonItemStylePlain target:nil action:nil];
-        
         _toolbar = ({
+            UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Share"] style:UIBarButtonItemStylePlain target:nil action:nil];
+            UIBarButtonItem *trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Trash"] style:UIBarButtonItemStylePlain target:nil action:nil];
             UIBarButtonItem *flexilbeItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
             
             UIToolbar *toolbar = [[UIToolbar alloc] init];
@@ -47,7 +45,7 @@
             toolbar.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.7f];
             toolbar.tintColor = [UIColor whiteColor];
             
-            toolbar.items = @[self.shareButtonItem, flexilbeItem, self.trashButtonItem];
+            toolbar.items = @[shareButtonItem, flexilbeItem, trashButtonItem];
             [self.contentView addSubview:toolbar];
             [toolbar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
             [toolbar.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;

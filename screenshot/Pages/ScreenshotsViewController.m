@@ -10,7 +10,7 @@
 #import "ScreenshotCollectionViewCell.h"
 #import "Geometry.h"
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 
@@ -74,12 +74,9 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    cell.delegate = self;
     cell.backgroundColor = [UIColor greenColor];
     cell.image = nil; // TODO: set this
-    cell.shareButtonItem.target = self;
-    cell.shareButtonItem.action = @selector(shareAction:);
-    cell.trashButtonItem.target = self;
-    cell.trashButtonItem.action = @selector(trashAction:);
     return cell;
 }
 
@@ -99,11 +96,11 @@
 
 #pragma mark - Actions
 
-- (void)shareAction:(UIBarButtonItem *)item {
+- (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
     
 }
 
-- (void)trashAction:(UIBarButtonItem *)item {
+- (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     
 }
 
