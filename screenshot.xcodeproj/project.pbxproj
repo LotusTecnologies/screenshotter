@@ -22,13 +22,13 @@
 		C5278F981F39BD920090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F971F39BD920090E422 /* FavoriteButton.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
-		E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D4A1F09083B00E8A53B /* ViewController.m */; };
 		E4139D4E1F09083B00E8A53B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4C1F09083B00E8A53B /* Main.storyboard */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4139D531F09083B00E8A53B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4139D511F09083B00E8A53B /* LaunchScreen.storyboard */; };
 		E42CB2F31F39E055008EA086 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E42CB2F11F39E055008EA086 /* Model.xcdatamodeld */; };
 		E43583FA1F38771000A0A540 /* NetworkingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E43583F91F38771000A0A540 /* NetworkingModel.m */; };
 		E45AC7221F090C2300F82CE7 /* MatchModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E45AC7211F090C2300F82CE7 /* MatchModel.m */; };
+		E47BC8201F39F71D0025056C /* OldViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47BC81F1F39F71D0025056C /* OldViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,8 +62,6 @@
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E4139D461F09083B00E8A53B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E4139D471F09083B00E8A53B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		E4139D491F09083B00E8A53B /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		E4139D4A1F09083B00E8A53B /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E4139D4D1F09083B00E8A53B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4139D521F09083B00E8A53B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -74,6 +72,7 @@
 		E45AC7201F090C2300F82CE7 /* MatchModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatchModel.h; sourceTree = "<group>"; };
 		E45AC7211F090C2300F82CE7 /* MatchModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MatchModel.m; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
+		E47BC81F1F39F71D0025056C /* OldViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OldViewController.swift; sourceTree = "<group>"; };
 		FB8CE9097A57D1795AB29300 /* libPods-screenshot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-screenshot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -135,6 +134,7 @@
 				C5278F791F3988590090E422 /* ScreenshotsNavigationController.m */,
 				C5278F7B1F398DCA0090E422 /* BaseViewController.h */,
 				C5278F7C1F398DCA0090E422 /* BaseViewController.m */,
+				E47BC81F1F39F71D0025056C /* OldViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -179,8 +179,6 @@
 				C5278F701F3986CD0090E422 /* Views */,
 				E4139D461F09083B00E8A53B /* AppDelegate.h */,
 				E4139D471F09083B00E8A53B /* AppDelegate.m */,
-				E4139D491F09083B00E8A53B /* ViewController.h */,
-				E4139D4A1F09083B00E8A53B /* ViewController.m */,
 				E4139D4C1F09083B00E8A53B /* Main.storyboard */,
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				E4139D511F09083B00E8A53B /* LaunchScreen.storyboard */,
@@ -352,8 +350,8 @@
 			files = (
 				C5278F921F399E360090E422 /* Geometry.m in Sources */,
 				C5278F981F39BD920090E422 /* FavoriteButton.m in Sources */,
-				E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */,
 				C5278F6C1F3986B00090E422 /* FavoritesViewController.m in Sources */,
+				E47BC8201F39F71D0025056C /* OldViewController.swift in Sources */,
 				E45AC7221F090C2300F82CE7 /* MatchModel.m in Sources */,
 				E42CB2F31F39E055008EA086 /* Model.xcdatamodeld in Sources */,
 				C5278F8D1F399E0A0090E422 /* UIColor+Appearance.m in Sources */,
