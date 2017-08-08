@@ -11,12 +11,13 @@
 		C5278F6C1F3986B00090E422 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F651F3986B00090E422 /* FavoritesViewController.m */; };
 		C5278F6D1F3986B00090E422 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F671F3986B00090E422 /* ScreenshotsViewController.m */; };
 		C5278F6E1F3986B00090E422 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F691F3986B00090E422 /* SettingsViewController.m */; };
-		C5278F6F1F3986B00090E422 /* ShoppablesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F6B1F3986B00090E422 /* ShoppablesViewController.m */; };
+		C5278F6F1F3986B00090E422 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F6B1F3986B00090E422 /* ProductsViewController.m */; };
 		C5278F731F3986CD0090E422 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F721F3986CD0090E422 /* ScreenshotCollectionViewCell.m */; };
 		C5278F771F39881B0090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F761F39881B0090E422 /* MainTabBarController.m */; };
 		C5278F7A1F3988590090E422 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F791F3988590090E422 /* ScreenshotsNavigationController.m */; };
 		C5278F7D1F398DCA0090E422 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F7C1F398DCA0090E422 /* BaseViewController.m */; };
-		C5278F861F398F800090E422 /* UIColor+Appearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F851F398F800090E422 /* UIColor+Appearance.m */; };
+		C5278F8D1F399E0A0090E422 /* UIColor+Appearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F8C1F399E0A0090E422 /* UIColor+Appearance.m */; };
+		C5278F921F399E360090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F911F399E360090E422 /* Geometry.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D4A1F09083B00E8A53B /* ViewController.m */; };
@@ -35,8 +36,8 @@
 		C5278F671F3986B00090E422 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
 		C5278F681F3986B00090E422 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		C5278F691F3986B00090E422 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		C5278F6A1F3986B00090E422 /* ShoppablesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesViewController.h; sourceTree = "<group>"; };
-		C5278F6B1F3986B00090E422 /* ShoppablesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesViewController.m; sourceTree = "<group>"; };
+		C5278F6A1F3986B00090E422 /* ProductsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductsViewController.h; sourceTree = "<group>"; };
+		C5278F6B1F3986B00090E422 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
 		C5278F711F3986CD0090E422 /* ScreenshotCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotCollectionViewCell.h; sourceTree = "<group>"; };
 		C5278F721F3986CD0090E422 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
 		C5278F751F39881B0090E422 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
@@ -45,8 +46,10 @@
 		C5278F791F3988590090E422 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
 		C5278F7B1F398DCA0090E422 /* BaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseViewController.h; sourceTree = "<group>"; };
 		C5278F7C1F398DCA0090E422 /* BaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewController.m; sourceTree = "<group>"; };
-		C5278F841F398F800090E422 /* UIColor+Appearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Appearance.h"; sourceTree = "<group>"; };
-		C5278F851F398F800090E422 /* UIColor+Appearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Appearance.m"; sourceTree = "<group>"; };
+		C5278F8B1F399E0A0090E422 /* UIColor+Appearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Appearance.h"; sourceTree = "<group>"; };
+		C5278F8C1F399E0A0090E422 /* UIColor+Appearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Appearance.m"; sourceTree = "<group>"; };
+		C5278F901F399E360090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
+		C5278F911F399E360090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -91,12 +94,12 @@
 			children = (
 				C5278F641F3986B00090E422 /* FavoritesViewController.h */,
 				C5278F651F3986B00090E422 /* FavoritesViewController.m */,
+				C5278F6A1F3986B00090E422 /* ProductsViewController.h */,
+				C5278F6B1F3986B00090E422 /* ProductsViewController.m */,
 				C5278F661F3986B00090E422 /* ScreenshotsViewController.h */,
 				C5278F671F3986B00090E422 /* ScreenshotsViewController.m */,
 				C5278F681F3986B00090E422 /* SettingsViewController.h */,
 				C5278F691F3986B00090E422 /* SettingsViewController.m */,
-				C5278F6A1F3986B00090E422 /* ShoppablesViewController.h */,
-				C5278F6B1F3986B00090E422 /* ShoppablesViewController.m */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -123,13 +126,15 @@
 			path = ViewControllers;
 			sourceTree = "<group>";
 		};
-		C5278F831F398F800090E422 /* Categories */ = {
+		C5278F8A1F399E0A0090E422 /* Appearance */ = {
 			isa = PBXGroup;
 			children = (
-				C5278F841F398F800090E422 /* UIColor+Appearance.h */,
-				C5278F851F398F800090E422 /* UIColor+Appearance.m */,
+				C5278F8B1F399E0A0090E422 /* UIColor+Appearance.h */,
+				C5278F8C1F399E0A0090E422 /* UIColor+Appearance.m */,
+				C5278F901F399E360090E422 /* Geometry.h */,
+				C5278F911F399E360090E422 /* Geometry.m */,
 			);
-			path = Categories;
+			path = Appearance;
 			sourceTree = "<group>";
 		};
 		E4139D371F09083B00E8A53B = {
@@ -153,7 +158,7 @@
 		E4139D421F09083B00E8A53B /* screenshot */ = {
 			isa = PBXGroup;
 			children = (
-				C5278F831F398F800090E422 /* Categories */,
+				C5278F8A1F399E0A0090E422 /* Appearance */,
 				E45AC71F1F090BC800F82CE7 /* Model */,
 				C5278F631F3986B00090E422 /* Pages */,
 				C5278F741F3988040090E422 /* ViewControllers */,
@@ -329,15 +334,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5278F921F399E360090E422 /* Geometry.m in Sources */,
 				E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */,
-				C5278F861F398F800090E422 /* UIColor+Appearance.m in Sources */,
 				C5278F6C1F3986B00090E422 /* FavoritesViewController.m in Sources */,
 				E45AC7221F090C2300F82CE7 /* MatchModel.m in Sources */,
+				C5278F8D1F399E0A0090E422 /* UIColor+Appearance.m in Sources */,
 				C5278F7A1F3988590090E422 /* ScreenshotsNavigationController.m in Sources */,
 				E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */,
 				E4139D451F09083B00E8A53B /* main.m in Sources */,
 				C5278F771F39881B0090E422 /* MainTabBarController.m in Sources */,
-				C5278F6F1F3986B00090E422 /* ShoppablesViewController.m in Sources */,
+				C5278F6F1F3986B00090E422 /* ProductsViewController.m in Sources */,
 				E43583FA1F38771000A0A540 /* NetworkingModel.m in Sources */,
 				C5278F7D1F398DCA0090E422 /* BaseViewController.m in Sources */,
 				C5278F6D1F3986B00090E422 /* ScreenshotsViewController.m in Sources */,

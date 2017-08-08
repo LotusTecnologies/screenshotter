@@ -8,7 +8,7 @@
 
 #import "ScreenshotsNavigationController.h"
 #import "ScreenshotsViewController.h"
-#import "ShoppablesViewController.h"
+#import "ProductsViewController.h"
 
 @interface ScreenshotsNavigationController () <ScreenshotsViewControllerDelegate>
 
@@ -43,9 +43,9 @@
 #pragma mark - Screenshots View Controller
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    ShoppablesViewController *shoppablesViewController = [[ShoppablesViewController alloc] init];
+    ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
     
-    [self pushViewController:shoppablesViewController animated:YES];
+    [self pushViewController:productsViewController animated:YES];
 }
 
 @end

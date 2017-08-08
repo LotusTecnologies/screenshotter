@@ -1,35 +1,54 @@
 //
-//  ScreenshotsViewController.m
+//  ProductsViewController.m
 //  screenshot
 //
-//  Created by Corey Werner on 8/7/17.
+//  Created by Corey Werner on 8/8/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import "ScreenshotsViewController.h"
-#import "ScreenshotCollectionViewCell.h"
+#import "ProductsViewController.h"
+#import "UIColor+Appearance.h"
 #import "Geometry.h"
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) UIToolbar *segmentToolbar;
 
 @end
 
-@implementation ScreenshotsViewController
-
-#pragma mark - Life Cycle
+@implementation ProductsViewController
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.title = @"Screenshots";
+        self.title = @"Products";
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"one", @"two"]];
+    segmentedControl.backgroundColor = [UIColor whiteColor];
+    segmentedControl.tintColor = [UIColor crazeRedColor];
+    segmentedControl.selectedSegmentIndex = 0;
+    
+    self.segmentToolbar = ({
+        UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+        
+        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 44.f)];
+        toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+        toolbar.delegate = self;
+        toolbar.items = @[spacerItem, [[UIBarButtonItem alloc] initWithCustomView:segmentedControl], spacerItem];
+        
+        [self.view addSubview:toolbar];
+        [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+        [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        toolbar;
+    });
     
     self.collectionView = ({
         CGFloat p = [Geometry padding];
@@ -42,12 +61,13 @@
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(p, p, p, p);
+        collectionView.contentInset = UIEdgeInsetsMake(p + self.segmentToolbar.bounds.size.height, p, p, p);
+        collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.segmentToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         
-        [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
-        [self.view addSubview:collectionView];
+        [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
         [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
@@ -56,8 +76,11 @@
     });
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [self.collectionView.collectionViewLayout invalidateLayout];
+
+#pragma mark - Toolbar
+
+- (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
+    return UIBarPositionTopAttached;
 }
 
 
@@ -72,9 +95,8 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor greenColor];
-    cell.imageView = nil; // TODO: set this
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    cell.backgroundColor = [UIColor cyanColor];
     return cell;
 }
 
@@ -85,10 +107,6 @@
     size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
     size.height = size.width;
     return size;
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
 }
 
 @end

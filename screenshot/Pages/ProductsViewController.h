@@ -1,5 +1,5 @@
 //
-//  ShoppablesViewController.h
+//  ProductsViewController.h
 //  screenshot
 //
 //  Created by Corey Werner on 8/8/17.
@@ -8,6 +8,6 @@
 
 #import "BaseViewController.h"
 
-@interface ShoppablesViewController : BaseViewController
+@interface ProductsViewController : BaseViewController
 
 @end
