@@ -35,8 +35,8 @@
         });
         
         _toolbar = ({
-            UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Share"] style:UIBarButtonItemStylePlain target:nil action:nil];
-            UIBarButtonItem *trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Trash"] style:UIBarButtonItemStylePlain target:nil action:nil];
+            UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Share"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
+            UIBarButtonItem *trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Trash"] style:UIBarButtonItemStylePlain target:self action:@selector(trashAction:)];
             UIBarButtonItem *flexilbeItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
             
             UIToolbar *toolbar = [[UIToolbar alloc] init];
@@ -71,6 +71,17 @@
 
 - (UIImage *)image {
     return self.imageView.image;
+}
+
+
+#pragma mark - Actions
+
+- (void)shareAction:(UIBarButtonItem *)buttonItem {
+    [self.delegate screenshotCollectionViewCellDidTapShare:self];
+}
+
+- (void)trashAction:(UIBarButtonItem *)buttonItem {
+    [self.delegate screenshotCollectionViewCellDidTapTrash:self];
 }
 
 @end
