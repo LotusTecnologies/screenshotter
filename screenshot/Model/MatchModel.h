@@ -12,6 +12,9 @@
 
 @interface MatchModel : NSObject
 
+@property(strong, nonatomic) UIImage *lastScreenshot;
+
+
 +(instancetype)shared;
 -(void)logClarifaiSyteInitial:(NSMutableString *)logString completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler;
 

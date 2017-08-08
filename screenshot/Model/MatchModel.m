@@ -104,6 +104,7 @@
 
 -(void)logClarifaiSyteInitial:(NSMutableString *)logString completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
     [self latestScreenshotWithCallback:^(UIImage *pickedImage) {
+        self.lastScreenshot = pickedImage;
         if (pickedImage == nil) {
             [logString appendString:@"ERROR latestScreenshotWithCallback returned nothing"];
             NSURLResponse *resp = [[NSURLResponse alloc] init];
