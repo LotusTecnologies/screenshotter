@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		A1CB092CCF3273F0C85709DF /* libPods-screenshot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB8CE9097A57D1795AB29300 /* libPods-screenshot.a */; };
+		C5278F521F389E590090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F511F389E590090E422 /* MainTabBarController.m */; };
+		C5278F541F38B9840090E422 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F531F38B9840090E422 /* ScreenshotsViewController.m */; };
+		C5278F571F38C7890090E422 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F561F38C7890090E422 /* ScreenshotCollectionViewCell.m */; };
+		C5278F5A1F39823B0090E422 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F591F39823B0090E422 /* SettingsViewController.m */; };
+		C5278F5D1F3982760090E422 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F5C1F3982760090E422 /* FavoritesViewController.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D4A1F09083B00E8A53B /* ViewController.m */; };
@@ -20,6 +25,16 @@
 
 /* Begin PBXFileReference section */
 		A876FB250F1D7FE8A41B8A8F /* Pods-screenshot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.debug.xcconfig"; sourceTree = "<group>"; };
+		C5278F4D1F389DF80090E422 /* ScreenshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsViewController.h; sourceTree = "<group>"; };
+		C5278F501F389E590090E422 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
+		C5278F511F389E590090E422 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
+		C5278F531F38B9840090E422 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
+		C5278F551F38C7890090E422 /* ScreenshotCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotCollectionViewCell.h; sourceTree = "<group>"; };
+		C5278F561F38C7890090E422 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
+		C5278F581F39823B0090E422 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		C5278F591F39823B0090E422 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		C5278F5B1F3982760090E422 /* FavoritesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoritesViewController.h; sourceTree = "<group>"; };
+		C5278F5C1F3982760090E422 /* FavoritesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoritesViewController.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -59,6 +74,28 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		C5278F5E1F3983B70090E422 /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				C5278F5B1F3982760090E422 /* FavoritesViewController.h */,
+				C5278F5C1F3982760090E422 /* FavoritesViewController.m */,
+				C5278F4D1F389DF80090E422 /* ScreenshotsViewController.h */,
+				C5278F531F38B9840090E422 /* ScreenshotsViewController.m */,
+				C5278F581F39823B0090E422 /* SettingsViewController.h */,
+				C5278F591F39823B0090E422 /* SettingsViewController.m */,
+			);
+			name = Pages;
+			sourceTree = "<group>";
+		};
+		C5278F5F1F3983FE0090E422 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C5278F551F38C7890090E422 /* ScreenshotCollectionViewCell.h */,
+				C5278F561F38C7890090E422 /* ScreenshotCollectionViewCell.m */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		E4139D371F09083B00E8A53B = {
 			isa = PBXGroup;
 			children = (
@@ -83,8 +120,12 @@
 				E45AC71F1F090BC800F82CE7 /* Model */,
 				E4139D461F09083B00E8A53B /* AppDelegate.h */,
 				E4139D471F09083B00E8A53B /* AppDelegate.m */,
+				C5278F5E1F3983B70090E422 /* Pages */,
+				C5278F5F1F3983FE0090E422 /* Views */,
 				E4139D491F09083B00E8A53B /* ViewController.h */,
 				E4139D4A1F09083B00E8A53B /* ViewController.m */,
+				C5278F501F389E590090E422 /* MainTabBarController.h */,
+				C5278F511F389E590090E422 /* MainTabBarController.m */,
 				E4139D4C1F09083B00E8A53B /* Main.storyboard */,
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				E4139D511F09083B00E8A53B /* LaunchScreen.storyboard */,
@@ -242,7 +283,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -252,10 +293,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5278F5D1F3982760090E422 /* FavoritesViewController.m in Sources */,
 				E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */,
 				E45AC7221F090C2300F82CE7 /* MatchModel.m in Sources */,
 				E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */,
+				C5278F5A1F39823B0090E422 /* SettingsViewController.m in Sources */,
 				E4139D451F09083B00E8A53B /* main.m in Sources */,
+				C5278F521F389E590090E422 /* MainTabBarController.m in Sources */,
+				C5278F541F38B9840090E422 /* ScreenshotsViewController.m in Sources */,
+				C5278F571F38C7890090E422 /* ScreenshotCollectionViewCell.m in Sources */,
 				E43583FA1F38771000A0A540 /* NetworkingModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

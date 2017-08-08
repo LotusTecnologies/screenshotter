@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "MatchModel.h"
+#import "MainTabBarController.h"
 @import MobileCoreServices;
 
 NSString *imageMediaType;
@@ -17,6 +18,7 @@ NSString *imageMediaType;
 @property(weak, nonatomic) IBOutlet UIButton *openURLButton;
 @property(weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property(weak, nonatomic) IBOutlet UILabel *resultantJsonLabel;
+@property(weak, nonatomic) IBOutlet UIButton *openButton;
 
 @property(strong, nonatomic) NSString *topMediaURLString;
 
@@ -31,6 +33,8 @@ NSString *imageMediaType;
     [super viewDidLoad];
     imageMediaType = (NSString *)kUTTypeImage;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uploadLastScreenshot) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    [self.openButton addTarget:self action:@selector(openButtonClick) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -84,6 +88,12 @@ NSString *imageMediaType;
         _resultantJsonLabel.text = text;
         NSLog(@"%@", text);
     });
+}
+
+- (void)openButtonClick {
+    MainTabBarController *tabBarController = [[MainTabBarController alloc] init];
+    
+    [self presentViewController:tabBarController animated:YES completion:nil];
 }
 
 @end
