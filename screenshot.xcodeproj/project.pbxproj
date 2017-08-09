@@ -29,6 +29,7 @@
 		E43583FA1F38771000A0A540 /* NetworkingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E43583F91F38771000A0A540 /* NetworkingModel.m */; };
 		E45AC7221F090C2300F82CE7 /* MatchModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E45AC7211F090C2300F82CE7 /* MatchModel.m */; };
 		E47BC8201F39F71D0025056C /* OldViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47BC81F1F39F71D0025056C /* OldViewController.swift */; };
+		E47BC8231F3AD93D0025056C /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47BC8221F3AD93D0025056C /* DataModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		E45AC7211F090C2300F82CE7 /* MatchModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MatchModel.m; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		E47BC81F1F39F71D0025056C /* OldViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OldViewController.swift; sourceTree = "<group>"; };
+		E47BC8221F3AD93D0025056C /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		FB8CE9097A57D1795AB29300 /* libPods-screenshot.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-screenshot.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -204,6 +206,7 @@
 				E43583F81F38771000A0A540 /* NetworkingModel.h */,
 				E43583F91F38771000A0A540 /* NetworkingModel.m */,
 				E42CB2F11F39E055008EA086 /* Model.xcdatamodeld */,
+				E47BC8221F3AD93D0025056C /* DataModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				C5278F6F1F3986B00090E422 /* ProductsViewController.m in Sources */,
 				E43583FA1F38771000A0A540 /* NetworkingModel.m in Sources */,
 				C5278F7D1F398DCA0090E422 /* BaseViewController.m in Sources */,
+				E47BC8231F3AD93D0025056C /* DataModel.swift in Sources */,
 				C5278F6D1F3986B00090E422 /* ScreenshotsViewController.m in Sources */,
 				C5278F731F3986CD0090E422 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278F951F39A23C0090E422 /* ProductCollectionViewCell.m in Sources */,
