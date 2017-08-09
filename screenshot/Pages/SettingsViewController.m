@@ -49,7 +49,57 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.tableView = ({
+    UIView *tableHeaderView = ({
+        CGFloat p = [Geometry padding];
+        
+        UIView *view = [[UIView alloc] init];
+        view.layoutMargins = UIEdgeInsetsMake(p, p, 0.f, p);
+        
+        UIView *centerView = [[UIView alloc] init];
+        centerView.translatesAutoresizingMaskIntoConstraints = NO;
+        [view addSubview:centerView];
+        [centerView.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor].active = YES;
+        [centerView.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor].active = YES;
+        [centerView.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
+        [centerView.leftAnchor constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide.leftAnchor].active = YES;
+        [centerView.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor].active = YES;
+        
+        UIImageView *badgeImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Badge"]];
+        badgeImageView.translatesAutoresizingMaskIntoConstraints = NO;
+        badgeImageView.contentMode = UIViewContentModeScaleAspectFit;
+        badgeImageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, 0.f, -p);
+        [centerView addSubview:badgeImageView];
+        [badgeImageView setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [badgeImageView.topAnchor constraintEqualToAnchor:centerView.topAnchor].active = YES;
+        [badgeImageView.leftAnchor constraintEqualToAnchor:centerView.leftAnchor].active = YES;
+        [badgeImageView.bottomAnchor constraintEqualToAnchor:centerView.bottomAnchor].active = YES;
+        
+        UIImageView *barImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Bar"]];
+        barImageView.translatesAutoresizingMaskIntoConstraints = NO;
+        barImageView.contentMode = UIViewContentModeScaleAspectFit;
+        barImageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -4.f, 0.f);
+        [centerView addSubview:barImageView];
+        [barImageView.layoutMarginsGuide.bottomAnchor constraintEqualToAnchor:centerView.centerYAnchor].active = YES;
+        [barImageView.leftAnchor constraintEqualToAnchor:badgeImageView.layoutMarginsGuide.rightAnchor].active = YES;
+        [barImageView.rightAnchor constraintEqualToAnchor:centerView.rightAnchor].active = YES;
+        
+        UILabel *label = [[UILabel alloc] init];
+        label.translatesAutoresizingMaskIntoConstraints = NO;
+        label.layoutMargins = UIEdgeInsetsMake(-4.f, 0.f, 0.f, 0.f);
+        label.textAlignment = NSTextAlignmentCenter;
+        label.text = @"3 screenshots to next level";
+        [centerView addSubview:label];
+        [label.layoutMarginsGuide.topAnchor constraintEqualToAnchor:centerView.centerYAnchor].active = YES;
+        [label.leftAnchor constraintEqualToAnchor:barImageView.leftAnchor].active = YES;
+        [label.rightAnchor constraintEqualToAnchor:barImageView.rightAnchor].active = YES;
+        
+        CGRect rect = view.frame;
+        rect.size.height = badgeImageView.bounds.size.height + view.layoutMargins.top + view.layoutMargins.bottom;
+        view.frame = rect;
+        view;
+    });
+    
+    UITextView *tableFooterTextView = ({
         UITextView *textView = [[UITextView alloc] init];
         textView.backgroundColor = [UIColor clearColor];
         textView.editable = NO;
@@ -63,14 +113,18 @@ typedef NS_ENUM(NSUInteger, RowType) {
             rect.size.height += [Geometry padding];
             rect;
         });
-        
+        textView;
+    });
+    
+    self.tableView = ({
         UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
         tableView.translatesAutoresizingMaskIntoConstraints = NO;
         tableView.delegate = self;
         tableView.dataSource = self;
         tableView.backgroundView = nil;
         tableView.backgroundColor = [UIColor clearColor];
-        tableView.tableFooterView = textView;
+        tableView.tableHeaderView = tableHeaderView;
+        tableView.tableFooterView = tableFooterTextView;
         [self.view addSubview:tableView];
         [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -148,6 +202,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     switch (rowType) {
         case RowTypeVersion:
+        case RowTypeEmail:
             return NO;
             break;
         case RowTypeLocationService:
@@ -166,16 +221,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     switch (rowType) {
         case RowTypeBug:
-            
+            // TODO: open email modal to support@crazeapp.com
             break;
         case RowTypeTellFriend:
-            
+            // TODO: open share sheet to crazeapp.com/app
             break;
         case RowTypeTutorial:
-            
+            // TODO: open onboarding tutorial
             break;
         case RowTypeEmail:
-            
             break;
         case RowTypeLocationService:
         case RowTypePushNotification:
@@ -259,7 +313,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeEmail:
         case RowTypeTutorial:
         case RowTypeTellFriend:
         case RowTypeBug:
