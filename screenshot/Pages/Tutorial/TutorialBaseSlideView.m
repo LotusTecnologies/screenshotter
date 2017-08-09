@@ -41,6 +41,18 @@
             [label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor].active = YES;
             label;
         });
+        
+        _contentView = ({
+            UIView *view = [[UIView alloc] init];
+            view.backgroundColor = [UIColor yellowColor];
+            view.translatesAutoresizingMaskIntoConstraints = NO;
+            [self addSubview:view];
+            [view.topAnchor constraintEqualToAnchor:self.subtitleLabel.layoutMarginsGuide.bottomAnchor].active = YES;
+            [view.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor].active = YES;
+            [view.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor].active = YES;
+            [view.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor].active = YES;
+            view;
+        });
     }
     return self;
 }

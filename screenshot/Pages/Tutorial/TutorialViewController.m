@@ -87,6 +87,16 @@
     }
 }
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        CGPoint offset = self.scrollView.contentOffset;
+        offset.x = size.width * self.pageControl.currentPage;
+        self.scrollView.contentOffset = offset;
+    } completion:nil];
+}
+
 - (void)dealloc {
     self.scrollView.delegate = nil;
 }
