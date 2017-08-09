@@ -21,6 +21,12 @@
 		C5278F951F39A23C0090E422 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F941F39A23C0090E422 /* ProductCollectionViewCell.m */; };
 		C5278F981F39BD920090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F971F39BD920090E422 /* FavoriteButton.m */; };
 		C5278F9C1F3A3FAE0090E422 /* PermissionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278F9B1F3A3FAE0090E422 /* PermissionsManager.m */; };
+		C5278FA31F3B035B0090E422 /* TutorialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FA21F3B035B0090E422 /* TutorialViewController.m */; };
+		C5278FA61F3B03D20090E422 /* TutorialBaseSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FA51F3B03D20090E422 /* TutorialBaseSlideView.m */; };
+		C5278FA91F3B2A860090E422 /* TutorialScreenshotSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FA81F3B2A860090E422 /* TutorialScreenshotSlideView.m */; };
+		C5278FAC1F3B2A940090E422 /* TutorialShopSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FAB1F3B2A940090E422 /* TutorialShopSlideView.m */; };
+		C5278FAF1F3B2AA00090E422 /* TutorialPermissionsSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FAE1F3B2AA00090E422 /* TutorialPermissionsSlideView.m */; };
+		C5278FB21F3B2ABE0090E422 /* TutorialEmailSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB11F3B2ABE0090E422 /* TutorialEmailSlideView.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D4A1F09083B00E8A53B /* ViewController.m */; };
@@ -59,6 +65,18 @@
 		C5278F971F39BD920090E422 /* FavoriteButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoriteButton.m; sourceTree = "<group>"; };
 		C5278F9A1F3A3FAE0090E422 /* PermissionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PermissionsManager.h; sourceTree = "<group>"; };
 		C5278F9B1F3A3FAE0090E422 /* PermissionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PermissionsManager.m; sourceTree = "<group>"; };
+		C5278FA11F3B035B0090E422 /* TutorialViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialViewController.h; sourceTree = "<group>"; };
+		C5278FA21F3B035B0090E422 /* TutorialViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialViewController.m; sourceTree = "<group>"; };
+		C5278FA41F3B03D20090E422 /* TutorialBaseSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialBaseSlideView.h; sourceTree = "<group>"; };
+		C5278FA51F3B03D20090E422 /* TutorialBaseSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialBaseSlideView.m; sourceTree = "<group>"; };
+		C5278FA71F3B2A860090E422 /* TutorialScreenshotSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialScreenshotSlideView.h; sourceTree = "<group>"; };
+		C5278FA81F3B2A860090E422 /* TutorialScreenshotSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialScreenshotSlideView.m; sourceTree = "<group>"; };
+		C5278FAA1F3B2A940090E422 /* TutorialShopSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialShopSlideView.h; sourceTree = "<group>"; };
+		C5278FAB1F3B2A940090E422 /* TutorialShopSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialShopSlideView.m; sourceTree = "<group>"; };
+		C5278FAD1F3B2AA00090E422 /* TutorialPermissionsSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialPermissionsSlideView.h; sourceTree = "<group>"; };
+		C5278FAE1F3B2AA00090E422 /* TutorialPermissionsSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialPermissionsSlideView.m; sourceTree = "<group>"; };
+		C5278FB01F3B2ABE0090E422 /* TutorialEmailSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialEmailSlideView.h; sourceTree = "<group>"; };
+		C5278FB11F3B2ABE0090E422 /* TutorialEmailSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialEmailSlideView.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -109,6 +127,7 @@
 				C5278F671F3986B00090E422 /* ScreenshotsViewController.m */,
 				C5278F681F3986B00090E422 /* SettingsViewController.h */,
 				C5278F691F3986B00090E422 /* SettingsViewController.m */,
+				C5278FA01F3B035B0090E422 /* Tutorial */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -157,6 +176,25 @@
 				C5278F9B1F3A3FAE0090E422 /* PermissionsManager.m */,
 			);
 			path = Singletons;
+			sourceTree = "<group>";
+		};
+		C5278FA01F3B035B0090E422 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				C5278FA11F3B035B0090E422 /* TutorialViewController.h */,
+				C5278FA21F3B035B0090E422 /* TutorialViewController.m */,
+				C5278FA41F3B03D20090E422 /* TutorialBaseSlideView.h */,
+				C5278FA51F3B03D20090E422 /* TutorialBaseSlideView.m */,
+				C5278FA71F3B2A860090E422 /* TutorialScreenshotSlideView.h */,
+				C5278FA81F3B2A860090E422 /* TutorialScreenshotSlideView.m */,
+				C5278FAA1F3B2A940090E422 /* TutorialShopSlideView.h */,
+				C5278FAB1F3B2A940090E422 /* TutorialShopSlideView.m */,
+				C5278FAD1F3B2AA00090E422 /* TutorialPermissionsSlideView.h */,
+				C5278FAE1F3B2AA00090E422 /* TutorialPermissionsSlideView.m */,
+				C5278FB01F3B2ABE0090E422 /* TutorialEmailSlideView.h */,
+				C5278FB11F3B2ABE0090E422 /* TutorialEmailSlideView.m */,
+			);
+			path = Tutorial;
 			sourceTree = "<group>";
 		};
 		E4139D371F09083B00E8A53B = {
@@ -360,19 +398,25 @@
 				C5278F921F399E360090E422 /* Geometry.m in Sources */,
 				C5278F981F39BD920090E422 /* FavoriteButton.m in Sources */,
 				E4139D4B1F09083B00E8A53B /* ViewController.m in Sources */,
+				C5278FB21F3B2ABE0090E422 /* TutorialEmailSlideView.m in Sources */,
 				C5278F6C1F3986B00090E422 /* FavoritesViewController.m in Sources */,
 				E45AC7221F090C2300F82CE7 /* MatchModel.m in Sources */,
 				C5278F8D1F399E0A0090E422 /* UIColor+Appearance.m in Sources */,
 				C5278F7A1F3988590090E422 /* ScreenshotsNavigationController.m in Sources */,
+				C5278FAF1F3B2AA00090E422 /* TutorialPermissionsSlideView.m in Sources */,
 				E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */,
+				C5278FAC1F3B2A940090E422 /* TutorialShopSlideView.m in Sources */,
 				E4139D451F09083B00E8A53B /* main.m in Sources */,
 				C5278F771F39881B0090E422 /* MainTabBarController.m in Sources */,
 				C5278F6F1F3986B00090E422 /* ProductsViewController.m in Sources */,
 				E43583FA1F38771000A0A540 /* NetworkingModel.m in Sources */,
 				C5278F7D1F398DCA0090E422 /* BaseViewController.m in Sources */,
 				C5278F6D1F3986B00090E422 /* ScreenshotsViewController.m in Sources */,
+				C5278FA31F3B035B0090E422 /* TutorialViewController.m in Sources */,
 				C5278F731F3986CD0090E422 /* ScreenshotCollectionViewCell.m in Sources */,
+				C5278FA91F3B2A860090E422 /* TutorialScreenshotSlideView.m in Sources */,
 				C5278F951F39A23C0090E422 /* ProductCollectionViewCell.m in Sources */,
+				C5278FA61F3B03D20090E422 /* TutorialBaseSlideView.m in Sources */,
 				C5278F9C1F3A3FAE0090E422 /* PermissionsManager.m in Sources */,
 				C5278F6E1F3986B00090E422 /* SettingsViewController.m in Sources */,
 			);

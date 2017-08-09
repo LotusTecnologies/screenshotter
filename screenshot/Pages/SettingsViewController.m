@@ -37,6 +37,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 @implementation SettingsViewController
 
+#pragma mark - Life Cycle
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
@@ -132,6 +134,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         tableView;
     });
+}
+
+- (void)dealloc {
+    self.tableView.delegate = nil;
+    self.tableView.dataSource = nil;
 }
 
 

@@ -11,12 +11,14 @@
 #import "ScreenshotsNavigationController.h"
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
+#import "TutorialViewController.h"
 
 @interface MainTabBarController ()
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
+@property (nonatomic, strong) TutorialViewController *tutorialViewController;
 
 @end
 
@@ -25,7 +27,7 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.favoritesNavigationController = ({
+        _favoritesNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarHeart"];
             
             FavoritesViewController *viewController = [[FavoritesViewController alloc] init];
@@ -34,7 +36,7 @@
             [[UINavigationController alloc] initWithRootViewController:viewController];
         });
         
-        self.screenshotsNavigationController = ({
+        _screenshotsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarScreens"];
             
             ScreenshotsNavigationController *viewController = [[ScreenshotsNavigationController alloc] init];
@@ -42,7 +44,7 @@
             viewController;
         });
         
-        self.settingsNavigationController = ({
+        _settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarGear"];
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
@@ -51,7 +53,13 @@
             [[UINavigationController alloc] initWithRootViewController:viewController];
         });
         
-        self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
+        _tutorialViewController = ({
+            TutorialViewController *viewController = [[TutorialViewController alloc] init];
+            viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tutorial" image:nil tag:3];
+            viewController;
+        });
+        
+        self.viewControllers = @[self.tutorialViewController, self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
     }
     return self;
 }

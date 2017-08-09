@@ -20,6 +20,8 @@
 
 @implementation ProductsViewController
 
+#pragma mark - Life Cycle
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
@@ -76,6 +78,12 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+}
+
+- (void)dealloc {
+    self.segmentToolbar.delegate = nil;
+    self.collectionView.delegate = nil;
+    self.collectionView.dataSource = nil;
 }
 
 

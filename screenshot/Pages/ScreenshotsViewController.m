@@ -61,6 +61,11 @@
     [self.collectionView.collectionViewLayout invalidateLayout];
 }
 
+- (void)dealloc {
+    self.collectionView.delegate = nil;
+    self.collectionView.dataSource = nil;
+}
+
 
 #pragma mark - Collection View
 
