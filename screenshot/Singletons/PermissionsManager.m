@@ -9,11 +9,15 @@
 #import "PermissionsManager.h"
 
 //  Libraries
-@import AssetsLibrary;
+@import CoreLocation;
 @import Photos;
-#import <CoreLocation/CoreLocation.h>
+@import UserNotifications;
 
-@implementation PermissionsManager
+@interface PermissionsManager () <CLLocationManagerDelegate>
+
+@end
+
+@implementation PermissionsManager 
 
 + (PermissionsManager *)sharedPermissionsManager {
     static dispatch_once_t pred;
@@ -107,11 +111,14 @@
     PermissionBlock responseCopy = [response copy];
     PermissionBlock responseCopyOnMainThread = [^(BOOL granted) {
         if (responseCopy) {
-//            executeOrAsyncOnMain(^{
-                if (responseCopy) {
+            if ([NSThread isMainThread]) {
+                responseCopy(granted);
+                
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
                     responseCopy(granted);
-                }
-//            });
+                });
+            }
         }
     } copy];
     
@@ -125,7 +132,7 @@
             break;
             
         case PermissionTypeLocation:
-            //not supported use CLLocationManger
+            [self requestLocationPermissionWithResponse:responseCopyOnMainThread];
             break;
     }
 }
@@ -135,10 +142,6 @@
     
     if (status == PHAuthorizationStatusNotDetermined) {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus requestedStatus) {
-            if (requestedStatus == PHAuthorizationStatusDenied) {
-//                LoginLogDebug(@"Photo Library: User denied access");
-            }
-            
             if (response) {
                 response(requestedStatus == PHAuthorizationStatusAuthorized);
             }
@@ -152,15 +155,53 @@
 }
 
 - (void)requestPushPermissionWithResponse:(PermissionBlock)response {
-//    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-//    
-//    [delegate promptForRemoteNotifications:^(BOOL granted) {
-//        [[AnalyticsManager sharedAnalyticsManager] logAnalyticsEventForPermissionsType:@"Notifications" granted:granted];
-//        
-//        if (response) {
-//            response(granted);
-//        }
-//    }];
+    UNAuthorizationOptions options = UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound;
+    
+    [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        // ???: is this needed
+//        [[UIApplication sharedApplication] registerForRemoteNotifications];
+        
+        if (response) {
+            response(granted);
+        }
+    }];
+}
+
+- (void)requestLocationPermissionWithResponse:(PermissionBlock)response {
+    CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+    
+    if (status == kCLAuthorizationStatusNotDetermined) {
+        if ([CLLocationManager locationServicesEnabled]) {
+            CLLocationManager *locationManager = [[CLLocationManager alloc] init];
+            locationManager.delegate = self;
+            
+            // TODO: call one of the below.
+//            [locationManager requestAlwaysAuthorization];
+//            [locationManager requestWhenInUseAuthorization];
+            
+            // TODO: once the delegate is called, take the response and pass it here
+            if (response) {
+                response(NO);
+            }
+            
+        } else {
+            if (response) {
+                response(NO);
+            }
+        }
+        
+    } else {
+        if (response) {
+            response(status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse);
+        }
+    }
+}
+
+
+#pragma mark - Location Manager
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    
 }
 
 @end

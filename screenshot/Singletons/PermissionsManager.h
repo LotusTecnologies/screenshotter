@@ -8,10 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_OPTIONS(NSUInteger, PermissionType) {
-    PermissionTypePhoto    = 1 << 0,
-    PermissionTypePush     = 1 << 1,
-    PermissionTypeLocation = 1 << 2
+typedef NS_ENUM(NSUInteger, PermissionType) {
+    PermissionTypePhoto,
+    PermissionTypePush,
+    PermissionTypeLocation
 };
 
 typedef NS_ENUM(NSUInteger, PermissionStatus) {

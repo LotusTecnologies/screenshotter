@@ -7,6 +7,8 @@
 //
 
 #import "SettingsViewController.h"
+#import "Geometry.h"
+#import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
@@ -48,12 +50,27 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [super viewDidLoad];
     
     self.tableView = ({
+        UITextView *textView = [[UITextView alloc] init];
+        textView.backgroundColor = [UIColor clearColor];
+        textView.editable = NO;
+        textView.dataDetectorTypes = UIDataDetectorTypePhoneNumber | UIDataDetectorTypeLink;
+        textView.textAlignment = NSTextAlignmentCenter;
+        textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+        textView.text = @"Questions? Get in touch: (212) 202-0991\nOr info@crazeapp.com";
+        [textView sizeToFit];
+        textView.frame = ({
+            CGRect rect = textView.frame;
+            rect.size.height += [Geometry padding];
+            rect;
+        });
+        
         UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
         tableView.translatesAutoresizingMaskIntoConstraints = NO;
         tableView.delegate = self;
         tableView.dataSource = self;
         tableView.backgroundView = nil;
         tableView.backgroundColor = [UIColor clearColor];
+        tableView.tableFooterView = textView;
         [self.view addSubview:tableView];
         [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -127,11 +144,27 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [self rowTypeForIndexPath:indexPath] != RowTypeVersion;
+    RowType rowType = [self rowTypeForIndexPath:indexPath];
+    
+    switch (rowType) {
+        case RowTypeVersion:
+            return NO;
+            break;
+        case RowTypeLocationService:
+        case RowTypePushNotification:
+        case RowTypeCameraRoll:
+            return ![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]];
+            break;
+        default:
+            return YES;
+            break;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    switch ([self rowTypeForIndexPath:indexPath]) {
+    RowType rowType = [self rowTypeForIndexPath:indexPath];
+    
+    switch (rowType) {
         case RowTypeBug:
             
             break;
@@ -145,17 +178,20 @@ typedef NS_ENUM(NSUInteger, RowType) {
             
             break;
         case RowTypeLocationService:
-            
-            break;
         case RowTypePushNotification:
-            
-            break;
-        case RowTypeCameraRoll:
-            
+        case RowTypeCameraRoll: {
+            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] response:^(BOOL granted) {
+                if (granted) {
+                    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                }
+            }];
+        }
             break;
         case RowTypeVersion:
             break;
     }
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (NSString *)textForSectionType:(SectionType)sectionType {
@@ -202,19 +238,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (NSString *)detailTextForRowType:(RowType)rowType {
-    NSString *(^enabledText)(BOOL) = ^(BOOL isEnabled) {
-        return isEnabled ? @"Enabled" : @"Disabled";
-    };
-    
     switch (rowType) {
         case RowTypeCameraRoll:
-            return enabledText(YES);
-            break;
         case RowTypeLocationService:
-            return enabledText(YES);
-            break;
         case RowTypePushNotification:
-            return enabledText(NO);
+            return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
             return @"*version number*";
@@ -223,6 +251,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return nil;
             break;
     }
+}
+
+- (NSString *)enabledTextForRowType:(RowType)rowType {
+    return [[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]] ? @"Enabled" : @"Disabled";
 }
 
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
@@ -235,6 +267,24 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         default:
             return UITableViewCellAccessoryNone;
+            break;
+    }
+}
+
+
+#pragma mark - Permissions
+
+- (PermissionType)permissionTypeForRowType:(RowType)rowType {
+    switch (rowType) {
+        case RowTypeCameraRoll:
+            return PermissionTypePhoto;
+            break;
+        case RowTypeLocationService:
+            return PermissionTypeLocation;
+            break;
+        case RowTypePushNotification:
+        default:
+            return PermissionTypePush;
             break;
     }
 }
