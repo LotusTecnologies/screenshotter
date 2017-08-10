@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "MainTabBarController.h"
 #import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 
 @interface AppDelegate ()
 
@@ -55,6 +56,10 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    NSLog(@"applicationDidBecomeActive starting uploadLastScreenshot");
+    [AssetSyncModel.sharedInstance uploadLastScreenshotWithCompletionHandler:^(BOOL success) {
+        NSLog(@"applicationDidBecomeActive completed uploadLastScreenshot success:%d", success);
+    }];
 }
 
 
