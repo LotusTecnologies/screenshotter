@@ -55,7 +55,8 @@
         button.backgroundColor = [UIColor crazeRedColor];
         [button setTitle:@"Submit" forState:UIControlStateNormal];
         button.contentEdgeInsets = UIEdgeInsetsMake(p * .5f, p, p * .5f, p);
-        button.layer.cornerRadius = 4.f;
+        [button addTarget:self action:@selector(submitEmail) forControlEvents:UIControlEventTouchUpInside];
+        button.layer.cornerRadius = 5.f;
         [self.contentView addSubview:button];
         [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [button.topAnchor constraintGreaterThanOrEqualToAnchor:textField.layoutMarginsGuide.bottomAnchor];
@@ -76,6 +77,16 @@
 }
 
 
+#pragma mark - Submit
+
+- (void)submitEmail {
+    [[NSUserDefaults standardUserDefaults] setValue:self.textField.text forKey:@"Email"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self.delegate tutorialEmailSlideViewDidSubmit:self];
+}
+
+
 #pragma mark - Text Field
 
 - (void)resignTextField {
@@ -83,6 +94,7 @@
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [self submitEmail];
     [textField resignFirstResponder];
     return YES;
 }

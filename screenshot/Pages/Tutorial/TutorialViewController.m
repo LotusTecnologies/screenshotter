@@ -13,7 +13,7 @@
 #import "TutorialEmailSlideView.h"
 #import "UIColor+Appearance.h"
 
-@interface TutorialViewController () <UIScrollViewDelegate>
+@interface TutorialViewController () <UIScrollViewDelegate, TutorialEmailSlideViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIPageControl *pageControl;
@@ -109,13 +109,20 @@
 
 - (NSArray<TutorialBaseSlideView *> *)slides {
     if (!_slides) {
+        TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
+        emailSlideView.delegate = self;
+        
         _slides = @[[[TutorialScreenshotSlideView alloc] init],
                     [[TutorialShopSlideView alloc] init],
                     [[TutorialPermissionsSlideView alloc] init],
-                    [[TutorialEmailSlideView alloc] init]
+                    emailSlideView
                     ];
     }
     return _slides;
+}
+
+- (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
+    [self.delegate tutorialViewControllerDidComplete:self];
 }
 
 

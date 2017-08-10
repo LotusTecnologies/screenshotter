@@ -8,6 +8,17 @@
 
 #import "TutorialBaseSlideView.h"
 
+@class TutorialEmailSlideView;
+
+@protocol TutorialEmailSlideViewDelegate <NSObject>
+@required
+
+- (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView;
+
+@end
+
 @interface TutorialEmailSlideView : TutorialBaseSlideView
+
+@property (nonatomic, weak) id<TutorialEmailSlideViewDelegate> delegate;
 
 @end
