@@ -50,10 +50,11 @@
     [ScreenshotImage screenshot:self.screenshot handler:^(UIImage *image, Screenshot *screenshot) {
         for (NSUInteger i = 0; i < self.shoppablesFrc.fetchedObjects.count; i++) {
             Shoppable *shoppable = [self.shoppablesFrc objectAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
-            CGRect imageRect = [shoppable frameWithSize:image.size];
+            UIImage *shoppableImage = [[shoppable croppedWithImage:image] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
             
-            
-            [segmentedControl insertSegmentWithImage:[UIImage imageNamed:@"TabBarHeart"] atIndex:i animated:NO];
+            if (shoppable) {
+                [segmentedControl insertSegmentWithImage:shoppableImage atIndex:i animated:NO];
+            }
         }
         
         [segmentedControl sizeToFit];
