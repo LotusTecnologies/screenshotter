@@ -7,6 +7,7 @@
 //
 
 #import "ScreenshotCollectionViewCell.h"
+#import "ScreenshotImage.h"
 
 @interface ScreenshotCollectionViewCell ()
 
@@ -71,6 +72,18 @@
 
 - (UIImage *)image {
     return self.imageView.image;
+}
+
+- (void)setScreenshot:(Screenshot *)screenshot {
+    _screenshot = screenshot;
+    
+    if (screenshot) {
+        [ScreenshotImage screenshot:screenshot handler:^(UIImage *image, Screenshot *aScreenshot) {
+            if (screenshot.objectID == aScreenshot.objectID) {
+                self.imageView.image = image;
+            }
+        }];
+    }
 }
 
 

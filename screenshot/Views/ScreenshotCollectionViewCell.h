@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "screenshot-Swift.h"
 
 @class ScreenshotCollectionViewCell;
 
@@ -23,5 +24,7 @@
 @property (nonatomic, weak) id<ScreenshotCollectionViewCellDelegate> delegate;
 
 @property (nonatomic, copy) UIImage *image;
+
+@property (nonatomic, strong) Screenshot *screenshot;
 
 @end

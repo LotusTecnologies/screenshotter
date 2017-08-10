@@ -10,9 +10,12 @@
 #import "ScreenshotCollectionViewCell.h"
 #import "Geometry.h"
 
+#import "screenshot-Swift.h"
+
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 
 @end
 
@@ -55,6 +58,8 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    self.screenshotFrc = DataModel.sharedInstance.screenshotFrc;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -76,14 +81,17 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 15;
+    return self.screenshotFrc.fetchedObjects.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    Screenshot *screenshot = [self.screenshotFrc objectAtIndexPath:indexPath];
+    
     ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
     cell.backgroundColor = [UIColor lightGrayColor];
-    cell.image = nil;
+    cell.image = [UIImage imageWithData:screenshot.imageData];
+    cell.screenshot = screenshot;
     return cell;
 }
 

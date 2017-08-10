@@ -44,7 +44,6 @@
         
         _contentView = ({
             UIView *view = [[UIView alloc] init];
-            view.backgroundColor = [UIColor yellowColor];
             view.translatesAutoresizingMaskIntoConstraints = NO;
             [self addSubview:view];
             [view.topAnchor constraintEqualToAnchor:self.subtitleLabel.layoutMarginsGuide.bottomAnchor].active = YES;

@@ -33,6 +33,7 @@
 		C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE41F3C38510090E422 /* FavoriteButton.m */; };
 		C52790001F3C38510090E422 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE61F3C38510090E422 /* ProductCollectionViewCell.m */; };
 		C52790011F3C38510090E422 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */; };
+		C52790061F3C48F70090E422 /* ScreenshotImage.m in Sources */ = {isa = PBXBuildFile; fileRef = C52790051F3C48F70090E422 /* ScreenshotImage.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4E1F09083B00E8A53B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4C1F09083B00E8A53B /* Main.storyboard */; };
@@ -88,6 +89,8 @@
 		C5278FE61F3C38510090E422 /* ProductCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCollectionViewCell.m; sourceTree = "<group>"; };
 		C5278FE71F3C38510090E422 /* ScreenshotCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotCollectionViewCell.h; sourceTree = "<group>"; };
 		C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
+		C52790041F3C48F70090E422 /* ScreenshotImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotImage.h; sourceTree = "<group>"; };
+		C52790051F3C48F70090E422 /* ScreenshotImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotImage.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -143,6 +146,8 @@
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
 				C5278FBF1F3C38510090E422 /* NetworkingModel.h */,
 				C5278FC01F3C38510090E422 /* NetworkingModel.m */,
+				C52790041F3C48F70090E422 /* ScreenshotImage.h */,
+				C52790051F3C48F70090E422 /* ScreenshotImage.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -406,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
+				C52790061F3C48F70090E422 /* ScreenshotImage.m in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
 				C5278FE91F3C38510090E422 /* Geometry.m in Sources */,
 				C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */,

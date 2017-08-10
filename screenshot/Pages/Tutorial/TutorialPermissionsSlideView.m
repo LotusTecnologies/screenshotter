@@ -79,7 +79,6 @@
     
     UISwitch *aSwitch = [[UISwitch alloc] init];
     aSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-    aSwitch.backgroundColor = [UIColor greenColor];
     [view addSubview:aSwitch];
     [aSwitch.leadingAnchor constraintEqualToAnchor:label.layoutMarginsGuide.trailingAnchor].active = YES;
     [aSwitch.trailingAnchor constraintEqualToAnchor:view.trailingAnchor].active = YES;
