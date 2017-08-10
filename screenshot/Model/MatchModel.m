@@ -81,7 +81,7 @@
     imageRequestOptions.version = PHImageRequestOptionsVersionCurrent;
     imageRequestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     imageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeNone;
-    imageRequestOptions.networkAccessAllowed = YES;
+    imageRequestOptions.networkAccessAllowed = NO;
     [[PHImageManager defaultManager] requestImageDataForAsset:lastScreenshotAsset options:imageRequestOptions resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         UIImage *lastScreenshotImage = [UIImage imageWithData:imageData];
         NSLog(@"lastScreenshotImage size:%@", NSStringFromCGSize(lastScreenshotImage.size));

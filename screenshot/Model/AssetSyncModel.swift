@@ -80,7 +80,7 @@ class AssetSyncModel: NSObject {
         let imageRequestOptions = PHImageRequestOptions()
         imageRequestOptions.isSynchronous = false
         imageRequestOptions.version = .current
-        imageRequestOptions.deliveryMode = .fastFormat // For screenshot screen thumbnails.
+        imageRequestOptions.deliveryMode = .opportunistic
         imageRequestOptions.resizeMode = .none
         imageRequestOptions.isNetworkAccessAllowed = false
         let targetSize = CGSize(width: 180, height: 320)
