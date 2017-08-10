@@ -12,6 +12,8 @@
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate>
 
+@property (nonatomic, strong) UITextField *textField;
+
 @end
 
 @implementation TutorialEmailSlideView
@@ -37,6 +39,7 @@
         textField.translatesAutoresizingMaskIntoConstraints = NO;
         textField.delegate = self;
         textField.placeholder = @"you@website.com";
+        textField.returnKeyType = UIReturnKeyDone;
         textField.backgroundColor = [UIColor whiteColor];
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, [Geometry padding], 0.f);
@@ -45,13 +48,15 @@
         [textField.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
         [textField.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         [textField.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
+        self.textField = textField;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.translatesAutoresizingMaskIntoConstraints = NO;
         button.backgroundColor = [UIColor crazeRedColor];
         [button setTitle:@"Submit" forState:UIControlStateNormal];
         button.contentEdgeInsets = UIEdgeInsetsMake(p * .5f, p, p * .5f, p);
-        button.layer.cornerRadius = 4.f;
+        [button addTarget:self action:@selector(submitEmail) forControlEvents:UIControlEventTouchUpInside];
+        button.layer.cornerRadius = 5.f;
         [self.contentView addSubview:button];
         [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [button.topAnchor constraintGreaterThanOrEqualToAnchor:textField.layoutMarginsGuide.bottomAnchor];
@@ -64,14 +69,32 @@
         [self separatorFromAnchor:imageView.bottomAnchor toAnchor:textField.topAnchor];
         [self separatorFromAnchor:textField.bottomAnchor toAnchor:button.topAnchor];
         [self separatorFromAnchor:button.bottomAnchor toAnchor:self.contentView.bottomAnchor];
+        
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
+        [self addGestureRecognizer:tapGesture];
     }
     return self;
 }
 
 
+#pragma mark - Submit
+
+- (void)submitEmail {
+    [[NSUserDefaults standardUserDefaults] setValue:self.textField.text forKey:@"Email"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self.delegate tutorialEmailSlideViewDidSubmit:self];
+}
+
+
 #pragma mark - Text Field
 
+- (void)resignTextField {
+    [self.textField resignFirstResponder];
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [self submitEmail];
     [textField resignFirstResponder];
     return YES;
 }

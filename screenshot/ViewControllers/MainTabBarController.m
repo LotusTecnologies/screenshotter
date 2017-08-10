@@ -13,7 +13,7 @@
 #import "SettingsViewController.h"
 #import "TutorialViewController.h"
 
-@interface MainTabBarController ()
+@interface MainTabBarController () <TutorialViewControllerDelegate>
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
@@ -55,6 +55,7 @@
         
         _tutorialViewController = ({
             TutorialViewController *viewController = [[TutorialViewController alloc] init];
+            viewController.delegate = self;
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tutorial" image:nil tag:3];
             viewController;
         });
@@ -62,6 +63,17 @@
         self.viewControllers = @[self.tutorialViewController, self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
     }
     return self;
+}
+
+- (void)dealloc {
+    self.tutorialViewController.delegate = nil;
+}
+
+
+#pragma mark - Tutorial
+
+- (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
+    self.selectedViewController = self.screenshotsNavigationController;
 }
 
 @end
