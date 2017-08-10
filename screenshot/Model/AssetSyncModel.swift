@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Photos
 import MobileCoreServices // kUTTypeImage
 
 class AssetSyncModel: NSObject {
@@ -59,6 +60,36 @@ class AssetSyncModel: NSObject {
                 order += 1
             }
             completionHandler?(true)
+        })
+    }
+
+    func image(assetId: String, callback: @escaping ((UIImage?) -> Void)) {
+        let fetchOptions = PHFetchOptions()
+        //fetchOptions.predicate = NSPredicate(format: "mediaSubtype == %lu", .photoScreenshot)//PHAssetMediaSubtypePhotoScreenshot)
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        fetchOptions.fetchLimit = 1;
+        
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: fetchOptions)
+        
+        guard let asset = assets.firstObject else {
+            print("No asset for assetId:\(assetId)")
+            callback(nil)
+            return
+        }
+        
+        let imageRequestOptions = PHImageRequestOptions()
+        imageRequestOptions.isSynchronous = false
+        imageRequestOptions.version = .current
+        imageRequestOptions.deliveryMode = .fastFormat // For screenshot screen thumbnails.
+        imageRequestOptions.resizeMode = .none
+        imageRequestOptions.isNetworkAccessAllowed = false
+        let targetSize = CGSize(width: 180, height: 320)
+        PHImageManager.default().requestImage(for: asset,
+                                              targetSize: targetSize,
+                                              contentMode: .aspectFill,
+                                              options: imageRequestOptions,
+                                              resultHandler: { (image: UIImage?, info: [AnyHashable : Any]?) in
+                                                callback(image)
         })
     }
 

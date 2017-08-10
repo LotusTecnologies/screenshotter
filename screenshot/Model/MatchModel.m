@@ -57,12 +57,12 @@
 }
 
 -(void)latestScreenshotWithCallback:(void (^)(UIImage *))callback {
-    PHFetchOptions *lastScreenshotOptions = [[PHFetchOptions alloc] init];
-    lastScreenshotOptions.predicate = [NSPredicate predicateWithFormat:@"mediaSubtype == %lu", PHAssetMediaSubtypePhotoScreenshot];
-    lastScreenshotOptions.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO] ];
-    lastScreenshotOptions.fetchLimit = 1;
-
-    self.assets = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:lastScreenshotOptions];
+    PHFetchOptions *fetchOptions = [[PHFetchOptions alloc] init];
+    fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaSubtype == %lu", PHAssetMediaSubtypePhotoScreenshot];
+    fetchOptions.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO] ];
+    fetchOptions.fetchLimit = 1;
+    
+    self.assets = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:fetchOptions];
     
     PHAsset *lastScreenshotAsset = self.assets.firstObject;
     if (lastScreenshotAsset == nil) {
