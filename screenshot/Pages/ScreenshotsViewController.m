@@ -90,7 +90,6 @@
     ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
     cell.backgroundColor = [UIColor lightGrayColor];
-    cell.image = [UIImage imageWithData:screenshot.imageData];
     cell.screenshot = screenshot;
     return cell;
 }

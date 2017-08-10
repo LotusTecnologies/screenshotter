@@ -10,11 +10,11 @@
 
 @implementation ScreenshotImage
 
-+ (ScreenshotImage *)screenshot:(Screenshot *)screenshot handler:(void (^)(UIImage *image, Screenshot *screenshot))handler {
++ (ScreenshotImage *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler {
     return [[ScreenshotImage alloc] initWithScreenshot:screenshot handler:handler];
 }
 
-- (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(void (^)(UIImage *image, Screenshot *))handler {
+- (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler {
     self = [super init];
     if (self) {
         _screenshot = screenshot;

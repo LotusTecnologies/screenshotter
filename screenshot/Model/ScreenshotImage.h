@@ -9,10 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "screenshot-Swift.h"
 
+typedef void (^ScreenshotImageHandler)(UIImage *image, Screenshot *screenshot);
+
 @interface ScreenshotImage : NSObject
 
-+ (ScreenshotImage *)screenshot:(Screenshot *)screenshot handler:(void (^)(UIImage *image, Screenshot *screenshot))handler;
-- (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(void (^)(UIImage *image, Screenshot *screenshot))handler;
++ (ScreenshotImage *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
+- (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
 
 @property (nonatomic, strong, readonly) Screenshot *screenshot;
 
