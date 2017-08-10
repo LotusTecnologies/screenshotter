@@ -327,4 +327,13 @@ extension Shoppable {
         return frame
     }
     
+    @objc public func cropped(image: UIImage) -> UIImage? {
+        let cropFrame = self.frame(size: image.size)
+        guard let imageRef = image.cgImage?.cropping(to: cropFrame) else {
+            return nil
+        }
+        let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
+        return croppedImage
+    }
+    
 }
