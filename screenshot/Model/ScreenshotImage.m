@@ -26,6 +26,7 @@
             } else {
                 [AssetSyncModel.sharedInstance imageWithAssetId:screenshot.assetId callback:^(UIImage *image){
                     handler(image, screenshot);
+                    screenshot.imageData = UIImageJPEGRepresentation(image, 0.95);
                 }];
             }
         }
