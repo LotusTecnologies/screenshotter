@@ -59,7 +59,7 @@
         collectionView;
     });
     
-    self.screenshotFrc = DataModel.sharedInstance.screenshotFrc;
+    self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
