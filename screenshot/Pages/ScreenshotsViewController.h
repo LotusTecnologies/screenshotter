@@ -9,6 +9,7 @@
 #import "BaseViewController.h"
 
 @class ScreenshotsViewController;
+@class Screenshot;
 
 @protocol ScreenshotsViewControllerDelegate <NSObject>
 @required
@@ -20,5 +21,7 @@
 @interface ScreenshotsViewController : BaseViewController
 
 @property (nonatomic, weak) id<ScreenshotsViewControllerDelegate> delegate;
+
+- (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath;
 
 @end

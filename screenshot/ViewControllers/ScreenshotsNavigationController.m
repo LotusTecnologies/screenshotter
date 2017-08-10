@@ -44,6 +44,7 @@
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
+    productsViewController.screenshot = [viewController screenshotAtIndexPath:indexPath];
     
     [self pushViewController:productsViewController animated:YES];
 }

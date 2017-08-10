@@ -85,7 +85,7 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Screenshot *screenshot = [self.screenshotFrc objectAtIndexPath:indexPath];
+    Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
     
     ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
@@ -98,13 +98,17 @@
     NSInteger columns = [self numberOfCollectionViewColumns];
     
     CGSize size = CGSizeZero;
-    size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
-    size.height = size.width;
+    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
+    size.height = ceil(size.width * (16.f / 9.f));
     return size;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
+}
+
+- (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath {
+    return [self.screenshotFrc objectAtIndexPath:indexPath];
 }
 
 

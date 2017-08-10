@@ -10,11 +10,14 @@
 #import "ProductCollectionViewCell.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
+#import "ScreenshotImage.h"
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate, ProductCollectionViewCellDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIToolbar *segmentToolbar;
+
+@property (nonatomic, strong) NSFetchedResultsController *shoppablesFrc;
 
 @end
 
@@ -33,11 +36,30 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"one", @"two"]];
+    self.shoppablesFrc = [[DataModel sharedInstance] setupShoppableFrcWithScreenshot:self.screenshot];
+    
+    
+    UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] init];
     segmentedControl.backgroundColor = [UIColor whiteColor];
     segmentedControl.tintColor = [UIColor crazeRedColor];
     segmentedControl.selectedSegmentIndex = 0;
     [segmentedControl addTarget:self action:@selector(segmentedControlChanged:) forControlEvents:UIControlEventValueChanged];
+    
+    
+    
+    [ScreenshotImage screenshot:self.screenshot handler:^(UIImage *image, Screenshot *screenshot) {
+        for (NSUInteger i = 0; i < self.shoppablesFrc.fetchedObjects.count; i++) {
+            Shoppable *shoppable = [self.shoppablesFrc objectAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+            CGRect imageRect = [shoppable frameWithSize:image.size];
+            
+            
+            [segmentedControl insertSegmentWithImage:[UIImage imageNamed:@"TabBarHeart"] atIndex:i animated:NO];
+        }
+        
+        [segmentedControl sizeToFit];
+    }];
+    
+    
     
     self.segmentToolbar = ({
         UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -84,6 +106,7 @@
     self.segmentToolbar.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
+    [[DataModel sharedInstance] clearShoppableFrc];
 }
 
 
@@ -112,7 +135,7 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 15;
+    return 0;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
