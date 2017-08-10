@@ -8,6 +8,7 @@
 
 #import "MatchModel.h"
 #import "NetworkingModel.h"
+#import "screenshot-Swift.h"
 @import Photos;
 @import UserNotifications;
 
@@ -70,6 +71,11 @@
         return;
     }
     
+    Screenshot *screenshot = [DataModel.sharedInstance lastSavedScreenshotBackground];
+    if (![screenshot.assetId isEqualToString:lastScreenshotAsset.localIdentifier]) {
+        screenshot = [DataModel.sharedInstance saveScreenshotWithAssetId:lastScreenshotAsset.localIdentifier];
+    }
+
     PHImageRequestOptions *imageRequestOptions = [[PHImageRequestOptions alloc] init];
     imageRequestOptions.synchronous = NO;
     imageRequestOptions.version = PHImageRequestOptionsVersionCurrent;
@@ -83,14 +89,6 @@
     }];
 }
 
--(void)matchImage:(UIImage *)image completion:(ClarifaiSearchCompletion)completion {
-    ClarifaiSearchTerm *term = [ClarifaiSearchTerm searchVisuallyWithUIImage:image];
-    [self.app search:@[term]
-                page:@1
-             perPage:@4
-          completion:completion];
-}
-
 -(void)isFashion:(UIImage *)image completion:(ClarifaiPredictionsCompletion)completion {
     [self.app getModelByName:@"general-v1.3" completion:^(ClarifaiModel *model, NSError *error) {
         ClarifaiImage *clarifaiImage = [[ClarifaiImage alloc] initWithImage:image];
@@ -102,15 +100,15 @@
     }];
 }
 
--(void)logClarifaiSyteInitial:(NSMutableString *)logString completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
+-(void)logClarifaiSyteInitial:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
     [self latestScreenshotWithCallback:^(UIImage *pickedImage) {
         self.lastScreenshot = pickedImage;
         if (pickedImage == nil) {
-            [logString appendString:@"ERROR latestScreenshotWithCallback returned nothing"];
+            NSLog(@"ERROR latestScreenshotWithCallback returned nothing");
             NSURLResponse *resp = [[NSURLResponse alloc] init];
             completionhandler(resp, nil, nil);
         } else {
-            [logString appendFormat:@"image size:%@  scale:%.1f\n", NSStringFromCGSize(pickedImage.size), pickedImage.scale];
+            NSLog(@"image size:%@  scale:%.1f\n", NSStringFromCGSize(pickedImage.size), pickedImage.scale);
             [self isFashion:pickedImage completion:^(NSArray<ClarifaiOutput *> *outputs, NSError *error) {
                 BOOL isFashion = NO;
                 NSInteger j = 0;
@@ -123,13 +121,20 @@
                             || [concept.conceptName isEqualToString:@"dress"]) {
                             isFashion = YES;
                         }
-                        [logString appendFormat:@"%.2ld  %f  %@\n", (long)++j, concept.score * 100.0f, concept.conceptName];
+                        NSLog(@"%.2ld  %f  %@\n", (long)++j, concept.score * 100.0f, concept.conceptName);
                     }
                 }
-                [logString appendFormat:@"isFashion:%@\n", (isFashion ? @"YES" : @"NO")];
+                NSLog(@"isFashion:%@\n", (isFashion ? @"YES" : @"NO"));
+                DataModel *dataModel = DataModel.sharedInstance;
+                Screenshot *screenshot = [dataModel lastSavedScreenshotMain];
+                screenshot.isFashion = @(isFashion);
                 if (isFashion) {
-                    [NetworkingModel uploadToSyte:pickedImage completionHandler:completionhandler];
+                    NSData *imageData = UIImageJPEGRepresentation(pickedImage, 0.95);
+                    screenshot.imageData = imageData;
+                    [dataModel saveMain];
+                    [NetworkingModel uploadToSyte:imageData completionHandler:completionhandler];
                 } else {
+                    [dataModel saveMain];
                     NSURLResponse *resp = [[NSURLResponse alloc] init];
                     completionhandler(resp, nil, nil);
                 }
@@ -145,15 +150,12 @@
     PHFetchResultChangeDetails *collectionChanges = [changeInfo changeDetailsForFetchResult:self.assets];
     if (collectionChanges.hasIncrementalChanges && collectionChanges.insertedIndexes.count > 0) {
         NSLog(@"photoLibraryDidChange hasIncrementalChanges and insertedIndexes");
-        NSMutableString *logString = [[NSMutableString alloc] initWithString:@""];
-        [self logClarifaiSyteInitial:logString
-                   completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+        [self logClarifaiSyteInitial:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
                        if (error) {
-                           [logString appendFormat:@"logClarifaiSyteInitial error:%@", error];
+                           NSLog(@"logClarifaiSyteInitial error:%@", error);
                        } else {
-                           [logString appendFormat:@"logClarifaiSyteInitial response:%@\nresponseObject:%@", response, responseObject];
+                           NSLog(@"logClarifaiSyteInitial response:%@\nresponseObject:%@", response, responseObject);
                        }
-                       NSLog(@"%@", logString);
                    }
         ];
     }

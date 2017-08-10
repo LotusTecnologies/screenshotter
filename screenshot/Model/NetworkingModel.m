@@ -11,14 +11,13 @@
 
 @implementation NetworkingModel
 
-+(void)uploadToSyte:(UIImage *_Nonnull)image completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
++(void)uploadToSyte:(NSData *_Nonnull)imageData completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
     NSDictionary *dictParams = @{@"account_id"      : @(6677),
                                  @"sig"             : @"GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=",
                                  @"feed"            : @"default",
                                  @"payload_type"    : @"image_bin"};
     NSString *strService = @"https://syteapi.com/offers/bb";
     
-    NSData *imageData = UIImageJPEGRepresentation(image, 0.95);
     NSError *error;
     
     AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];

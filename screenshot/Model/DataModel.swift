@@ -66,7 +66,7 @@ class DataModel: NSObject {
         return persistentContainer.viewContext
     }
     
-    func adHocMoc() -> NSManagedObjectContext {
+    public func adHocMoc() -> NSManagedObjectContext {
         return persistentContainer.newBackgroundContext()
     }
     
@@ -93,7 +93,7 @@ class DataModel: NSObject {
     
     public func setupShoppableFrc(screenshot: Screenshot) -> NSFetchedResultsController<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
         request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         shoppableFrc = fetchedResultsController
@@ -221,6 +221,110 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         default:
             print("Unknown controller:\(controller) in controllerDidChangeContent")
         }
+    }
+    
+}
+
+extension DataModel {
+    
+    // Save a new Screenshot to Core Data.
+    func saveScreenshot(assetId: String) -> Screenshot {
+        let managedObjectContext = mainMoc()
+        let entityDescription = NSEntityDescription.entity(forEntityName: "Screenshot", in: managedObjectContext)
+        let screenshotToSave = Screenshot(entity: entityDescription!, insertInto: managedObjectContext)
+        screenshotToSave.assetId = assetId
+        screenshotToSave.createdAt = NSDate()
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to saveScreenshot")
+        }
+        return screenshotToSave
+    }
+    
+    func lastSavedScreenshotMain() -> Screenshot? {
+        return lastSavedScreenshot(managedObjectContext: mainMoc())
+    }
+    
+    func lastSavedScreenshotBackground() -> Screenshot? {
+        return lastSavedScreenshot(managedObjectContext: adHocMoc())
+    }
+    
+    func lastSavedScreenshot(managedObjectContext: NSManagedObjectContext) -> Screenshot? {
+        return screenshot(predicate: nil, managedObjectContext: managedObjectContext)
+    }
+    
+    func screenshot(assetId: String, managedObjectContext: NSManagedObjectContext) -> Screenshot? {
+        return screenshot(predicate: NSPredicate(format: "assetId == %@", assetId), managedObjectContext: managedObjectContext)
+    }
+    
+    fileprivate func screenshot(predicate: NSPredicate?, managedObjectContext: NSManagedObjectContext) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
+        fetchRequest.predicate = predicate
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchBatchSize = 1
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let lastSavedScreenshot = results.first as? Screenshot {
+                return lastSavedScreenshot
+            }
+        } catch {
+            print("lastSavedScreenshot results with error:\(error)")
+        }
+        return nil
+    }
+    
+    // Save a new Shoppable to Core Data.
+    func saveShoppable(managedObjectContext: NSManagedObjectContext,
+                       screenshot: Screenshot,
+                       order: Int16,
+                       label: String?,
+                       offersURL: String?,
+                       b0x: Double,
+                       b0y: Double,
+                       b1x: Double,
+                       b1y: Double) -> Shoppable {
+        let entityDescription = NSEntityDescription.entity(forEntityName: "Shoppable", in: managedObjectContext)
+        let shoppableToSave = Shoppable(entity: entityDescription!, insertInto: managedObjectContext)
+        shoppableToSave.screenshot = screenshot
+        shoppableToSave.order = order
+        shoppableToSave.label = label
+        shoppableToSave.offersURL = offersURL
+        shoppableToSave.b0x = b0x
+        shoppableToSave.b0y = b0y
+        shoppableToSave.b1x = b1x
+        shoppableToSave.b1y = b1y
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to saveShoppable")
+        }
+        return shoppableToSave
+    }
+    
+    // Update changes made in the background
+    public func saveMain() {
+        saveMoc(managedObjectContext: mainMoc())
+    }
+    
+    public func saveMoc(managedObjectContext: NSManagedObjectContext) {
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Updating db results with error:\(error)")
+        }
+    }
+
+}
+
+extension Shoppable {
+    
+    @objc public func frame(size: CGSize) -> CGRect {
+        let viewWidth = Double(size.width)
+        let viewHeight = Double(size.height)
+        let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
+        print("frame:\(NSStringFromCGRect(frame))")
+        return frame
     }
     
 }
