@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "MainTabBarController.h"
 #import "UIColor+Appearance.h"
 
 @interface AppDelegate ()
@@ -21,8 +22,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
     
-//    UIColor *a = [[UIColor whiteColor] colorWithAlphaComponent:0.9];
-//    [[UIView appearanceWhenContainedInInstancesOfClasses:@[[UIViewController class]]] setBackgroundColor:a];
+    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    self.window.rootViewController = [[MainTabBarController alloc] init];
+    [self.window makeKeyAndVisible];
     
     return YES;
 }

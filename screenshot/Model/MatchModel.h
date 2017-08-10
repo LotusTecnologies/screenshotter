@@ -12,10 +12,14 @@
 
 @interface MatchModel : NSObject
 
+@property(strong, nonatomic) UIImage *lastScreenshot;
+
+
 +(instancetype)shared;
+-(void)logClarifaiSyteInitial:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler;
+
 
 -(void)latestScreenshotWithCallback:(void (^)(UIImage *))callback;
--(void)matchImage:(UIImage *)image completion:(ClarifaiSearchCompletion)completion;
 -(void)isFashion:(UIImage *)image completion:(ClarifaiPredictionsCompletion)completion;
 
 @end
