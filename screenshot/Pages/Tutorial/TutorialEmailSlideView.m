@@ -12,6 +12,8 @@
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate>
 
+@property (nonatomic, strong) UITextField *textField;
+
 @end
 
 @implementation TutorialEmailSlideView
@@ -37,6 +39,7 @@
         textField.translatesAutoresizingMaskIntoConstraints = NO;
         textField.delegate = self;
         textField.placeholder = @"you@website.com";
+        textField.returnKeyType = UIReturnKeyDone;
         textField.backgroundColor = [UIColor whiteColor];
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, [Geometry padding], 0.f);
@@ -45,6 +48,7 @@
         [textField.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
         [textField.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         [textField.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
+        self.textField = textField;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.translatesAutoresizingMaskIntoConstraints = NO;
@@ -64,12 +68,19 @@
         [self separatorFromAnchor:imageView.bottomAnchor toAnchor:textField.topAnchor];
         [self separatorFromAnchor:textField.bottomAnchor toAnchor:button.topAnchor];
         [self separatorFromAnchor:button.bottomAnchor toAnchor:self.contentView.bottomAnchor];
+        
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
+        [self addGestureRecognizer:tapGesture];
     }
     return self;
 }
 
 
 #pragma mark - Text Field
+
+- (void)resignTextField {
+    [self.textField resignFirstResponder];
+}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
