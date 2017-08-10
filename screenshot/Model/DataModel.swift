@@ -297,9 +297,45 @@ extension DataModel {
         do {
             try managedObjectContext.save()
         } catch {
-            print("Failed to saveShoppable")
+            print("Failed to saveShoppable order:\(order)")
         }
         return shoppableToSave
+    }
+    
+    // Save a new Product to Core Data.
+    func saveProduct(managedObjectContext: NSManagedObjectContext,
+                     shoppable: Shoppable,
+                     order: Int16,
+                     productDescription: String?,
+                     price: String?,
+                     originalPrice: String?,
+                     floatPrice: Float,
+                     floatOriginalPrice: Float,
+                     categories: String?,
+                     brand: String?,
+                     offer: String?,
+                     imageURL: String?,
+                     merchant: String?) -> Product {
+        let entityDescription = NSEntityDescription.entity(forEntityName: "Product", in: managedObjectContext)
+        let productToSave = Product(entity: entityDescription!, insertInto: managedObjectContext)
+        productToSave.shoppable = shoppable
+        productToSave.order = order
+        productToSave.productDescription = productDescription
+        productToSave.price = price
+        productToSave.originalPrice = originalPrice
+        productToSave.floatPrice = floatPrice
+        productToSave.floatOriginalPrice = floatOriginalPrice
+        productToSave.categories = categories
+        productToSave.brand = brand
+        productToSave.offer = offer
+        productToSave.imageURL = imageURL
+        productToSave.merchant = merchant
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to saveProduct order:\(order)")
+        }
+        return productToSave
     }
     
     // Update changes made in the background

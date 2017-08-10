@@ -6,6 +6,7 @@
 #define screenshot_Bridging_Header_h
 
 #import "MatchModel.h"
+#import "NetworkingModel.h"
 #import "MainTabBarController.h"
 
 #endif /* screenshot_Bridging_Header_h */
