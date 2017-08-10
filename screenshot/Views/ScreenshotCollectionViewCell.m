@@ -60,29 +60,27 @@
 - (void)prepareForReuse {
     [super prepareForReuse];
     
-    self.image = nil;
+    self.screenshot = nil;
+    self.imageView.image = nil;
 }
 
 
-#pragma mark -
-
-- (void)setImage:(UIImage *)image {
-    self.imageView.image = image;
-}
-
-- (UIImage *)image {
-    return self.imageView.image;
-}
+#pragma mark - Screenshot
 
 - (void)setScreenshot:(Screenshot *)screenshot {
-    _screenshot = screenshot;
-    
-    if (screenshot) {
-        [ScreenshotImage screenshot:screenshot handler:^(UIImage *image, Screenshot *aScreenshot) {
-            if (screenshot.objectID == aScreenshot.objectID) {
-                self.imageView.image = image;
-            }
-        }];
+    if (_screenshot != screenshot) {
+        _screenshot = screenshot;
+        
+        if (screenshot) {
+            [ScreenshotImage screenshot:screenshot handler:^(UIImage *image, Screenshot *aScreenshot) {
+                if (screenshot.objectID == aScreenshot.objectID) {
+                    self.imageView.image = image;
+                }
+            }];
+            
+        } else {
+            self.imageView.image = nil;
+        }
     }
 }
 
