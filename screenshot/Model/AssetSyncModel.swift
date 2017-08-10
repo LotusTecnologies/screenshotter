@@ -26,7 +26,8 @@ class AssetSyncModel: NSObject {
                 let uploadedURLString = responseObjectDict.keys.first,
                 let shoppables = responseObjectDict[uploadedURLString] as? [[String : AnyObject]],
                 shoppables.count > 0,
-                let screenshot = dataModel.lastSavedScreenshot(managedObjectContext: moc) else {
+                let screenshot = dataModel.lastSavedScreenshot(managedObjectContext: moc),
+                (screenshot.shoppables == nil || screenshot.shoppables!.count == 0) else {
                     print("AssetSyncModel uploadLastScreenshot error:\(error)")
                     completionHandler?(false)
                     return
