@@ -35,6 +35,7 @@
         control.currentPageIndicatorTintColor = [UIColor crazeRedColor];
         control.pageIndicatorTintColor = [UIColor colorWithWhite:216.f/255.f alpha:1.f];
         [self.view addSubview:control];
+        [control setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [control.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
         [control.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         control;
@@ -62,6 +63,8 @@
         [view.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor].active = YES;
         [view.bottomAnchor constraintEqualToAnchor:self.scrollView.bottomAnchor].active = YES;
         [view.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor].active = YES;
+        [view.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor multiplier:self.slides.count].active = YES;
+        [view.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
         view;
     });
     
