@@ -19,13 +19,15 @@
     if (self) {
         _screenshot = screenshot;
         
-        if (handler) {
-            // TODO: get screenshot image
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                UIImage *image;
-                
+        if (screenshot && handler) {
+            if (screenshot.imageData != nil) {
+                UIImage *image = [UIImage imageWithData:screenshot.imageData];
                 handler(image, screenshot);
-            });
+            } else {
+                [AssetSyncModel.sharedInstance imageWithAssetId:screenshot.assetId callback:^(UIImage *image){
+                    handler(image, screenshot);
+                }];
+            }
         }
     }
     return self;
