@@ -9,6 +9,12 @@
 #import "TutorialBaseSlideView.h"
 #import "Geometry.h"
 
+@interface TutorialBaseSlideView ()
+
+@property (nonatomic, strong) UIView *separatorView;
+
+@end
+
 @implementation TutorialBaseSlideView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -62,6 +68,26 @@
     if (newSuperview) {
         CGFloat p = [Geometry padding];
         self.layoutMargins = UIEdgeInsetsMake(50.f, p, p, p);
+    }
+}
+
+
+#pragma mark - Layout
+
+- (void)separatorFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor {
+    UIView *view = [[UIView alloc] init];
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:view];
+    [view setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
+    [view setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
+    [view.topAnchor constraintEqualToAnchor:fromAnchor].active = YES;
+    [view.bottomAnchor constraintEqualToAnchor:toAnchor].active = YES;
+    
+    if (self.separatorView) {
+        [view.heightAnchor constraintEqualToAnchor:self.separatorView.heightAnchor].active = YES;
+        
+    } else {
+        self.separatorView = view;
     }
 }
 

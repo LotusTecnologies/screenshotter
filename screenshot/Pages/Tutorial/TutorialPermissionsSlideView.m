@@ -10,12 +10,6 @@
 #import "PermissionsManager.h"
 #import "Geometry.h"
 
-@interface TutorialPermissionsSlideView ()
-
-@property (nonatomic, strong) UIView *separatorView;
-
-@end
-
 @implementation TutorialPermissionsSlideView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -94,21 +88,6 @@
     [aSwitch.centerYAnchor constraintEqualToAnchor:view.centerYAnchor].active = YES;
     
     return view;
-}
-
-- (void)separatorFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor {
-    UIView *view = [[UIView alloc] init];
-    view.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.contentView addSubview:view];
-    [view.topAnchor constraintEqualToAnchor:fromAnchor].active = YES;
-    [view.bottomAnchor constraintEqualToAnchor:toAnchor].active = YES;
-    
-    if (self.separatorView) {
-        [view.heightAnchor constraintEqualToAnchor:self.separatorView.heightAnchor].active = YES;
-        
-    } else {
-        self.separatorView = view;
-    }
 }
 
 
