@@ -281,7 +281,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Replay Tutorial";
             break;
         case RowTypeEmail:
-            return @"*email value*";
+            return [[NSUserDefaults standardUserDefaults] valueForKey:@"Email"];
             break;
         case RowTypeLocationService:
             return @"Location Services";
