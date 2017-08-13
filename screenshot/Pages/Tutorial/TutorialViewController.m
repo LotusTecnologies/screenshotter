@@ -12,6 +12,7 @@
 #import "TutorialPermissionsSlideView.h"
 #import "TutorialEmailSlideView.h"
 #import "UIColor+Appearance.h"
+#import "Geometry.h"
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialEmailSlideViewDelegate>
 
@@ -69,9 +70,12 @@
     });
     
     for (NSInteger i = 0; i < self.slides.count; i++) {
+        CGFloat p = [Geometry padding];
+        
         TutorialBaseSlideView *slide = self.slides[i];
         slide.translatesAutoresizingMaskIntoConstraints = NO;
         [contentView addSubview:slide];
+        slide.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
         [slide.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor].active = YES;
         [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
         [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;

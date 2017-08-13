@@ -7,6 +7,7 @@
 //
 
 #import "SettingsViewController.h"
+#import "TutorialViewController.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 
@@ -28,7 +29,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeVersion
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, TutorialViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray *data;
@@ -174,6 +175,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
     return [self.data[indexPath.section][indexPath.row] integerValue];
 }
 
+- (NSIndexPath *)indexPathForRowType:(RowType)rowType inSectionType:(SectionType)sectionType {
+    NSInteger row = [[self dataDict][@(sectionType)] indexOfObject:@(rowType)];
+    
+    return [NSIndexPath indexPathForRow:row inSection:sectionType];
+}
+
 
 #pragma mark - Table View
 
@@ -233,8 +240,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeTellFriend:
             // TODO: open share sheet to crazeapp.com/app
             break;
-        case RowTypeTutorial:
-            // TODO: open onboarding tutorial
+        case RowTypeTutorial: {
+            TutorialViewController *viewController = [[TutorialViewController alloc] init];
+            viewController.delegate = self;
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
             break;
         case RowTypeEmail:
             break;
@@ -347,6 +357,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return PermissionTypePush;
             break;
     }
+}
+
+
+#pragma mark - Tutorial
+
+- (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
+    NSIndexPath *indexPath = [self indexPathForRowType:RowTypeEmail inSectionType:SectionTypeEmail];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end

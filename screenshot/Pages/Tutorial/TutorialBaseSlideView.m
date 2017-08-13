@@ -62,15 +62,6 @@
     return self;
 }
 
-- (void)willMoveToSuperview:(UIView *)newSuperview {
-    [super willMoveToSuperview:newSuperview];
-    
-    if (newSuperview) {
-        CGFloat p = [Geometry padding];
-        self.layoutMargins = UIEdgeInsetsMake(50.f, p, p, p);
-    }
-}
-
 
 #pragma mark - Layout
 

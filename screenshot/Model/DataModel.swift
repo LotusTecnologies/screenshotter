@@ -319,17 +319,18 @@ extension DataModel {
         let entityDescription = NSEntityDescription.entity(forEntityName: "Product", in: managedObjectContext)
         let productToSave = Product(entity: entityDescription!, insertInto: managedObjectContext)
         productToSave.shoppable = shoppable
-        productToSave.order = order
-        productToSave.productDescription = productDescription
+        // !!!: DEBUG. the below values dont exist...
+//        productToSave.order = order
+//        productToSave.productDescription = productDescription
         productToSave.price = price
-        productToSave.originalPrice = originalPrice
-        productToSave.floatPrice = floatPrice
-        productToSave.floatOriginalPrice = floatOriginalPrice
-        productToSave.categories = categories
-        productToSave.brand = brand
-        productToSave.offer = offer
+//        productToSave.originalPrice = originalPrice
+//        productToSave.floatPrice = floatPrice
+//        productToSave.floatOriginalPrice = floatOriginalPrice
+//        productToSave.categories = categories
+//        productToSave.brand = brand
+//        productToSave.offer = offer
         productToSave.imageURL = imageURL
-        productToSave.merchant = merchant
+//        productToSave.merchant = merchant
         do {
             try managedObjectContext.save()
         } catch {

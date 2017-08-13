@@ -8,10 +8,11 @@
 
 #import "AppDelegate.h"
 #import "MainTabBarController.h"
+#import "TutorialViewController.h"
 #import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <TutorialViewControllerDelegate>
 
 @property (assign, nonatomic) UIBackgroundTaskIdentifier bgTask;
 
@@ -19,12 +20,22 @@
 
 @implementation AppDelegate
 
+#pragma mark - Life Cycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
     
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    self.window.rootViewController = [[MainTabBarController alloc] init];
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+        self.window.rootViewController = [[MainTabBarController alloc] init];
+        
+    } else {
+        TutorialViewController *viewController = [[TutorialViewController alloc] init];
+        viewController.delegate = self;
+        self.window.rootViewController = viewController;
+    }
+    
     [self.window makeKeyAndVisible];
     
     return YES;
@@ -73,6 +84,22 @@
     if (completionHandler) {
         completionHandler(UIBackgroundFetchResultNoData);
     }
+}
+
+
+#pragma mark - Tutorial
+
+- (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
+    viewController.delegate = nil;
+    
+    UIViewController *oldViewController = self.window.rootViewController;
+    UIViewController *newViewController = [[MainTabBarController alloc] init];
+    UIViewAnimationOptions options = UIViewAnimationOptionTransitionFlipFromLeft | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionLayoutSubviews;
+    
+    [UIView transitionFromView:oldViewController.view toView:newViewController.view duration:0.5f options:options completion:^(BOOL finished) {
+        self.window.rootViewController = newViewController;
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"Tutorial"];
+    }];
 }
 
 @end

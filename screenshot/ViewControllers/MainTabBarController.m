@@ -11,14 +11,12 @@
 #import "ScreenshotsNavigationController.h"
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
-#import "TutorialViewController.h"
 
-@interface MainTabBarController () <TutorialViewControllerDelegate>
+@interface MainTabBarController () <UITabBarControllerDelegate>
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
-@property (nonatomic, strong) TutorialViewController *tutorialViewController;
 
 @end
 
@@ -27,6 +25,8 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.delegate = self;
+        
         _favoritesNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarHeart"];
             
@@ -53,27 +53,19 @@
             [[UINavigationController alloc] initWithRootViewController:viewController];
         });
         
-        _tutorialViewController = ({
-            TutorialViewController *viewController = [[TutorialViewController alloc] init];
-            viewController.delegate = self;
-            viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tutorial" image:nil tag:3];
-            viewController;
-        });
-        
-        self.viewControllers = @[self.tutorialViewController, self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
+        self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
     }
     return self;
 }
 
-- (void)dealloc {
-    self.tutorialViewController.delegate = nil;
-}
 
+#pragma mark - Tab Bar
 
-#pragma mark - Tutorial
-
-- (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
-    self.selectedViewController = self.screenshotsNavigationController;
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    if (self.selectedViewController == self.settingsNavigationController) {
+        [self.settingsNavigationController popToRootViewControllerAnimated:NO];
+    }
+    return YES;
 }
 
 @end
