@@ -12,7 +12,7 @@
 #import "Geometry.h"
 #import "ScreenshotImage.h"
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate, ProductCollectionViewCellDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIToolbar *segmentToolbar;
@@ -36,7 +36,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.shoppablesFrc = [[DataModel sharedInstance] setupShoppableFrcWithScreenshot:self.screenshot];
+    DataModel *dataModel = [DataModel sharedInstance];
+    dataModel.shoppableFrcDelegate = self;
+    self.shoppablesFrc = [dataModel setupShoppableFrcWithScreenshot:self.screenshot];
     
     
     UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] init];
@@ -162,6 +164,21 @@
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+}
+
+
+#pragma mark - Fetched Results Controller
+
+- (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcReloadData {
+    [self.collectionView reloadData];
 }
 
 @end

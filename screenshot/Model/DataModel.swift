@@ -9,10 +9,10 @@
 import UIKit
 import CoreData
 
-public protocol FrcDelegateProtocol : class {
-    func oneAddedAt(indexPath: IndexPath)
-    func oneDeletedAt(indexPath: IndexPath)
-    func reloadData()
+@objc public protocol FrcDelegateProtocol : class {
+    func frcOneAddedAt(indexPath: IndexPath)
+    func frcOneDeletedAt(indexPath: IndexPath)
+    func frcReloadData()
 }
 
 enum CZChangeKind {
@@ -178,20 +178,20 @@ extension DataModel: NSFetchedResultsControllerDelegate {
                 print("DataModel screenshot no change. Weird")
             case .singleAdd:
                 if let screenshotChangeIndexPath = screenshotChangeIndexPath {
-                    screenshotFrcDelegate?.oneAddedAt(indexPath: screenshotChangeIndexPath)
+                    screenshotFrcDelegate?.frcOneAddedAt(indexPath: screenshotChangeIndexPath)
                 } else {
                     print("Error DataModel singleAdd screenshotChangeIndexPath nil")
-                    screenshotFrcDelegate?.reloadData()
+                    screenshotFrcDelegate?.frcReloadData()
                 }
             case .singleDelete:
                 if let screenshotChangeIndexPath = screenshotChangeIndexPath {
-                    screenshotFrcDelegate?.oneDeletedAt(indexPath: screenshotChangeIndexPath)
+                    screenshotFrcDelegate?.frcOneDeletedAt(indexPath: screenshotChangeIndexPath)
                 } else {
                     print("Error DataModel singleDelete screenshotChangeIndexPath nil")
-                    screenshotFrcDelegate?.reloadData()
+                    screenshotFrcDelegate?.frcReloadData()
                 }
             case .multiple:
-                screenshotFrcDelegate?.reloadData()
+                screenshotFrcDelegate?.frcReloadData()
             }
             screenshotChangeKind = .none
             screenshotChangeIndexPath = nil
@@ -201,20 +201,20 @@ extension DataModel: NSFetchedResultsControllerDelegate {
                 print("DataModel shoppable no change. Weird")
             case .singleAdd:
                 if let shoppableChangeIndexPath = shoppableChangeIndexPath {
-                    shoppableFrcDelegate?.oneAddedAt(indexPath: shoppableChangeIndexPath)
+                    shoppableFrcDelegate?.frcOneAddedAt(indexPath: shoppableChangeIndexPath)
                 } else {
                     print("Error DataModel singleAdd shoppableChangeIndexPath nil")
-                    shoppableFrcDelegate?.reloadData()
+                    shoppableFrcDelegate?.frcReloadData()
                 }
             case .singleDelete:
                 if let shoppableChangeIndexPath = shoppableChangeIndexPath {
-                    shoppableFrcDelegate?.oneDeletedAt(indexPath: shoppableChangeIndexPath)
+                    shoppableFrcDelegate?.frcOneDeletedAt(indexPath: shoppableChangeIndexPath)
                 } else {
                     print("Error DataModel singleDelete shoppableChangeIndexPath nil")
-                    shoppableFrcDelegate?.reloadData()
+                    shoppableFrcDelegate?.frcReloadData()
                 }
             case .multiple:
-                shoppableFrcDelegate?.reloadData()
+                shoppableFrcDelegate?.frcReloadData()
             }
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
@@ -319,18 +319,17 @@ extension DataModel {
         let entityDescription = NSEntityDescription.entity(forEntityName: "Product", in: managedObjectContext)
         let productToSave = Product(entity: entityDescription!, insertInto: managedObjectContext)
         productToSave.shoppable = shoppable
-        // !!!: DEBUG. the below values dont exist...
-//        productToSave.order = order
-//        productToSave.productDescription = productDescription
+        productToSave.order = order
+        productToSave.productDescription = productDescription
         productToSave.price = price
-//        productToSave.originalPrice = originalPrice
-//        productToSave.floatPrice = floatPrice
-//        productToSave.floatOriginalPrice = floatOriginalPrice
-//        productToSave.categories = categories
-//        productToSave.brand = brand
-//        productToSave.offer = offer
+        productToSave.originalPrice = originalPrice
+        productToSave.floatPrice = floatPrice
+        productToSave.floatOriginalPrice = floatOriginalPrice
+        productToSave.categories = categories
+        productToSave.brand = brand
+        productToSave.offer = offer
         productToSave.imageURL = imageURL
-//        productToSave.merchant = merchant
+        productToSave.merchant = merchant
         do {
             try managedObjectContext.save()
         } catch {

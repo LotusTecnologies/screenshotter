@@ -9,10 +9,9 @@
 #import "ScreenshotsViewController.h"
 #import "ScreenshotCollectionViewCell.h"
 #import "Geometry.h"
-
 #import "screenshot-Swift.h"
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
@@ -59,7 +58,9 @@
         collectionView;
     });
     
-    self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+    DataModel *dataModel = [DataModel sharedInstance];
+    dataModel.screenshotFrcDelegate = self;
+    self.screenshotFrc = dataModel.screenshotFrc;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -120,6 +121,21 @@
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+}
+
+
+#pragma mark - Fetch Results Controller
+
+- (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcReloadData {
+    [self.collectionView reloadData];
 }
 
 @end
