@@ -57,13 +57,6 @@
     return self;
 }
 
-- (void)prepareForReuse {
-    [super prepareForReuse];
-    
-    self.screenshot = nil;
-    self.imageView.image = nil;
-}
-
 
 #pragma mark - Screenshot
 

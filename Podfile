@@ -5,6 +5,7 @@ def shared_pods
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     #use_frameworks!
     pod 'Clarifai'
+    pod 'SDWebImage', '~> 4.0'
 end
 
 #target 'dev_influencer' do

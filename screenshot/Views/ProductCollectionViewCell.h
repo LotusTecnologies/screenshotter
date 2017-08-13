@@ -21,9 +21,10 @@
 
 @property (nonatomic, weak) id<ProductCollectionViewCellDelegate> delegate;
 
-@property (nonatomic, copy) UIImage *image;
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *price;
+@property (nonatomic, copy) NSString *imageUrl;
+- (void)attachImage;
 
 @property (nonatomic, strong, readonly) UIButton *favoriteButton;
 

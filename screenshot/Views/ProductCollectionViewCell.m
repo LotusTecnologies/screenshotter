@@ -8,6 +8,7 @@
 
 #import "ProductCollectionViewCell.h"
 #import "FavoriteButton.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 
 @interface ProductCollectionViewCell ()
 
@@ -26,7 +27,7 @@
         _imageView = ({
             UIImageView *imageView = [[UIImageView alloc] init];
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
-            imageView.backgroundColor = [UIColor lightGrayColor];
+            imageView.backgroundColor = [UIColor whiteColor];
             imageView.contentMode = UIViewContentModeScaleAspectFit;
             [self.contentView addSubview:imageView];
             [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
@@ -39,7 +40,6 @@
         _titleLabel = ({
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
-            label.backgroundColor = [UIColor yellowColor];
             label.numberOfLines = [[self class] titleLabelNumberOfLines];
             label.textAlignment = NSTextAlignmentCenter;
             label.font = [[self class] labelFont];
@@ -56,9 +56,9 @@
         _priceLabel = ({
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
-            label.backgroundColor = [UIColor orangeColor];
             label.textAlignment = NSTextAlignmentCenter;
             label.font = [[self class] labelFont];
+            label.textColor = [UIColor colorWithWhite:155.f/255.f alpha:1.f];
             [self.contentView addSubview:label];
 
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;
@@ -81,14 +81,6 @@
         });
     }
     return self;
-}
-
-- (void)prepareForReuse {
-    [super prepareForReuse];
-    
-    self.imageView.image = nil;
-    self.titleLabel.text = nil;
-    self.priceLabel.text = nil;
 }
 
 
@@ -135,6 +127,24 @@
 
 - (NSString *)price {
     return self.priceLabel.text;
+}
+
+
+#pragma mark - Image
+
+- (void)setImageUrl:(NSString *)imageUrl {
+    if (_imageUrl != imageUrl) {
+        _imageUrl = imageUrl;
+        
+        if (imageUrl) {
+            SDWebImageOptions options = SDWebImageRetryFailed | SDWebImageHighPriority;
+            
+            [self.imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:@"DefaultProduct"] options:options];
+            
+        } else {
+            self.imageView.image = nil;
+        }
+    }
 }
 
 

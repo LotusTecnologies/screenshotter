@@ -147,6 +147,7 @@
     NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
     self.products = [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
     
+    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
     [self.collectionView reloadData];
 }
 
@@ -163,9 +164,9 @@
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
-    cell.backgroundColor = [UIColor cyanColor];
     cell.title = product.productDescription;
     cell.price = product.price;
+    cell.imageUrl = product.imageURL;
     return cell;
 }
 
