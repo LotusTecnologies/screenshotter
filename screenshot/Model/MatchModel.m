@@ -127,7 +127,7 @@
                 NSLog(@"isFashion:%@\n", (isFashion ? @"YES" : @"NO"));
                 DataModel *dataModel = DataModel.sharedInstance;
                 Screenshot *screenshot = [dataModel lastSavedScreenshotMain];
-                screenshot.isFashion = @(isFashion);
+                screenshot.isFashion = isFashion;
                 if (isFashion) {
                     NSData *imageData = UIImageJPEGRepresentation(pickedImage, 0.95);
                     screenshot.imageData = imageData;
