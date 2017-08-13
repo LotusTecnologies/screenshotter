@@ -27,6 +27,10 @@
     if (self) {
         self.title = @"Screenshots";
         [self addNavigationItemLogo];
+        
+        DataModel *dataModel = [DataModel sharedInstance];
+        dataModel.screenshotFrcDelegate = self;
+        self.screenshotFrc = dataModel.screenshotFrc;
     }
     return self;
 }
@@ -57,10 +61,6 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
-    
-    DataModel *dataModel = [DataModel sharedInstance];
-    dataModel.screenshotFrcDelegate = self;
-    self.screenshotFrc = dataModel.screenshotFrc;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -72,6 +72,8 @@
 - (void)dealloc {
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
+    
+    [DataModel sharedInstance].screenshotFrcDelegate = nil;
 }
 
 

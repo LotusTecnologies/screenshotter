@@ -11,13 +11,15 @@
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "ScreenshotImage.h"
+#import "ShoppablesToolbar.h"
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIToolbarDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
-@property (nonatomic, strong) UIToolbar *segmentToolbar;
+@property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
 @property (nonatomic, strong) NSFetchedResultsController *shoppablesFrc;
+@property (nonatomic, strong) NSArray<Product *> *products;
 
 @end
 
@@ -36,46 +38,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    DataModel *dataModel = [DataModel sharedInstance];
-    dataModel.shoppableFrcDelegate = self;
-    self.shoppablesFrc = [dataModel setupShoppableFrcWithScreenshot:self.screenshot];
-    
-    
-    UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] init];
-    segmentedControl.backgroundColor = [UIColor whiteColor];
-    segmentedControl.tintColor = [UIColor crazeRedColor];
-    segmentedControl.selectedSegmentIndex = 0;
-    [segmentedControl addTarget:self action:@selector(segmentedControlChanged:) forControlEvents:UIControlEventValueChanged];
-    
-    
-    
-    [ScreenshotImage screenshot:self.screenshot handler:^(UIImage *image, Screenshot *screenshot) {
-        for (NSUInteger i = 0; i < self.shoppablesFrc.fetchedObjects.count; i++) {
-            Shoppable *shoppable = [self.shoppablesFrc objectAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
-            UIImage *shoppableImage = [[shoppable croppedWithImage:image] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-            
-            if (shoppable) {
-                [segmentedControl insertSegmentWithImage:shoppableImage atIndex:i animated:NO];
-            }
-        }
+    self.shoppablesToolbar = ({
+        CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
+        CGFloat shoppableHeight = 60.f;
         
-        [segmentedControl sizeToFit];
-    }];
-    
-    
-    
-    self.segmentToolbar = ({
-        UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-        
-        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, 44.f)];
+        ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
         toolbar.delegate = self;
-        toolbar.items = @[spacerItem, [[UIBarButtonItem alloc] initWithCustomView:segmentedControl], spacerItem];
-        
+        toolbar.layoutMargins = UIEdgeInsetsMake(margin, margin, margin, margin);
+        [toolbar insertShoppables:[self shoppables] withScreenshot:self.screenshot];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
         [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        [toolbar.heightAnchor constraintEqualToConstant:toolbar.bounds.size.height].active = YES;
         toolbar;
     });
     
@@ -90,8 +66,8 @@
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(p + self.segmentToolbar.bounds.size.height, p, p, p);
-        collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.segmentToolbar.bounds.size.height, 0.f, 0.f, 0.f);
+        collectionView.contentInset = UIEdgeInsetsMake(p + self.shoppablesToolbar.bounds.size.height, p, p, p);
+        collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -103,34 +79,75 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    [self reloadCollectionViewForIndex:0];
 }
 
 - (void)dealloc {
-    self.segmentToolbar.delegate = nil;
+    self.shoppablesToolbar.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
+    
+    [DataModel sharedInstance].shoppableFrcDelegate = nil;
     [[DataModel sharedInstance] clearShoppableFrc];
 }
 
 
-#pragma mark - Toolbar
+#pragma mark - Screenshot
+
+- (void)setScreenshot:(Screenshot *)screenshot {
+    if (_screenshot != screenshot) {
+        _screenshot = screenshot;
+        
+        DataModel *dataModel = [DataModel sharedInstance];
+        
+        if (screenshot) {
+            dataModel.shoppableFrcDelegate = self;
+            self.shoppablesFrc = [dataModel setupShoppableFrcWithScreenshot:screenshot];
+            
+        } else {
+            dataModel.shoppableFrcDelegate = nil;
+        }
+    }
+}
+
+
+#pragma mark - Shoppable
+
+- (Shoppable *)shoppableAtIndex:(NSUInteger)index {
+    return [self.shoppablesFrc objectAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+}
+
+- (NSArray<Shoppable *> *)shoppables {
+    NSMutableArray *shoppables = [NSMutableArray array];
+    
+    for (NSUInteger i = 0; i < self.shoppablesFrc.fetchedObjects.count; i++) {
+        [shoppables addObject:[self shoppableAtIndex:i]];
+    }
+    
+    return shoppables;
+}
+
+
+#pragma mark - Shoppable
 
 - (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
     return UIBarPositionTopAttached;
 }
 
-
-#pragma mark - Segmented Control
-
-- (void)segmentedControlChanged:(UISegmentedControl *)segmentedControl {
-    [self reloadCollectionViewForIndex:segmentedControl.selectedSegmentIndex];
+- (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
+    [self reloadCollectionViewForIndex:index];
 }
 
 
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
-    // TODO:
+    Shoppable *shoppable = [self shoppableAtIndex:index];
+    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
+    self.products = [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
+    
+    [self.collectionView reloadData];
 }
 
 - (NSInteger)numberOfCollectionViewColumns {
@@ -138,15 +155,17 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 0;
+    return self.products.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    Product *product = self.products[indexPath.item];
+    
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
     cell.backgroundColor = [UIColor cyanColor];
-    cell.title = @"cool product";
-    cell.price = @"99";
+    cell.title = product.productDescription;
+    cell.price = product.price;
     return cell;
 }
 

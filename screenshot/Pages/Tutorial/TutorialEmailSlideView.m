@@ -60,6 +60,7 @@
         textField.delegate = self;
         textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:@"Email"];
         textField.placeholder = @"you@website.com";
+        textField.keyboardType = UIKeyboardTypeEmailAddress;
         textField.returnKeyType = UIReturnKeyDone;
         textField.backgroundColor = [UIColor whiteColor];
         textField.borderStyle = UITextBorderStyleRoundedRect;

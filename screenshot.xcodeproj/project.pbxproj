@@ -34,6 +34,7 @@
 		C52790001F3C38510090E422 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE61F3C38510090E422 /* ProductCollectionViewCell.m */; };
 		C52790011F3C38510090E422 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */; };
 		C52790061F3C48F70090E422 /* ScreenshotImage.m in Sources */ = {isa = PBXBuildFile; fileRef = C52790051F3C48F70090E422 /* ScreenshotImage.m */; };
+		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4E1F09083B00E8A53B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4C1F09083B00E8A53B /* Main.storyboard */; };
@@ -91,6 +92,8 @@
 		C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
 		C52790041F3C48F70090E422 /* ScreenshotImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotImage.h; sourceTree = "<group>"; };
 		C52790051F3C48F70090E422 /* ScreenshotImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotImage.m; sourceTree = "<group>"; };
+		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
+		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -219,6 +222,8 @@
 				C5278FE61F3C38510090E422 /* ProductCollectionViewCell.m */,
 				C5278FE71F3C38510090E422 /* ScreenshotCollectionViewCell.h */,
 				C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */,
+				C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */,
+				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -429,6 +434,7 @@
 				C5278FF41F3C38510090E422 /* TutorialBaseSlideView.m in Sources */,
 				C52790011F3C38510090E422 /* ScreenshotCollectionViewCell.m in Sources */,
 				C52790001F3C38510090E422 /* ProductCollectionViewCell.m in Sources */,
+				C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */,
 				C5278FED1F3C38510090E422 /* MatchModel.m in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */,
