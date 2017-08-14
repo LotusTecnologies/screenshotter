@@ -159,6 +159,15 @@
     return self.products.count;
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger columns = [self numberOfCollectionViewColumns];
+    
+    CGSize size = CGSizeZero;
+    size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
+    size.height = size.width + [ProductCollectionViewCell labelsHeight];
+    return size;
+}
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     Product *product = self.products[indexPath.item];
     
@@ -170,13 +179,8 @@
     return cell;
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
-    
-    CGSize size = CGSizeZero;
-    size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
-    size.height = size.width + [ProductCollectionViewCell labelsHeight];
-    return size;
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
 }
 
 
@@ -184,6 +188,13 @@
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+}
+
+
+#pragma mark - Product
+
+- (Product *)productAtIndexPath:(NSIndexPath *)indexPath {
+    return self.products[indexPath.item];
 }
 
 

@@ -87,6 +87,15 @@
     return self.screenshotFrc.fetchedObjects.count;
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger columns = [self numberOfCollectionViewColumns];
+    
+    CGSize size = CGSizeZero;
+    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
+    size.height = ceil(size.width * (16.f / 9.f));
+    return size;
+}
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
     
@@ -95,15 +104,6 @@
     cell.backgroundColor = [UIColor lightGrayColor];
     cell.screenshot = screenshot;
     return cell;
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
-    
-    CGSize size = CGSizeZero;
-    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
-    size.height = ceil(size.width * (16.f / 9.f));
-    return size;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {

@@ -11,6 +11,7 @@
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
+#import "WebViewController.h"
 
 @import MessageUI;
 
@@ -258,8 +259,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeBug:
             [self presentMailComposer];
             break;
-        case RowTypeTellFriend:
-            // TODO: open share sheet to crazeapp.com/app
+        case RowTypeTellFriend: {
+            WebViewController *viewController = [[WebViewController alloc] init];
+            [viewController addNavigationItemLogo];
+            viewController.url = [NSURL URLWithString:@"http://crazeapp.com/app"];
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
             break;
         case RowTypeTutorial: {
             TutorialViewController *viewController = [[TutorialViewController alloc] init];
@@ -414,7 +419,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [self presentViewController:mail animated:YES completion:nil];
         
     } else {
-        // alert that mail doesnt work
+        // TODO: alert that mail doesnt work
     }
 }
 

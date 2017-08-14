@@ -9,8 +9,10 @@
 #import "ScreenshotsNavigationController.h"
 #import "ScreenshotsViewController.h"
 #import "ProductsViewController.h"
+#import "WebViewController.h"
+#import "UIColor+Appearance.h"
 
-@interface ScreenshotsNavigationController () <ScreenshotsViewControllerDelegate>
+@interface ScreenshotsNavigationController () <ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate>
 
 @property (nonatomic, strong) ScreenshotsViewController *screenshotsViewController;
 
@@ -37,6 +39,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor backgroundColor];
 }
 
 
@@ -44,9 +47,20 @@
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
+    productsViewController.delegate = self;
     productsViewController.screenshot = [viewController screenshotAtIndexPath:indexPath];
     
     [self pushViewController:productsViewController animated:YES];
+}
+
+
+#pragma mark - Products View Controller
+
+- (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    WebViewController *webViewController = [[WebViewController alloc] init];
+    webViewController.url = [NSURL URLWithString:[viewController productAtIndexPath:indexPath].offer];
+    
+    [self pushViewController:webViewController animated:YES];
 }
 
 @end

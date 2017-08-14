@@ -36,6 +36,7 @@
 		C52790061F3C48F70090E422 /* ScreenshotImage.m in Sources */ = {isa = PBXBuildFile; fileRef = C52790051F3C48F70090E422 /* ScreenshotImage.m */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
+		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
 		E4139D451F09083B00E8A53B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D441F09083B00E8A53B /* main.m */; };
 		E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E4139D471F09083B00E8A53B /* AppDelegate.m */; };
 		E4139D4E1F09083B00E8A53B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4C1F09083B00E8A53B /* Main.storyboard */; };
@@ -97,6 +98,8 @@
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
 		C5CCBB3E1F41BC1400D6B392 /* UIApplication+Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Version.h"; sourceTree = "<group>"; };
 		C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Version.m"; sourceTree = "<group>"; };
+		C5CCBB411F41C3E600D6B392 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
+		C5CCBB421F41C3E600D6B392 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		DBD57DBE54ED8D9285AC2899 /* Pods-screenshot.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.release.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.release.xcconfig"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D441F09083B00E8A53B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -212,6 +215,8 @@
 				C5278FDF1F3C38510090E422 /* OldViewController.swift */,
 				C5278FE01F3C38510090E422 /* ScreenshotsNavigationController.h */,
 				C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */,
+				C5CCBB411F41C3E600D6B392 /* WebViewController.h */,
+				C5CCBB421F41C3E600D6B392 /* WebViewController.m */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -438,6 +443,7 @@
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
 				C5278FF61F3C38510090E422 /* TutorialPermissionsSlideView.m in Sources */,
 				C5278FF81F3C38510090E422 /* TutorialShopSlideView.m in Sources */,
+				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
 				C5278FFD1F3C38510090E422 /* OldViewController.swift in Sources */,
