@@ -43,6 +43,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        
         self.title = @"Settings";
         [self addNavigationItemLogo];
     }
@@ -137,7 +139,21 @@ typedef NS_ENUM(NSUInteger, RowType) {
     });
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self reloadPermissionIndexPaths];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if (self.view.window) {
+        [self reloadPermissionIndexPaths];
+    }
+}
+
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
 }
@@ -339,6 +355,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return UITableViewCellAccessoryNone;
             break;
     }
+}
+
+- (void)reloadPermissionIndexPaths {
+    NSMutableArray *permissionIndexPaths = [NSMutableArray array];
+    
+    for (NSNumber *permissionNumber in [self dataDict][@(SectionTypePermissions)]) {
+        [permissionIndexPaths addObject:[NSIndexPath indexPathForRow:[permissionNumber integerValue] inSection:0]];
+    }
+    
+    [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];
 }
 
 

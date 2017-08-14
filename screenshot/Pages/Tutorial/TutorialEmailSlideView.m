@@ -24,7 +24,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHideNotification:) name:UIKeyboardDidHideNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
         self.titleLabel.text = @"Almost Done!";
         
@@ -105,6 +105,10 @@
     return self;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 
 #pragma mark - Submit
 
@@ -172,8 +176,10 @@
 
 #pragma mark - Keyboard
 
-- (void)keyboardDidHideNotification:(NSNotification *)notification {
-    [self informDelegateOfSubmittedEmailIfPossible];
+- (void)keyboardDidHide:(NSNotification *)notification {
+    if (self.window) {
+        [self informDelegateOfSubmittedEmailIfPossible];
+    }
 }
 
 @end

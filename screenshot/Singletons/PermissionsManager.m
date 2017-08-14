@@ -15,6 +15,8 @@
 
 @interface PermissionsManager () <CLLocationManagerDelegate>
 
+@property (nonatomic) PermissionStatus pushStatus;
+
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, copy) PermissionBlock locationPermissionBlock;
 
@@ -43,7 +45,7 @@
             break;
             
         case PermissionTypePush:
-            return [self permissionStatusForPush];
+            return self.pushStatus;
             break;
             
         case PermissionTypeLocation:
@@ -76,9 +78,23 @@
     }
 }
 
-- (PermissionStatus)permissionStatusForPush {
-    BOOL hasPermission = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
-    return hasPermission ? PermissionStatusAuthorized : PermissionStatusDenied;
+- (PermissionStatus)permissionStatusForPush:(UNAuthorizationStatus)status {
+    // Fetch to try and keep the status always synced.
+    [self fetchPushPermissionStatus];
+    
+    switch (status) {
+        case UNAuthorizationStatusDenied:
+            return PermissionStatusDenied;
+            break;
+            
+        case UNAuthorizationStatusNotDetermined:
+            return PermissionStatusNotDetermined;
+            break;
+            
+        case UNAuthorizationStatusAuthorized:
+            return PermissionStatusAuthorized;
+            break;
+    }
 }
 
 - (PermissionStatus)permissionStatusForLocation:(CLAuthorizationStatus)status {
@@ -180,6 +196,8 @@
         // ???: is this needed
 //        [[UIApplication sharedApplication] registerForRemoteNotifications];
         
+        self.pushStatus = granted ? PermissionStatusAuthorized : PermissionStatusDenied;
+        
         if (response) {
             response(granted);
         }
@@ -217,7 +235,18 @@
 }
 
 
-#pragma mark - Location Manager
+#pragma mark - Push
+
+- (void)fetchPushPermissionStatus {
+    // The push status returns async, to maintain sync we need to manage the value.
+    
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        self.pushStatus = [self permissionStatusForPush:settings.authorizationStatus];
+    }];
+}
+
+
+#pragma mark - Location
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     if (status != kCLAuthorizationStatusNotDetermined) {
