@@ -15,6 +15,9 @@
 
 @interface PermissionsManager () <CLLocationManagerDelegate>
 
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, copy) PermissionBlock locationPermissionBlock;
+
 @end
 
 @implementation PermissionsManager 
@@ -44,7 +47,7 @@
             break;
             
         case PermissionTypeLocation:
-            return [self permissionStatusForLocationStatus:[CLLocationManager authorizationStatus]];
+            return [self permissionStatusForLocation:[CLLocationManager authorizationStatus]];
             break;
             
         default:
@@ -78,7 +81,7 @@
     return hasPermission ? PermissionStatusAuthorized : PermissionStatusDenied;
 }
 
-- (PermissionStatus)permissionStatusForLocationStatus:(CLAuthorizationStatus)status {
+- (PermissionStatus)permissionStatusForLocation:(CLAuthorizationStatus)status {
     switch (status) {
         case kCLAuthorizationStatusAuthorizedAlways:
         case kCLAuthorizationStatusAuthorizedWhenInUse:
@@ -137,6 +140,22 @@
     }
 }
 
+- (void)requestPermissionForType:(PermissionType)type openSettingsIfNeeded:(BOOL)openSettings response:(PermissionBlock)response {
+    if (openSettings) {
+        PermissionStatus status = [self permissionStatusForType:type];
+        
+        if (status == PermissionStatusNotDetermined) {
+            [self requestPermissionForType:type response:response];
+            
+        } else {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+        }
+        
+    } else {
+        [self requestPermissionForType:type response:response];
+    }
+}
+
 - (void)requestPhotoPermissionWithResponse:(PermissionBlock)response {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
@@ -172,17 +191,17 @@
     
     if (status == kCLAuthorizationStatusNotDetermined) {
         if ([CLLocationManager locationServicesEnabled]) {
-            CLLocationManager *locationManager = [[CLLocationManager alloc] init];
-            locationManager.delegate = self;
-            
-            // TODO: call one of the below.
-//            [locationManager requestAlwaysAuthorization];
-//            [locationManager requestWhenInUseAuthorization];
-            
-            // TODO: once the delegate is called, take the response and pass it here
             if (response) {
-                response(NO);
+                if (self.locationPermissionBlock) {
+                    self.locationPermissionBlock(NO);
+                }
+                
+                self.locationPermissionBlock = response;
             }
+            
+            self.locationManager = [[CLLocationManager alloc] init];
+            self.locationManager.delegate = self;
+            [self.locationManager requestAlwaysAuthorization];
             
         } else {
             if (response) {
@@ -192,7 +211,7 @@
         
     } else {
         if (response) {
-            response(status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse);
+            response([self permissionStatusForLocation:status] == PermissionStatusAuthorized);
         }
     }
 }
@@ -201,7 +220,15 @@
 #pragma mark - Location Manager
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    
+    if (status != kCLAuthorizationStatusNotDetermined) {
+        if (self.locationPermissionBlock) {
+            self.locationPermissionBlock([self permissionStatusForLocation:status] == PermissionStatusAuthorized);
+            self.locationPermissionBlock = nil;
+            
+            self.locationManager.delegate = nil;
+            self.locationManager = nil;
+        }
+    }
 }
 
 @end

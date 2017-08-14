@@ -115,16 +115,9 @@
 
 - (void)switchChanged:(UISwitch *)aSwitch forPermissionType:(PermissionType)permissionType {
     if ([aSwitch isOn]) {
-        PermissionStatus status = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:permissionType];
-        
-        if (status == PermissionStatusNotDetermined) {
-            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType response:^(BOOL granted) {
-                [self updatePermission:granted forSwitch:aSwitch];
-            }];
-            
-        } else if (status == PermissionStatusDenied) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
-        }
+        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType openSettingsIfNeeded:YES response:^(BOOL granted) {
+            [self updatePermission:granted forSwitch:aSwitch];
+        }];
     }
 }
 

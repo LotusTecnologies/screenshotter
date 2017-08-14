@@ -251,7 +251,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeLocationService:
         case RowTypePushNotification:
         case RowTypeCameraRoll: {
-            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] response:^(BOOL granted) {
+            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] openSettingsIfNeeded:YES response:^(BOOL granted) {
                 if (granted) {
                     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
                 }
