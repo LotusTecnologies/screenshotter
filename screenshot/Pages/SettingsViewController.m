@@ -145,6 +145,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    self.tableView.contentOffset = CGPointMake(0.f, -self.tableView.contentInset.top);
+    
     [self reloadPermissionIndexPaths];
 }
 
