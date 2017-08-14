@@ -12,21 +12,20 @@
 
 @interface WebViewController () <WKNavigationDelegate>
 
-@property (nonatomic, strong) WKWebView *webView;
-
 @end
 
 @implementation WebViewController
+@dynamic view;
 
 - (void)loadView {
-    self.view = self.webView = [[WKWebView alloc] init];
+    self.view = [[WKWebView alloc] init];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     if (self.url) {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
+        [self.view loadRequest:[NSURLRequest requestWithURL:self.url]];
     }
 }
 
@@ -34,7 +33,7 @@
     _url = url;
     
     if (url && [self isViewLoaded]) {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+        [self.view loadRequest:[NSURLRequest requestWithURL:url]];
     }
 }
 
