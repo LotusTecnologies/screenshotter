@@ -10,6 +10,7 @@
 #import "TutorialViewController.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
+#import "UIApplication+Version.h"
 
 @import MessageUI;
 
@@ -334,7 +335,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
-            return @"*version number*";
+            return [UIApplication versionBuild];
             break;
         default:
             return nil;
