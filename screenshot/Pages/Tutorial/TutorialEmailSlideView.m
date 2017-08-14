@@ -132,7 +132,7 @@
         [self informDelegateOfSubmittedEmailIfPossible];
         
     } else {
-        // TODO: create delegate informing the submitted email is invalid
+        [self.delegate tutorialEmailSlideViewDidFail:self];
     }
     
     [self.textField resignFirstResponder];
@@ -142,6 +142,12 @@
     if (![self.textField isFirstResponder] && self.readyToSubmit) {
         [self.delegate tutorialEmailSlideViewDidSubmit:self];
     }
+}
+
++ (UIAlertController *)failedAlertController {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Submission Failed" message:@"Please enter a valid email." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    return alertController;
 }
 
 

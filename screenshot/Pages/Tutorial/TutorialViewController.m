@@ -125,6 +125,11 @@
     return _slides;
 }
 
+- (void)tutorialEmailSlideViewDidFail:(TutorialEmailSlideView *)slideView {
+    UIAlertController *alertController = [TutorialEmailSlideView failedAlertController];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
 - (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
     [self.delegate tutorialViewControllerDidComplete:self];
 }
