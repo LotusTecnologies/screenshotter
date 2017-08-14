@@ -15,7 +15,9 @@
 @property (nonatomic) BOOL readyToSubmit;
 
 @property (nonatomic, strong) UITextField *textField;
+@property (nonatomic, strong) UIButton *button;
 @property (nonatomic, strong) NSLayoutConstraint *expandableViewHeightConstraint;
+@property (nonatomic) CGRect keyboardFrame;
 
 @end
 
@@ -24,6 +26,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
         self.titleLabel.text = @"Almost Done!";
@@ -87,6 +90,7 @@
         [button.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor];
         [button.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         [button.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
+        self.button = button;
         
         UIView *expandableView = [[UIView alloc] init];
         expandableView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -158,12 +162,17 @@
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
-    // TODO: constant should be height of keyboard (when in portrait!)
-    self.expandableViewHeightConstraint.constant = [UIScreen mainScreen].bounds.size.height * .2f;
-    
-    [UIView animateWithDuration:0.25 animations:^{
-        [self.contentView layoutIfNeeded];
-    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        // Wait until the keyboardFrame has been set.
+        
+        CGRect toWindowRect = [self convertRect:self.frame toView:self.window];
+        CGFloat bottomOffset = self.window.bounds.size.height - CGRectGetMaxY(toWindowRect) + self.button.bounds.size.height;
+        self.expandableViewHeightConstraint.constant = MAX(self.keyboardFrame.size.height - bottomOffset, 0);
+        
+        [UIView animateWithDuration:0.25 animations:^{
+            [self.contentView layoutIfNeeded];
+        }];
+    });
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
@@ -181,6 +190,12 @@
 
 
 #pragma mark - Keyboard
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    if (self.window) {
+        self.keyboardFrame = [[[notification userInfo] valueForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    }
+}
 
 - (void)keyboardDidHide:(NSNotification *)notification {
     if (self.window) {

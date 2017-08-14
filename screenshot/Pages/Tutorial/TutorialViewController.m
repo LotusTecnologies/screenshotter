@@ -25,6 +25,15 @@
 
 #pragma mark - Life Cycle
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -105,6 +114,8 @@
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     self.scrollView.delegate = nil;
 }
 
@@ -152,6 +163,21 @@
 
 - (void)updateCurrentPage {
     self.pageControl.currentPage = self.scrollView.contentOffset.x / self.scrollView.bounds.size.width;
+}
+
+
+#pragma mark - Keyboard
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    if (self.view.window) {
+        self.scrollView.scrollEnabled = NO;
+    }
+}
+
+- (void)keyboardDidHide:(NSNotification *)notification {
+    if (self.view.window) {
+        self.scrollView.scrollEnabled = YES;
+    }
 }
 
 @end
