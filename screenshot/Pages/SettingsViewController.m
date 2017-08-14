@@ -11,6 +11,8 @@
 #import "Geometry.h"
 #import "PermissionsManager.h"
 
+@import MessageUI;
+
 typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
     SectionTypePermissions,
@@ -29,7 +31,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeVersion
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, TutorialViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray *data;
@@ -251,7 +253,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     switch (rowType) {
         case RowTypeBug:
-            // TODO: open email modal to support@crazeapp.com
+            [self presentMailComposer];
             break;
         case RowTypeTellFriend:
             // TODO: open share sheet to crazeapp.com/app
@@ -393,6 +395,28 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+
+#pragma mark - Mail
+
+- (void)presentMailComposer {
+    if ([MFMailComposeViewController canSendMail]) {
+        MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
+        mail.mailComposeDelegate = self;
+        [mail setSubject:@"Bug Report"];
+        [mail setMessageBody:@"\n\n\n\n-----------------\nDon't edit below.\n\n**debug values here**" isHTML:NO];
+        [mail setToRecipients:@[@"support@crazeapp.com"]];
+        
+        [self presentViewController:mail animated:YES completion:nil];
+        
+    } else {
+        // alert that mail doesnt work
+    }
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end
