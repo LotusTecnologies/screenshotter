@@ -24,7 +24,12 @@
                 UIImage *image = [UIImage imageWithData:screenshot.imageData];
                 handler(image, screenshot);
             } else {
-                [AssetSyncModel.sharedInstance imageWithAssetId:screenshot.assetId callback:^(UIImage *image){
+                [AssetSyncModel.sharedInstance imageWithAssetId:screenshot.assetId callback:^(UIImage *image, NSDictionary *info){
+                    // This callback may be called initially with degraded image. Wait for next one.
+                    NSNumber *isDegraded = info[PHImageResultIsDegradedKey];
+                    if ([isDegraded boolValue]) {
+                        return;
+                    }
                     handler(image, screenshot);
                     screenshot.imageData = UIImageJPEGRepresentation(image, 0.95);
                 }];

@@ -75,7 +75,7 @@ class DataModel: NSObject {
     public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = NSPredicate(format: "isFashion == TRUE")
+        request.predicate = NSPredicate(format: "isFashion == TRUE AND shoppablesCount > 0")
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {
@@ -231,17 +231,13 @@ extension DataModel {
     func saveScreenshot(managedObjectContext: NSManagedObjectContext,
                         assetId: String,
                         isFashion: Bool,
-                        createdAt: Date?,
-                        imageData: Data?) -> Screenshot {
+                        createdAt: Date?) -> Screenshot {
         let entityDescription = NSEntityDescription.entity(forEntityName: "Screenshot", in: managedObjectContext)
         let screenshotToSave = Screenshot(entity: entityDescription!, insertInto: managedObjectContext)
         screenshotToSave.assetId = assetId
         screenshotToSave.isFashion = isFashion
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
-        }
-        if let nsData = imageData as NSData? {
-            screenshotToSave.imageData = nsData
         }
         do {
             try managedObjectContext.save()
@@ -429,7 +425,6 @@ extension Shoppable {
         let viewWidth = Double(size.width)
         let viewHeight = Double(size.height)
         let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
-        print("frame:\(NSStringFromCGRect(frame))")
         return frame
     }
     

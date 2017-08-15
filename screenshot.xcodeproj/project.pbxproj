@@ -12,7 +12,6 @@
 		C5278FEA1F3C38510090E422 /* UIColor+Appearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB71F3C38510090E422 /* UIColor+Appearance.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
-		C5278FED1F3C38510090E422 /* MatchModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBC1F3C38510090E422 /* MatchModel.m */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
 		C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC01F3C38510090E422 /* NetworkingModel.m */; };
 		C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC31F3C38510090E422 /* FavoritesViewController.m */; };
@@ -54,8 +53,6 @@
 		C5278FB71F3C38510090E422 /* UIColor+Appearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Appearance.m"; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
-		C5278FBB1F3C38510090E422 /* MatchModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatchModel.h; sourceTree = "<group>"; };
-		C5278FBC1F3C38510090E422 /* MatchModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MatchModel.m; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C5278FBF1F3C38510090E422 /* NetworkingModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkingModel.h; sourceTree = "<group>"; };
 		C5278FC01F3C38510090E422 /* NetworkingModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkingModel.m; sourceTree = "<group>"; };
@@ -153,8 +150,6 @@
 			children = (
 				C5278FB91F3C38510090E422 /* AssetSyncModel.swift */,
 				C5278FBA1F3C38510090E422 /* DataModel.swift */,
-				C5278FBB1F3C38510090E422 /* MatchModel.h */,
-				C5278FBC1F3C38510090E422 /* MatchModel.m */,
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
 				C5278FBF1F3C38510090E422 /* NetworkingModel.h */,
 				C5278FC01F3C38510090E422 /* NetworkingModel.m */,
@@ -469,7 +464,6 @@
 				C52790011F3C38510090E422 /* ScreenshotCollectionViewCell.m in Sources */,
 				C52790001F3C38510090E422 /* ProductCollectionViewCell.m in Sources */,
 				C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */,
-				C5278FED1F3C38510090E422 /* MatchModel.m in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */,
 				C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */,
@@ -583,6 +577,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
