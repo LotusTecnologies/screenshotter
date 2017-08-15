@@ -14,16 +14,21 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
-  - Clarifai (2.3.2):
-    - AFNetworking (~> 3.1)
+  - Clarifai-Apple-SDK (3.0.0-beta2)
+  - PromiseKit/CorePromise (4.3.1)
+  - PromiseKit/Foundation (4.3.1):
+    - PromiseKit/CorePromise
 
 DEPENDENCIES:
-  - Clarifai
+  - AFNetworking
+  - Clarifai-Apple-SDK (= 3.0.0-beta2)
+  - PromiseKit/Foundation
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
-  Clarifai: 6d6cce2b31aefcf33893f2c3a18588b266771d11
+  Clarifai-Apple-SDK: f35f46a7eafe0490a5dc87d722d13ac31d638b5c
+  PromiseKit: 25a114b90b932ec8169b5736bd0881fe0efa93b5
 
-PODFILE CHECKSUM: 443448ee59c9a535ff756e302a7eff0283f0163c
+PODFILE CHECKSUM: 49d36166514533066c52cfc2a685571851385911
 
 COCOAPODS: 1.3.1
