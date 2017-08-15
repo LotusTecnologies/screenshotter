@@ -10,6 +10,10 @@
 #import "TutorialViewController.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
+#import "UIApplication+Version.h"
+#import "WebViewController.h"
+
+@import MessageUI;
 
 typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
@@ -29,7 +33,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeVersion
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, TutorialViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray *data;
@@ -43,6 +47,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        
         self.title = @"Settings";
         [self addNavigationItemLogo];
     }
@@ -137,7 +143,23 @@ typedef NS_ENUM(NSUInteger, RowType) {
     });
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.tableView.contentOffset = CGPointMake(0.f, -self.tableView.contentInset.top);
+    
+    [self reloadPermissionIndexPaths];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if (self.view.window) {
+        [self reloadPermissionIndexPaths];
+    }
+}
+
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     self.tableView.delegate = nil;
     self.tableView.dataSource = nil;
 }
@@ -235,10 +257,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     switch (rowType) {
         case RowTypeBug:
-            // TODO: open email modal to support@crazeapp.com
+            [self presentMailComposer];
             break;
-        case RowTypeTellFriend:
-            // TODO: open share sheet to crazeapp.com/app
+        case RowTypeTellFriend: {
+            WebViewController *viewController = [[WebViewController alloc] init];
+            [viewController addNavigationItemLogo];
+            viewController.url = [NSURL URLWithString:@"http://crazeapp.com/app"];
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
             break;
         case RowTypeTutorial: {
             TutorialViewController *viewController = [[TutorialViewController alloc] init];
@@ -251,7 +277,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeLocationService:
         case RowTypePushNotification:
         case RowTypeCameraRoll: {
-            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] response:^(BOOL granted) {
+            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] openSettingsIfNeeded:YES response:^(BOOL granted) {
                 if (granted) {
                     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
                 }
@@ -316,7 +342,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
-            return @"*version number*";
+            return [UIApplication versionBuild];
             break;
         default:
             return nil;
@@ -339,6 +365,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return UITableViewCellAccessoryNone;
             break;
     }
+}
+
+- (void)reloadPermissionIndexPaths {
+    NSMutableArray *permissionIndexPaths = [NSMutableArray array];
+    
+    for (NSNumber *permissionNumber in [self dataDict][@(SectionTypePermissions)]) {
+        [permissionIndexPaths addObject:[NSIndexPath indexPathForRow:[permissionNumber integerValue] inSection:0]];
+    }
+    
+    [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];
 }
 
 
@@ -367,6 +403,28 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+
+#pragma mark - Mail
+
+- (void)presentMailComposer {
+    if ([MFMailComposeViewController canSendMail]) {
+        MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
+        mail.mailComposeDelegate = self;
+        [mail setSubject:@"Bug Report"];
+        [mail setMessageBody:@"\n\n\n\n-----------------\nDon't edit below.\n\n**debug values here**" isHTML:NO];
+        [mail setToRecipients:@[@"support@crazeapp.com"]];
+        
+        [self presentViewController:mail animated:YES completion:nil];
+        
+    } else {
+        // TODO: alert that mail doesnt work
+    }
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

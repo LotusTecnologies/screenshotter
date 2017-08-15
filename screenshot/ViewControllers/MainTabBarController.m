@@ -37,7 +37,7 @@
         });
         
         _screenshotsNavigationController = ({
-            UIImage *image = [UIImage imageNamed:@"TabBarScreens"];
+            UIImage *image = [UIImage imageNamed:@"TabBarSnapshot"];
             
             ScreenshotsNavigationController *viewController = [[ScreenshotsNavigationController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Screenshots" image:image tag:1];
@@ -45,7 +45,7 @@
         });
         
         _settingsNavigationController = ({
-            UIImage *image = [UIImage imageNamed:@"TabBarGear"];
+            UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:2];

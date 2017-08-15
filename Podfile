@@ -7,6 +7,7 @@ def shared_pods
     pod 'Clarifai-Apple-SDK', '3.0.0-beta2'
     pod 'PromiseKit/Foundation'
     pod 'AFNetworking'
+    pod 'SDWebImage', '~> 4.0'
 end
 
 #target 'dev_influencer' do

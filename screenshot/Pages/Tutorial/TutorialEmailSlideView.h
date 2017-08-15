@@ -13,6 +13,7 @@
 @protocol TutorialEmailSlideViewDelegate <NSObject>
 @required
 
+- (void)tutorialEmailSlideViewDidFail:(TutorialEmailSlideView *)slideView;
 - (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView;
 
 @end
@@ -20,5 +21,7 @@
 @interface TutorialEmailSlideView : TutorialBaseSlideView
 
 @property (nonatomic, weak) id<TutorialEmailSlideViewDelegate> delegate;
+
++ (UIAlertController *)failedAlertController;
 
 @end

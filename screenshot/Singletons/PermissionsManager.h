@@ -30,5 +30,9 @@ typedef void (^PermissionBlock)(BOOL granted);
 - (PermissionStatus)permissionStatusForType:(PermissionType)type;
 - (BOOL)hasPermissionForType:(PermissionType)type;
 - (void)requestPermissionForType:(PermissionType)type response:(PermissionBlock)response;
+- (void)requestPermissionForType:(PermissionType)type openSettingsIfNeeded:(BOOL)openSettings response:(PermissionBlock)response;
+
+//  Called when the app starts
+- (void)fetchPushPermissionStatus;
 
 @end

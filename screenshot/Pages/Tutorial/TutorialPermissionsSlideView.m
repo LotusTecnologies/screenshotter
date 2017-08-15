@@ -10,26 +10,32 @@
 #import "PermissionsManager.h"
 #import "Geometry.h"
 
+@interface TutorialPermissionsSlideView ()
+
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UISwitch *> *switchesDict;
+
+@end
+
 @implementation TutorialPermissionsSlideView
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        
+        self.switchesDict = [NSMutableDictionary dictionary];
+        
         self.titleLabel.text = @"Get Started";
         self.subtitleLabel.text = @"Turn on permissions for the best CRAZE experience";
         
-        BOOL hasPhotosPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto];
-        BOOL hasNotificationPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePush];
-        BOOL hasLocationPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypeLocation];
-        
-        UIView *photosRow = [self permissionViewWithImageNamed:@"IconPhotos" text:@"Allow Photo Gallery Access" hasPermission:hasPhotosPermission action:@selector(photosSwitchChanged:)];
+        UIView *photosRow = [self permissionViewWithImageNamed:@"IconPhotos" text:@"Allow Photo Gallery Access" type:PermissionTypePhoto action:@selector(photosSwitchChanged:)];
         [photosRow.topAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.topAnchor].active = YES;
         
-        UIView *notificationRow = [self permissionViewWithImageNamed:@"IconNotifications" text:@"Enable Notifications" hasPermission:hasNotificationPermission action:@selector(notificationsSwitchChanged:)];
+        UIView *notificationRow = [self permissionViewWithImageNamed:@"IconNotifications" text:@"Enable Notifications" type:PermissionTypePush action:@selector(notificationsSwitchChanged:)];
         [notificationRow.heightAnchor constraintEqualToAnchor:photosRow.heightAnchor].active = YES;
         [notificationRow.topAnchor constraintGreaterThanOrEqualToAnchor:photosRow.bottomAnchor].active = YES;
         
-        UIView *locationRow = [self permissionViewWithImageNamed:@"IconLocation" text:@"Allow Location Access" hasPermission:hasLocationPermission action:@selector(locationSwitchChanged:)];
+        UIView *locationRow = [self permissionViewWithImageNamed:@"IconLocation" text:@"Allow Location Access" type:PermissionTypeLocation action:@selector(locationSwitchChanged:)];
         [locationRow.heightAnchor constraintEqualToAnchor:notificationRow.heightAnchor].active = YES;
         [locationRow.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
         [locationRow.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
@@ -42,10 +48,21 @@
     return self;
 }
 
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if (self.window) {
+        [self syncSwitchesState];
+    }
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 
 #pragma mark - Layout
 
-- (UIView *)permissionViewWithImageNamed:(NSString *)imageName text:(NSString *)text hasPermission:(BOOL)hasPermission action:(SEL)action {
+- (UIView *)permissionViewWithImageNamed:(NSString *)imageName text:(NSString *)text type:(PermissionType)type action:(SEL)action {
+    BOOL hasPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:type];
     CGFloat p = [Geometry padding];
     
     UIView *view = [[UIView alloc] init];
@@ -86,6 +103,7 @@
     [aSwitch.leadingAnchor constraintEqualToAnchor:label.layoutMarginsGuide.trailingAnchor].active = YES;
     [aSwitch.trailingAnchor constraintEqualToAnchor:view.trailingAnchor].active = YES;
     [aSwitch.centerYAnchor constraintEqualToAnchor:view.centerYAnchor].active = YES;
+    self.switchesDict[@(type)] = aSwitch;
     
     return view;
 }
@@ -94,12 +112,9 @@
 #pragma mark - Switch
 
 - (void)updatePermission:(BOOL)hasPermission forSwitch:(UISwitch *)aSwitch {
-    aSwitch.on = hasPermission;
     aSwitch.userInteractionEnabled = !hasPermission;
+    [aSwitch setOn:hasPermission animated:YES];
 }
-
-
-#pragma mark - Actions
 
 - (void)photosSwitchChanged:(UISwitch *)aSwitch {
     [self switchChanged:aSwitch forPermissionType:PermissionTypePhoto];
@@ -115,17 +130,17 @@
 
 - (void)switchChanged:(UISwitch *)aSwitch forPermissionType:(PermissionType)permissionType {
     if ([aSwitch isOn]) {
-        PermissionStatus status = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:permissionType];
-        
-        if (status == PermissionStatusNotDetermined) {
-            [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType response:^(BOOL granted) {
-                [self updatePermission:granted forSwitch:aSwitch];
-            }];
-            
-        } else if (status == PermissionStatusDenied) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
-        }
+        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType openSettingsIfNeeded:YES response:^(BOOL granted) {
+            [self updatePermission:granted forSwitch:aSwitch];
+        }];
     }
+}
+
+- (void)syncSwitchesState {
+    [self.switchesDict enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, UISwitch * _Nonnull obj, BOOL * _Nonnull stop) {
+        BOOL hasPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:[key integerValue]];
+        [self updatePermission:hasPermission forSwitch:obj];
+    }];
 }
 
 @end

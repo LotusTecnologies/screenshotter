@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "MainTabBarController.h"
 #import "TutorialViewController.h"
+#import "PermissionsManager.h"
 #import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
 
@@ -25,19 +26,25 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [ClarifaiModel sharedInstance];
     [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
+    [[UIToolbar appearance] setTintColor:[UIColor crazeRedColor]];
     
-    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
-        self.window.rootViewController = [[MainTabBarController alloc] init];
+    self.window = ({
+        UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         
-    } else {
-        TutorialViewController *viewController = [[TutorialViewController alloc] init];
-        viewController.delegate = self;
-        self.window.rootViewController = viewController;
-    }
-    
-    [self.window makeKeyAndVisible];
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+            window.rootViewController = [[MainTabBarController alloc] init];
+            
+        } else {
+            TutorialViewController *viewController = [[TutorialViewController alloc] init];
+            viewController.delegate = self;
+            window.rootViewController = viewController;
+        }
+        
+        [window makeKeyAndVisible];
+        window;
+    });
     
     return YES;
 }

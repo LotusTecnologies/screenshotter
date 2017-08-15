@@ -76,9 +76,9 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
-    cell.image = nil;
     cell.title = @"title which is two lines of text";
     cell.price = @"price";
+    cell.imageUrl = nil;
     cell.favoriteButton.selected = YES;
     return cell;
 }

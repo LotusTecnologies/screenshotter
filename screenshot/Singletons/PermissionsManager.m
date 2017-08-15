@@ -15,6 +15,11 @@
 
 @interface PermissionsManager () <CLLocationManagerDelegate>
 
+@property (nonatomic) PermissionStatus pushStatus;
+
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, copy) PermissionBlock locationPermissionBlock;
+
 @end
 
 @implementation PermissionsManager 
@@ -40,11 +45,11 @@
             break;
             
         case PermissionTypePush:
-            return [self permissionStatusForPush];
+            return self.pushStatus;
             break;
             
         case PermissionTypeLocation:
-            return [self permissionStatusForLocationStatus:[CLLocationManager authorizationStatus]];
+            return [self permissionStatusForLocation:[CLLocationManager authorizationStatus]];
             break;
             
         default:
@@ -73,12 +78,26 @@
     }
 }
 
-- (PermissionStatus)permissionStatusForPush {
-    BOOL hasPermission = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
-    return hasPermission ? PermissionStatusAuthorized : PermissionStatusDenied;
+- (PermissionStatus)permissionStatusForPush:(UNAuthorizationStatus)status {
+    // Fetch to try and keep the status always synced.
+    [self fetchPushPermissionStatus];
+    
+    switch (status) {
+        case UNAuthorizationStatusDenied:
+            return PermissionStatusDenied;
+            break;
+            
+        case UNAuthorizationStatusNotDetermined:
+            return PermissionStatusNotDetermined;
+            break;
+            
+        case UNAuthorizationStatusAuthorized:
+            return PermissionStatusAuthorized;
+            break;
+    }
 }
 
-- (PermissionStatus)permissionStatusForLocationStatus:(CLAuthorizationStatus)status {
+- (PermissionStatus)permissionStatusForLocation:(CLAuthorizationStatus)status {
     switch (status) {
         case kCLAuthorizationStatusAuthorizedAlways:
         case kCLAuthorizationStatusAuthorizedWhenInUse:
@@ -137,6 +156,22 @@
     }
 }
 
+- (void)requestPermissionForType:(PermissionType)type openSettingsIfNeeded:(BOOL)openSettings response:(PermissionBlock)response {
+    if (openSettings) {
+        PermissionStatus status = [self permissionStatusForType:type];
+        
+        if (status == PermissionStatusNotDetermined) {
+            [self requestPermissionForType:type response:response];
+            
+        } else {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+        }
+        
+    } else {
+        [self requestPermissionForType:type response:response];
+    }
+}
+
 - (void)requestPhotoPermissionWithResponse:(PermissionBlock)response {
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     
@@ -161,6 +196,8 @@
         // ???: is this needed
 //        [[UIApplication sharedApplication] registerForRemoteNotifications];
         
+        self.pushStatus = granted ? PermissionStatusAuthorized : PermissionStatusDenied;
+        
         if (response) {
             response(granted);
         }
@@ -172,17 +209,17 @@
     
     if (status == kCLAuthorizationStatusNotDetermined) {
         if ([CLLocationManager locationServicesEnabled]) {
-            CLLocationManager *locationManager = [[CLLocationManager alloc] init];
-            locationManager.delegate = self;
-            
-            // TODO: call one of the below.
-//            [locationManager requestAlwaysAuthorization];
-//            [locationManager requestWhenInUseAuthorization];
-            
-            // TODO: once the delegate is called, take the response and pass it here
             if (response) {
-                response(NO);
+                if (self.locationPermissionBlock) {
+                    self.locationPermissionBlock(NO);
+                }
+                
+                self.locationPermissionBlock = response;
             }
+            
+            self.locationManager = [[CLLocationManager alloc] init];
+            self.locationManager.delegate = self;
+            [self.locationManager requestAlwaysAuthorization];
             
         } else {
             if (response) {
@@ -192,16 +229,35 @@
         
     } else {
         if (response) {
-            response(status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse);
+            response([self permissionStatusForLocation:status] == PermissionStatusAuthorized);
         }
     }
 }
 
 
-#pragma mark - Location Manager
+#pragma mark - Push
+
+- (void)fetchPushPermissionStatus {
+    // The push status returns async, to maintain sync we need to manage the value.
+    
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        self.pushStatus = [self permissionStatusForPush:settings.authorizationStatus];
+    }];
+}
+
+
+#pragma mark - Location
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    
+    if (status != kCLAuthorizationStatusNotDetermined) {
+        if (self.locationPermissionBlock) {
+            self.locationPermissionBlock([self permissionStatusForLocation:status] == PermissionStatusAuthorized);
+            self.locationPermissionBlock = nil;
+            
+            self.locationManager.delegate = nil;
+            self.locationManager = nil;
+        }
+    }
 }
 
 @end
