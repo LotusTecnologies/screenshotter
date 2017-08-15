@@ -58,6 +58,8 @@
 
 - (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     WebViewController *webViewController = [[WebViewController alloc] init];
+    [webViewController addNavigationItemLogo];
+    webViewController.hidesBottomBarWhenPushed = YES;
     webViewController.url = [NSURL URLWithString:[viewController productAtIndexPath:indexPath].offer];
     
     [self pushViewController:webViewController animated:YES];
