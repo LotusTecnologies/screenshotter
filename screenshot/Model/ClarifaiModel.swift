@@ -13,6 +13,10 @@ import PromiseKit
 class ClarifaiModel: NSObject {
 
     public static let sharedInstance = ClarifaiModel()
+    
+    public static func setup() {
+        let _ = ClarifaiModel.sharedInstance
+    }
 
     override init() {
         super.init()

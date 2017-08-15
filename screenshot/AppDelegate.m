@@ -24,7 +24,9 @@
 #pragma mark - Life Cycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [ClarifaiModel sharedInstance];
+    NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
+    [AssetSyncModel.sharedInstance syncPhotos];
+    NSLog(@"didFinishLaunchingWithOptions completed syncPhotos");
     [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
     [[UIToolbar appearance] setTintColor:[UIColor crazeRedColor]];
     
@@ -75,9 +77,6 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    NSLog(@"applicationDidBecomeActive starting syncPhotos");
-    [AssetSyncModel.sharedInstance syncPhotos];
-    NSLog(@"applicationDidBecomeActive completed syncPhotos success");
 }
 
 

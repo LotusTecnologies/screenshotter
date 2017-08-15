@@ -9,6 +9,7 @@
 #import "TutorialPermissionsSlideView.h"
 #import "PermissionsManager.h"
 #import "Geometry.h"
+#import "screenshot-Swift.h"
 
 @interface TutorialPermissionsSlideView ()
 
@@ -132,6 +133,9 @@
     if ([aSwitch isOn]) {
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType openSettingsIfNeeded:YES response:^(BOOL granted) {
             [self updatePermission:granted forSwitch:aSwitch];
+            if (permissionType == PermissionTypePhoto) {
+                [AssetSyncModel.sharedInstance syncPhotos];
+            }
         }];
     }
 }
