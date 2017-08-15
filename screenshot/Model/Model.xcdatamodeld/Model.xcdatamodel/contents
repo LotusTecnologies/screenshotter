@@ -3,6 +3,7 @@
     <entity name="Product" representedClassName="Product" syncable="YES" codeGenerationType="class">
         <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="categories" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateFavorited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="floatOriginalPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="floatPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
@@ -38,7 +39,7 @@
         <relationship name="screenshot" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="shoppables" inverseEntity="Screenshot" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Product" positionX="124" positionY="189" width="128" height="238"/>
+        <element name="Product" positionX="124" positionY="189" width="128" height="255"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="165"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="195"/>
     </elements>

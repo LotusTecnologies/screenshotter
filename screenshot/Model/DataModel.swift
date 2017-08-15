@@ -116,6 +116,25 @@ class DataModel: NSObject {
     fileprivate var shoppableChangeIndexPath: IndexPath?
     fileprivate var shoppableChangeKind: CZChangeKind = .none
 
+    
+    public lazy var favoriteFrc: NSFetchedResultsController<Product> = {
+        let request: NSFetchRequest<Product> = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "isFavorite == TRUE")
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            print("Failed to fetch favorites from core data:\(error)")
+        }
+        return fetchedResultsController
+    }()
+    weak open var favoriteFrcDelegate: FrcDelegateProtocol?
+    
+    fileprivate var favoriteChangeIndexPath: IndexPath?
+    fileprivate var favoriteChangeKind: CZChangeKind = .none
+
 }
 
 extension DataModel: NSFetchedResultsControllerDelegate {
@@ -128,96 +147,77 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case shoppableFrc:
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
+        case favoriteFrc:
+            favoriteChangeKind = .none
+            favoriteChangeIndexPath = nil
         default:
             print("Unknown controller:\(controller) in controllerWillChangeContent")
+        }
+    }
+    
+    func didChange(changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, type: NSFetchedResultsChangeType, indexPath: IndexPath?, newIndexPath: IndexPath?) {
+        if changeKind != .none || changeIndexPath != nil {
+            changeKind = .multiple
+        } else {
+            switch type {
+            case .insert:
+                changeKind = .singleAdd
+                changeIndexPath = newIndexPath
+            case .delete:
+                changeKind = .singleDelete
+                changeIndexPath = indexPath
+            default:
+                changeKind = .multiple
+            }
         }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch controller {
         case screenshotFrc:
-            if screenshotChangeKind != .none || screenshotChangeIndexPath != nil {
-                screenshotChangeKind = .multiple
-            } else {
-                switch type {
-                case .insert:
-                    screenshotChangeKind = .singleAdd
-                    screenshotChangeIndexPath = newIndexPath
-                case .delete:
-                    screenshotChangeKind = .singleDelete
-                    screenshotChangeIndexPath = indexPath
-                default:
-                    screenshotChangeKind = .multiple
-                }
-            }
+            didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case shoppableFrc:
-            if shoppableChangeKind != .none || shoppableChangeIndexPath != nil {
-                shoppableChangeKind = .multiple
-            } else {
-                switch type {
-                case .insert:
-                    shoppableChangeKind = .singleAdd
-                    shoppableChangeIndexPath = newIndexPath
-                case .delete:
-                    shoppableChangeKind = .singleDelete
-                    shoppableChangeIndexPath = indexPath
-                default:
-                    shoppableChangeKind = .multiple
-                }
-            }
+            didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
+        case favoriteFrc:
+            didChange(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         default:
             print("Unknown controller:\(controller) in controller didChange")
         }
     }
     
+    func didChangeContent(changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, frcDelegate: FrcDelegateProtocol?) {
+        switch changeKind {
+        case .none:
+            print("DataModel didChangeContent no change. Weird")
+        case .singleAdd:
+            if let changeIndexPath = changeIndexPath {
+                frcDelegate?.frcOneAddedAt(indexPath: changeIndexPath)
+            } else {
+                print("Error DataModel singleAdd changeIndexPath nil")
+                frcDelegate?.frcReloadData()
+            }
+        case .singleDelete:
+            if let changeIndexPath = changeIndexPath {
+                frcDelegate?.frcOneDeletedAt(indexPath: changeIndexPath)
+            } else {
+                print("Error DataModel singleDelete changeIndexPath nil")
+                frcDelegate?.frcReloadData()
+            }
+        case .multiple:
+            frcDelegate?.frcReloadData()
+        }
+        changeKind = .none
+        changeIndexPath = nil
+    }
+    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         switch controller {
         case screenshotFrc:
-            switch screenshotChangeKind {
-            case .none:
-                print("DataModel screenshot no change. Weird")
-            case .singleAdd:
-                if let screenshotChangeIndexPath = screenshotChangeIndexPath {
-                    screenshotFrcDelegate?.frcOneAddedAt(indexPath: screenshotChangeIndexPath)
-                } else {
-                    print("Error DataModel singleAdd screenshotChangeIndexPath nil")
-                    screenshotFrcDelegate?.frcReloadData()
-                }
-            case .singleDelete:
-                if let screenshotChangeIndexPath = screenshotChangeIndexPath {
-                    screenshotFrcDelegate?.frcOneDeletedAt(indexPath: screenshotChangeIndexPath)
-                } else {
-                    print("Error DataModel singleDelete screenshotChangeIndexPath nil")
-                    screenshotFrcDelegate?.frcReloadData()
-                }
-            case .multiple:
-                screenshotFrcDelegate?.frcReloadData()
-            }
-            screenshotChangeKind = .none
-            screenshotChangeIndexPath = nil
+            didChangeContent(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
         case shoppableFrc:
-            switch shoppableChangeKind {
-            case .none:
-                print("DataModel shoppable no change. Weird")
-            case .singleAdd:
-                if let shoppableChangeIndexPath = shoppableChangeIndexPath {
-                    shoppableFrcDelegate?.frcOneAddedAt(indexPath: shoppableChangeIndexPath)
-                } else {
-                    print("Error DataModel singleAdd shoppableChangeIndexPath nil")
-                    shoppableFrcDelegate?.frcReloadData()
-                }
-            case .singleDelete:
-                if let shoppableChangeIndexPath = shoppableChangeIndexPath {
-                    shoppableFrcDelegate?.frcOneDeletedAt(indexPath: shoppableChangeIndexPath)
-                } else {
-                    print("Error DataModel singleDelete shoppableChangeIndexPath nil")
-                    shoppableFrcDelegate?.frcReloadData()
-                }
-            case .multiple:
-                shoppableFrcDelegate?.frcReloadData()
-            }
-            shoppableChangeKind = .none
-            shoppableChangeIndexPath = nil
+            didChangeContent(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
+        case favoriteFrc:
+            didChangeContent(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
         default:
             print("Unknown controller:\(controller) in controllerDidChangeContent")
         }
@@ -435,6 +435,16 @@ extension Shoppable {
         }
         let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
         return croppedImage
+    }
+    
+}
+
+extension Product {
+    
+    @objc public func setFavorited(toFavorited: Bool) {
+        self.isFavorite = toFavorited
+        self.dateFavorited = toFavorited ? NSDate() : nil
+        DataModel.sharedInstance.saveMain()
     }
     
 }
