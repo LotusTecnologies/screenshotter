@@ -24,7 +24,9 @@
 
 //  This will set the attributedText property. The dictionary's
 //  string is a text fragment while the number is a boolean. If
-//  @YES then the text fragment becomes tappable.
+//  @YES then the text fragment becomes tappable. Note that for
+//  the best tapping results, a space key ' ', should always be
+//  inserted before and after tappable text fragments.
 - (void)applyTappableText:(NSArray<NSDictionary<NSString *, NSNumber *> *> *)texts;
 - (void)applyTappableText:(NSArray<NSDictionary<NSString *, NSNumber *> *> *)texts withAttributes:(NSDictionary<NSString *, id> *)attributes;
 
