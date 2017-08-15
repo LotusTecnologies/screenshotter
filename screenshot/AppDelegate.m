@@ -25,6 +25,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
+    [[UIToolbar appearance] setTintColor:[UIColor crazeRedColor]];
     
     [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     
