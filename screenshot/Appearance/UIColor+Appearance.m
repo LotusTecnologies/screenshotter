@@ -18,4 +18,8 @@
     return [UIColor colorWithRed:237.f/255.f green:20.f/255.f blue:90.f/255.f alpha:1.f];
 }
 
++ (UIColor *)softTextColor {
+    return [UIColor colorWithWhite:155.f/255.f alpha:1.f];
+}
+
 @end

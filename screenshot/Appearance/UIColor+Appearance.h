@@ -12,5 +12,6 @@
 
 + (UIColor *)backgroundColor;
 + (UIColor *)crazeRedColor;
++ (UIColor *)softTextColor;
 
 @end

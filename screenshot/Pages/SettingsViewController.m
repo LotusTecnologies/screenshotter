@@ -112,6 +112,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         UITextView *textView = [[UITextView alloc] init];
         textView.backgroundColor = [UIColor clearColor];
         textView.editable = NO;
+        textView.scrollsToTop = NO;
+        textView.scrollEnabled = NO;
         textView.dataDetectorTypes = UIDataDetectorTypePhoneNumber | UIDataDetectorTypeLink;
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
