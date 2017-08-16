@@ -17,6 +17,7 @@
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *favoriteFrc;
+@property (nonatomic, strong) NSMutableArray<Product *> *unfavoriteArray;
 
 @end
 
@@ -31,6 +32,7 @@
         [self addNavigationItemLogo];
         
         self.favoriteFrc = [DataModel sharedInstance].favoriteFrc;
+        self.unfavoriteArray = [NSMutableArray array];
     }
     return self;
 }
@@ -71,6 +73,15 @@
     }
     
     _didViewWillAppear = YES;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if (self.unfavoriteArray.count) {
+        [[DataModel sharedInstance] unfavoriteWithFavoriteArray:self.unfavoriteArray];
+        [self.unfavoriteArray removeAllObjects];
+    }
 }
 
 - (void)dealloc {
@@ -116,7 +127,13 @@
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
-    [product setFavoritedToFavorited:!product.isFavorite];
+    
+    if ([cell.favoriteButton isSelected]) {
+        [self.unfavoriteArray removeObject:product];
+        
+    } else {
+        [self.unfavoriteArray addObject:product];
+    }
 }
 
 @end

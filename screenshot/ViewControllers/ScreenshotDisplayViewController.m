@@ -8,8 +8,11 @@
 
 #import "ScreenshotDisplayViewController.h"
 #import "Geometry.h"
+#import "screenshot-Swift.h"
 
-@interface ScreenshotDisplayViewController ()
+@interface ScreenshotDisplayViewController () {
+    BOOL _didLayoutShoppableFrames;
+}
 
 @property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic, strong) UIImageView *screenshotImageView;
@@ -62,6 +65,15 @@
     [screenshotImageView.layoutMarginsGuide.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    if (!_didLayoutShoppableFrames) {
+        _didLayoutShoppableFrames = YES;
+        [self insertShoppableFrames];
+    }
+}
+
 - (UIButton *)closeButton {
     if (!_closeButton) {
         _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -82,6 +94,36 @@
 
 - (UIImage *)image {
     return self.screenshotImageView.image;
+}
+
+- (void)insertShoppableFrames {
+    CGFloat imageWidth = self.image.size.width;
+    CGFloat imageHeight = self.image.size.height;
+    CGFloat imageViewWidth = self.screenshotImageView.bounds.size.width;
+    CGFloat imageViewHeight = self.screenshotImageView.bounds.size.height;
+    
+    CGFloat imageScale = MIN(imageViewWidth / imageWidth, imageViewHeight / imageHeight);
+    CGSize scaledImageSize = CGSizeMake(imageWidth * imageScale, imageHeight * imageScale);
+    
+    CGRect imageFrame = CGRectZero;
+    imageFrame.origin.x = round((imageViewWidth - scaledImageSize.width) * .5f);
+    imageFrame.origin.y = round((imageViewHeight - scaledImageSize.height) * .5f);
+    imageFrame.size.width = round(scaledImageSize.width);
+    imageFrame.size.height = round(scaledImageSize.height);
+    
+    UIView *screenshotImageFrameView = [[UIView alloc] initWithFrame:imageFrame];
+    screenshotImageFrameView.userInteractionEnabled = NO;
+    [self.screenshotImageView addSubview:screenshotImageFrameView];
+    
+    
+    for (Shoppable *shoppable in self.shoppables) {
+        CGRect frame = [shoppable frameWithSize:screenshotImageFrameView.bounds.size];
+        
+        UIView *frameView = [[UIView alloc] initWithFrame:frame];
+        frameView.layer.borderColor = [[UIColor whiteColor] colorWithAlphaComponent:.7f].CGColor;
+        frameView.layer.borderWidth = 2.f;
+        [screenshotImageFrameView addSubview:frameView];
+    }
 }
 
 @end

@@ -142,8 +142,7 @@
 }
 
 - (void)safariAction {
-    // TODO: get correct url
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.google.com"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:self.url options:@{} completionHandler:nil];
 }
 
 @end

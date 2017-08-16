@@ -15,7 +15,7 @@
 #import "ScreenshotDisplayViewController.h"
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
-    BOOL _didViewWillAppear;
+    BOOL _didViewDidAppear;
 }
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -101,14 +101,14 @@
     [self reloadCollectionViewForIndex:0];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     
-    if (_didViewWillAppear) {
+    if (_didViewDidAppear) {
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
     
-    _didViewWillAppear = YES;
+    _didViewDidAppear = YES;
 }
 
 - (void)dealloc {
@@ -142,6 +142,7 @@
 - (void)displayScreenshotAction {
     ScreenshotDisplayViewController *viewController = [[ScreenshotDisplayViewController alloc] init];
     viewController.image = self.image;
+    viewController.shoppables = [self shoppables];
     [viewController.closeButton addTarget:self action:@selector(dismissScreenshotDisplay) forControlEvents:UIControlEventTouchUpInside];
     [self presentViewController:viewController animated:YES completion:nil];
 }
