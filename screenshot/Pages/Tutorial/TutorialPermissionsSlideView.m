@@ -45,6 +45,7 @@
         label.translatesAutoresizingMaskIntoConstraints = NO;
         label.numberOfLines = 0;
         label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+        label.textColor = [UIColor grayColor];
         label.text = @"Craze needs access to your photos to turn your screenshots into shoppable experiences.\n\nCraze sends you a notification when your screenshot is ready to shop. Enabling notifications turns all your favorite apps, like Instagram and Snapchat into shoppable experiences.";
         [self.contentView addSubview:label];
         [label.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
