@@ -404,6 +404,13 @@ extension DataModel {
         return productToSave
     }
     
+    public func unfavorite(favoriteArray: [Product]) {
+        for favorite in favoriteArray {
+            favorite.isFavorite = false
+        }
+        saveMain()
+    }
+    
     // Update changes made in the background
     public func saveMain() {
         saveMoc(managedObjectContext: mainMoc())
