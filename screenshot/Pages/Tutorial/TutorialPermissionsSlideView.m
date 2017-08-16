@@ -112,7 +112,7 @@
 #pragma mark - Switch
 
 - (void)updatePermission:(BOOL)hasPermission forSwitch:(UISwitch *)aSwitch {
-    aSwitch.userInteractionEnabled = !hasPermission;
+    aSwitch.enabled = !hasPermission;
     [aSwitch setOn:hasPermission animated:YES];
 }
 
