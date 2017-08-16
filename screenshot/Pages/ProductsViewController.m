@@ -15,7 +15,7 @@
 #import "ScreenshotDisplayViewController.h"
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
-    BOOL _didViewWillAppear;
+    BOOL _didViewDidAppear;
 }
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -104,11 +104,11 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    if (_didViewWillAppear) {
+    if (_didViewDidAppear) {
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
     
-    _didViewWillAppear = YES;
+    _didViewDidAppear = YES;
 }
 
 - (void)dealloc {
