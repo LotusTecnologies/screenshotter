@@ -203,6 +203,7 @@
     cell.title = product.productDescription;
     cell.price = product.price;
     cell.imageUrl = product.imageURL;
+    cell.favoriteButton.selected = product.isFavorite;
     return cell;
 }
 
@@ -214,7 +215,10 @@
 #pragma mark - Product Cell
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
-//    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    Product *product = self.products[indexPath.item];
+    
+    [product setFavoritedToFavorited:!product.isFavorite];
 }
 
 

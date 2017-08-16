@@ -11,7 +11,7 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 
-@interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate>
+@interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *favoriteFrc;
@@ -28,7 +28,8 @@
         self.title = @"Favorites";
         [self addNavigationItemLogo];
         
-//        self.favoriteFrc = DataModel.sharedInstance.favoriteFrc;
+        [DataModel sharedInstance].favoriteFrcDelegate = self;
+        self.favoriteFrc = DataModel.sharedInstance.favoriteFrc;
     }
     return self;
 }
@@ -64,6 +65,8 @@
 - (void)dealloc {
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
+    
+    [DataModel sharedInstance].favoriteFrcDelegate = nil;
 }
 
 
@@ -74,16 +77,19 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 15;
+    return self.favoriteFrc.fetchedObjects.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
+    
+    
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
-    cell.title = @"title which is two lines of text";
-    cell.price = @"price";
+    cell.title = product.productDescription;
+    cell.price = product.price;
     cell.imageUrl = nil;
-    cell.favoriteButton.selected = YES;
+    cell.favoriteButton.selected = product.isFavorite;
     return cell;
 }
 
@@ -101,6 +107,21 @@
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+}
+
+
+#pragma mark - Fetched Results
+
+- (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcReloadData {
+    [self.collectionView reloadData];
 }
 
 @end
