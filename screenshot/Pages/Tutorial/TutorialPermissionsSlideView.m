@@ -36,15 +36,26 @@
         [notificationRow.heightAnchor constraintEqualToAnchor:photosRow.heightAnchor].active = YES;
         [notificationRow.topAnchor constraintGreaterThanOrEqualToAnchor:photosRow.bottomAnchor].active = YES;
         
-        UIView *locationRow = [self permissionViewWithImageNamed:@"IconLocation" text:@"Allow Location Access" type:PermissionTypeLocation action:@selector(locationSwitchChanged:)];
-        [locationRow.heightAnchor constraintEqualToAnchor:notificationRow.heightAnchor].active = YES;
-        [locationRow.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
-        [locationRow.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+//        UIView *locationRow = [self permissionViewWithImageNamed:@"IconLocation" text:@"Allow Location Access" type:PermissionTypeLocation action:@selector(locationSwitchChanged:)];
+//        [locationRow.heightAnchor constraintEqualToAnchor:notificationRow.heightAnchor].active = YES;
+//        [locationRow.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
+//        [locationRow.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+        
+        UILabel *label = [[UILabel alloc] init];
+        label.translatesAutoresizingMaskIntoConstraints = NO;
+        label.numberOfLines = 0;
+        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+        label.text = @"Craze needs access to your photos to turn your screenshots into shoppable experiences.\n\nCraze sends you a notification when your screenshot is ready to shop. Enabling notifications turns all your favorite apps, like Instagram and Snapchat into shoppable experiences.";
+        [self.contentView addSubview:label];
+        [label.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
+        [label.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+        [label.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+        [label.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         
         [self separatorFromAnchor:self.contentView.topAnchor toAnchor:photosRow.topAnchor];
         [self separatorFromAnchor:photosRow.layoutMarginsGuide.bottomAnchor toAnchor:notificationRow.topAnchor];
-        [self separatorFromAnchor:notificationRow.layoutMarginsGuide.bottomAnchor toAnchor:locationRow.topAnchor];
-        [self separatorFromAnchor:locationRow.bottomAnchor toAnchor:self.contentView.bottomAnchor];
+        [self separatorFromAnchor:notificationRow.layoutMarginsGuide.bottomAnchor toAnchor:label.topAnchor];
+        [self separatorFromAnchor:label.bottomAnchor toAnchor:self.contentView.bottomAnchor];
     }
     return self;
 }
