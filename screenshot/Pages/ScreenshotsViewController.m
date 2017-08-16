@@ -10,11 +10,13 @@
 #import "ScreenshotCollectionViewCell.h"
 #import "Geometry.h"
 #import "screenshot-Swift.h"
+#import "HelperView.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
+@property (nonatomic, strong) HelperView *helperView;
 
 @end
 
@@ -61,6 +63,34 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    self.helperView = ({
+        UIImageView *imageView = [[UIImageView alloc] init];
+        imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        imageView.image = [UIImage imageNamed:@"ScreenshotEmptyListHelper"];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        
+        CGFloat verticalPadding = 40.f;
+        
+        HelperView *helperView = [[HelperView alloc] init];
+        helperView.translatesAutoresizingMaskIntoConstraints = NO;
+        helperView.userInteractionEnabled = NO;
+        helperView.titleLabel.text = @"No Screenshots Yet";
+        helperView.subtitleLabel.text = @"Screenshot looks you want to shop by pressing the power & home buttons at the same time";
+        [helperView.contentView addSubview:imageView];
+        [self.view addSubview:helperView];
+        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:verticalPadding].active = YES;
+        [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-verticalPadding].active = YES;
+        [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        helperView;
+    });
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self syncHelperViewVisibility];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -131,14 +161,24 @@
 
 - (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
     [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+    [self syncHelperViewVisibility];
 }
 
 - (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
     [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+    [self syncHelperViewVisibility];
 }
 
 - (void)frcReloadData {
     [self.collectionView reloadData];
+    [self syncHelperViewVisibility];
+}
+
+
+#pragma mark - Helper View
+
+- (void)syncHelperViewVisibility {
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
 }
 
 @end
