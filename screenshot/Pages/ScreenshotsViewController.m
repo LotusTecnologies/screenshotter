@@ -123,8 +123,7 @@
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
-    screenshot.isHidden = YES;
+    [[self screenshotAtIndexPath:indexPath] setHide];
 }
 
 
