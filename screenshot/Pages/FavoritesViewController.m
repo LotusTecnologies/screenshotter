@@ -88,7 +88,7 @@
     cell.delegate = self;
     cell.title = product.productDescription;
     cell.price = product.price;
-    cell.imageUrl = nil;
+    cell.imageUrl = product.imageURL;
     cell.favoriteButton.selected = product.isFavorite;
     return cell;
 }
