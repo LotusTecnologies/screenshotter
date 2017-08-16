@@ -186,11 +186,11 @@
     NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
     self.products = [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
     
+    [self.collectionView reloadData];
+    
     if (self.products.count) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
     }
-    
-    [self.collectionView reloadData];
 }
 
 - (NSInteger)numberOfCollectionViewColumns {
