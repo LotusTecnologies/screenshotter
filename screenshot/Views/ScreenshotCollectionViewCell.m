@@ -27,6 +27,7 @@
             UIImageView *imageView = [[UIImageView alloc] init];
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
             imageView.contentMode = UIViewContentModeScaleAspectFill;
+            imageView.clipsToBounds = YES;
             [self.contentView addSubview:imageView];
             [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
             [imageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;

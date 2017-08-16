@@ -30,6 +30,7 @@
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
             imageView.backgroundColor = [UIColor whiteColor];
             imageView.contentMode = UIViewContentModeScaleAspectFit;
+            imageView.clipsToBounds = YES;
             [self.contentView addSubview:imageView];
             [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
             [imageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;

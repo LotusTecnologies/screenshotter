@@ -8,9 +8,12 @@
 
 #import "BaseViewController.h"
 
+@class Shoppable;
+
 @interface ScreenshotDisplayViewController : BaseViewController
 
 @property (nonatomic, copy) UIImage *image;
 @property (nonatomic, strong, readonly) UIButton *closeButton;
+@property (nonatomic, strong) NSArray<Shoppable *> *shoppables;
 
 @end

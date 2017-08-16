@@ -142,6 +142,7 @@
 - (void)displayScreenshotAction {
     ScreenshotDisplayViewController *viewController = [[ScreenshotDisplayViewController alloc] init];
     viewController.image = self.image;
+    viewController.shoppables = [self shoppables];
     [viewController.closeButton addTarget:self action:@selector(dismissScreenshotDisplay) forControlEvents:UIControlEventTouchUpInside];
     [self presentViewController:viewController animated:YES completion:nil];
 }
