@@ -12,6 +12,7 @@
 #import "Geometry.h"
 #import "ScreenshotImageFetcher.h"
 #import "ShoppablesToolbar.h"
+#import "ScreenshotDisplayViewController.h"
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate>
 
@@ -20,6 +21,8 @@
 
 @property (nonatomic, strong) NSFetchedResultsController *shoppablesFrc;
 @property (nonatomic, strong) NSArray<Product *> *products;
+
+@property (nonatomic, copy) UIImage *image;
 
 @end
 
@@ -80,6 +83,19 @@
         collectionView;
     });
     
+    [ScreenshotImageFetcher screenshot:self.screenshot handler:^(UIImage *image, Screenshot *screenshot) {
+        CGFloat buttonSize = 32.f;
+        
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
+        button.imageView.contentMode = UIViewContentModeScaleAspectFill;
+        [button setImage:image forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
+        
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        self.image = image;
+    }];
+    
     [self reloadCollectionViewForIndex:0];
 }
 
@@ -109,6 +125,17 @@
             dataModel.shoppableFrcDelegate = nil;
         }
     }
+}
+
+- (void)displayScreenshotAction {
+    ScreenshotDisplayViewController *viewController = [[ScreenshotDisplayViewController alloc] init];
+    viewController.image = self.image;
+    [viewController.closeButton addTarget:self action:@selector(dismissScreenshotDisplay) forControlEvents:UIControlEventTouchUpInside];
+    [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void)dismissScreenshotDisplay {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
