@@ -67,7 +67,7 @@
         textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:@"Email"];
         textField.placeholder = @"you@website.com";
         textField.keyboardType = UIKeyboardTypeEmailAddress;
-        textField.returnKeyType = UIReturnKeyDone;
+        textField.returnKeyType = UIReturnKeyDone; // TODO: remove submitting functionality from here
         textField.backgroundColor = [UIColor whiteColor];
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.spellCheckingType = UITextSpellCheckingTypeNo;

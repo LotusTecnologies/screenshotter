@@ -9,10 +9,12 @@
 #import "FavoritesViewController.h"
 #import "ProductCollectionViewCell.h"
 #import "Geometry.h"
+#import "screenshot-Swift.h"
 
 @interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) NSFetchedResultsController *favoriteFrc;
 
 @end
 
@@ -25,6 +27,8 @@
     if (self) {
         self.title = @"Favorites";
         [self addNavigationItemLogo];
+        
+//        self.favoriteFrc = DataModel.sharedInstance.favoriteFrc;
     }
     return self;
 }

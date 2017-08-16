@@ -75,7 +75,7 @@ class DataModel: NSObject {
     public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = NSPredicate(format: "isFashion == TRUE")
+        request.predicate = NSPredicate(format: "isFashion == TRUE AND shoppablesCount > 0")
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {
@@ -228,12 +228,17 @@ extension DataModel: NSFetchedResultsControllerDelegate {
 extension DataModel {
     
     // Save a new Screenshot to Core Data.
-    func saveScreenshot(assetId: String) -> Screenshot {
-        let managedObjectContext = mainMoc()
+    func saveScreenshot(managedObjectContext: NSManagedObjectContext,
+                        assetId: String,
+                        isFashion: Bool,
+                        createdAt: Date?) -> Screenshot {
         let entityDescription = NSEntityDescription.entity(forEntityName: "Screenshot", in: managedObjectContext)
         let screenshotToSave = Screenshot(entity: entityDescription!, insertInto: managedObjectContext)
         screenshotToSave.assetId = assetId
-        screenshotToSave.createdAt = NSDate()
+        screenshotToSave.isFashion = isFashion
+        if let nsDate = createdAt as NSDate? {
+            screenshotToSave.createdAt = nsDate
+        }
         do {
             try managedObjectContext.save()
         } catch {
@@ -254,6 +259,43 @@ extension DataModel {
         return screenshot(predicate: nil, managedObjectContext: managedObjectContext)
     }
     
+    func retrieveAllAssetIds() -> Set<String> {
+        return retrieveAssetIds(predicate: nil)
+    }
+    
+    func retrieveCompleteAssetIds() -> Set<String> {
+        return retrieveAssetIds(predicate: NSPredicate(format: "isFashion != nil"))
+    }
+    
+    func retrieveAssetIds(predicate: NSPredicate?) -> Set<String> {
+        let managedObjectContext = adHocMoc()
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
+        fetchRequest.predicate = predicate
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.includesSubentities = false
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.includesPendingChanges = false
+        fetchRequest.propertiesToFetch = ["assetId"]
+        fetchRequest.returnsDistinctResults = true
+        fetchRequest.includesPropertyValues = true
+        fetchRequest.shouldRefreshRefetchedObjects = true
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        var allAssetIdsSet = Set<String>()
+        do {
+            if let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]] {
+                for result in results {
+                    if let assetId = result["assetId"] {
+                        allAssetIdsSet.insert(assetId)
+                    }
+                }
+            }
+        } catch {
+            print("retrieveAllAssetIds results with error:\(error)")
+        }
+        return allAssetIdsSet
+    }
+    
     func screenshot(assetId: String, managedObjectContext: NSManagedObjectContext) -> Screenshot? {
         return screenshot(predicate: NSPredicate(format: "assetId == %@", assetId), managedObjectContext: managedObjectContext)
     }
@@ -269,9 +311,33 @@ extension DataModel {
                 return lastSavedScreenshot
             }
         } catch {
-            print("lastSavedScreenshot results with error:\(error)")
+            print("fetch screenshot results with error:\(error)")
         }
         return nil
+    }
+    
+    func deleteScreenshots(assetIds: Set<String>) {
+        let managedObjectContext = adHocMoc()
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
+        fetchRequest.predicate = NSPredicate(format: "assetId IN %@", assetIds)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.includesSubentities = false
+        fetchRequest.resultType = .managedObjectIDResultType
+        fetchRequest.includesPendingChanges = false
+        fetchRequest.propertiesToFetch = nil
+        fetchRequest.includesPropertyValues = false
+        fetchRequest.shouldRefreshRefetchedObjects = true
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for managedObject in results
+            {
+                managedObjectContext.delete(managedObject as! NSManagedObject)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("deleteScreenshots results with error:\(error)")
+        }
     }
     
     // Save a new Shoppable to Core Data.
@@ -359,7 +425,6 @@ extension Shoppable {
         let viewWidth = Double(size.width)
         let viewHeight = Double(size.height)
         let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
-        print("frame:\(NSStringFromCGRect(frame))")
         return frame
     }
     

@@ -5,7 +5,7 @@
 #ifndef screenshot_Bridging_Header_h
 #define screenshot_Bridging_Header_h
 
-#import "MatchModel.h"
+#import "PermissionsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 

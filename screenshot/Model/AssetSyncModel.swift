@@ -10,60 +10,71 @@ import UIKit
 import Photos
 import MobileCoreServices // kUTTypeImage
 import CoreData // NSManagedObjectContext
+import PromiseKit
 
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
+    var allScreenshotAssets: PHFetchResult<PHAsset>!
+    // TODO: Atomicity
+    var isSyncing = false
+    var shouldSyncAgain = false
 
     let imageMediaType = kUTTypeImage as String;
     
-    func uploadLastScreenshot(completionHandler: ((_ success: Bool) -> Void)?) {
-        let matchModel = MatchModel.shared()!
+    func uploadScreenshot(asset: PHAsset) {
         let dataModel = DataModel.sharedInstance
         let moc = dataModel.adHocMoc()
-        matchModel.logClarifaiSyteInitial({ (response: URLResponse, responseObject: Any?, error: Error?) in
-            guard error == nil,
-                let responseObjectDict = responseObject as? [String : AnyObject],
-                let uploadedURLString = responseObjectDict.keys.first,
-                let segments = responseObjectDict[uploadedURLString] as? [[String : AnyObject]],
-                segments.count > 0,
-                let screenshot = dataModel.lastSavedScreenshot(managedObjectContext: moc),
-                (screenshot.shoppables == nil || screenshot.shoppables!.count == 0) else {
-                    print("AssetSyncModel uploadLastScreenshot error:\(error)")
-                    completionHandler?(false)
-                    return
-            }
-            print("AssetSyncModel response:\(response)\nresponseObject:\(responseObject ?? ""))")
-            var order: Int16 = 0
-            for segment in segments {
-                guard let b0 = segment["b0"] as? [Any],
-                    b0.count >= 2,
-                    let b1 = segment["b1"] as? [Any],
-                    b1.count >= 2,
-                    let b0x = b0[0] as? Double,
-                    let b0y = b0[1] as? Double,
-                    let b1x = b1[0] as? Double,
-                    let b1y = b1[1] as? Double else {
-                        print("AssetSyncModel error parsing b0, b1")
-                        continue
+        firstly {
+            return image(asset: asset)
+            }.then { image in
+                return ClarifaiModel.sharedInstance.isFashion(image: image)
+            }.then { isFashion, image -> Void in
+                print("uploadScreenshot isFashion:\(isFashion)")
+                let screenshot = dataModel.saveScreenshot(managedObjectContext: moc,
+                                                          assetId: asset.localIdentifier,
+                                                          isFashion: isFashion,
+                                                          createdAt: asset.creationDate)
+                if isFashion {
+                    let imageData = UIImageJPEGRepresentation(image, 0.95)
+                    firstly {
+                        return NetworkingPromise.uploadToSyte(imageData: imageData)
+                        }.then { segments -> Void in
+                            var order: Int16 = 0
+                            for segment in segments {
+                                guard let b0 = segment["b0"] as? [Any],
+                                    b0.count >= 2,
+                                    let b1 = segment["b1"] as? [Any],
+                                    b1.count >= 2,
+                                    let b0x = b0[0] as? Double,
+                                    let b0y = b0[1] as? Double,
+                                    let b1x = b1[0] as? Double,
+                                    let b1y = b1[1] as? Double else {
+                                        print("AssetSyncModel error parsing b0, b1")
+                                        continue
+                                }
+                                let label = segment["label"] as? String
+                                let offersURL = segment["offers"] as? String
+                                screenshot.shoppablesCount += 1
+                                let shoppable = dataModel.saveShoppable(managedObjectContext: moc,
+                                                                        screenshot: screenshot,
+                                                                        order: order,
+                                                                        label: label,
+                                                                        offersURL: offersURL,
+                                                                        b0x: b0x,
+                                                                        b0y: b0y,
+                                                                        b1x: b1x,
+                                                                        b1y: b1y)
+                                order += 1
+                                self.extractProducts(shoppable: shoppable, managedObjectContext: moc)
+                            }
+                        }.catch { error in
+                            print("uploadScreenshot inner uploadToSyte catch error:\(error)")
+                    }
                 }
-                let label = segment["label"] as? String
-                let offersURL = segment["offers"] as? String
-                print("b0x:\(b0x)  b0y:\(b0y)  b1x:\(b1x)  b1y:\(b1y)")
-                let shoppable = dataModel.saveShoppable(managedObjectContext: moc,
-                                                        screenshot: screenshot,
-                                                        order: order,
-                                                        label: label,
-                                                        offersURL: offersURL,
-                                                        b0x: b0x,
-                                                        b0y: b0y,
-                                                        b1x: b1x,
-                                                        b1y: b1y)
-                self.extractProducts(shoppable: shoppable, managedObjectContext: moc)
-                order += 1
-            }
-            completionHandler?(true)
-        })
+            }.catch { error in
+                print("uploadScreenshot outer Clarifai catch error:\(error)")
+        }
     }
     
     func extractProducts(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
@@ -98,6 +109,7 @@ class AssetSyncModel: NSObject {
                 if let extractedCategories = prod["categories"] as? [String] {
                     categories = extractedCategories.first
                 }
+                shoppable.productCount += 1
                 let p = dataModel.saveProduct(managedObjectContext: managedObjectContext,
                                               shoppable: shoppable,
                                               order: order,
@@ -117,9 +129,8 @@ class AssetSyncModel: NSObject {
         })
     }
     
-    func image(assetId: String, callback: @escaping ((UIImage?) -> Void)) {
+    func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
         let fetchOptions = PHFetchOptions()
-        //fetchOptions.predicate = NSPredicate(format: "mediaSubtype == %lu", .photoScreenshot)//PHAssetMediaSubtypePhotoScreenshot)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 1;
         
@@ -127,10 +138,13 @@ class AssetSyncModel: NSObject {
         
         guard let asset = assets.firstObject else {
             print("No asset for assetId:\(assetId)")
-            callback(nil)
+            callback(nil, nil)
             return
         }
-        
+        image(asset: asset, callback: callback)
+    }
+    
+    func image(asset: PHAsset, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
         let imageRequestOptions = PHImageRequestOptions()
         imageRequestOptions.isSynchronous = false
         imageRequestOptions.version = .current
@@ -143,8 +157,97 @@ class AssetSyncModel: NSObject {
                                               contentMode: .aspectFill,
                                               options: imageRequestOptions,
                                               resultHandler: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                                                callback(image)
+                                                callback(image, info)
         })
     }
 
+    func image(asset: PHAsset) -> Promise<UIImage> {
+        return Promise { fulfill, reject in
+            image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
+                if let imageError = info?[PHImageErrorKey] as? NSError {
+                    reject(imageError)
+                    return
+                }
+                if let isCancelled = info?[PHImageCancelledKey] as? Bool,
+                    isCancelled == true {
+                    let cancelledError = NSError(domain: "Craze", code: 5, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
+                    reject(cancelledError)
+                    return
+                }
+                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
+                    isDegraded == true {
+                    // This callback will be called again with a better quality image.
+                    return
+                }
+                if let image = image {
+                    fulfill(image)
+                } else {
+                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
+                    reject(emptyError)
+                }
+            })
+        }
+    }
+    
+    func setupAllScreenshotAssets() {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "(mediaSubtype & %d) != 0", PHAssetMediaSubtype.photoScreenshot.rawValue)
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        allScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+    }
+    
+    func retrieveAllScreenshotAssetIds() -> Set<String> {
+        setupAllScreenshotAssets()
+        var assetIds = Set<String>()
+        allScreenshotAssets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+            assetIds.insert(asset.localIdentifier)
+        })
+        return assetIds
+    }
+    
+    func countAndPrint(name: String, set: Set<String>) {
+        print("\(name) count:\(set.count)")
+    }
+    
+    func isSyncReady() -> Bool {
+        if isSyncing {
+            shouldSyncAgain = true
+            return false
+        }
+        return true
+    }
+    
+    @objc public func syncPhotos() {
+        guard PermissionsManager.shared().hasPermission(for: .photo),
+          isSyncReady() else {
+            print("syncPhotos refused by guard")
+            return
+        }
+        isSyncing = true
+        print("syncPhotos passed guard")
+        let photosSet = retrieveAllScreenshotAssetIds()
+        let dbSet = DataModel.sharedInstance.retrieveCompleteAssetIds()
+        let toDeleteFromDB = dbSet.subtracting(photosSet)
+        let toUpload = photosSet.subtracting(dbSet)
+        countAndPrint(name: "photosSet", set: photosSet)
+        countAndPrint(name: "dbSet", set: dbSet)
+        countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
+        countAndPrint(name: "toUpload", set: toUpload)
+        if toDeleteFromDB.count > 0 {
+            DataModel.sharedInstance.deleteScreenshots(assetIds: toDeleteFromDB)
+        }
+        if toUpload.count > 0 {
+            allScreenshotAssets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                if toUpload.contains(asset.localIdentifier) {
+                    self.uploadScreenshot(asset: asset)
+                }
+            })
+        }
+        isSyncing = false
+        if shouldSyncAgain {
+            shouldSyncAgain = false
+            syncPhotos()
+        }
+    }
+    
 }
