@@ -10,6 +10,7 @@
 #import "ProductCollectionViewCell.h"
 #import "Geometry.h"
 #import "screenshot-Swift.h"
+#import "WebViewController.h"
 
 @interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate> {
     BOOL _didViewWillAppear;
@@ -100,6 +101,15 @@
     return self.favoriteFrc.fetchedObjects.count;
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger columns = [self numberOfCollectionViewColumns];
+    
+    CGSize size = CGSizeZero;
+    size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
+    size.height = size.width + [ProductCollectionViewCell labelsHeight];
+    return size;
+}
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
     
@@ -112,13 +122,15 @@
     return cell;
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
     
-    CGSize size = CGSizeZero;
-    size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
-    size.height = size.width + [ProductCollectionViewCell labelsHeight];
-    return size;
+    WebViewController *webViewController = [[WebViewController alloc] init];
+    [webViewController addNavigationItemLogo];
+    webViewController.hidesBottomBarWhenPushed = YES;
+    webViewController.url = [NSURL URLWithString:product.offer];
+    
+    [self.navigationController pushViewController:webViewController animated:YES];
 }
 
 

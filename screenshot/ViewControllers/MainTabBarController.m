@@ -11,6 +11,7 @@
 #import "ScreenshotsNavigationController.h"
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
+#import "UIColor+Appearance.h"
 
 @interface MainTabBarController () <UITabBarControllerDelegate>
 
@@ -33,7 +34,9 @@
             FavoritesViewController *viewController = [[FavoritesViewController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Favorites" image:image tag:0];
             
-            [[UINavigationController alloc] initWithRootViewController:viewController];
+            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+            navigationController.view.backgroundColor = [UIColor backgroundColor];
+            navigationController;
         });
         
         _screenshotsNavigationController = ({
@@ -50,7 +53,9 @@
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:2];
             
-            [[UINavigationController alloc] initWithRootViewController:viewController];
+            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+            navigationController.view.backgroundColor = [UIColor backgroundColor];
+            navigationController;
         });
         
         self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];

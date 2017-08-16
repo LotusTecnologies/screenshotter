@@ -13,6 +13,7 @@
 #import "ScreenshotImageFetcher.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayViewController.h"
+#import "WebViewController.h"
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
@@ -224,7 +225,12 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
+    WebViewController *webViewController = [[WebViewController alloc] init];
+    [webViewController addNavigationItemLogo];
+    webViewController.hidesBottomBarWhenPushed = YES;
+    webViewController.url = [NSURL URLWithString:self.products[indexPath.item].offer];
+    
+    [self.navigationController pushViewController:webViewController animated:YES];
 }
 
 
@@ -234,13 +240,6 @@
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = self.products[indexPath.item];
     [product setFavoritedToFavorited:!product.isFavorite];
-}
-
-
-#pragma mark - Product
-
-- (Product *)productAtIndexPath:(NSIndexPath *)indexPath {
-    return self.products[indexPath.item];
 }
 
 
