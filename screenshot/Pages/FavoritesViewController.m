@@ -11,7 +11,9 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 
-@interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate> {
+    BOOL _didViewWillAppear;
+}
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *favoriteFrc;
@@ -28,8 +30,7 @@
         self.title = @"Favorites";
         [self addNavigationItemLogo];
         
-        [DataModel sharedInstance].favoriteFrcDelegate = self;
-        self.favoriteFrc = DataModel.sharedInstance.favoriteFrc;
+        self.favoriteFrc = [DataModel sharedInstance].favoriteFrc;
     }
     return self;
 }
@@ -62,11 +63,19 @@
     });
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if (_didViewWillAppear) {
+        [self.collectionView reloadData];
+    }
+    
+    _didViewWillAppear = YES;
+}
+
 - (void)dealloc {
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
-    
-    [DataModel sharedInstance].favoriteFrcDelegate = nil;
 }
 
 
@@ -82,7 +91,6 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
-    
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
@@ -109,21 +117,6 @@
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
     [product setFavoritedToFavorited:!product.isFavorite];
-}
-
-
-#pragma mark - Fetched Results
-
-- (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
-    [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
-}
-
-- (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
-    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
-}
-
-- (void)frcReloadData {
-    [self.collectionView reloadData];
 }
 
 @end

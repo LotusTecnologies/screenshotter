@@ -14,7 +14,9 @@
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayViewController.h"
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
+    BOOL _didViewWillAppear;
+}
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
@@ -97,6 +99,16 @@
     }];
     
     [self reloadCollectionViewForIndex:0];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if (_didViewWillAppear) {
+        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
+    }
+    
+    _didViewWillAppear = YES;
 }
 
 - (void)dealloc {
