@@ -250,18 +250,6 @@ extension DataModel {
         return screenshotToSave
     }
     
-    func lastSavedScreenshotMain() -> Screenshot? {
-        return lastSavedScreenshot(managedObjectContext: mainMoc())
-    }
-    
-    func lastSavedScreenshotBackground() -> Screenshot? {
-        return lastSavedScreenshot(managedObjectContext: adHocMoc())
-    }
-    
-    func lastSavedScreenshot(managedObjectContext: NSManagedObjectContext) -> Screenshot? {
-        return screenshot(predicate: nil, managedObjectContext: managedObjectContext)
-    }
-    
     func retrieveAllAssetIds() -> Set<String> {
         return retrieveAssetIds(predicate: nil)
     }
@@ -286,37 +274,19 @@ extension DataModel {
         
         var allAssetIdsSet = Set<String>()
         do {
-            if let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]] {
-                for result in results {
-                    if let assetId = result["assetId"] {
-                        allAssetIdsSet.insert(assetId)
-                    }
+            guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]] else {
+                print("retrieveAssetIds failed to fetch dictionaries")
+                return allAssetIdsSet
+            }
+            for result in results {
+                if let assetId = result["assetId"] {
+                    allAssetIdsSet.insert(assetId)
                 }
             }
         } catch {
             print("retrieveAllAssetIds results with error:\(error)")
         }
         return allAssetIdsSet
-    }
-    
-    func screenshot(assetId: String, managedObjectContext: NSManagedObjectContext) -> Screenshot? {
-        return screenshot(predicate: NSPredicate(format: "assetId == %@", assetId), managedObjectContext: managedObjectContext)
-    }
-    
-    fileprivate func screenshot(predicate: NSPredicate?, managedObjectContext: NSManagedObjectContext) -> Screenshot? {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
-        fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        fetchRequest.fetchBatchSize = 1
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            if let lastSavedScreenshot = results.first as? Screenshot {
-                return lastSavedScreenshot
-            }
-        } catch {
-            print("fetch screenshot results with error:\(error)")
-        }
-        return nil
     }
     
     func deleteScreenshots(assetIds: Set<String>) {
@@ -333,9 +303,12 @@ extension DataModel {
         
         do {
             let results = try managedObjectContext.fetch(fetchRequest)
-            for managedObject in results
-            {
-                managedObjectContext.delete(managedObject as! NSManagedObject)
+            guard let managedObjectIds = results as? [NSManagedObjectID] else {
+                return
+            }
+            for managedObjectId in managedObjectIds {
+                let managedObject = managedObjectContext.object(with: managedObjectId)
+                managedObjectContext.delete(managedObject)
             }
             try managedObjectContext.save()
         } catch {
