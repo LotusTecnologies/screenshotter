@@ -1,17 +1,17 @@
 //
-//  ScreenshotImage.m
+//  ScreenshotImageFetcher.m
 //  screenshot
 //
 //  Created by Corey Werner on 8/10/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import "ScreenshotImage.h"
+#import "ScreenshotImageFetcher.h"
 
-@implementation ScreenshotImage
+@implementation ScreenshotImageFetcher
 
-+ (ScreenshotImage *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler {
-    return [[ScreenshotImage alloc] initWithScreenshot:screenshot handler:handler];
++ (ScreenshotImageFetcher *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler {
+    return [[ScreenshotImageFetcher alloc] initWithScreenshot:screenshot handler:handler];
 }
 
 - (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler {

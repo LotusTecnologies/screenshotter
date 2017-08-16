@@ -10,7 +10,7 @@
 #import "ProductCollectionViewCell.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
-#import "ScreenshotImage.h"
+#import "ScreenshotImageFetcher.h"
 #import "ShoppablesToolbar.h"
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate>
@@ -88,8 +88,8 @@
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     
-    [DataModel sharedInstance].shoppableFrcDelegate = nil;
     [[DataModel sharedInstance] clearShoppableFrc];
+    [DataModel sharedInstance].shoppableFrcDelegate = nil;
 }
 
 

@@ -1,5 +1,5 @@
 //
-//  ScreenshotImage.h
+//  ScreenshotImageFetcher.h
 //  screenshot
 //
 //  Created by Corey Werner on 8/10/17.
@@ -11,9 +11,9 @@
 
 typedef void (^ScreenshotImageHandler)(UIImage *image, Screenshot *screenshot);
 
-@interface ScreenshotImage : NSObject
+@interface ScreenshotImageFetcher : NSObject
 
-+ (ScreenshotImage *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
++ (ScreenshotImageFetcher *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
 - (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
 
 @property (nonatomic, strong, readonly) Screenshot *screenshot;

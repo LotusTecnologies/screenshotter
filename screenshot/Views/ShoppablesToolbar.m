@@ -8,7 +8,7 @@
 
 #import "ShoppablesToolbar.h"
 #import "screenshot-Swift.h"
-#import "ScreenshotImage.h"
+#import "ScreenshotImageFetcher.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 
@@ -51,7 +51,7 @@
     self.shoppableButtons = nil;
     
     if (shoppables && shoppables.count && screenshot) {
-        [ScreenshotImage screenshot:screenshot handler:^(UIImage *image, Screenshot *screenshot) {
+        [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image, Screenshot *screenshot) {
             NSMutableArray<UIButton *> *buttons = [NSMutableArray array];
             
             for (NSUInteger i = 0; i < shoppables.count; i++) {
