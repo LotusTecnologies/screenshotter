@@ -36,8 +36,8 @@
         });
         
         _toolbar = ({
-            UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Share"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
-            UIBarButtonItem *trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Trash"] style:UIBarButtonItemStylePlain target:self action:@selector(trashAction:)];
+            UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ScreenshotShare"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
+            UIBarButtonItem *trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ScreenshotTrash"] style:UIBarButtonItemStylePlain target:self action:@selector(trashAction:)];
             UIBarButtonItem *flexilbeItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
             
             UIToolbar *toolbar = [[UIToolbar alloc] init];
