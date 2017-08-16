@@ -112,7 +112,7 @@ class DataModel: NSObject {
     
     weak open var shoppableFrcDelegate: FrcDelegateProtocol?
     
-    fileprivate var shoppableFrc: NSFetchedResultsController<Shoppable>!
+    fileprivate var shoppableFrc: NSFetchedResultsController<Shoppable>?
     fileprivate var shoppableChangeIndexPath: IndexPath?
     fileprivate var shoppableChangeKind: CZChangeKind = .none
 
@@ -140,11 +140,12 @@ class DataModel: NSObject {
 extension DataModel: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
         switch controller {
         case screenshotFrc:
             screenshotChangeKind = .none
             screenshotChangeIndexPath = nil
-        case shoppableFrc:
+        case shoppableFrcStandIn:
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
         case favoriteFrc:
@@ -173,10 +174,11 @@ extension DataModel: NSFetchedResultsControllerDelegate {
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
         switch controller {
         case screenshotFrc:
             didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case shoppableFrc:
+        case shoppableFrcStandIn:
             didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
             didChange(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
@@ -211,10 +213,11 @@ extension DataModel: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
         switch controller {
         case screenshotFrc:
             didChangeContent(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
-        case shoppableFrc:
+        case shoppableFrcStandIn:
             didChangeContent(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
         case favoriteFrc:
             didChangeContent(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
