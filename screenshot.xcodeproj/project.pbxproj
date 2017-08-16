@@ -32,6 +32,7 @@
 		C52790001F3C38510090E422 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE61F3C38510090E422 /* ProductCollectionViewCell.m */; };
 		C52790011F3C38510090E422 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */; };
 		C52790061F3C48F70090E422 /* ScreenshotImageFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = C52790051F3C48F70090E422 /* ScreenshotImageFetcher.m */; };
+		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C5921E9A1F44127F00DF4888 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E991F44127F00DF4888 /* ScreenshotDisplayViewController.m */; };
@@ -94,6 +95,8 @@
 		C5278FE81F3C38510090E422 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
 		C52790041F3C48F70090E422 /* ScreenshotImageFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotImageFetcher.h; sourceTree = "<group>"; };
 		C52790051F3C48F70090E422 /* ScreenshotImageFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotImageFetcher.m; sourceTree = "<group>"; };
+		C54F032B1F44361C00CF8CBD /* HelperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperView.h; sourceTree = "<group>"; };
+		C54F032C1F44361C00CF8CBD /* HelperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperView.m; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
@@ -243,6 +246,8 @@
 				C56F2BF61F42C2DF00501AE9 /* Loader.m */,
 				C5921E951F433D4100DF4888 /* TappableTextView.h */,
 				C5921E961F433D4100DF4888 /* TappableTextView.m */,
+				C54F032B1F44361C00CF8CBD /* HelperView.h */,
+				C54F032C1F44361C00CF8CBD /* HelperView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -484,6 +489,7 @@
 				C5278FF31F3C38510090E422 /* SettingsViewController.m in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
+				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
 				C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

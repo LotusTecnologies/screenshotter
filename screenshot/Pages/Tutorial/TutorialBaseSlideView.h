@@ -6,13 +6,9 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "HelperView.h"
 
-@interface TutorialBaseSlideView : UIView
-
-@property (nonatomic, strong, readonly) UILabel *titleLabel;
-@property (nonatomic, strong, readonly) UILabel *subtitleLabel;
-@property (nonatomic, strong, readonly) UIView *contentView;
+@interface TutorialBaseSlideView : HelperView
 
 - (void)separatorFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor;
 
