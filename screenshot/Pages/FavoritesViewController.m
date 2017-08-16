@@ -106,7 +106,9 @@
 #pragma mark - Product Cell
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
-//    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
+    [product setFavoritedToFavorited:!product.isFavorite];
 }
 
 

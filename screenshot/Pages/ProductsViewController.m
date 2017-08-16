@@ -217,7 +217,6 @@
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = self.products[indexPath.item];
-    
     [product setFavoritedToFavorited:!product.isFavorite];
 }
 
