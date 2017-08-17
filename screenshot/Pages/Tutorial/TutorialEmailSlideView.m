@@ -10,7 +10,8 @@
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "TappableTextView.h"
-#import <Analytics/SEGAnalytics.h>
+
+@import Analytics;
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 

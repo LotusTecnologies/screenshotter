@@ -10,8 +10,8 @@
 #import "Loader.h"
 #import "Geometry.h"
 #import "NetworkingModel.h"
-#import <Analytics/SEGAnalytics.h>
 
+@import Analytics;
 @import WebKit;
 
 @interface WebViewController () <WKNavigationDelegate> {

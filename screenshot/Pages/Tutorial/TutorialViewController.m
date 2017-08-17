@@ -13,7 +13,8 @@
 #import "TutorialEmailSlideView.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
-#import <Analytics/SEGAnalytics.h>
+
+@import Analytics;
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialEmailSlideViewDelegate>
 

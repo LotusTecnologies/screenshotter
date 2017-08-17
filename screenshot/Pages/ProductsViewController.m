@@ -14,7 +14,9 @@
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayViewController.h"
 #import "WebViewController.h"
-#import <Analytics/SEGAnalytics.h>
+
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+@import Analytics;
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
@@ -235,18 +237,25 @@
     [self.navigationController pushViewController:webViewController animated:YES];
     
     [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Products"}];
+    
+    [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }
 
 
 #pragma mark - Product Cell
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
+    BOOL isFavorited = [cell.favoriteButton isSelected];
+    
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = self.products[indexPath.item];
-    [product setFavoritedToFavorited:[cell.favoriteButton isSelected]];
+    [product setFavoritedToFavorited:isFavorited];
     
-    NSString *favoriteString = [cell.favoriteButton isSelected] ? @"Product favorited" : @"Product unfavorited";
+    NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
     [[SEGAnalytics sharedAnalytics] track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    
+    NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
+    [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
 }
 
 

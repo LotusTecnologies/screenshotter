@@ -11,7 +11,8 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "HelperView.h"
-#import <Analytics/SEGAnalytics.h>
+
+@import Analytics;
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 

@@ -12,7 +12,8 @@
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "UIColor+Appearance.h"
-#import <Analytics/SEGAnalytics.h>
+
+@import Analytics;
 
 @interface MainTabBarController () <UITabBarControllerDelegate>
 

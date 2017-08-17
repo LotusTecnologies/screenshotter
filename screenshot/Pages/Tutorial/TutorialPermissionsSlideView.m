@@ -10,7 +10,8 @@
 #import "PermissionsManager.h"
 #import "Geometry.h"
 #import "screenshot-Swift.h"
-#import <Analytics/SEGAnalytics.h>
+
+@import Analytics;
 
 @interface TutorialPermissionsSlideView ()
 
