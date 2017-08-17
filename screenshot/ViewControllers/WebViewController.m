@@ -138,7 +138,12 @@
 }
 
 - (void)shareAction {
-    
+    // TODO: need shortened url
+//    NSArray *items = @[self.url];
+//    
+//    // build an activity view controller
+//    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
+//    [self presentViewController:controller animated:YES completion:nil];
 }
 
 - (void)safariAction {
