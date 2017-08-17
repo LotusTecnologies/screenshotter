@@ -93,7 +93,7 @@ class DataModel: NSObject {
     
     public func setupShoppableFrc(screenshot: Screenshot) -> NSFetchedResultsController<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: false)]
         request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         shoppableFrc = fetchedResultsController
