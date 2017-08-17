@@ -13,6 +13,7 @@
 #import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
 #import <Analytics/SEGAnalytics.h>
+#import <Appsee/Appsee.h>
 
 @interface AppDelegate () <TutorialViewControllerDelegate>
 
@@ -33,6 +34,8 @@
         configuration.trackPushNotifications = YES;
         configuration;
     })];
+    
+    [Appsee start:@"7fb11213125444f9bd1b18140c5dd782"];
     
     NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
     [AssetSyncModel.sharedInstance syncPhotos];
