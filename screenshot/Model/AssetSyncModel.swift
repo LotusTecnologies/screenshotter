@@ -244,6 +244,7 @@ class AssetSyncModel: NSObject {
         }
         isSyncing = true
         print("syncPhotos passed guard")
+        UIApplication.shared.isNetworkActivityIndicatorVisible = isSyncing
         if !isRegistered {
             registerForPhotoChanges()
         }
@@ -268,6 +269,7 @@ class AssetSyncModel: NSObject {
             })
         }
         isSyncing = false
+        UIApplication.shared.isNetworkActivityIndicatorVisible = isSyncing
         if shouldSyncAgain {
             shouldSyncAgain = false
             syncPhotos()
