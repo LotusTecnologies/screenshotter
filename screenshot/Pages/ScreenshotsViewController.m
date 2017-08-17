@@ -154,6 +154,10 @@
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Screenshot Sharing" message:@"Coming soon." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
+    
     [[SEGAnalytics sharedAnalytics] track:@"Shared screenshot"];
 }
 
