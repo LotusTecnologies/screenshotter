@@ -70,6 +70,7 @@
         textField.backgroundColor = [UIColor whiteColor];
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.spellCheckingType = UITextSpellCheckingTypeNo;
+        textField.autocorrectionType = UITextAutocorrectionTypeNo;
         textField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
         [self.contentView addSubview:textField];
         [textField setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];

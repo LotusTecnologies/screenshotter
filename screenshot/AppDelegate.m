@@ -27,8 +27,12 @@
     NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
     [AssetSyncModel.sharedInstance syncPhotos];
     NSLog(@"didFinishLaunchingWithOptions completed syncPhotos");
-    [[UITabBar appearance] setTintColor:[UIColor crazeRedColor]];
-    [[UIToolbar appearance] setTintColor:[UIColor crazeRedColor]];
+
+    UIColor *crazeRedColor = [UIColor crazeRedColor];
+    
+    [[UITabBar appearance] setTintColor:crazeRedColor];
+    [[UIToolbar appearance] setTintColor:crazeRedColor];
+    [[UIActivityIndicatorView appearanceWhenContainedInInstancesOfClasses:@[[UIToolbar class]]] setColor:crazeRedColor];
     
     [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     

@@ -15,7 +15,6 @@
 @interface ShoppablesToolbar ()
 
 @property (nonatomic, strong) UIView *shoppablesContainerView;
-@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSArray<UIButton *> *shoppableButtons;
 @property (nonatomic) NSUInteger selectedShoppableButtonIndex;
 
@@ -29,12 +28,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _scrollView = ({
-            UIScrollView *scrollView = [[UIScrollView alloc] init];
-            
-            scrollView;
-        });
-        
         _shoppablesContainerView = ({
             UIView *view = [[UIView alloc] init];
             view.translatesAutoresizingMaskIntoConstraints = NO;

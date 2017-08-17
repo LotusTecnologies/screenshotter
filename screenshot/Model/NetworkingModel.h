@@ -15,4 +15,6 @@
 
 +(void)downloadProductInfo:(NSURL * _Nonnull)url completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler;
 
++ (void)shortenUrl:(NSURL * _Nonnull)url completion:(void(^_Nonnull)(NSURL * _Nullable url))completion;
+
 @end

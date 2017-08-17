@@ -9,10 +9,13 @@
 #import "WebViewController.h"
 #import "Loader.h"
 #import "Geometry.h"
+#import "NetworkingModel.h"
 
 @import WebKit;
 
-@interface WebViewController () <WKNavigationDelegate>
+@interface WebViewController () <WKNavigationDelegate> {
+    BOOL _isShorteningUrl;
+}
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) UIToolbar *toolbar;
@@ -35,6 +38,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self.view addObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack)) options:NSKeyValueObservingOptionNew context:NULL];
+    [self.view addObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward)) options:NSKeyValueObservingOptionNew context:NULL];
+    [self.view addObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress)) options:NSKeyValueObservingOptionNew context:NULL];
+    
     self.toolbar = ({
         UIToolbar *toolbar = [[UIToolbar alloc] init];
         toolbar.frame = CGRectMake(0.f, 0.f, 0.f, [toolbar intrinsicContentSize].height);
@@ -43,28 +50,9 @@
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
         [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
         [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        
-        UIBarButtonItem *fixed = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        fixed.width = [Geometry padding];
-        
-        UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-        
-        self.backItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(backAction)];
-        self.backItem.enabled = NO;
-        
-        self.forwardItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardAction)];
-        self.forwardItem.enabled = NO;
-        
-        UIBarButtonItem *refresh = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Refresh"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshAction)];
-        
-        UIBarButtonItem *share = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareAction)];
-        
-        UIBarButtonItem *safari = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Safari"] style:UIBarButtonItemStylePlain target:self action:@selector(safariAction)];
-        
-        toolbar.items = @[self.backItem, fixed, self.forwardItem, fixed, refresh, flexible, share, fixed, safari];
-        
         toolbar;
     });
+    [self updateToolbarItems];
     
     self.loader = ({
         Loader *loader = [[Loader alloc] init];
@@ -98,6 +86,74 @@
     [self.loader startAnimation];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (object == self.view) {
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(canGoBack))] ||
+            [keyPath isEqualToString:NSStringFromSelector(@selector(canGoForward))]) {
+            [self syncToolbarNavigationItems];
+            
+        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(estimatedProgress))]) {
+//            NSLog(@"||| %f", self.view.estimatedProgress);
+            // TODO: hidding the loader should be done once the estimatedProgress hits above 0.5
+            // however we first need to detect if there is a redirect before implementing this
+        
+        } else {
+            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        }
+    }
+}
+
+- (void)dealloc {
+    if ([self isViewLoaded]) {
+        [self.view removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack))];
+        [self.view removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward))];
+        [self.view removeObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress))];
+    }
+}
+
+
+#pragma mark - Toolbar
+
+- (void)updateToolbarItems {
+    UIBarButtonItem *fixed = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    fixed.width = [Geometry padding];
+    
+    UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    
+    self.backItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(backAction)];
+    
+    self.forwardItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardAction)];
+    
+    [self syncToolbarNavigationItems];
+    
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Refresh"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshAction)];
+    
+    UIBarButtonItem *share = ({
+        UIBarButtonItem *item;
+        
+        if (_isShorteningUrl) {
+            UIActivityIndicatorView *activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+            [activityIndicatorView startAnimating];
+            
+            item = [[UIBarButtonItem alloc] initWithCustomView:activityIndicatorView];
+            
+        } else {
+            item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareAction)];
+        }
+        
+        item;
+    });
+    
+    UIBarButtonItem *safari = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Safari"] style:UIBarButtonItemStylePlain target:self action:@selector(safariAction)];
+    
+    self.toolbar.items = @[self.backItem, fixed, self.forwardItem, fixed, refresh, flexible, share, fixed, safari];
+}
+
+- (void)syncToolbarNavigationItems {
+    self.backItem.enabled = [self.view canGoBack];
+    self.forwardItem.enabled = [self.view canGoForward];
+}
+
 
 #pragma mark - Url
 
@@ -118,8 +174,7 @@
         self.loader.hidden = YES;
     }
     
-    self.backItem.enabled = [self.view canGoBack];
-    self.forwardItem.enabled = [self.view canGoForward];
+//    [self syncToolbarNavigationItems];
 }
 
 
@@ -138,12 +193,18 @@
 }
 
 - (void)shareAction {
-    // TODO: need shortened url
-//    NSArray *items = @[self.url];
-//    
-//    // build an activity view controller
-//    UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
-//    [self presentViewController:controller animated:YES completion:nil];
+    _isShorteningUrl = YES;
+    [self updateToolbarItems];
+    
+    [NetworkingModel shortenUrl:self.url completion:^(NSURL * _Nullable url) {
+        if (url) {
+            UIActivityViewController *controller = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
+            [self presentViewController:controller animated:YES completion:nil];
+        }
+        
+        _isShorteningUrl = NO;
+        [self updateToolbarItems];
+    }];
 }
 
 - (void)safariAction {
