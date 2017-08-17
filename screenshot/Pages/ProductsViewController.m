@@ -235,7 +235,7 @@
     
     [self.navigationController pushViewController:webViewController animated:YES];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Products"}];
 }
 
 

@@ -10,6 +10,7 @@
 #import "Loader.h"
 #import "Geometry.h"
 #import "NetworkingModel.h"
+#import <Analytics/SEGAnalytics.h>
 
 @import WebKit;
 
@@ -205,6 +206,8 @@
         _isShorteningUrl = NO;
         [self updateToolbarItems];
     }];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Shared Webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)safariAction {

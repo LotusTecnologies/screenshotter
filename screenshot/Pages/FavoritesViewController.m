@@ -133,6 +133,8 @@
     webViewController.url = [NSURL URLWithString:product.offer];
     
     [self.navigationController pushViewController:webViewController animated:YES];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Favorites"}];
 }
 
 
