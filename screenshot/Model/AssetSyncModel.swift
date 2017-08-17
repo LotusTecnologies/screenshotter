@@ -15,7 +15,7 @@ import PromiseKit
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
-    var allScreenshotAssets: PHFetchResult<PHAsset>!
+    var allScreenshotAssets: PHFetchResult<PHAsset>?
 //    var changedAssetIds: [String] = []
     var isRegistered = false
     // TODO: Atomicity
@@ -218,7 +218,7 @@ class AssetSyncModel: NSObject {
     func retrieveAllScreenshotAssetIds() -> Set<String> {
         setupAllScreenshotAssets()
         var assetIds = Set<String>()
-        allScreenshotAssets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+        allScreenshotAssets?.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
             assetIds.insert(asset.localIdentifier)
         })
         return assetIds
@@ -261,7 +261,7 @@ class AssetSyncModel: NSObject {
             DataModel.sharedInstance.deleteScreenshots(assetIds: toDeleteFromDB)
         }
         if toUpload.count > 0 {
-            allScreenshotAssets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+            allScreenshotAssets?.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                 if toUpload.contains(asset.localIdentifier) {
                     self.uploadScreenshot(asset: asset)
                 }
@@ -280,9 +280,11 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     func photoLibraryDidChange(_ changeInstance: PHChange) {
         print("photoLibraryDidChange")
-        if allScreenshotAssets == nil {
+        guard let allScreenshotAssets = allScreenshotAssets else {
             syncPhotos()
-        } else if let changes = changeInstance.changeDetails(for: allScreenshotAssets),
+            return
+        }
+        if let changes = changeInstance.changeDetails(for: allScreenshotAssets),
             changes.hasIncrementalChanges {
             //                let changedAssets = changes.changedObjects
             //                if changedAssets.count > 0 {
