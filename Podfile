@@ -8,6 +8,7 @@ def shared_pods
     pod 'PromiseKit/Foundation'
     pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
+    pod 'Analytics', '~> 3.0'
 end
 
 #target 'dev_influencer' do

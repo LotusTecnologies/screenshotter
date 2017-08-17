@@ -12,6 +12,7 @@
 #import "PermissionsManager.h"
 #import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface AppDelegate () <TutorialViewControllerDelegate>
 
@@ -24,6 +25,15 @@
 #pragma mark - Life Cycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [SEGAnalytics setupWithConfiguration:({
+        SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:@"RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"];
+        configuration.trackApplicationLifecycleEvents = YES;
+        configuration.recordScreenViews = YES;
+        configuration.trackDeepLinks = YES;
+        configuration.trackPushNotifications = YES;
+        configuration;
+    })];
+    
     NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
     [AssetSyncModel.sharedInstance syncPhotos];
     NSLog(@"didFinishLaunchingWithOptions completed syncPhotos");
