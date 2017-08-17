@@ -13,6 +13,7 @@
 #import "TutorialEmailSlideView.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialEmailSlideViewDelegate>
 
@@ -30,6 +31,8 @@
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+        
+        [[SEGAnalytics sharedAnalytics] track:@"Started Tutorial"];
     }
     return self;
 }
@@ -142,7 +145,12 @@
 }
 
 - (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
-    [self.delegate tutorialViewControllerDidComplete:self];
+    BOOL didEnableRequiredPermissions = YES; // TODO:
+    
+    if (didEnableRequiredPermissions) {
+        [self.delegate tutorialViewControllerDidComplete:self];
+        [[SEGAnalytics sharedAnalytics] track:@"Finished Tutorial"];
+    }
 }
 
 

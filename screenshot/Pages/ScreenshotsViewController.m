@@ -11,6 +11,7 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "HelperView.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
@@ -138,6 +139,8 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on screenshot"];
 }
 
 - (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath {
@@ -149,11 +152,15 @@
 
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Shared screenshot"];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     [[self screenshotAtIndexPath:indexPath] setHide];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Removed screenshot"];
 }
 
 

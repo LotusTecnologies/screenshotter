@@ -14,6 +14,7 @@
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayViewController.h"
 #import "WebViewController.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
@@ -225,12 +226,16 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    Product *product = self.products[indexPath.item];
+    
     WebViewController *webViewController = [[WebViewController alloc] init];
     [webViewController addNavigationItemLogo];
     webViewController.hidesBottomBarWhenPushed = YES;
-    webViewController.url = [NSURL URLWithString:self.products[indexPath.item].offer];
+    webViewController.url = [NSURL URLWithString:product.offer];
     
     [self.navigationController pushViewController:webViewController animated:YES];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
 }
 
 
@@ -239,7 +244,10 @@
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = self.products[indexPath.item];
-    [product setFavoritedToFavorited:!product.isFavorite];
+    [product setFavoritedToFavorited:[cell.favoriteButton isSelected]];
+    
+    NSString *favoriteString = [cell.favoriteButton isSelected] ? @"Product favorited" : @"Product unfavorited";
+    [[SEGAnalytics sharedAnalytics] track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
 }
 
 

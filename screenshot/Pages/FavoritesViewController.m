@@ -11,6 +11,7 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "WebViewController.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate> {
     BOOL _didViewWillAppear;
@@ -79,6 +80,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    // TODO: need to take into account when the user backgrounds / force quits
     if (self.unfavoriteArray.count) {
         [[DataModel sharedInstance] unfavoriteWithFavoriteArray:self.unfavoriteArray];
         [self.unfavoriteArray removeAllObjects];
@@ -146,6 +148,9 @@
     } else {
         [self.unfavoriteArray addObject:product];
     }
+    
+    NSString *favoriteString = [cell.favoriteButton isSelected] ? @"Product favorited" : @"Product unfavorited";
+    [[SEGAnalytics sharedAnalytics] track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
 }
 
 @end
