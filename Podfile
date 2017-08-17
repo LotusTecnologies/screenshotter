@@ -9,6 +9,7 @@ def shared_pods
     pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
+    pod 'Appsee'
 end
 
 #target 'dev_influencer' do
