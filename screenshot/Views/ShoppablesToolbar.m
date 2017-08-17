@@ -15,6 +15,7 @@
 @interface ShoppablesToolbar ()
 
 @property (nonatomic, strong) UIView *shoppablesContainerView;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSArray<UIButton *> *shoppableButtons;
 @property (nonatomic) NSUInteger selectedShoppableButtonIndex;
 
@@ -28,6 +29,12 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        _scrollView = ({
+            UIScrollView *scrollView = [[UIScrollView alloc] init];
+            
+            scrollView;
+        });
+        
         _shoppablesContainerView = ({
             UIView *view = [[UIView alloc] init];
             view.translatesAutoresizingMaskIntoConstraints = NO;
@@ -73,6 +80,7 @@
                     [self.shoppablesContainerView addSubview:button];
                     [button.topAnchor constraintEqualToAnchor:self.shoppablesContainerView.topAnchor].active = YES;
                     [button.bottomAnchor constraintEqualToAnchor:self.shoppablesContainerView.bottomAnchor].active = YES;
+                    [button.widthAnchor constraintEqualToAnchor:button.heightAnchor multiplier:.8f].active = YES;
                     
                     if (i == 0) {
                         [button.leadingAnchor constraintEqualToAnchor:self.shoppablesContainerView.leadingAnchor].active = YES;
@@ -81,13 +89,11 @@
                         UIButton *previousButton = [buttons objectAtIndex:i - 1];
                         
                         [button.leadingAnchor constraintEqualToAnchor:previousButton.layoutMarginsGuide.trailingAnchor].active = YES;
-                        [button.widthAnchor constraintEqualToAnchor:previousButton.widthAnchor].active = YES;
                     }
                     
                     if (i == shoppables.count - 1) {
                         [button.trailingAnchor constraintEqualToAnchor:self.shoppablesContainerView.trailingAnchor].active = YES;
                     }
-                    
                     
                     [buttons addObject:button];
                 }
