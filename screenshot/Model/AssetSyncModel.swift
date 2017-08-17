@@ -167,7 +167,10 @@ class AssetSyncModel: NSObject {
         imageRequestOptions.deliveryMode = .opportunistic
         imageRequestOptions.resizeMode = .none
         imageRequestOptions.isNetworkAccessAllowed = false
-        let targetSize = CGSize(width: 180, height: 320)
+        let screen = UIScreen.main
+        let screenSizePx = screen.nativeBounds.size
+        let targetSize = CGSize(width: screenSizePx.width / screen.nativeScale, height: screenSizePx.height / screen.nativeScale)
+//        let targetSize = CGSize(width: 180, height: 320)
         PHImageManager.default().requestImage(for: asset,
                                               targetSize: targetSize,
                                               contentMode: .aspectFill,
