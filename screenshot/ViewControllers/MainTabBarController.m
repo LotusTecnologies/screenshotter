@@ -12,6 +12,7 @@
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "UIColor+Appearance.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface MainTabBarController () <UITabBarControllerDelegate>
 
@@ -71,6 +72,24 @@
         [self.settingsNavigationController popToRootViewControllerAnimated:NO];
     }
     return YES;
+}
+
+- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
+    NSString *tab;
+    
+    if (self.selectedViewController == self.favoritesNavigationController) {
+        tab = @"Favorites";
+        
+    } else if (self.selectedViewController == self.screenshotsNavigationController) {
+        tab = @"Screenshots";
+        
+    } else if (self.selectedViewController == self.settingsNavigationController) {
+        tab = @"Settings";
+    }
+    
+    if (tab) {
+        [[SEGAnalytics sharedAnalytics] track:@"Tab Bar tapped" properties:@{@"tab": tab}];
+    }
 }
 
 @end

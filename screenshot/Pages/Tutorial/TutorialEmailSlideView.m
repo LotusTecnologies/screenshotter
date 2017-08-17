@@ -10,6 +10,7 @@
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "TappableTextView.h"
+#import <Analytics/SEGAnalytics.h>
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
@@ -177,6 +178,8 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
+        
+        [[SEGAnalytics sharedAnalytics] track:@"Submitted email" properties:@{@"email": self.textField.text}];
         
     } else {
         [self.delegate tutorialEmailSlideViewDidFail:self];

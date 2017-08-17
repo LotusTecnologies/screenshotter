@@ -170,15 +170,14 @@
     return shoppables;
 }
 
-
-#pragma mark - Shoppable
-
 - (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
     return UIBarPositionTopAttached;
 }
 
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
     [self reloadCollectionViewForIndex:index];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on shoppable"];
 }
 
 

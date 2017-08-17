@@ -191,6 +191,8 @@
 
 - (void)refreshAction {
     [self.view reload];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)shareAction {
@@ -207,11 +209,13 @@
         [self updateToolbarItems];
     }];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Shared Webpage" properties:@{@"url": self.url.absoluteString}];
+    [[SEGAnalytics sharedAnalytics] track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)safariAction {
     [[UIApplication sharedApplication] openURL:self.url options:@{} completionHandler:nil];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
 }
 
 @end
