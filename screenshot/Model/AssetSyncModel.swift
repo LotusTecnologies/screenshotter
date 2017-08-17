@@ -16,11 +16,27 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     var allScreenshotAssets: PHFetchResult<PHAsset>!
+//    var changedAssetIds: [String] = []
+    var isRegistered = false
     // TODO: Atomicity
     var isSyncing = false
     var shouldSyncAgain = false
 
     let imageMediaType = kUTTypeImage as String;
+    
+    override init() {
+        super.init()
+        registerForPhotoChanges()
+    }
+    
+    func registerForPhotoChanges() {
+        guard PermissionsManager.shared().hasPermission(for: .photo) else {
+            print("registerForPhotoChanges refused by guard")
+            return
+        }
+        PHPhotoLibrary.shared().register(self)
+        isRegistered = true
+    }
     
     func uploadScreenshot(asset: PHAsset) {
         let dataModel = DataModel.sharedInstance
@@ -151,7 +167,10 @@ class AssetSyncModel: NSObject {
         imageRequestOptions.deliveryMode = .opportunistic
         imageRequestOptions.resizeMode = .none
         imageRequestOptions.isNetworkAccessAllowed = false
-        let targetSize = CGSize(width: 180, height: 320)
+        let screen = UIScreen.main
+        let screenSizePx = screen.nativeBounds.size
+        let targetSize = CGSize(width: screenSizePx.width / screen.nativeScale, height: screenSizePx.height / screen.nativeScale)
+//        let targetSize = CGSize(width: 180, height: 320)
         PHImageManager.default().requestImage(for: asset,
                                               targetSize: targetSize,
                                               contentMode: .aspectFill,
@@ -225,10 +244,15 @@ class AssetSyncModel: NSObject {
         }
         isSyncing = true
         print("syncPhotos passed guard")
+        if !isRegistered {
+            registerForPhotoChanges()
+        }
         let photosSet = retrieveAllScreenshotAssetIds()
         let dbSet = DataModel.sharedInstance.retrieveCompleteAssetIds()
-        let toDeleteFromDB = dbSet.subtracting(photosSet)
-        let toUpload = photosSet.subtracting(dbSet)
+        let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
+        let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
+        // TODO: Remove changedAssetIds as each screenshot is successfully saved.
+        //changedAssetIds = []
         countAndPrint(name: "photosSet", set: photosSet)
         countAndPrint(name: "dbSet", set: dbSet)
         countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
@@ -246,6 +270,27 @@ class AssetSyncModel: NSObject {
         isSyncing = false
         if shouldSyncAgain {
             shouldSyncAgain = false
+            syncPhotos()
+        }
+    }
+    
+}
+
+extension AssetSyncModel: PHPhotoLibraryChangeObserver {
+    
+    func photoLibraryDidChange(_ changeInstance: PHChange) {
+        print("photoLibraryDidChange")
+        if allScreenshotAssets == nil {
+            syncPhotos()
+        } else if let changes = changeInstance.changeDetails(for: allScreenshotAssets),
+            changes.hasIncrementalChanges {
+            //                let changedAssets = changes.changedObjects
+            //                if changedAssets.count > 0 {
+            //                    for changedAsset in changedAssets {
+            //                        changedAssetIds.append(changedAsset.localIdentifier)
+            //                    }
+            //                }
+            //                print("photoLibraryDidChange changedAssets count:\(changedAssets.count)")
             syncPhotos()
         }
     }
