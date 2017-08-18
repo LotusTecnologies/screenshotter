@@ -58,7 +58,7 @@ class ClarifaiModel: NSObject {
                         break
                     }
                     j += 1
-                    print("\(j)  \(concept.score * 100.0)  \(concept.name ?? "-")")
+                    //print("\(j)  \(concept.score * 100.0)  \(concept.name ?? "-")")
                 }
             }
             print("isFashion: \(isFashion ? "YES" : "NO")")

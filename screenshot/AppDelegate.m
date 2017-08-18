@@ -24,6 +24,7 @@
 #pragma mark - Life Cycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [ClarifaiModel setup]; // Takes a long time to intialize; start early.
     NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
     [AssetSyncModel.sharedInstance syncPhotos];
     NSLog(@"didFinishLaunchingWithOptions completed syncPhotos");

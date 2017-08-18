@@ -11,17 +11,22 @@ import Photos
 import MobileCoreServices // kUTTypeImage
 import CoreData // NSManagedObjectContext
 import PromiseKit
+import UserNotifications
+
 
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     var allScreenshotAssets: PHFetchResult<PHAsset>?
 //    var changedAssetIds: [String] = []
+    let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
+    let processingQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing") // DispatchQueue.global(qos: .userInitiated) // TODO: Parallelize.
     var isRegistered = false
-    // TODO: Atomicity
     var isSyncing = false
     var shouldSyncAgain = false
-
+    var screenshotsToProcess: Int = 0
+    var shoppablesToProcess: Int = 0
+    
     let imageMediaType = kUTTypeImage as String;
     
     override init() {
@@ -39,54 +44,40 @@ class AssetSyncModel: NSObject {
     }
     
     func uploadScreenshot(asset: PHAsset) {
+        NSLog("uploadScreenshot started assetId:\(asset.localIdentifier)")
+        let uploadStart = Date()
         let dataModel = DataModel.sharedInstance
         let moc = dataModel.adHocMoc()
         firstly {
             return image(asset: asset)
-            }.then { image in
+            }.then /*(on: processingQ)*/ { image -> Promise<(Bool, UIImage)> in  // Clarifai bug, must run on main
+                NSLog("uploadScreenshot til image retrieved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
-            }.then { isFashion, image -> Void in
-                print("uploadScreenshot isFashion:\(isFashion)")
+            }.then(on: processingQ) { isFashion, image -> Void in
+                NSLog("uploadScreenshot til isFashion:\(isFashion) \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                 let screenshot = dataModel.saveScreenshot(managedObjectContext: moc,
                                                           assetId: asset.localIdentifier,
                                                           isFashion: isFashion,
                                                           createdAt: asset.creationDate)
                 if isFashion {
+                    NSLog("uploadScreenshot til db saved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                     let imageData = UIImageJPEGRepresentation(image, 0.95)
-                    firstly {
+                    firstly { _ -> Promise<[[String : Any]]> in
+                        NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
-                        }.then { segments -> Void in
-                            var order: Int16 = 0
-                            for segment in segments {
-                                guard let b0 = segment["b0"] as? [Any],
-                                    b0.count >= 2,
-                                    let b1 = segment["b1"] as? [Any],
-                                    b1.count >= 2,
-                                    let b0x = b0[0] as? Double,
-                                    let b0y = b0[1] as? Double,
-                                    let b1x = b1[0] as? Double,
-                                    let b1y = b1[1] as? Double else {
-                                        print("AssetSyncModel error parsing b0, b1")
-                                        continue
-                                }
-                                let label = segment["label"] as? String
-                                let offersURL = segment["offers"] as? String
-                                screenshot.shoppablesCount += 1
-                                let shoppable = dataModel.saveShoppable(managedObjectContext: moc,
-                                                                        screenshot: screenshot,
-                                                                        order: order,
-                                                                        label: label,
-                                                                        offersURL: offersURL,
-                                                                        b0x: b0x,
-                                                                        b0y: b0y,
-                                                                        b1x: b1x,
-                                                                        b1y: b1y)
-                                order += 1
-                                self.extractProducts(shoppable: shoppable, managedObjectContext: moc)
-                            }
+                        }.then(on: self.processingQ) { segments -> Void in
+                            NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                            self.saveShoppables(managedObjectContext: moc, screenshot: screenshot, segments: segments)
                         }.catch { error in
                             print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                     }
+                }
+            }.always(on: self.serialQ) {
+                self.screenshotsToProcess -= 1
+                if self.screenshotsToProcess == 0 {
+                    self.endSync()
+                } else if self.screenshotsToProcess < 0 {
+                    print("WTF? negative screenshotsToProcess:\(self.screenshotsToProcess) after subtracting one")
                 }
             }.catch { error in
                 print("uploadScreenshot outer Clarifai catch error:\(error)")
@@ -99,15 +90,10 @@ class AssetSyncModel: NSObject {
                 print("No offersUrl for shoppable order:\(shoppable.order)")
                 return
         }
-        NetworkingModel.downloadProductInfo(url , completionHandler: { (response: URLResponse, responseObject: Any?, error: Error?) in
-            if let error = error {
-                print("NetworkingModel.downloadProductInfo error:\(error)")
-                return
-            }
-            guard let productsDict = responseObject as? [String : Any],
-                let productsArray = productsDict["ads"] as? [[String : Any]],
+        NetworkingPromise.downloadInfo(url: url).then(on: self.processingQ) { productsDict -> Void in
+            guard let productsArray = productsDict["ads"] as? [[String : Any]],
                 productsArray.count > 0 else {
-                    print("NetworkingModel.downloadProductInfo Error parsing products")
+                    print("AssetSyncModel extractProducts error parsing productsArray")
                     return
             }
             let dataModel = DataModel.sharedInstance
@@ -125,8 +111,8 @@ class AssetSyncModel: NSObject {
                 if let extractedCategories = prod["categories"] as? [String] {
                     categories = extractedCategories.first
                 }
-                shoppable.productCount += 1
-                let p = dataModel.saveProduct(managedObjectContext: managedObjectContext,
+                shoppable.productCount += 1 // Before saveProduct gets this saved too.
+                let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
                                               shoppable: shoppable,
                                               order: order,
                                               productDescription: prod["description"] as? String,
@@ -139,10 +125,11 @@ class AssetSyncModel: NSObject {
                                               offer: prod["offer"] as? String,
                                               imageURL: prod["imageUrl"] as? String,
                                               merchant: prod["merchant"] as? String)
-                print("saveProduct:\(p)")
                 order += 1
             }
-        })
+            }.catch { error in
+                print("AssetSyncModel extractProducts error parsing product:\(error)")
+        }
     }
     
     func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
@@ -180,6 +167,48 @@ class AssetSyncModel: NSObject {
         })
     }
 
+    func saveShoppables(managedObjectContext: NSManagedObjectContext, screenshot: Screenshot, segments: [[String : Any]]) { //-> Promise<[String]> {
+//        return Promise { fulfill, reject in
+            var order: Int16 = 0
+            var offers: [String] = []
+            for segment in segments {
+                guard let offersURL = segment["offers"] as? String,
+                    let b0 = segment["b0"] as? [Any],
+                    b0.count >= 2,
+                    let b1 = segment["b1"] as? [Any],
+                    b1.count >= 2,
+                    let b0x = b0[0] as? Double,
+                    let b0y = b0[1] as? Double,
+                    let b1x = b1[0] as? Double,
+                    let b1y = b1[1] as? Double else {
+                        print("AssetSyncModel error parsing offers, b0, b1")
+                        continue
+                }
+                offers.append(offersURL)
+                let label = segment["label"] as? String
+                screenshot.shoppablesCount += 1
+                let shoppable = DataModel.sharedInstance.saveShoppable(managedObjectContext: managedObjectContext,
+                                                                       screenshot: screenshot,
+                                                                       order: order,
+                                                                       label: label,
+                                                                       offersURL: offersURL,
+                                                                       b0x: b0x,
+                                                                       b0y: b0y,
+                                                                       b1x: b1x,
+                                                                       b1y: b1y)
+                order += 1
+                self.extractProducts(shoppable: shoppable, managedObjectContext: managedObjectContext)
+            }
+            if offers.count > 0 {
+                self.sendScreenshotAddedLocalNotification(assetId: screenshot.assetId ?? "")
+//                fulfill(offers)
+//            } else {
+//                let emptyError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "No shoppable segments"])
+//                reject(emptyError)
+            }
+//        }
+    }
+    
     func image(asset: PHAsset) -> Promise<UIImage> {
         return Promise { fulfill, reject in
             image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
@@ -212,6 +241,7 @@ class AssetSyncModel: NSObject {
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "(mediaSubtype & %d) != 0", PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        fetchOptions.fetchLimit = 3
         allScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
     }
     
@@ -222,6 +252,29 @@ class AssetSyncModel: NSObject {
             assetIds.insert(asset.localIdentifier)
         })
         return assetIds
+    }
+    
+    func beginSync() {
+        isSyncing = true
+        NSLog("beginSync")
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
+        if !isRegistered {
+            registerForPhotoChanges()
+        }
+    }
+    
+    func endSync() {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+        }
+        NSLog("endSync")
+        isSyncing = false
+        if shouldSyncAgain {
+            shouldSyncAgain = false
+            syncPhotos()
+        }
     }
     
     func countAndPrint(name: String, set: Set<String>) {
@@ -237,43 +290,66 @@ class AssetSyncModel: NSObject {
     }
     
     @objc public func syncPhotos() {
-        guard PermissionsManager.shared().hasPermission(for: .photo),
-          isSyncReady() else {
-            print("syncPhotos refused by guard")
+        self.serialQ.async {
+            guard PermissionsManager.shared().hasPermission(for: .photo),
+                self.isSyncReady() else {
+                    NSLog("syncPhotos refused by guard")
+                    return
+            }
+            self.beginSync()
+            let photosSet = self.retrieveAllScreenshotAssetIds()
+            let dbSet = DataModel.sharedInstance.retrieveCompleteAssetIds()
+            let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
+            let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
+            // TODO: Remove changedAssetIds as each screenshot is successfully saved.
+            //changedAssetIds = []
+            self.countAndPrint(name: "photosSet", set: photosSet)
+            self.countAndPrint(name: "dbSet", set: dbSet)
+            self.countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
+            self.countAndPrint(name: "toUpload", set: toUpload)
+            if toDeleteFromDB.count > 0 {
+                DataModel.sharedInstance.deleteScreenshots(assetIds: toDeleteFromDB)
+            }
+            if toUpload.count > 0 {
+                self.allScreenshotAssets?.enumerateObjects(options: [.reverse]) { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                    if toUpload.contains(asset.localIdentifier) {
+                        self.screenshotsToProcess += 1
+                        self.processingQ.async {
+                            self.uploadScreenshot(asset: asset)
+                        }
+                    }
+                }
+            }
+            NSLog("enumerated assets to upload")
+            if self.screenshotsToProcess == 0 {
+                self.endSync()
+            }
+        }
+    }
+    
+}
+
+extension AssetSyncModel {
+    
+    func sendScreenshotAddedLocalNotification(assetId: String) {
+        guard PermissionsManager.shared().hasPermission(for: .push) else {
+            print("sendScreenshotAddedLocalNotification refused by guard")
             return
         }
-        isSyncing = true
-        print("syncPhotos passed guard")
-        UIApplication.shared.isNetworkActivityIndicatorVisible = isSyncing
-        if !isRegistered {
-            registerForPhotoChanges()
-        }
-        let photosSet = retrieveAllScreenshotAssetIds()
-        let dbSet = DataModel.sharedInstance.retrieveCompleteAssetIds()
-        let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
-        let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
-        // TODO: Remove changedAssetIds as each screenshot is successfully saved.
-        //changedAssetIds = []
-        countAndPrint(name: "photosSet", set: photosSet)
-        countAndPrint(name: "dbSet", set: dbSet)
-        countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
-        countAndPrint(name: "toUpload", set: toUpload)
-        if toDeleteFromDB.count > 0 {
-            DataModel.sharedInstance.deleteScreenshots(assetIds: toDeleteFromDB)
-        }
-        if toUpload.count > 0 {
-            allScreenshotAssets?.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-                if toUpload.contains(asset.localIdentifier) {
-                    self.uploadScreenshot(asset: asset)
-                }
-            })
-        }
-        isSyncing = false
-        UIApplication.shared.isNetworkActivityIndicatorVisible = isSyncing
-        if shouldSyncAgain {
-            shouldSyncAgain = false
-            syncPhotos()
-        }
+        let content = UNMutableNotificationContent()
+        content.title = "Congratulations!"
+        content.body = "Tap to shop your screenshot."
+        content.sound = UNNotificationSound.default()
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let identifier = "CrazeLocal" + assetId
+        let request = UNNotificationRequest(identifier: identifier,
+                                            content: content,
+                                            trigger: trigger)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
+            if let error = error {
+                print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
+            }
+        })
     }
     
 }
