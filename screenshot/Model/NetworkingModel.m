@@ -31,22 +31,10 @@
     NSURLSessionUploadTask *uploadTask;
     uploadTask = [manager uploadTaskWithRequest:request
                                        fromData:imageData
-                                       progress:^(NSProgress * _Nonnull uploadProgress) { NSLog(@"Wrote %f", uploadProgress.fractionCompleted); }
+                                       progress: nil //^(NSProgress * _Nonnull uploadProgress) { NSLog(@"Wrote %f", uploadProgress.fractionCompleted); }
                               completionHandler:completionhandler];
 
     [uploadTask resume];
-}
-
-+(void)downloadProductInfo:(NSURL * _Nonnull)url completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
-    
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    
-    NSLog(@"downloadProductInfo headers:%@  request.URL:%@  ", request.allHTTPHeaderFields, request.URL);
-
-    NSURLSessionDataTask *dataTask = [manager dataTaskWithRequest:request completionHandler:completionhandler];
-    [dataTask resume];
 }
 
 + (void)shortenUrl:(NSURL * _Nonnull)url completion:(void(^_Nonnull)(NSURL * _Nullable url))completion {
