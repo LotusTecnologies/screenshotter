@@ -12,6 +12,8 @@
 #import "screenshot-Swift.h"
 #import "HelperView.h"
 
+@import Analytics;
+
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -138,6 +140,8 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on screenshot"];
 }
 
 - (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath {
@@ -149,11 +153,19 @@
 
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
 //    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Screenshot Sharing" message:@"Coming soon." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Shared screenshot"];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     [[self screenshotAtIndexPath:indexPath] setHide];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Removed screenshot"];
 }
 
 

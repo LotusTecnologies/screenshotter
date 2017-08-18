@@ -11,6 +11,8 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 
+@import Analytics;
+
 @interface TutorialPermissionsSlideView ()
 
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, UISwitch *> *switchesDict;
@@ -145,8 +147,20 @@
     if ([aSwitch isOn]) {
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType openSettingsIfNeeded:YES response:^(BOOL granted) {
             [self updatePermission:granted forSwitch:aSwitch];
-            if (permissionType == PermissionTypePhoto) {
-                [AssetSyncModel.sharedInstance syncPhotos];
+            
+            switch (permissionType) {
+                case PermissionTypePhoto:
+                    [[AssetSyncModel sharedInstance] syncPhotos];
+                    [[SEGAnalytics sharedAnalytics] track:@"Granted photo permissions"];
+                    break;
+                    
+                case PermissionTypePush:
+                    [[SEGAnalytics sharedAnalytics] track:@"Granted push permissions"];
+                    break;
+                    
+                case PermissionTypeLocation:
+                    [[SEGAnalytics sharedAnalytics] track:@"Granted location permissions"];
+                    break;
             }
         }];
     }

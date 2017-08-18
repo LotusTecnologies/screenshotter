@@ -11,6 +11,8 @@
 #import "Geometry.h"
 #import "TappableTextView.h"
 
+@import Analytics;
+
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
 @property (nonatomic) BOOL readyToSubmit;
@@ -70,6 +72,7 @@
         textField.backgroundColor = [UIColor whiteColor];
         textField.borderStyle = UITextBorderStyleRoundedRect;
         textField.spellCheckingType = UITextSpellCheckingTypeNo;
+        textField.autocorrectionType = UITextAutocorrectionTypeNo;
         textField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
         [self.contentView addSubview:textField];
         [textField setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
@@ -176,6 +179,8 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
+        
+        [[SEGAnalytics sharedAnalytics] track:@"Submitted email" properties:@{@"email": self.textField.text}];
         
     } else {
         [self.delegate tutorialEmailSlideViewDidFail:self];

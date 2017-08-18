@@ -12,6 +12,9 @@
 #import "screenshot-Swift.h"
 #import "WebViewController.h"
 
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+@import Analytics;
+
 @interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate> {
     BOOL _didViewWillAppear;
 }
@@ -79,6 +82,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    // TODO: need to take into account when the user backgrounds / force quits
     if (self.unfavoriteArray.count) {
         [[DataModel sharedInstance] unfavoriteWithFavoriteArray:self.unfavoriteArray];
         [self.unfavoriteArray removeAllObjects];
@@ -131,21 +135,33 @@
     webViewController.url = [NSURL URLWithString:product.offer];
     
     [self.navigationController pushViewController:webViewController animated:YES];
+    
+    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Favorites"}];
+    
+    [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }
 
 
 #pragma mark - Product Cell
 
 - (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
+    BOOL isFavorited = [cell.favoriteButton isSelected];
+    
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
     
-    if ([cell.favoriteButton isSelected]) {
+    if (isFavorited) {
         [self.unfavoriteArray removeObject:product];
         
     } else {
         [self.unfavoriteArray addObject:product];
     }
+    
+    NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
+    [[SEGAnalytics sharedAnalytics] track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    
+    NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
+    [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
 }
 
 @end
