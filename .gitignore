@@ -4,6 +4,8 @@ screenshot.xcodeproj/project.xcworkspace/
 screenshot.xcodeproj/xcuserdata/
 screenshot.xcworkspace/xcuserdata/
 screenshot/.DS_Store
+screenshot.app.dSYM.zip
+screenshot.ipa
 
 # fastlane specific
 fastlane/report.xml
