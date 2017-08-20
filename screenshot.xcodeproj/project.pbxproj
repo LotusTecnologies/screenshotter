@@ -44,6 +44,7 @@
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
+		E4D495D21F49834900312614 /* upload_symbols.sh in Resources */ = {isa = PBXBuildFile; fileRef = E4D495D11F49834900312614 /* upload_symbols.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,6 +119,7 @@
 		E41449FF1F41890900B1F039 /* ClarifaiModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiModel.swift; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
+		E4D495D11F49834900312614 /* upload_symbols.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = upload_symbols.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -292,6 +294,7 @@
 				E4139D471F09083B00E8A53B /* AppDelegate.m */,
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				E4139D541F09083B00E8A53B /* Info.plist */,
+				E4D495D11F49834900312614 /* upload_symbols.sh */,
 				E4139D431F09083B00E8A53B /* Supporting Files */,
 			);
 			path = screenshot;
@@ -326,6 +329,7 @@
 				E4139D3E1F09083B00E8A53B /* Resources */,
 				38086E33D1327D16D87CDA61 /* [CP] Embed Pods Frameworks */,
 				1FF8BB3D1907C42520066B16 /* [CP] Copy Pods Resources */,
+				E4D495D31F4987B100312614 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -382,6 +386,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
+				E4D495D21F49834900312614 /* upload_symbols.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,6 +459,19 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		E4D495D31F4987B100312614 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/screenshot/upload_symbols.sh\" 7fb11213125444f9bd1b18140c5dd782";
 		};
 /* End PBXShellScriptBuildPhase section */
 
