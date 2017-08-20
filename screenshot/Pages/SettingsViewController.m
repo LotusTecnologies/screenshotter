@@ -172,7 +172,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (NSDictionary *)dataDict {
     return @{@(SectionTypePermissions): @[@(RowTypeCameraRoll),
                                           @(RowTypePushNotification),
-                                          @(RowTypeLocationService)
+//                                          @(RowTypeLocationService)
                                           ],
              @(SectionTypeEmail): @[@(RowTypeEmail)
                                     ],
