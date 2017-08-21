@@ -139,6 +139,8 @@
             
         } else {
             dataModel.shoppableFrcDelegate = nil;
+            self.shoppablesFrc = nil;
+            [[DataModel sharedInstance] clearShoppableFrc];
         }
     }
 }
