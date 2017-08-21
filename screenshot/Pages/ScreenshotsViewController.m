@@ -190,7 +190,8 @@
 #pragma mark - Helper View
 
 - (void)syncHelperViewVisibility {
-    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
+    // !!!: debug
+//    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
 }
 
 @end

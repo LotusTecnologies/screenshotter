@@ -51,7 +51,7 @@
     self.shoppableButtons = nil;
     
     if (shoppables && shoppables.count && screenshot) {
-        [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image, Screenshot *screenshot) {
+        [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image, NSString* assetId) {
             NSMutableArray<UIButton *> *buttons = [NSMutableArray array];
             
             for (NSUInteger i = 0; i < shoppables.count; i++) {
