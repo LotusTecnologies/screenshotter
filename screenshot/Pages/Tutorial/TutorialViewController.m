@@ -21,6 +21,8 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIPageControl *pageControl;
 @property (nonatomic, strong) NSArray <TutorialBaseSlideView *>* slides;
+@property (nonatomic, strong) TutorialPermissionsSlideView *permissionsSlideView;
+
 @end
 
 @implementation TutorialViewController
@@ -131,9 +133,11 @@
         TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
         emailSlideView.delegate = self;
         
+        self.permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
+        
         _slides = @[[[TutorialScreenshotSlideView alloc] init],
                     [[TutorialShopSlideView alloc] init],
-                    [[TutorialPermissionsSlideView alloc] init],
+                    self.permissionsSlideView,
                     emailSlideView
                     ];
     }
@@ -156,6 +160,15 @@
 
 
 #pragma mark - Scroll View
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+    
+    if (scrollView.contentOffset.x > scrollView.bounds.size.width * 2.f) {
+        if (![self.permissionsSlideView hasDecidedAllPermissions]) {
+            targetContentOffset->x = scrollView.bounds.size.width * 2.f;
+        }
+    }
+}
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (!decelerate) {

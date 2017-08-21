@@ -10,4 +10,6 @@
 
 @interface TutorialPermissionsSlideView : TutorialBaseSlideView
 
+- (BOOL)hasDecidedAllPermissions;
+
 @end

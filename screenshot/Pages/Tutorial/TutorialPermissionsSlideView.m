@@ -124,7 +124,7 @@
 }
 
 
-#pragma mark - Switch
+#pragma mark - Permissions
 
 - (void)updatePermission:(BOOL)hasPermission forSwitch:(UISwitch *)aSwitch {
     aSwitch.enabled = !hasPermission;
@@ -171,6 +171,14 @@
         BOOL hasPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:[key integerValue]];
         [self updatePermission:hasPermission forSwitch:obj];
     }];
+}
+
+- (BOOL)hasDecidedAllPermissions {
+    PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
+    PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
+//    PermissionStatus locationStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypeLocation];
+    
+    return photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined;// && locationStatus != PermissionStatusNotDetermined;
 }
 
 @end
