@@ -66,8 +66,11 @@
         _screenshot = screenshot;
         
         if (screenshot) {
-            [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image, Screenshot *aScreenshot) {
-                if (screenshot.objectID == aScreenshot.objectID) {
+            // TODO: set to default screenshot image
+            self.imageView.image = nil;
+            
+            [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image, NSString *assetId) {
+                if ([screenshot.assetId isEqualToString:assetId]) {
                     self.imageView.image = image;
                 }
             }];

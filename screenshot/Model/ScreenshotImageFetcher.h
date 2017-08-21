@@ -9,13 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "screenshot-Swift.h"
 
-typedef void (^ScreenshotImageHandler)(UIImage *image, Screenshot *screenshot);
+typedef void (^ScreenshotImageHandler)(UIImage *image, NSString *assetId);
 
 @interface ScreenshotImageFetcher : NSObject
 
 + (ScreenshotImageFetcher *)screenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
 - (instancetype)initWithScreenshot:(Screenshot *)screenshot handler:(ScreenshotImageHandler)handler;
 
-@property (nonatomic, strong, readonly) Screenshot *screenshot;
+@property (nonatomic, strong, readonly) NSString *assetId;
 
 @end
