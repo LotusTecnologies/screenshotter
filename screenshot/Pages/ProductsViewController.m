@@ -54,8 +54,7 @@
         ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
         toolbar.delegate = self;
-        toolbar.layoutMargins = UIEdgeInsetsMake(margin, margin, margin, margin);
-        [toolbar insertShoppables:[self shoppables] withScreenshot:self.screenshot];
+        toolbar.shoppables = [self shoppables];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -99,10 +98,18 @@
         [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
         
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        
         self.image = image;
+        self.shoppablesToolbar.screenshotImage = image;
     }];
     
     [self reloadCollectionViewForIndex:0];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.shoppablesToolbar selectFirstItem];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
