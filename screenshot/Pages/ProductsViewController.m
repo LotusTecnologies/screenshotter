@@ -88,7 +88,7 @@
         collectionView;
     });
     
-    [ScreenshotImageFetcher screenshot:self.screenshot handler:^(UIImage *image, NSString *assetId) {
+    [ScreenshotImageFetcher screenshot:self.screenshot handler:^(UIImage *image) {
         CGFloat buttonSize = 32.f;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
