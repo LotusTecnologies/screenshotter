@@ -94,7 +94,7 @@ class DataModel: NSObject {
     public func setupShoppableFrc(screenshot: Screenshot) -> NSFetchedResultsController<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: false)]
-        request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
+        request.predicate = NSPredicate(format: "screenshot == %@ AND productCount > 0", screenshot)
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         shoppableFrc = fetchedResultsController
         fetchedResultsController.delegate = self
@@ -145,6 +145,7 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case screenshotFrc:
             screenshotChangeKind = .none
             screenshotChangeIndexPath = nil
+            NSLog("controllerWillChangeContent screenshotFrc")
         case shoppableFrcStandIn:
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
@@ -178,6 +179,7 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
+            NSLog("controller screenshotFrc didChange at indexPath:\(String(describing: indexPath))  type:\(type)  newIndexPath:\(String(describing: newIndexPath))")
         case shoppableFrcStandIn:
             didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
@@ -216,6 +218,7 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
         switch controller {
         case screenshotFrc:
+            NSLog("screenshotFrc controllerDidChangeContent")
             didChangeContent(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
         case shoppableFrcStandIn:
             didChangeContent(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
@@ -342,6 +345,17 @@ extension DataModel {
             print("Failed to saveShoppable order:\(order)")
         }
         return shoppableToSave
+    }
+    
+    func delete(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
+        let screenshot = shoppable.screenshot
+        do {
+            managedObjectContext.delete(shoppable)
+            screenshot?.shoppablesCount -= 1
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to delete shoppable")
+        }
     }
     
     // Save a new Product to Core Data.

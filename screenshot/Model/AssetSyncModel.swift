@@ -84,16 +84,60 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    func saveShoppables(managedObjectContext: NSManagedObjectContext, screenshot: Screenshot, segments: [[String : Any]]) { //-> Promise<[String]> {
+        //        return Promise { fulfill, reject in
+        var order: Int16 = 0
+        var offers: [String] = []
+        for segment in segments {
+            guard let offersURL = segment["offers"] as? String,
+                let b0 = segment["b0"] as? [Any],
+                b0.count >= 2,
+                let b1 = segment["b1"] as? [Any],
+                b1.count >= 2,
+                let b0x = b0[0] as? Double,
+                let b0y = b0[1] as? Double,
+                let b1x = b1[0] as? Double,
+                let b1y = b1[1] as? Double else {
+                    print("AssetSyncModel error parsing offers, b0, b1")
+                    continue
+            }
+            offers.append(offersURL)
+            let label = segment["label"] as? String
+            screenshot.shoppablesCount += 1
+            let shoppable = DataModel.sharedInstance.saveShoppable(managedObjectContext: managedObjectContext,
+                                                                   screenshot: screenshot,
+                                                                   order: order,
+                                                                   label: label,
+                                                                   offersURL: offersURL,
+                                                                   b0x: b0x,
+                                                                   b0y: b0y,
+                                                                   b1x: b1x,
+                                                                   b1y: b1y)
+            order += 1
+            self.extractProducts(shoppable: shoppable, managedObjectContext: managedObjectContext)
+        }
+        if offers.count > 0 {
+            self.sendScreenshotAddedLocalNotification(assetId: screenshot.assetId ?? "")
+            //                fulfill(offers)
+            //            } else {
+            //                let emptyError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "No shoppable segments"])
+            //                reject(emptyError)
+        }
+        //        }
+    }
+
     func extractProducts(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
         guard let offersUrl = shoppable.offersURL,
             let url = URL(string: (offersUrl.hasPrefix("//") ? "https:" + offersUrl : offersUrl)) else {
                 print("No offersUrl for shoppable order:\(shoppable.order)")
+                rollback(shoppable: shoppable, managedObjectContext: managedObjectContext)
                 return
         }
         NetworkingPromise.downloadInfo(url: url).then(on: self.processingQ) { productsDict -> Void in
             guard let productsArray = productsDict["ads"] as? [[String : Any]],
                 productsArray.count > 0 else {
-                    print("AssetSyncModel extractProducts error parsing productsArray")
+                    print("AssetSyncModel extractProducts error parsing productsArray. productsDict:\(productsDict)\noffersUrl:\(offersUrl)")
+                    self.rollback(shoppable: shoppable, managedObjectContext: managedObjectContext)
                     return
             }
             let dataModel = DataModel.sharedInstance
@@ -127,9 +171,19 @@ class AssetSyncModel: NSObject {
                                               merchant: prod["merchant"] as? String)
                 order += 1
             }
+            if shoppable.productCount <= 0 {
+                self.rollback(shoppable: shoppable, managedObjectContext: managedObjectContext)
+            }
             }.catch { error in
                 print("AssetSyncModel extractProducts error parsing product:\(error)")
         }
+    }
+    
+    func rollback(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
+        let screenshot = shoppable.screenshot
+        NSLog("Rolling back shoppable:\(shoppable)  its screenshot:\(String(describing: screenshot))  its shoppablesCount:\(String(describing: screenshot?.shoppablesCount))")
+        DataModel.sharedInstance.delete(shoppable: shoppable, managedObjectContext: managedObjectContext)
+        NSLog("After rollback screenshot:\(String(describing: screenshot))  its shoppablesCount:\(String(describing: screenshot?.shoppablesCount))")
     }
     
     func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
@@ -165,48 +219,6 @@ class AssetSyncModel: NSObject {
                                               resultHandler: { (image: UIImage?, info: [AnyHashable : Any]?) in
                                                 callback(image, info)
         })
-    }
-
-    func saveShoppables(managedObjectContext: NSManagedObjectContext, screenshot: Screenshot, segments: [[String : Any]]) { //-> Promise<[String]> {
-//        return Promise { fulfill, reject in
-            var order: Int16 = 0
-            var offers: [String] = []
-            for segment in segments {
-                guard let offersURL = segment["offers"] as? String,
-                    let b0 = segment["b0"] as? [Any],
-                    b0.count >= 2,
-                    let b1 = segment["b1"] as? [Any],
-                    b1.count >= 2,
-                    let b0x = b0[0] as? Double,
-                    let b0y = b0[1] as? Double,
-                    let b1x = b1[0] as? Double,
-                    let b1y = b1[1] as? Double else {
-                        print("AssetSyncModel error parsing offers, b0, b1")
-                        continue
-                }
-                offers.append(offersURL)
-                let label = segment["label"] as? String
-                screenshot.shoppablesCount += 1
-                let shoppable = DataModel.sharedInstance.saveShoppable(managedObjectContext: managedObjectContext,
-                                                                       screenshot: screenshot,
-                                                                       order: order,
-                                                                       label: label,
-                                                                       offersURL: offersURL,
-                                                                       b0x: b0x,
-                                                                       b0y: b0y,
-                                                                       b1x: b1x,
-                                                                       b1y: b1y)
-                order += 1
-                self.extractProducts(shoppable: shoppable, managedObjectContext: managedObjectContext)
-            }
-            if offers.count > 0 {
-                self.sendScreenshotAddedLocalNotification(assetId: screenshot.assetId ?? "")
-//                fulfill(offers)
-//            } else {
-//                let emptyError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "No shoppable segments"])
-//                reject(emptyError)
-            }
-//        }
     }
     
     func image(asset: PHAsset) -> Promise<UIImage> {
