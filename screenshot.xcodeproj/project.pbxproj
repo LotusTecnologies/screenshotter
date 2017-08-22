@@ -497,7 +497,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/screenshot/upload_symbols.sh\" 7fb11213125444f9bd1b18140c5dd782";
+			shellScript = "\"${SRCROOT}/screenshot/upload_symbols.sh\" 0ece18b50f7d4ef9aae3e473c28030bc";
 		};
 /* End PBXShellScriptBuildPhase section */
 

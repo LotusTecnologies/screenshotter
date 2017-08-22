@@ -154,14 +154,11 @@
         configuration;
     })];
     
-    BOOL isEnvironmentDev = YES;
-    
-    if (isEnvironmentDev) {
-        [Appsee start:@"d9010050cea04490b6b9cdd795849dd4"];
-        
-    } else {
-        [Appsee start:@"0ece18b50f7d4ef9aae3e473c28030bc"];
-    }
+#ifdef DEBUG
+    [Appsee start:@"d9010050cea04490b6b9cdd795849dd4"];
+#else
+    [Appsee start:@"0ece18b50f7d4ef9aae3e473c28030bc"];
+#endif
     
     [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
 }
