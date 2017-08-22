@@ -40,21 +40,60 @@
     
     [self setupApplicationAppearance];
     
-    self.window = ({
-        UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+    
+    
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+        if ([DataModel sharedInstance].isCoreDataStackReady) {
             window.rootViewController = [[MainTabBarController alloc] init];
             
         } else {
-            TutorialViewController *viewController = [[TutorialViewController alloc] init];
-            viewController.delegate = self;
+            [DataModel sharedInstance].coreDataStackCompletionHandler = ^{
+                UIViewController *oldViewController = self.window.rootViewController;
+                UIViewController *newViewController = [[MainTabBarController alloc] init];
+                UIViewAnimationOptions options = UIViewAnimationOptionTransitionFlipFromLeft | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionLayoutSubviews;
+                
+                [UIView transitionFromView:oldViewController.view toView:newViewController.view duration:0.5f options:options completion:^(BOOL finished) {
+                    self.window.rootViewController = newViewController;
+                }];
+            };
+            
+            [DataModel sharedInstance].coreDataStackFailureHandler = ^{
+                // TODO:
+            };
+            
+            UIViewController *viewController = [[UIViewController alloc] init];
+            viewController.view.backgroundColor = [UIColor greenColor];
             window.rootViewController = viewController;
         }
         
-        [window makeKeyAndVisible];
-        window;
-    });
+    } else {
+        TutorialViewController *viewController = [[TutorialViewController alloc] init];
+        viewController.delegate = self;
+        window.rootViewController = viewController;
+    }
+    
+    [window makeKeyAndVisible];
+    self.window = window;
+    
+    
+    
+//    self.window = ({
+//        UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+//        
+//        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+//            window.rootViewController = [[MainTabBarController alloc] init];
+//            
+//        } else {
+//            TutorialViewController *viewController = [[TutorialViewController alloc] init];
+//            viewController.delegate = self;
+//            window.rootViewController = viewController;
+//        }
+//        
+//        [window makeKeyAndVisible];
+//        window;
+//    });
     
     return YES;
 }
