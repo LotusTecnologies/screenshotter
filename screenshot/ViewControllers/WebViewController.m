@@ -12,6 +12,7 @@
 #import "NetworkingModel.h"
 
 @import Analytics;
+@import Appsee;
 @import WebKit;
 
 @interface WebViewController () <WKNavigationDelegate> {
@@ -93,6 +94,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    [Appsee startScreen:@"WebView"];
     [self.loader startAnimation];
 }
 
