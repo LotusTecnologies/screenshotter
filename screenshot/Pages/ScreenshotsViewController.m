@@ -11,6 +11,7 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "HelperView.h"
+#import "PermissionsManager.h"
 
 @import Analytics;
 
@@ -93,6 +94,15 @@
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
+        UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {

@@ -21,6 +21,4 @@
 
 @property (nonatomic, weak) id<TutorialPermissionsSlideViewDelegate> delegate;
 
-+ (UIAlertController *)deniedPhotosPermissionAlertController;
-
 @end

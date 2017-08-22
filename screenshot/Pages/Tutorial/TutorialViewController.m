@@ -147,7 +147,7 @@
 }
 
 - (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView {
-    UIAlertController *alertController = [TutorialPermissionsSlideView deniedPhotosPermissionAlertController];
+    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 

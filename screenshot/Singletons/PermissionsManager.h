@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, PermissionType) {
     PermissionTypePhoto,
@@ -31,6 +31,8 @@ typedef void (^PermissionBlock)(BOOL granted);
 - (BOOL)hasPermissionForType:(PermissionType)type;
 - (void)requestPermissionForType:(PermissionType)type response:(PermissionBlock)response;
 - (void)requestPermissionForType:(PermissionType)type openSettingsIfNeeded:(BOOL)openSettings response:(PermissionBlock)response;
+
+- (UIAlertController *)deniedAlertControllerForType:(PermissionType)type;
 
 //  Called when the app starts
 - (void)fetchPushPermissionStatus;
