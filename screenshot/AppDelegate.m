@@ -28,19 +28,7 @@
 #pragma mark - Life Cycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [ClarifaiModel setup]; // Takes a long time to intialize; start early.
-    [SEGAnalytics setupWithConfiguration:({
-        SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:@"RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"];
-        configuration.trackApplicationLifecycleEvents = YES;
-        configuration.recordScreenViews = YES;
-        configuration.trackDeepLinks = YES;
-        configuration.trackPushNotifications = YES;
-        configuration;
-    })];
-    
-    [Appsee start:@"7fb11213125444f9bd1b18140c5dd782"];
-    
-    [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
+    [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
     
     NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
     [AssetSyncModel.sharedInstance syncPhotos];
@@ -112,6 +100,33 @@
                     ];
     // Add any custom logic here.
     return handled;
+}
+
+
+#pragma mark - Third Party
+
+- (void)setupThirdPartyLibrariesWithApplication:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [ClarifaiModel setup]; // Takes a long time to intialize; start early.
+    
+    [SEGAnalytics setupWithConfiguration:({
+        SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:@"RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"];
+        configuration.trackApplicationLifecycleEvents = YES;
+        configuration.recordScreenViews = YES;
+        configuration.trackDeepLinks = YES;
+        configuration.trackPushNotifications = YES;
+        configuration;
+    })];
+    
+    BOOL isEnvironmentDev = YES;
+    
+    if (isEnvironmentDev) {
+        [Appsee start:@"d9010050cea04490b6b9cdd795849dd4"];
+        
+    } else {
+        [Appsee start:@"0ece18b50f7d4ef9aae3e473c28030bc"];
+    }
+    
+    [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
 
