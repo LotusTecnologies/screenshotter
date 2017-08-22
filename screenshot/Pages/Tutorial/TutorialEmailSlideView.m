@@ -11,8 +11,7 @@
 #import "Geometry.h"
 #import "TappableTextView.h"
 #import "WebViewController.h"
-
-@import Analytics;
+#import "AnalyticsManager.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
@@ -181,7 +180,7 @@
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [[SEGAnalytics sharedAnalytics] track:@"Submitted email" properties:@{@"email": self.textField.text}];
+        [AnalyticsManager track:@"Submitted email" properties:@{@"email": self.textField.text}];
         
     } else {
         [self.delegate tutorialEmailSlideViewDidFail:self];

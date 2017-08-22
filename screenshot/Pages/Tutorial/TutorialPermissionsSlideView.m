@@ -10,8 +10,7 @@
 #import "PermissionsManager.h"
 #import "Geometry.h"
 #import "screenshot-Swift.h"
-
-@import Analytics;
+#import "AnalyticsManager.h"
 
 @interface TutorialPermissionsSlideView ()
 
@@ -171,7 +170,7 @@
                     break;
             }
             
-            [[SEGAnalytics sharedAnalytics] track:event properties:@{@"granted": grantedString}];
+            [AnalyticsManager track:event properties:@{@"granted": grantedString}];
         }];
     }
 }

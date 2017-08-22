@@ -10,8 +10,8 @@
 #import "Loader.h"
 #import "Geometry.h"
 #import "NetworkingModel.h"
+#import "AnalyticsManager.h"
 
-@import Analytics;
 @import Appsee;
 @import WebKit;
 
@@ -208,7 +208,7 @@
 - (void)refreshAction {
     [self.view reload];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsManager track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)shareAction {
@@ -225,13 +225,13 @@
         [self updateToolbarItems];
     }];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsManager track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)safariAction {
     [[UIApplication sharedApplication] openURL:self.url options:@{} completionHandler:nil];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsManager track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
 }
 
 @end

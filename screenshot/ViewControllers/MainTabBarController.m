@@ -12,8 +12,7 @@
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "UIColor+Appearance.h"
-
-@import Analytics;
+#import "AnalyticsManager.h"
 
 @interface MainTabBarController () <UITabBarControllerDelegate>
 
@@ -89,7 +88,7 @@
     }
     
     if (tab) {
-        [[SEGAnalytics sharedAnalytics] track:@"Tab Bar tapped" properties:@{@"tab": tab}];
+        [AnalyticsManager track:@"Tab Bar tapped" properties:@{@"tab": tab}];
     }
 }
 

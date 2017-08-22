@@ -12,8 +12,7 @@
 #import "screenshot-Swift.h"
 #import "HelperView.h"
 #import "PermissionsManager.h"
-
-@import Analytics;
+#import "AnalyticsManager.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
@@ -151,7 +150,7 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Tapped on screenshot"];
+    [AnalyticsManager track:@"Tapped on screenshot"];
 }
 
 - (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath {
@@ -168,14 +167,14 @@
     [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Shared screenshot"];
+    [AnalyticsManager track:@"Shared screenshot"];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     [[self screenshotAtIndexPath:indexPath] setHide];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Removed screenshot"];
+    [AnalyticsManager track:@"Removed screenshot"];
 }
 
 

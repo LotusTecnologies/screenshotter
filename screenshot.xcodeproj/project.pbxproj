@@ -36,6 +36,7 @@
 		C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C11F4AD40500EE7855 /* ShoppableCollectionViewCell.m */; };
 		C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */; };
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
+		C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CB1F4C557200EE7855 /* AnalyticsManager.m */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
@@ -105,6 +106,8 @@
 		C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayViewController.m; sourceTree = "<group>"; };
 		C55184C71F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayNavigationController.h; sourceTree = "<group>"; };
 		C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayNavigationController.m; sourceTree = "<group>"; };
+		C55184CA1F4C557200EE7855 /* AnalyticsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnalyticsManager.h; sourceTree = "<group>"; };
+		C55184CB1F4C557200EE7855 /* AnalyticsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnalyticsManager.m; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
@@ -216,6 +219,8 @@
 			children = (
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
+				C55184CA1F4C557200EE7855 /* AnalyticsManager.h */,
+				C55184CB1F4C557200EE7855 /* AnalyticsManager.m */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";
@@ -526,6 +531,7 @@
 				C5278FF71F3C38510090E422 /* TutorialScreenshotSlideView.m in Sources */,
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
+				C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */,
 				C5278FEA1F3C38510090E422 /* UIColor+Appearance.m in Sources */,
 				C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */,
 				C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */,

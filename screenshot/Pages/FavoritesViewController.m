@@ -11,6 +11,7 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "WebViewController.h"
+#import "AnalyticsManager.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
@@ -136,7 +137,7 @@
     
     [self.navigationController pushViewController:webViewController animated:YES];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Favorites"}];
+    [AnalyticsManager track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Favorites"}];
     
     [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }
@@ -158,7 +159,7 @@
     }
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [[SEGAnalytics sharedAnalytics] track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    [AnalyticsManager track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];

@@ -15,8 +15,7 @@
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"
-
-@import Analytics;
+#import "AnalyticsManager.h"
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate>
 
@@ -36,7 +35,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
-        [[SEGAnalytics sharedAnalytics] track:@"Started Tutorial"];
+        [AnalyticsManager track:@"Started Tutorial"];
     }
     return self;
 }
@@ -158,7 +157,7 @@
 
 - (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
     [self.delegate tutorialViewControllerDidComplete:self];
-    [[SEGAnalytics sharedAnalytics] track:@"Finished Tutorial"];
+    [AnalyticsManager track:@"Finished Tutorial"];
 }
 
 - (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView {
