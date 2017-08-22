@@ -8,8 +8,19 @@
 
 #import "TutorialBaseSlideView.h"
 
+@class TutorialPermissionsSlideView;
+
+@protocol TutorialPermissionsSlideViewDelegate <NSObject>
+@required
+
+- (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView;
+
+@end
+
 @interface TutorialPermissionsSlideView : TutorialBaseSlideView
 
-- (BOOL)hasDecidedAllPermissions;
+@property (nonatomic, weak) id<TutorialPermissionsSlideViewDelegate> delegate;
+
++ (UIAlertController *)deniedPhotosPermissionAlertController;
 
 @end

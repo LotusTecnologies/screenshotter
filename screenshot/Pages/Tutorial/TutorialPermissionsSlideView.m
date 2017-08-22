@@ -148,20 +148,30 @@
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType openSettingsIfNeeded:YES response:^(BOOL granted) {
             [self updatePermission:granted forSwitch:aSwitch];
             
+            NSString *event;
+            NSString *grantedString = granted ? @"yes" : @"no";
+            
             switch (permissionType) {
                 case PermissionTypePhoto:
                     [[AssetSyncModel sharedInstance] syncPhotos];
-                    [[SEGAnalytics sharedAnalytics] track:@"Granted photo permissions"];
+                    
+                    if (!granted) {
+                        [self.delegate tutorialPermissionsSlideViewDidDenyPhotosPermission:self];
+                    }
+                    
+                    event = @"Granted photo permissions";
                     break;
                     
                 case PermissionTypePush:
-                    [[SEGAnalytics sharedAnalytics] track:@"Granted push permissions"];
+                    event = @"Granted push permissions";
                     break;
                     
                 case PermissionTypeLocation:
-                    [[SEGAnalytics sharedAnalytics] track:@"Granted location permissions"];
+                    event = @"Granted location permissions";
                     break;
             }
+            
+            [[SEGAnalytics sharedAnalytics] track:event properties:@{@"granted": grantedString}];
         }];
     }
 }
@@ -173,12 +183,15 @@
     }];
 }
 
-- (BOOL)hasDecidedAllPermissions {
-    PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
-    PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
-//    PermissionStatus locationStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypeLocation];
-    
-    return photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined;// && locationStatus != PermissionStatusNotDetermined;
+
+#pragma mark - Alert
+
++ (UIAlertController *)deniedPhotosPermissionAlertController {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Allow Permissions To Continue" message:@"We need access to your photos in order to show you shoppable items." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+    }]];
+    return alertController;
 }
 
 @end
