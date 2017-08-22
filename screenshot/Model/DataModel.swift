@@ -12,11 +12,12 @@ import CoreData
 @objc public protocol FrcDelegateProtocol : class {
     func frcOneAddedAt(indexPath: IndexPath)
     func frcOneDeletedAt(indexPath: IndexPath)
+    func frcOneUpdatedAt(indexPath: IndexPath)
     func frcReloadData()
 }
 
 enum CZChangeKind {
-    case none, singleAdd, singleDelete, multiple
+    case none, singleAdd, singleDelete, singleUpdate, multiple
 }
 
 
@@ -80,6 +81,7 @@ class DataModel: NSObject {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
         request.predicate = NSPredicate(format: "isFashion == TRUE AND isHidden == FALSE AND shoppablesCount > 0")
+        request.fetchLimit = 100
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {
@@ -172,6 +174,9 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             case .delete:
                 changeKind = .singleDelete
                 changeIndexPath = indexPath
+            case .update:
+                changeKind = .singleUpdate
+                changeIndexPath = indexPath
             default:
                 changeKind = .multiple
             }
@@ -183,7 +188,7 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-            NSLog("controller screenshotFrc didChange at indexPath:\(String(describing: indexPath))  type:\(type)  newIndexPath:\(String(describing: newIndexPath))")
+            NSLog("controller screenshotFrc didChange at indexPath:\(String(describing: indexPath))  type:\(type.rawValue)  newIndexPath:\(String(describing: newIndexPath))")
         case shoppableFrcStandIn:
             didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
@@ -209,6 +214,13 @@ extension DataModel: NSFetchedResultsControllerDelegate {
                 frcDelegate?.frcOneDeletedAt(indexPath: changeIndexPath)
             } else {
                 print("Error DataModel singleDelete changeIndexPath nil")
+                frcDelegate?.frcReloadData()
+            }
+        case .singleUpdate:
+            if let changeIndexPath = changeIndexPath {
+                frcDelegate?.frcOneUpdatedAt(indexPath: changeIndexPath)
+            } else {
+                print("Error DataModel singleAdd changeIndexPath nil")
                 frcDelegate?.frcReloadData()
             }
         case .multiple:
@@ -240,13 +252,17 @@ extension DataModel {
     // Save a new Screenshot to Core Data.
     func saveScreenshot(managedObjectContext: NSManagedObjectContext,
                         assetId: String,
+                        createdAt: Date?,
                         isFashion: Bool,
-                        createdAt: Date?) -> Screenshot {
+                        imageData: Data?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
-        screenshotToSave.isFashion = isFashion
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
+        }
+        screenshotToSave.isFashion = isFashion
+        if let nsData = imageData as NSData? {
+            screenshotToSave.imageData = nsData
         }
         do {
             try managedObjectContext.save()
@@ -364,6 +380,7 @@ extension DataModel {
     
     func delete(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
         do {
+            NSLog("In delete shoppable:\(shoppable)")
             if let screenshot = shoppable.screenshot {
                 screenshot.shoppablesCount -= 1
             } else {

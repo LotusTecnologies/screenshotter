@@ -49,20 +49,21 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
-            }.then /*(on: processingQ)*/ { image -> Promise<(Bool, UIImage)> in  // Clarifai bug, must run on main
+            }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
                 NSLog("uploadScreenshot til image retrieved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
                 NSLog("uploadScreenshot til isFashion:\(isFashion) \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
                 dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
+                                                     createdAt: asset.creationDate,
                                                      isFashion: isFashion,
-                                                     createdAt: asset.creationDate)
+                                                     imageData: imageData)
                 }
                 if isFashion {
                     NSLog("uploadScreenshot til db saved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
-                    let imageData = UIImageJPEGRepresentation(image, 0.80)
                     firstly { _ -> Promise<[[String : Any]]> in
                         NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
@@ -310,16 +311,16 @@ class AssetSyncModel: NSObject {
             var dbSet = Set<String>()
             managedObjectContext.performAndWait {
                 dbSet = dataModel.retrieveCompleteAssetIds(managedObjectContext: managedObjectContext)
-                let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
-                self.countAndPrint(name: "dbSet", set: dbSet)
-                self.countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
-                if toDeleteFromDB.count > 0 {
-                    dataModel.deleteScreenshots(managedObjectContext: managedObjectContext, assetIds: toDeleteFromDB)
-                }
+//                let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
+//                self.countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
+//                if toDeleteFromDB.count > 0 {
+//                    dataModel.deleteScreenshots(managedObjectContext: managedObjectContext, assetIds: toDeleteFromDB)
+//                }
             }
             let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
             // TODO: Remove changedAssetIds as each screenshot is successfully saved.
             //changedAssetIds = []
+            self.countAndPrint(name: "dbSet", set: dbSet)
             self.countAndPrint(name: "photosSet", set: photosSet)
             self.countAndPrint(name: "toUpload", set: toUpload)
             if toUpload.count > 0 {

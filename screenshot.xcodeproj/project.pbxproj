@@ -29,7 +29,6 @@
 		C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDE1F3C38510090E422 /* MainTabBarController.m */; };
 		C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */; };
 		C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE41F3C38510090E422 /* FavoriteButton.m */; };
-		C52790061F3C48F70090E422 /* ScreenshotImageFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = C52790051F3C48F70090E422 /* ScreenshotImageFetcher.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
 		C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */; };
 		C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */; };
@@ -92,8 +91,6 @@
 		C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
 		C5278FE31F3C38510090E422 /* FavoriteButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoriteButton.h; sourceTree = "<group>"; };
 		C5278FE41F3C38510090E422 /* FavoriteButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoriteButton.m; sourceTree = "<group>"; };
-		C52790041F3C48F70090E422 /* ScreenshotImageFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotImageFetcher.h; sourceTree = "<group>"; };
-		C52790051F3C48F70090E422 /* ScreenshotImageFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotImageFetcher.m; sourceTree = "<group>"; };
 		C54F032B1F44361C00CF8CBD /* HelperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperView.h; sourceTree = "<group>"; };
 		C54F032C1F44361C00CF8CBD /* HelperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperView.m; sourceTree = "<group>"; };
 		C55184BA1F4AD3E000EE7855 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
@@ -171,8 +168,6 @@
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
 				C5278FBF1F3C38510090E422 /* NetworkingModel.h */,
 				C5278FC01F3C38510090E422 /* NetworkingModel.m */,
-				C52790041F3C48F70090E422 /* ScreenshotImageFetcher.h */,
-				C52790051F3C48F70090E422 /* ScreenshotImageFetcher.m */,
 				E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */,
 				E41449FF1F41890900B1F039 /* ClarifaiModel.swift */,
 			);
@@ -512,7 +507,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
-				C52790061F3C48F70090E422 /* ScreenshotImageFetcher.m in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
 				C5278FE91F3C38510090E422 /* Geometry.m in Sources */,
 				C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */,

@@ -7,7 +7,6 @@
 //
 
 #import "ScreenshotCollectionViewCell.h"
-#import "ScreenshotImageFetcher.h"
 
 @interface ScreenshotCollectionViewCell ()
 
@@ -67,14 +66,7 @@
         
         if (screenshot) {
             // TODO: set to default screenshot image
-            self.imageView.image = nil;
-            
-            [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image) {
-                if ([_screenshot.assetId isEqualToString:screenshot.assetId]) {
-                    self.imageView.image = image;
-                }
-            }];
-            
+            self.imageView.image = [UIImage imageWithData:_screenshot.imageData];
         } else {
             self.imageView.image = nil;
         }

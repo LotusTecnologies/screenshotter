@@ -10,7 +10,6 @@
 #import "ProductCollectionViewCell.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
-#import "ScreenshotImageFetcher.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
 #import "WebViewController.h"
@@ -88,7 +87,8 @@
         collectionView;
     });
     
-    [ScreenshotImageFetcher screenshot:self.screenshot handler:^(UIImage *image) {
+    {
+        UIImage *image = [UIImage imageWithData:self.screenshot.imageData];
         CGFloat buttonSize = 32.f;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -101,7 +101,7 @@
         
         self.image = image;
         self.shoppablesToolbar.screenshotImage = image;
-    }];
+    }
     
     [self reloadCollectionViewForIndex:0];
 }
@@ -271,6 +271,10 @@
 
 - (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
     [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+}
+
+- (void)frcOneUpdatedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
 }
 
 - (void)frcReloadData {

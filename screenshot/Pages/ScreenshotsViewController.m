@@ -190,6 +190,10 @@
     [self syncHelperViewVisibility];
 }
 
+- (void)frcOneUpdatedAtIndexPath:(NSIndexPath *)indexPath {
+    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+}
+
 - (void)frcReloadData {
     [self.collectionView reloadData];
     [self syncHelperViewVisibility];
