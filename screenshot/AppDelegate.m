@@ -32,10 +32,6 @@
     [ClarifaiModel setup]; // Takes a long time to intialize; start early.
     [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
     
-    NSLog(@"didFinishLaunchingWithOptions starting syncPhotos");
-    [AssetSyncModel.sharedInstance syncPhotos];
-    NSLog(@"didFinishLaunchingWithOptions completed syncPhotos");
-    
     [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     
     [self setupApplicationAppearance];
@@ -46,10 +42,12 @@
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
+            [AssetSyncModel.sharedInstance syncPhotos];
             window.rootViewController = [[MainTabBarController alloc] init];
             
         } else {
             [DataModel sharedInstance].coreDataStackCompletionHandler = ^{
+                [AssetSyncModel.sharedInstance syncPhotos];
                 UIViewController *oldViewController = self.window.rootViewController;
                 UIViewController *newViewController = [[MainTabBarController alloc] init];
                 UIViewAnimationOptions options = UIViewAnimationOptionTransitionFlipFromLeft | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionLayoutSubviews;

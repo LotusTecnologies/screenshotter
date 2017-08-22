@@ -297,14 +297,15 @@ class AssetSyncModel: NSObject {
     
     @objc public func syncPhotos() {
         self.serialQ.async {
+            let dataModel = DataModel.sharedInstance
             guard PermissionsManager.shared().hasPermission(for: .photo),
+                dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
                     NSLog("syncPhotos refused by guard")
                     return
             }
             self.beginSync()
             let photosSet = self.retrieveAllScreenshotAssetIds()
-            let dataModel = DataModel.sharedInstance
             let managedObjectContext = dataModel.adHocMoc()
             var dbSet = Set<String>()
             managedObjectContext.performAndWait {

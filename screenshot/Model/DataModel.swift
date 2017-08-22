@@ -40,12 +40,20 @@ class DataModel: NSObject {
         let container = NSPersistentContainer(name: "Model")
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
-                print("Unresolved error \(error), \(error.userInfo)")
-                self.coreDataStackFailureHandler?()
+                print("loadPersistentStores error:\(error)")
+                if let handler = self.coreDataStackFailureHandler {
+                    DispatchQueue.main.async {
+                        handler()
+                    }
+                }
             } else {
                 container.viewContext.automaticallyMergesChangesFromParent = true
                 self.isCoreDataStackReady = true
-                self.coreDataStackCompletionHandler?()
+                if let handler = self.coreDataStackCompletionHandler {
+                    DispatchQueue.main.async {
+                        handler()
+                    }
+                }
             }
         }
         return container
@@ -355,11 +363,15 @@ extension DataModel {
     }
     
     func delete(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
-        let screenshot = shoppable.screenshot
         do {
+            if let screenshot = shoppable.screenshot {
+                screenshot.shoppablesCount -= 1
+            } else {
+                print("Failed to decrement shoppable.screenshot.shoppablesCount")
+            }
             managedObjectContext.delete(shoppable)
-            screenshot?.shoppablesCount -= 1
             try managedObjectContext.save()
+            NSLog("Succeeded to delete shoppable")
         } catch {
             print("Failed to delete shoppable")
         }

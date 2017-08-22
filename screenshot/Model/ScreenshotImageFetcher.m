@@ -33,9 +33,6 @@
                     }
                     
                     handler(image);
-                    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
-                        screenshot.imageData = UIImageJPEGRepresentation(image, 0.95);
-                    });
                 }];
             }
         }
