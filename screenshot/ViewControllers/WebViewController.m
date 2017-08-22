@@ -31,6 +31,14 @@
 
 #pragma mark - Life Cycle
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        _toolbarEnabled = YES;
+    }
+    return self;
+}
+
 - (void)loadView {
     self.view = [[WKWebView alloc] init];
     self.view.navigationDelegate = self;
@@ -47,6 +55,7 @@
         UIToolbar *toolbar = [[UIToolbar alloc] init];
         toolbar.frame = CGRectMake(0.f, 0.f, 0.f, [toolbar intrinsicContentSize].height);
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+        toolbar.hidden = !self.toolbarEnabled;
         [self.view addSubview:toolbar];
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
         [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
@@ -114,6 +123,11 @@
 
 
 #pragma mark - Toolbar
+
+- (void)setToolbarEnabled:(BOOL)toolbarEnabled {
+    _toolbarEnabled = toolbarEnabled;
+    self.toolbar.hidden = !toolbarEnabled;
+}
 
 - (void)updateToolbarItems {
     UIBarButtonItem *fixed = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
