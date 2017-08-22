@@ -28,7 +28,8 @@
 #pragma mark - Life Cycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [ClarifaiModel setup]; // Takes a long time to intialize; start early.
+    [DataModel setup]; // Sets up Core Data stack on a background queue.
+    [ClarifaiModel setup]; // Takes a long time to intialize; start early. Also uses its own queue.
     [SEGAnalytics setupWithConfiguration:({
         SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:@"RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"];
         configuration.trackApplicationLifecycleEvents = YES;

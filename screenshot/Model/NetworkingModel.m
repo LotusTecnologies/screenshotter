@@ -25,7 +25,7 @@
     
     NSMutableURLRequest *request = [serializer requestWithMethod:@"POST" URLString:strService parameters:dictParams error:&error];
 
-    NSLog(@"uploadToSyte headers:%@  request.URL:%@  ", request.allHTTPHeaderFields, request.URL);
+//    NSLog(@"uploadToSyte headers:%@  request.URL:%@  ", request.allHTTPHeaderFields, request.URL);
     
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     NSURLSessionUploadTask *uploadTask;

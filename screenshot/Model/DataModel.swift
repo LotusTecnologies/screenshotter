@@ -23,51 +23,47 @@ enum CZChangeKind {
 class DataModel: NSObject {
     
     public static let sharedInstance = DataModel()
-    
+    public static func setup() {
+        let _ = DataModel.sharedInstance
+    }
+
     public static func docsDirURL() -> URL {
         let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return urls.last! // If no documents dir, just crash.
     }
     
+    public var coreDataStackFailureHandler: (() -> Void)?
+    public var coreDataStackCompletionHandler: (() -> Void)?
+    public var isCoreDataStackReady = false
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Model")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
                 print("Unresolved error \(error), \(error.userInfo)")
+                self.coreDataStackFailureHandler?()
+            } else {
+                container.viewContext.automaticallyMergesChangesFromParent = true
+                self.isCoreDataStackReady = true
+                self.coreDataStackCompletionHandler?()
             }
-            container.viewContext.automaticallyMergesChangesFromParent = true
-        })
+        }
         return container
     }()
     
-    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
-        let modelURL = Bundle.main.url(forResource: "Model", withExtension: "momd")!
-        let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL)!
-        
-        let applicationDocumentsDirectory = DataModel.docsDirURL()
-        let coordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
-        let url = applicationDocumentsDirectory.appendingPathComponent("CoreData.sqlite")
-        do {
-            try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
-        } catch {
-            var dict = [String: AnyObject]()
-            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's core data" as AnyObject?
-            dict[NSLocalizedFailureReasonErrorKey] = "There was an error creating or loading the application's core data." as AnyObject?
-            
-            dict[NSUnderlyingErrorKey] = error as NSError
-            let wrappedError = NSError(domain: "CZ_ERROR_DOMAIN", code: 9999, userInfo: dict)
-            print("Unresolved error \(wrappedError), \(wrappedError.userInfo)")
-        }
-        
-        return coordinator
-    }()
-
     func mainMoc() -> NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
     public func adHocMoc() -> NSManagedObjectContext {
         return persistentContainer.newBackgroundContext()
+    }
+    
+    override init() {
+        super.init()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let _ = self.persistentContainer
+        }
     }
     
     // MARK: - FRC
@@ -238,8 +234,7 @@ extension DataModel {
                         assetId: String,
                         isFashion: Bool,
                         createdAt: Date?) -> Screenshot {
-        let entityDescription = NSEntityDescription.entity(forEntityName: "Screenshot", in: managedObjectContext)
-        let screenshotToSave = Screenshot(entity: entityDescription!, insertInto: managedObjectContext)
+        let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
         screenshotToSave.isFashion = isFashion
         if let nsDate = createdAt as NSDate? {
@@ -253,16 +248,15 @@ extension DataModel {
         return screenshotToSave
     }
     
-    func retrieveAllAssetIds() -> Set<String> {
-        return retrieveAssetIds(predicate: nil)
+    func retrieveAllAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
+        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: nil)
     }
     
-    func retrieveCompleteAssetIds() -> Set<String> {
-        return retrieveAssetIds(predicate: NSPredicate(format: "isFashion != nil"))
+    func retrieveCompleteAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
+        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isFashion != nil"))
     }
     
-    func retrieveAssetIds(predicate: NSPredicate?) -> Set<String> {
-        let managedObjectContext = adHocMoc()
+    func retrieveAssetIds(managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> Set<String> {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
@@ -272,7 +266,7 @@ extension DataModel {
         fetchRequest.propertiesToFetch = ["assetId"]
         fetchRequest.returnsDistinctResults = true
         fetchRequest.includesPropertyValues = true
-        fetchRequest.shouldRefreshRefetchedObjects = true
+        fetchRequest.shouldRefreshRefetchedObjects = false
         fetchRequest.returnsObjectsAsFaults = false
         
         var allAssetIdsSet = Set<String>()
@@ -292,8 +286,22 @@ extension DataModel {
         return allAssetIdsSet
     }
     
-    func deleteScreenshots(assetIds: Set<String>) {
-        let managedObjectContext = adHocMoc()
+    func retrieveScreenshot(managedObjectContext: NSManagedObjectContext, assetId: String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            print("retrieveScreenshot assetId:\(assetId) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func deleteScreenshots(managedObjectContext: NSManagedObjectContext, assetIds: Set<String>) {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
         fetchRequest.predicate = NSPredicate(format: "assetId IN %@", assetIds)
         fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
@@ -329,8 +337,7 @@ extension DataModel {
                        b0y: Double,
                        b1x: Double,
                        b1y: Double) -> Shoppable {
-        let entityDescription = NSEntityDescription.entity(forEntityName: "Shoppable", in: managedObjectContext)
-        let shoppableToSave = Shoppable(entity: entityDescription!, insertInto: managedObjectContext)
+        let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
         shoppableToSave.order = order
         shoppableToSave.label = label
@@ -372,8 +379,7 @@ extension DataModel {
                      offer: String?,
                      imageURL: String?,
                      merchant: String?) -> Product {
-        let entityDescription = NSEntityDescription.entity(forEntityName: "Product", in: managedObjectContext)
-        let productToSave = Product(entity: entityDescription!, insertInto: managedObjectContext)
+        let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
         productToSave.productDescription = productDescription

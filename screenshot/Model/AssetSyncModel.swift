@@ -47,7 +47,6 @@ class AssetSyncModel: NSObject {
         NSLog("uploadScreenshot started assetId:\(asset.localIdentifier)")
         let uploadStart = Date()
         let dataModel = DataModel.sharedInstance
-        let moc = dataModel.adHocMoc()
         firstly {
             return image(asset: asset)
             }.then /*(on: processingQ)*/ { image -> Promise<(Bool, UIImage)> in  // Clarifai bug, must run on main
@@ -55,19 +54,22 @@ class AssetSyncModel: NSObject {
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
                 NSLog("uploadScreenshot til isFashion:\(isFashion) \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
-                let screenshot = dataModel.saveScreenshot(managedObjectContext: moc,
-                                                          assetId: asset.localIdentifier,
-                                                          isFashion: isFashion,
-                                                          createdAt: asset.creationDate)
+                dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
+                    let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                     assetId: asset.localIdentifier,
+                                                     isFashion: isFashion,
+                                                     createdAt: asset.creationDate)
+                }
                 if isFashion {
                     NSLog("uploadScreenshot til db saved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
-                    let imageData = UIImageJPEGRepresentation(image, 0.95)
+                    let imageData = UIImageJPEGRepresentation(image, 0.80)
                     firstly { _ -> Promise<[[String : Any]]> in
                         NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
                         }.then(on: self.processingQ) { segments -> Void in
                             NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
-                            self.saveShoppables(managedObjectContext: moc, screenshot: screenshot, segments: segments)
+                            self.saveShoppables(assetId: asset.localIdentifier, segments: segments)
+                            NSLog("uploadScreenshot til saveShoppables \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         }.catch { error in
                             print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                     }
@@ -84,106 +86,98 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func saveShoppables(managedObjectContext: NSManagedObjectContext, screenshot: Screenshot, segments: [[String : Any]]) { //-> Promise<[String]> {
-        //        return Promise { fulfill, reject in
-        var order: Int16 = 0
-        var offers: [String] = []
-        for segment in segments {
-            guard let offersURL = segment["offers"] as? String,
-                let b0 = segment["b0"] as? [Any],
-                b0.count >= 2,
-                let b1 = segment["b1"] as? [Any],
-                b1.count >= 2,
-                let b0x = b0[0] as? Double,
-                let b0y = b0[1] as? Double,
-                let b1x = b1[0] as? Double,
-                let b1y = b1[1] as? Double else {
-                    print("AssetSyncModel error parsing offers, b0, b1")
-                    continue
+    func saveShoppables(assetId: String, segments: [[String : Any]]) { //-> Promise<[String]> {
+        let dataModel = DataModel.sharedInstance
+        dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
+            if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
+                var order: Int16 = 0
+                for segment in segments {
+                    guard let offersURL = segment["offers"] as? String,
+                        let url = URL(string: offersURL.hasPrefix("//") ? "https:" + offersURL : offersURL),
+                        let b0 = segment["b0"] as? [Any],
+                        b0.count >= 2,
+                        let b1 = segment["b1"] as? [Any],
+                        b1.count >= 2,
+                        let b0x = b0[0] as? Double,
+                        let b0y = b0[1] as? Double,
+                        let b1x = b1[0] as? Double,
+                        let b1y = b1[1] as? Double else {
+                            print("AssetSyncModel error parsing offers, b0, b1")
+                            continue
+                    }
+                    let label = segment["label"] as? String
+                    screenshot.shoppablesCount += 1
+                    let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
+                                                            screenshot: screenshot,
+                                                            order: order,
+                                                            label: label,
+                                                            offersURL: offersURL,
+                                                            b0x: b0x,
+                                                            b0y: b0y,
+                                                            b1x: b1x,
+                                                            b1y: b1y)
+                    order += 1
+                    self.extractProducts(shoppableOID: shoppable.objectID, url: url)
+                }
+                if order > 0 {
+                    self.sendScreenshotAddedLocalNotification(assetId: assetId)
+                }
             }
-            offers.append(offersURL)
-            let label = segment["label"] as? String
-            screenshot.shoppablesCount += 1
-            let shoppable = DataModel.sharedInstance.saveShoppable(managedObjectContext: managedObjectContext,
-                                                                   screenshot: screenshot,
-                                                                   order: order,
-                                                                   label: label,
-                                                                   offersURL: offersURL,
-                                                                   b0x: b0x,
-                                                                   b0y: b0y,
-                                                                   b1x: b1x,
-                                                                   b1y: b1y)
-            order += 1
-            self.extractProducts(shoppable: shoppable, managedObjectContext: managedObjectContext)
         }
-        if offers.count > 0 {
-            self.sendScreenshotAddedLocalNotification(assetId: screenshot.assetId ?? "")
-            //                fulfill(offers)
-            //            } else {
-            //                let emptyError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "No shoppable segments"])
-            //                reject(emptyError)
-        }
-        //        }
     }
-
-    func extractProducts(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
-        guard let offersUrl = shoppable.offersURL,
-            let url = URL(string: (offersUrl.hasPrefix("//") ? "https:" + offersUrl : offersUrl)) else {
-                print("No offersUrl for shoppable order:\(shoppable.order)")
-                rollback(shoppable: shoppable, managedObjectContext: managedObjectContext)
-                return
-        }
+    
+    func extractProducts(shoppableOID: NSManagedObjectID, url: URL) {
         NetworkingPromise.downloadInfo(url: url).then(on: self.processingQ) { productsDict -> Void in
-            guard let productsArray = productsDict["ads"] as? [[String : Any]],
-                productsArray.count > 0 else {
-                    print("AssetSyncModel extractProducts error parsing productsArray. productsDict:\(productsDict)\noffersUrl:\(offersUrl)")
-                    self.rollback(shoppable: shoppable, managedObjectContext: managedObjectContext)
-                    return
-            }
             let dataModel = DataModel.sharedInstance
-            var order: Int16 = 0
-            for prod in productsArray {
-                var floatPrice: Float = 0 // -1 ?
-                if let extractedFloatPrice = prod["floatPrice"] as? Float {
-                    floatPrice = extractedFloatPrice
+            dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
+                if let shoppable = managedObjectContext.object(with: shoppableOID) as? Shoppable {
+                    if let productsArray = productsDict["ads"] as? [[String : Any]],
+                        productsArray.count > 0 {
+                        var order: Int16 = 0
+                        for prod in productsArray {
+                            var floatPrice: Float = 0 // -1 ?
+                            if let extractedFloatPrice = prod["floatPrice"] as? Float {
+                                floatPrice = extractedFloatPrice
+                            }
+                            var floatOriginalPrice: Float = 0 // -1 ?
+                            if let extractedOriginalFloatPrice = prod["floatOriginalPrice"] as? Float {
+                                floatOriginalPrice = extractedOriginalFloatPrice
+                            }
+                            var categories: String?
+                            if let extractedCategories = prod["categories"] as? [String] {
+                                categories = extractedCategories.first
+                            }
+                            shoppable.productCount += 1 // Before saveProduct gets this saved too.
+                            let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
+                                                          shoppable: shoppable,
+                                                          order: order,
+                                                          productDescription: prod["description"] as? String,
+                                                          price: prod["price"] as? String,
+                                                          originalPrice: prod["originalPrice"] as? String,
+                                                          floatPrice: floatPrice,
+                                                          floatOriginalPrice: floatOriginalPrice,
+                                                          categories: categories,
+                                                          brand: prod["brand"] as? String,
+                                                          offer: prod["offer"] as? String,
+                                                          imageURL: prod["imageUrl"] as? String,
+                                                          merchant: prod["merchant"] as? String)
+                            order += 1
+                        }
+                        if shoppable.productCount <= 0 {
+                            print("AssetSyncModel extractProducts empty productsArray. productsDict:\(productsDict)\noffersUrl:\(url)")
+                            dataModel.delete(shoppable: shoppable, managedObjectContext: managedObjectContext)
+                        }
+                    } else {
+                        print("AssetSyncModel extractProducts error parsing productsArray. productsDict:\(productsDict)\noffersUrl:\(url)")
+                        dataModel.delete(shoppable: shoppable, managedObjectContext: managedObjectContext)
+                    }
+                } else {
+                    print("Failed to get managed object with shoppableOID:\(shoppableOID)")
                 }
-                var floatOriginalPrice: Float = 0 // -1 ?
-                if let extractedOriginalFloatPrice = prod["floatOriginalPrice"] as? Float {
-                    floatOriginalPrice = extractedOriginalFloatPrice
-                }
-                var categories: String?
-                if let extractedCategories = prod["categories"] as? [String] {
-                    categories = extractedCategories.first
-                }
-                shoppable.productCount += 1 // Before saveProduct gets this saved too.
-                let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
-                                              shoppable: shoppable,
-                                              order: order,
-                                              productDescription: prod["description"] as? String,
-                                              price: prod["price"] as? String,
-                                              originalPrice: prod["originalPrice"] as? String,
-                                              floatPrice: floatPrice,
-                                              floatOriginalPrice: floatOriginalPrice,
-                                              categories: categories,
-                                              brand: prod["brand"] as? String,
-                                              offer: prod["offer"] as? String,
-                                              imageURL: prod["imageUrl"] as? String,
-                                              merchant: prod["merchant"] as? String)
-                order += 1
-            }
-            if shoppable.productCount <= 0 {
-                self.rollback(shoppable: shoppable, managedObjectContext: managedObjectContext)
             }
             }.catch { error in
                 print("AssetSyncModel extractProducts error parsing product:\(error)")
         }
-    }
-    
-    func rollback(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
-        let screenshot = shoppable.screenshot
-        NSLog("Rolling back shoppable:\(shoppable)  its screenshot:\(String(describing: screenshot))  its shoppablesCount:\(String(describing: screenshot?.shoppablesCount))")
-        DataModel.sharedInstance.delete(shoppable: shoppable, managedObjectContext: managedObjectContext)
-        NSLog("After rollback screenshot:\(String(describing: screenshot))  its shoppablesCount:\(String(describing: screenshot?.shoppablesCount))")
     }
     
     func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
@@ -310,27 +304,32 @@ class AssetSyncModel: NSObject {
             }
             self.beginSync()
             let photosSet = self.retrieveAllScreenshotAssetIds()
-            let dbSet = DataModel.sharedInstance.retrieveCompleteAssetIds()
-            let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
+            let dataModel = DataModel.sharedInstance
+            let managedObjectContext = dataModel.adHocMoc()
+            var dbSet = Set<String>()
+            managedObjectContext.performAndWait {
+                dbSet = dataModel.retrieveCompleteAssetIds(managedObjectContext: managedObjectContext)
+                let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
+                self.countAndPrint(name: "dbSet", set: dbSet)
+                self.countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
+                if toDeleteFromDB.count > 0 {
+                    dataModel.deleteScreenshots(managedObjectContext: managedObjectContext, assetIds: toDeleteFromDB)
+                }
+            }
             let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
             // TODO: Remove changedAssetIds as each screenshot is successfully saved.
             //changedAssetIds = []
             self.countAndPrint(name: "photosSet", set: photosSet)
-            self.countAndPrint(name: "dbSet", set: dbSet)
-            self.countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
             self.countAndPrint(name: "toUpload", set: toUpload)
-            if toDeleteFromDB.count > 0 {
-                DataModel.sharedInstance.deleteScreenshots(assetIds: toDeleteFromDB)
-            }
             if toUpload.count > 0 {
-                self.allScreenshotAssets?.enumerateObjects(options: [.reverse]) { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                self.allScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
                         self.processingQ.async {
                             self.uploadScreenshot(asset: asset)
                         }
                     }
-                }
+                })
             }
             NSLog("enumerated assets to upload")
             if self.screenshotsToProcess == 0 {
