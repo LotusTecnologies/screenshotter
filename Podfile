@@ -9,7 +9,7 @@ def shared_pods
     pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
-    pod 'Appsee’
+    pod 'Appsee'
     pod 'FBSDKCoreKit'
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
