@@ -15,4 +15,6 @@
 @property (nonatomic, strong) WKWebView *view;
 @property (nonatomic, copy) NSURL *url;
 
+@property (nonatomic) BOOL toolbarEnabled;
+
 @end

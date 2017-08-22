@@ -13,14 +13,16 @@
 #import "TutorialEmailSlideView.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
+#import "PermissionsManager.h"
+#import "WebViewController.h"
+#import "AnalyticsManager.h"
 
-@import Analytics;
-
-@interface TutorialViewController () <UIScrollViewDelegate, TutorialEmailSlideViewDelegate>
+@interface TutorialViewController () <UIScrollViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIPageControl *pageControl;
 @property (nonatomic, strong) NSArray <TutorialBaseSlideView *>* slides;
+
 @end
 
 @implementation TutorialViewController
@@ -33,7 +35,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
-        [[SEGAnalytics sharedAnalytics] track:@"Started Tutorial"];
+        [AnalyticsManager track:@"Started Tutorial"];
     }
     return self;
 }
@@ -131,13 +133,21 @@
         TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
         emailSlideView.delegate = self;
         
+        TutorialPermissionsSlideView *permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
+        permissionsSlideView.delegate = self;
+        
         _slides = @[[[TutorialScreenshotSlideView alloc] init],
                     [[TutorialShopSlideView alloc] init],
-                    [[TutorialPermissionsSlideView alloc] init],
+                    permissionsSlideView,
                     emailSlideView
                     ];
     }
     return _slides;
+}
+
+- (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView {
+    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)tutorialEmailSlideViewDidFail:(TutorialEmailSlideView *)slideView {
@@ -146,16 +156,33 @@
 }
 
 - (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
-    BOOL didEnableRequiredPermissions = YES; // TODO:
-    
-    if (didEnableRequiredPermissions) {
-        [self.delegate tutorialViewControllerDidComplete:self];
-        [[SEGAnalytics sharedAnalytics] track:@"Finished Tutorial"];
-    }
+    [self.delegate tutorialViewControllerDidComplete:self];
+    [AnalyticsManager track:@"Finished Tutorial"];
+}
+
+- (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView {
+    UIViewController *viewController = [TutorialEmailSlideView termsOfServiceViewControllerWithDoneTarget:self doneAction:@selector(dismissViewController)];
+    [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void)tutorialEmailSlideViewDidTapPrivacyPolicy:(TutorialEmailSlideView *)slideView {
+    UIViewController *viewController = [TutorialEmailSlideView privacyPolicyViewControllerWithDoneTarget:self doneAction:@selector(dismissViewController)];
+    [self presentViewController:viewController animated:YES completion:nil];
 }
 
 
 #pragma mark - Scroll View
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+    if (scrollView.contentOffset.x > scrollView.bounds.size.width * 2.f) {
+        PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
+        PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
+        
+        if (photoStatus == PermissionStatusNotDetermined || pushStatus == PermissionStatusNotDetermined) {
+            targetContentOffset->x = scrollView.bounds.size.width * 2.f;
+        }
+    }
+}
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (!decelerate) {
@@ -187,6 +214,13 @@
     if (self.view.window) {
         self.scrollView.scrollEnabled = YES;
     }
+}
+
+
+#pragma mark - Navigation
+
+- (void)dismissViewController {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

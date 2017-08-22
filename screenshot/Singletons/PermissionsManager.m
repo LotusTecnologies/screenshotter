@@ -260,4 +260,22 @@
     }
 }
 
+
+#pragma mark - Alert
+
+- (UIAlertController *)deniedAlertControllerForType:(PermissionType)type {
+    if (type == PermissionTypePhoto) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Allow Permissions To Continue" message:@"We need access to your photos in order to show you shoppable items." preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+        }]];
+        
+        return alertController;
+        
+    } else {
+        return nil;
+    }
+}
+
 @end

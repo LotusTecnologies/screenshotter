@@ -12,11 +12,11 @@
 #import "Geometry.h"
 #import "ScreenshotImageFetcher.h"
 #import "ShoppablesToolbar.h"
-#import "ScreenshotDisplayViewController.h"
+#import "ScreenshotDisplayNavigationController.h"
 #import "WebViewController.h"
+#import "AnalyticsManager.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
-@import Analytics;
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
@@ -54,8 +54,7 @@
         ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
         toolbar.delegate = self;
-        toolbar.layoutMargins = UIEdgeInsetsMake(margin, margin, margin, margin);
-        [toolbar insertShoppables:[self shoppables] withScreenshot:self.screenshot];
+        toolbar.shoppables = [self shoppables];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -89,7 +88,7 @@
         collectionView;
     });
     
-    [ScreenshotImageFetcher screenshot:self.screenshot handler:^(UIImage *image, NSString *assetId) {
+    [ScreenshotImageFetcher screenshot:self.screenshot handler:^(UIImage *image) {
         CGFloat buttonSize = 32.f;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -99,10 +98,18 @@
         [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
         
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        
         self.image = image;
+        self.shoppablesToolbar.screenshotImage = image;
     }];
     
     [self reloadCollectionViewForIndex:0];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.shoppablesToolbar selectFirstItem];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -146,15 +153,10 @@
 }
 
 - (void)displayScreenshotAction {
-    ScreenshotDisplayViewController *viewController = [[ScreenshotDisplayViewController alloc] init];
-    viewController.image = self.image;
-    viewController.shoppables = [self shoppables];
-    [viewController.closeButton addTarget:self action:@selector(dismissScreenshotDisplay) forControlEvents:UIControlEventTouchUpInside];
-    [self presentViewController:viewController animated:YES completion:nil];
-}
-
-- (void)dismissScreenshotDisplay {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    ScreenshotDisplayNavigationController *navigationController = [[ScreenshotDisplayNavigationController alloc] init];
+    navigationController.screenshotDisplayViewController.image = self.image;
+    navigationController.screenshotDisplayViewController.shoppables = [self shoppables];
+    [self presentViewController:navigationController animated:YES completion:nil];
 }
 
 
@@ -181,7 +183,7 @@
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
     [self reloadCollectionViewForIndex:index];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Tapped on shoppable"];
+    [AnalyticsManager track:@"Tapped on shoppable"];
 }
 
 
@@ -238,7 +240,7 @@
     
     [self.navigationController pushViewController:webViewController animated:YES];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Products"}];
+    [AnalyticsManager track:@"Tapped on product" properties:@{@"url": product.offer, @"imageUrl": product.imageURL, @"page": @"Products"}];
     
     [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }
@@ -254,7 +256,7 @@
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [[SEGAnalytics sharedAnalytics] track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    [AnalyticsManager track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];

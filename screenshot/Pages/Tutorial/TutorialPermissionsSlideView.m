@@ -10,8 +10,7 @@
 #import "PermissionsManager.h"
 #import "Geometry.h"
 #import "screenshot-Swift.h"
-
-@import Analytics;
+#import "AnalyticsManager.h"
 
 @interface TutorialPermissionsSlideView ()
 
@@ -124,7 +123,7 @@
 }
 
 
-#pragma mark - Switch
+#pragma mark - Permissions
 
 - (void)updatePermission:(BOOL)hasPermission forSwitch:(UISwitch *)aSwitch {
     aSwitch.enabled = !hasPermission;
@@ -148,20 +147,30 @@
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:permissionType openSettingsIfNeeded:YES response:^(BOOL granted) {
             [self updatePermission:granted forSwitch:aSwitch];
             
+            NSString *event;
+            NSString *grantedString = granted ? @"yes" : @"no";
+            
             switch (permissionType) {
                 case PermissionTypePhoto:
                     [[AssetSyncModel sharedInstance] syncPhotos];
-                    [[SEGAnalytics sharedAnalytics] track:@"Granted photo permissions"];
+                    
+                    if (!granted) {
+                        [self.delegate tutorialPermissionsSlideViewDidDenyPhotosPermission:self];
+                    }
+                    
+                    event = @"Granted photo permissions";
                     break;
                     
                 case PermissionTypePush:
-                    [[SEGAnalytics sharedAnalytics] track:@"Granted push permissions"];
+                    event = @"Granted push permissions";
                     break;
                     
                 case PermissionTypeLocation:
-                    [[SEGAnalytics sharedAnalytics] track:@"Granted location permissions"];
+                    event = @"Granted location permissions";
                     break;
             }
+            
+            [AnalyticsManager track:event properties:@{@"granted": grantedString}];
         }];
     }
 }

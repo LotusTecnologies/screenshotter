@@ -8,15 +8,12 @@
 
 #import "ShoppablesToolbar.h"
 #import "screenshot-Swift.h"
-#import "ScreenshotImageFetcher.h"
-#import "UIColor+Appearance.h"
 #import "Geometry.h"
+#import "ShoppableCollectionViewCell.h"
 
-@interface ShoppablesToolbar ()
+@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource>
 
-@property (nonatomic, strong) UIView *shoppablesContainerView;
-@property (nonatomic, strong) NSArray<UIButton *> *shoppableButtons;
-@property (nonatomic) NSUInteger selectedShoppableButtonIndex;
+@property (nonatomic, strong) UICollectionView *collectionView;
 
 @end
 
@@ -28,98 +25,103 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _shoppablesContainerView = ({
-            UIView *view = [[UIView alloc] init];
-            view.translatesAutoresizingMaskIntoConstraints = NO;
-            [self addSubview:view];
-            [view.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor].active = YES;
-            [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide.leadingAnchor].active = YES;
-            [view.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor].active = YES;
-            [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide.trailingAnchor].active = YES;
-            [view.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-            view;
+        _collectionView = ({
+            CGFloat p = [Geometry padding];
+            CGFloat p2 = p * .5f;
+            
+            UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+            layout.minimumInteritemSpacing = p;
+            layout.minimumLineSpacing = p;
+            layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+            
+            UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
+            collectionView.translatesAutoresizingMaskIntoConstraints = NO;
+            collectionView.delegate = self;
+            collectionView.dataSource = self;
+            collectionView.backgroundColor = [UIColor clearColor];
+            collectionView.scrollsToTop = NO;
+            collectionView.contentInset = UIEdgeInsetsMake(p2, p2, p2, p2);
+            collectionView.showsHorizontalScrollIndicator = NO;
+            
+            [collectionView registerClass:[ShoppableCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+            
+            [self addSubview:collectionView];
+            [collectionView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+            [collectionView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+            [collectionView.leftAnchor constraintEqualToAnchor:self.leftAnchor].active = YES;
+            [collectionView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+            collectionView;
         });
     }
     return self;
 }
 
-
-#pragma mark - Shoppable
-
-- (void)insertShoppables:(NSArray<Shoppable *> *)shoppables withScreenshot:(Screenshot *)screenshot {
-    [self.shoppableButtons performSelector:@selector(removeFromSuperview)];
-    self.shoppableButtons = nil;
+- (void)layoutSubviews {
+    [super layoutSubviews];
     
-    if (shoppables && shoppables.count && screenshot) {
-        [ScreenshotImageFetcher screenshot:screenshot handler:^(UIImage *image, NSString* assetId) {
-            NSMutableArray<UIButton *> *buttons = [NSMutableArray array];
-            
-            for (NSUInteger i = 0; i < shoppables.count; i++) {
-                Shoppable *shoppable = shoppables[i];
-                
-                if (shoppable) {
-                    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-                    button.translatesAutoresizingMaskIntoConstraints = NO;
-                    button.backgroundColor = [UIColor whiteColor];
-                    [button setImage:[shoppable croppedWithImage:image] forState:UIControlStateNormal];
-                    button.imageView.contentMode = UIViewContentModeScaleAspectFit;
-                    button.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
-                    button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
-                    button.adjustsImageWhenHighlighted = NO;
-                    button.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, 0.f, -[Geometry padding]);
-                    [button addTarget:self action:@selector(shoppableButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-                    button.layer.borderColor = [self shoppableButtonBorderColor].CGColor;
-                    button.layer.borderWidth = 1.f;
-                    [self.shoppablesContainerView addSubview:button];
-                    [button.topAnchor constraintEqualToAnchor:self.shoppablesContainerView.topAnchor].active = YES;
-                    [button.bottomAnchor constraintEqualToAnchor:self.shoppablesContainerView.bottomAnchor].active = YES;
-                    [button.widthAnchor constraintEqualToAnchor:button.heightAnchor multiplier:.8f].active = YES;
-                    
-                    if (i == 0) {
-                        [button.leadingAnchor constraintEqualToAnchor:self.shoppablesContainerView.leadingAnchor].active = YES;
-                        
-                    } else {
-                        UIButton *previousButton = [buttons objectAtIndex:i - 1];
-                        
-                        [button.leadingAnchor constraintEqualToAnchor:previousButton.layoutMarginsGuide.trailingAnchor].active = YES;
-                    }
-                    
-                    if (i == shoppables.count - 1) {
-                        [button.trailingAnchor constraintEqualToAnchor:self.shoppablesContainerView.trailingAnchor].active = YES;
-                    }
-                    
-                    [buttons addObject:button];
-                }
-            }
-            
-            self.shoppableButtons = buttons;
-            [self selectShoppableButtonAtIndex:0];
-        }];
+    if (self.shoppables.count) {
+        CGFloat lineSpacing = ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).minimumLineSpacing;
+        CGFloat spacingsWidth = lineSpacing * (self.shoppables.count - 1);
+        CGFloat shoppablesWidth = [self shoppableSize].width * self.shoppables.count;
+        CGFloat contentWidth = round(spacingsWidth + shoppablesWidth);
+        CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
+        
+        if (width > contentWidth) {
+            UIEdgeInsets insets = self.collectionView.contentInset;
+            insets.left = insets.right = (self.collectionView.bounds.size.width - contentWidth) / 2.f;
+            self.collectionView.contentInset = insets;
+        }
     }
 }
 
-- (void)shoppableButtonAction:(UIButton *)button {
-    NSUInteger index = [self.shoppableButtons indexOfObject:button];
-    
-    [self deselectShoppableButtonAtIndex:self.selectedShoppableButtonIndex];
-    [self selectShoppableButtonAtIndex:index];
-    [self.delegate shoppablesToolbar:self didSelectShoppableAtIndex:index];
+
+#pragma mark - Layout
+
+- (CGSize)shoppableSize {
+    CGSize size = CGSizeZero;
+    size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
+    size.width = size.height * .8f;
+    return size;
 }
 
-- (void)selectShoppableButtonAtIndex:(NSUInteger)index {
-    UIButton *button = self.shoppableButtons[index];
-    button.layer.borderColor = [UIColor crazeRedColor].CGColor;
-    
-    self.selectedShoppableButtonIndex = index;
+
+#pragma mark - Shoppable
+
+- (void)setScreenshotImage:(UIImage *)screenshotImage {
+    if (_screenshotImage != screenshotImage) {
+        _screenshotImage = screenshotImage;
+        
+        if (screenshotImage) {
+            [self.collectionView reloadData];
+        }
+    }
 }
 
-- (void)deselectShoppableButtonAtIndex:(NSUInteger)index {
-    UIButton *button = self.shoppableButtons[index];
-    button.layer.borderColor = [self shoppableButtonBorderColor].CGColor;
+
+#pragma mark - Collection View
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return self.shoppables.count;
 }
 
-- (UIColor *)shoppableButtonBorderColor {
-    return [UIColor colorWithWhite:193.f/255.f alpha:1.f];
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return [self shoppableSize];
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    ShoppableCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    cell.image = [self.shoppables[indexPath.item] croppedWithImage:self.screenshotImage];
+    return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    [self.delegate shoppablesToolbar:self didSelectShoppableAtIndex:indexPath.item];
+}
+
+- (void)selectFirstItem {
+    if ([self.collectionView numberOfItemsInSection:0]) {
+        [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+    }
 }
 
 @end

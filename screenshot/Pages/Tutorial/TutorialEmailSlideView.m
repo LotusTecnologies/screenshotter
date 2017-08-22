@@ -10,8 +10,8 @@
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "TappableTextView.h"
-
-@import Analytics;
+#import "WebViewController.h"
+#import "AnalyticsManager.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
@@ -180,7 +180,7 @@
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [[SEGAnalytics sharedAnalytics] track:@"Submitted email" properties:@{@"email": self.textField.text}];
+        [AnalyticsManager track:@"Submitted email" properties:@{@"email": self.textField.text}];
         
     } else {
         [self.delegate tutorialEmailSlideViewDidFail:self];
@@ -193,12 +193,6 @@
     if (![self.textField isFirstResponder] && self.readyToSubmit) {
         [self.delegate tutorialEmailSlideViewDidSubmit:self];
     }
-}
-
-+ (UIAlertController *)failedAlertController {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Submission Failed" message:@"Please enter a valid email." preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
-    return alertController;
 }
 
 
@@ -239,12 +233,11 @@
 #pragma mark - Text View
 
 - (void)tappableTextView:(TappableTextView *)textView tappedTextAtIndex:(NSUInteger)index {
-    // TODO:
     if (index == 1) {
-        NSLog(@"tapped terms");
+        [self.delegate tutorialEmailSlideViewDidTapTermsOfService:self];
         
     } else if (index == 3) {
-        NSLog(@"tapped privacy");
+        [self.delegate tutorialEmailSlideViewDidTapPrivacyPolicy:self];
     }
 }
 
@@ -261,6 +254,42 @@
     if (self.window) {
         [self informDelegateOfSubmittedEmailIfPossible];
     }
+}
+
+
+#pragma mark - Legal
+
++ (UIViewController *)termsOfServiceViewControllerWithDoneTarget:(id)target doneAction:(SEL)action {
+    NSString *title = @"Terms of Service";
+    NSURL *url = [NSURL URLWithString:@"http://crazeapp.com/legal/#tos"];
+    
+    return [self webViewControllerWithTitle:title url:url doneTarget:target doneAction:action];
+}
+
++ (UIViewController *)privacyPolicyViewControllerWithDoneTarget:(id)target doneAction:(SEL)action {
+    NSString *title = @"Privacy Policy";
+    NSURL *url = [NSURL URLWithString:@"http://crazeapp.com/legal/#privacy"];
+    
+    return [self webViewControllerWithTitle:title url:url doneTarget:target doneAction:action];
+}
+
++ (UIViewController *)webViewControllerWithTitle:(NSString *)title url:(NSURL *)url doneTarget:(id)target doneAction:(SEL)action {
+    WebViewController *viewController = [[WebViewController alloc] init];
+    viewController.url = url;
+    viewController.toolbarEnabled = NO;
+    viewController.navigationItem.title = title;
+    viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:target action:action];
+    
+    return [[UINavigationController alloc] initWithRootViewController:viewController];
+}
+
+
+#pragma mark - Alert
+
++ (UIAlertController *)failedAlertController {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Submission Failed" message:@"Please enter a valid email." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    return alertController;
 }
 
 @end

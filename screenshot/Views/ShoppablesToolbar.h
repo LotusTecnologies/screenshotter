@@ -22,6 +22,9 @@
 
 @property (nonatomic, weak) id<ShoppablesToolbarDelegate> delegate;
 
-- (void)insertShoppables:(NSArray<Shoppable *> *)shoppables withScreenshot:(Screenshot *)screenshot;
+@property (nonatomic, strong) NSArray<Shoppable *> *shoppables;
+@property (nonatomic, copy) UIImage *screenshotImage;
+
+- (void)selectFirstItem;
 
 @end

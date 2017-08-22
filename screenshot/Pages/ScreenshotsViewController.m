@@ -11,8 +11,8 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "HelperView.h"
-
-@import Analytics;
+#import "PermissionsManager.h"
+#import "AnalyticsManager.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
@@ -95,6 +95,15 @@
     [self syncHelperViewVisibility];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
+        UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
@@ -141,7 +150,7 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Tapped on screenshot"];
+    [AnalyticsManager track:@"Tapped on screenshot"];
 }
 
 - (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath {
@@ -158,14 +167,14 @@
     [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Shared screenshot"];
+    [AnalyticsManager track:@"Shared screenshot"];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     [[self screenshotAtIndexPath:indexPath] setHide];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Removed screenshot"];
+    [AnalyticsManager track:@"Removed screenshot"];
 }
 
 
@@ -190,8 +199,7 @@
 #pragma mark - Helper View
 
 - (void)syncHelperViewVisibility {
-    // !!!: debug
-//    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
 }
 
 @end

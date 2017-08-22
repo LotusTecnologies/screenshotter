@@ -10,8 +10,9 @@
 #import "Loader.h"
 #import "Geometry.h"
 #import "NetworkingModel.h"
+#import "AnalyticsManager.h"
 
-@import Analytics;
+@import Appsee;
 @import WebKit;
 
 @interface WebViewController () <WKNavigationDelegate> {
@@ -31,6 +32,14 @@
 
 #pragma mark - Life Cycle
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        _toolbarEnabled = YES;
+    }
+    return self;
+}
+
 - (void)loadView {
     self.view = [[WKWebView alloc] init];
     self.view.navigationDelegate = self;
@@ -47,6 +56,7 @@
         UIToolbar *toolbar = [[UIToolbar alloc] init];
         toolbar.frame = CGRectMake(0.f, 0.f, 0.f, [toolbar intrinsicContentSize].height);
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+        toolbar.hidden = !self.toolbarEnabled;
         [self.view addSubview:toolbar];
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
         [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
@@ -84,6 +94,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    [Appsee startScreen:@"WebView"];
     [self.loader startAnimation];
 }
 
@@ -114,6 +125,11 @@
 
 
 #pragma mark - Toolbar
+
+- (void)setToolbarEnabled:(BOOL)toolbarEnabled {
+    _toolbarEnabled = toolbarEnabled;
+    self.toolbar.hidden = !toolbarEnabled;
+}
 
 - (void)updateToolbarItems {
     UIBarButtonItem *fixed = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
@@ -192,7 +208,7 @@
 - (void)refreshAction {
     [self.view reload];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsManager track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)shareAction {
@@ -209,13 +225,13 @@
         [self updateToolbarItems];
     }];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsManager track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)safariAction {
     [[UIApplication sharedApplication] openURL:self.url options:@{} completionHandler:nil];
     
-    [[SEGAnalytics sharedAnalytics] track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsManager track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
 }
 
 @end
