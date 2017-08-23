@@ -12,6 +12,7 @@
 #import "TappableTextView.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
+#import "UserDefaultsConstants.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
@@ -66,7 +67,7 @@
         UITextField *textField = [[UITextField alloc] init];
         textField.translatesAutoresizingMaskIntoConstraints = NO;
         textField.delegate = self;
-        textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:@"Email"];
+        textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsEmail];
         textField.placeholder = @"you@website.com";
         textField.keyboardType = UIKeyboardTypeEmailAddress;
         textField.backgroundColor = [UIColor whiteColor];
@@ -175,7 +176,7 @@
     if ([self isValidEmail:self.textField.text]) {
         self.readyToSubmit = YES;
         
-        [[NSUserDefaults standardUserDefaults] setValue:self.textField.text forKey:@"Email"];
+        [[NSUserDefaults standardUserDefaults] setValue:self.textField.text forKey:UserDefaultsEmail];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];

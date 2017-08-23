@@ -8,4 +8,5 @@
 
 #import "UserDefaultsConstants.h"
 
-NSString *const TutorialCompleted = @"TutorialCompleted";
+NSString *const UserDefaultsEmail = @"Email";
+NSString *const UserDefaultsTutorialCompleted = @"TutorialCompleted";

@@ -8,4 +8,5 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString *const TutorialCompleted;
+extern NSString *const UserDefaultsEmail;
+extern NSString *const UserDefaultsTutorialCompleted;
