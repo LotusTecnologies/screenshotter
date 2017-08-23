@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, LoaderAnimation) {
+    LoaderAnimationSpin,
+    LoaderAnimationPoseThenSpin
+};
+
 @interface Loader : UIView
 
-- (void)startAnimation;
+- (void)startAnimation:(LoaderAnimation)loaderAnimation;
 - (void)stopAnimation;
 
 @end

@@ -66,7 +66,31 @@
 
 #pragma mark - Animation
 
-- (void)startAnimation {
+- (void)startAnimation:(LoaderAnimation)loaderAnimation {
+    switch (loaderAnimation) {
+        case LoaderAnimationSpin:
+            [self startSpinAnimation];
+            break;
+            
+        case LoaderAnimationPoseThenSpin:
+            [self startPoseThenSpinAnimation];
+            break;
+    }
+}
+
+- (void)startSpinAnimation {
+    self.cImageViewCenterXConstraint.active = YES;
+    
+    CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotationAnimation.toValue = @(M_PI * 2.0);
+    rotationAnimation.duration = 1.5;
+//    rotationAnimation.cumulative = YES; // ???:
+    rotationAnimation.repeatCount = HUGE_VALF;
+    
+    [self.cImageView.layer addAnimation:rotationAnimation forKey:@"rotation"];
+}
+
+- (void)startPoseThenSpinAnimation {
     self.cImageViewCenterXConstraint.active = YES;
     
     [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
@@ -74,14 +98,7 @@
         
     } completion:^(BOOL finished) {
         if (finished) {
-            
-            CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-            rotationAnimation.toValue = @(M_PI * 2.0);
-            rotationAnimation.duration = 1.5;
-//            rotationAnimation.cumulative = YES; // ???:
-            rotationAnimation.repeatCount = HUGE_VALF;
-            
-            [self.cImageView.layer addAnimation:rotationAnimation forKey:@"rotation"];
+            [self startSpinAnimation];
         }
     }];
 }

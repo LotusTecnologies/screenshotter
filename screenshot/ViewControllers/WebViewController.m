@@ -95,7 +95,7 @@
     [super viewDidAppear:animated];
     
     [Appsee startScreen:@"WebView"];
-    [self.loader startAnimation];
+    [self.loader startAnimation:LoaderAnimationPoseThenSpin];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {

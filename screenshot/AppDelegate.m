@@ -157,7 +157,6 @@
         } else {
             [DataModel sharedInstance].coreDataStackCompletionHandler = ^{
                 [[AssetSyncModel sharedInstance] syncPhotos];
-                
                 [self transitionToViewController:[self nextViewController]];
             };
             
