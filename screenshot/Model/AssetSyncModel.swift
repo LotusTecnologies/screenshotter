@@ -254,7 +254,14 @@ class AssetSyncModel: NSObject {
     
     func setupAllScreenshotAssets() {
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "(mediaSubtype & %d) != 0", PHAssetMediaSubtype.photoScreenshot.rawValue)
+        var installDate: NSDate
+        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsDateInstalled) as? NSDate {
+            installDate = UserDefaultsInstallDate
+        } else {
+            installDate = NSDate()
+            UserDefaults.standard.set(installDate, forKey: UserDefaultsDateInstalled)
+        }
+        fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", installDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 100
         allScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
