@@ -38,6 +38,7 @@
 		C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CB1F4C557200EE7855 /* AnalyticsManager.m */; };
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
 		C55184D91F4D611400EE7855 /* UserDefaultsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184D81F4D611400EE7855 /* UserDefaultsConstants.m */; };
+		C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184DB1F4D637400EE7855 /* NotificationManager.m */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
@@ -111,6 +112,8 @@
 		C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingViewController.m; sourceTree = "<group>"; };
 		C55184D71F4D611400EE7855 /* UserDefaultsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaultsConstants.h; sourceTree = "<group>"; };
 		C55184D81F4D611400EE7855 /* UserDefaultsConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDefaultsConstants.m; sourceTree = "<group>"; };
+		C55184DA1F4D637400EE7855 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationManager.h; sourceTree = "<group>"; };
+		C55184DB1F4D637400EE7855 /* NotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationManager.m; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
@@ -218,10 +221,12 @@
 		C5278FD71F3C38510090E422 /* Singletons */ = {
 			isa = PBXGroup;
 			children = (
-				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
-				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
 				C55184CA1F4C557200EE7855 /* AnalyticsManager.h */,
 				C55184CB1F4C557200EE7855 /* AnalyticsManager.m */,
+				C55184DA1F4D637400EE7855 /* NotificationManager.h */,
+				C55184DB1F4D637400EE7855 /* NotificationManager.m */,
+				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
+				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";
@@ -558,6 +563,7 @@
 				C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */,
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
+				C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */,
 				C5278FF31F3C38510090E422 /* SettingsViewController.m in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
