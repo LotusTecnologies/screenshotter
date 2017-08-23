@@ -124,12 +124,12 @@
 
 - (NSString *)textForContentType:(NotificationManagerContentType)contentType {
     switch (contentType) {
-        case NotificationManagerContentTypeOne:
-            return @"Identifying new screenshots...";
+        case NotificationManagerContentTypeScreenshots:
+            return @"Identifying new screenshots";
             break;
             
-        case NotificationManagerContentTypeTwo:
-            return @"Identifying new products...";
+        case NotificationManagerContentTypeProducts:
+            return @"Searching for similar products";
             break;
     }
 }
@@ -169,6 +169,15 @@
             notificationView.frame = rect;
             
         } completion:nil];
+    }
+}
+
+- (void)presentWithContentType:(NotificationManagerContentType)contentType autoDismiss:(BOOL)autoDismiss {
+    if (autoDismiss) {
+        [self presentWithContentType:contentType];
+        
+    } else {
+        [self presentWithContentType:contentType duration:5];
     }
 }
 

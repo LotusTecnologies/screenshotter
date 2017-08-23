@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, NotificationManagerContentType) {
-    NotificationManagerContentTypeOne,
-    NotificationManagerContentTypeTwo
+    NotificationManagerContentTypeScreenshots,
+    NotificationManagerContentTypeProducts
 };
 
 @interface NotificationManager : NSObject
@@ -18,7 +18,7 @@ typedef NS_ENUM(NSUInteger, NotificationManagerContentType) {
 + (NotificationManager *)sharedNotificationManager;
 
 - (void)presentWithContentType:(NotificationManagerContentType)contentType;
-- (void)presentWithContentType:(NotificationManagerContentType)contentType duration:(NSTimeInterval)duration;
+- (void)presentWithContentType:(NotificationManagerContentType)contentType autoDismiss:(BOOL)autoDismiss;
 - (void)dismissWithContentType:(NotificationManagerContentType)contentType;
 
 @end
