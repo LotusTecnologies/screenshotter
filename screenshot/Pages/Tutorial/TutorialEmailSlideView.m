@@ -52,7 +52,7 @@
         
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
-        label.text = @"Enter you email:";
+        label.text = @"Enter your email:";
         label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
         [self.contentView addSubview:label];
         [label setContentCompressionResistancePriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];

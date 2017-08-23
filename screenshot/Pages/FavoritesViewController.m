@@ -12,6 +12,7 @@
 #import "screenshot-Swift.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
+#import "HelperView.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
@@ -22,6 +23,7 @@
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *favoriteFrc;
+@property (nonatomic, strong) HelperView *helperView;
 @property (nonatomic, strong) NSMutableArray<Product *> *unfavoriteArray;
 
 @end
@@ -68,6 +70,31 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    self.helperView = ({
+        CGFloat verticalPadding = 40.f;
+        
+        HelperView *helperView = [[HelperView alloc] init];
+        helperView.translatesAutoresizingMaskIntoConstraints = NO;
+        helperView.userInteractionEnabled = NO;
+        helperView.titleLabel.text = @"No Favorites";
+        helperView.subtitleLabel.text = @"Tap the heart icon on products to add them to your favorites";
+        [self.view addSubview:helperView];
+        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:verticalPadding].active = YES;
+        [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-verticalPadding].active = YES;
+        [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        
+        UIImageView *imageView = [[UIImageView alloc] init];
+        imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        imageView.image = [UIImage imageNamed:@"FavoriteEmptyListHelper"];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [helperView.contentView addSubview:imageView];
+        [imageView.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+        [imageView.centerYAnchor constraintEqualToAnchor:helperView.contentView.centerYAnchor].active = YES;
+        
+        helperView;
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -78,6 +105,8 @@
     }
     
     _didViewWillAppear = YES;
+    
+    [self syncHelperViewVisibility];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -163,6 +192,13 @@
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
+
+
+#pragma mark - Helper View
+
+- (void)syncHelperViewVisibility {
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
 }
 
 @end

@@ -67,11 +67,6 @@
     });
     
     self.helperView = ({
-        UIImageView *imageView = [[UIImageView alloc] init];
-        imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        imageView.image = [UIImage imageNamed:@"ScreenshotEmptyListHelper"];
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        
         CGFloat verticalPadding = 40.f;
         
         HelperView *helperView = [[HelperView alloc] init];
@@ -79,12 +74,20 @@
         helperView.userInteractionEnabled = NO;
         helperView.titleLabel.text = @"No Screenshots Yet";
         helperView.subtitleLabel.text = @"Screenshot looks you want to shop by pressing the power & home buttons at the same time";
-        [helperView.contentView addSubview:imageView];
         [self.view addSubview:helperView];
         [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:verticalPadding].active = YES;
         [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
         [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-verticalPadding].active = YES;
         [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        
+        UIImageView *imageView = [[UIImageView alloc] init];
+        imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        imageView.image = [UIImage imageNamed:@"ScreenshotEmptyListHelper"];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [helperView.contentView addSubview:imageView];
+        [imageView.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+        [imageView.centerYAnchor constraintEqualToAnchor:helperView.contentView.centerYAnchor].active = YES;
+        
         helperView;
     });
 }
