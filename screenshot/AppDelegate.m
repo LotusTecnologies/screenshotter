@@ -12,6 +12,7 @@
 #import "PermissionsManager.h"
 #import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
+#import "LoadingViewController.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
@@ -136,8 +137,7 @@
             viewController = [[MainTabBarController alloc] init];
             
         } else {
-            viewController = [[UIViewController alloc] init]; // TODO: loading view controller
-            viewController.view.backgroundColor = [UIColor greenColor];
+            viewController = [[LoadingViewController alloc] init];
         }
         
     } else {
