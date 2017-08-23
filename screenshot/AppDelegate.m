@@ -30,68 +30,19 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [DataModel setup]; // Sets up Core Data stack on a background queue.
     [ClarifaiModel setup]; // Takes a long time to intialize; start early.
-    [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
-    
     [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     
+    [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
     [self setupApplicationAppearance];
     
+    [self prepareDataStackCompletionIfNeeded];
     
-    
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
-        if ([DataModel sharedInstance].isCoreDataStackReady) {
-            [AssetSyncModel.sharedInstance syncPhotos];
-            window.rootViewController = [[MainTabBarController alloc] init];
-            
-        } else {
-            [DataModel sharedInstance].coreDataStackCompletionHandler = ^{
-                [AssetSyncModel.sharedInstance syncPhotos];
-                UIViewController *oldViewController = self.window.rootViewController;
-                UIViewController *newViewController = [[MainTabBarController alloc] init];
-                UIViewAnimationOptions options = UIViewAnimationOptionTransitionFlipFromLeft | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionLayoutSubviews;
-                
-                [UIView transitionFromView:oldViewController.view toView:newViewController.view duration:0.5f options:options completion:^(BOOL finished) {
-                    self.window.rootViewController = newViewController;
-                }];
-            };
-            
-            [DataModel sharedInstance].coreDataStackFailureHandler = ^{
-                // TODO:
-            };
-            
-            UIViewController *viewController = [[UIViewController alloc] init];
-            viewController.view.backgroundColor = [UIColor greenColor];
-            window.rootViewController = viewController;
-        }
-        
-    } else {
-        TutorialViewController *viewController = [[TutorialViewController alloc] init];
-        viewController.delegate = self;
-        window.rootViewController = viewController;
-    }
-    
-    [window makeKeyAndVisible];
-    self.window = window;
-    
-    
-    
-//    self.window = ({
-//        UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-//        
-//        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
-//            window.rootViewController = [[MainTabBarController alloc] init];
-//            
-//        } else {
-//            TutorialViewController *viewController = [[TutorialViewController alloc] init];
-//            viewController.delegate = self;
-//            window.rootViewController = viewController;
-//        }
-//        
-//        [window makeKeyAndVisible];
-//        window;
-//    });
+    self.window = ({
+        UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        window.rootViewController = [self nextViewController];
+        [window makeKeyAndVisible];
+        window;
+    });
     
     return YES;
 }
@@ -175,19 +126,63 @@
 }
 
 
-#pragma mark - Tutorial
+#pragma mark - View Controllers
+
+- (UIViewController *)nextViewController {
+    UIViewController *viewController;
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+        if ([DataModel sharedInstance].isCoreDataStackReady) {
+            viewController = [[MainTabBarController alloc] init];
+            
+        } else {
+            viewController = [[UIViewController alloc] init]; // TODO: loading view controller
+            viewController.view.backgroundColor = [UIColor greenColor];
+        }
+        
+    } else {
+        TutorialViewController *tutorialViewController = [[TutorialViewController alloc] init];
+        tutorialViewController.delegate = self;
+        viewController = tutorialViewController;
+    }
+    
+    return viewController;
+}
+
+- (void)prepareDataStackCompletionIfNeeded {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+        if ([DataModel sharedInstance].isCoreDataStackReady) {
+            [[AssetSyncModel sharedInstance] syncPhotos];
+            
+        } else {
+            [DataModel sharedInstance].coreDataStackCompletionHandler = ^{
+                [[AssetSyncModel sharedInstance] syncPhotos];
+                
+                [self transitionToViewController:[self nextViewController]];
+            };
+            
+            [DataModel sharedInstance].coreDataStackFailureHandler = ^{
+                // TODO:
+            };
+        }
+    }
+}
+
+- (void)transitionToViewController:(UIViewController *)toViewController {
+    UIViewAnimationOptions options = UIViewAnimationOptionTransitionFlipFromLeft | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionLayoutSubviews;
+    
+    [UIView transitionFromView:self.window.rootViewController.view toView:toViewController.view duration:0.5f options:options completion:^(BOOL finished) {
+        self.window.rootViewController = toViewController;
+    }];
+}
 
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
     viewController.delegate = nil;
     
-    UIViewController *oldViewController = self.window.rootViewController;
-    UIViewController *newViewController = [[MainTabBarController alloc] init];
-    UIViewAnimationOptions options = UIViewAnimationOptionTransitionFlipFromLeft | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionLayoutSubviews;
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"Tutorial"];
     
-    [UIView transitionFromView:oldViewController.view toView:newViewController.view duration:0.5f options:options completion:^(BOOL finished) {
-        self.window.rootViewController = newViewController;
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"Tutorial"];
-    }];
+    [self prepareDataStackCompletionIfNeeded];
+    [self transitionToViewController:[self nextViewController]];
 }
 
 @end
