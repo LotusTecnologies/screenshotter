@@ -64,6 +64,9 @@ class AssetSyncModel: NSObject {
                 }
                 if isFashion {
                     NSLog("uploadScreenshot til db saved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                    DispatchQueue.main.async {
+                        NotificationManager.shared().present(with: .products)
+                    }
                     firstly { _ -> Promise<[[String : Any]]> in
                         NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
@@ -71,6 +74,8 @@ class AssetSyncModel: NSObject {
                             NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                             self.saveShoppables(assetId: asset.localIdentifier, segments: segments)
                             NSLog("uploadScreenshot til saveShoppables \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                        }.always {
+                            NotificationManager.shared().dismiss(with: .products)
                         }.catch { error in
                             print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                     }
@@ -78,6 +83,9 @@ class AssetSyncModel: NSObject {
             }.always(on: self.serialQ) {
                 self.screenshotsToProcess -= 1
                 if self.screenshotsToProcess == 0 {
+                    DispatchQueue.main.async {
+                        NotificationManager.shared().dismiss(with: .screenshots)
+                    }
                     self.endSync()
                 } else if self.screenshotsToProcess < 0 {
                     print("WTF? negative screenshotsToProcess:\(self.screenshotsToProcess) after subtracting one")
@@ -324,6 +332,9 @@ class AssetSyncModel: NSObject {
             self.countAndPrint(name: "photosSet", set: photosSet)
             self.countAndPrint(name: "toUpload", set: toUpload)
             if toUpload.count > 0 {
+                DispatchQueue.main.async {
+                    NotificationManager.shared().present(with: .screenshots)
+                }
                 self.allScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
