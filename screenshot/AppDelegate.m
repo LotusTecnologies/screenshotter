@@ -13,6 +13,7 @@
 #import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
+#import "UserDefaultsConstants.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
@@ -132,7 +133,7 @@
 - (UIViewController *)nextViewController {
     UIViewController *viewController;
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:TutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             viewController = [[MainTabBarController alloc] init];
             
@@ -150,7 +151,7 @@
 }
 
 - (void)prepareDataStackCompletionIfNeeded {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"Tutorial"]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:TutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             [[AssetSyncModel sharedInstance] syncPhotos];
             
@@ -178,7 +179,7 @@
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
     viewController.delegate = nil;
     
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"Tutorial"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:TutorialCompleted];
     
     [self prepareDataStackCompletionIfNeeded];
     [self transitionToViewController:[self nextViewController]];
