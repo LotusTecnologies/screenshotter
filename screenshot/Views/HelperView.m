@@ -22,6 +22,7 @@
             label.numberOfLines = 0;
             label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -[Geometry padding], 0.f);
             [self addSubview:label];
+            [label setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
             [label.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor].active = YES;
             [label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor].active = YES;
             [label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor].active = YES;
@@ -36,6 +37,7 @@
             label.numberOfLines = 0;
             label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -[Geometry padding], 0.f);
             [self addSubview:label];
+            [label setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
             [label.topAnchor constraintEqualToAnchor:self.titleLabel.layoutMarginsGuide.bottomAnchor].active = YES;
             [label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor].active = YES;
             [label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor].active = YES;
