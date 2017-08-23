@@ -96,94 +96,104 @@ class AssetSyncModel: NSObject {
     }
     
     func saveShoppables(assetId: String, segments: [[String : Any]]) { //-> Promise<[String]> {
-        let dataModel = DataModel.sharedInstance
-        dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
-            if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
-                var order: Int16 = 0
-                for segment in segments {
-                    guard let offersURL = segment["offers"] as? String,
-                        let url = URL(string: offersURL.hasPrefix("//") ? "https:" + offersURL : offersURL),
-                        let b0 = segment["b0"] as? [Any],
-                        b0.count >= 2,
-                        let b1 = segment["b1"] as? [Any],
-                        b1.count >= 2,
-                        let b0x = b0[0] as? Double,
-                        let b0y = b0[1] as? Double,
-                        let b1x = b1[0] as? Double,
-                        let b1y = b1[1] as? Double else {
-                            print("AssetSyncModel error parsing offers, b0, b1")
-                            continue
-                    }
-                    let label = segment["label"] as? String
-                    screenshot.shoppablesCount += 1
-                    let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
-                                                            screenshot: screenshot,
-                                                            order: order,
-                                                            label: label,
-                                                            offersURL: offersURL,
-                                                            b0x: b0x,
-                                                            b0y: b0y,
-                                                            b1x: b1x,
-                                                            b1y: b1y)
-                    order += 1
-                    self.extractProducts(shoppableOID: shoppable.objectID, url: url)
-                }
-                if order > 0 {
-                    self.sendScreenshotAddedLocalNotification(assetId: assetId)
-                }
+        var order: Int16 = 0
+        for segment in segments {
+            guard let offersURL = segment["offers"] as? String,
+                let url = URL(string: offersURL.hasPrefix("//") ? "https:" + offersURL : offersURL),
+                let b0 = segment["b0"] as? [Any],
+                b0.count >= 2,
+                let b1 = segment["b1"] as? [Any],
+                b1.count >= 2,
+                let b0x = b0[0] as? Double,
+                let b0y = b0[1] as? Double,
+                let b1x = b1[0] as? Double,
+                let b1y = b1[1] as? Double else {
+                    print("AssetSyncModel error parsing offers, b0, b1")
+                    continue
             }
+            let label = segment["label"] as? String
+            self.extractProducts(assetId: assetId,
+                                 url: url,
+                                 order: order,
+                                 label: label,
+                                 b0x: b0x,
+                                 b0y: b0y,
+                                 b1x: b1x,
+                                 b1y: b1y)
+            order += 1
         }
     }
-    
-    func extractProducts(shoppableOID: NSManagedObjectID, url: URL) {
-        NetworkingPromise.downloadInfo(url: url).then(on: self.processingQ) { productsDict -> Void in
-            let dataModel = DataModel.sharedInstance
-            dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
-                if let shoppable = managedObjectContext.object(with: shoppableOID) as? Shoppable {
-                    if let productsArray = productsDict["ads"] as? [[String : Any]],
-                        productsArray.count > 0 {
-                        var order: Int16 = 0
-                        for prod in productsArray {
-                            var floatPrice: Float = 0 // -1 ?
-                            if let extractedFloatPrice = prod["floatPrice"] as? Float {
-                                floatPrice = extractedFloatPrice
+
+    func extractProducts(assetId: String,
+                         url: URL,
+                         order: Int16,
+                         label: String?,
+                         b0x: Double,
+                         b0y: Double,
+                         b1x: Double,
+                         b1y: Double) {
+        firstly {
+            NetworkingPromise.downloadInfo(url: url)
+            }.then(on: self.processingQ) { productsDict -> Void in
+                if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    let dataModel = DataModel.sharedInstance
+                    dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
+                        if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
+                            let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
+                                                                    screenshot: screenshot,
+                                                                    order: order,
+                                                                    label: label,
+                                                                    offersURL: url.absoluteString,
+                                                                    b0x: b0x,
+                                                                    b0y: b0y,
+                                                                    b1x: b1x,
+                                                                    b1y: b1y)
+                            var productOrder: Int16 = 0
+                            for prod in productsArray {
+                                var floatPrice: Float = 0 // -1 ?
+                                if let extractedFloatPrice = prod["floatPrice"] as? Float {
+                                    floatPrice = extractedFloatPrice
+                                }
+                                var floatOriginalPrice: Float = 0 // -1 ?
+                                if let extractedOriginalFloatPrice = prod["floatOriginalPrice"] as? Float {
+                                    floatOriginalPrice = extractedOriginalFloatPrice
+                                }
+                                var categories: String?
+                                if let extractedCategories = prod["categories"] as? [String] {
+                                    categories = extractedCategories.first
+                                }
+                                let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
+                                                              shoppable: shoppable,
+                                                              order: productOrder,
+                                                              productDescription: prod["description"] as? String,
+                                                              price: prod["price"] as? String,
+                                                              originalPrice: prod["originalPrice"] as? String,
+                                                              floatPrice: floatPrice,
+                                                              floatOriginalPrice: floatOriginalPrice,
+                                                              categories: categories,
+                                                              brand: prod["brand"] as? String,
+                                                              offer: prod["offer"] as? String,
+                                                              imageURL: prod["imageUrl"] as? String,
+                                                              merchant: prod["merchant"] as? String)
+                                productOrder += 1
                             }
-                            var floatOriginalPrice: Float = 0 // -1 ?
-                            if let extractedOriginalFloatPrice = prod["floatOriginalPrice"] as? Float {
-                                floatOriginalPrice = extractedOriginalFloatPrice
+                            shoppable.productCount = productOrder
+                            if shoppable.productCount > 0 {
+                                screenshot.shoppablesCount += 1
+                                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                                if screenshot.shoppablesCount == 1 {
+                                    self.sendScreenshotAddedLocalNotification(assetId: assetId)
+                                }
+                            } else {
+                                print("AssetSyncModel extractProducts empty productsArray. productsDict:\(productsDict)\noffersUrl:\(url)")
                             }
-                            var categories: String?
-                            if let extractedCategories = prod["categories"] as? [String] {
-                                categories = extractedCategories.first
-                            }
-                            shoppable.productCount += 1 // Before saveProduct gets this saved too.
-                            let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
-                                                          shoppable: shoppable,
-                                                          order: order,
-                                                          productDescription: prod["description"] as? String,
-                                                          price: prod["price"] as? String,
-                                                          originalPrice: prod["originalPrice"] as? String,
-                                                          floatPrice: floatPrice,
-                                                          floatOriginalPrice: floatOriginalPrice,
-                                                          categories: categories,
-                                                          brand: prod["brand"] as? String,
-                                                          offer: prod["offer"] as? String,
-                                                          imageURL: prod["imageUrl"] as? String,
-                                                          merchant: prod["merchant"] as? String)
-                            order += 1
+                        } else {
+                            print("AssetSyncModel extractProducts error retreiving screenshot:\(assetId) to which to add shoppable and products")
                         }
-                        if shoppable.productCount <= 0 {
-                            print("AssetSyncModel extractProducts empty productsArray. productsDict:\(productsDict)\noffersUrl:\(url)")
-                            dataModel.delete(shoppable: shoppable, managedObjectContext: managedObjectContext)
-                        }
-                    } else {
-                        print("AssetSyncModel extractProducts error parsing productsArray. productsDict:\(productsDict)\noffersUrl:\(url)")
-                        dataModel.delete(shoppable: shoppable, managedObjectContext: managedObjectContext)
                     }
                 } else {
-                    print("Failed to get managed object with shoppableOID:\(shoppableOID)")
+                    print("AssetSyncModel extractProducts no products in ads. productsDict:\(productsDict)")
                 }
-            }
             }.catch { error in
                 print("AssetSyncModel extractProducts error parsing product:\(error)")
         }
