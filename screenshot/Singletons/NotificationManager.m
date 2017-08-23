@@ -48,6 +48,13 @@
             window.windowLevel = UIWindowLevelNormal;
             window;
         });
+        
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissTopNotificationView)];
+        [self.window addGestureRecognizer:tapGesture];
+        
+        UISwipeGestureRecognizer *swipeGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(dismissTopNotificationView)];
+        swipeGesture.direction = UISwipeGestureRecognizerDirectionUp;
+        [self.window addGestureRecognizer:swipeGesture];
     }
     return self;
 }
@@ -120,6 +127,7 @@
         case NotificationManagerContentTypeOne:
             return @"Identifying new screenshots...";
             break;
+            
         case NotificationManagerContentTypeTwo:
             return @"Identifying new products...";
             break;
@@ -197,6 +205,18 @@
 
 - (void)dismissWithContentTypeNumber:(NSNumber *)contentTypeNumber {
     [self dismissWithContentType:[contentTypeNumber unsignedIntegerValue]];
+}
+
+- (void)dismissTopNotificationView {
+    UIView *topNotificationView = self.window.subviews.lastObject;
+    
+    if (topNotificationView) {
+        NSNumber *key = [[self.notificationViewDict allKeysForObject:topNotificationView] firstObject];
+        
+        if (key) {
+            [self dismissWithContentType:[key unsignedIntegerValue]];
+        }
+    }
 }
 
 @end
