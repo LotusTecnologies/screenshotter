@@ -176,6 +176,9 @@
     }];
 }
 
+
+#pragma mark - Tutorial
+
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
     viewController.delegate = nil;
     
