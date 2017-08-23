@@ -98,10 +98,17 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
-        UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
+    // TODO: dispatch after to prevent presenting a view controller on dismissed view controller.
+    // this function is called before AppDelegate-transitionToViewController:(set window rootVC)
+    // Note: turn off photo permissions to enter this path
+    // the solution is to create a view controller which deals with the logic and to never change
+    // the window, only the underlying view controller.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
+            UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+    });
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
