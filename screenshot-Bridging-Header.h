@@ -6,6 +6,8 @@
 #define screenshot_Bridging_Header_h
 
 #import "PermissionsManager.h"
+#import "UserDefaultsConstants.h"
+#import "NotificationManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 
