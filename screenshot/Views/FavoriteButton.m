@@ -13,8 +13,8 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        UIImage *emptyImage = [UIImage imageNamed:@"HeartEmpty"];
-        UIImage *filledImage = [UIImage imageNamed:@"HeartFilled"];
+        UIImage *emptyImage = [UIImage imageNamed:@"FavoriteHeartEmpty"];
+        UIImage *filledImage = [UIImage imageNamed:@"FavoriteHeartFilled"];
         
         [self setImage:emptyImage forState:UIControlStateNormal];
         [self setImage:filledImage forState:UIControlStateSelected];
