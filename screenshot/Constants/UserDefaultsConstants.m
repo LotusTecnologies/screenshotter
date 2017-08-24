@@ -9,5 +9,6 @@
 #import "UserDefaultsConstants.h"
 
 NSString *const UserDefaultsEmail = @"Email";
+NSString *const UserDefaultsName = @"Name";
 NSString *const UserDefaultsTutorialCompleted = @"TutorialCompleted";
 NSString *const UserDefaultsDateInstalled = @"DateInstalled";

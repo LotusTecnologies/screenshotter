@@ -47,6 +47,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor whiteColor];
+    
     self.scrollView = ({
         UIScrollView *scrollView = [[UIScrollView alloc] init];
         scrollView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -141,9 +143,9 @@
         
         _slides = @[welcomeSlideView,
                     permissionsSlideView,
+                    emailSlideView,
                     [[TutorialScreenshotSlideView alloc] init],
-                    [[TutorialShopSlideView alloc] init],
-                    emailSlideView
+                    [[TutorialShopSlideView alloc] init]
                     ];
     }
     return _slides;
@@ -182,12 +184,15 @@
     }
 }
 
-- (void)tutorialEmailSlideViewDidFail:(TutorialEmailSlideView *)slideView {
+- (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
     UIAlertController *alertController = [TutorialEmailSlideView failedAlertController];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
+- (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
+    slideView.delegate = nil;
+    
+    // TODO: move the below code elsewhere
     [self.delegate tutorialViewControllerDidComplete:self];
     [AnalyticsManager track:@"Finished Tutorial"];
 }
