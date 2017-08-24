@@ -13,6 +13,7 @@
 #import "HelperView.h"
 #import "PermissionsManager.h"
 #import "AnalyticsManager.h"
+#import "UIColor+Appearance.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
@@ -55,6 +56,7 @@
         collectionView.dataSource = self;
         collectionView.contentInset = UIEdgeInsetsMake(p, p, p, p);
         collectionView.backgroundColor = self.view.backgroundColor;
+        collectionView.alwaysBounceVertical = YES;
         
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
@@ -65,6 +67,11 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    refreshControl.tintColor = [UIColor crazeRedColor];
+    [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
+    [self.collectionView addSubview:refreshControl];
     
     self.helperView = ({
         CGFloat verticalPadding = 40.f;
@@ -185,6 +192,17 @@
     [[self screenshotAtIndexPath:indexPath] setHide];
     
     [AnalyticsManager track:@"Removed screenshot"];
+}
+
+
+#pragma mark - Refresh Control
+
+- (void)refreshControlAction:(UIRefreshControl *)refreshControl {
+    if ([refreshControl isRefreshing]) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [refreshControl endRefreshing];
+        });
+    }
 }
 
 
