@@ -370,11 +370,6 @@ extension DataModel {
         shoppableToSave.b0y = b0y
         shoppableToSave.b1x = b1x
         shoppableToSave.b1y = b1y
-        do {
-            try managedObjectContext.save()
-        } catch {
-            print("Failed to saveShoppable order:\(order)")
-        }
         return shoppableToSave
     }
     
@@ -421,11 +416,6 @@ extension DataModel {
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
-        do {
-            try managedObjectContext.save()
-        } catch {
-            print("Failed to saveProduct order:\(order)")
-        }
         return productToSave
     }
     
