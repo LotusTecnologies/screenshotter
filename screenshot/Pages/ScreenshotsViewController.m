@@ -73,7 +73,7 @@
         helperView.translatesAutoresizingMaskIntoConstraints = NO;
         helperView.userInteractionEnabled = NO;
         helperView.titleLabel.text = @"No Screenshots Yet";
-        helperView.subtitleLabel.text = @"Screenshot looks you want to shop by pressing the power & home buttons at the same time";
+        helperView.subtitleLabel.text = @"Add screenshots you want to shop by pressing the power & home buttons at the same time";
         [self.view addSubview:helperView];
         [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:verticalPadding].active = YES;
         [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
