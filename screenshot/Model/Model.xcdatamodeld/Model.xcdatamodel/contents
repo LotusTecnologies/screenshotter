@@ -23,6 +23,7 @@
         <attribute name="isFashion" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="shoppablesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="syteJson" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uploadedImageURL" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="shoppables" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Shoppable" inverseName="screenshot" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
@@ -40,7 +41,7 @@
     </entity>
     <elements>
         <element name="Product" positionX="124" positionY="189" width="128" height="255"/>
-        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="165"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="180"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="195"/>
     </elements>
 </model>
