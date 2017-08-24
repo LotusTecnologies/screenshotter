@@ -46,15 +46,16 @@
             
             UIWindow *window = [[UIWindow alloc] initWithFrame:rect];
             window.windowLevel = UIWindowLevelNormal;
+            window.userInteractionEnabled = NO;
             window;
         });
         
-        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissTopNotificationView)];
-        [self.window addGestureRecognizer:tapGesture];
-        
-        UISwipeGestureRecognizer *swipeGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(dismissTopNotificationView)];
-        swipeGesture.direction = UISwipeGestureRecognizerDirectionUp;
-        [self.window addGestureRecognizer:swipeGesture];
+//        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissTopNotificationView)];
+//        [self.window addGestureRecognizer:tapGesture];
+//        
+//        UISwipeGestureRecognizer *swipeGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(dismissTopNotificationView)];
+//        swipeGesture.direction = UISwipeGestureRecognizerDirectionUp;
+//        [self.window addGestureRecognizer:swipeGesture];
     }
     return self;
 }
@@ -72,7 +73,6 @@
 //        viewRect.origin.y = -viewRect.size.height;
         
         notificationView = [[UIView alloc] initWithFrame:viewRect];
-        notificationView.userInteractionEnabled = NO; // !!!: staging purposes
         notificationView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 //        notificationView.backgroundColor = [UIColor whiteColor];
         notificationView.layoutMargins = UIEdgeInsetsMake(0.f, p, 0.f, p);
