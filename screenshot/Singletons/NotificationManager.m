@@ -69,11 +69,12 @@
         CGFloat p = [Geometry padding];
         
         CGRect viewRect = self.window.bounds;
-        viewRect.origin.y = -viewRect.size.height;
+//        viewRect.origin.y = -viewRect.size.height;
         
         notificationView = [[UIView alloc] initWithFrame:viewRect];
+        notificationView.userInteractionEnabled = NO; // !!!: staging purposes
         notificationView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        notificationView.backgroundColor = [UIColor whiteColor];
+//        notificationView.backgroundColor = [UIColor whiteColor];
         notificationView.layoutMargins = UIEdgeInsetsMake(0.f, p, 0.f, p);
         [self.window addSubview:notificationView];
         
@@ -81,42 +82,61 @@
         contentView.translatesAutoresizingMaskIntoConstraints = NO;
         [notificationView addSubview:contentView];
         [contentView.topAnchor constraintEqualToAnchor:notificationView.bottomAnchor constant:-self.contentHeight].active = YES;
-        [contentView.leadingAnchor constraintGreaterThanOrEqualToAnchor:notificationView.layoutMarginsGuide.leadingAnchor].active = YES;
+//        [contentView.leadingAnchor constraintGreaterThanOrEqualToAnchor:notificationView.layoutMarginsGuide.leadingAnchor].active = YES;
         [contentView.bottomAnchor constraintEqualToAnchor:notificationView.bottomAnchor].active = YES;
-        [contentView.trailingAnchor constraintLessThanOrEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
-        [contentView.centerXAnchor constraintEqualToAnchor:notificationView.centerXAnchor].active = YES;
-        
-        CGFloat borderHeight = ([UIScreen mainScreen].scale > 1.f) ? .5f : 1.f;
-        
-        UIView *border = [[UIView alloc] init];
-        border.translatesAutoresizingMaskIntoConstraints = NO;
-        border.backgroundColor = [UIColor colorWithWhite:178.f/255.f alpha:1.f];
-        border.userInteractionEnabled = NO;
-        [notificationView addSubview:border];
-        [border.leadingAnchor constraintEqualToAnchor:notificationView.leadingAnchor].active = YES;
-        [border.bottomAnchor constraintEqualToAnchor:notificationView.bottomAnchor].active = YES;
-        [border.trailingAnchor constraintEqualToAnchor:notificationView.trailingAnchor].active = YES;
-        [border.heightAnchor constraintEqualToConstant:borderHeight].active = YES;
+//        [contentView.trailingAnchor constraintLessThanOrEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
+//        [contentView.centerXAnchor constraintEqualToAnchor:notificationView.centerXAnchor].active = YES;
+        [contentView.trailingAnchor constraintEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
+
+//        CGFloat borderHeight = ([UIScreen mainScreen].scale > 1.f) ? .5f : 1.f;
+//        
+//        UIView *border = [[UIView alloc] init];
+//        border.translatesAutoresizingMaskIntoConstraints = NO;
+//        border.backgroundColor = [UIColor colorWithWhite:178.f/255.f alpha:1.f];
+//        border.userInteractionEnabled = NO;
+//        [notificationView addSubview:border];
+//        [border.leadingAnchor constraintEqualToAnchor:notificationView.leadingAnchor].active = YES;
+//        [border.bottomAnchor constraintEqualToAnchor:notificationView.bottomAnchor].active = YES;
+//        [border.trailingAnchor constraintEqualToAnchor:notificationView.trailingAnchor].active = YES;
+//        [border.heightAnchor constraintEqualToConstant:borderHeight].active = YES;
+//        
+//        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+//        activityView.translatesAutoresizingMaskIntoConstraints = NO;
+//        activityView.color = [UIColor crazeRedColor];
+//        activityView.transform = CGAffineTransformMakeScale(.6f, .6f);
+//        [activityView startAnimating];
+//        [contentView addSubview:activityView];
+//        [activityView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+//        [activityView.centerYAnchor constraintEqualToAnchor:contentView.centerYAnchor].active = YES;
+//        
+//        UILabel *label = [[UILabel alloc] init];
+//        label.translatesAutoresizingMaskIntoConstraints = NO;
+//        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+//        label.textColor = [UIColor crazeRedColor];
+//        label.text = [self textForContentType:contentType];
+//        [contentView addSubview:label];
+//        [label.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
+//        [label.leadingAnchor constraintEqualToAnchor:activityView.trailingAnchor].active = YES;
+//        [label.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = YES;
+//        [label.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
         
         UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
         activityView.translatesAutoresizingMaskIntoConstraints = NO;
-        activityView.color = [UIColor crazeRedColor];
         activityView.transform = CGAffineTransformMakeScale(.6f, .6f);
         [activityView startAnimating];
         [contentView addSubview:activityView];
-        [activityView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [activityView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
         [activityView.centerYAnchor constraintEqualToAnchor:contentView.centerYAnchor].active = YES;
         
-        UILabel *label = [[UILabel alloc] init];
-        label.translatesAutoresizingMaskIntoConstraints = NO;
-        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-        label.textColor = [UIColor crazeRedColor];
-        label.text = [self textForContentType:contentType];
-        [contentView addSubview:label];
-        [label.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
-        [label.leadingAnchor constraintEqualToAnchor:activityView.trailingAnchor].active = YES;
-        [label.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor].active = YES;
-        [label.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        switch (contentType) {
+            case NotificationManagerContentTypeScreenshots:
+                activityView.color = [UIColor grayColor];
+                break;
+                
+            case NotificationManagerContentTypeProducts:
+                activityView.color = [UIColor crazeRedColor];
+                break;
+        }
     }
     
     return notificationView;
@@ -144,16 +164,18 @@
     
     if (notificationView) {
         if (self.window.subviews.lastObject != notificationView) {
-            CGRect rect = notificationView.frame;
-            rect.origin.y = -rect.size.height;
-            notificationView.frame = rect;
+//            CGRect rect = notificationView.frame;
+//            rect.origin.y = -rect.size.height;
+//            notificationView.frame = rect;
+            notificationView.alpha = 0.f;
             
             [self.window bringSubviewToFront:notificationView];
             
             [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                CGRect rect = notificationView.frame;
-                rect.origin.y = 0.f;
-                notificationView.frame = rect;
+//                CGRect rect = notificationView.frame;
+//                rect.origin.y = 0.f;
+//                notificationView.frame = rect;
+                notificationView.alpha = 1.f;
                 
             } completion:nil];
         }
@@ -164,9 +186,10 @@
         [self.notificationViewDict setObject:notificationView forKey:@(contentType)];
         
         [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseOut animations:^{
-            CGRect rect = notificationView.frame;
-            rect.origin.y = 0.f;
-            notificationView.frame = rect;
+//            CGRect rect = notificationView.frame;
+//            rect.origin.y = 0.f;
+//            notificationView.frame = rect;
+            notificationView.alpha = 1.f;
             
         } completion:nil];
     }
@@ -193,9 +216,10 @@
         [self.notificationViewDict removeObjectForKey:@(contentType)];
         
         [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseIn animations:^{
-            CGRect rect = notificationView.frame;
-            rect.origin.y = -rect.size.height;
-            notificationView.frame = rect;
+//            CGRect rect = notificationView.frame;
+//            rect.origin.y = -rect.size.height;
+//            notificationView.frame = rect;
+            notificationView.alpha = 0.f;
             
         } completion:^(BOOL finished) {
             [notificationView removeFromSuperview];
