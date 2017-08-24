@@ -18,7 +18,9 @@
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
 
-@interface TutorialViewController () <TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate>
+@interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate> {
+    BOOL _shouldSlideNextFromPermissionsSlide;
+}
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
@@ -32,6 +34,7 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
@@ -46,6 +49,7 @@
     self.scrollView = ({
         UIScrollView *scrollView = [[UIScrollView alloc] init];
         scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+        scrollView.delegate = self;
         scrollView.showsHorizontalScrollIndicator = NO;
         scrollView.pagingEnabled = YES;
         scrollView.scrollEnabled = NO;
@@ -98,13 +102,21 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
-    NSUInteger currentPage = 0; // TODO: Update based on contentOffset before transition
+    NSUInteger currentSlide = [self currentSlide];
     
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         CGPoint offset = self.scrollView.contentOffset;
-        offset.x = size.width * currentPage;
+        offset.x = size.width * currentSlide;
         self.scrollView.contentOffset = offset;
     } completion:nil];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if (self.view.window && _shouldSlideNextFromPermissionsSlide) {
+        _shouldSlideNextFromPermissionsSlide = NO;
+        
+        [self scrollToNextSlide];
+    }
 }
 
 - (void)dealloc {
@@ -119,20 +131,24 @@
         TutorialWelcomeSlideView *welcomeSlideView = [[TutorialWelcomeSlideView alloc] init];
         welcomeSlideView.delegate = self;
         
-        TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
-        emailSlideView.delegate = self;
-        
         TutorialPermissionsSlideView *permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
         permissionsSlideView.delegate = self;
         
+        TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
+        emailSlideView.delegate = self;
+        
         _slides = @[welcomeSlideView,
+                    permissionsSlideView,
                     [[TutorialScreenshotSlideView alloc] init],
                     [[TutorialShopSlideView alloc] init],
-                    permissionsSlideView,
                     emailSlideView
                     ];
     }
     return _slides;
+}
+
+- (NSUInteger)currentSlide {
+    return round(self.scrollView.contentOffset.x / self.scrollView.bounds.size.width);
 }
 
 - (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
@@ -141,8 +157,27 @@
 }
 
 - (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView {
-    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
+    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto opened:^(BOOL granted) {
+        // The delegate will be nil if the slide is completed
+        if (granted && slideView.delegate == nil) {
+            _shouldSlideNextFromPermissionsSlide = YES;
+        }
+    }];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)tutorialPermissionsSlideViewDidComplete:(TutorialPermissionsSlideView *)slideView {
+    slideView.delegate = nil;
+    
+    if (self.presentedViewController) {
+        // The photos permission denied alert has been presented.
+        // Enabling this permission will force quite the app. The
+        // only way to open the app where it was left off is to
+        // implement restoration.
+        
+    } else {
+        [self scrollToNextSlide];
+    }
 }
 
 - (void)tutorialEmailSlideViewDidFail:(TutorialEmailSlideView *)slideView {
@@ -167,6 +202,12 @@
 
 
 #pragma mark - Scroll View
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    if ([self currentSlide] == 2) { // TODO: dynamic value for permissions slide
+        // TODO: check if permisions are determined and proceed
+    }
+}
 
 - (void)scrollToNextSlide {
     CGPoint offset = CGPointZero;

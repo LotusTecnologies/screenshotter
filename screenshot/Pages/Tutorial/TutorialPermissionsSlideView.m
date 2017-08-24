@@ -11,6 +11,7 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
+#import "UIColor+Appearance.h"
 
 @interface TutorialPermissionsSlideView ()
 
@@ -30,34 +31,53 @@
         self.titleLabel.text = @"Get Started";
         self.subtitleLabel.text = @"Turn on permissions for the best CRAZE experience";
         
-        UIView *photosRow = [self permissionViewWithImageNamed:@"IconPhotos" text:@"Allow Photo Gallery Access" type:PermissionTypePhoto action:@selector(photosSwitchChanged:)];
-        [photosRow.topAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.topAnchor].active = YES;
+        CGFloat p = [Geometry padding];
         
-        UIView *notificationRow = [self permissionViewWithImageNamed:@"IconNotifications" text:@"Enable Notifications" type:PermissionTypePush action:@selector(notificationsSwitchChanged:)];
-        [notificationRow.heightAnchor constraintEqualToAnchor:photosRow.heightAnchor].active = YES;
-        [notificationRow.topAnchor constraintGreaterThanOrEqualToAnchor:photosRow.bottomAnchor].active = YES;
+        UIView *photosRow = [self permissionViewWithImageNamed:@"TutorialPhotosIcon" text:@"Allow Photo Gallery Access" type:PermissionTypePhoto action:@selector(photosSwitchChanged:)];
+        [photosRow.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:p].active = YES;
         
-//        UIView *locationRow = [self permissionViewWithImageNamed:@"IconLocation" text:@"Allow Location Access" type:PermissionTypeLocation action:@selector(locationSwitchChanged:)];
-//        [locationRow.heightAnchor constraintEqualToAnchor:notificationRow.heightAnchor].active = YES;
-//        [locationRow.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
-//        [locationRow.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+        UILabel *photosLabel = [[UILabel alloc] init];
+        photosLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        photosLabel.numberOfLines = 0;
+        photosLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        photosLabel.textColor = [UIColor softTextColor];
+        photosLabel.text = @"CRAZE needs access to your photo gallery to turn your screenshots into shoppable experiences";
+        [self.contentView addSubview:photosLabel];
+        [photosLabel.topAnchor constraintEqualToAnchor:photosRow.bottomAnchor constant:p].active = YES;
+        [photosLabel.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+        [photosLabel.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         
-        UILabel *label = [[UILabel alloc] init];
-        label.translatesAutoresizingMaskIntoConstraints = NO;
-        label.numberOfLines = 0;
-        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
-        label.textColor = [UIColor grayColor];
-        label.text = @"Craze needs access to your photos to turn your screenshots into shoppable experiences.\n\nCraze sends you a notification when your screenshot is ready to shop. Enabling notifications turns all your favorite apps, like Instagram and Snapchat into shoppable experiences.";
-        [self.contentView addSubview:label];
-        [label.topAnchor constraintGreaterThanOrEqualToAnchor:notificationRow.bottomAnchor].active = YES;
-        [label.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-        [label.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
-        [label.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+        UIView *notificationRow = [self permissionViewWithImageNamed:@"TutorialNotificationsIcon" text:@"Enable Notifications" type:PermissionTypePush action:@selector(notificationsSwitchChanged:)];
+        [notificationRow.topAnchor constraintEqualToAnchor:photosLabel.bottomAnchor constant:p * 2.f].active = YES;
         
-        [self flexibleSpaceFromAnchor:self.contentView.topAnchor toAnchor:photosRow.topAnchor];
-        [self flexibleSpaceFromAnchor:photosRow.layoutMarginsGuide.bottomAnchor toAnchor:notificationRow.topAnchor];
-        [self flexibleSpaceFromAnchor:notificationRow.layoutMarginsGuide.bottomAnchor toAnchor:label.topAnchor];
-        [self flexibleSpaceFromAnchor:label.bottomAnchor toAnchor:self.contentView.bottomAnchor];
+        UIImageView *arrowImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialPermissionsArrow"]];
+        arrowImageView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.contentView addSubview:arrowImageView];
+        [arrowImageView.topAnchor constraintEqualToAnchor:notificationRow.bottomAnchor].active = YES;
+        [arrowImageView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+        
+        UILabel *notificationLabel = [[UILabel alloc] init];
+        notificationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        notificationLabel.numberOfLines = 0;
+        notificationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        notificationLabel.textColor = [UIColor softTextColor];
+        notificationLabel.text = @"We’ll send you a notification when your screenshot is ready to be shopped";
+        [self.contentView addSubview:notificationLabel];
+        [notificationLabel.topAnchor constraintEqualToAnchor:notificationRow.bottomAnchor constant:p].active = YES;
+        [notificationLabel.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+        [notificationLabel.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+        [notificationLabel.trailingAnchor constraintEqualToAnchor:arrowImageView.leadingAnchor].active = YES;
+        
+        UILabel *arrowLabel = [[UILabel alloc] init];
+        arrowLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        arrowLabel.text = @"Tap\nme!";
+        arrowLabel.numberOfLines = 0;
+        arrowLabel.textAlignment = NSTextAlignmentCenter;
+        arrowLabel.textColor = [UIColor crazeRedColor];
+        arrowLabel.transform = CGAffineTransformMakeRotation(M_PI_4);
+        [self.contentView addSubview:arrowLabel];
+        [arrowLabel.topAnchor constraintEqualToAnchor:arrowImageView.bottomAnchor constant:-2.f].active = YES;
+        [arrowLabel.trailingAnchor constraintEqualToAnchor:arrowImageView.leadingAnchor constant:2.f].active = YES;
     }
     return self;
 }
@@ -100,7 +120,7 @@
     UILabel *label = [[UILabel alloc] init];
     label.translatesAutoresizingMaskIntoConstraints = NO;
     label.numberOfLines = 0;
-    label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle3];
     label.text = text;
     label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, 0.f, -p);
     [view addSubview:label];
@@ -171,6 +191,10 @@
             }
             
             [AnalyticsManager track:event properties:@{@"granted": grantedString}];
+            
+            if ([self didDetermineAllPermissions]) {
+                [self.delegate tutorialPermissionsSlideViewDidComplete:self];
+            }
         }];
     }
 }
@@ -180,6 +204,13 @@
         BOOL hasPermission = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:[key integerValue]];
         [self updatePermission:hasPermission forSwitch:obj];
     }];
+}
+
+- (BOOL)didDetermineAllPermissions {
+    PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
+    PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
+    
+    return photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined;
 }
 
 @end

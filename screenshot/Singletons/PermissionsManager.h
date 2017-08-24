@@ -32,7 +32,7 @@ typedef void (^PermissionBlock)(BOOL granted);
 - (void)requestPermissionForType:(PermissionType)type response:(PermissionBlock)response;
 - (void)requestPermissionForType:(PermissionType)type openSettingsIfNeeded:(BOOL)openSettings response:(PermissionBlock)response;
 
-- (UIAlertController *)deniedAlertControllerForType:(PermissionType)type;
+- (UIAlertController *)deniedAlertControllerForType:(PermissionType)type opened:(PermissionBlock)opened;
 
 //  Called when the app starts
 - (void)fetchPushPermissionStatus;

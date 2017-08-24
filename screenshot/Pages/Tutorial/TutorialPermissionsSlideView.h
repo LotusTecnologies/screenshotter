@@ -14,6 +14,7 @@
 @required
 
 - (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView;
+- (void)tutorialPermissionsSlideViewDidComplete:(TutorialPermissionsSlideView *)slideView;
 
 @end
 
