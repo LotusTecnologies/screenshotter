@@ -11,17 +11,17 @@
 #import "TutorialShopSlideView.h"
 #import "TutorialPermissionsSlideView.h"
 #import "TutorialEmailSlideView.h"
+#import "TutorialWelcomeSlideView.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
 
-@interface TutorialViewController () <UIScrollViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate>
+@interface TutorialViewController () <TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIPageControl *pageControl;
-@property (nonatomic, strong) NSArray <TutorialBaseSlideView *>* slides;
+@property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
 
 @end
 
@@ -43,30 +43,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.pageControl = ({
-        UIPageControl *control = [[UIPageControl alloc] init];
-        control.translatesAutoresizingMaskIntoConstraints = NO;
-        control.numberOfPages = self.slides.count;
-        control.defersCurrentPageDisplay = YES;
-        control.currentPageIndicatorTintColor = [UIColor crazeRedColor];
-        control.pageIndicatorTintColor = [UIColor colorWithWhite:216.f/255.f alpha:1.f];
-        [self.view addSubview:control];
-        [control setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [control.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-        [control.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
-        control;
-    });
-    
     self.scrollView = ({
         UIScrollView *scrollView = [[UIScrollView alloc] init];
         scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-        scrollView.delegate = self;
         scrollView.showsHorizontalScrollIndicator = NO;
         scrollView.pagingEnabled = YES;
+        scrollView.scrollEnabled = NO;
         [self.view addSubview:scrollView];
         [scrollView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [scrollView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [scrollView.bottomAnchor constraintEqualToAnchor:self.pageControl.topAnchor].active = YES;
+        [scrollView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [scrollView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         scrollView;
     });
@@ -84,13 +70,13 @@
         view;
     });
     
+    CGFloat p = [Geometry padding];
+    
     for (NSInteger i = 0; i < self.slides.count; i++) {
-        CGFloat p = [Geometry padding];
-        
         TutorialBaseSlideView *slide = self.slides[i];
         slide.translatesAutoresizingMaskIntoConstraints = NO;
         [contentView addSubview:slide];
-        slide.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
+        slide.layoutMargins = UIEdgeInsetsMake(p + 30.f, p, p, p);
         [slide.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor].active = YES;
         [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
         [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
@@ -112,17 +98,17 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
+    NSUInteger currentPage = 0; // TODO: Update based on contentOffset before transition
+    
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         CGPoint offset = self.scrollView.contentOffset;
-        offset.x = size.width * self.pageControl.currentPage;
+        offset.x = size.width * currentPage;
         self.scrollView.contentOffset = offset;
     } completion:nil];
 }
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    self.scrollView.delegate = nil;
 }
 
 
@@ -130,19 +116,28 @@
 
 - (NSArray<TutorialBaseSlideView *> *)slides {
     if (!_slides) {
+        TutorialWelcomeSlideView *welcomeSlideView = [[TutorialWelcomeSlideView alloc] init];
+        welcomeSlideView.delegate = self;
+        
         TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
         emailSlideView.delegate = self;
         
         TutorialPermissionsSlideView *permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
         permissionsSlideView.delegate = self;
         
-        _slides = @[[[TutorialScreenshotSlideView alloc] init],
+        _slides = @[welcomeSlideView,
+                    [[TutorialScreenshotSlideView alloc] init],
                     [[TutorialShopSlideView alloc] init],
                     permissionsSlideView,
                     emailSlideView
                     ];
     }
     return _slides;
+}
+
+- (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
+    slideView.delegate = nil;
+    [self scrollToNextSlide];
 }
 
 - (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView {
@@ -173,32 +168,11 @@
 
 #pragma mark - Scroll View
 
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
-    if (scrollView.contentOffset.x > scrollView.bounds.size.width * 2.f) {
-        PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
-        PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
-        
-        if (photoStatus == PermissionStatusNotDetermined || pushStatus == PermissionStatusNotDetermined) {
-            targetContentOffset->x = scrollView.bounds.size.width * 2.f;
-        }
-    }
-}
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        [self updateCurrentPage];
-    }
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [self updateCurrentPage];
-}
-
-
-#pragma mark - Page Control
-
-- (void)updateCurrentPage {
-    self.pageControl.currentPage = self.scrollView.contentOffset.x / self.scrollView.bounds.size.width;
+- (void)scrollToNextSlide {
+    CGPoint offset = CGPointZero;
+    offset.x = self.scrollView.bounds.size.width + self.scrollView.contentOffset.x;
+    
+    [self.scrollView setContentOffset:offset animated:YES];
 }
 
 

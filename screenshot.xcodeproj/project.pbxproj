@@ -29,6 +29,7 @@
 		C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDE1F3C38510090E422 /* MainTabBarController.m */; };
 		C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */; };
 		C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE41F3C38510090E422 /* FavoriteButton.m */; };
+		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
 		C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */; };
 		C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */; };
@@ -94,6 +95,8 @@
 		C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
 		C5278FE31F3C38510090E422 /* FavoriteButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoriteButton.h; sourceTree = "<group>"; };
 		C5278FE41F3C38510090E422 /* FavoriteButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoriteButton.m; sourceTree = "<group>"; };
+		C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialWelcomeSlideView.h; sourceTree = "<group>"; };
+		C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialWelcomeSlideView.m; sourceTree = "<group>"; };
 		C54F032B1F44361C00CF8CBD /* HelperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperView.h; sourceTree = "<group>"; };
 		C54F032C1F44361C00CF8CBD /* HelperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperView.m; sourceTree = "<group>"; };
 		C55184BA1F4AD3E000EE7855 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
@@ -214,6 +217,8 @@
 				C5278FD41F3C38510090E422 /* TutorialShopSlideView.m */,
 				C5278FD51F3C38510090E422 /* TutorialViewController.h */,
 				C5278FD61F3C38510090E422 /* TutorialViewController.m */,
+				C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */,
+				C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -538,6 +543,7 @@
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
+				C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
 				C5278FF61F3C38510090E422 /* TutorialPermissionsSlideView.m in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,

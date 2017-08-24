@@ -142,10 +142,11 @@
         [expandableView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
         self.expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
         self.expandableViewHeightConstraint.active = YES;
-        [self separatorFromAnchor:self.contentView.topAnchor toAnchor:imageView.topAnchor];
-        [self separatorFromAnchor:imageView.bottomAnchor toAnchor:label.topAnchor];
-        [self separatorFromAnchor:textField.bottomAnchor toAnchor:self.button.topAnchor];
-        [self separatorFromAnchor:self.button.bottomAnchor toAnchor:expandableView.topAnchor];
+        
+        [self flexibleSpaceFromAnchor:self.contentView.topAnchor toAnchor:imageView.topAnchor];
+        [self flexibleSpaceFromAnchor:imageView.bottomAnchor toAnchor:label.topAnchor];
+        [self flexibleSpaceFromAnchor:textField.bottomAnchor toAnchor:self.button.topAnchor];
+        [self flexibleSpaceFromAnchor:self.button.bottomAnchor toAnchor:expandableView.topAnchor];
         
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
         [self addGestureRecognizer:tapGesture];

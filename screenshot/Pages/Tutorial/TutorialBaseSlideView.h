@@ -10,6 +10,6 @@
 
 @interface TutorialBaseSlideView : HelperView
 
-- (void)separatorFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor;
+- (UIView *)flexibleSpaceFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor;
 
 @end

@@ -54,10 +54,10 @@
         [label.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
         [label.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         
-        [self separatorFromAnchor:self.contentView.topAnchor toAnchor:photosRow.topAnchor];
-        [self separatorFromAnchor:photosRow.layoutMarginsGuide.bottomAnchor toAnchor:notificationRow.topAnchor];
-        [self separatorFromAnchor:notificationRow.layoutMarginsGuide.bottomAnchor toAnchor:label.topAnchor];
-        [self separatorFromAnchor:label.bottomAnchor toAnchor:self.contentView.bottomAnchor];
+        [self flexibleSpaceFromAnchor:self.contentView.topAnchor toAnchor:photosRow.topAnchor];
+        [self flexibleSpaceFromAnchor:photosRow.layoutMarginsGuide.bottomAnchor toAnchor:notificationRow.topAnchor];
+        [self flexibleSpaceFromAnchor:notificationRow.layoutMarginsGuide.bottomAnchor toAnchor:label.topAnchor];
+        [self flexibleSpaceFromAnchor:label.bottomAnchor toAnchor:self.contentView.bottomAnchor];
     }
     return self;
 }

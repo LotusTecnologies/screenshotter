@@ -16,7 +16,7 @@
 
 @implementation TutorialBaseSlideView
 
-- (void)separatorFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor {
+- (UIView *)flexibleSpaceFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor {
     UIView *view = [[UIView alloc] init];
     view.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:view];
@@ -31,6 +31,8 @@
     } else {
         self.separatorView = view;
     }
+    
+    return view;
 }
 
 @end
