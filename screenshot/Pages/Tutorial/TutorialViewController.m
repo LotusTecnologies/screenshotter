@@ -24,6 +24,7 @@
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
+@property (nonatomic, strong) TutorialPermissionsSlideView *permissionsSlideView;
 
 @end
 
@@ -133,6 +134,7 @@
         
         TutorialPermissionsSlideView *permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
         permissionsSlideView.delegate = self;
+        self.permissionsSlideView = permissionsSlideView;
         
         TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
         emailSlideView.delegate = self;
@@ -204,8 +206,16 @@
 #pragma mark - Scroll View
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
-    if ([self currentSlide] == 2) { // TODO: dynamic value for permissions slide
-        // TODO: check if permisions are determined and proceed
+    if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
+        PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
+        PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
+        
+        if (photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined) {
+            // Create a delay before scrolling so it doesn't feel liek a bug
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self scrollToNextSlide];
+            });
+        }
     }
 }
 
