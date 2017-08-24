@@ -48,7 +48,18 @@
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
     productsViewController.screenshot = [viewController screenshotAtIndexPath:indexPath];
     
-    [self pushViewController:productsViewController animated:YES];
+    if (productsViewController.hasShoppables) {
+        [self pushViewController:productsViewController animated:YES];
+    } else {
+        UIAlertController *alert =[UIAlertController alertControllerWithTitle:@"Sorry"
+                                                                      message:@"We had a problem with this screenshot."
+                                                               preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:nil];
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
 }
 
 @end
