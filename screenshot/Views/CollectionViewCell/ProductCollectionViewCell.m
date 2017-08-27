@@ -43,6 +43,8 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.numberOfLines = [[self class] titleLabelNumberOfLines];
+            label.minimumScaleFactor = .7f;
+            label.adjustsFontSizeToFitWidth = YES;
             label.textAlignment = NSTextAlignmentCenter;
             label.font = [[self class] labelFont];
             [self.contentView addSubview:label];
@@ -97,7 +99,7 @@
 }
 
 + (NSInteger)titleLabelNumberOfLines {
-    return 2;
+    return 1;
 }
 
 + (CGFloat)titleLableHeight {

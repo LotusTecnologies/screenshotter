@@ -227,7 +227,7 @@
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
-    cell.title = product.productDescription;
+    cell.title = product.brand.length ? product.brand : product.merchant;
     cell.price = product.price;
     cell.imageUrl = product.imageURL;
     cell.favoriteButton.selected = product.isFavorite;

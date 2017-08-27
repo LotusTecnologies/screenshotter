@@ -25,15 +25,12 @@
         self.navigationBar.tintColor = [UIColor whiteColor];
         
         _screenshotDisplayViewController = ({
-            UIImage *image = [[UIImage imageNamed:@"LogoHollowC"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-            imageView.tintColor = [UIColor whiteColor];
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"LogoWhite"]];
             
             ScreenshotDisplayViewController *viewController = [[ScreenshotDisplayViewController alloc] init];
             viewController.navigationItem.titleView = imageView;
             viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ControlX"] style:UIBarButtonItemStylePlain target:self action:@selector(closeAction)];
-            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareAction)];
+//            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareAction)];
             viewController;
         });
         
