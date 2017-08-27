@@ -156,7 +156,7 @@
 }
 
 - (NSUInteger)currentSlide {
-    return round(self.scrollView.contentOffset.x / self.scrollView.bounds.size.width);
+    return ceil(self.scrollView.contentOffset.x / self.scrollView.bounds.size.width);
 }
 
 - (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
@@ -236,9 +236,14 @@
         PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
         
         if (photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined) {
-            // Create a delay before scrolling so it doesn't feel liek a bug
+            // Create a delay before scrolling so it doesn't feel like a bug
+            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self scrollToNextSlide];
+                // Check again to make sure the user didn't already move on
+                
+                if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
+                    [self scrollToNextSlide];
+                }
             });
         }
     }
