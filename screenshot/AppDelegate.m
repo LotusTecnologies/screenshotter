@@ -11,6 +11,7 @@
 #import "TutorialViewController.h"
 #import "PermissionsManager.h"
 #import "UIColor+Appearance.h"
+#import "UIDevice+Model.h"
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
 #import "UserDefaultsConstants.h"
@@ -142,8 +143,12 @@
         }
         
     } else {
+        UIEdgeInsets insets = UIEdgeInsetsZero;
+        insets.top = [UIDevice is568h] ? 0.f : 30.f;
+        
         TutorialViewController *tutorialViewController = [[TutorialViewController alloc] init];
         tutorialViewController.delegate = self;
+        tutorialViewController.contentLayoutMargins = insets;
         viewController = tutorialViewController;
     }
     
@@ -181,8 +186,6 @@
 
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
     viewController.delegate = nil;
-    
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialCompleted];
     
     [self prepareDataStackCompletionIfNeeded];
     [self transitionToViewController:[self nextViewController]];

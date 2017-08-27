@@ -7,21 +7,26 @@
 //
 
 #import "TutorialViewController.h"
-#import "TutorialScreenshotSlideView.h"
-#import "TutorialShopSlideView.h"
 #import "TutorialPermissionsSlideView.h"
 #import "TutorialEmailSlideView.h"
+#import "TutorialWelcomeSlideView.h"
+#import "TutorialTrySlideView.h"
 #import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
+#import "UserDefaultsConstants.h"
 
-@interface TutorialViewController () <UIScrollViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate>
+@interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
+    BOOL _shouldSlideNextFromPermissionsSlide;
+    BOOL _didPresentDeterminePushAlertController;
+}
 
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIPageControl *pageControl;
-@property (nonatomic, strong) NSArray <TutorialBaseSlideView *>* slides;
+@property (nonatomic, strong) UIView *contentView;
+@property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
+@property (nonatomic, strong) TutorialPermissionsSlideView *permissionsSlideView;
 
 @end
 
@@ -32,8 +37,11 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+        
+        self.title = @"Tutorial";
         
         [AnalyticsManager track:@"Started Tutorial"];
     }
@@ -43,19 +51,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.pageControl = ({
-        UIPageControl *control = [[UIPageControl alloc] init];
-        control.translatesAutoresizingMaskIntoConstraints = NO;
-        control.numberOfPages = self.slides.count;
-        control.defersCurrentPageDisplay = YES;
-        control.currentPageIndicatorTintColor = [UIColor crazeRedColor];
-        control.pageIndicatorTintColor = [UIColor colorWithWhite:216.f/255.f alpha:1.f];
-        [self.view addSubview:control];
-        [control setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [control.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-        [control.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
-        control;
-    });
+    self.view.backgroundColor = [UIColor whiteColor];
     
     self.scrollView = ({
         UIScrollView *scrollView = [[UIScrollView alloc] init];
@@ -63,37 +59,39 @@
         scrollView.delegate = self;
         scrollView.showsHorizontalScrollIndicator = NO;
         scrollView.pagingEnabled = YES;
+        scrollView.scrollEnabled = NO;
         [self.view addSubview:scrollView];
         [scrollView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [scrollView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [scrollView.bottomAnchor constraintEqualToAnchor:self.pageControl.topAnchor].active = YES;
+        [scrollView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [scrollView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         scrollView;
     });
     
     UIView *contentView = ({
-        UIView *view = [[UIView alloc] init];
+        UIView *view = self.contentView;
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [self.scrollView addSubview:view];
-        [view.topAnchor constraintEqualToAnchor:self.scrollView.topAnchor].active = YES;
+        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [view.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor].active = YES;
-        [view.bottomAnchor constraintEqualToAnchor:self.scrollView.bottomAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [view.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor].active = YES;
         [view.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor multiplier:self.slides.count].active = YES;
         [view.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
         view;
     });
     
+    CGFloat p = [Geometry padding];
+    CGFloat t = self.contentView.layoutMargins.top;
+    
     for (NSInteger i = 0; i < self.slides.count; i++) {
-        CGFloat p = [Geometry padding];
-        
         TutorialBaseSlideView *slide = self.slides[i];
         slide.translatesAutoresizingMaskIntoConstraints = NO;
         [contentView addSubview:slide];
         slide.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
         [slide.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor].active = YES;
-        [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
-        [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
+        [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor constant:-t].active = YES;
+        [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor constant:t].active = YES;
         
         if (i == 0) {
             [slide.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
@@ -112,17 +110,43 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
+    NSUInteger currentSlide = [self currentSlide];
+    
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         CGPoint offset = self.scrollView.contentOffset;
-        offset.x = size.width * self.pageControl.currentPage;
+        offset.x = size.width * currentSlide;
         self.scrollView.contentOffset = offset;
     } completion:nil];
 }
 
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if (self.view.window && _shouldSlideNextFromPermissionsSlide) {
+        _shouldSlideNextFromPermissionsSlide = NO;
+        
+        [self scrollToNextSlide];
+    }
+}
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    self.scrollView.delegate = nil;
+}
+
+
+#pragma mark - Layout
+
+- (UIView *)contentView {
+    if (!_contentView) {
+        _contentView = [[UIView alloc] init];
+    }
+    return _contentView;
+}
+
+- (void)setContentLayoutMargins:(UIEdgeInsets)contentLayoutMargins {
+    self.contentView.layoutMargins = contentLayoutMargins;
+}
+
+- (UIEdgeInsets)contentLayoutMargins {
+    return self.contentView.layoutMargins;
 }
 
 
@@ -130,34 +154,90 @@
 
 - (NSArray<TutorialBaseSlideView *> *)slides {
     if (!_slides) {
-        TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
-        emailSlideView.delegate = self;
+        TutorialWelcomeSlideView *welcomeSlideView = [[TutorialWelcomeSlideView alloc] init];
+        welcomeSlideView.delegate = self;
         
         TutorialPermissionsSlideView *permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
         permissionsSlideView.delegate = self;
+        self.permissionsSlideView = permissionsSlideView;
         
-        _slides = @[[[TutorialScreenshotSlideView alloc] init],
-                    [[TutorialShopSlideView alloc] init],
+        TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
+        emailSlideView.delegate = self;
+        
+        TutorialTrySlideView *trySlideView = [[TutorialTrySlideView alloc] init];
+        trySlideView.delegate = self;
+        
+        _slides = @[welcomeSlideView,
                     permissionsSlideView,
-                    emailSlideView
+                    emailSlideView,
+                    trySlideView
                     ];
     }
     return _slides;
 }
 
+- (NSUInteger)currentSlide {
+    return ceil(self.scrollView.contentOffset.x / self.scrollView.bounds.size.width);
+}
+
+- (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
+    slideView.delegate = nil;
+    [self scrollToNextSlide];
+}
+
 - (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView {
-    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto];
+    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto opened:^(BOOL granted) {
+        // The delegate will be nil if the slide is completed
+        if (granted && slideView.delegate == nil) {
+            _shouldSlideNextFromPermissionsSlide = YES;
+        }
+    }];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)tutorialEmailSlideViewDidFail:(TutorialEmailSlideView *)slideView {
+- (void)tutorialPermissionsSlideViewDidComplete:(TutorialPermissionsSlideView *)slideView {
+    if (self.presentedViewController) {
+        slideView.delegate = nil;
+        
+        // The photos permission denied alert has been presented.
+        // Enabling this permission will force quite the app. The
+        // only way to open the app where it was left off is to
+        // implement restoration.
+        
+    } else {
+        BOOL hasPush = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush] == PermissionStatusNotDetermined;
+        
+        if (hasPush && !_didPresentDeterminePushAlertController) {
+            _didPresentDeterminePushAlertController = YES;
+            
+            UIAlertController *alertController = [TutorialPermissionsSlideView determinePushAlertController];
+            [self presentViewController:alertController animated:YES completion:nil];
+            
+        } else {
+            slideView.delegate = nil;
+            
+            [self scrollToNextSlide];
+        }
+    }
+}
+
+- (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
     UIAlertController *alertController = [TutorialEmailSlideView failedAlertController];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)tutorialEmailSlideViewDidSubmit:(TutorialEmailSlideView *)slideView {
-    [self.delegate tutorialViewControllerDidComplete:self];
-    [AnalyticsManager track:@"Finished Tutorial"];
+- (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
+    slideView.delegate = nil;
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+        // The tutorial is being presented elsewhere and shouldn't
+        // include the try slide
+        
+        [self.delegate tutorialViewControllerDidComplete:self];
+        
+    } else {
+        [self scrollToNextSlide];
+    }
 }
 
 - (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView {
@@ -170,35 +250,42 @@
     [self presentViewController:viewController animated:YES completion:nil];
 }
 
+- (void)tutorialTrySlideViewDidComplete:(TutorialTrySlideView *)slideView {
+    slideView.delegate = nil;
+    
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialCompleted];
+    
+    [self.delegate tutorialViewControllerDidComplete:self];
+    [AnalyticsManager track:@"Finished Tutorial"];
+}
+
 
 #pragma mark - Scroll View
 
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
-    if (scrollView.contentOffset.x > scrollView.bounds.size.width * 2.f) {
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
         PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
         PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
         
-        if (photoStatus == PermissionStatusNotDetermined || pushStatus == PermissionStatusNotDetermined) {
-            targetContentOffset->x = scrollView.bounds.size.width * 2.f;
+        if (photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined) {
+            // Create a delay before scrolling so it doesn't feel like a bug
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                // Check again to make sure the user didn't already move on
+                
+                if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
+                    [self scrollToNextSlide];
+                }
+            });
         }
     }
 }
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        [self updateCurrentPage];
-    }
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [self updateCurrentPage];
-}
-
-
-#pragma mark - Page Control
-
-- (void)updateCurrentPage {
-    self.pageControl.currentPage = self.scrollView.contentOffset.x / self.scrollView.bounds.size.width;
+- (void)scrollToNextSlide {
+    CGPoint offset = CGPointZero;
+    offset.x = self.scrollView.bounds.size.width + self.scrollView.contentOffset.x;
+    
+    [self.scrollView setContentOffset:offset animated:YES];
 }
 
 

@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import "BaseViewController.h"
+#import <UIKit/UIKit.h>
 
 @class TutorialViewController;
 
@@ -17,8 +17,10 @@
 
 @end
 
-@interface TutorialViewController : BaseViewController
+@interface TutorialViewController : UIViewController
 
 @property (nonatomic, weak) id<TutorialViewControllerDelegate> delegate;
+
+@property (nonatomic) UIEdgeInsets contentLayoutMargins;
 
 @end

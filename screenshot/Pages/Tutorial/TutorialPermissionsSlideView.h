@@ -14,11 +14,14 @@
 @required
 
 - (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView;
+- (void)tutorialPermissionsSlideViewDidComplete:(TutorialPermissionsSlideView *)slideView;
 
 @end
 
 @interface TutorialPermissionsSlideView : TutorialBaseSlideView
 
 @property (nonatomic, weak) id<TutorialPermissionsSlideViewDelegate> delegate;
+
++ (UIAlertController *)determinePushAlertController;
 
 @end

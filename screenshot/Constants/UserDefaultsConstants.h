@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 extern NSString *const UserDefaultsEmail;
+extern NSString *const UserDefaultsName;
 extern NSString *const UserDefaultsTutorialCompleted;
 extern NSString *const UserDefaultsDateInstalled;
 extern NSString *const UserDefaultsDateLastSound;

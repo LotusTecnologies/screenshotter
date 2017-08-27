@@ -13,13 +13,14 @@
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
 #import "UserDefaultsConstants.h"
+#import "Button.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
 @property (nonatomic) BOOL readyToSubmit;
 
-@property (nonatomic, strong) UITextField *textField;
-@property (nonatomic, strong) UIButton *button;
+@property (nonatomic, strong) UITextField *emailTextField;
+@property (nonatomic, strong) Button *button;
 @property (nonatomic, strong) TappableTextView *textView;
 
 @property (nonatomic, strong) NSLayoutConstraint *expandableViewHeightConstraint;
@@ -35,67 +36,82 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
-        self.titleLabel.text = @"Almost Done!";
+        self.titleLabel.text = @"Join The Craze";
+        self.subtitleLabel.text = @"Fill out your info below";
         
         CGFloat p = [Geometry padding];
         
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Mail"]];
-        imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        imageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
-        [self.contentView addSubview:imageView];
-        [imageView setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
-        [imageView.topAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.topAnchor].active = YES;
-        [imageView.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-        [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-        [imageView.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
-        
-        UILabel *label = [[UILabel alloc] init];
-        label.translatesAutoresizingMaskIntoConstraints = NO;
-        label.text = @"Enter your email:";
-        label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
-        [self.contentView addSubview:label];
-        [label setContentCompressionResistancePriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];
-        [label.topAnchor constraintGreaterThanOrEqualToAnchor:imageView.layoutMarginsGuide.bottomAnchor].active = YES;
-        [label.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-        [label.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-        [label.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
-        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0f constant:400.f];
+        UILabel *nameLabel = [[UILabel alloc] init];
+        nameLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        nameLabel.text = @"Your name:";
+        nameLabel.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
+        [self.contentView addSubview:nameLabel];
+        [nameLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [nameLabel.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:30.f].active = YES;
+        [nameLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+        [nameLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+        [nameLabel.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
+        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:nameLabel attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0f constant:400.f];
         widthConstraint.priority = UILayoutPriorityDefaultHigh;
         widthConstraint.active = YES;
         
-        UITextField *textField = [[UITextField alloc] init];
-        textField.translatesAutoresizingMaskIntoConstraints = NO;
-        textField.delegate = self;
-        textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsEmail];
-        textField.placeholder = @"you@website.com";
-        textField.keyboardType = UIKeyboardTypeEmailAddress;
-        textField.backgroundColor = [UIColor whiteColor];
-        textField.borderStyle = UITextBorderStyleRoundedRect;
-        textField.spellCheckingType = UITextSpellCheckingTypeNo;
-        textField.autocorrectionType = UITextAutocorrectionTypeNo;
-        textField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
-        [self.contentView addSubview:textField];
-        [textField setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [textField.topAnchor constraintEqualToAnchor:label.layoutMarginsGuide.bottomAnchor].active = YES;
-        [textField.leadingAnchor constraintEqualToAnchor:label.leadingAnchor].active = YES;
-        [textField.trailingAnchor constraintEqualToAnchor:label.trailingAnchor].active = YES;
-        self.textField = textField;
+        UITextField *nameTextField = [[UITextField alloc] init];
+        nameTextField.translatesAutoresizingMaskIntoConstraints = NO;
+        nameTextField.delegate = self;
+        nameTextField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsName];
+        nameTextField.placeholder = @"Enter your name";
+        nameTextField.backgroundColor = [UIColor whiteColor];
+        nameTextField.borderStyle = UITextBorderStyleRoundedRect;
+        nameTextField.spellCheckingType = UITextSpellCheckingTypeNo;
+        nameTextField.autocorrectionType = UITextAutocorrectionTypeNo;
+        nameTextField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
+        [self.contentView addSubview:nameTextField];
+        [nameTextField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
+        [nameTextField.topAnchor constraintEqualToAnchor:nameLabel.layoutMarginsGuide.bottomAnchor].active = YES;
+        [nameTextField.leadingAnchor constraintEqualToAnchor:nameLabel.leadingAnchor].active = YES;
+        [nameTextField.trailingAnchor constraintEqualToAnchor:nameLabel.trailingAnchor].active = YES;
+        [nameTextField.heightAnchor constraintEqualToConstant:50.f].active = YES;
+        
+        UILabel *emailLabel = [[UILabel alloc] init];
+        emailLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        emailLabel.text = @"Your email:";
+        emailLabel.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
+        [self.contentView addSubview:emailLabel];
+        [emailLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [emailLabel.topAnchor constraintEqualToAnchor:nameTextField.layoutMarginsGuide.bottomAnchor constant:20.f].active = YES;
+        [emailLabel.leadingAnchor constraintEqualToAnchor:nameTextField.leadingAnchor].active = YES;
+        [emailLabel.trailingAnchor constraintEqualToAnchor:nameTextField.trailingAnchor].active = YES;
+        
+        self.emailTextField = ({
+            UITextField *textField = [[UITextField alloc] init];
+            textField.translatesAutoresizingMaskIntoConstraints = NO;
+            textField.delegate = self;
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsEmail];
+            textField.placeholder = @"you@website.com";
+            textField.keyboardType = UIKeyboardTypeEmailAddress;
+            textField.backgroundColor = [UIColor whiteColor];
+            textField.borderStyle = UITextBorderStyleRoundedRect;
+            textField.spellCheckingType = UITextSpellCheckingTypeNo;
+            textField.autocorrectionType = UITextAutocorrectionTypeNo;
+            [self.contentView addSubview:textField];
+            [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
+            [textField.topAnchor constraintEqualToAnchor:emailLabel.layoutMarginsGuide.bottomAnchor].active = YES;
+            [textField.leadingAnchor constraintEqualToAnchor:emailLabel.leadingAnchor].active = YES;
+            [textField.trailingAnchor constraintEqualToAnchor:emailLabel.trailingAnchor].active = YES;
+            [textField.heightAnchor constraintEqualToAnchor:nameTextField.heightAnchor].active = YES;
+            textField;
+        });
         
         self.button = ({
-            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+            Button *button = [Button buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
-            button.backgroundColor = [UIColor crazeRedColor];
             [button setTitle:@"Submit" forState:UIControlStateNormal];
-            button.contentEdgeInsets = UIEdgeInsetsMake(p * .5f, p, p * .5f, p);
             [button addTarget:self action:@selector(submitEmail) forControlEvents:UIControlEventTouchUpInside];
-            button.layer.cornerRadius = 5.f;
             [self.contentView addSubview:button];
             [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-            [button setContentCompressionResistancePriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];
-            [button.topAnchor constraintGreaterThanOrEqualToAnchor:textField.layoutMarginsGuide.bottomAnchor];
+            [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+            [button.topAnchor constraintEqualToAnchor:self.emailTextField.bottomAnchor constant:40.f].active = YES;
             [button.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [button.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor];
             [button.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
             [button.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
             button;
@@ -114,6 +130,7 @@
             textView.scrollsToTop = NO;
             [self.contentView addSubview:textView];
             [textView setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+            [textView.topAnchor constraintGreaterThanOrEqualToAnchor:self.button.bottomAnchor constant:p].active = YES;
             [textView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
             [textView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
             [textView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
@@ -142,10 +159,10 @@
         [expandableView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
         self.expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
         self.expandableViewHeightConstraint.active = YES;
-        [self separatorFromAnchor:self.contentView.topAnchor toAnchor:imageView.topAnchor];
-        [self separatorFromAnchor:imageView.bottomAnchor toAnchor:label.topAnchor];
-        [self separatorFromAnchor:textField.bottomAnchor toAnchor:self.button.topAnchor];
-        [self separatorFromAnchor:self.button.bottomAnchor toAnchor:expandableView.topAnchor];
+        
+    
+//        [self flexibleSpaceFromAnchor:emailTextField.bottomAnchor toAnchor:self.button.topAnchor];
+//        [self flexibleSpaceFromAnchor:self.button.bottomAnchor toAnchor:expandableView.topAnchor];
         
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
         [self addGestureRecognizer:tapGesture];
@@ -173,26 +190,26 @@
 }
 
 - (void)submitEmail {
-    if ([self isValidEmail:self.textField.text]) {
+    if ([self isValidEmail:self.emailTextField.text]) {
         self.readyToSubmit = YES;
         
-        [[NSUserDefaults standardUserDefaults] setValue:self.textField.text forKey:UserDefaultsEmail];
+        [[NSUserDefaults standardUserDefaults] setValue:self.emailTextField.text forKey:UserDefaultsEmail];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [AnalyticsManager track:@"Submitted email" properties:@{@"email": self.textField.text}];
+        [AnalyticsManager track:@"Submitted email" properties:@{@"email": self.emailTextField.text}];
         
     } else {
-        [self.delegate tutorialEmailSlideViewDidFail:self];
+        [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }
     
-    [self.textField resignFirstResponder];
+    [self.emailTextField resignFirstResponder];
 }
 
 - (void)informDelegateOfSubmittedEmailIfPossible {
-    if (![self.textField isFirstResponder] && self.readyToSubmit) {
-        [self.delegate tutorialEmailSlideViewDidSubmit:self];
+    if (![self.emailTextField isFirstResponder] && self.readyToSubmit) {
+        [self.delegate tutorialEmailSlideViewDidComplete:self];
     }
 }
 
@@ -200,7 +217,7 @@
 #pragma mark - Text Field
 
 - (void)resignTextField {
-    [self.textField resignFirstResponder];
+    [self.emailTextField resignFirstResponder];
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
