@@ -54,6 +54,7 @@ class AssetSyncModel: NSObject {
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
                 NSLog("uploadScreenshot til isFashion:\(isFashion) \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
                 dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -72,6 +73,7 @@ class AssetSyncModel: NSObject {
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
                         }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                             NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                            AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
                             self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
                             NSLog("uploadScreenshot til saveShoppables \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         }.always {
@@ -360,6 +362,7 @@ class AssetSyncModel: NSObject {
                 DispatchQueue.main.async {
                     NotificationManager.shared().present(with: .screenshots)
                 }
+                AnalyticsManager.track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
                 self.allScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1

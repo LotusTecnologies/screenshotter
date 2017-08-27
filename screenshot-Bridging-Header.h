@@ -8,6 +8,7 @@
 #import "PermissionsManager.h"
 #import "UserDefaultsConstants.h"
 #import "NotificationManager.h"
+#import "AnalyticsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 
