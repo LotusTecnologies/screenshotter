@@ -162,6 +162,10 @@
 
 #pragma mark - Shoppable
 
+-(BOOL)hasShoppables {
+    return self.shoppablesFrc.fetchedObjects.count > 0;
+}
+
 - (Shoppable *)shoppableAtIndex:(NSUInteger)index {
     return [self.shoppablesFrc objectAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
 }

@@ -11,7 +11,7 @@ import PromiseKit
 
 class NetworkingPromise: NSObject {
     
-    static func uploadToSyte(imageData: Data?) -> Promise<[[String : Any]]> {
+    static func uploadToSyte(imageData: Data?) -> Promise<(String, [[String : Any]])> {
         return Promise { fulfill, reject in
             guard let imageData = imageData else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
@@ -28,9 +28,17 @@ class NetworkingPromise: NSObject {
                         reject(emptyError)
                         return
                 }
-                fulfill(segments)
+                fulfill(uploadedURLString, segments)
             })
         }
+    }
+    
+    static func jsonStringify(object: Any) -> String? {
+        if let objectData = try? JSONSerialization.data(withJSONObject: object, options: JSONSerialization.WritingOptions(rawValue: 0)) {
+            let objectString = String(data: objectData, encoding: .utf8)
+            return objectString
+        }
+        return nil
     }
     
     static func downloadInfo(url: URL) -> Promise<[String : Any]> {

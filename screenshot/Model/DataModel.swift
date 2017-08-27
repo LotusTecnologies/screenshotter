@@ -373,22 +373,6 @@ extension DataModel {
         return shoppableToSave
     }
     
-    func delete(shoppable: Shoppable, managedObjectContext: NSManagedObjectContext) {
-        do {
-            NSLog("In delete shoppable:\(shoppable)")
-            if let screenshot = shoppable.screenshot {
-                screenshot.shoppablesCount -= 1
-            } else {
-                print("Failed to decrement shoppable.screenshot.shoppablesCount")
-            }
-            managedObjectContext.delete(shoppable)
-            try managedObjectContext.save()
-            NSLog("Succeeded to delete shoppable")
-        } catch {
-            print("Failed to delete shoppable")
-        }
-    }
-    
     // Save a new Product to Core Data.
     func saveProduct(managedObjectContext: NSManagedObjectContext,
                      shoppable: Shoppable,
@@ -445,7 +429,17 @@ extension Screenshot {
     
     @objc public func setHide() {
         self.isHidden = true
-        DataModel.sharedInstance.saveMain()
+        self.imageData = nil
+        self.syteJson = nil
+        self.uploadedImageURL = nil
+        let dataModel = DataModel.sharedInstance
+        let managedObjectContext = dataModel.mainMoc()
+        if let shoppables = self.shoppables as? Set<Shoppable> {
+            for shoppable in shoppables {
+                managedObjectContext.delete(shoppable)
+            }
+        }
+        dataModel.saveMain()
     }
     
 }

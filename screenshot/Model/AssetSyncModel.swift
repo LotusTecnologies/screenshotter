@@ -67,12 +67,12 @@ class AssetSyncModel: NSObject {
                     DispatchQueue.main.async {
                         NotificationManager.shared().present(with: .products)
                     }
-                    firstly { _ -> Promise<[[String : Any]]> in
+                    firstly { _ -> Promise<(String, [[String : Any]])> in
                         NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
-                        }.then(on: self.processingQ) { segments -> Void in
+                        }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                             NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
-                            self.saveShoppables(assetId: asset.localIdentifier, segments: segments)
+                            self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
                             NSLog("uploadScreenshot til saveShoppables \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         }.always {
                             NotificationManager.shared().dismiss(with: .products)
@@ -95,7 +95,7 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func saveShoppables(assetId: String, segments: [[String : Any]]) { //-> Promise<[String]> {
+    func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
         var order: Int16 = 0
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
@@ -113,6 +113,8 @@ class AssetSyncModel: NSObject {
             }
             let label = segment["label"] as? String
             self.extractProducts(assetId: assetId,
+                                 uploadedURLString: uploadedURLString,
+                                 segments: segments,
                                  url: url,
                                  order: order,
                                  label: label,
@@ -125,6 +127,8 @@ class AssetSyncModel: NSObject {
     }
 
     func extractProducts(assetId: String,
+                         uploadedURLString: String,
+                         segments: [[String : Any]],
                          url: URL,
                          order: Int16,
                          label: String?,
@@ -180,6 +184,10 @@ class AssetSyncModel: NSObject {
                             shoppable.productCount = productOrder
                             if shoppable.productCount > 0 {
                                 screenshot.shoppablesCount += 1
+                                if screenshot.shoppablesCount == 1 {
+                                    screenshot.syteJson = NetworkingPromise.jsonStringify(object: segments)
+                                    screenshot.uploadedImageURL = uploadedURLString
+                                }
                                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
                                 if screenshot.shoppablesCount == 1 {
                                     self.sendScreenshotAddedLocalNotification(assetId: assetId)
