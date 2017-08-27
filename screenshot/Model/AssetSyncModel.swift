@@ -388,8 +388,14 @@ extension AssetSyncModel {
         let content = UNMutableNotificationContent()
         content.title = "Congratulations!"
         content.body = "Tap to shop your screenshot."
-        content.sound = UNNotificationSound.default()
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsDateLastSound) as? Date,
+            -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
+            content.sound = nil
+        } else {
+            content.sound = UNNotificationSound.default()
+        }
+        UserDefaults.standard.setValue(Date(), forKey: UserDefaultsDateLastSound)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let identifier = "CrazeLocal" + assetId
         let request = UNNotificationRequest(identifier: identifier,
                                             content: content,

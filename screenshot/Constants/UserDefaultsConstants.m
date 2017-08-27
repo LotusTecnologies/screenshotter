@@ -11,3 +11,4 @@
 NSString *const UserDefaultsEmail = @"Email";
 NSString *const UserDefaultsTutorialCompleted = @"TutorialCompleted";
 NSString *const UserDefaultsDateInstalled = @"DateInstalled";
+NSString *const UserDefaultsDateLastSound = @"DateLastSound";
