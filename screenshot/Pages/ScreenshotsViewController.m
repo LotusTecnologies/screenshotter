@@ -33,9 +33,8 @@
         self.title = @"Screenshots";
         [self addNavigationItemLogo];
         
-        DataModel *dataModel = [DataModel sharedInstance];
-        dataModel.screenshotFrcDelegate = self;
-        self.screenshotFrc = dataModel.screenshotFrc;
+        [DataModel sharedInstance].screenshotFrcDelegate = self;
+        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
     }
     return self;
 }
