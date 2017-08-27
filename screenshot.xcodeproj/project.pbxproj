@@ -31,6 +31,7 @@
 		C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE41F3C38510090E422 /* FavoriteButton.m */; };
 		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
 		C540FE101F4F5BA8005863D7 /* Button.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0F1F4F5BA8005863D7 /* Button.m */; };
+		C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE121F52993F005863D7 /* UIDevice+Model.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
 		C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */; };
 		C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */; };
@@ -100,6 +101,8 @@
 		C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialWelcomeSlideView.m; sourceTree = "<group>"; };
 		C540FE0E1F4F5BA8005863D7 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
 		C540FE0F1F4F5BA8005863D7 /* Button.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Button.m; sourceTree = "<group>"; };
+		C540FE111F52993F005863D7 /* UIDevice+Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+Model.h"; sourceTree = "<group>"; };
+		C540FE121F52993F005863D7 /* UIDevice+Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+Model.m"; sourceTree = "<group>"; };
 		C54F032B1F44361C00CF8CBD /* HelperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperView.h; sourceTree = "<group>"; };
 		C54F032C1F44361C00CF8CBD /* HelperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperView.m; sourceTree = "<group>"; };
 		C55184BA1F4AD3E000EE7855 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
@@ -315,6 +318,8 @@
 			children = (
 				C5CCBB3E1F41BC1400D6B392 /* UIApplication+Version.h */,
 				C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */,
+				C540FE111F52993F005863D7 /* UIDevice+Model.h */,
+				C540FE121F52993F005863D7 /* UIDevice+Model.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -555,6 +560,7 @@
 				C5278FF81F3C38510090E422 /* TutorialShopSlideView.m in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
 				C540FE101F4F5BA8005863D7 /* Button.m in Sources */,
+				C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,

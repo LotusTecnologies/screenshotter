@@ -13,6 +13,7 @@
 #import "TutorialEmailSlideView.h"
 #import "TutorialWelcomeSlideView.h"
 #import "UIColor+Appearance.h"
+#import "UIDevice+Model.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"
@@ -78,12 +79,13 @@
     });
     
     CGFloat p = [Geometry padding];
+    CGFloat tp = p + ([UIDevice is568h] ? 0.f : 30.f);
     
     for (NSInteger i = 0; i < self.slides.count; i++) {
         TutorialBaseSlideView *slide = self.slides[i];
         slide.translatesAutoresizingMaskIntoConstraints = NO;
         [contentView addSubview:slide];
-        slide.layoutMargins = UIEdgeInsetsMake(p + 30.f, p, p, p);
+        slide.layoutMargins = UIEdgeInsetsMake(tp, p, p, p);
         [slide.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor].active = YES;
         [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
         [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;

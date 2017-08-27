@@ -46,8 +46,8 @@
         nameLabel.text = @"Your name:";
         nameLabel.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
         [self.contentView addSubview:nameLabel];
-        [nameLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];
-        [nameLabel.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:20.f].active = YES;
+        [nameLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [nameLabel.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:30.f].active = YES;
         [nameLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
         [nameLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         [nameLabel.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
@@ -66,17 +66,18 @@
         nameTextField.autocorrectionType = UITextAutocorrectionTypeNo;
         nameTextField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
         [self.contentView addSubview:nameTextField];
-        [nameTextField setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [nameTextField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
         [nameTextField.topAnchor constraintEqualToAnchor:nameLabel.layoutMarginsGuide.bottomAnchor].active = YES;
         [nameTextField.leadingAnchor constraintEqualToAnchor:nameLabel.leadingAnchor].active = YES;
         [nameTextField.trailingAnchor constraintEqualToAnchor:nameLabel.trailingAnchor].active = YES;
+        [nameTextField.heightAnchor constraintEqualToConstant:50.f].active = YES;
         
         UILabel *emailLabel = [[UILabel alloc] init];
         emailLabel.translatesAutoresizingMaskIntoConstraints = NO;
         emailLabel.text = @"Your email:";
         emailLabel.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
         [self.contentView addSubview:emailLabel];
-        [emailLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];
+        [emailLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [emailLabel.topAnchor constraintEqualToAnchor:nameTextField.layoutMarginsGuide.bottomAnchor constant:20.f].active = YES;
         [emailLabel.leadingAnchor constraintEqualToAnchor:nameTextField.leadingAnchor].active = YES;
         [emailLabel.trailingAnchor constraintEqualToAnchor:nameTextField.trailingAnchor].active = YES;
@@ -93,10 +94,11 @@
             textField.spellCheckingType = UITextSpellCheckingTypeNo;
             textField.autocorrectionType = UITextAutocorrectionTypeNo;
             [self.contentView addSubview:textField];
-            [textField setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+            [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
             [textField.topAnchor constraintEqualToAnchor:emailLabel.layoutMarginsGuide.bottomAnchor].active = YES;
             [textField.leadingAnchor constraintEqualToAnchor:emailLabel.leadingAnchor].active = YES;
             [textField.trailingAnchor constraintEqualToAnchor:emailLabel.trailingAnchor].active = YES;
+            [textField.heightAnchor constraintEqualToAnchor:nameTextField.heightAnchor].active = YES;
             textField;
         });
         
