@@ -87,9 +87,7 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
-- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
-    NSLog(@"application performFetchWithCompletionHandler");
-    
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {    
     if (completionHandler) {
         completionHandler(UIBackgroundFetchResultNoData);
     }

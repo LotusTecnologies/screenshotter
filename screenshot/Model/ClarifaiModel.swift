@@ -29,10 +29,8 @@ class ClarifaiModel: NSObject {
         let input = Input(dataAsset: dataAsset)
         let generalModel = Clarifai.sharedInstance().generalModel
         return Promise { fulfill, reject in
-            NSLog("Clarifai localClarifaiOutputs before predict isMain:\(Thread.isMainThread)")
             AnalyticsManager.track("sent image to Clarifai")
             generalModel.predict([input]) { (outputs: [Output]?, error: Error?) in
-                NSLog("Clarifai localClarifaiOutputs after predict isMain:\(Thread.isMainThread)")
                 if let error = error {
                     reject(error)
                 } else if let outputs = outputs {

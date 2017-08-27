@@ -151,7 +151,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case screenshotFrc:
             screenshotChangeKind = .none
             screenshotChangeIndexPath = nil
-            NSLog("controllerWillChangeContent screenshotFrc")
         case shoppableFrcStandIn:
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
@@ -188,7 +187,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-            NSLog("controller screenshotFrc didChange at indexPath:\(String(describing: indexPath))  type:\(type.rawValue)  newIndexPath:\(String(describing: newIndexPath))")
         case shoppableFrcStandIn:
             didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
@@ -234,7 +232,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
         switch controller {
         case screenshotFrc:
-            NSLog("screenshotFrc controllerDidChangeContent")
             didChangeContent(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
         case shoppableFrcStandIn:
             didChangeContent(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)

@@ -44,16 +44,13 @@ class AssetSyncModel: NSObject {
     }
     
     func uploadScreenshot(asset: PHAsset) {
-        NSLog("uploadScreenshot started assetId:\(asset.localIdentifier)")
         let uploadStart = Date()
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
-                NSLog("uploadScreenshot til image retrieved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
-                NSLog("uploadScreenshot til isFashion:\(isFashion) \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                 AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
                 dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
@@ -64,18 +61,14 @@ class AssetSyncModel: NSObject {
                                                      imageData: imageData)
                 }
                 if isFashion {
-                    NSLog("uploadScreenshot til db saved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                     DispatchQueue.main.async {
                         NotificationManager.shared().present(with: .products)
                     }
                     firstly { _ -> Promise<(String, [[String : Any]])> in
-                        NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
                         }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                            NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                             AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
                             self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
-                            NSLog("uploadScreenshot til saveShoppables \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         }.always {
                             NotificationManager.shared().dismiss(with: .products)
                         }.catch { error in
@@ -298,7 +291,6 @@ class AssetSyncModel: NSObject {
     
     func beginSync() {
         isSyncing = true
-        NSLog("beginSync")
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
@@ -311,7 +303,6 @@ class AssetSyncModel: NSObject {
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
         }
-        NSLog("endSync")
         isSyncing = false
         if shouldSyncAgain {
             shouldSyncAgain = false
@@ -337,7 +328,6 @@ class AssetSyncModel: NSObject {
             guard PermissionsManager.shared().hasPermission(for: .photo),
                 dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
-                    NSLog("syncPhotos refused by guard")
                     return
             }
             self.beginSync()
@@ -372,7 +362,6 @@ class AssetSyncModel: NSObject {
                     }
                 })
             }
-            NSLog("enumerated assets to upload")
             if self.screenshotsToProcess == 0 {
                 self.endSync()
             }
