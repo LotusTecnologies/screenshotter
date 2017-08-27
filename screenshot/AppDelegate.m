@@ -15,12 +15,14 @@
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
 #import "UserDefaultsConstants.h"
+#import "ScreenshotsNavigationController.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
 @import Appsee;
+@import UserNotifications;
 
-@interface AppDelegate () <TutorialViewControllerDelegate>
+@interface AppDelegate () <UNUserNotificationCenterDelegate, TutorialViewControllerDelegate>
 
 @property (assign, nonatomic) UIBackgroundTaskIdentifier bgTask;
 
@@ -29,6 +31,11 @@
 @implementation AppDelegate
 
 #pragma mark - Life Cycle
+
+-(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    UNUserNotificationCenter.currentNotificationCenter.delegate = self;
+    return YES;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [DataModel setup]; // Sets up Core Data stack on a background queue.
@@ -189,6 +196,27 @@
     
     [self prepareDataStackCompletionIfNeeded];
     [self transitionToViewController:[self nextViewController]];
+}
+
+#pragma mark - UNUserNotificationCenterDelegate
+
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    NSDictionary *userInfo = response.notification.request.content.userInfo;
+    if (userInfo) {
+        NSString *openingScreen = userInfo[Constants.openingScreenKey];
+        if ([openingScreen isEqualToString:Constants.openingScreenValueScreenshot]) {
+            MainTabBarController *mainTabBarController = (MainTabBarController *)self.window.rootViewController;
+            if ([mainTabBarController isKindOfClass:[MainTabBarController class]]) {
+                mainTabBarController.selectedIndex = 0;
+                ScreenshotsNavigationController *screenshotsNavigationController = (ScreenshotsNavigationController *)mainTabBarController.selectedViewController;
+                if ([screenshotsNavigationController isKindOfClass:[ScreenshotsNavigationController class]]) {
+                    [screenshotsNavigationController popToRootViewControllerAnimated:NO];
+                }
+            }
+        }
+    }
+    if (completionHandler)
+        completionHandler();
 }
 
 @end

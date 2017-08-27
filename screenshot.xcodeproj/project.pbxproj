@@ -51,6 +51,7 @@
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
+		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
 		E4D495D21F49834900312614 /* upload_symbols.sh in Resources */ = {isa = PBXBuildFile; fileRef = E4D495D11F49834900312614 /* upload_symbols.sh */; };
 /* End PBXBuildFile section */
 
@@ -140,6 +141,7 @@
 		E41449FF1F41890900B1F039 /* ClarifaiModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiModel.swift; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
+		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E4D495D11F49834900312614 /* upload_symbols.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = upload_symbols.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -304,6 +306,7 @@
 			children = (
 				C55184D71F4D611400EE7855 /* UserDefaultsConstants.h */,
 				C55184D81F4D611400EE7855 /* UserDefaultsConstants.m */,
+				E4978C3B1F53610F0008B87F /* Constants.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -547,6 +550,7 @@
 				E4139D481F09083B00E8A53B /* AppDelegate.m in Sources */,
 				E4139D451F09083B00E8A53B /* main.m in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
+				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
 				C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */,

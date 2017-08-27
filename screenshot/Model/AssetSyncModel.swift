@@ -395,6 +395,7 @@ extension AssetSyncModel {
             content.sound = UNNotificationSound.default()
         }
         UserDefaults.standard.setValue(Date(), forKey: UserDefaultsDateLastSound)
+        content.userInfo = [ Constants.openingScreenKey : Constants.openingScreenValueScreenshot ]
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let identifier = "CrazeLocal" + assetId
         let request = UNNotificationRequest(identifier: identifier,
