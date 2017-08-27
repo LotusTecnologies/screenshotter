@@ -12,7 +12,6 @@
 #import "TutorialWelcomeSlideView.h"
 #import "TutorialTrySlideView.h"
 #import "UIColor+Appearance.h"
-#import "UIDevice+Model.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"
@@ -24,6 +23,7 @@
 }
 
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
 @property (nonatomic, strong) TutorialPermissionsSlideView *permissionsSlideView;
 
@@ -66,12 +66,12 @@
     });
     
     UIView *contentView = ({
-        UIView *view = [[UIView alloc] init];
+        UIView *view = self.contentView;
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [self.scrollView addSubview:view];
-        [view.topAnchor constraintEqualToAnchor:self.scrollView.topAnchor].active = YES;
+        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [view.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor].active = YES;
-        [view.bottomAnchor constraintEqualToAnchor:self.scrollView.bottomAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [view.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor].active = YES;
         [view.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor multiplier:self.slides.count].active = YES;
         [view.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
@@ -79,16 +79,16 @@
     });
     
     CGFloat p = [Geometry padding];
-    CGFloat tp = p + ([UIDevice is568h] ? 0.f : 30.f);
+    CGFloat t = self.contentView.layoutMargins.top;
     
     for (NSInteger i = 0; i < self.slides.count; i++) {
         TutorialBaseSlideView *slide = self.slides[i];
         slide.translatesAutoresizingMaskIntoConstraints = NO;
         [contentView addSubview:slide];
-        slide.layoutMargins = UIEdgeInsetsMake(tp, p, p, p);
+        slide.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
         [slide.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor].active = YES;
-        [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor].active = YES;
-        [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
+        [slide.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor constant:-t].active = YES;
+        [slide.topAnchor constraintEqualToAnchor:contentView.topAnchor constant:t].active = YES;
         
         if (i == 0) {
             [slide.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
@@ -126,6 +126,24 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
+#pragma mark - Layout
+
+- (UIView *)contentView {
+    if (!_contentView) {
+        _contentView = [[UIView alloc] init];
+    }
+    return _contentView;
+}
+
+- (void)setContentLayoutMargins:(UIEdgeInsets)contentLayoutMargins {
+    self.contentView.layoutMargins = contentLayoutMargins;
+}
+
+- (UIEdgeInsets)contentLayoutMargins {
+    return self.contentView.layoutMargins;
 }
 
 

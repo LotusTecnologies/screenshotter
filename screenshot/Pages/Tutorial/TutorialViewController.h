@@ -21,4 +21,6 @@
 
 @property (nonatomic, weak) id<TutorialViewControllerDelegate> delegate;
 
+@property (nonatomic) UIEdgeInsets contentLayoutMargins;
+
 @end
