@@ -187,8 +187,6 @@
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
     viewController.delegate = nil;
     
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialCompleted];
-    
     [self prepareDataStackCompletionIfNeeded];
     [self transitionToViewController:[self nextViewController]];
 }

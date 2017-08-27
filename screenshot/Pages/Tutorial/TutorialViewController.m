@@ -16,6 +16,7 @@
 #import "PermissionsManager.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
+#import "UserDefaultsConstants.h"
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
     BOOL _shouldSlideNextFromPermissionsSlide;
@@ -39,6 +40,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+        
+        self.title = @"Tutorial";
         
         [AnalyticsManager track:@"Started Tutorial"];
     }
@@ -225,7 +228,16 @@
 
 - (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
     slideView.delegate = nil;
-    [self scrollToNextSlide];
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+        // The tutorial is being presented elsewhere and shouldn't
+        // include the try slide
+        
+        [self.delegate tutorialViewControllerDidComplete:self];
+        
+    } else {
+        [self scrollToNextSlide];
+    }
 }
 
 - (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView {
@@ -240,6 +252,8 @@
 
 - (void)tutorialTrySlideViewDidComplete:(TutorialTrySlideView *)slideView {
     slideView.delegate = nil;
+    
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialCompleted];
     
     [self.delegate tutorialViewControllerDidComplete:self];
     [AnalyticsManager track:@"Finished Tutorial"];
