@@ -109,7 +109,7 @@
             [button addTarget:self action:@selector(submitEmail) forControlEvents:UIControlEventTouchUpInside];
             [self.contentView addSubview:button];
             [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-            [button setContentCompressionResistancePriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisVertical];
+            [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
             [button.topAnchor constraintEqualToAnchor:self.emailTextField.bottomAnchor constant:40.f].active = YES;
             [button.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
             [button.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;

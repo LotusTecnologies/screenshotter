@@ -12,9 +12,11 @@
 #import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
 #import "UIColor+Appearance.h"
+#import "Button.h"
 
 @interface TutorialPermissionsSlideView ()
 
+@property (nonatomic, strong) Button *button;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, UISwitch *> *switchesDict;
 
 @end
@@ -65,7 +67,6 @@
         [self.contentView addSubview:notificationLabel];
         [notificationLabel.topAnchor constraintEqualToAnchor:notificationRow.bottomAnchor constant:p].active = YES;
         [notificationLabel.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-        [notificationLabel.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
         [notificationLabel.trailingAnchor constraintEqualToAnchor:arrowImageView.leadingAnchor].active = YES;
         
         UILabel *arrowLabel = [[UILabel alloc] init];
@@ -78,6 +79,27 @@
         [self.contentView addSubview:arrowLabel];
         [arrowLabel.topAnchor constraintEqualToAnchor:arrowImageView.bottomAnchor constant:-2.f].active = YES;
         [arrowLabel.trailingAnchor constraintEqualToAnchor:arrowImageView.leadingAnchor constant:2.f].active = YES;
+        
+        self.button = ({
+            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            button.translatesAutoresizingMaskIntoConstraints = NO;
+            [button setTitle:@"Next" forState:UIControlStateNormal];
+            [button addTarget:self action:@selector(slideCompleted) forControlEvents:UIControlEventTouchUpInside];
+            button.alpha = [self shouldButtonBeVisible];
+            [self.contentView addSubview:button];
+            [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+            [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+            [button.topAnchor constraintGreaterThanOrEqualToAnchor:notificationLabel.bottomAnchor constant:p].active = YES;
+            [button.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+            
+            NSLayoutConstraint *constraint = [button.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor constant:-50.f];
+            constraint.priority = UILayoutPriorityDefaultHigh;
+            constraint.active = YES;
+            
+            [button.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            [button.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
+            button;
+        });
     }
     return self;
 }
@@ -142,6 +164,21 @@
     return view;
 }
 
+- (BOOL)shouldButtonBeVisible {
+    return [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto] != PermissionStatusNotDetermined;
+}
+
+- (void)syncButtonVisibility {
+    BOOL shouldButtonBeVisible = [self shouldButtonBeVisible];
+    
+    if (self.button.alpha != shouldButtonBeVisible) {
+        [UIView animateWithDuration:.3f delay:0.f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.button.alpha = shouldButtonBeVisible;
+            
+        } completion:nil];
+    }
+}
+
 
 #pragma mark - Permissions
 
@@ -173,6 +210,7 @@
             switch (permissionType) {
                 case PermissionTypePhoto:
                     [[AssetSyncModel sharedInstance] syncPhotos];
+                    [self syncButtonVisibility];
                     
                     if (!granted) {
                         [self.delegate tutorialPermissionsSlideViewDidDenyPhotosPermission:self];
@@ -211,6 +249,23 @@
     PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
     
     return photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined;
+}
+
+
+#pragma mark - Action
+
+- (void)slideCompleted {
+    [self.delegate tutorialPermissionsSlideViewDidComplete:self];
+}
+
+
+#pragma mark - Alert
+
++ (UIAlertController *)determinePushAlertController {
+    // TODO: update copy
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enable Notifications" message:@"Please enable notifications so we can tell you when a screenshot is ready." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    return alertController;
 }
 
 @end

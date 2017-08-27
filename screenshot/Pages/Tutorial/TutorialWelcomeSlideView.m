@@ -35,6 +35,7 @@
         [button addTarget:self action:@selector(slideCompleted) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:button];
         [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [button.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
         [button.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor constant:-50.f].active = YES;
         [button.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;

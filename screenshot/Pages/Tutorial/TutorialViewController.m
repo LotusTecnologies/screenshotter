@@ -21,6 +21,7 @@
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate> {
     BOOL _shouldSlideNextFromPermissionsSlide;
+    BOOL _didPresentDeterminePushAlertController;
 }
 
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -173,16 +174,28 @@
 }
 
 - (void)tutorialPermissionsSlideViewDidComplete:(TutorialPermissionsSlideView *)slideView {
-    slideView.delegate = nil;
-    
     if (self.presentedViewController) {
+        slideView.delegate = nil;
+        
         // The photos permission denied alert has been presented.
         // Enabling this permission will force quite the app. The
         // only way to open the app where it was left off is to
         // implement restoration.
         
     } else {
-        [self scrollToNextSlide];
+        BOOL hasPush = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush] == PermissionStatusNotDetermined;
+        
+        if (hasPush && !_didPresentDeterminePushAlertController) {
+            _didPresentDeterminePushAlertController = YES;
+            
+            UIAlertController *alertController = [TutorialPermissionsSlideView determinePushAlertController];
+            [self presentViewController:alertController animated:YES completion:nil];
+            
+        } else {
+            slideView.delegate = nil;
+            
+            [self scrollToNextSlide];
+        }
     }
 }
 
