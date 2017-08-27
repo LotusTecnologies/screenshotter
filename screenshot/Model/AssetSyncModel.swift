@@ -44,7 +44,6 @@ class AssetSyncModel: NSObject {
     }
     
     func uploadScreenshot(asset: PHAsset) {
-        let uploadStart = Date()
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
