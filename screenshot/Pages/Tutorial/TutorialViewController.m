@@ -7,11 +7,10 @@
 //
 
 #import "TutorialViewController.h"
-#import "TutorialScreenshotSlideView.h"
-#import "TutorialShopSlideView.h"
 #import "TutorialPermissionsSlideView.h"
 #import "TutorialEmailSlideView.h"
 #import "TutorialWelcomeSlideView.h"
+#import "TutorialTrySlideView.h"
 #import "UIColor+Appearance.h"
 #import "UIDevice+Model.h"
 #import "Geometry.h"
@@ -19,7 +18,7 @@
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
 
-@interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate> {
+@interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
     BOOL _shouldSlideNextFromPermissionsSlide;
     BOOL _didPresentDeterminePushAlertController;
 }
@@ -144,11 +143,13 @@
         TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
         emailSlideView.delegate = self;
         
+        TutorialTrySlideView *trySlideView = [[TutorialTrySlideView alloc] init];
+        trySlideView.delegate = self;
+        
         _slides = @[welcomeSlideView,
                     permissionsSlideView,
                     emailSlideView,
-                    [[TutorialScreenshotSlideView alloc] init],
-                    [[TutorialShopSlideView alloc] init]
+                    trySlideView
                     ];
     }
     return _slides;
@@ -206,10 +207,7 @@
 
 - (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
     slideView.delegate = nil;
-    
-    // TODO: move the below code elsewhere
-    [self.delegate tutorialViewControllerDidComplete:self];
-    [AnalyticsManager track:@"Finished Tutorial"];
+    [self scrollToNextSlide];
 }
 
 - (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView {
@@ -220,6 +218,13 @@
 - (void)tutorialEmailSlideViewDidTapPrivacyPolicy:(TutorialEmailSlideView *)slideView {
     UIViewController *viewController = [TutorialEmailSlideView privacyPolicyViewControllerWithDoneTarget:self doneAction:@selector(dismissViewController)];
     [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void)tutorialTrySlideViewDidComplete:(TutorialTrySlideView *)slideView {
+    slideView.delegate = nil;
+    
+    [self.delegate tutorialViewControllerDidComplete:self];
+    [AnalyticsManager track:@"Finished Tutorial"];
 }
 
 
