@@ -48,6 +48,7 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
+                AnalyticsManager.track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
                 AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])

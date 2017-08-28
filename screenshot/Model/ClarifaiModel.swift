@@ -20,7 +20,28 @@ class ClarifaiModel: NSObject {
 
     override init() {
         super.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadStarted), name: Notification.Name.CAIWillDownloadGeneralModel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidDownloadGeneralModel, object: nil)
         Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
+        if UserDefaults.standard.object(forKey: UserDefaultsDateInstalled) == nil {
+            if let image = UIImage.init(named: "ControlX") {
+                let _ = localClarifaiOutputs(image: image)
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    func modelDownloadStarted() {
+        NSLog("modelDownloadStarted")
+        AnalyticsManager.track("started downloading Clarifai model")
+    }
+    
+    func modelDownloadFinished() {
+        NSLog("modelDownloadFinished")
+        AnalyticsManager.track("finished downloading Clarifai model")
     }
     
     func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
@@ -29,7 +50,6 @@ class ClarifaiModel: NSObject {
         let input = Input(dataAsset: dataAsset)
         let generalModel = Clarifai.sharedInstance().generalModel
         return Promise { fulfill, reject in
-            AnalyticsManager.track("sent image to Clarifai")
             generalModel.predict([input]) { (outputs: [Output]?, error: Error?) in
                 if let error = error {
                     reject(error)

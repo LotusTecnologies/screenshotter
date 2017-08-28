@@ -29,8 +29,8 @@ PODS:
     - FBSDKCoreKit
   - FBSDKShareKit (4.26.0):
     - FBSDKCoreKit
-  - PromiseKit/CorePromise (4.3.2)
-  - PromiseKit/Foundation (4.3.2):
+  - PromiseKit/CorePromise (4.4.0)
+  - PromiseKit/Foundation (4.4.0):
     - PromiseKit/CorePromise
   - SDWebImage (4.1.0):
     - SDWebImage/Core (= 4.1.0)
@@ -56,7 +56,7 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: c8b8582311ec11b145451d8b9717dc6cc2ae5a76
   FBSDKLoginKit: f3f03b94c21eb834af243c0a881d48641f47ca60
   FBSDKShareKit: 320712d8293fde6392872c91eb80ef0da5d73cc3
-  PromiseKit: 32430ae679605b17c15d6193679cae7bf60147f7
+  PromiseKit: ecf5fe92275d57ee77c9ede858af47a162e9b97e
   SDWebImage: 0e435c14e402a6730315a0fb79f95e68654d55a4
 
 PODFILE CHECKSUM: 4de8080f66e8ece418c787061a79bb8766bb9f06
