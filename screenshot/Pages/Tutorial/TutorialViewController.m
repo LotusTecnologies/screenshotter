@@ -21,6 +21,7 @@
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
     BOOL _shouldSlideNextFromPermissionsSlide;
     BOOL _didPresentDeterminePushAlertController;
+    BOOL _scrollViewIsScrollingAnimation;
 }
 
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -262,7 +263,20 @@
 
 #pragma mark - Scroll View
 
+- (void)scrollToNextSlide {
+    if (!_scrollViewIsScrollingAnimation) {
+        _scrollViewIsScrollingAnimation = YES;
+        
+        CGPoint offset = CGPointZero;
+        offset.x = self.scrollView.bounds.size.width + self.scrollView.contentOffset.x;
+        
+        [self.scrollView setContentOffset:offset animated:YES];
+    }
+}
+
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    _scrollViewIsScrollingAnimation = NO;
+    
     if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
         PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
         PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
@@ -279,13 +293,6 @@
             });
         }
     }
-}
-
-- (void)scrollToNextSlide {
-    CGPoint offset = CGPointZero;
-    offset.x = self.scrollView.bounds.size.width + self.scrollView.contentOffset.x;
-    
-    [self.scrollView setContentOffset:offset animated:YES];
 }
 
 
