@@ -20,7 +20,7 @@ class ClarifaiModel: NSObject {
 
     override init() {
         super.init()
-        Clarifai.sharedInstance().start(appKey: "b0c68b58001546afa6e9cbe0f8f619b2")
+        Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
     }
     
     func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
