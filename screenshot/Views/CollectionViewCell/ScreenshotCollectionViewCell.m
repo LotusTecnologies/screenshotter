@@ -7,11 +7,13 @@
 //
 
 #import "ScreenshotCollectionViewCell.h"
+#import "UIColor+Appearance.h"
 
 @interface ScreenshotCollectionViewCell ()
 
 @property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UIToolbar *toolbar;
+@property (nonatomic, strong) UIView *badge;
 
 @end
 
@@ -55,6 +57,31 @@
             [toolbar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
             toolbar;
         });
+        
+        _badge = ({
+            CGFloat diameter= 16.f;
+            
+            CGRect rect = CGRectZero;
+            rect.size.width = rect.size.height = diameter;
+            
+            UIView *view = [[UIView alloc] initWithFrame:rect];
+            view.translatesAutoresizingMaskIntoConstraints = NO;
+            view.backgroundColor = [UIColor crazeRedColor];
+            view.userInteractionEnabled = NO;
+            view.hidden = YES;
+            view.layer.cornerRadius = diameter / 2.f;
+            view.layer.shadowPath = [UIBezierPath bezierPathWithOvalInRect:view.bounds].CGPath;
+            view.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:.5f].CGColor;
+            view.layer.shadowOffset = CGSizeMake(0.f, 1.f);
+            view.layer.shadowRadius = 2.f;
+            view.layer.shadowOpacity = 1.f;
+            [self.contentView addSubview:view];
+            [view.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:-2.f].active = YES;
+            [view.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor constant:2.f].active = YES;
+            [view.widthAnchor constraintEqualToConstant:view.bounds.size.width].active = YES;
+            [view.heightAnchor constraintEqualToConstant:view.bounds.size.height].active = YES;
+            view;
+        });
     }
     return self;
 }
@@ -69,10 +96,22 @@
         if (screenshot) {
             // TODO: set to default screenshot image
             self.imageView.image = [UIImage imageWithData:_screenshot.imageData];
+            
         } else {
             self.imageView.image = nil;
         }
     }
+}
+
+
+#pragma mark - Badge
+
+- (void)setBadgeEnabled:(BOOL)badgeEnabled {
+    self.badge.hidden = !badgeEnabled;
+}
+
+- (BOOL)badgeEnabled {
+    return !self.badge.hidden;
 }
 
 

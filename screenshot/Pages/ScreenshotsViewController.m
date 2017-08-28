@@ -247,6 +247,7 @@
     cell.delegate = self;
     cell.backgroundColor = [UIColor lightGrayColor];
     cell.screenshot = screenshot;
+    cell.badgeEnabled = NO; // TODO: Gershon
     return cell;
 }
 

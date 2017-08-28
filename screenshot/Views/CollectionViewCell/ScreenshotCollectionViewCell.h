@@ -25,4 +25,6 @@
 
 @property (nonatomic, strong) Screenshot *screenshot;
 
+@property (nonatomic) BOOL badgeEnabled;
+
 @end
