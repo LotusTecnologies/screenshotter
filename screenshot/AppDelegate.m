@@ -15,12 +15,15 @@
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
 #import "UserDefaultsConstants.h"
+#import "ScreenshotsNavigationController.h"
+#import "AnalyticsManager.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
 @import Appsee;
+@import UserNotifications;
 
-@interface AppDelegate () <TutorialViewControllerDelegate>
+@interface AppDelegate () <UNUserNotificationCenterDelegate, TutorialViewControllerDelegate>
 
 @property (assign, nonatomic) UIBackgroundTaskIdentifier bgTask;
 
@@ -30,9 +33,14 @@
 
 #pragma mark - Life Cycle
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [DataModel setup]; // Sets up Core Data stack on a background queue.
+-(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    UNUserNotificationCenter.currentNotificationCenter.delegate = self;
     [ClarifaiModel setup]; // Takes a long time to intialize; start early.
+    [DataModel setup]; // Sets up Core Data stack on a background queue.
+    return YES;
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     
     [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
@@ -80,9 +88,7 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
-- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
-    NSLog(@"application performFetchWithCompletionHandler");
-    
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {    
     if (completionHandler) {
         completionHandler(UIBackgroundFetchResultNoData);
     }
@@ -189,6 +195,28 @@
     
     [self prepareDataStackCompletionIfNeeded];
     [self transitionToViewController:[self nextViewController]];
+}
+
+#pragma mark - UNUserNotificationCenterDelegate
+
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    [AnalyticsManager track:@"app opened from local notification"];
+    NSDictionary *userInfo = response.notification.request.content.userInfo;
+    if (userInfo) {
+        NSString *openingScreen = userInfo[Constants.openingScreenKey];
+        if ([openingScreen isEqualToString:Constants.openingScreenValueScreenshot]) {
+            MainTabBarController *mainTabBarController = (MainTabBarController *)self.window.rootViewController;
+            if ([mainTabBarController isKindOfClass:[MainTabBarController class]]) {
+                mainTabBarController.selectedIndex = 0;
+                ScreenshotsNavigationController *screenshotsNavigationController = (ScreenshotsNavigationController *)mainTabBarController.selectedViewController;
+                if ([screenshotsNavigationController isKindOfClass:[ScreenshotsNavigationController class]]) {
+                    [screenshotsNavigationController popToRootViewControllerAnimated:NO];
+                }
+            }
+        }
+    }
+    if (completionHandler)
+        completionHandler();
 }
 
 @end

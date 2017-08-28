@@ -44,16 +44,14 @@ class AssetSyncModel: NSObject {
     }
     
     func uploadScreenshot(asset: PHAsset) {
-        NSLog("uploadScreenshot started assetId:\(asset.localIdentifier)")
-        let uploadStart = Date()
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
-                NSLog("uploadScreenshot til image retrieved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                AnalyticsManager.track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
-                NSLog("uploadScreenshot til isFashion:\(isFashion) \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
                 dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -63,17 +61,14 @@ class AssetSyncModel: NSObject {
                                                      imageData: imageData)
                 }
                 if isFashion {
-                    NSLog("uploadScreenshot til db saved \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                     DispatchQueue.main.async {
                         NotificationManager.shared().present(with: .products)
                     }
                     firstly { _ -> Promise<(String, [[String : Any]])> in
-                        NSLog("uploadScreenshot til jpeg \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         return NetworkingPromise.uploadToSyte(imageData: imageData)
                         }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                            NSLog("uploadScreenshot til Syte response \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
+                            AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
                             self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
-                            NSLog("uploadScreenshot til saveShoppables \(-uploadStart.timeIntervalSinceNow) sec assetId:\(asset.localIdentifier)")
                         }.always {
                             NotificationManager.shared().dismiss(with: .products)
                         }.catch { error in
@@ -296,7 +291,6 @@ class AssetSyncModel: NSObject {
     
     func beginSync() {
         isSyncing = true
-        NSLog("beginSync")
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
@@ -309,7 +303,6 @@ class AssetSyncModel: NSObject {
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
         }
-        NSLog("endSync")
         isSyncing = false
         if shouldSyncAgain {
             shouldSyncAgain = false
@@ -335,7 +328,6 @@ class AssetSyncModel: NSObject {
             guard PermissionsManager.shared().hasPermission(for: .photo),
                 dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
-                    NSLog("syncPhotos refused by guard")
                     return
             }
             self.beginSync()
@@ -360,6 +352,7 @@ class AssetSyncModel: NSObject {
                 DispatchQueue.main.async {
                     NotificationManager.shared().present(with: .screenshots)
                 }
+                AnalyticsManager.track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
                 self.allScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
@@ -369,7 +362,6 @@ class AssetSyncModel: NSObject {
                     }
                 })
             }
-            NSLog("enumerated assets to upload")
             if self.screenshotsToProcess == 0 {
                 self.endSync()
             }
@@ -395,6 +387,7 @@ extension AssetSyncModel {
             content.sound = UNNotificationSound.default()
         }
         UserDefaults.standard.setValue(Date(), forKey: UserDefaultsDateLastSound)
+        content.userInfo = [ Constants.openingScreenKey : Constants.openingScreenValueScreenshot ]
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let identifier = "CrazeLocal" + assetId
         let request = UNNotificationRequest(identifier: identifier,

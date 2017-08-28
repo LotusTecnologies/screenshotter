@@ -18,6 +18,7 @@ class NetworkingPromise: NSObject {
                 reject(emptyError)
                 return
             }
+            AnalyticsManager.track("sent image to Syte")
             NetworkingModel.upload(toSyte: imageData, completionHandler: { (response: URLResponse, responseObject: Any?, error: Error?) in
                 guard error == nil,
                     let responseObjectDict = responseObject as? [String : Any],
