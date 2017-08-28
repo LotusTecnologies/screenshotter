@@ -22,6 +22,6 @@
 
 @property (nonatomic, weak) id<TutorialPermissionsSlideViewDelegate> delegate;
 
-+ (UIAlertController *)determinePushAlertController;
+- (UIAlertController *)determinePushAlertController;
 
 @end

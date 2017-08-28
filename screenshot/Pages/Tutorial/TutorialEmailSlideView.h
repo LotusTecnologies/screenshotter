@@ -25,8 +25,9 @@
 
 @property (nonatomic, weak) id<TutorialEmailSlideViewDelegate> delegate;
 
+- (UIAlertController *)failedAlertController;
+
 + (UIViewController *)termsOfServiceViewControllerWithDoneTarget:(id)target doneAction:(SEL)action;
 + (UIViewController *)privacyPolicyViewControllerWithDoneTarget:(id)target doneAction:(SEL)action;
-+ (UIAlertController *)failedAlertController;
 
 @end

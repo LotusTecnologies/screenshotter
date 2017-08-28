@@ -205,12 +205,12 @@
         // implement restoration.
         
     } else {
-        BOOL hasPush = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush] == PermissionStatusNotDetermined;
+        BOOL isPushUndetermined = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush] == PermissionStatusNotDetermined;
         
-        if (hasPush && !_didPresentDeterminePushAlertController) {
+        if (isPushUndetermined && !_didPresentDeterminePushAlertController) {
             _didPresentDeterminePushAlertController = YES;
             
-            UIAlertController *alertController = [TutorialPermissionsSlideView determinePushAlertController];
+            UIAlertController *alertController = [slideView determinePushAlertController];
             [self presentViewController:alertController animated:YES completion:nil];
             
         } else {
@@ -222,7 +222,7 @@
 }
 
 - (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
-    UIAlertController *alertController = [TutorialEmailSlideView failedAlertController];
+    UIAlertController *alertController = [slideView failedAlertController];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 

@@ -275,6 +275,15 @@
 }
 
 
+#pragma mark - Alert
+
+- (UIAlertController *)failedAlertController {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Submission Failed" message:@"Please enter a valid email." preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    return alertController;
+}
+
+
 #pragma mark - Legal
 
 + (UIViewController *)termsOfServiceViewControllerWithDoneTarget:(id)target doneAction:(SEL)action {
@@ -299,15 +308,6 @@
     viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:target action:action];
     
     return [[UINavigationController alloc] initWithRootViewController:viewController];
-}
-
-
-#pragma mark - Alert
-
-+ (UIAlertController *)failedAlertController {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Submission Failed" message:@"Please enter a valid email." preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
-    return alertController;
 }
 
 @end

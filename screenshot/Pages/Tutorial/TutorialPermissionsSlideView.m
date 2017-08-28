@@ -261,10 +261,23 @@
 
 #pragma mark - Alert
 
-+ (UIAlertController *)determinePushAlertController {
+- (UIAlertController *)determinePushAlertController {
     // TODO: update copy
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enable Notifications" message:@"Please enable notifications so we can tell you when a screenshot is ready." preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush openSettingsIfNeeded:YES response:^(BOOL granted) {
+            if (granted) {
+                [self syncSwitchesState];
+            }
+            
+            // Create delay for a natural feel from the switch animating
+            // to the slide transitioning.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self.delegate tutorialPermissionsSlideViewDidComplete:self];
+            });
+        }];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Not now" style:UIAlertActionStyleCancel handler:nil]];
     return alertController;
 }
 
