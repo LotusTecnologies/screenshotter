@@ -34,12 +34,12 @@
 
 -(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     UNUserNotificationCenter.currentNotificationCenter.delegate = self;
+    [ClarifaiModel setup]; // Takes a long time to intialize; start early.
+    [DataModel setup]; // Sets up Core Data stack on a background queue.
     return YES;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [DataModel setup]; // Sets up Core Data stack on a background queue.
-    [ClarifaiModel setup]; // Takes a long time to intialize; start early.
     [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
     
     [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
