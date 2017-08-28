@@ -19,6 +19,7 @@
 
 @property (nonatomic) BOOL readyToSubmit;
 
+@property (nonatomic, strong) UITextField *nameTextField;
 @property (nonatomic, strong) UITextField *emailTextField;
 @property (nonatomic, strong) Button *button;
 @property (nonatomic, strong) TappableTextView *textView;
@@ -55,22 +56,26 @@
         widthConstraint.priority = UILayoutPriorityDefaultHigh;
         widthConstraint.active = YES;
         
-        UITextField *nameTextField = [[UITextField alloc] init];
-        nameTextField.translatesAutoresizingMaskIntoConstraints = NO;
-        nameTextField.delegate = self;
-        nameTextField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsName];
-        nameTextField.placeholder = @"Enter your name";
-        nameTextField.backgroundColor = [UIColor whiteColor];
-        nameTextField.borderStyle = UITextBorderStyleRoundedRect;
-        nameTextField.spellCheckingType = UITextSpellCheckingTypeNo;
-        nameTextField.autocorrectionType = UITextAutocorrectionTypeNo;
-        nameTextField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
-        [self.contentView addSubview:nameTextField];
-        [nameTextField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
-        [nameTextField.topAnchor constraintEqualToAnchor:nameLabel.layoutMarginsGuide.bottomAnchor].active = YES;
-        [nameTextField.leadingAnchor constraintEqualToAnchor:nameLabel.leadingAnchor].active = YES;
-        [nameTextField.trailingAnchor constraintEqualToAnchor:nameLabel.trailingAnchor].active = YES;
-        [nameTextField.heightAnchor constraintEqualToConstant:50.f].active = YES;
+        _nameTextField = ({
+            UITextField *textField = [[UITextField alloc] init];
+            textField.translatesAutoresizingMaskIntoConstraints = NO;
+            textField.delegate = self;
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsName];
+            textField.placeholder = @"Enter your name";
+            textField.backgroundColor = [UIColor whiteColor];
+            textField.borderStyle = UITextBorderStyleRoundedRect;
+            textField.returnKeyType = UIReturnKeyNext;
+            textField.spellCheckingType = UITextSpellCheckingTypeNo;
+            textField.autocorrectionType = UITextAutocorrectionTypeNo;
+            textField.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -p, 0.f);
+            [self.contentView addSubview:textField];
+            [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
+            [textField.topAnchor constraintEqualToAnchor:nameLabel.layoutMarginsGuide.bottomAnchor].active = YES;
+            [textField.leadingAnchor constraintEqualToAnchor:nameLabel.leadingAnchor].active = YES;
+            [textField.trailingAnchor constraintEqualToAnchor:nameLabel.trailingAnchor].active = YES;
+            [textField.heightAnchor constraintEqualToConstant:50.f].active = YES;
+            textField;
+        });
         
         UILabel *emailLabel = [[UILabel alloc] init];
         emailLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -78,11 +83,11 @@
         emailLabel.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -5.f, 0.f);
         [self.contentView addSubview:emailLabel];
         [emailLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [emailLabel.topAnchor constraintEqualToAnchor:nameTextField.layoutMarginsGuide.bottomAnchor constant:20.f].active = YES;
-        [emailLabel.leadingAnchor constraintEqualToAnchor:nameTextField.leadingAnchor].active = YES;
-        [emailLabel.trailingAnchor constraintEqualToAnchor:nameTextField.trailingAnchor].active = YES;
+        [emailLabel.topAnchor constraintEqualToAnchor:self.nameTextField.layoutMarginsGuide.bottomAnchor constant:20.f].active = YES;
+        [emailLabel.leadingAnchor constraintEqualToAnchor:self.nameTextField.leadingAnchor].active = YES;
+        [emailLabel.trailingAnchor constraintEqualToAnchor:self.nameTextField.trailingAnchor].active = YES;
         
-        self.emailTextField = ({
+        _emailTextField = ({
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
@@ -98,11 +103,11 @@
             [textField.topAnchor constraintEqualToAnchor:emailLabel.layoutMarginsGuide.bottomAnchor].active = YES;
             [textField.leadingAnchor constraintEqualToAnchor:emailLabel.leadingAnchor].active = YES;
             [textField.trailingAnchor constraintEqualToAnchor:emailLabel.trailingAnchor].active = YES;
-            [textField.heightAnchor constraintEqualToAnchor:nameTextField.heightAnchor].active = YES;
+            [textField.heightAnchor constraintEqualToAnchor:self.nameTextField.heightAnchor].active = YES;
             textField;
         });
         
-        self.button = ({
+        _button = ({
             Button *button = [Button buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Submit" forState:UIControlStateNormal];
@@ -117,7 +122,7 @@
             button;
         });
         
-        self.textView = ({
+        _textView = ({
             TappableTextView *textView = [[TappableTextView alloc] init];
             textView.delegate = self;
             textView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -157,12 +162,8 @@
         expandableView.translatesAutoresizingMaskIntoConstraints = NO;
         [self.contentView addSubview:expandableView];
         [expandableView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
-        self.expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
+        _expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
         self.expandableViewHeightConstraint.active = YES;
-        
-    
-//        [self flexibleSpaceFromAnchor:emailTextField.bottomAnchor toAnchor:self.button.topAnchor];
-//        [self flexibleSpaceFromAnchor:self.button.bottomAnchor toAnchor:expandableView.topAnchor];
         
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
         [self addGestureRecognizer:tapGesture];
@@ -193,12 +194,16 @@
     if ([self isValidEmail:self.emailTextField.text]) {
         self.readyToSubmit = YES;
         
-        [[NSUserDefaults standardUserDefaults] setValue:self.emailTextField.text forKey:UserDefaultsEmail];
+        NSString *trimmedName = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSString *trimmedEmail = [self.emailTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsName];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsEmail];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [AnalyticsManager track:@"Submitted email" properties:@{@"email": self.emailTextField.text}];
+        [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
         
     } else {
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
@@ -243,7 +248,13 @@
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [textField resignFirstResponder];
+    if (textField == self.nameTextField) {
+        [self.emailTextField becomeFirstResponder];
+        
+    } else {
+        [textField resignFirstResponder];
+    }
+    
     return YES;
 }
 
