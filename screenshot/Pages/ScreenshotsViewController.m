@@ -14,6 +14,7 @@
 #import "PermissionsManager.h"
 #import "AnalyticsManager.h"
 #import "UIColor+Appearance.h"
+#import "UserDefaultsConstants.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
@@ -30,6 +31,9 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        
         self.title = @"Screenshots";
         [self addNavigationItemLogo];
         
@@ -42,13 +46,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    CGFloat p = [Geometry padding];
-    
-    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-    layout.minimumInteritemSpacing = p;
-    layout.minimumLineSpacing = p;
-    
     self.collectionView = ({
+        CGFloat p = [Geometry padding];
+        
+        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+        layout.minimumInteritemSpacing = p;
+        layout.minimumLineSpacing = p;
+        
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
@@ -56,6 +60,7 @@
         collectionView.contentInset = UIEdgeInsetsMake(p, p, p, p);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
+        collectionView.scrollEnabled = NO;
         
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
@@ -66,49 +71,6 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
-    
-    {
-        UIView *backgroundView = [[UIView alloc] init];
-        self.collectionView.backgroundView = backgroundView;
-        
-        UIView *contentView = [[UIView alloc] init];
-        contentView.translatesAutoresizingMaskIntoConstraints = NO;
-        [backgroundView addSubview:contentView];
-        [contentView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:layout.minimumLineSpacing].active = YES;
-        [contentView.trailingAnchor constraintEqualToAnchor:backgroundView.trailingAnchor constant:-layout.minimumInteritemSpacing].active = YES;
-        [contentView.widthAnchor constraintEqualToAnchor:backgroundView.widthAnchor multiplier:.5f constant:-layout.minimumInteritemSpacing * 1.5f].active = YES;
-        [contentView.heightAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:[self screenshotRatio]].active = YES;
-        
-        UILabel *titleLabel = [[UILabel alloc] init];
-        titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        titleLabel.text = @"Ready To Shop";
-        titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-        titleLabel.minimumScaleFactor = .7f;
-        titleLabel.adjustsFontSizeToFitWidth = YES;
-        [contentView addSubview:titleLabel];
-        [titleLabel.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
-        [titleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
-        [titleLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
-        
-        UILabel *descriptionLabel = [[UILabel alloc] init];
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        descriptionLabel.text = @"Here’s your screenshot!\nTap on it to see the products in the photo.";
-        descriptionLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        descriptionLabel.numberOfLines = 0;
-        [contentView addSubview:descriptionLabel];
-        [descriptionLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:p].active = YES;
-        [descriptionLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
-        [descriptionLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
-        
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialReadyArrow"]];
-        imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [contentView addSubview:imageView];
-        [imageView.topAnchor constraintEqualToAnchor:descriptionLabel.bottomAnchor].active = YES;
-        [imageView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
-        [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:contentView.trailingAnchor].active = YES;
-        [imageView.bottomAnchor constraintLessThanOrEqualToAnchor:contentView.bottomAnchor].active = YES;
-    }
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
     refreshControl.tintColor = [UIColor crazeRedColor];
@@ -163,10 +125,32 @@
     });
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if (self.collectionView.backgroundView) {
+        [self.collectionView.backgroundView removeFromSuperview];
+        self.collectionView.backgroundView = nil;
+    }
+}
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
     [self.collectionView.collectionViewLayout invalidateLayout];
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    if (self.view.window && self.collectionView.backgroundView) {
+        [self.collectionView.backgroundView removeFromSuperview];
+        self.collectionView.backgroundView = nil;
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self syncHelperViewVisibility];
+    }
 }
 
 - (void)dealloc {
@@ -174,6 +158,8 @@
     self.collectionView.dataSource = nil;
     
     [DataModel sharedInstance].screenshotFrcDelegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -181,6 +167,57 @@
 
 - (CGFloat)screenshotRatio {
     return 16.f / 9.f;
+}
+
+- (void)insertScreenshotHelperView {
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialPresentedScreenshotHelper];
+    
+    if (!hasPresented && [self.collectionView numberOfItemsInSection:0] == 1) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedScreenshotHelper];
+        
+        UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
+        
+        UIView *backgroundView = [[UIView alloc] init];
+        self.collectionView.backgroundView = backgroundView;
+        
+        UIView *contentView = [[UIView alloc] init];
+        contentView.translatesAutoresizingMaskIntoConstraints = NO;
+        [backgroundView addSubview:contentView];
+        [contentView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:layout.minimumLineSpacing].active = YES;
+        [contentView.trailingAnchor constraintEqualToAnchor:backgroundView.trailingAnchor constant:-layout.minimumInteritemSpacing].active = YES;
+        [contentView.widthAnchor constraintEqualToAnchor:backgroundView.widthAnchor multiplier:.5f constant:-layout.minimumInteritemSpacing * 1.5f].active = YES;
+        [contentView.heightAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:[self screenshotRatio]].active = YES;
+        
+        UILabel *titleLabel = [[UILabel alloc] init];
+        titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        titleLabel.text = @"Ready To Shop";
+        titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        titleLabel.minimumScaleFactor = .7f;
+        titleLabel.adjustsFontSizeToFitWidth = YES;
+        [contentView addSubview:titleLabel];
+        [titleLabel.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
+        [titleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [titleLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        
+        UILabel *descriptionLabel = [[UILabel alloc] init];
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        descriptionLabel.text = @"Here’s your screenshot!\nTap on it to see the products in the photo.";
+        descriptionLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        descriptionLabel.numberOfLines = 0;
+        [contentView addSubview:descriptionLabel];
+        [descriptionLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:[Geometry padding]].active = YES;
+        [descriptionLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [descriptionLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialReadyArrow"]];
+        imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [contentView addSubview:imageView];
+        [imageView.topAnchor constraintEqualToAnchor:descriptionLabel.bottomAnchor].active = YES;
+        [imageView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:contentView.trailingAnchor].active = YES;
+        [imageView.bottomAnchor constraintLessThanOrEqualToAnchor:contentView.bottomAnchor].active = YES;
+    }
 }
 
 
@@ -211,6 +248,12 @@
     cell.backgroundColor = [UIColor lightGrayColor];
     cell.screenshot = screenshot;
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.item == 0) {
+        [self insertScreenshotHelperView];
+    }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -281,6 +324,7 @@
 
 - (void)syncHelperViewVisibility {
     self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
+    self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
 }
 
 @end
