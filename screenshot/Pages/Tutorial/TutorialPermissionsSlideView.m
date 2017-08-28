@@ -262,9 +262,8 @@
 #pragma mark - Alert
 
 - (UIAlertController *)determinePushAlertController {
-    // TODO: update copy
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enable Notifications" message:@"Please enable notifications so we can tell you when a screenshot is ready." preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Continue Without Notifications?" message:@"If you don't enable notifications we won't be able to let you know when you have new shoppable screenshots!" preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush openSettingsIfNeeded:YES response:^(BOOL granted) {
             if (granted) {
                 [self syncSwitchesState];
@@ -277,7 +276,7 @@
             });
         }];
     }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Not now" style:UIAlertActionStyleCancel handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Not Now" style:UIAlertActionStyleCancel handler:nil]];
     return alertController;
 }
 

@@ -424,6 +424,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     } else {
         // TODO: alert that mail doesnt work
         
+        // https://stackoverflow.com/questions/8821934/launch-apple-mail-app-from-within-my-own-app
+        
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"" preferredStyle:UIAlertControllerStyleAlert];
         [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
         [self presentViewController:alertController animated:YES completion:nil];
