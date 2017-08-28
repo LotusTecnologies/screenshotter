@@ -42,13 +42,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    CGFloat p = [Geometry padding];
+    
+    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+    layout.minimumInteritemSpacing = p;
+    layout.minimumLineSpacing = p;
+    
     self.collectionView = ({
-        CGFloat p = [Geometry padding];
-        
-        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumInteritemSpacing = p;
-        layout.minimumLineSpacing = p;
-        
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
@@ -66,6 +66,49 @@
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    {
+        UIView *backgroundView = [[UIView alloc] init];
+        self.collectionView.backgroundView = backgroundView;
+        
+        UIView *contentView = [[UIView alloc] init];
+        contentView.translatesAutoresizingMaskIntoConstraints = NO;
+        [backgroundView addSubview:contentView];
+        [contentView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:layout.minimumLineSpacing].active = YES;
+        [contentView.trailingAnchor constraintEqualToAnchor:backgroundView.trailingAnchor constant:-layout.minimumInteritemSpacing].active = YES;
+        [contentView.widthAnchor constraintEqualToAnchor:backgroundView.widthAnchor multiplier:.5f constant:-layout.minimumInteritemSpacing * 1.5f].active = YES;
+        [contentView.heightAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:[self screenshotRatio]].active = YES;
+        
+        UILabel *titleLabel = [[UILabel alloc] init];
+        titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        titleLabel.text = @"Ready To Shop";
+        titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        titleLabel.minimumScaleFactor = .7f;
+        titleLabel.adjustsFontSizeToFitWidth = YES;
+        [contentView addSubview:titleLabel];
+        [titleLabel.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
+        [titleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [titleLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        
+        UILabel *descriptionLabel = [[UILabel alloc] init];
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        descriptionLabel.text = @"Here’s your screenshot!\nTap on it to see the products in the photo.";
+        descriptionLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        descriptionLabel.numberOfLines = 0;
+        [contentView addSubview:descriptionLabel];
+        [descriptionLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:p].active = YES;
+        [descriptionLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [descriptionLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialReadyArrow"]];
+        imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [contentView addSubview:imageView];
+        [imageView.topAnchor constraintEqualToAnchor:descriptionLabel.bottomAnchor].active = YES;
+        [imageView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+        [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:contentView.trailingAnchor].active = YES;
+        [imageView.bottomAnchor constraintLessThanOrEqualToAnchor:contentView.bottomAnchor].active = YES;
+    }
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
     refreshControl.tintColor = [UIColor crazeRedColor];
@@ -134,6 +177,13 @@
 }
 
 
+#pragma mark - Layout
+
+- (CGFloat)screenshotRatio {
+    return 16.f / 9.f;
+}
+
+
 #pragma mark - Collection View
 
 - (NSInteger)numberOfCollectionViewColumns {
@@ -149,7 +199,7 @@
     
     CGSize size = CGSizeZero;
     size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
-    size.height = ceil(size.width * (16.f / 9.f));
+    size.height = ceil(size.width * [self screenshotRatio]);
     return size;
 }
 
