@@ -413,21 +413,32 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)presentMailComposer {
     if ([MFMailComposeViewController canSendMail]) {
+        NSArray *message = @[@"\n\n\n",
+                             @"-----------------",
+                             @"Don't edit below.\n",
+                             [NSString stringWithFormat:@"version: %@", [UIApplication versionBuild]]
+                             ];
+        
         MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
         mail.mailComposeDelegate = self;
         [mail setSubject:@"Bug Report"];
-        [mail setMessageBody:@"\n\n\n\n-----------------\nDon't edit below.\n\n**debug values here**" isHTML:NO];
+        [mail setMessageBody:[message componentsJoinedByString:@"\n"] isHTML:NO];
         [mail setToRecipients:@[@"support@crazeapp.com"]];
         
         [self presentViewController:mail animated:YES completion:nil];
         
     } else {
-        // TODO: alert that mail doesnt work
+        NSURL* mailURL = [NSURL URLWithString:@"message://"];
         
-        // https://stackoverflow.com/questions/8821934/launch-apple-mail-app-from-within-my-own-app
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Setup Email" message:@"You need to setup an email on your device in order to send a bug report." preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Later" style:UIAlertActionStyleCancel handler:nil]];
         
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"" preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+        if ([[UIApplication sharedApplication] canOpenURL:mailURL]) {
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Setup" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [[UIApplication sharedApplication] openURL:mailURL options:@{} completionHandler:nil];
+            }]];
+        }
+        
         [self presentViewController:alertController animated:YES completion:nil];
     }
 }
