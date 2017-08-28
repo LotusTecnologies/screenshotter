@@ -16,6 +16,7 @@
 #import "LoadingViewController.h"
 #import "UserDefaultsConstants.h"
 #import "ScreenshotsNavigationController.h"
+#import "AnalyticsManager.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
@@ -199,6 +200,7 @@
 #pragma mark - UNUserNotificationCenterDelegate
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    [AnalyticsManager track:@"app opened from local notification"];
     NSDictionary *userInfo = response.notification.request.content.userInfo;
     if (userInfo) {
         NSString *openingScreen = userInfo[Constants.openingScreenKey];
