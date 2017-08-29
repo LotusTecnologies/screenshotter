@@ -13,6 +13,7 @@ def shared_pods
     pod 'FBSDKCoreKit'
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
+    pod 'ImageEffects'
 end
 
 #target 'dev_influencer' do

@@ -9,9 +9,12 @@
 #import "ScreenshotCollectionViewCell.h"
 #import "UIColor+Appearance.h"
 
+#import <ImageEffects/ImageEffects.h>
+
 @interface ScreenshotCollectionViewCell ()
 
 @property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) UIImageView *toolbarImageView;
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UIView *badge;
 
@@ -37,6 +40,26 @@
             imageView;
         });
         
+        UIView *toolbarBackgroundView = [[UIView alloc] init];
+        toolbarBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+        toolbarBackgroundView.clipsToBounds = YES;
+        [self.contentView addSubview:toolbarBackgroundView];
+        [toolbarBackgroundView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+        [toolbarBackgroundView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+        [toolbarBackgroundView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+        
+        _toolbarImageView = ({
+            UIImageView *imageView = [[UIImageView alloc] init];
+            imageView.translatesAutoresizingMaskIntoConstraints = NO;
+            imageView.contentMode = UIViewContentModeScaleAspectFill;
+            [toolbarBackgroundView addSubview:imageView];
+            [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
+            [imageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+            [imageView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+            [imageView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            imageView;
+        });
+        
         _toolbar = ({
             // Restore when Share feature implemented.
             //UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ScreenshotShare"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
@@ -45,16 +68,16 @@
             
             UIToolbar *toolbar = [[UIToolbar alloc] init];
             toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-            [toolbar setBackgroundImage:[UIImage new] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
-            toolbar.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.7f];
-            toolbar.tintColor = [UIColor whiteColor];
+            [toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+            toolbar.tintColor = [UIColor crazeRedColor];
             
             //toolbar.items = @[shareButtonItem, flexilbeItem, trashButtonItem];
             toolbar.items = @[flexilbeItem, trashButtonItem];
-            [self.contentView addSubview:toolbar];
-            [toolbar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [toolbar.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
-            [toolbar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            [toolbarBackgroundView addSubview:toolbar];
+            [toolbar.topAnchor constraintEqualToAnchor:toolbarBackgroundView.topAnchor].active = YES;
+            [toolbar.leadingAnchor constraintEqualToAnchor:toolbarBackgroundView.leadingAnchor].active = YES;
+            [toolbar.bottomAnchor constraintEqualToAnchor:toolbarBackgroundView.bottomAnchor].active = YES;
+            [toolbar.trailingAnchor constraintEqualToAnchor:toolbarBackgroundView.trailingAnchor].active = YES;
             toolbar;
         });
         
@@ -96,9 +119,11 @@
         if (screenshot) {
             // TODO: set to default screenshot image
             self.imageView.image = [UIImage imageWithData:_screenshot.imageData];
+            self.toolbarImageView.image = [self.imageView.image extraLightImage];
             
         } else {
             self.imageView.image = nil;
+            self.toolbarImageView.image = nil;
         }
     }
 }
