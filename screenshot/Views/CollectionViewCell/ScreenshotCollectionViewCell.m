@@ -51,12 +51,12 @@
         _toolbarImageView = ({
             UIImageView *imageView = [[UIImageView alloc] init];
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
-            imageView.contentMode = UIViewContentModeScaleAspectFill;
+            imageView.contentMode = self.imageView.contentMode;
             [toolbarBackgroundView addSubview:imageView];
-            [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
-            [imageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [imageView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
-            [imageView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            [imageView.topAnchor constraintEqualToAnchor:self.imageView.topAnchor].active = YES;
+            [imageView.leadingAnchor constraintEqualToAnchor:self.imageView.leadingAnchor].active = YES;
+            [imageView.bottomAnchor constraintEqualToAnchor:self.imageView.bottomAnchor].active = YES;
+            [imageView.trailingAnchor constraintEqualToAnchor:self.imageView.trailingAnchor].active = YES;
             imageView;
         });
         
