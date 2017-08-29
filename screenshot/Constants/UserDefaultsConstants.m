@@ -14,3 +14,4 @@ NSString *const UserDefaultsTutorialCompleted = @"TutorialCompleted";
 NSString *const UserDefaultsTutorialPresentedScreenshotHelper = @"TutorialPresentedScreenshotHelper";
 NSString *const UserDefaultsDateInstalled = @"DateInstalled";
 NSString *const UserDefaultsDateLastSound = @"DateLastSound";
+NSString *const UserDefaultsDateLastVisitedScreenshots = @"DateLastVisitedScreenshots";

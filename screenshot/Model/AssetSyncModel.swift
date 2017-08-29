@@ -183,6 +183,7 @@ class AssetSyncModel: NSObject {
                                     screenshot.syteJson = NetworkingPromise.jsonStringify(object: segments)
                                     screenshot.uploadedImageURL = uploadedURLString
                                 }
+                                screenshot.lastModified = NSDate()
                                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
                                 if screenshot.shoppablesCount == 1 {
                                     self.sendScreenshotAddedLocalNotification(assetId: assetId)

@@ -264,6 +264,7 @@ extension DataModel {
         if let nsData = imageData as NSData? {
             screenshotToSave.imageData = nsData
         }
+        screenshotToSave.lastModified = NSDate()
         do {
             try managedObjectContext.save()
         } catch {

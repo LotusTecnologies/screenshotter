@@ -14,3 +14,4 @@ extern NSString *const UserDefaultsTutorialCompleted;
 extern NSString *const UserDefaultsTutorialPresentedScreenshotHelper;
 extern NSString *const UserDefaultsDateInstalled;
 extern NSString *const UserDefaultsDateLastSound;
+extern NSString *const UserDefaultsDateLastVisitedScreenshots;

@@ -21,6 +21,7 @@
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 @property (nonatomic, strong) HelperView *helperView;
+@property (nonatomic, strong) NSDate *lastVisited;
 
 @end
 
@@ -101,6 +102,8 @@
         
         helperView;
     });
+    
+    self.lastVisited = [NSUserDefaults.standardUserDefaults objectForKey:UserDefaultsDateLastVisitedScreenshots];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -128,6 +131,7 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
+    [self updateLastVisited];
     if (self.collectionView.backgroundView) {
         [self.collectionView.backgroundView removeFromSuperview];
         self.collectionView.backgroundView = nil;
@@ -140,7 +144,13 @@
     [self.collectionView.collectionViewLayout invalidateLayout];
 }
 
+-(void)updateLastVisited {
+    self.lastVisited = [NSDate date];
+    [NSUserDefaults.standardUserDefaults setObject:self.lastVisited forKey:UserDefaultsDateLastVisitedScreenshots];
+}
+
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
+    [self updateLastVisited];
     if (self.view.window && self.collectionView.backgroundView) {
         [self.collectionView.backgroundView removeFromSuperview];
         self.collectionView.backgroundView = nil;
@@ -247,7 +257,7 @@
     cell.delegate = self;
     cell.backgroundColor = [UIColor lightGrayColor];
     cell.screenshot = screenshot;
-    cell.badgeEnabled = NO; // TODO: Gershon
+    cell.badgeEnabled = [self.lastVisited timeIntervalSinceDate:screenshot.lastModified] <= 0.0;
     return cell;
 }
 
