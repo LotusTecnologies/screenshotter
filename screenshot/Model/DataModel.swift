@@ -75,6 +75,9 @@ class DataModel: NSObject {
         }
     }
     
+    // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
+    let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
+
     // MARK: - FRC
 
     public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
@@ -400,11 +403,36 @@ extension DataModel {
         return productToSave
     }
     
-    public func unfavorite(favoriteArray: [Product]) {
-        for favorite in favoriteArray {
-            favorite.isFavorite = false
+    // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
+    // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
+    // But it only runs against a private queue, and each call may have its own private queue running in parallel.
+    // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
+    func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
+        dbQ.async {
+            let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+            managedObjectContext.performAndWait {
+                block(managedObjectContext)
+            }
         }
-        saveMain()
+    }
+    
+    public func unfavorite(favoriteArray: [Product]) {
+        let moiArray = favoriteArray.map { $0.objectID }
+        self.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for product in results {
+                    product.isFavorite = false
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
+            }
+        }
     }
     
     // Update changes made in the background
@@ -425,18 +453,30 @@ extension DataModel {
 extension Screenshot {
     
     @objc public func setHide() {
-        self.isHidden = true
-        self.imageData = nil
-        self.syteJson = nil
-        self.uploadedImageURL = nil
-        let dataModel = DataModel.sharedInstance
-        let managedObjectContext = dataModel.mainMoc()
-        if let shoppables = self.shoppables as? Set<Shoppable> {
-            for shoppable in shoppables {
-                managedObjectContext.delete(shoppable)
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for screenshot in results {
+                    screenshot.isHidden = true
+                    screenshot.imageData = nil
+                    screenshot.syteJson = nil
+                    screenshot.uploadedImageURL = nil
+                    if let shoppables = screenshot.shoppables as? Set<Shoppable> {
+                        for shoppable in shoppables {
+                            managedObjectContext.delete(shoppable)
+                        }
+                    }
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("setHide objectID:\(managedObjectID) results with error:\(error)")
             }
         }
-        dataModel.saveMain()
     }
     
 }
@@ -464,9 +504,23 @@ extension Shoppable {
 extension Product {
     
     @objc public func setFavorited(toFavorited: Bool) {
-        self.isFavorite = toFavorited
-        self.dateFavorited = toFavorited ? NSDate() : nil
-        DataModel.sharedInstance.saveMain()
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for product in results {
+                    product.isFavorite = toFavorited
+                    product.dateFavorited = toFavorited ? NSDate() : nil
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("setFavorited objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
     }
     
 }

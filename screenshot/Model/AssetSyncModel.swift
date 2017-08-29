@@ -53,7 +53,7 @@ class AssetSyncModel: NSObject {
             }.then(on: processingQ) { isFashion, image -> Void in
                 AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
-                dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
+                dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
                                                      createdAt: asset.creationDate,
@@ -136,7 +136,7 @@ class AssetSyncModel: NSObject {
             }.then(on: self.processingQ) { productsDict -> Void in
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
                     let dataModel = DataModel.sharedInstance
-                    dataModel.persistentContainer.performBackgroundTask { (managedObjectContext) in
+                    dataModel.performBackgroundTask { (managedObjectContext) in
                         if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
                             let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
                                                                     screenshot: screenshot,
