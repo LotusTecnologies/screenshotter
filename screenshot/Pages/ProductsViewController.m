@@ -162,7 +162,7 @@
 
 #pragma mark - Shoppable
 
--(BOOL)hasShoppables {
+- (BOOL)hasShoppables {
     return self.shoppablesFrc.fetchedObjects.count > 0;
 }
 

@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ScreenshotsNavigationController.h"
 
 @interface MainTabBarController : UITabBarController
+
+@property (nonatomic, strong, readonly) UINavigationController *favoritesNavigationController;
+@property (nonatomic, strong, readonly) ScreenshotsNavigationController *screenshotsNavigationController;
+@property (nonatomic, strong, readonly) UINavigationController *settingsNavigationController;
 
 @end

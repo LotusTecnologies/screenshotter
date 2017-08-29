@@ -24,4 +24,6 @@
 
 - (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath;
 
+- (void)scrollTopTop;
+
 @end

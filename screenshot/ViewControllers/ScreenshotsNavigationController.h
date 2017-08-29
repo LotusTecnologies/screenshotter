@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ScreenshotsViewController.h"
 
 @interface ScreenshotsNavigationController : UINavigationController
+
+@property (nonatomic, strong, readonly) ScreenshotsViewController *screenshotsViewController;
 
 @end

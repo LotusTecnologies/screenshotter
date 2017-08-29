@@ -7,13 +7,10 @@
 //
 
 #import "ScreenshotsNavigationController.h"
-#import "ScreenshotsViewController.h"
 #import "ProductsViewController.h"
 #import "UIColor+Appearance.h"
 
 @interface ScreenshotsNavigationController () <ScreenshotsViewControllerDelegate>
-
-@property (nonatomic, strong) ScreenshotsViewController *screenshotsViewController;
 
 @end
 
@@ -48,10 +45,11 @@
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
     productsViewController.screenshot = [viewController screenshotAtIndexPath:indexPath];
     
-    if (productsViewController.hasShoppables) {
+    if ([productsViewController hasShoppables]) {
         [self pushViewController:productsViewController animated:YES];
+        
     } else {
-        UIAlertController *alert =[UIAlertController alertControllerWithTitle:@"Sorry"
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry"
                                                                       message:@"We had a problem with this screenshot."
                                                                preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"

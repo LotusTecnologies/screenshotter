@@ -13,6 +13,6 @@
 
 @property (nonatomic, strong) Screenshot *screenshot;
 
--(BOOL)hasShoppables;
+- (BOOL)hasShoppables;
 
 @end

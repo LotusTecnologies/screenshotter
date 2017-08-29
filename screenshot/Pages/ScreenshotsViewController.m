@@ -267,6 +267,12 @@
     return [self.screenshotFrc objectAtIndexPath:indexPath];
 }
 
+- (void)scrollTopTop {
+    if ([self.collectionView numberOfItemsInSection:0]) {
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    }
+}
+
 
 #pragma mark - Screenshot Cell
 

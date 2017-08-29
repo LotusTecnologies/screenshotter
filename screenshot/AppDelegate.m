@@ -33,7 +33,7 @@
 
 #pragma mark - Life Cycle
 
--(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     UNUserNotificationCenter.currentNotificationCenter.delegate = self;
     [ClarifaiModel setup]; // Takes a long time to intialize; start early.
     [DataModel setup]; // Sets up Core Data stack on a background queue.
@@ -197,26 +197,31 @@
     [self transitionToViewController:[self nextViewController]];
 }
 
+
 #pragma mark - UNUserNotificationCenterDelegate
 
--(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
-    [AnalyticsManager track:@"app opened from local notification"];
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
     NSDictionary *userInfo = response.notification.request.content.userInfo;
+    
     if (userInfo) {
         NSString *openingScreen = userInfo[Constants.openingScreenKey];
+        
         if ([openingScreen isEqualToString:Constants.openingScreenValueScreenshot]) {
             MainTabBarController *mainTabBarController = (MainTabBarController *)self.window.rootViewController;
+            
             if ([mainTabBarController isKindOfClass:[MainTabBarController class]]) {
-                mainTabBarController.selectedIndex = 0;
-                ScreenshotsNavigationController *screenshotsNavigationController = (ScreenshotsNavigationController *)mainTabBarController.selectedViewController;
-                if ([screenshotsNavigationController isKindOfClass:[ScreenshotsNavigationController class]]) {
-                    [screenshotsNavigationController popToRootViewControllerAnimated:NO];
-                }
+                [mainTabBarController.screenshotsNavigationController popToRootViewControllerAnimated:NO];
+                [mainTabBarController.screenshotsNavigationController.screenshotsViewController scrollTopTop];
+                mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController;
             }
         }
     }
-    if (completionHandler)
+    
+    if (completionHandler) {
         completionHandler();
+    }
+    
+    [AnalyticsManager track:@"app opened from local notification"];
 }
 
 @end

@@ -8,7 +8,6 @@
 
 #import "MainTabBarController.h"
 #import "FavoritesViewController.h"
-#import "ScreenshotsNavigationController.h"
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "UIColor+Appearance.h"
