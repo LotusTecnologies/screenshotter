@@ -7,6 +7,7 @@
 //
 
 #import "TutorialTrySlideView.h"
+#import "screenshot-Swift.h"
 
 @implementation TutorialTrySlideView
 
@@ -34,6 +35,7 @@
 }
 
 - (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
+    AssetSyncModel.sharedInstance.isTutorialScreenshot = YES;
     [self.delegate tutorialTrySlideViewDidComplete:self];
 }
 

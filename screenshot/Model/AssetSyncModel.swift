@@ -23,6 +23,7 @@ class AssetSyncModel: NSObject {
     let processingQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing") // DispatchQueue.global(qos: .userInitiated) // TODO: Parallelize.
     var isRegistered = false
     var isSyncing = false
+    var isTutorialScreenshot = false
     var shouldSyncAgain = false
     var screenshotsToProcess: Int = 0
     var shoppablesToProcess: Int = 0
@@ -48,8 +49,14 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
-                AnalyticsManager.track("sent image to Clarifai")
-                return ClarifaiModel.sharedInstance.isFashion(image: image)
+                if self.isTutorialScreenshot {
+                    self.isTutorialScreenshot = false
+                    print("Bypassing Clarifai")
+                    return Promise(value: (true, image))
+                } else {
+                    AnalyticsManager.track("sent image to Clarifai")
+                    return ClarifaiModel.sharedInstance.isFashion(image: image)
+                }
             }.then(on: processingQ) { isFashion, image -> Void in
                 AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
