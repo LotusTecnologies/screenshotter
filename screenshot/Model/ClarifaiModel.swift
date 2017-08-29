@@ -73,7 +73,7 @@ class ClarifaiModel: NSObject {
                 }
                 for concept in concepts {
                     switch concept.name {
-                    case "woman", "fashion", "beauty", "glamour", "dress":
+                    case "woman", "man", "fashion", "beauty", "glamour", "dress":
                         isFashion = true
                     default:
                         break
