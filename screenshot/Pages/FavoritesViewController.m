@@ -87,7 +87,7 @@
         
         UIImageView *imageView = [[UIImageView alloc] init];
         imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        imageView.image = [UIImage imageNamed:@"FavoriteEmptyListHelper"];
+        imageView.image = [UIImage imageNamed:@"FavoriteEmptyListGraphic"];
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         [helperView.contentView addSubview:imageView];
         [imageView.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
