@@ -26,6 +26,7 @@ class NetworkingPromise: NSObject {
                     let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
                     segments.count > 0 else {
                         let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments"])
+                        print("Syte no segments. responseObject:\(String(describing: responseObject))")
                         reject(emptyError)
                         return
                 }

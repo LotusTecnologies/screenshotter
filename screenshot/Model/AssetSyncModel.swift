@@ -50,7 +50,6 @@ class AssetSyncModel: NSObject {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
                 if self.isTutorialScreenshot {
-                    self.isTutorialScreenshot = false
                     print("Bypassing Clarifai")
                     return Promise(value: (true, image))
                 } else {
@@ -58,7 +57,9 @@ class AssetSyncModel: NSObject {
                     return ClarifaiModel.sharedInstance.isFashion(image: image)
                 }
             }.then(on: processingQ) { isFashion, image -> Void in
-                AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
+                if !self.isTutorialScreenshot {
+                    AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
+                }
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -72,9 +73,19 @@ class AssetSyncModel: NSObject {
                         NotificationManager.shared().present(with: .products)
                     }
                     firstly { _ -> Promise<(String, [[String : Any]])> in
-                        return NetworkingPromise.uploadToSyte(imageData: imageData)
+                        if self.isTutorialScreenshot {
+                            print("Bypassing Syte")
+                            let segments = [["label":"Skirts","gender":"female","b0":[0.4177178144454956,0.4898432493209839],"center":[0.5302261114120483,0.5905150771141052],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC42OTM3MDM3MDA2MDIwNTQ2LCJ5IjowLjQ4NzMyNjQ1MzYyNjE1NTg0LCJ4MiI6MC42NDU1NDcxMTU4MDI3NjQ5LCJ4IjowLjQxNDkwNTEwNzAyMTMzMTh9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.5819&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6427344083786011,0.6911869049072266]],["label":"Jackets","gender":"female","b0":[0.3964715600013733,0.4136771559715271],"center":[0.5247414112091064,0.4848739802837372],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC41NTc4NTA3MjUyMDM3NTI2LCJ5IjowLjQxMTg5NzIzNTM2MzcyMTg2LCJ4MiI6MC42NTYyMTgwMDg2OTcwMzMsIngiOjAuMzkzMjY0ODEzNzIxMTh9&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.5910&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6530112624168396,0.5560708045959473]],["label":"Shoes","gender":"female","b0":[0.4400824010372162,0.7088841199874878],"center":[0.4686053097248077,0.73576420545578],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC43NjMzMTYyOTMwNjA3Nzk1LCJ5IjowLjcwODIxMjExNzg1MDc4MDUsIngyIjowLjQ5Nzg0MTI5MTEyOTU4OTEsIngiOjAuNDM5MzY5MzI4MzIwMDI2NH0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5940&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4971282184123993,0.7626442909240723]],["label":"Bags","gender":"female","b0":[0.3904582262039185,0.5603976249694824],"center":[0.4276284575462341,0.6082033514976501],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC42NTcyMDQyMjExODkwMjIxLCJ5IjowLjU1OTIwMjQ4MTgwNjI3ODIsIngyIjowLjQ2NTcyNzk0NDY3MjEwNzcsIngiOjAuMzg5NTI4OTcwNDIwMzYwNTV9&cats=WyJIYW5kYmFncyJd&prob=0.5947&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4647986888885498,0.6560090780258179]],["label":"Shoes","gender":"female","b0":[0.5386749505996704,0.7097557187080383],"center":[0.5780842304229736,0.7361155152320862],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC43NjMxMzQzMDY2NjkyMzUyLCJ5IjowLjcwOTA5NjcyMzc5NDkzNzIsIngyIjowLjYxODQ3ODc0MjI0MTg1OTQsIngiOjAuNTM3Njg5NzE4NjA0MDg3OX0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6584&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6174935102462769,0.762475311756134]]]
+                            return Promise(value: ("https://s3.amazonaws.com/s3-file-store/generated/JjdvWeV7u5S75ZPl5pSOX", segments))
+                        } else {
+                            return NetworkingPromise.uploadToSyte(imageData: imageData)
+                        }
                         }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                            AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
+                            if self.isTutorialScreenshot {
+                                self.isTutorialScreenshot = false
+                            } else {
+                                AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
+                            }
                             self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
                         }.always {
                             NotificationManager.shared().dismiss(with: .products)
