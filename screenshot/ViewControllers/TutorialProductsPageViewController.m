@@ -229,7 +229,7 @@
 }
 
 - (CGFloat)bottomContentHeight {
-    return 210.f;
+    return 200.f;
 }
 
 - (UIView *)pointerView {

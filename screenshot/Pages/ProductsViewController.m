@@ -16,6 +16,7 @@
 #import "AnalyticsManager.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
+#import "UserDefaultsConstants.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
@@ -31,7 +32,6 @@
 
 @property (nonatomic, copy) UIImage *image;
 
-@property (nonatomic, strong) TutorialProductsPageViewController *helperViewController;
 @property (nonatomic, strong) TransitioningController *transitioningController;
 
 @end
@@ -126,13 +126,7 @@
     
     _didViewDidAppear = YES;
     
-    self.transitioningController = [[TransitioningController alloc] init];
-    
-    self.helperViewController = [[TutorialProductsPageViewController alloc] init];
-    self.helperViewController.modalPresentationStyle = UIModalPresentationCustom;
-    self.helperViewController.transitioningDelegate = self.transitioningController;
-    self.helperViewController.product = [self.products firstObject];
-    [self presentViewController:self.helperViewController animated:YES completion:nil];
+    [self presentTutorialHelperIfNeeded];
 }
 
 - (void)dealloc {
@@ -173,7 +167,7 @@
 }
 
 
-#pragma mark - Shoppable
+#pragma mark - Shoppable / Products
 
 - (BOOL)hasShoppables {
     return self.shoppablesFrc.fetchedObjects.count > 0;
@@ -193,23 +187,16 @@
     return shoppables;
 }
 
-- (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
-    return UIBarPositionTopAttached;
-}
-
-- (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
-    [self reloadCollectionViewForIndex:index];
-    
-    [AnalyticsManager track:@"Tapped on shoppable"];
+- (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
+    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
+    return [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
 }
 
 
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
-    Shoppable *shoppable = [self shoppableAtIndex:index];
-    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-    self.products = [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
+    self.products = [self productsForShoppable:[self shoppableAtIndex:index]];
     
     [self.collectionView reloadData];
     
@@ -296,6 +283,53 @@
 
 - (void)frcReloadData {
     [self.collectionView reloadData];
+}
+
+
+#pragma mark - Toolbar
+
+- (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
+    return UIBarPositionTopAttached;
+}
+
+- (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
+    [self reloadCollectionViewForIndex:index];
+    
+    [AnalyticsManager track:@"Tapped on shoppable"];
+}
+
+
+#pragma mark - Tutorial
+
+- (void)presentTutorialHelperIfNeeded {
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialPresentedProductHelper];
+    BOOL isTutorialScreenshot = YES; // TODO: gershon how can we set this?
+    
+    if (!hasPresented && isTutorialScreenshot) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedProductHelper];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        self.transitioningController = [[TransitioningController alloc] init];
+    
+        NSArray<Shoppable *> *shoppables = [self shoppables];
+        Product *product;
+        
+        for (Shoppable *shoppable in shoppables) {
+            if ([shoppable.label isEqualToString:@"Jackets"]) {
+                product = [[self productsForShoppable:shoppable] firstObject];
+            }
+        }
+        
+        if (!product) {
+            product = [self.products firstObject];
+        }
+    
+        TutorialProductsPageViewController *viewController = [[TutorialProductsPageViewController alloc] init];
+        viewController.modalPresentationStyle = UIModalPresentationCustom;
+        viewController.transitioningDelegate = self.transitioningController;
+        viewController.product = product;
+        [self presentViewController:viewController animated:YES completion:nil];
+    }
 }
 
 @end

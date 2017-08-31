@@ -185,6 +185,7 @@
     
     if (!hasPresented && [self.collectionView numberOfItemsInSection:0] == 1) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedScreenshotHelper];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         
         UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
         
