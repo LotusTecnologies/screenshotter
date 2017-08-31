@@ -14,6 +14,8 @@
 #import "ScreenshotDisplayNavigationController.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
+#import "ProductsPageHelperViewController.h"
+#import "TransitioningController.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
@@ -28,6 +30,9 @@
 @property (nonatomic, strong) NSArray<Product *> *products;
 
 @property (nonatomic, copy) UIImage *image;
+
+@property (nonatomic, strong) ProductsPageHelperViewController *helperViewController;
+@property (nonatomic, strong) TransitioningController *transitioningController;
 
 @end
 
@@ -120,6 +125,13 @@
     }
     
     _didViewDidAppear = YES;
+    
+    self.transitioningController = [[TransitioningController alloc] init];
+    
+    self.helperViewController = [[ProductsPageHelperViewController alloc] init];
+    self.helperViewController.modalPresentationStyle = UIModalPresentationCustom;
+    self.helperViewController.transitioningDelegate = self.transitioningController;
+    [self presentViewController:self.helperViewController animated:YES completion:nil];
 }
 
 - (void)dealloc {

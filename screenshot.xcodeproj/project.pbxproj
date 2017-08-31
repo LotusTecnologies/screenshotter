@@ -27,6 +27,9 @@
 		C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDE1F3C38510090E422 /* MainTabBarController.m */; };
 		C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */; };
 		C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE41F3C38510090E422 /* FavoriteButton.m */; };
+		C528DC0F1F57E9D700F4E723 /* ProductsPageHelperViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC0E1F57E9D700F4E723 /* ProductsPageHelperViewController.m */; };
+		C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC111F57EDD100F4E723 /* InsetPresentationController.m */; };
+		C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC151F57F34E00F4E723 /* TransitioningController.m */; };
 		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
 		C540FE101F4F5BA8005863D7 /* Button.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0F1F4F5BA8005863D7 /* Button.m */; };
 		C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE121F52993F005863D7 /* UIDevice+Model.m */; };
@@ -93,6 +96,12 @@
 		C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
 		C5278FE31F3C38510090E422 /* FavoriteButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoriteButton.h; sourceTree = "<group>"; };
 		C5278FE41F3C38510090E422 /* FavoriteButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoriteButton.m; sourceTree = "<group>"; };
+		C528DC0D1F57E9D700F4E723 /* ProductsPageHelperViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductsPageHelperViewController.h; sourceTree = "<group>"; };
+		C528DC0E1F57E9D700F4E723 /* ProductsPageHelperViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsPageHelperViewController.m; sourceTree = "<group>"; };
+		C528DC101F57EDD100F4E723 /* InsetPresentationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InsetPresentationController.h; sourceTree = "<group>"; };
+		C528DC111F57EDD100F4E723 /* InsetPresentationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InsetPresentationController.m; sourceTree = "<group>"; };
+		C528DC141F57F34E00F4E723 /* TransitioningController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransitioningController.h; sourceTree = "<group>"; };
+		C528DC151F57F34E00F4E723 /* TransitioningController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransitioningController.m; sourceTree = "<group>"; };
 		C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialWelcomeSlideView.h; sourceTree = "<group>"; };
 		C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialWelcomeSlideView.m; sourceTree = "<group>"; };
 		C540FE0E1F4F5BA8005863D7 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
@@ -244,10 +253,14 @@
 			children = (
 				C5278FDB1F3C38510090E422 /* BaseViewController.h */,
 				C5278FDC1F3C38510090E422 /* BaseViewController.m */,
+				C528DC101F57EDD100F4E723 /* InsetPresentationController.h */,
+				C528DC111F57EDD100F4E723 /* InsetPresentationController.m */,
 				C55184CD1F4D5DC600EE7855 /* LoadingViewController.h */,
 				C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */,
 				C5278FDD1F3C38510090E422 /* MainTabBarController.h */,
 				C5278FDE1F3C38510090E422 /* MainTabBarController.m */,
+				C528DC0D1F57E9D700F4E723 /* ProductsPageHelperViewController.h */,
+				C528DC0E1F57E9D700F4E723 /* ProductsPageHelperViewController.m */,
 				C55184C31F4C0DAA00EE7855 /* ScreenshotDisplay */,
 				C5278FE01F3C38510090E422 /* ScreenshotsNavigationController.h */,
 				C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */,
@@ -275,6 +288,15 @@
 				C540FE0F1F4F5BA8005863D7 /* Button.m */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		C528DC131F57F33900F4E723 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C528DC141F57F34E00F4E723 /* TransitioningController.h */,
+				C528DC151F57F34E00F4E723 /* TransitioningController.m */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 		C55184B91F4AD3E000EE7855 /* CollectionViewCell */ = {
@@ -347,6 +369,7 @@
 				C5278FB31F3C38510090E422 /* Appearance */,
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
+				C528DC131F57F33900F4E723 /* Controllers */,
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
 				C5278FD71F3C38510090E422 /* Singletons */,
@@ -556,6 +579,7 @@
 				C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
 				C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */,
+				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
 				C5278FF61F3C38510090E422 /* TutorialPermissionsSlideView.m in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
@@ -570,6 +594,7 @@
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */,
 				C5278FEA1F3C38510090E422 /* UIColor+Appearance.m in Sources */,
+				C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */,
 				C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */,
 				C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */,
 				C5278FF41F3C38510090E422 /* TutorialBaseSlideView.m in Sources */,
@@ -583,6 +608,7 @@
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */,
 				C5278FF31F3C38510090E422 /* SettingsViewController.m in Sources */,
+				C528DC0F1F57E9D700F4E723 /* ProductsPageHelperViewController.m in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
 				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
