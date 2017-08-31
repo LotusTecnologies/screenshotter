@@ -303,7 +303,8 @@
 
 - (void)presentTutorialHelperIfNeeded {
     BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialPresentedProductHelper];
-    BOOL isTutorialScreenshot = YES; // TODO: gershon how can we set this?
+    NSString *tutorialScreenshotAssetId = [NSUserDefaults.standardUserDefaults stringForKey:UserDefaultsTutorialScreenshotAssetId];
+    BOOL isTutorialScreenshot = [self.screenshot.assetId isEqualToString:tutorialScreenshotAssetId];
     
     if (!hasPresented && isTutorialScreenshot) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedProductHelper];

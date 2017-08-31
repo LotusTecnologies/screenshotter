@@ -74,6 +74,7 @@ class AssetSyncModel: NSObject {
                     }
                     firstly { _ -> Promise<(String, [[String : Any]])> in
                         if self.isTutorialScreenshot {
+                            UserDefaults.standard.setValue(asset.localIdentifier, forKey: UserDefaultsTutorialScreenshotAssetId)
                             print("Bypassing Syte")
                             let nativeSize = UIScreen.main.nativeBounds.size
                             let deviceAspectRatio = nativeSize.height / nativeSize.width

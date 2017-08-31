@@ -13,6 +13,7 @@ NSString *const UserDefaultsName = @"Name";
 NSString *const UserDefaultsTutorialCompleted = @"TutorialCompleted";
 NSString *const UserDefaultsTutorialPresentedScreenshotHelper = @"TutorialPresentedScreenshotHelper";
 NSString *const UserDefaultsTutorialPresentedProductHelper = @"TutorialPresentedProductHelper";
+NSString *const UserDefaultsTutorialScreenshotAssetId = @"TutorialScreenshotAssetId";
 NSString *const UserDefaultsDateInstalled = @"DateInstalled";
 NSString *const UserDefaultsDateLastSound = @"DateLastSound";
 NSString *const UserDefaultsDateLastVisitedScreenshots = @"DateLastVisitedScreenshots";
