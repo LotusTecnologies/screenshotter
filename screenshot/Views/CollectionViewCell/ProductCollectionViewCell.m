@@ -9,7 +9,8 @@
 #import "ProductCollectionViewCell.h"
 #import "FavoriteButton.h"
 #import "UIColor+Appearance.h"
-#import <SDWebImage/UIImageView+WebCache.h>
+
+@import SDWebImage.UIImageView_WebCache;
 
 @interface ProductCollectionViewCell ()
 

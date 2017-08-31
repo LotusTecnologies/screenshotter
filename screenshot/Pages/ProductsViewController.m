@@ -14,7 +14,7 @@
 #import "ScreenshotDisplayNavigationController.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
-#import "ProductsPageHelperViewController.h"
+#import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
@@ -31,7 +31,7 @@
 
 @property (nonatomic, copy) UIImage *image;
 
-@property (nonatomic, strong) ProductsPageHelperViewController *helperViewController;
+@property (nonatomic, strong) TutorialProductsPageViewController *helperViewController;
 @property (nonatomic, strong) TransitioningController *transitioningController;
 
 @end
@@ -128,9 +128,10 @@
     
     self.transitioningController = [[TransitioningController alloc] init];
     
-    self.helperViewController = [[ProductsPageHelperViewController alloc] init];
+    self.helperViewController = [[TutorialProductsPageViewController alloc] init];
     self.helperViewController.modalPresentationStyle = UIModalPresentationCustom;
     self.helperViewController.transitioningDelegate = self.transitioningController;
+    self.helperViewController.product = [self.products firstObject];
     [self presentViewController:self.helperViewController animated:YES completion:nil];
 }
 
