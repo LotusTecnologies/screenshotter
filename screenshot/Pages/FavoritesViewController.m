@@ -19,6 +19,7 @@
 
 @interface FavoritesViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate> {
     BOOL _didViewWillAppear;
+    BOOL _needsReloadData;
 }
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -35,6 +36,9 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        
         self.title = @"Favorites";
         [self addNavigationItemLogo];
         
@@ -100,7 +104,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    if (_didViewWillAppear) {
+    if (_didViewWillAppear || _needsReloadData) {
+        _needsReloadData = NO;
         [self.collectionView reloadData];
     }
     
@@ -112,16 +117,29 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    // TODO: need to take into account when the user backgrounds / force quits
-    if (self.unfavoriteArray.count) {
-        [[DataModel sharedInstance] unfavoriteWithFavoriteArray:self.unfavoriteArray];
-        [self.unfavoriteArray removeAllObjects];
+    [self removeUnfavorited];
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self removeUnfavorited];
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        if (_needsReloadData) {
+            _needsReloadData = NO;
+            [self.collectionView reloadData];
+        }
     }
 }
 
 - (void)dealloc {
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -192,6 +210,17 @@
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
+
+
+#pragma mark - Favorites
+
+- (void)removeUnfavorited {
+    if (self.unfavoriteArray.count) {
+        [[DataModel sharedInstance] unfavoriteWithFavoriteArray:self.unfavoriteArray];
+        [self.unfavoriteArray removeAllObjects];
+        _needsReloadData = YES;
+    }
 }
 
 
