@@ -29,6 +29,11 @@
     [Appsee addEvent:track];
 }
 
++ (void)identify:(NSString *)email {
+    [[SEGAnalytics sharedAnalytics] identify:nil traits:@{ @"email": email }];
+    [Appsee setUserID:email];
+}
+
 + (void)track:(NSString *)track properties:(NSDictionary<NSString *, id> *)properties {
     [[SEGAnalytics sharedAnalytics] track:track properties:properties];
     
