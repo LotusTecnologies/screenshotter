@@ -13,4 +13,6 @@
 + (void)track:(NSString *)track;
 + (void)track:(NSString *)track properties:(NSDictionary<NSString *, id> *)properties;
 
++ (void)identify:(NSString *)email;
+
 @end
