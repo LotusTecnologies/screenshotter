@@ -110,6 +110,7 @@
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
+    [self syncCellsBadgeEnabled];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -132,6 +133,7 @@
     [super viewDidDisappear:animated];
     
     [self updateLastVisited];
+    
     if (self.collectionView.backgroundView) {
         [self.collectionView.backgroundView removeFromSuperview];
         self.collectionView.backgroundView = nil;
@@ -144,22 +146,21 @@
     [self.collectionView.collectionViewLayout invalidateLayout];
 }
 
--(void)updateLastVisited {
-    self.lastVisited = [NSDate date];
-    [NSUserDefaults.standardUserDefaults setObject:self.lastVisited forKey:UserDefaultsDateLastVisitedScreenshots];
-}
-
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
-    [self updateLastVisited];
-    if (self.view.window && self.collectionView.backgroundView) {
-        [self.collectionView.backgroundView removeFromSuperview];
-        self.collectionView.backgroundView = nil;
+    if (self.view.window) {
+        [self updateLastVisited];
+        
+        if (self.collectionView.backgroundView) {
+            [self.collectionView.backgroundView removeFromSuperview];
+            self.collectionView.backgroundView = nil;
+        }
     }
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self syncHelperViewVisibility];
+        [self syncCellsBadgeEnabled];
     }
 }
 
@@ -257,7 +258,7 @@
     cell.delegate = self;
     cell.backgroundColor = [UIColor lightGrayColor];
     cell.screenshot = screenshot;
-    cell.badgeEnabled = [self.lastVisited timeIntervalSinceDate:screenshot.lastModified] <= 0.0;
+    cell.badgeEnabled = [self badgeEnabledForScreenshot:screenshot];
     return cell;
 }
 
@@ -342,6 +343,28 @@
 - (void)syncHelperViewVisibility {
     self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
+}
+
+
+#pragma mark - New Badge
+
+- (void)updateLastVisited {
+    self.lastVisited = [NSDate date];
+    [[NSUserDefaults standardUserDefaults] setObject:self.lastVisited forKey:UserDefaultsDateLastVisitedScreenshots];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)badgeEnabledForScreenshot:(Screenshot *)screenshot {
+    return [self.lastVisited timeIntervalSinceDate:screenshot.lastModified] <= 0.0;
+}
+
+- (void)syncCellsBadgeEnabled {
+    for (ScreenshotCollectionViewCell *cell in self.collectionView.visibleCells) {
+        NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+        Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
+        
+        cell.badgeEnabled = [self badgeEnabledForScreenshot:screenshot];
+    }
 }
 
 @end
