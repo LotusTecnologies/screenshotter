@@ -132,7 +132,6 @@ class AssetSyncModel: NSObject {
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
-        var order: Int16 = 0
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
                 let url = URL(string: offersURL.hasPrefix("//") ? "https:" + offersURL : offersURL),
@@ -152,13 +151,11 @@ class AssetSyncModel: NSObject {
                                  uploadedURLString: uploadedURLString,
                                  segments: segments,
                                  url: url,
-                                 order: order,
                                  label: label,
                                  b0x: b0x,
                                  b0y: b0y,
                                  b1x: b1x,
                                  b1y: b1y)
-            order += 1
         }
     }
 
@@ -166,7 +163,6 @@ class AssetSyncModel: NSObject {
                          uploadedURLString: String,
                          segments: [[String : Any]],
                          url: URL,
-                         order: Int16,
                          label: String?,
                          b0x: Double,
                          b0y: Double,
@@ -181,7 +177,6 @@ class AssetSyncModel: NSObject {
                         if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
                             let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
                                                                     screenshot: screenshot,
-                                                                    order: order,
                                                                     label: label,
                                                                     offersURL: url.absoluteString,
                                                                     b0x: b0x,

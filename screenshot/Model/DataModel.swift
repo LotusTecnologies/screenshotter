@@ -102,7 +102,7 @@ class DataModel: NSObject {
     
     public func setupShoppableFrc(screenshot: Screenshot) -> NSFetchedResultsController<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
         request.predicate = NSPredicate(format: "screenshot == %@ AND productCount > 0", screenshot)
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         shoppableFrc = fetchedResultsController
@@ -355,7 +355,6 @@ extension DataModel {
     // Save a new Shoppable to Core Data.
     func saveShoppable(managedObjectContext: NSManagedObjectContext,
                        screenshot: Screenshot,
-                       order: Int16,
                        label: String?,
                        offersURL: String?,
                        b0x: Double,
@@ -364,8 +363,13 @@ extension DataModel {
                        b1y: Double) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
-        shoppableToSave.order = order
         shoppableToSave.label = label
+        let priorityMap = ["Jackets" : "A", "Skirts" : "B", "Shoes" : "C", "Bags" : "D"]
+        if let label = label, let priorityOrder = priorityMap[label] {
+            shoppableToSave.order = priorityOrder
+        } else {
+            shoppableToSave.order = label?.lowercased()
+        }
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
         shoppableToSave.b0y = b0y
