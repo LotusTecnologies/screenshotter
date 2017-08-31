@@ -214,6 +214,7 @@
 
 - (void)informDelegateOfSubmittedEmailIfPossible {
     if (![self.emailTextField isFirstResponder] && self.readyToSubmit) {
+        [self resignTextField];
         [self.delegate tutorialEmailSlideViewDidComplete:self];
     }
 }
@@ -222,7 +223,7 @@
 #pragma mark - Text Field
 
 - (void)resignTextField {
-    [self.emailTextField resignFirstResponder];
+    [self endEditing:YES];
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
