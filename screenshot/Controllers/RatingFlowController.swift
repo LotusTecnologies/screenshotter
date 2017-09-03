@@ -72,14 +72,16 @@ class RatingFlowController : NSObject {
             EggRating.promptRateUs(viewController: viewController)
             return
         }
-        
 
         EggRating.promptRateUsIfNeeded(viewController: viewController)
-
     }
 }
 
 extension RatingFlowController : EggRatingDelegate {
+    func shouldPresentDisadvantageAlert() -> Bool {
+        return false
+    }
+    
     func didRateOnAppStore() {
         delegate?.controller(self, didRate: .AppStore)
     }
