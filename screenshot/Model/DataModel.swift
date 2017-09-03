@@ -364,11 +364,11 @@ extension DataModel {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
         shoppableToSave.label = label
-        let priorityMap = ["Jackets" : "A", "Skirts" : "B", "Shoes" : "C", "Bags" : "D"]
+        let priorityMap = ["Jackets" : "00", "Skirts" : "01", "Shoes" : "02", "Bags" : "03"]
         if let label = label, let priorityOrder = priorityMap[label] {
             shoppableToSave.order = priorityOrder
         } else {
-            shoppableToSave.order = label?.lowercased()
+            shoppableToSave.order = label
         }
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
