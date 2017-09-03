@@ -20,8 +20,8 @@ class ClarifaiModel: NSObject {
 
     override init() {
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadStarted), name: Notification.Name.CAIWillDownloadGeneralModel, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidDownloadGeneralModel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadStarted), name: Notification.Name.CAIWillFetchModel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidFetchModel, object: nil)
         Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
         if UserDefaults.standard.object(forKey: UserDefaultsDateInstalled) == nil {
             if let image = UIImage.init(named: "ControlX") {
