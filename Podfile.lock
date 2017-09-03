@@ -22,7 +22,7 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
-  - Clarifai-Apple-SDK (3.0.0-beta3)
+  - Clarifai-Apple-SDK (3.0.0-beta4)
   - FBSDKCoreKit (4.26.0):
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.26.0):
@@ -41,7 +41,7 @@ DEPENDENCIES:
   - AFNetworking
   - Analytics (~> 3.0)
   - Appsee
-  - Clarifai-Apple-SDK (= 3.0.0-beta3)
+  - Clarifai-Apple-SDK (= 3.0.0-beta4)
   - FBSDKCoreKit
   - FBSDKLoginKit
   - FBSDKShareKit
@@ -54,7 +54,7 @@ SPEC CHECKSUMS:
   Analytics: 2c09a50e3478a3a7ced08a22d00c43ba6f7011e6
   Appsee: be7e8199ddf914dc4e2adb4cb7ed7f162c74e7a9
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Clarifai-Apple-SDK: 4f3d8ae1971cd49612611a97a3c1ce06bfbd2425
+  Clarifai-Apple-SDK: 8214da02c0276fe3b5f48fdc433a1a79f333a152
   FBSDKCoreKit: c8b8582311ec11b145451d8b9717dc6cc2ae5a76
   FBSDKLoginKit: f3f03b94c21eb834af243c0a881d48641f47ca60
   FBSDKShareKit: 320712d8293fde6392872c91eb80ef0da5d73cc3
@@ -62,6 +62,6 @@ SPEC CHECKSUMS:
   PromiseKit: ecf5fe92275d57ee77c9ede858af47a162e9b97e
   SDWebImage: 0e435c14e402a6730315a0fb79f95e68654d55a4
 
-PODFILE CHECKSUM: f0dd7a2e20907fe848260d505bf9e238d16105ef
+PODFILE CHECKSUM: ec468ece54a11ae3a37dcf12a820d74d6881a6f2
 
 COCOAPODS: 1.3.1

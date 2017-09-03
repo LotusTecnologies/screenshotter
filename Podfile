@@ -4,7 +4,7 @@ platform :ios, '9.0'
 def shared_pods
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     use_frameworks!
-    pod 'Clarifai-Apple-SDK', '3.0.0-beta3'
+    pod 'Clarifai-Apple-SDK', '3.0.0-beta4'
     pod 'PromiseKit/Foundation'
     pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
