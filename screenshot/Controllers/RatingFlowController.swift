@@ -9,10 +9,10 @@
 import Foundation
 import EggRating
 
-@objc class RatingFlow : NSObject, RatingFlowControllerDelegate {
+class RatingFlow : NSObject, RatingFlowControllerDelegate {
     static let sharedInstance = RatingFlow()
     
-    let controller = RatingFlowController()
+    fileprivate let controller = RatingFlowController()
     
     func start() {
         controller.delegate = self
@@ -23,8 +23,7 @@ import EggRating
     }
     
     // MARK: RatingFlowControllerDelegate
-    
-    func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating) {
+    fileprivate func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating) {
         if case .InApp = rating {
             AnalyticsManager.track("Rated app", properties: ["rating": "\(rating)"])
         } else {
@@ -32,7 +31,7 @@ import EggRating
         }
     }
     
-    func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlowController.Phase) {
+    fileprivate func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlowController.Phase) {
         if case .Initial = phase {
             AnalyticsManager.track("Ignored rating in app")
         } else {
@@ -41,12 +40,12 @@ import EggRating
     }
 }
 
-protocol RatingFlowControllerDelegate : class {
+fileprivate protocol RatingFlowControllerDelegate : class {
     func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating)
     func controllerDidCancel(_ controller: RatingFlowController, inPhase phase:RatingFlowController.Phase)
 }
 
-class RatingFlowController : NSObject {
+fileprivate class RatingFlowController : NSObject {
     weak var delegate: RatingFlowControllerDelegate?
 
     enum Rating {
@@ -72,7 +71,8 @@ class RatingFlowController : NSObject {
         // TODO: Track significant events performed in the app?
     }
 
-    // MARK: Public methods
+    // MARK: Operations
+    
     func prompt(force: Bool = false, inViewController viewController: UIViewController) {
         guard force == false else {
             EggRating.promptRateUs(viewController: viewController)
