@@ -8,7 +8,6 @@
 
 #import "TutorialProductsPageViewController.h"
 #import "UIColor+Appearance.h"
-#import "Button.h"
 #import "Geometry.h"
 
 @import SDWebImage.UIImageView_WebCache;

@@ -12,7 +12,6 @@
 #import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
 #import "UIColor+Appearance.h"
-#import "Button.h"
 
 @interface TutorialPermissionsSlideView ()
 

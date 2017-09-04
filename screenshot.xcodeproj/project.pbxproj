@@ -30,8 +30,10 @@
 		C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */; };
 		C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC111F57EDD100F4E723 /* InsetPresentationController.m */; };
 		C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC151F57F34E00F4E723 /* TransitioningController.m */; };
+		C528DC181F5D74BD00F4E723 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* Button.swift */; };
+		C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC191F5D7C2D00F4E723 /* Appearance.swift */; };
+		C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */; };
 		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
-		C540FE101F4F5BA8005863D7 /* Button.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0F1F4F5BA8005863D7 /* Button.m */; };
 		C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE121F52993F005863D7 /* UIDevice+Model.m */; };
 		C540FE161F52ADBE005863D7 /* TutorialTrySlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
@@ -102,10 +104,11 @@
 		C528DC111F57EDD100F4E723 /* InsetPresentationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InsetPresentationController.m; sourceTree = "<group>"; };
 		C528DC141F57F34E00F4E723 /* TransitioningController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransitioningController.h; sourceTree = "<group>"; };
 		C528DC151F57F34E00F4E723 /* TransitioningController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransitioningController.m; sourceTree = "<group>"; };
+		C528DC171F5D74BD00F4E723 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		C528DC191F5D7C2D00F4E723 /* Appearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
+		C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
 		C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialWelcomeSlideView.h; sourceTree = "<group>"; };
 		C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialWelcomeSlideView.m; sourceTree = "<group>"; };
-		C540FE0E1F4F5BA8005863D7 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
-		C540FE0F1F4F5BA8005863D7 /* Button.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Button.m; sourceTree = "<group>"; };
 		C540FE111F52993F005863D7 /* UIDevice+Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+Model.h"; sourceTree = "<group>"; };
 		C540FE121F52993F005863D7 /* UIDevice+Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+Model.m"; sourceTree = "<group>"; };
 		C540FE141F52ADBE005863D7 /* TutorialTrySlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialTrySlideView.h; sourceTree = "<group>"; };
@@ -182,6 +185,7 @@
 				C5278FB51F3C38510090E422 /* Geometry.m */,
 				C5278FB61F3C38510090E422 /* UIColor+Appearance.h */,
 				C5278FB71F3C38510090E422 /* UIColor+Appearance.m */,
+				C528DC191F5D7C2D00F4E723 /* Appearance.swift */,
 			);
 			path = Appearance;
 			sourceTree = "<group>";
@@ -274,8 +278,10 @@
 			isa = PBXGroup;
 			children = (
 				C55184B91F4AD3E000EE7855 /* CollectionViewCell */,
+				C528DC171F5D74BD00F4E723 /* Button.swift */,
 				C5278FE31F3C38510090E422 /* FavoriteButton.h */,
 				C5278FE41F3C38510090E422 /* FavoriteButton.m */,
+				C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */,
 				C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */,
 				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
 				C56F2BF51F42C2DF00501AE9 /* Loader.h */,
@@ -284,8 +290,6 @@
 				C5921E961F433D4100DF4888 /* TappableTextView.m */,
 				C54F032B1F44361C00CF8CBD /* HelperView.h */,
 				C54F032C1F44361C00CF8CBD /* HelperView.m */,
-				C540FE0E1F4F5BA8005863D7 /* Button.h */,
-				C540FE0F1F4F5BA8005863D7 /* Button.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -582,9 +586,9 @@
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
 				C5278FF61F3C38510090E422 /* TutorialPermissionsSlideView.m in Sources */,
+				C528DC181F5D74BD00F4E723 /* Button.swift in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
-				C540FE101F4F5BA8005863D7 /* Button.m in Sources */,
 				C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
@@ -609,8 +613,10 @@
 				C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */,
 				C5278FF31F3C38510090E422 /* SettingsViewController.m in Sources */,
 				C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */,
+				C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
+				C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */,
 				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
 				C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */,
 			);

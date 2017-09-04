@@ -13,7 +13,7 @@
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
 #import "UserDefaultsConstants.h"
-#import "Button.h"
+#import "screenshot-Swift.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
