@@ -6,7 +6,6 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
 import EggRating
 
 class RatingFlow : NSObject, RatingFlowControllerDelegate {
