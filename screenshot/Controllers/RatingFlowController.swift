@@ -26,15 +26,18 @@ import EggRating
     
     func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating) {
         if case .InApp = rating {
-            print("rated \(rating)")
+            AnalyticsManager.track("Rated app", properties: ["rating": "\(rating)"])
         } else {
-            print("rated on app store!")
+            AnalyticsManager.track("Rated app on app store")
         }
     }
     
     func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlowController.Phase) {
-        let suffix = phase == .AppStore ? " on AppStore" : ""
-        print("Ignored rating" + suffix)
+        if case .Initial = phase {
+            AnalyticsManager.track("Ignored rating in app")
+        } else {
+            AnalyticsManager.track("Ignored rating on AppStore")
+        }
     }
 }
 
