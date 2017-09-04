@@ -15,7 +15,20 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.titleLabel.text = @"Welcome to CRAZE"; // TODO: use craze logo
+        self.titleLabel.attributedText = ({
+            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+            attachment.image = [UIImage imageNamed:@"Logo36h"];
+            
+            CGRect rect = attachment.bounds;
+            rect.origin.y = -3.f;
+            rect.size = attachment.image.size;
+            attachment.bounds = rect;
+            
+            NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Welcome to "];
+            [attributedString appendAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
+            attributedString;
+        });
+        
         self.subtitleLabel.text = @"Any fashion picture you screenshot becomes shoppable in the app";
         
         UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialWelcomeGraphic"]];
