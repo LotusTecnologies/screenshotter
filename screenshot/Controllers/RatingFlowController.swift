@@ -67,6 +67,9 @@ class RatingFlowController : NSObject {
         EggRating.delegate = self
         EggRating.itunesId = "1254964391"
         EggRating.minRatingToAppStore = 4
+        EggRating.daysUntilPrompt = 2
+        
+        // TODO: Track significant events performed in the app?
     }
 
     // MARK: Public methods
