@@ -1,5 +1,5 @@
 //
-//  RatingFlowController.swift
+//  RatingFlow.swift
 //  screenshot
 //
 //  Created by Jacob Relkin on 9/3/17.
@@ -32,28 +32,53 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
         }
     }
     
-    fileprivate let controller = RatingFlowController()
+    private var hasSufficientSignificantEvents: Bool {
+        return significantEventCount >= significantEventThreshold
+    }
+    
+    fileprivate var controller = RatingFlowController() {
+        didSet {
+           controller.delegate = self
+        }
+    }
+    
+    // MARK: Public methods
     
     func start() {
-        controller.delegate = self
+        promptIfNecessary(delay: 3.5)
     }
     
     func recordSignificantEvent() {
         significantEventCount += 1
         
-        if let vc = self.containerViewControllerClosure(), significantEventCount > significantEventThreshold {
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) { [weak controller, vc] in
-                controller?.prompt(inViewController: vc)
-                
-                self.significantEventCount = 0
-            }
+        promptIfNecessary()
+    }
+    
+    // MARK: Private methods
+ 
+    private func promptIfNecessary(delay:Double = 2.5) {
+        guard hasSufficientSignificantEvents else {
+            return
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delay) {
+            self.prompt()
         }
     }
     
+    private func prompt(force: Bool = false) {
+        guard let vc = self.containerViewControllerClosure() else {
+            return
+        }
+        
+        controller.prompt(force: force, inViewController: vc)
+    }
+    
     // MARK: RatingFlowControllerDelegate
+    
     fileprivate func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating) {
-        if case .InApp = rating {
-            AnalyticsManager.track("Rated app", properties: ["rating": "\(rating)"])
+        if case .InApp(let ratingValue) = rating {
+            AnalyticsManager.track("Rated app", properties: ["rating": "\(ratingValue)"])
         } else {
             AnalyticsManager.track("Rated app on app store")
         }
@@ -90,11 +115,13 @@ fileprivate class RatingFlowController : NSObject {
     
     override init() {
         super.init()
-        
+
         EggRating.delegate = self
+        EggRating.titleLabelText = "Rate \(Bundle.main.infoDictionary!["CFBundleDisplayName"] ?? "Craze")"
         EggRating.itunesId = "1254964391"
-        EggRating.daysUntilPrompt = 1
-        EggRating.minRatingToAppStore = 4.5
+        EggRating.daysUntilPrompt = 1 // 1 day until first prompt
+        EggRating.remindPeriod = 3 // remind every 3 days thereafter
+        EggRating.minRatingToAppStore = 4
     }
 
     // MARK: Operations
