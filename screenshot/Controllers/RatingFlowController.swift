@@ -9,15 +9,44 @@
 import EggRating
 
 class RatingFlow : NSObject, RatingFlowControllerDelegate {
-    static let sharedInstance = RatingFlow()
+    public static let sharedInstance = RatingFlow(significantEventThreshold: 3)
+
+    private let containerViewControllerClosure: () -> UIViewController?
+    
+    init(significantEventThreshold threshold: Int = 3, containerViewControllerClosure closure: @escaping () -> UIViewController? = { UIApplication.shared.keyWindow?.rootViewController }) {
+        self.containerViewControllerClosure = closure
+        self.significantEventThreshold = threshold
+        
+        super.init()
+    }
+    
+    private static let SignificantEventCountUserDefaultsKey = "\(RatingFlow.self).SignificantEventCount"
+    private let significantEventThreshold: Int
+    private var significantEventCount:Int {
+        get {
+            return UserDefaults.standard.integer(forKey: RatingFlow.SignificantEventCountUserDefaultsKey)
+        }
+        set (newCount) {
+            UserDefaults.standard.set(newCount, forKey: RatingFlow.SignificantEventCountUserDefaultsKey)
+            UserDefaults.standard.synchronize()
+        }
+    }
     
     fileprivate let controller = RatingFlowController()
     
     func start() {
         controller.delegate = self
+    }
+    
+    func recordSignificantEvent() {
+        significantEventCount += 1
         
-        if let rvc = UIApplication.shared.keyWindow?.rootViewController {
-            controller.prompt(inViewController: rvc)
+        if let vc = self.containerViewControllerClosure(), significantEventCount > significantEventThreshold {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) { [weak controller, vc] in
+                controller?.prompt(inViewController: vc)
+                
+                self.significantEventCount = 0
+            }
         }
     }
     
@@ -64,10 +93,8 @@ fileprivate class RatingFlowController : NSObject {
         
         EggRating.delegate = self
         EggRating.itunesId = "1254964391"
-        EggRating.minRatingToAppStore = 4
-        EggRating.daysUntilPrompt = 2
-        
-        // TODO: Track significant events performed in the app?
+        EggRating.daysUntilPrompt = 1
+        EggRating.minRatingToAppStore = 4.5
     }
 
     // MARK: Operations
