@@ -7,7 +7,7 @@
 //
 
 #import "BaseViewController.h"
-#import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 
 @interface BaseViewController ()
 
@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor backgroundColor];
+    self.view.backgroundColor = [UIColor background];
 }
 
 - (void)addNavigationItemLogo {

@@ -8,7 +8,7 @@
 
 #import "ScreenshotsNavigationController.h"
 #import "ProductsViewController.h"
-#import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 
 @interface ScreenshotsNavigationController () <ScreenshotsViewControllerDelegate>
 
@@ -35,7 +35,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor backgroundColor];
+    self.view.backgroundColor = [UIColor background];
 }
 
 

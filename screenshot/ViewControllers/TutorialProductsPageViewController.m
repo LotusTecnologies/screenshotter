@@ -7,7 +7,6 @@
 //
 
 #import "TutorialProductsPageViewController.h"
-#import "UIColor+Appearance.h"
 #import "Geometry.h"
 
 @import SDWebImage.UIImageView_WebCache;
@@ -75,7 +74,7 @@
             [imageView.bottomAnchor constraintEqualToAnchor:shoppableContentView.bottomAnchor].active = YES;
             
             if (i == 0) {
-                imageView.layer.borderColor = [UIColor crazeRedColor].CGColor;
+                imageView.layer.borderColor = [UIColor crazeRed].CGColor;
                 imageView.layer.borderWidth = 2.f;
                 [imageView.leadingAnchor constraintEqualToAnchor:shoppableContentView.leadingAnchor].active = YES;
                 
@@ -153,7 +152,7 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
-            label.textColor = [UIColor softTextColor];
+            label.textColor = [UIColor softText];
             label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
             [bottomContentView addSubview:label];
             [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
@@ -238,7 +237,7 @@
     
     UIView *circle = [[UIView alloc] init];
     circle.translatesAutoresizingMaskIntoConstraints = NO;
-    circle.backgroundColor = [UIColor crazeRedColor];
+    circle.backgroundColor = [UIColor crazeRed];
     circle.layer.cornerRadius = circleDiameter / 2.f;
     circle.layer.masksToBounds = YES;
     [view addSubview:circle];
@@ -250,7 +249,7 @@
     
     UIView *line = [[UIView alloc] init];
     line.translatesAutoresizingMaskIntoConstraints = NO;
-    line.backgroundColor = [UIColor crazeRedColor];
+    line.backgroundColor = [UIColor crazeRed];
     [view addSubview:line];
     [line setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
     [line.heightAnchor constraintEqualToConstant:1.f].active = YES;

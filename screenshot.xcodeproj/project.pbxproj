@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C5278FE91F3C38510090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB51F3C38510090E422 /* Geometry.m */; };
-		C5278FEA1F3C38510090E422 /* UIColor+Appearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB71F3C38510090E422 /* UIColor+Appearance.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
@@ -26,7 +25,6 @@
 		C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDC1F3C38510090E422 /* BaseViewController.m */; };
 		C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDE1F3C38510090E422 /* MainTabBarController.m */; };
 		C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */; };
-		C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE41F3C38510090E422 /* FavoriteButton.m */; };
 		C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */; };
 		C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC111F57EDD100F4E723 /* InsetPresentationController.m */; };
 		C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC151F57F34E00F4E723 /* TransitioningController.m */; };
@@ -65,8 +63,6 @@
 		A876FB250F1D7FE8A41B8A8F /* Pods-screenshot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.debug.xcconfig"; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		C5278FB51F3C38510090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
-		C5278FB61F3C38510090E422 /* UIColor+Appearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Appearance.h"; sourceTree = "<group>"; };
-		C5278FB71F3C38510090E422 /* UIColor+Appearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Appearance.m"; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -96,8 +92,6 @@
 		C5278FDE1F3C38510090E422 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
 		C5278FE01F3C38510090E422 /* ScreenshotsNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsNavigationController.h; sourceTree = "<group>"; };
 		C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
-		C5278FE31F3C38510090E422 /* FavoriteButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoriteButton.h; sourceTree = "<group>"; };
-		C5278FE41F3C38510090E422 /* FavoriteButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoriteButton.m; sourceTree = "<group>"; };
 		C528DC0D1F57E9D700F4E723 /* TutorialProductsPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialProductsPageViewController.h; sourceTree = "<group>"; };
 		C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialProductsPageViewController.m; sourceTree = "<group>"; };
 		C528DC101F57EDD100F4E723 /* InsetPresentationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InsetPresentationController.h; sourceTree = "<group>"; };
@@ -183,8 +177,6 @@
 			children = (
 				C5278FB41F3C38510090E422 /* Geometry.h */,
 				C5278FB51F3C38510090E422 /* Geometry.m */,
-				C5278FB61F3C38510090E422 /* UIColor+Appearance.h */,
-				C5278FB71F3C38510090E422 /* UIColor+Appearance.m */,
 				C528DC191F5D7C2D00F4E723 /* Appearance.swift */,
 			);
 			path = Appearance;
@@ -279,8 +271,6 @@
 			children = (
 				C55184B91F4AD3E000EE7855 /* CollectionViewCell */,
 				C528DC171F5D74BD00F4E723 /* Button.swift */,
-				C5278FE31F3C38510090E422 /* FavoriteButton.h */,
-				C5278FE41F3C38510090E422 /* FavoriteButton.m */,
 				C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */,
 				C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */,
 				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
@@ -597,7 +587,6 @@
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */,
-				C5278FEA1F3C38510090E422 /* UIColor+Appearance.m in Sources */,
 				C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */,
 				C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */,
 				C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */,
@@ -606,7 +595,6 @@
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
-				C5278FFF1F3C38510090E422 /* FavoriteButton.m in Sources */,
 				C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */,
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,

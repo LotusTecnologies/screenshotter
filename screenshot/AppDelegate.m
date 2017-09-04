@@ -10,7 +10,6 @@
 #import "MainTabBarController.h"
 #import "TutorialViewController.h"
 #import "PermissionsManager.h"
-#import "UIColor+Appearance.h"
 #import "UIDevice+Model.h"
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
@@ -130,7 +129,7 @@
 #pragma mark - Appearance
 
 - (void)setupApplicationAppearance {
-    UIColor *crazeRedColor = [UIColor crazeRedColor];
+    UIColor *crazeRedColor = [UIColor crazeRed];
     
     [[UITabBar appearance] setTintColor:crazeRedColor];
     [[UIToolbar appearance] setTintColor:crazeRedColor];

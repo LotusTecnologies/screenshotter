@@ -13,7 +13,6 @@
 #import "HelperView.h"
 #import "PermissionsManager.h"
 #import "AnalyticsManager.h"
-#import "UIColor+Appearance.h"
 #import "UserDefaultsConstants.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
@@ -74,7 +73,7 @@
     });
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.tintColor = [UIColor crazeRedColor];
+    refreshControl.tintColor = [UIColor crazeRed];
     [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
     [self.collectionView addSubview:refreshControl];
     

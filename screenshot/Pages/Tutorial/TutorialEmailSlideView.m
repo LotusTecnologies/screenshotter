@@ -7,7 +7,6 @@
 //
 
 #import "TutorialEmailSlideView.h"
-#import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "TappableTextView.h"
 #import "WebViewController.h"
@@ -125,7 +124,7 @@
             textView.delegate = self;
             textView.translatesAutoresizingMaskIntoConstraints = NO;
             textView.backgroundColor = [UIColor clearColor];
-            textView.textColor = [UIColor softTextColor];
+            textView.textColor = [UIColor softText];
             textView.textAlignment = NSTextAlignmentCenter;
             textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
             textView.editable = NO;

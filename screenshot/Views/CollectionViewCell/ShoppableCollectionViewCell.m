@@ -7,7 +7,7 @@
 //
 
 #import "ShoppableCollectionViewCell.h"
-#import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 
 @interface ShoppableCollectionViewCell ()
 
@@ -42,7 +42,7 @@
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
     
-    self.layer.borderColor = selected ? [UIColor crazeRedColor].CGColor : [self borderColor].CGColor;
+    self.layer.borderColor = selected ? [UIColor crazeRed].CGColor : [self borderColor].CGColor;
 }
 
 - (UIColor *)borderColor {

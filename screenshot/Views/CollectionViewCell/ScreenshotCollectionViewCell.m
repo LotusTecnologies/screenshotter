@@ -7,7 +7,6 @@
 //
 
 #import "ScreenshotCollectionViewCell.h"
-#import "UIColor+Appearance.h"
 
 #import <ImageEffects/ImageEffects.h>
 
@@ -69,7 +68,7 @@
             UIToolbar *toolbar = [[UIToolbar alloc] init];
             toolbar.translatesAutoresizingMaskIntoConstraints = NO;
             [toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
-            toolbar.tintColor = [UIColor crazeRedColor];
+            toolbar.tintColor = [UIColor crazeRed];
             
             //toolbar.items = @[shareButtonItem, flexilbeItem, trashButtonItem];
             toolbar.items = @[flexilbeItem, trashButtonItem];
@@ -89,7 +88,7 @@
             
             UIView *view = [[UIView alloc] initWithFrame:rect];
             view.translatesAutoresizingMaskIntoConstraints = NO;
-            view.backgroundColor = [UIColor crazeRedColor];
+            view.backgroundColor = [UIColor crazeRed];
             view.userInteractionEnabled = NO;
             view.hidden = YES;
             view.layer.cornerRadius = diameter / 2.f;

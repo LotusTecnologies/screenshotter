@@ -11,7 +11,6 @@
 #import "TutorialEmailSlideView.h"
 #import "TutorialWelcomeSlideView.h"
 #import "TutorialTrySlideView.h"
-#import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"

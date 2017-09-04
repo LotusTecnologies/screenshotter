@@ -11,7 +11,6 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
-#import "UIColor+Appearance.h"
 
 @interface TutorialPermissionsSlideView ()
 
@@ -39,7 +38,7 @@
         photosLabel.translatesAutoresizingMaskIntoConstraints = NO;
         photosLabel.numberOfLines = 0;
         photosLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        photosLabel.textColor = [UIColor softTextColor];
+        photosLabel.textColor = [UIColor softText];
         photosLabel.text = @"CRAZE needs access to your photo gallery to turn your screenshots into shoppable experiences";
         [self.contentView addSubview:photosLabel];
         [photosLabel.topAnchor constraintEqualToAnchor:photosRow.bottomAnchor constant:p].active = YES;
@@ -59,7 +58,7 @@
         notificationLabel.translatesAutoresizingMaskIntoConstraints = NO;
         notificationLabel.numberOfLines = 0;
         notificationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        notificationLabel.textColor = [UIColor softTextColor];
+        notificationLabel.textColor = [UIColor softText];
         notificationLabel.text = @"We’ll send you a notification when your screenshot is ready to be shopped";
         [self.contentView addSubview:notificationLabel];
         [notificationLabel.topAnchor constraintEqualToAnchor:notificationRow.bottomAnchor constant:p].active = YES;
@@ -71,7 +70,7 @@
         arrowLabel.text = @"Tap\nme!";
         arrowLabel.numberOfLines = 0;
         arrowLabel.textAlignment = NSTextAlignmentCenter;
-        arrowLabel.textColor = [UIColor crazeRedColor];
+        arrowLabel.textColor = [UIColor crazeRed];
         arrowLabel.transform = CGAffineTransformMakeRotation(M_PI_4);
         [self.contentView addSubview:arrowLabel];
         [arrowLabel.topAnchor constraintEqualToAnchor:arrowImageView.bottomAnchor constant:-2.f].active = YES;

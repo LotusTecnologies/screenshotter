@@ -7,8 +7,7 @@
 //
 
 #import "ProductCollectionViewCell.h"
-#import "FavoriteButton.h"
-#import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 
 @import SDWebImage.UIImageView_WebCache;
 
@@ -63,7 +62,7 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
             label.font = [[self class] labelFont];
-            label.textColor = [UIColor softTextColor];
+            label.textColor = [UIColor softText];
             [self.contentView addSubview:label];
 
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;

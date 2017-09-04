@@ -7,7 +7,6 @@
 //
 
 #import "TutorialWelcomeSlideView.h"
-#import "UIColor+Appearance.h"
 #import "screenshot-Swift.h"
 
 @implementation TutorialWelcomeSlideView
