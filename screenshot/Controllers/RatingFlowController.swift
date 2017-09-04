@@ -18,7 +18,7 @@ import EggRating
         controller.delegate = self
         
         if let rvc = UIApplication.shared.keyWindow?.rootViewController {
-            controller.prompt(force: true, inViewController: rvc)
+            controller.prompt(inViewController: rvc)
         }
     }
     
