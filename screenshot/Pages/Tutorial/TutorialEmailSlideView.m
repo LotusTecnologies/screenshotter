@@ -34,9 +34,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-        
         self.titleLabel.text = @"Join The Craze";
         self.subtitleLabel.text = @"Fill out your info below";
         
@@ -98,6 +95,7 @@
             textField.borderStyle = UITextBorderStyleRoundedRect;
             textField.spellCheckingType = UITextSpellCheckingTypeNo;
             textField.autocorrectionType = UITextAutocorrectionTypeNo;
+            textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
             [self.contentView addSubview:textField];
             [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
             [textField.topAnchor constraintEqualToAnchor:emailLabel.layoutMarginsGuide.bottomAnchor].active = YES;
@@ -165,10 +163,18 @@
         _expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
         self.expandableViewHeightConstraint.active = YES;
         
-        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
-        [self addGestureRecognizer:tapGesture];
+        [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)]];
     }
     return self;
+}
+
+- (void)didEnterSlide {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+}
+
+- (void)willLeaveSlide {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)dealloc {
@@ -205,6 +211,7 @@
         
         [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
         [AnalyticsManager identify:trimmedEmail];
+        
     } else {
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }

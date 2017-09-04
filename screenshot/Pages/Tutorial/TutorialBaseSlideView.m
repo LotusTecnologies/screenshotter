@@ -16,6 +16,14 @@
 
 @implementation TutorialBaseSlideView
 
+- (void)didEnterSlide {
+    // For subclasses
+}
+
+- (void)willLeaveSlide {
+    // For subclasses
+}
+
 - (UIView *)flexibleSpaceFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor {
     UIView *view = [[UIView alloc] init];
     view.translatesAutoresizingMaskIntoConstraints = NO;

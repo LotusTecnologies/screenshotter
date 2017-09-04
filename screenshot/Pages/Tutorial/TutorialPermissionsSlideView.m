@@ -26,8 +26,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        
         self.switchesDict = [NSMutableDictionary dictionary];
         
         self.titleLabel.text = @"Get Started";
@@ -102,6 +100,14 @@
         });
     }
     return self;
+}
+
+- (void)didEnterSlide {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)willLeaveSlide {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {

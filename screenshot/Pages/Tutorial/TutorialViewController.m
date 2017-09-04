@@ -96,6 +96,7 @@
         
         if (i == 0) {
             [slide.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
+            [slide didEnterSlide];
             
         } else if (i == self.slides.count - 1) {
             [slide.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
@@ -111,11 +112,11 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
-    NSUInteger currentSlide = [self currentSlide];
+    NSUInteger currentSlideIndex = [self currentSlideIndex];
     
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         CGPoint offset = self.scrollView.contentOffset;
-        offset.x = size.width * currentSlide;
+        offset.x = size.width * currentSlideIndex;
         self.scrollView.contentOffset = offset;
     } completion:nil];
 }
@@ -177,8 +178,12 @@
     return _slides;
 }
 
-- (NSUInteger)currentSlide {
+- (NSUInteger)currentSlideIndex {
     return ceil(self.scrollView.contentOffset.x / self.scrollView.bounds.size.width);
+}
+
+- (TutorialBaseSlideView *)currentSlide {
+    return self.slides[[self currentSlideIndex]];
 }
 
 - (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
@@ -267,6 +272,8 @@
     if (!_scrollViewIsScrollingAnimation) {
         _scrollViewIsScrollingAnimation = YES;
         
+        [[self currentSlide] willLeaveSlide];
+        
         CGPoint offset = CGPointZero;
         offset.x = self.scrollView.bounds.size.width + self.scrollView.contentOffset.x;
         
@@ -277,7 +284,9 @@
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
     _scrollViewIsScrollingAnimation = NO;
     
-    if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
+    [[self currentSlide] didEnterSlide];
+    
+    if ([self currentSlideIndex] == [self.slides indexOfObject:self.permissionsSlideView]) {
         PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
         PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
         
@@ -287,7 +296,7 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 // Check again to make sure the user didn't already move on
                 
-                if ([self currentSlide] == [self.slides indexOfObject:self.permissionsSlideView]) {
+                if ([self currentSlideIndex] == [self.slides indexOfObject:self.permissionsSlideView]) {
                     [self scrollToNextSlide];
                 }
             });
