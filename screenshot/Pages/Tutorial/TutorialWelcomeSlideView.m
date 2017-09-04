@@ -16,7 +16,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.titleLabel.text = @"Welcome to CRAZE"; // TODO: use craze logo
-        self.subtitleLabel.text = @"Any picture you screenshot becomes shoppable in the app";
+        self.subtitleLabel.text = @"Any fashion picture you screenshot becomes shoppable in the app";
         
         UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialWelcomeGraphic"]];
         imageView.translatesAutoresizingMaskIntoConstraints = NO;
