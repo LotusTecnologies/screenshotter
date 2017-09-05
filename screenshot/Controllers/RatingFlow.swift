@@ -11,6 +11,7 @@ import EggRating
 class RatingFlow : NSObject, RatingFlowControllerDelegate {
     public static let sharedInstance = RatingFlow(significantEventThreshold: 3)
 
+    // Using a closure to allow for immediate initialization of the RatingFlow wihtout a concrete instance of a UIViewController.
     private let containerViewControllerClosure: () -> UIViewController?
     
     init(significantEventThreshold threshold: Int = 3, containerViewControllerClosure closure: @escaping () -> UIViewController? = { UIApplication.shared.keyWindow?.rootViewController }) {
