@@ -20,15 +20,14 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
         
         super.init()
     }
-    
-    private static let SignificantEventCountUserDefaultsKey = "\(RatingFlow.self).SignificantEventCount"
+
     private let significantEventThreshold: Int
     private var significantEventCount:Int {
         get {
-            return UserDefaults.standard.integer(forKey: RatingFlow.SignificantEventCountUserDefaultsKey)
+            return UserDefaults.standard.integer(forKey: UserDefaultsKeys.significantEventCount)
         }
         set (newCount) {
-            UserDefaults.standard.set(newCount, forKey: RatingFlow.SignificantEventCountUserDefaultsKey)
+            UserDefaults.standard.set(newCount, forKey: UserDefaultsKeys.significantEventCount)
             UserDefaults.standard.synchronize()
         }
     }
