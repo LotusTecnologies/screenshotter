@@ -11,7 +11,6 @@
 #import "TappableTextView.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
-#import "Button.h"
 #import "screenshot-Swift.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>

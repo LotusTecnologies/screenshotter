@@ -13,7 +13,6 @@
 #import "HelperView.h"
 #import "PermissionsManager.h"
 #import "AnalyticsManager.h"
-#import "UIColor+Appearance.h"
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
