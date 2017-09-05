@@ -15,7 +15,6 @@
 #import "AnalyticsManager.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
-#import "UserDefaultsConstants.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
@@ -301,12 +300,12 @@
 #pragma mark - Tutorial
 
 - (void)presentTutorialHelperIfNeeded {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialPresentedProductHelper];
-    NSString *tutorialScreenshotAssetId = [NSUserDefaults.standardUserDefaults stringForKey:UserDefaultsTutorialScreenshotAssetId];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys tutorialPresentedProductHelper]];
+    NSString *tutorialScreenshotAssetId = [NSUserDefaults.standardUserDefaults stringForKey:[UserDefaultsKeys tutorialScreenshotAssetId]];
     BOOL isTutorialScreenshot = [self.screenshot.assetId isEqualToString:tutorialScreenshotAssetId];
     
     if (!hasPresented && isTutorialScreenshot) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedProductHelper];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys tutorialPresentedProductHelper]];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         self.transitioningController = [[TransitioningController alloc] init];

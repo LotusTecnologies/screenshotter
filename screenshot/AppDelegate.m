@@ -13,7 +13,6 @@
 #import "UIDevice+Model.h"
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
-#import "UserDefaultsConstants.h"
 #import "ScreenshotsNavigationController.h"
 #import "AnalyticsManager.h"
 #import "UIApplication+Version.h"
@@ -144,7 +143,7 @@
 - (UIViewController *)nextViewController {
     UIViewController *viewController;
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             viewController = [[MainTabBarController alloc] init];
             
@@ -166,7 +165,7 @@
 }
 
 - (void)prepareDataStackCompletionIfNeeded {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys tutorialCompleted]]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             [[AssetSyncModel sharedInstance] syncPhotos];
             

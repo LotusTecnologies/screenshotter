@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
+		523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
+		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C5278FE91F3C38510090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB51F3C38510090E422 /* Geometry.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
@@ -17,7 +19,6 @@
 		C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC31F3C38510090E422 /* FavoritesViewController.m */; };
 		C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC51F3C38510090E422 /* ProductsViewController.m */; };
 		C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC71F3C38510090E422 /* ScreenshotsViewController.m */; };
-		C5278FF31F3C38510090E422 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
 		C5278FF41F3C38510090E422 /* TutorialBaseSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FCC1F3C38510090E422 /* TutorialBaseSlideView.m */; };
 		C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FCE1F3C38510090E422 /* TutorialEmailSlideView.m */; };
 		C5278FF61F3C38510090E422 /* TutorialPermissionsSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FD01F3C38510090E422 /* TutorialPermissionsSlideView.m */; };
@@ -43,7 +44,6 @@
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
 		C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CB1F4C557200EE7855 /* AnalyticsManager.m */; };
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
-		C55184D91F4D611400EE7855 /* UserDefaultsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184D81F4D611400EE7855 /* UserDefaultsConstants.m */; };
 		C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184DB1F4D637400EE7855 /* NotificationManager.m */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
@@ -62,6 +62,7 @@
 /* Begin PBXFileReference section */
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
+		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		A876FB250F1D7FE8A41B8A8F /* Pods-screenshot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.debug.xcconfig"; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		C5278FB51F3C38510090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
@@ -125,8 +126,6 @@
 		C55184CB1F4C557200EE7855 /* AnalyticsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnalyticsManager.m; sourceTree = "<group>"; };
 		C55184CD1F4D5DC600EE7855 /* LoadingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingViewController.h; sourceTree = "<group>"; };
 		C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingViewController.m; sourceTree = "<group>"; };
-		C55184D71F4D611400EE7855 /* UserDefaultsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaultsConstants.h; sourceTree = "<group>"; };
-		C55184D81F4D611400EE7855 /* UserDefaultsConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDefaultsConstants.m; sourceTree = "<group>"; };
 		C55184DA1F4D637400EE7855 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationManager.h; sourceTree = "<group>"; };
 		C55184DB1F4D637400EE7855 /* NotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationManager.m; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
@@ -323,9 +322,8 @@
 		C55184D01F4D5FAB00EE7855 /* Constants */ = {
 			isa = PBXGroup;
 			children = (
-				C55184D71F4D611400EE7855 /* UserDefaultsConstants.h */,
-				C55184D81F4D611400EE7855 /* UserDefaultsConstants.m */,
 				E4978C3B1F53610F0008B87F /* Constants.swift */,
+				528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -578,6 +576,7 @@
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */,
+				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
 				C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */,
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
@@ -586,11 +585,12 @@
 				C528DC181F5D74BD00F4E723 /* Button.swift in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
+				C540FE101F4F5BA8005863D7 /* Button.m in Sources */,
+				523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */,
 				C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
-				C55184D91F4D611400EE7855 /* UserDefaultsConstants.m in Sources */,
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */,
@@ -607,7 +607,6 @@
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */,
-				C5278FF31F3C38510090E422 /* SettingsViewController.m in Sources */,
 				C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */,
 				C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,

@@ -15,7 +15,7 @@
 #import "PermissionsManager.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
-#import "UserDefaultsConstants.h"
+#import "screenshot-Swift.h"
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
     BOOL _shouldSlideNextFromPermissionsSlide;
@@ -234,7 +234,7 @@
 - (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
     slideView.delegate = nil;
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys tutorialCompleted]]) {
         // The tutorial is being presented elsewhere and shouldn't
         // include the try slide
         
@@ -258,7 +258,7 @@
 - (void)tutorialTrySlideViewDidComplete:(TutorialTrySlideView *)slideView {
     slideView.delegate = nil;
     
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialCompleted];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys tutorialCompleted]];
     
     [self.delegate tutorialViewControllerDidComplete:self];
     [AnalyticsManager track:@"Finished Tutorial"];

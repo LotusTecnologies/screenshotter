@@ -11,7 +11,7 @@
 #import "TappableTextView.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
-#import "UserDefaultsConstants.h"
+#import "Button.h"
 #import "screenshot-Swift.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
@@ -56,7 +56,7 @@
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
-            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsName];
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:[UserDefaultsKeys name]];
             textField.placeholder = @"Enter your name";
             textField.backgroundColor = [UIColor whiteColor];
             textField.borderStyle = UITextBorderStyleRoundedRect;
@@ -87,7 +87,7 @@
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
-            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsEmail];
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:[UserDefaultsKeys email]];
             textField.placeholder = @"you@website.com";
             textField.keyboardType = UIKeyboardTypeEmailAddress;
             textField.backgroundColor = [UIColor whiteColor];
@@ -202,8 +202,8 @@
         NSString *trimmedName = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         NSString *trimmedEmail = [self.emailTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsName];
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsEmail];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:[UserDefaultsKeys name]];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:[UserDefaultsKeys email]];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
