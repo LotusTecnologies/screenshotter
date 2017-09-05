@@ -320,7 +320,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Replay Tutorial";
             break;
         case RowTypeEmail:
-            return [[NSUserDefaults standardUserDefaults] valueForKey:[UserDefaultsKeys email]];
+            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
             break;
         case RowTypeLocationService:
             return @"Location Services";

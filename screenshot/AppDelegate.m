@@ -165,7 +165,7 @@
 }
 
 - (void)prepareDataStackCompletionIfNeeded {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys tutorialCompleted]]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             [[AssetSyncModel sharedInstance] syncPhotos];
             

@@ -234,7 +234,7 @@
 - (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
     slideView.delegate = nil;
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys tutorialCompleted]]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         // The tutorial is being presented elsewhere and shouldn't
         // include the try slide
         
@@ -258,7 +258,7 @@
 - (void)tutorialTrySlideViewDidComplete:(TutorialTrySlideView *)slideView {
     slideView.delegate = nil;
     
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys tutorialCompleted]];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialCompleted];
     
     [self.delegate tutorialViewControllerDidComplete:self];
     [AnalyticsManager track:@"Finished Tutorial"];

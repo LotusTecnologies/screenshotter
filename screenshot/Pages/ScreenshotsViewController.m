@@ -101,7 +101,7 @@
         helperView;
     });
     
-    self.lastVisited = [NSUserDefaults.standardUserDefaults objectForKey:[UserDefaultsKeys dateLastVisitedScreenshots]];
+    self.lastVisited = [NSUserDefaults.standardUserDefaults objectForKey:UserDefaultsKeys.dateLastVisitedScreenshots];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -179,10 +179,10 @@
 }
 
 - (void)insertScreenshotHelperView {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys tutorialPresentedScreenshotHelper]];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
     
     if (!hasPresented && [self.collectionView numberOfItemsInSection:0] == 1) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys tutorialPresentedScreenshotHelper]];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
@@ -349,7 +349,7 @@
 
 - (void)updateLastVisited {
     self.lastVisited = [NSDate date];
-    [[NSUserDefaults standardUserDefaults] setObject:self.lastVisited forKey:[UserDefaultsKeys dateLastVisitedScreenshots]];
+    [[NSUserDefaults standardUserDefaults] setObject:self.lastVisited forKey:UserDefaultsKeys.dateLastVisitedScreenshots];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

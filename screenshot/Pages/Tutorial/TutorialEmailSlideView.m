@@ -55,7 +55,7 @@
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
-            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:[UserDefaultsKeys name]];
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
             textField.placeholder = @"Enter your name";
             textField.backgroundColor = [UIColor whiteColor];
             textField.borderStyle = UITextBorderStyleRoundedRect;
@@ -86,7 +86,7 @@
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
-            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:[UserDefaultsKeys email]];
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
             textField.placeholder = @"you@website.com";
             textField.keyboardType = UIKeyboardTypeEmailAddress;
             textField.backgroundColor = [UIColor whiteColor];
@@ -201,8 +201,8 @@
         NSString *trimmedName = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         NSString *trimmedEmail = [self.emailTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:[UserDefaultsKeys name]];
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:[UserDefaultsKeys email]];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
