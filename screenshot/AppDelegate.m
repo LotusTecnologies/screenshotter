@@ -21,7 +21,6 @@
 @import Analytics;
 @import Appsee;
 @import UserNotifications;
-@import EggRating;
 
 @interface AppDelegate () <UNUserNotificationCenterDelegate, TutorialViewControllerDelegate>
 
