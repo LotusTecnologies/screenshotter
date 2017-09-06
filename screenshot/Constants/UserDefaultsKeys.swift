@@ -19,5 +19,5 @@ class UserDefaultsKeys : NSObject {
     static let dateLastSound = "DateLastSound"
     static let dateLastVisitedScreenshots = "DateLastVisitedScreenshots"
     
-    static let significantEventCount = "\(RatingFlow.self).SignificantEventCount"
+    static let significantEventCount = "SignificantEventCount"
 }
