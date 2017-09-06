@@ -124,7 +124,7 @@
             textView.delegate = self;
             textView.translatesAutoresizingMaskIntoConstraints = NO;
             textView.backgroundColor = [UIColor clearColor];
-            textView.textColor = [UIColor softText];
+            textView.textColor = [UIColor gray6];
             textView.textAlignment = NSTextAlignmentCenter;
             textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
             textView.editable = NO;

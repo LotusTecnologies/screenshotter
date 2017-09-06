@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class FavoriteButton: UIButton {
     required init?(coder aDecoder: NSCoder) {

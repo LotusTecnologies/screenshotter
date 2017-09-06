@@ -152,7 +152,7 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
-            label.textColor = [UIColor softText];
+            label.textColor = [UIColor gray6];
             label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
             [bottomContentView addSubview:label];
             [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];

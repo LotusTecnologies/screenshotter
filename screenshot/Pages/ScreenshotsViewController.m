@@ -35,6 +35,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
         self.title = @"Screenshots";
+        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
         
         [DataModel sharedInstance].screenshotFrcDelegate = self;

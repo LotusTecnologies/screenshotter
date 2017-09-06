@@ -62,7 +62,7 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
             label.font = [[self class] labelFont];
-            label.textColor = [UIColor softText];
+            label.textColor = [UIColor gray6];
             [self.contentView addSubview:label];
 
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;
