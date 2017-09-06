@@ -14,6 +14,7 @@ def shared_pods
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
     pod 'ImageEffects'
+    pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/add-disadvantaged-flow-customization'
 end
 
 #target 'dev_influencer' do
