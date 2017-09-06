@@ -119,6 +119,8 @@
     [Appsee start:@"0ece18b50f7d4ef9aae3e473c28030bc"];
 #endif
     
+    [IntercomHelper start];
+    
     [Appsee addEvent:@"App Launched" withProperties:@{@"version": [UIApplication versionBuild]}];
     
     [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];

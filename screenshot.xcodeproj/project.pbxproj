@@ -10,6 +10,7 @@
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
+		52D8F5081F6018D10032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F5071F6018D10032C5A9 /* Intercom.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C5278FE91F3C38510090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB51F3C38510090E422 /* Geometry.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
@@ -63,6 +64,7 @@
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
+		52D8F5071F6018D10032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Intercom.swift; sourceTree = "<group>"; };
 		A876FB250F1D7FE8A41B8A8F /* Pods-screenshot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.debug.xcconfig"; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		C5278FB51F3C38510090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				C55184DB1F4D637400EE7855 /* NotificationManager.m */,
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
+				52D8F5071F6018D10032C5A9 /* Intercom.swift */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";
@@ -589,7 +592,6 @@
 				C5278FF61F3C38510090E422 /* TutorialPermissionsSlideView.m in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
-				C540FE101F4F5BA8005863D7 /* Button.m in Sources */,
 				523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */,
 				C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
@@ -597,6 +599,7 @@
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
+				52D8F5081F6018D10032C5A9 /* Intercom.swift in Sources */,
 				C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */,
 				C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,

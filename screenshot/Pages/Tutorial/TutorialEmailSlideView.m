@@ -207,9 +207,10 @@
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
-        [AnalyticsManager identify:trimmedEmail];
+        [IntercomHelper registerUserWithEmail:trimmedEmail];
         
+        [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
+        [AnalyticsManager identify:trimmedEmail];        
     } else {
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }
