@@ -14,7 +14,7 @@
 
 @interface TutorialPermissionsSlideView ()
 
-@property (nonatomic, strong) Button *button;
+@property (nonatomic, strong) MainButton *button;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, UISwitch *> *switchesDict;
 
 @end
@@ -77,7 +77,7 @@
         [arrowLabel.trailingAnchor constraintEqualToAnchor:arrowImageView.leadingAnchor constant:2.f].active = YES;
         
         self.button = ({
-            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Next" forState:UIControlStateNormal];
             [button addTarget:self action:@selector(slideCompleted) forControlEvents:UIControlEventTouchUpInside];

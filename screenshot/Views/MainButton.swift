@@ -1,16 +1,20 @@
 //
-//  Button.swift
+//  MainButton.swift
 //  screenshot
 //
 //  Created by Corey Werner on 9/4/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-class Button: UIButton {
+class MainButton: UIButton {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         self.backgroundColor = UIColor.crazeRed
         self.contentEdgeInsets = UIEdgeInsetsMake(16, 16, 16, 16)

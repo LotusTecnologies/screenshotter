@@ -16,7 +16,7 @@
 @property (nonatomic, strong) UIImageView *productImageView;
 @property (nonatomic, strong) UILabel *productBrandLabel;
 @property (nonatomic, strong) UILabel *productPriceLabel;
-@property (nonatomic, strong) Button *button;
+@property (nonatomic, strong) MainButton *button;
 
 @end
 
@@ -202,7 +202,7 @@
         [purchasePointerView.trailingAnchor constraintEqualToAnchor:purchaseLabel.leadingAnchor constant:-4.f].active = YES;
         
         _button = ({
-            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Got It" forState:UIControlStateNormal];
             button.layer.cornerRadius = 0.f;

@@ -11,6 +11,10 @@ import Foundation
 class FavoriteButton: UIButton {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         let emptyImage = UIImage.init(named: "FavoriteHeartEmpty")
         let filledImage = UIImage.init(named: "FavoriteHeartFilled")

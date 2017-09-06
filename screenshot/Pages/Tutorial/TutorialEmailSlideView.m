@@ -20,7 +20,7 @@
 
 @property (nonatomic, strong) UITextField *nameTextField;
 @property (nonatomic, strong) UITextField *emailTextField;
-@property (nonatomic, strong) Button *button;
+@property (nonatomic, strong) MainButton *button;
 @property (nonatomic, strong) TappableTextView *textView;
 
 @property (nonatomic, strong) NSLayoutConstraint *expandableViewHeightConstraint;
@@ -105,7 +105,7 @@
         });
         
         _button = ({
-            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Submit" forState:UIControlStateNormal];
             [button addTarget:self action:@selector(submitEmail) forControlEvents:UIControlEventTouchUpInside];

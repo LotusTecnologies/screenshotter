@@ -41,7 +41,7 @@
         
         [self flexibleSpaceFromAnchor:self.contentView.topAnchor toAnchor:imageView.topAnchor];
         
-        Button *button = [Button buttonWithType:UIButtonTypeCustom];
+        MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
         button.translatesAutoresizingMaskIntoConstraints = NO;
         [button setTitle:@"Next" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(slideCompleted) forControlEvents:UIControlEventTouchUpInside];
