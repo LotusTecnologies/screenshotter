@@ -124,4 +124,8 @@
     }
 }
 
+- (NSInteger)selectedShoppableIndex {
+    return [self.collectionView.indexPathsForSelectedItems firstObject].item;
+}
+
 @end

@@ -99,6 +99,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView.contentInset = UIEdgeInsetsMake(p + self.shoppablesToolbar.bounds.size.height, p, p, p);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
+        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
@@ -212,8 +213,25 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
-    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-    return [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
+    NSArray<NSSortDescriptor *> *descriptors;
+    
+    switch (self.currentSortType) {
+        case ShoppableSortTypeSimilar:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
+            break;
+            
+        case ShoppableSortTypePrice:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
+            break;
+            
+        case ShoppableSortTypeBrands:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"brand" ascending:YES],
+                            [[NSSortDescriptor alloc] initWithKey:@"merchant" ascending:YES]
+                            ];
+            break;
+    }
+    
+    return [shoppable.products sortedArrayUsingDescriptors:descriptors];
 }
 
 
@@ -375,6 +393,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     self.currentSortType = row;
     self.navigationItem.titleView = [self currentTitleView];
+    [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     [self.navigationController.navigationBar endEditing:YES];
 }
 
