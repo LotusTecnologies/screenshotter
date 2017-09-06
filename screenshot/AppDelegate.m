@@ -10,11 +10,9 @@
 #import "MainTabBarController.h"
 #import "TutorialViewController.h"
 #import "PermissionsManager.h"
-#import "UIColor+Appearance.h"
 #import "UIDevice+Model.h"
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
-#import "UserDefaultsConstants.h"
 #import "ScreenshotsNavigationController.h"
 #import "AnalyticsManager.h"
 #import "UIApplication+Version.h"
@@ -149,16 +147,32 @@
     [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
     
     [FIRApp configure];
+    
+    [[RatingFlow sharedInstance] start];
 }
 
 
 #pragma mark - Appearance
 
 - (void)setupApplicationAppearance {
-    UIColor *crazeRedColor = [UIColor crazeRedColor];
+    UIColor *crazeRedColor = [UIColor crazeRed];
+    
+    [[UINavigationBar appearance] setTintColor:[UIColor gray6]];
+    [[UINavigationBar appearance] setTitleTextAttributes:({
+        @{NSFontAttributeName: [UIFont fontWithName:@"Futura-Medium" size:20.0],
+          NSForegroundColorAttributeName: [UIColor gray3]
+          };
+    })];
+    
+    [[UIBarButtonItem appearance] setTitleTextAttributes:({
+        @{NSFontAttributeName: [UIFont fontWithName:@"Futura" size:16.0],
+          };
+    }) forState:UIControlStateNormal];
     
     [[UITabBar appearance] setTintColor:crazeRedColor];
+    
     [[UIToolbar appearance] setTintColor:crazeRedColor];
+    
     [[UIActivityIndicatorView appearanceWhenContainedInInstancesOfClasses:@[[UIToolbar class]]] setColor:crazeRedColor];
 }
 
@@ -168,7 +182,7 @@
 - (UIViewController *)nextViewController {
     UIViewController *viewController;
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             viewController = [[MainTabBarController alloc] init];
             
@@ -190,7 +204,7 @@
 }
 
 - (void)prepareDataStackCompletionIfNeeded {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             [[AssetSyncModel sharedInstance] syncPhotos];
             

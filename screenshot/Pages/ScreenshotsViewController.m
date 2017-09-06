@@ -13,8 +13,6 @@
 #import "HelperView.h"
 #import "PermissionsManager.h"
 #import "AnalyticsManager.h"
-#import "UIColor+Appearance.h"
-#import "UserDefaultsConstants.h"
 @import PromiseKit;
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
@@ -37,6 +35,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
         self.title = @"Screenshots";
+        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
         
         [DataModel sharedInstance].screenshotFrcDelegate = self;
@@ -75,7 +74,7 @@
     });
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.tintColor = [UIColor crazeRedColor];
+    refreshControl.tintColor = [UIColor crazeRed];
     [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
     [self.collectionView addSubview:refreshControl];
     
@@ -104,7 +103,7 @@
         helperView;
     });
     
-    self.lastVisited = [NSUserDefaults.standardUserDefaults objectForKey:UserDefaultsDateLastVisitedScreenshots];
+    self.lastVisited = [NSUserDefaults.standardUserDefaults objectForKey:UserDefaultsKeys.dateLastVisitedScreenshots];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -182,10 +181,10 @@
 }
 
 - (void)insertScreenshotHelperView {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialPresentedScreenshotHelper];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
     
     if (!hasPresented && [self.collectionView numberOfItemsInSection:0] == 1) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedScreenshotHelper];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
@@ -366,7 +365,7 @@
 
 - (void)updateLastVisited {
     self.lastVisited = [NSDate date];
-    [[NSUserDefaults standardUserDefaults] setObject:self.lastVisited forKey:UserDefaultsDateLastVisitedScreenshots];
+    [[NSUserDefaults standardUserDefaults] setObject:self.lastVisited forKey:UserDefaultsKeys.dateLastVisitedScreenshots];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

@@ -26,5 +26,6 @@
 @property (nonatomic, copy) UIImage *screenshotImage;
 
 - (void)selectFirstItem;
+- (NSInteger)selectedShoppableIndex;
 
 @end

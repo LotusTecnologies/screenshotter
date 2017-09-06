@@ -15,10 +15,13 @@
     self = [super initWithFrame:frame];
     if (self) {
         _titleLabel = ({
+            UIFont *font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle1];
+            UIFontDescriptor *fontDescriptor = [font.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+            
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
-            label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle1];
+            label.font = [UIFont fontWithDescriptor:fontDescriptor size:0.f];
             label.numberOfLines = 0;
             label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -[Geometry padding], 0.f);
             [self addSubview:label];

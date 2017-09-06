@@ -11,12 +11,10 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
-#import "UIColor+Appearance.h"
-#import "Button.h"
 
 @interface TutorialPermissionsSlideView ()
 
-@property (nonatomic, strong) Button *button;
+@property (nonatomic, strong) MainButton *button;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, UISwitch *> *switchesDict;
 
 @end
@@ -26,8 +24,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        
         self.switchesDict = [NSMutableDictionary dictionary];
         
         self.titleLabel.text = @"Get Started";
@@ -42,7 +38,7 @@
         photosLabel.translatesAutoresizingMaskIntoConstraints = NO;
         photosLabel.numberOfLines = 0;
         photosLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        photosLabel.textColor = [UIColor softTextColor];
+        photosLabel.textColor = [UIColor gray6];
         photosLabel.text = @"CRAZE needs access to your photo gallery to turn your screenshots into shoppable experiences";
         [self.contentView addSubview:photosLabel];
         [photosLabel.topAnchor constraintEqualToAnchor:photosRow.bottomAnchor constant:p].active = YES;
@@ -62,7 +58,7 @@
         notificationLabel.translatesAutoresizingMaskIntoConstraints = NO;
         notificationLabel.numberOfLines = 0;
         notificationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        notificationLabel.textColor = [UIColor softTextColor];
+        notificationLabel.textColor = [UIColor gray6];
         notificationLabel.text = @"We’ll send you a notification when your screenshot is ready to be shopped";
         [self.contentView addSubview:notificationLabel];
         [notificationLabel.topAnchor constraintEqualToAnchor:notificationRow.bottomAnchor constant:p].active = YES;
@@ -74,14 +70,14 @@
         arrowLabel.text = @"Tap\nme!";
         arrowLabel.numberOfLines = 0;
         arrowLabel.textAlignment = NSTextAlignmentCenter;
-        arrowLabel.textColor = [UIColor crazeRedColor];
+        arrowLabel.textColor = [UIColor crazeRed];
         arrowLabel.transform = CGAffineTransformMakeRotation(M_PI_4);
         [self.contentView addSubview:arrowLabel];
         [arrowLabel.topAnchor constraintEqualToAnchor:arrowImageView.bottomAnchor constant:-2.f].active = YES;
         [arrowLabel.trailingAnchor constraintEqualToAnchor:arrowImageView.leadingAnchor constant:2.f].active = YES;
         
         self.button = ({
-            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Next" forState:UIControlStateNormal];
             [button addTarget:self action:@selector(slideCompleted) forControlEvents:UIControlEventTouchUpInside];
@@ -102,6 +98,14 @@
         });
     }
     return self;
+}
+
+- (void)didEnterSlide {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)willLeaveSlide {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {

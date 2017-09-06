@@ -10,6 +10,9 @@
 
 @interface TutorialBaseSlideView : HelperView
 
+- (void)didEnterSlide;
+- (void)willLeaveSlide;
+
 - (UIView *)flexibleSpaceFromAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)fromAnchor toAnchor:(NSLayoutAnchor<NSLayoutYAxisAnchor *> *)toAnchor;
 
 @end

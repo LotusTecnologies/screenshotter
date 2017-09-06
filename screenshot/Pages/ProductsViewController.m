@@ -8,7 +8,6 @@
 
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
-#import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
@@ -16,11 +15,16 @@
 #import "AnalyticsManager.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
-#import "UserDefaultsConstants.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
+typedef NS_ENUM(NSUInteger, ShoppableSortType) {
+    ShoppableSortTypeSimilar,
+    ShoppableSortTypePrice,
+    ShoppableSortTypeBrands
+};
+
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
 }
 
@@ -29,10 +33,18 @@
 
 @property (nonatomic, strong) NSFetchedResultsController *shoppablesFrc;
 @property (nonatomic, strong) NSArray<Product *> *products;
+@property (nonatomic, strong) NSDictionary<NSNumber *, NSString *> *shoppableSortTitles;
+@property (nonatomic) ShoppableSortType currentSortType;
 
 @property (nonatomic, copy) UIImage *image;
 
 @property (nonatomic, strong) TransitioningController *transitioningController;
+
+@end
+
+@interface ProductsViewControllerControl : UIControl
+
+@property (nonatomic, strong) UIView *customInputView;
 
 @end
 
@@ -43,7 +55,13 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        _shoppableSortTitles = @{@(ShoppableSortTypeSimilar): @"Similar",
+                                 @(ShoppableSortTypePrice): @"Price",
+                                 @(ShoppableSortTypeBrands): @"Brands"
+                                 };
+        
         self.title = @"Products";
+        self.navigationItem.titleView = [self currentTitleView];
     }
     return self;
 }
@@ -81,6 +99,7 @@
         collectionView.contentInset = UIEdgeInsetsMake(p + self.shoppablesToolbar.bounds.size.height, p, p, p);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
+        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
@@ -127,6 +146,12 @@
     _didViewDidAppear = YES;
     
     [self presentTutorialHelperIfNeeded];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self.navigationController.navigationBar endEditing:YES];
 }
 
 - (void)dealloc {
@@ -188,8 +213,25 @@
 }
 
 - (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
-    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES];
-    return [shoppable.products sortedArrayUsingDescriptors:@[descriptor]];
+    NSArray<NSSortDescriptor *> *descriptors;
+    
+    switch (self.currentSortType) {
+        case ShoppableSortTypeSimilar:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
+            break;
+            
+        case ShoppableSortTypePrice:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
+            break;
+            
+        case ShoppableSortTypeBrands:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"brand" ascending:YES],
+                            [[NSSortDescriptor alloc] initWithKey:@"merchant" ascending:YES]
+                            ];
+            break;
+    }
+    
+    return [shoppable.products sortedArrayUsingDescriptors:descriptors];
 }
 
 
@@ -286,6 +328,76 @@
 }
 
 
+#pragma mark - Sorting
+
+- (UIView *)currentTitleView {
+    UILabel *label = [[UILabel alloc] init];
+    label.adjustsFontSizeToFitWidth = YES;
+    label.minimumScaleFactor = .7f;
+    
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[[UINavigationBar appearance] titleTextAttributes]];
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Sort by: " attributes:attributes];
+    
+    [attributes setObject:[UIColor crazeGreen] forKey:NSForegroundColorAttributeName];
+    
+    NSAttributedString *sortString = [[NSAttributedString alloc] initWithString:self.shoppableSortTitles[@(self.currentSortType)] attributes:attributes];
+    [attributedString appendAttributedString:sortString];
+    
+    CGFloat offset = 3.f;
+    
+    [attributes setObject:@(offset) forKey:NSBaselineOffsetAttributeName];
+    
+    NSAttributedString *arrowString = [[NSAttributedString alloc] initWithString:@"⌄" attributes:attributes];
+    [attributedString appendAttributedString:arrowString];
+    
+    label.attributedText = attributedString;
+    [label sizeToFit];
+    
+    CGRect rect = label.frame;
+    rect.origin.y -= offset;
+    label.frame = rect;
+    
+    ProductsViewControllerControl *container = [[ProductsViewControllerControl alloc] initWithFrame:label.bounds];
+    [container addTarget:self action:@selector(presentSortPicker:) forControlEvents:UIControlEventTouchUpInside];
+    [container addSubview:label];
+    return container;
+}
+
+- (void)presentSortPicker:(ProductsViewControllerControl *)control {
+    UIPickerView *picker = [[UIPickerView alloc] init];
+    picker.delegate = self;
+    picker.dataSource = self;
+    picker.backgroundColor = [UIColor whiteColor];
+    [picker selectRow:self.currentSortType inComponent:0 animated:NO];
+    
+    control.customInputView = picker;
+    [control becomeFirstResponder];
+}
+
+
+#pragma mark - Picker View
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+    return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+    return self.shoppableSortTitles.count;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    return self.shoppableSortTitles[@(row)];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    self.currentSortType = row;
+    self.navigationItem.titleView = [self currentTitleView];
+    [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+    [self.navigationController.navigationBar endEditing:YES];
+}
+
+
 #pragma mark - Toolbar
 
 - (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
@@ -302,12 +414,12 @@
 #pragma mark - Tutorial
 
 - (void)presentTutorialHelperIfNeeded {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialPresentedProductHelper];
-    NSString *tutorialScreenshotAssetId = [NSUserDefaults.standardUserDefaults stringForKey:UserDefaultsTutorialScreenshotAssetId];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedProductHelper];
+    NSString *tutorialScreenshotAssetId = [NSUserDefaults.standardUserDefaults stringForKey:UserDefaultsKeys. tutorialScreenshotAssetId];
     BOOL isTutorialScreenshot = [self.screenshot.assetId isEqualToString:tutorialScreenshotAssetId];
     
     if (!hasPresented && isTutorialScreenshot) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsTutorialPresentedProductHelper];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedProductHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         self.transitioningController = [[TransitioningController alloc] init];
@@ -331,6 +443,18 @@
         viewController.product = product;
         [self presentViewController:viewController animated:YES completion:nil];
     }
+}
+
+@end
+
+@implementation ProductsViewControllerControl
+
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
+- (UIView *)inputView {
+    return self.customInputView;
 }
 
 @end

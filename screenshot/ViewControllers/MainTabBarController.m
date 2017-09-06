@@ -10,7 +10,7 @@
 #import "FavoritesViewController.h"
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
-#import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
 
 @interface MainTabBarController () <UITabBarControllerDelegate>
@@ -35,7 +35,7 @@
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Favorites" image:image tag:0];
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-            navigationController.view.backgroundColor = [UIColor backgroundColor];
+            navigationController.view.backgroundColor = [UIColor background];
             navigationController;
         });
         
@@ -54,7 +54,7 @@
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:2];
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-            navigationController.view.backgroundColor = [UIColor backgroundColor];
+            navigationController.view.backgroundColor = [UIColor background];
             navigationController;
         });
         

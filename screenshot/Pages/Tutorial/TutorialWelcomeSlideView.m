@@ -7,16 +7,28 @@
 //
 
 #import "TutorialWelcomeSlideView.h"
-#import "UIColor+Appearance.h"
-#import "Button.h"
+#import "screenshot-Swift.h"
 
 @implementation TutorialWelcomeSlideView
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.titleLabel.text = @"Welcome to CRAZE"; // TODO: use craze logo
-        self.subtitleLabel.text = @"Any picture you screenshot becomes shoppable in the app";
+        self.titleLabel.attributedText = ({
+            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+            attachment.image = [UIImage imageNamed:@"Logo36h"];
+            
+            CGRect rect = attachment.bounds;
+            rect.origin.y = -3.f;
+            rect.size = attachment.image.size;
+            attachment.bounds = rect;
+            
+            NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Welcome to "];
+            [attributedString appendAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
+            attributedString;
+        });
+        
+        self.subtitleLabel.text = @"Any fashion picture you screenshot becomes shoppable in the app";
         
         UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialWelcomeGraphic"]];
         imageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -29,7 +41,7 @@
         
         [self flexibleSpaceFromAnchor:self.contentView.topAnchor toAnchor:imageView.topAnchor];
         
-        Button *button = [Button buttonWithType:UIButtonTypeCustom];
+        MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
         button.translatesAutoresizingMaskIntoConstraints = NO;
         [button setTitle:@"Next" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(slideCompleted) forControlEvents:UIControlEventTouchUpInside];

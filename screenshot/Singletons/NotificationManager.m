@@ -7,7 +7,7 @@
 //
 
 #import "NotificationManager.h"
-#import "UIColor+Appearance.h"
+#import "screenshot-Swift.h"
 #import "Geometry.h"
 
 @interface NotificationManager ()
@@ -134,7 +134,7 @@
                 break;
                 
             case NotificationManagerContentTypeProducts:
-                activityView.color = [UIColor crazeRedColor];
+                activityView.color = [UIColor crazeRed];
                 break;
         }
     }

@@ -7,8 +7,6 @@
 //
 
 #import "TutorialProductsPageViewController.h"
-#import "UIColor+Appearance.h"
-#import "Button.h"
 #import "Geometry.h"
 
 @import SDWebImage.UIImageView_WebCache;
@@ -18,7 +16,7 @@
 @property (nonatomic, strong) UIImageView *productImageView;
 @property (nonatomic, strong) UILabel *productBrandLabel;
 @property (nonatomic, strong) UILabel *productPriceLabel;
-@property (nonatomic, strong) Button *button;
+@property (nonatomic, strong) MainButton *button;
 
 @end
 
@@ -76,7 +74,7 @@
             [imageView.bottomAnchor constraintEqualToAnchor:shoppableContentView.bottomAnchor].active = YES;
             
             if (i == 0) {
-                imageView.layer.borderColor = [UIColor crazeRedColor].CGColor;
+                imageView.layer.borderColor = [UIColor crazeRed].CGColor;
                 imageView.layer.borderWidth = 2.f;
                 [imageView.leadingAnchor constraintEqualToAnchor:shoppableContentView.leadingAnchor].active = YES;
                 
@@ -154,7 +152,7 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
-            label.textColor = [UIColor softTextColor];
+            label.textColor = [UIColor gray6];
             label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
             [bottomContentView addSubview:label];
             [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
@@ -204,7 +202,7 @@
         [purchasePointerView.trailingAnchor constraintEqualToAnchor:purchaseLabel.leadingAnchor constant:-4.f].active = YES;
         
         _button = ({
-            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Got It" forState:UIControlStateNormal];
             button.layer.cornerRadius = 0.f;
@@ -239,7 +237,7 @@
     
     UIView *circle = [[UIView alloc] init];
     circle.translatesAutoresizingMaskIntoConstraints = NO;
-    circle.backgroundColor = [UIColor crazeRedColor];
+    circle.backgroundColor = [UIColor crazeRed];
     circle.layer.cornerRadius = circleDiameter / 2.f;
     circle.layer.masksToBounds = YES;
     [view addSubview:circle];
@@ -251,7 +249,7 @@
     
     UIView *line = [[UIView alloc] init];
     line.translatesAutoresizingMaskIntoConstraints = NO;
-    line.backgroundColor = [UIColor crazeRedColor];
+    line.backgroundColor = [UIColor crazeRed];
     [view addSubview:line];
     [line setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
     [line.heightAnchor constraintEqualToConstant:1.f].active = YES;

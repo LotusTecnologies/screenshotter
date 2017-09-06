@@ -12,7 +12,7 @@
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
 #import "WebViewController.h"
-#import "UserDefaultsConstants.h"
+#import "screenshot-Swift.h"
 
 @import MessageUI;
 
@@ -320,7 +320,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Replay Tutorial";
             break;
         case RowTypeEmail:
-            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsEmail];
+            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
             break;
         case RowTypeLocationService:
             return @"Location Services";

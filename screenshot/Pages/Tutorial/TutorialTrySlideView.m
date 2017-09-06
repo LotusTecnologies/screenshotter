@@ -14,8 +14,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
-        
         self.titleLabel.text = @"Try It Out";
         self.subtitleLabel.text = @"Press the home & power buttons to take a screenshot of this page";
         
@@ -34,9 +32,19 @@
     return self;
 }
 
+- (void)didEnterSlide {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
+}
+
+- (void)willLeaveSlide {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
-    AssetSyncModel.sharedInstance.isTutorialScreenshot = YES;
-    [self.delegate tutorialTrySlideViewDidComplete:self];
+    if (self.window) {
+        [AssetSyncModel sharedInstance].isTutorialScreenshot = YES;
+        [self.delegate tutorialTrySlideViewDidComplete:self];
+    }
 }
 
 - (void)dealloc {

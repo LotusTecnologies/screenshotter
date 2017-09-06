@@ -7,13 +7,11 @@
 //
 
 #import "TutorialEmailSlideView.h"
-#import "UIColor+Appearance.h"
 #import "Geometry.h"
 #import "TappableTextView.h"
 #import "WebViewController.h"
 #import "AnalyticsManager.h"
-#import "UserDefaultsConstants.h"
-#import "Button.h"
+#import "screenshot-Swift.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
 
@@ -21,7 +19,7 @@
 
 @property (nonatomic, strong) UITextField *nameTextField;
 @property (nonatomic, strong) UITextField *emailTextField;
-@property (nonatomic, strong) Button *button;
+@property (nonatomic, strong) MainButton *button;
 @property (nonatomic, strong) TappableTextView *textView;
 
 @property (nonatomic, strong) NSLayoutConstraint *expandableViewHeightConstraint;
@@ -34,9 +32,6 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-        
         self.titleLabel.text = @"Join The Craze";
         self.subtitleLabel.text = @"Fill out your info below";
         
@@ -60,7 +55,7 @@
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
-            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsName];
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
             textField.placeholder = @"Enter your name";
             textField.backgroundColor = [UIColor whiteColor];
             textField.borderStyle = UITextBorderStyleRoundedRect;
@@ -91,13 +86,14 @@
             UITextField *textField = [[UITextField alloc] init];
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
-            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsEmail];
+            textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
             textField.placeholder = @"you@website.com";
             textField.keyboardType = UIKeyboardTypeEmailAddress;
             textField.backgroundColor = [UIColor whiteColor];
             textField.borderStyle = UITextBorderStyleRoundedRect;
             textField.spellCheckingType = UITextSpellCheckingTypeNo;
             textField.autocorrectionType = UITextAutocorrectionTypeNo;
+            textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
             [self.contentView addSubview:textField];
             [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
             [textField.topAnchor constraintEqualToAnchor:emailLabel.layoutMarginsGuide.bottomAnchor].active = YES;
@@ -108,7 +104,7 @@
         });
         
         _button = ({
-            Button *button = [Button buttonWithType:UIButtonTypeCustom];
+            MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Submit" forState:UIControlStateNormal];
             [button addTarget:self action:@selector(submitEmail) forControlEvents:UIControlEventTouchUpInside];
@@ -127,7 +123,7 @@
             textView.delegate = self;
             textView.translatesAutoresizingMaskIntoConstraints = NO;
             textView.backgroundColor = [UIColor clearColor];
-            textView.textColor = [UIColor softTextColor];
+            textView.textColor = [UIColor gray6];
             textView.textAlignment = NSTextAlignmentCenter;
             textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
             textView.editable = NO;
@@ -165,10 +161,18 @@
         _expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
         self.expandableViewHeightConstraint.active = YES;
         
-        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)];
-        [self addGestureRecognizer:tapGesture];
+        [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)]];
     }
     return self;
+}
+
+- (void)didEnterSlide {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+}
+
+- (void)willLeaveSlide {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)dealloc {
@@ -197,14 +201,15 @@
         NSString *trimmedName = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         NSString *trimmedEmail = [self.emailTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsName];
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsEmail];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
         [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
         [AnalyticsManager identify:trimmedEmail];
+        
     } else {
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }

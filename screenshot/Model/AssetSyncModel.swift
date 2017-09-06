@@ -75,7 +75,7 @@ class AssetSyncModel: NSObject {
                     }
                     firstly { _ -> Promise<(String, [[String : Any]])> in
                         if self.isTutorialScreenshot {
-                            UserDefaults.standard.setValue(asset.localIdentifier, forKey: UserDefaultsTutorialScreenshotAssetId)
+                            UserDefaults.standard.setValue(asset.localIdentifier, forKey: UserDefaultsKeys.tutorialScreenshotAssetId)
                             print("Bypassing Syte")
                             let nativeSize = UIScreen.main.nativeBounds.size
                             let deviceAspectRatio = nativeSize.height / nativeSize.width
@@ -356,11 +356,11 @@ class AssetSyncModel: NSObject {
     func setupAllScreenshotAssets() {
         let fetchOptions = PHFetchOptions()
         var installDate: NSDate
-        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsDateInstalled) as? NSDate {
+        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate {
             installDate = UserDefaultsInstallDate
         } else {
             installDate = NSDate()
-            UserDefaults.standard.set(installDate, forKey: UserDefaultsDateInstalled)
+            UserDefaults.standard.set(installDate, forKey: UserDefaultsKeys.dateInstalled)
         }
         fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", installDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
@@ -481,13 +481,13 @@ extension AssetSyncModel {
         let content = UNMutableNotificationContent()
         content.title = "Congratulations!"
         content.body = "Tap to shop your screenshot."
-        if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsDateLastSound) as? Date,
+        if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
             -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
             content.sound = nil
         } else {
             content.sound = UNNotificationSound.default()
         }
-        UserDefaults.standard.setValue(Date(), forKey: UserDefaultsDateLastSound)
+        UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
         content.userInfo = [ Constants.openingScreenKey : Constants.openingScreenValueScreenshot ]
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let identifier = "CrazeLocal" + assetId
@@ -550,7 +550,7 @@ extension Screenshot {
         let assetSyncModel = AssetSyncModel.sharedInstance
         return firstly { _ -> Promise<(String, String)> in
             // Post to Craze server, which returns deep share link.
-            let userName = UserDefaults.standard.string(forKey: UserDefaultsName)
+            let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
             return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
             }.then(on: assetSyncModel.processingQ) { id, shareLink -> Promise<String> in
                 // Return the promise as soon as we have the shareLink, and concurrently or afterwards save shareLink to DB.
