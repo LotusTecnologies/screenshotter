@@ -13,7 +13,6 @@
 #import "UIDevice+Model.h"
 #import "screenshot-Swift.h"
 #import "LoadingViewController.h"
-#import "UserDefaultsConstants.h"
 #import "ScreenshotsNavigationController.h"
 #import "AnalyticsManager.h"
 #import "UIApplication+Version.h"
@@ -123,6 +122,7 @@
     [Appsee addEvent:@"App Launched" withProperties:@{@"version": [UIApplication versionBuild]}];
     
     [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
+    [[RatingFlow sharedInstance] start];
 }
 
 
@@ -142,7 +142,7 @@
 - (UIViewController *)nextViewController {
     UIViewController *viewController;
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             viewController = [[MainTabBarController alloc] init];
             
@@ -164,7 +164,7 @@
 }
 
 - (void)prepareDataStackCompletionIfNeeded {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsTutorialCompleted]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         if ([DataModel sharedInstance].isCoreDataStackReady) {
             [[AssetSyncModel sharedInstance] syncPhotos];
             

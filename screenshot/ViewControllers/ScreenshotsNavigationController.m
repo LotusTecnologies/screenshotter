@@ -47,7 +47,8 @@
     
     if ([productsViewController hasShoppables]) {
         [self pushViewController:productsViewController animated:YES];
-        
+
+        [[RatingFlow sharedInstance] recordSignificantEvent];
     } else {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry"
                                                                       message:@"We had a problem with this screenshot."
