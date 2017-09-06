@@ -15,6 +15,7 @@
 #import "AnalyticsManager.h"
 #import "UIColor+Appearance.h"
 #import "UserDefaultsConstants.h"
+@import PromiseKit;
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
@@ -289,12 +290,26 @@
 #pragma mark - Screenshot Cell
 
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
-//    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Screenshot Sharing" message:@"Coming soon." preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alertController animated:YES completion:nil];
-    
+    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
+    UIActivityViewController *activityViewController;
+    if (screenshot.shareLink) {
+        NSURL *shareURL = [NSURL URLWithString:screenshot.shareLink];
+        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[shareURL] applicationActivities:nil];
+    } else {
+        NSURL *placeholderURL = [NSURL URLWithString:@"https://crazeapp.com/"];
+        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL];
+        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[screenshotActivityItemProvider] applicationActivities:nil];
+    }
+    activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
+        if (completed) {
+            [AnalyticsManager track:@"share completed"];
+        } else {
+            [AnalyticsManager track:@"share incomplete"];
+        }
+    };
+    activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
+    [self presentViewController:activityViewController animated:YES completion:nil];
     [AnalyticsManager track:@"Shared screenshot"];
 }
 

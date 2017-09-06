@@ -14,6 +14,7 @@ def shared_pods
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
     pod 'ImageEffects'
+    pod 'Firebase/DynamicLinks'
 end
 
 #target 'dev_influencer' do

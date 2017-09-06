@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import PromiseKit
 
 @objc public protocol FrcDelegateProtocol : class {
     func frcOneAddedAt(indexPath: IndexPath)
@@ -417,6 +418,17 @@ extension DataModel {
             let managedObjectContext = DataModel.sharedInstance.adHocMoc()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
+            }
+        }
+    }
+    
+    func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
+        return Promise { fulfill, reject in
+            dbQ.async {
+                let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+                managedObjectContext.perform {
+                    fulfill(block(managedObjectContext), dict)
+                }
             }
         }
     }
