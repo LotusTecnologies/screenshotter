@@ -207,7 +207,7 @@
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [IntercomHelper registerUserWithEmail:trimmedEmail];
+        [IntercomHelper.sharedInstance registerUserWithEmail:trimmedEmail];
         
         [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
         [AnalyticsManager identify:trimmedEmail];        
