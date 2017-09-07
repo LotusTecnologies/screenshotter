@@ -38,7 +38,7 @@
         photosLabel.translatesAutoresizingMaskIntoConstraints = NO;
         photosLabel.numberOfLines = 0;
         photosLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        photosLabel.textColor = [UIColor softText];
+        photosLabel.textColor = [UIColor gray6];
         photosLabel.text = @"CRAZE needs access to your photo gallery to turn your screenshots into shoppable experiences";
         [self.contentView addSubview:photosLabel];
         [photosLabel.topAnchor constraintEqualToAnchor:photosRow.bottomAnchor constant:p].active = YES;
@@ -58,7 +58,7 @@
         notificationLabel.translatesAutoresizingMaskIntoConstraints = NO;
         notificationLabel.numberOfLines = 0;
         notificationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        notificationLabel.textColor = [UIColor softText];
+        notificationLabel.textColor = [UIColor gray6];
         notificationLabel.text = @"We’ll send you a notification when your screenshot is ready to be shopped";
         [self.contentView addSubview:notificationLabel];
         [notificationLabel.topAnchor constraintEqualToAnchor:notificationRow.bottomAnchor constant:p].active = YES;

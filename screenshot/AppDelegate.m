@@ -132,8 +132,22 @@
 - (void)setupApplicationAppearance {
     UIColor *crazeRedColor = [UIColor crazeRed];
     
+    [[UINavigationBar appearance] setTintColor:[UIColor gray6]];
+    [[UINavigationBar appearance] setTitleTextAttributes:({
+        @{NSFontAttributeName: [UIFont fontWithName:@"Futura-Medium" size:20.0],
+          NSForegroundColorAttributeName: [UIColor gray3]
+          };
+    })];
+    
+    [[UIBarButtonItem appearance] setTitleTextAttributes:({
+        @{NSFontAttributeName: [UIFont fontWithName:@"Futura" size:16.0],
+          };
+    }) forState:UIControlStateNormal];
+    
     [[UITabBar appearance] setTintColor:crazeRedColor];
+    
     [[UIToolbar appearance] setTintColor:crazeRedColor];
+    
     [[UIActivityIndicatorView appearanceWhenContainedInInstancesOfClasses:@[[UIToolbar class]]] setColor:crazeRedColor];
 }
 
