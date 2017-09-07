@@ -9,12 +9,6 @@
 import Foundation
 import Intercom
 
-extension Data {
-    func hexEncodedString() -> String {
-        return map { String(format: "%02hhx", $0) }.joined()
-    }
-}
-
 class IntercomHelper : NSObject {
     static let sharedInstance = IntercomHelper()
     
@@ -32,7 +26,6 @@ class IntercomHelper : NSObject {
     
     private func updateIntercomDeviceToken() {
         if let token = deviceToken {
-            print(token.hexEncodedString())
             Intercom.setDeviceToken(token)
         }
     }
