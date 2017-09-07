@@ -483,8 +483,8 @@ extension AssetSyncModel {
             return
         }
         let content = UNMutableNotificationContent()
-        content.title = "Congratulations!"
-        content.body = "Tap to shop your screenshot."
+        content.title = "Ready to shop?"
+        content.body = "Check out the products in your screenshot"
         if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
             -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
             content.sound = nil
