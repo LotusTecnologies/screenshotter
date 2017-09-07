@@ -40,7 +40,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
+    [PermissionsManager.sharedPermissionsManager fetchPushPermissionStatus];
     
     [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
     [self setupApplicationAppearance];
