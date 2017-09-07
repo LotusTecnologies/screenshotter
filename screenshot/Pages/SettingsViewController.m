@@ -30,6 +30,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeEmail,
     RowTypeTutorial,
     RowTypeTellFriend,
+    RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion
 };
@@ -179,6 +180,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                     ],
              @(SectionTypeAbout): @[@(RowTypeTutorial),
                                     @(RowTypeTellFriend),
+                                    @(RowTypeContactUs),
                                     @(RowTypeBug),
                                     @(RowTypeVersion)
                                     ]
@@ -277,6 +279,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeEmail:
             break;
+        case RowTypeContactUs:
+            [IntercomHelper.sharedInstance presentMessagingUI];
+            break;
         case RowTypeLocationService:
         case RowTypePushNotification:
         case RowTypeCameraRoll: {
@@ -315,6 +320,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeTellFriend:
             return @"Tell a Friend";
+            break;
+        case RowTypeContactUs:
+            return @"Contact Us";
             break;
         case RowTypeTutorial:
             return @"Replay Tutorial";
