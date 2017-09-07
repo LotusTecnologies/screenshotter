@@ -12,14 +12,6 @@ import Intercom
 class IntercomHelper : NSObject {
     static let sharedInstance = IntercomHelper()
     
-#if DEBUG
-    private let apiKey = "ios_sdk-97795b9b5fdcdb25e81866ff066ffa4869376161"
-    private let appID = "z57orduu"
-#else
-    private let apiKey = "ios_sdk-ddb9fad7f09f9b18ee7491740f99b6fd98e2296b"
-    private let appID = "avy9hyuz"
-#endif
-    
     private var email: String? {
         return UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
     }
@@ -37,7 +29,7 @@ class IntercomHelper : NSObject {
     }
     
     func start() {
-        Intercom.setApiKey(apiKey, forAppId: appID)
+        Intercom.setApiKey(Constants.intercomAPIKey, forAppId: Constants.intercomAppID)
         
         #if DEBUG
             Intercom.enableLogging()
