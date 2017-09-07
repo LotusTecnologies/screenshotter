@@ -24,6 +24,8 @@ class IntercomHelper : NSObject {
         }
     }
     
+    // MARK: -
+    
     func start() {
         Intercom.setApiKey(Constants.intercomAPIKey, forAppId: Constants.intercomAppID)
         
