@@ -26,7 +26,7 @@ class IntercomHelper : NSObject {
     
     // MARK: -
     
-    func start() {
+    func start(withLaunchOptions launchOptions:[AnyHashable : Any]) {
         Intercom.setApiKey(Constants.intercomAPIKey, forAppId: Constants.intercomAppID)
         
         #if DEBUG
@@ -37,6 +37,17 @@ class IntercomHelper : NSObject {
         if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             registerUser(withEmail: email)
         }
+        
+        if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
+            handleRemoteNotification(remoteNotification, opened: true)
+        }
+    }
+    
+    func handleRemoteNotification(_ userInfo:[AnyHashable : Any], opened:Bool = false) {
+        let isIntercomNotification = Intercom.isIntercomPushNotification(userInfo)
+        let trackingPrefix = opened ? "Opened with" : "Received"
+        
+        AnalyticsManager.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
     func registerUser(withEmail email: String) {

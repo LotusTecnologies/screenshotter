@@ -40,7 +40,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
+    [PermissionsManager.sharedPermissionsManager fetchPushPermissionStatus];
     
     [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
     [self setupApplicationAppearance];
@@ -123,7 +123,7 @@
     
     [FBSDKApplicationDelegate.sharedInstance application:application didFinishLaunchingWithOptions:launchOptions];
     [RatingFlow.sharedInstance start];
-    [IntercomHelper.sharedInstance start];
+    [IntercomHelper.sharedInstance startWithLaunchOptions:launchOptions];
 }
 
 
@@ -228,7 +228,13 @@
     NSLog(@"[ERROR] FAILED TO REGISTER FOR REMOTE NOTIFICATIONS!");
     NSLog(@"%@", error);
 }
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    [IntercomHelper.sharedInstance handleRemoteNotification:userInfo opened:false];
     
+    completionHandler(UIBackgroundFetchResultNoData);
+}
+
 #pragma mark - UNUserNotificationCenterDelegate
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
