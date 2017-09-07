@@ -64,7 +64,7 @@
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
-		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Intercom.swift; sourceTree = "<group>"; };
+		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
 		52D8F50D1F615C460032C5A9 /* screenshot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		A876FB250F1D7FE8A41B8A8F /* Pods-screenshot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.debug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.debug.xcconfig"; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
@@ -167,14 +167,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		52D8F5091F61391C0032C5A9 /* 3rdparty */ = {
-			isa = PBXGroup;
-			children = (
-				52D8F50A1F61391C0032C5A9 /* Intercom.swift */,
-			);
-			path = 3rdparty;
-			sourceTree = "<group>";
-		};
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -246,6 +238,7 @@
 		C5278FD71F3C38510090E422 /* Singletons */ = {
 			isa = PBXGroup;
 			children = (
+				52D8F50A1F61391C0032C5A9 /* Intercom.swift */,
 				C55184CA1F4C557200EE7855 /* AnalyticsManager.h */,
 				C55184CB1F4C557200EE7855 /* AnalyticsManager.m */,
 				C55184DA1F4D637400EE7855 /* NotificationManager.h */,
@@ -373,7 +366,6 @@
 			isa = PBXGroup;
 			children = (
 				52D8F50D1F615C460032C5A9 /* screenshot.entitlements */,
-				52D8F5091F61391C0032C5A9 /* 3rdparty */,
 				C5278FB31F3C38510090E422 /* Appearance */,
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
