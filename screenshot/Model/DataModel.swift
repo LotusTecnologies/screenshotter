@@ -364,12 +364,17 @@ extension DataModel {
                        b1y: Double) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
-        shoppableToSave.label = label
+        let spellingMap = ["Neclesses" : "Necklaces"]
+        if let label = label, let correctedSpelling = spellingMap[label] {
+            shoppableToSave.label = correctedSpelling
+        } else {
+            shoppableToSave.label = label
+        }
         let priorityMap = ["Jackets" : "00", "Skirts" : "01", "Shoes" : "02", "Bags" : "03"]
         if let label = label, let priorityOrder = priorityMap[label] {
             shoppableToSave.order = priorityOrder
         } else {
-            shoppableToSave.order = label
+            shoppableToSave.order = shoppableToSave.label
         }
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
