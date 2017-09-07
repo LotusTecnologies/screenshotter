@@ -19,11 +19,13 @@ class Constants: NSObject {
     static let screenShotLambdaDomain = "https://euqm1pl241.execute-api.us-east-1.amazonaws.com/dev/"
     static let intercomAPIKey = "ios_sdk-97795b9b5fdcdb25e81866ff066ffa4869376161"
     static let intercomAppID = "z57orduu"
+    static let buildEnvironmentSuffix = "d"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
     static let intercomAPIKey = "ios_sdk-ddb9fad7f09f9b18ee7491740f99b6fd98e2296b"
     static let intercomAppID = "avy9hyuz"
+    static let buildEnvironmentSuffix = ""
 #endif
 
 }

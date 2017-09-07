@@ -353,7 +353,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
-            return [UIApplication versionBuild];
+            return [NSString stringWithFormat:@"%@%@", [UIApplication versionBuild], Constants.buildEnvironmentSuffix];
             break;
         default:
             return nil;

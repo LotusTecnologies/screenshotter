@@ -19,14 +19,6 @@ def shared_pods
     pod 'Intercom'
 end
 
-#target 'dev_influencer' do
-#    shared_pods
-#end
-#
-#target 'stg_influencer' do
-#    shared_pods
-#end
-
 target 'screenshot' do
     shared_pods
 end
