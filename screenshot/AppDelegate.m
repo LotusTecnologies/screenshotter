@@ -41,7 +41,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[PermissionsManager sharedPermissionsManager] fetchPushPermissionStatus];
+    [PermissionsManager.sharedPermissionsManager fetchPushPermissionStatus];
     
     [self setupThirdPartyLibrariesWithApplication:application didFinishLaunchingWithOptions:launchOptions];
     [self setupApplicationAppearance];
@@ -145,14 +145,11 @@
     })];
     
     [Appsee start:Constants.appSeeApiKey];
-    
     [Appsee addEvent:@"App Launched" withProperties:@{@"version": [UIApplication versionBuild]}];
-    
-    [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
-    
     [FIRApp configure];
-    
-    [[RatingFlow sharedInstance] start];
+    [FBSDKApplicationDelegate.sharedInstance application:application didFinishLaunchingWithOptions:launchOptions];
+    [RatingFlow.sharedInstance start];
+    [IntercomHelper.sharedInstance startWithLaunchOptions:launchOptions];
 }
 
 
@@ -247,6 +244,22 @@
     });
 }
 
+#pragma mark - Push Notifications
+    
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    IntercomHelper.sharedInstance.deviceToken = deviceToken;
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"[ERROR] FAILED TO REGISTER FOR REMOTE NOTIFICATIONS!");
+    NSLog(@"%@", error);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    [IntercomHelper.sharedInstance handleRemoteNotification:userInfo opened:false];
+    
+    completionHandler(UIBackgroundFetchResultNoData);
+}
 
 #pragma mark - UNUserNotificationCenterDelegate
 

@@ -16,6 +16,7 @@ def shared_pods
     pod 'ImageEffects'
     pod 'Firebase/DynamicLinks'
     pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/add-disadvantaged-flow-customization'
+    pod 'Intercom'
 end
 
 #target 'dev_influencer' do
