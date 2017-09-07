@@ -17,7 +17,7 @@ platform :ios do
     commit_version_bump(force: true, xcodeproj: "screenshot.xcodeproj")
     push_to_git_remote
 
-    gym(scheme: "screenshot") # Build your app - more options available
+    gym(scheme: "prdScreenshot") # Build your app - more options available
     testflight(skip_waiting_for_build_processing: true) # to only upload the build
     add_git_tag
     push_to_git_remote
