@@ -7,6 +7,7 @@
 //
 
 #import "AnalyticsManager.h"
+#import "screenshot-Swift.h"
 
 @import Analytics;
 @import Appsee;
@@ -32,6 +33,7 @@
 + (void)identify:(NSString *)email {
     [[SEGAnalytics sharedAnalytics] identify:nil traits:@{ @"email": email }];
     [Appsee setUserID:email];
+    [IntercomHelper.sharedInstance registerUserWithEmail:email];
 }
 
 + (void)track:(NSString *)track properties:(NSDictionary<NSString *, id> *)properties {
