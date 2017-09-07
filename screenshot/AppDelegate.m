@@ -104,6 +104,12 @@
             return YES;
         }
     }
+    BOOL isSharingScheme = [url.scheme isEqualToString:[NSBundle.mainBundle bundleIdentifier]];
+    BOOL isSharingHost = [url.host isEqualToString:@"s"];
+    if (isSharingScheme && isSharingHost) {
+        [AssetSyncModel.sharedInstance handleDynamicLinkWithDynamicLink:url];
+        return YES;
+    }
     BOOL isHandled = [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:options [UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
     // Add any custom logic here.
     return isHandled;
@@ -119,8 +125,6 @@
                               BOOL isStrongMatch = dynamicLink.matchConfidence == FIRDynamicLinkMatchConfidenceStrong;
                               if (isStrongMatch && link && !error) {
                                   [AssetSyncModel.sharedInstance handleDynamicLinkWithDynamicLink:link];
-                              } else {
-                                  NSLog(@"continueUserActivity no strongMatch to a link. error:%@", error);
                               }
                           }];
         return isHandled;

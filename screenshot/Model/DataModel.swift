@@ -253,14 +253,13 @@ extension DataModel {
     // Save a new Screenshot to Core Data.
     func saveScreenshot(managedObjectContext: NSManagedObjectContext,
                         assetId: String,
+                        shareLink: String?,
                         createdAt: Date?,
                         isFashion: Bool,
                         imageData: Data?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
-        if assetId.hasPrefix("https:") {
-            screenshotToSave.shareLink = assetId
-        }
+        screenshotToSave.shareLink = shareLink
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
         }

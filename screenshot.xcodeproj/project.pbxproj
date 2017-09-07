@@ -55,8 +55,8 @@
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
+		E42AC3D81F614ADE0035A07C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E42AC3D71F614ADE0035A07C /* GoogleService-Info.plist */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
-		E474751B1F5BF59900DED4B0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E474751A1F5BF59900DED4B0 /* GoogleService-Info.plist */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
 		E4D495D21F49834900312614 /* upload_symbols.sh in Resources */ = {isa = PBXBuildFile; fileRef = E4D495D11F49834900312614 /* upload_symbols.sh */; };
 /* End PBXBuildFile section */
@@ -150,8 +150,9 @@
 		E41449FF1F41890900B1F039 /* ClarifaiModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiModel.swift; sourceTree = "<group>"; };
 		E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotActivityItemProvider.swift; sourceTree = "<group>"; };
 		E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
+		E42AC3D51F61484A0035A07C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E42AC3D71F614ADE0035A07C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
-		E474751A1F5BF59900DED4B0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E474751C1F5C0D2500DED4B0 /* screenshot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -389,12 +390,29 @@
 		E4139D431F09083B00E8A53B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E42AC3931F6144060035A07C /* dev */,
+				E42AC3941F61442C0035A07C /* prd */,
 				E4139D541F09083B00E8A53B /* Info.plist */,
-				E474751A1F5BF59900DED4B0 /* GoogleService-Info.plist */,
 				E4D495D11F49834900312614 /* upload_symbols.sh */,
 				E4139D441F09083B00E8A53B /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E42AC3931F6144060035A07C /* dev */ = {
+			isa = PBXGroup;
+			children = (
+				E42AC3D51F61484A0035A07C /* GoogleService-Info.plist */,
+			);
+			path = dev;
+			sourceTree = "<group>";
+		};
+		E42AC3941F61442C0035A07C /* prd */ = {
+			isa = PBXGroup;
+			children = (
+				E42AC3D71F614ADE0035A07C /* GoogleService-Info.plist */,
+			);
+			path = prd;
 			sourceTree = "<group>";
 		};
 		EED5E55462B98A9C783AC0F5 /* Frameworks */ = {
@@ -479,7 +497,7 @@
 			files = (
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				E4D495D21F49834900312614 /* upload_symbols.sh in Resources */,
-				E474751B1F5BF59900DED4B0 /* GoogleService-Info.plist in Resources */,
+				E42AC3D81F614ADE0035A07C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -744,7 +762,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;

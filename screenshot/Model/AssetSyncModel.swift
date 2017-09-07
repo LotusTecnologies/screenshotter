@@ -65,6 +65,7 @@ class AssetSyncModel: NSObject {
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
+                                                     shareLink: nil,
                                                      createdAt: asset.creationDate,
                                                      isFashion: isFashion,
                                                      imageData: imageData)
@@ -128,9 +129,11 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         firstly { _ -> Promise<[String : Any]> in
             // Get screenshot dict from Craze server. See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
-            guard let dynamicUrl = URL(string: dynamicLink),
-              dynamicUrl.deletingLastPathComponent().lastPathComponent == "s",
-              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + dynamicUrl.lastPathComponent) else {
+            let sDelimited = dynamicLink.components(separatedBy: "/s/")
+            print("downloadScreenshot dynamicLink:\(dynamicLink)  sDelimited:\(sDelimited)")
+            guard sDelimited.count > 1,
+              let lastComponent = sDelimited.last,
+              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + lastComponent) else {
                     let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from dynamicLink:\(dynamicLink)"])
                     return Promise(error: urlError)
             }
@@ -149,6 +152,7 @@ class AssetSyncModel: NSObject {
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: dynamicLink,
+                                                    shareLink: screenshotDict["shareLink"] as? String,
                                                     createdAt: Date(),
                                                     isFashion: true,
                                                     imageData: imageData)
