@@ -12,10 +12,6 @@ import Intercom
 class IntercomHelper : NSObject {
     static let sharedInstance = IntercomHelper()
     
-    private var email: String? {
-        return UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
-    }
-    
     private func updateIntercomDeviceToken() {
         if let token = deviceToken {
             Intercom.setDeviceToken(token)
@@ -36,7 +32,7 @@ class IntercomHelper : NSObject {
         #endif
         
         // Register the user if we're already logged in.
-        if let email = email {
+        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             registerUser(withEmail: email)
         }
     }
