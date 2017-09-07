@@ -193,8 +193,7 @@
     UNAuthorizationOptions options = UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound;
     
     [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError * _Nullable error) {
-        // ???: is this needed
-//        [[UIApplication sharedApplication] registerForRemoteNotifications];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
         
         self.pushStatus = granted ? PermissionStatusAuthorized : PermissionStatusDenied;
         

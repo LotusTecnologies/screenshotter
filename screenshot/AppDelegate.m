@@ -121,8 +121,9 @@
     
     [Appsee addEvent:@"App Launched" withProperties:@{@"version": [UIApplication versionBuild]}];
     
-    [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
-    [[RatingFlow sharedInstance] start];
+    [FBSDKApplicationDelegate.sharedInstance application:application didFinishLaunchingWithOptions:launchOptions];
+    [RatingFlow.sharedInstance start];
+    [IntercomHelper.sharedInstance start];
 }
 
 
@@ -217,7 +218,17 @@
     });
 }
 
+#pragma mark - Push Notifications
+    
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    IntercomHelper.sharedInstance.deviceToken = deviceToken;
+}
 
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"[ERROR] FAILED TO REGISTER FOR REMOTE NOTIFICATIONS!");
+    NSLog(@"%@", error);
+}
+    
 #pragma mark - UNUserNotificationCenterDelegate
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
