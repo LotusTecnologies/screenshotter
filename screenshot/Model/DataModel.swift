@@ -258,6 +258,9 @@ extension DataModel {
                         imageData: Data?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
+        if assetId.hasPrefix("https:") {
+            screenshotToSave.shareLink = assetId
+        }
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
         }
