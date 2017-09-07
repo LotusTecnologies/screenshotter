@@ -21,6 +21,7 @@
 @import Analytics;
 @import Appsee;
 @import UserNotifications;
+@import Firebase;
 
 @interface AppDelegate () <UNUserNotificationCenterDelegate, TutorialViewControllerDelegate>
 
@@ -94,12 +95,42 @@
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    BOOL handled = [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]
-                    ];
+    FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+    if (dynamicLink) {
+        NSURL *link = dynamicLink.url;
+        BOOL isStrongMatch = dynamicLink.matchConfidence == FIRDynamicLinkMatchConfidenceStrong;
+        if (isStrongMatch && link) {
+            [AssetSyncModel.sharedInstance handleDynamicLinkWithDynamicLink:link];
+            return YES;
+        }
+    }
+    BOOL isSharingScheme = [url.scheme isEqualToString:[NSBundle.mainBundle bundleIdentifier]];
+    BOOL isSharingHost = [url.host isEqualToString:@"s"];
+    if (isSharingScheme && isSharingHost) {
+        [AssetSyncModel.sharedInstance handleDynamicLinkWithDynamicLink:url];
+        return YES;
+    }
+    BOOL isHandled = [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:options [UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
     // Add any custom logic here.
-    return handled;
+    return isHandled;
 }
 
+-(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler {
+    if (userActivity.webpageURL != nil) {
+        BOOL isHandled = [[FIRDynamicLinks dynamicLinks]
+                          handleUniversalLink:userActivity.webpageURL
+                          completion:^(FIRDynamicLink * _Nullable dynamicLink,
+                                       NSError * _Nullable error) {
+                              NSURL *link = dynamicLink.url;
+                              BOOL isStrongMatch = dynamicLink.matchConfidence == FIRDynamicLinkMatchConfidenceStrong;
+                              if (isStrongMatch && link && !error) {
+                                  [AssetSyncModel.sharedInstance handleDynamicLinkWithDynamicLink:link];
+                              }
+                          }];
+        return isHandled;
+    }
+    return NO;
+}
 
 #pragma mark - Third Party
 
@@ -113,14 +144,9 @@
         configuration;
     })];
     
-#ifdef DEBUG
-    [Appsee start:@"d9010050cea04490b6b9cdd795849dd4"];
-#else
-    [Appsee start:@"0ece18b50f7d4ef9aae3e473c28030bc"];
-#endif
-    
+    [Appsee start:Constants.appSeeApiKey];
     [Appsee addEvent:@"App Launched" withProperties:@{@"version": [UIApplication versionBuild]}];
-    
+    [FIRApp configure];
     [FBSDKApplicationDelegate.sharedInstance application:application didFinishLaunchingWithOptions:launchOptions];
     [RatingFlow.sharedInstance start];
     [IntercomHelper.sharedInstance startWithLaunchOptions:launchOptions];

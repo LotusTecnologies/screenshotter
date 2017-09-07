@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import PromiseKit
 
 @objc public protocol FrcDelegateProtocol : class {
     func frcOneAddedAt(indexPath: IndexPath)
@@ -252,11 +253,13 @@ extension DataModel {
     // Save a new Screenshot to Core Data.
     func saveScreenshot(managedObjectContext: NSManagedObjectContext,
                         assetId: String,
+                        shareLink: String?,
                         createdAt: Date?,
                         isFashion: Bool,
                         imageData: Data?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
+        screenshotToSave.shareLink = shareLink
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
         }
@@ -363,12 +366,17 @@ extension DataModel {
                        b1y: Double) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
-        shoppableToSave.label = label
+        let spellingMap = ["Neclesses" : "Necklaces"]
+        if let label = label, let correctedSpelling = spellingMap[label] {
+            shoppableToSave.label = correctedSpelling
+        } else {
+            shoppableToSave.label = label
+        }
         let priorityMap = ["Jackets" : "00", "Skirts" : "01", "Shoes" : "02", "Bags" : "03"]
         if let label = label, let priorityOrder = priorityMap[label] {
             shoppableToSave.order = priorityOrder
         } else {
-            shoppableToSave.order = label
+            shoppableToSave.order = shoppableToSave.label
         }
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
@@ -417,6 +425,17 @@ extension DataModel {
             let managedObjectContext = DataModel.sharedInstance.adHocMoc()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
+            }
+        }
+    }
+    
+    func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
+        return Promise { fulfill, reject in
+            dbQ.async {
+                let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+                managedObjectContext.perform {
+                    fulfill(block(managedObjectContext), dict)
+                }
             }
         }
     }

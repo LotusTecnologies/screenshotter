@@ -14,17 +14,10 @@ def shared_pods
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
     pod 'ImageEffects'
+    pod 'Firebase/DynamicLinks'
     pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/add-disadvantaged-flow-customization'
     pod 'Intercom'
 end
-
-#target 'dev_influencer' do
-#    shared_pods
-#end
-#
-#target 'stg_influencer' do
-#    shared_pods
-#end
 
 target 'screenshot' do
     shared_pods

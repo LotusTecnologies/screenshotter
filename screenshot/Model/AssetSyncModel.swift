@@ -19,6 +19,7 @@ class AssetSyncModel: NSObject {
     public static let sharedInstance = AssetSyncModel()
     var allScreenshotAssets: PHFetchResult<PHAsset>?
 //    var changedAssetIds: [String] = []
+    var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
     var isRegistered = false
@@ -64,6 +65,7 @@ class AssetSyncModel: NSObject {
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
+                                                     shareLink: nil,
                                                      createdAt: asset.creationDate,
                                                      isFashion: isFashion,
                                                      imageData: imageData)
@@ -105,20 +107,73 @@ class AssetSyncModel: NSObject {
                     }
                 }
             }.always(on: self.serialQ) {
-                self.screenshotsToProcess -= 1
-                if self.screenshotsToProcess == 0 {
-                    DispatchQueue.main.async {
-                        NotificationManager.shared().dismiss(with: .screenshots)
-                    }
-                    self.endSync()
-                } else if self.screenshotsToProcess < 0 {
-                    print("WTF? negative screenshotsToProcess:\(self.screenshotsToProcess) after subtracting one")
-                }
+                self.decrementScreenshots()
             }.catch { error in
                 print("uploadScreenshot outer Clarifai catch error:\(error)")
         }
     }
     
+    func decrementScreenshots() {
+        self.screenshotsToProcess -= 1
+        if self.screenshotsToProcess == 0 {
+            DispatchQueue.main.async {
+                NotificationManager.shared().dismiss(with: .screenshots)
+            }
+            self.endSync()
+        } else if self.screenshotsToProcess < 0 {
+            print("WTF? negative screenshotsToProcess:\(self.screenshotsToProcess) after subtracting one")
+        }
+    }
+    
+    func downloadScreenshot(dynamicLink: String) {
+        let dataModel = DataModel.sharedInstance
+        firstly { _ -> Promise<[String : Any]> in
+            // Get screenshot dict from Craze server. See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
+            let sDelimited = dynamicLink.components(separatedBy: "/s/")
+            print("downloadScreenshot dynamicLink:\(dynamicLink)  sDelimited:\(sDelimited)")
+            guard sDelimited.count > 1,
+              let lastComponent = sDelimited.last,
+              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + lastComponent) else {
+                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from dynamicLink:\(dynamicLink)"])
+                    return Promise(error: urlError)
+            }
+            NSLog("dynamicLink:\(dynamicLink)  screenshotInfoUrl:\(screenshotInfoUrl)")
+            return NetworkingPromise.downloadInfo(url: screenshotInfoUrl)
+            }.then(on: self.processingQ) { screenshotDict -> Promise<(Data, [String : Any])> in
+                // Download image from Syte S3.
+                guard let imageURLString = screenshotDict["image"] as? String,
+                    let imageURL = URL(string: imageURLString) else {
+                        let imageURLError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from screenshotDict:\(screenshotDict)"])
+                        return Promise(error: imageURLError)
+                }
+                return NetworkingPromise.downloadImage(url: imageURL, screenshotDict: screenshotDict)
+            }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
+                // Save screenshot to db.
+                return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
+                    return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                    assetId: dynamicLink,
+                                                    shareLink: screenshotDict["shareLink"] as? String,
+                                                    createdAt: Date(),
+                                                    isFashion: true,
+                                                    imageData: imageData)
+                }
+            }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
+                // Save shoppables to db.
+                guard let syteJsonString = screenshotDict["syteJson"] as? String,
+                  let segments = NetworkingPromise.jsonDestringify(string: syteJsonString),
+                  let imageURLString = screenshotDict["image"] as? String else {
+                    let jsonError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not extract syteJson from screenshotDict:\(screenshotDict)"])
+                    print(jsonError)
+                    return
+                }
+                self.saveShoppables(assetId: dynamicLink, uploadedURLString: imageURLString, segments: segments)
+            }.always(on: self.serialQ) {
+                self.decrementScreenshots()
+            }.catch { error in
+                print("downloadScreenshot catch error:\(error)")
+        }
+    }
+
     func promiseForRatio17777() -> Promise<(String, [[String : Any]])> {
         let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/JjdvWeV7u5S75ZPl5pSOX"
         let segments = [["label":"Skirts","gender":"female","b0":[0.4177178144454956,0.4898432493209839],"center":[0.5302261114120483,0.5905150771141052],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC42OTM3MDM3MDA2MDIwNTQ2LCJ5IjowLjQ4NzMyNjQ1MzYyNjE1NTg0LCJ4MiI6MC42NDU1NDcxMTU4MDI3NjQ5LCJ4IjowLjQxNDkwNTEwNzAyMTMzMTh9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.5819&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6427344083786011,0.6911869049072266]],["label":"Jackets","gender":"female","b0":[0.3964715600013733,0.4136771559715271],"center":[0.5247414112091064,0.4848739802837372],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC41NTc4NTA3MjUyMDM3NTI2LCJ5IjowLjQxMTg5NzIzNTM2MzcyMTg2LCJ4MiI6MC42NTYyMTgwMDg2OTcwMzMsIngiOjAuMzkzMjY0ODEzNzIxMTh9&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.5910&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6530112624168396,0.5560708045959473]],["label":"Shoes","gender":"female","b0":[0.4400824010372162,0.7088841199874878],"center":[0.4686053097248077,0.73576420545578],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC43NjMzMTYyOTMwNjA3Nzk1LCJ5IjowLjcwODIxMjExNzg1MDc4MDUsIngyIjowLjQ5Nzg0MTI5MTEyOTU4OTEsIngiOjAuNDM5MzY5MzI4MzIwMDI2NH0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5940&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4971282184123993,0.7626442909240723]],["label":"Bags","gender":"female","b0":[0.3904582262039185,0.5603976249694824],"center":[0.4276284575462341,0.6082033514976501],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC42NTcyMDQyMjExODkwMjIxLCJ5IjowLjU1OTIwMjQ4MTgwNjI3ODIsIngyIjowLjQ2NTcyNzk0NDY3MjEwNzcsIngiOjAuMzg5NTI4OTcwNDIwMzYwNTV9&cats=WyJIYW5kYmFncyJd&prob=0.5947&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4647986888885498,0.6560090780258179]],["label":"Shoes","gender":"female","b0":[0.5386749505996704,0.7097557187080383],"center":[0.5780842304229736,0.7361155152320862],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC43NjMxMzQzMDY2NjkyMzUyLCJ5IjowLjcwOTA5NjcyMzc5NDkzNzIsIngyIjowLjYxODQ3ODc0MjI0MTg1OTQsIngiOjAuNTM3Njg5NzE4NjA0MDg3OX0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6584&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6174935102462769,0.762475311756134]]]
@@ -347,7 +402,7 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func countAndPrint(name: String, set: Set<String>) {
+    func countAndPrint(name: String, set: Set<AnyHashable>) {
         print("\(name) count:\(set.count)")
     }
     
@@ -380,15 +435,19 @@ class AssetSyncModel: NSObject {
 //                }
             }
             let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
+            let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
             // TODO: Remove changedAssetIds as each screenshot is successfully saved.
             //changedAssetIds = []
             self.countAndPrint(name: "dbSet", set: dbSet)
             self.countAndPrint(name: "photosSet", set: photosSet)
             self.countAndPrint(name: "toUpload", set: toUpload)
-            if toUpload.count > 0 {
+            self.countAndPrint(name: "toDownload", set: toDownload)
+            if toUpload.count > 0 || toDownload.count > 0 {
                 DispatchQueue.main.async {
                     NotificationManager.shared().present(with: .screenshots)
                 }
+            }
+            if toUpload.count > 0 {
                 AnalyticsManager.track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
                 self.allScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
@@ -398,6 +457,15 @@ class AssetSyncModel: NSObject {
                         }
                     }
                 })
+            }
+            if toDownload.count > 0 {
+                AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
+                self.screenshotsToProcess += toDownload.count
+                for dynamicLink in toDownload {
+                    self.processingQ.async {
+                        self.downloadScreenshot(dynamicLink: dynamicLink)
+                    }
+                }
             }
             if self.screenshotsToProcess == 0 {
                 self.endSync()
@@ -415,8 +483,8 @@ extension AssetSyncModel {
             return
         }
         let content = UNMutableNotificationContent()
-        content.title = "Congratulations!"
-        content.body = "Tap to shop your screenshot."
+        content.title = "Ready to shop?"
+        content.body = "Check out the products in your screenshot"
         if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
             -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
             content.sound = nil
@@ -458,6 +526,51 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             //                print("photoLibraryDidChange changedAssets count:\(changedAssets.count)")
             syncPhotos()
         }
+    }
+    
+}
+
+extension AssetSyncModel {
+    
+    @objc public func handleDynamicLink(dynamicLink: URL) {
+        incomingDynamicLinks.append(dynamicLink.absoluteString)
+        syncPhotos()
+    }
+    
+}
+
+extension Screenshot {
+    
+    public func share() -> Promise<String> {
+        if let shareLink = self.shareLink {
+            return Promise(value: shareLink)
+        }
+        guard let assetId = self.assetId else {
+            let error = NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey: "share with no assetId"])
+            print(error)
+            return Promise(error: error)
+        }
+        let dataModel = DataModel.sharedInstance
+        let assetSyncModel = AssetSyncModel.sharedInstance
+        return firstly { _ -> Promise<(String, String)> in
+            // Post to Craze server, which returns deep share link.
+            let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
+            return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
+            }.then(on: assetSyncModel.processingQ) { id, shareLink -> Promise<String> in
+                // Return the promise as soon as we have the shareLink, and concurrently or afterwards save shareLink to DB.
+                NSLog("id:\(id)  shareLink:\(shareLink)")
+                dataModel.performBackgroundTask { (managedObjectContext) in
+                    if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
+                        screenshot.shareLink = shareLink
+                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    }
+                }
+                return Promise(value: shareLink)
+        }
+    }
+    
+    @objc public func shareViaLink() -> AnyPromise {
+        return AnyPromise(share())
     }
     
 }

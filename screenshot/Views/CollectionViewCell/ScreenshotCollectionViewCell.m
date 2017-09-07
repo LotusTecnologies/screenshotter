@@ -60,8 +60,7 @@
         });
         
         _toolbar = ({
-            // Restore when Share feature implemented.
-            //UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ScreenshotShare"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
+            UIBarButtonItem *shareButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ScreenshotShare"] style:UIBarButtonItemStylePlain target:self action:@selector(shareAction:)];
             UIBarButtonItem *trashButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ScreenshotTrash"] style:UIBarButtonItemStylePlain target:self action:@selector(trashAction:)];
             UIBarButtonItem *flexilbeItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
             
@@ -70,8 +69,7 @@
             [toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
             toolbar.tintColor = [UIColor crazeRed];
             
-            //toolbar.items = @[shareButtonItem, flexilbeItem, trashButtonItem];
-            toolbar.items = @[flexilbeItem, trashButtonItem];
+            toolbar.items = @[shareButtonItem, flexilbeItem, trashButtonItem];
             [toolbarBackgroundView addSubview:toolbar];
             [toolbar.topAnchor constraintEqualToAnchor:toolbarBackgroundView.topAnchor].active = YES;
             [toolbar.leadingAnchor constraintEqualToAnchor:toolbarBackgroundView.leadingAnchor].active = YES;
