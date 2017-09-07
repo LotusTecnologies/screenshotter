@@ -121,9 +121,9 @@
     
     [Appsee addEvent:@"App Launched" withProperties:@{@"version": [UIApplication versionBuild]}];
     
-    [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
-    [[RatingFlow sharedInstance] start];
-    [[IntercomHelper sharedInstance] start];
+    [FBSDKApplicationDelegate.sharedInstance application:application didFinishLaunchingWithOptions:launchOptions];
+    [RatingFlow.sharedInstance start];
+    [IntercomHelper.sharedInstance start];
 }
 
 
