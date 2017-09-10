@@ -490,6 +490,7 @@ extension Screenshot {
                     screenshot.imageData = nil
                     screenshot.syteJson = nil
                     screenshot.uploadedImageURL = nil
+                    screenshot.shareLink = nil
                     if let shoppables = screenshot.shoppables as? Set<Shoppable> {
                         for shoppable in shoppables {
                             managedObjectContext.delete(shoppable)
