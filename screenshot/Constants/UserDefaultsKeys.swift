@@ -17,7 +17,6 @@ class UserDefaultsKeys : NSObject {
     static let tutorialScreenshotAssetId = "TutorialScreenshotAssetId"
     static let dateInstalled = "DateInstalled"
     static let dateLastSound = "DateLastSound"
-    static let dateLastVisitedScreenshots = "DateLastVisitedScreenshots"
     
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"

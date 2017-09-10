@@ -103,14 +103,12 @@
         helperView;
     });
     
-    self.lastVisited = [NSUserDefaults.standardUserDefaults objectForKey:UserDefaultsKeys.dateLastVisitedScreenshots];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
-    [self syncCellsBadgeEnabled];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -132,8 +130,6 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
-    [self updateLastVisited];
-    
     if (self.collectionView.backgroundView) {
         [self.collectionView.backgroundView removeFromSuperview];
         self.collectionView.backgroundView = nil;
@@ -148,8 +144,6 @@
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
     if (self.view.window) {
-        [self updateLastVisited];
-        
         if (self.collectionView.backgroundView) {
             [self.collectionView.backgroundView removeFromSuperview];
             self.collectionView.backgroundView = nil;
@@ -160,7 +154,6 @@
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self syncHelperViewVisibility];
-        [self syncCellsBadgeEnabled];
     }
 }
 
@@ -363,23 +356,8 @@
 
 #pragma mark - New Badge
 
-- (void)updateLastVisited {
-    self.lastVisited = [NSDate date];
-    [[NSUserDefaults standardUserDefaults] setObject:self.lastVisited forKey:UserDefaultsKeys.dateLastVisitedScreenshots];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
 - (BOOL)badgeEnabledForScreenshot:(Screenshot *)screenshot {
-    return [self.lastVisited timeIntervalSinceDate:screenshot.lastModified] <= 0.0;
-}
-
-- (void)syncCellsBadgeEnabled {
-    for (ScreenshotCollectionViewCell *cell in self.collectionView.visibleCells) {
-        NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-        Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
-        
-        cell.badgeEnabled = [self badgeEnabledForScreenshot:screenshot];
-    }
+    return screenshot.isNew;
 }
 
 @end
