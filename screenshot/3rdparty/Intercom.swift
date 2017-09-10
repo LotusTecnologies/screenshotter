@@ -51,9 +51,9 @@ class IntercomHelper : NSObject {
     }
     
     func registerUser(withEmail email: String) {
-        Intercom.registerUser(withEmail: email)
-        
         updateIntercomDeviceToken()
+    
+        Intercom.registerUser(withEmail: email)
     }
     
     func logoutUser() {
