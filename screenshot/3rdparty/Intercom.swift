@@ -18,7 +18,7 @@ class IntercomHelper : NSObject {
         }
     }
     
-    private var deviceToken: Data? {
+    var deviceToken: Data? {
         set {
             updateIntercomDeviceToken()
             
