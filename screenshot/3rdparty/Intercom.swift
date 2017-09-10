@@ -18,9 +18,17 @@ class IntercomHelper : NSObject {
         }
     }
     
-    var deviceToken: Data? {
-        didSet {
+    private var deviceToken: Data? {
+        set {
             updateIntercomDeviceToken()
+            
+            if let token = deviceToken {
+                UserDefaults.standard.set(token, forKey: UserDefaultsKeys.deviceToken)
+            } else {
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.deviceToken)
+            }
+        } get {
+            return UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data
         }
     }
     

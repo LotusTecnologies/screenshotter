@@ -20,4 +20,5 @@ class UserDefaultsKeys : NSObject {
     static let dateLastVisitedScreenshots = "DateLastVisitedScreenshots"
     
     static let significantEventCount = "SignificantEventCount"
+    static let deviceToken = "deviceToken"
 }
