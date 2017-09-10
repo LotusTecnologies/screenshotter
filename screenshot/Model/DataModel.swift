@@ -264,6 +264,7 @@ extension DataModel {
             screenshotToSave.createdAt = nsDate
         }
         screenshotToSave.isFashion = isFashion
+        screenshotToSave.isNew = true
         if let nsData = imageData as NSData? {
             screenshotToSave.imageData = nsData
         }
@@ -504,6 +505,25 @@ extension Screenshot {
         }
     }
     
+    @objc public func setViewed() {
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for screenshot in results {
+                    screenshot.isNew = false
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("setViewed objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+
 }
 
 extension Shoppable {

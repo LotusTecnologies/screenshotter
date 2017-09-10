@@ -43,11 +43,12 @@
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
-    productsViewController.screenshot = [viewController screenshotAtIndexPath:indexPath];
+    Screenshot *screenshot = [viewController screenshotAtIndexPath:indexPath];
+    productsViewController.screenshot = screenshot;
     
     if ([productsViewController hasShoppables]) {
         [self pushViewController:productsViewController animated:YES];
-
+        [screenshot setViewed];
         [[RatingFlow sharedInstance] recordSignificantEvent];
     } else {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry"
