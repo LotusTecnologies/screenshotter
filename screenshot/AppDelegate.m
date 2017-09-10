@@ -136,7 +136,7 @@
 
 - (void)setupThirdPartyLibrariesWithApplication:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [SEGAnalytics setupWithConfiguration:({
-        SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:@"RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"];
+        SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:Constants.segmentWriteKey];
         configuration.trackApplicationLifecycleEvents = YES;
         configuration.recordScreenViews = YES;
         configuration.trackDeepLinks = YES;
