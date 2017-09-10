@@ -13,8 +13,6 @@
 
 @interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource>
 
-@property (nonatomic, strong) UICollectionView *collectionView;
-
 @end
 
 @implementation ShoppablesToolbar
@@ -97,6 +95,16 @@
     }
 }
 
+- (void)selectFirstShoppable {
+    if ([self.collectionView numberOfItemsInSection:0]) {
+        [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+    }
+}
+
+- (NSInteger)selectedShoppableIndex {
+    return [self.collectionView.indexPathsForSelectedItems firstObject].item;
+}
+
 
 #pragma mark - Collection View
 
@@ -116,16 +124,6 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate shoppablesToolbar:self didSelectShoppableAtIndex:indexPath.item];
-}
-
-- (void)selectFirstItem {
-    if ([self.collectionView numberOfItemsInSection:0]) {
-        [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-    }
-}
-
-- (NSInteger)selectedShoppableIndex {
-    return [self.collectionView.indexPathsForSelectedItems firstObject].item;
 }
 
 @end

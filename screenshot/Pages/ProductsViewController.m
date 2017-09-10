@@ -24,14 +24,14 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeBrands
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, ProductCollectionViewCellDelegate, FrcDelegateProtocol, ShoppablesToolbarDelegate> {
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
 }
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
-@property (nonatomic, strong) NSFetchedResultsController *shoppablesFrc;
+@property (nonatomic, strong) ShoppablesController *shoppablesController;
 @property (nonatomic, strong) NSArray<Product *> *products;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSString *> *shoppableSortTitles;
 @property (nonatomic) ShoppableSortType currentSortType;
@@ -69,14 +69,17 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.image = [UIImage imageWithData:self.screenshot.imageData];
+    
     self.shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
         
         ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+        toolbar.screenshotImage = self.image;
+        toolbar.shoppables = [self.shoppablesController shoppables];
         toolbar.delegate = self;
-        toolbar.shoppables = [self shoppables];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -84,6 +87,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [toolbar.heightAnchor constraintEqualToConstant:toolbar.bounds.size.height].active = YES;
         toolbar;
     });
+    
+    self.shoppablesController.collectionView = self.shoppablesToolbar.collectionView;
     
     self.collectionView = ({
         CGFloat p = [Geometry padding];
@@ -111,21 +116,17 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView;
     });
     
-    {
-        UIImage *image = [UIImage imageWithData:self.screenshot.imageData];
+    self.navigationItem.rightBarButtonItem = ({
         CGFloat buttonSize = 32.f;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
         button.imageView.contentMode = UIViewContentModeScaleAspectFill;
-        [button setImage:image forState:UIControlStateNormal];
+        [button setImage:self.image forState:UIControlStateNormal];
         [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
         
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-        
-        self.image = image;
-        self.shoppablesToolbar.screenshotImage = image;
-    }
+        [[UIBarButtonItem alloc] initWithCustomView:button];
+    });
     
     [self reloadCollectionViewForIndex:0];
 }
@@ -133,7 +134,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.shoppablesToolbar selectFirstItem];
+    [self.shoppablesToolbar selectFirstShoppable];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -158,9 +159,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     self.shoppablesToolbar.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
-    
-    [[DataModel sharedInstance] clearShoppableFrc];
-    [DataModel sharedInstance].shoppableFrcDelegate = nil;
 }
 
 
@@ -170,24 +168,14 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     if (_screenshot != screenshot) {
         _screenshot = screenshot;
         
-        DataModel *dataModel = [DataModel sharedInstance];
-        
-        if (screenshot) {
-            dataModel.shoppableFrcDelegate = self;
-            self.shoppablesFrc = [dataModel setupShoppableFrcWithScreenshot:screenshot];
-            
-        } else {
-            dataModel.shoppableFrcDelegate = nil;
-            self.shoppablesFrc = nil;
-            [[DataModel sharedInstance] clearShoppableFrc];
-        }
+        self.shoppablesController = screenshot ? [[ShoppablesController alloc] initWithScreenshot:screenshot] : nil;
     }
 }
 
 - (void)displayScreenshotAction {
     ScreenshotDisplayNavigationController *navigationController = [[ScreenshotDisplayNavigationController alloc] init];
     navigationController.screenshotDisplayViewController.image = self.image;
-    navigationController.screenshotDisplayViewController.shoppables = [self shoppables];
+    navigationController.screenshotDisplayViewController.shoppables = [self.shoppablesToolbar shoppables];
     [self presentViewController:navigationController animated:YES completion:nil];
 }
 
@@ -195,21 +183,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 #pragma mark - Shoppable / Products
 
 - (BOOL)hasShoppables {
-    return self.shoppablesFrc.fetchedObjects.count > 0;
-}
-
-- (Shoppable *)shoppableAtIndex:(NSUInteger)index {
-    return [self.shoppablesFrc objectAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-}
-
-- (NSArray<Shoppable *> *)shoppables {
-    NSMutableArray *shoppables = [NSMutableArray array];
-    
-    for (NSUInteger i = 0; i < self.shoppablesFrc.fetchedObjects.count; i++) {
-        [shoppables addObject:[self shoppableAtIndex:i]];
-    }
-    
-    return shoppables;
+    return [self.shoppablesController shoppableCount];
 }
 
 - (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
@@ -238,7 +212,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
-    self.products = [self productsForShoppable:[self shoppableAtIndex:index]];
+    self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
     
     [self.collectionView reloadData];
     
@@ -306,25 +280,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
-}
-
-
-#pragma mark - Fetched Results Controller
-
-- (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
-    [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
-}
-
-- (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
-    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
-}
-
-- (void)frcOneUpdatedAtIndexPath:(NSIndexPath *)indexPath {
-    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-}
-
-- (void)frcReloadData {
-    [self.collectionView reloadData];
 }
 
 
@@ -424,7 +379,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         
         self.transitioningController = [[TransitioningController alloc] init];
     
-        NSArray<Shoppable *> *shoppables = [self shoppables];
+        NSArray<Shoppable *> *shoppables = [self.shoppablesToolbar shoppables];
         Product *product;
         
         for (Shoppable *shoppable in shoppables) {
