@@ -38,8 +38,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
         
         self.title = @"Tutorial";
         
@@ -300,21 +298,6 @@
                 }
             });
         }
-    }
-}
-
-
-#pragma mark - Keyboard
-
-- (void)keyboardWillShow:(NSNotification *)notification {
-    if (self.view.window) {
-        self.scrollView.scrollEnabled = NO;
-    }
-}
-
-- (void)keyboardDidHide:(NSNotification *)notification {
-    if (self.view.window) {
-        self.scrollView.scrollEnabled = YES;
     }
 }
 
