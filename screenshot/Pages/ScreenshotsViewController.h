@@ -22,7 +22,7 @@
 
 @property (nonatomic, weak) id<ScreenshotsViewControllerDelegate> delegate;
 
-- (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath;
+- (Screenshot *)screenshotAtIndex:(NSInteger)index;
 
 - (void)scrollTopTop;
 

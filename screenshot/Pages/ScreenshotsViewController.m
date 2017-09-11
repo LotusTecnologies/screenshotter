@@ -15,6 +15,11 @@
 #import "AnalyticsManager.h"
 @import PromiseKit;
 
+typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
+    ScreenshotsSectionInfo,
+    ScreenshotsSectionImages
+};
+
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -53,16 +58,18 @@
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = p;
         layout.minimumLineSpacing = p;
+        layout.sectionInset = UIEdgeInsetsMake(p, 0.f, 0.f, 0.f);
         
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(p, p, p, p);
+        collectionView.contentInset = UIEdgeInsetsMake(0.f, p, p, p);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
         
+        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"info"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view addSubview:collectionView];
@@ -176,7 +183,7 @@
 - (void)insertScreenshotHelperView {
     BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
     
-    if (!hasPresented && [self.collectionView numberOfItemsInSection:0] == 1) {
+    if (!hasPresented && [self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] == 1) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
@@ -232,48 +239,80 @@
     return 2;
 }
 
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 2;
+}
+
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.screenshotFrc.fetchedObjects.count;
+    if (section == ScreenshotsSectionInfo) {
+        return 1;
+        
+    } else if (section == ScreenshotsSectionImages) {
+        return self.screenshotFrc.fetchedObjects.count;
+        
+    } else {
+        return 0;
+    }
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
-    
     CGSize size = CGSizeZero;
-    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
-    size.height = ceil(size.width * [self screenshotRatio]);
+    
+    if (indexPath.section == ScreenshotsSectionInfo) {
+        size.width = floor(collectionView.bounds.size.width - ([Geometry padding] * 2));
+        size.height = 100.f;
+        
+    } else if (indexPath.section == ScreenshotsSectionImages) {
+        NSInteger columns = [self numberOfCollectionViewColumns];
+        
+        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
+        size.height = ceil(size.width * [self screenshotRatio]);
+    }
+    
     return size;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
-    
-    ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.delegate = self;
-    cell.backgroundColor = [UIColor lightGrayColor];
-    cell.screenshot = screenshot;
-    cell.badgeEnabled = [self badgeEnabledForScreenshot:screenshot];
-    return cell;
+    if (indexPath.section == ScreenshotsSectionInfo) {
+        UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"info" forIndexPath:indexPath];
+        cell.contentView.backgroundColor = [UIColor redColor];
+        return cell;
+        
+    } else if (indexPath.section == ScreenshotsSectionImages) {
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        
+        ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+        cell.delegate = self;
+        cell.backgroundColor = [UIColor lightGrayColor];
+        cell.screenshot = screenshot;
+        cell.badgeEnabled = [self badgeEnabledForScreenshot:screenshot];
+        return cell;
+        
+    } else {
+        return nil;
+    }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.item == 0) {
+    if (indexPath.section == ScreenshotsSectionImages && indexPath.item == 0) {
         [self insertScreenshotHelperView];
     }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
-    
-    [AnalyticsManager track:@"Tapped on screenshot"];
+    if (indexPath.section == ScreenshotsSectionImages) {
+        [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
+        
+        [AnalyticsManager track:@"Tapped on screenshot"];
+    }
 }
 
-- (Screenshot *)screenshotAtIndexPath:(NSIndexPath *)indexPath {
-    return [self.screenshotFrc objectAtIndexPath:indexPath];
+- (Screenshot *)screenshotAtIndex:(NSInteger)index {
+    return [self.screenshotFrc objectAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
 }
 
 - (void)scrollTopTop {
-    if ([self.collectionView numberOfItemsInSection:0]) {
+    if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages]) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
     }
 }
@@ -283,16 +322,18 @@
 
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
-    UIActivityViewController *activityViewController;
+    Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+    NSArray *items;
+    
     if (screenshot.shareLink) {
-        NSURL *shareURL = [NSURL URLWithString:screenshot.shareLink];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[shareURL] applicationActivities:nil];
+        items = @[[NSURL URLWithString:screenshot.shareLink]];
+        
     } else {
         NSURL *placeholderURL = [NSURL URLWithString:@"https://crazeapp.com/"];
-        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[screenshotActivityItemProvider] applicationActivities:nil];
+        items = @[[[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL]];
     }
+    
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
             [AnalyticsManager track:@"share completed"];
@@ -300,14 +341,16 @@
             [AnalyticsManager track:@"share incomplete"];
         }
     };
+    
     activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
     [self presentViewController:activityViewController animated:YES completion:nil];
+    
     [AnalyticsManager track:@"Shared screenshot"];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    [[self screenshotAtIndexPath:indexPath] setHide];
+    [[self screenshotAtIndex:indexPath.item] setHide];
     
     [AnalyticsManager track:@"Removed screenshot"];
 }
@@ -349,7 +392,7 @@
 #pragma mark - Helper View
 
 - (void)syncHelperViewVisibility {
-    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
 }
 

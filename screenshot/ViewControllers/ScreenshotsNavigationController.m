@@ -44,7 +44,7 @@
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
     productsViewController.hidesBottomBarWhenPushed = YES;
-    Screenshot *screenshot = [viewController screenshotAtIndexPath:indexPath];
+    Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     productsViewController.screenshot = screenshot;
     
     if ([productsViewController hasShoppables]) {
