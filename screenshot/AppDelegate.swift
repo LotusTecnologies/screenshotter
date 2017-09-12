@@ -78,8 +78,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let dynamicLink = DynamicLinks.dynamicLinks()?.dynamicLink(fromCustomSchemeURL: url),
           let link = dynamicLink.url,
           dynamicLink.matchConfidence == .strong {
-                AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: link)
-                return true
+            AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: link)
+            showScreenshotListTop()
+            return true
         }
         if let scheme = url.scheme,
           let mainBundleIdentifier = Bundle.main.bundleIdentifier,
@@ -87,6 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           let host = url.host,
           host == "s" {
             AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: url)
+            showScreenshotListTop()
             return true
         }
         let isHandled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
@@ -101,6 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     dynamicLink.matchConfidence == .strong,
                     error == nil {
                     AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: link)
+                    self.showScreenshotListTop()
                 }
             }) {
             return isHandled
