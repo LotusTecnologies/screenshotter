@@ -103,6 +103,16 @@ class AssetSyncModel: NSObject {
                         }.always {
                             NotificationManager.shared().dismiss(with: .products)
                         }.catch { error in
+                            let nsError = error as NSError
+                            if nsError.domain == "Craze" {
+                                switch nsError.code {
+                                case 3, 4:
+                                    // Syte returned no segments
+                                    dataModel.setNoShoppables(assetId: asset.localIdentifier)
+                                default:
+                                    break
+                                }
+                            }
                             print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                     }
                 }
@@ -134,7 +144,7 @@ class AssetSyncModel: NSObject {
             guard sDelimited.count > 1,
               let lastComponent = sDelimited.last,
               let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + lastComponent) else {
-                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from dynamicLink:\(dynamicLink)"])
+                    let urlError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from dynamicLink:\(dynamicLink)"])
                     return Promise(error: urlError)
             }
             NSLog("dynamicLink:\(dynamicLink)  screenshotInfoUrl:\(screenshotInfoUrl)")
@@ -143,7 +153,7 @@ class AssetSyncModel: NSObject {
                 // Download image from Syte S3.
                 guard let imageURLString = screenshotDict["image"] as? String,
                     let imageURL = URL(string: imageURLString) else {
-                        let imageURLError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from screenshotDict:\(screenshotDict)"])
+                        let imageURLError = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from screenshotDict:\(screenshotDict)"])
                         return Promise(error: imageURLError)
                 }
                 return NetworkingPromise.downloadImage(url: imageURL, screenshotDict: screenshotDict)
@@ -162,7 +172,7 @@ class AssetSyncModel: NSObject {
                 guard let syteJsonString = screenshotDict["syteJson"] as? String,
                   let segments = NetworkingPromise.jsonDestringify(string: syteJsonString),
                   let imageURLString = screenshotDict["image"] as? String else {
-                    let jsonError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not extract syteJson from screenshotDict:\(screenshotDict)"])
+                    let jsonError = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey : "Could not extract syteJson from screenshotDict:\(screenshotDict)"])
                     print(jsonError)
                     return
                 }
@@ -338,7 +348,7 @@ class AssetSyncModel: NSObject {
                 }
                 if let isCancelled = info?[PHImageCancelledKey] as? Bool,
                     isCancelled == true {
-                    let cancelledError = NSError(domain: "Craze", code: 5, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
+                    let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
                     reject(cancelledError)
                     return
                 }
@@ -546,7 +556,7 @@ extension Screenshot {
             return Promise(value: shareLink)
         }
         guard let assetId = self.assetId else {
-            let error = NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey: "share with no assetId"])
+            let error = NSError(domain: "Craze", code: 14, userInfo: [NSLocalizedDescriptionKey: "share with no assetId"])
             print(error)
             return Promise(error: error)
         }

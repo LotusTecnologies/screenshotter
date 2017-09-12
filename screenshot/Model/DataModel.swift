@@ -479,6 +479,24 @@ extension DataModel {
         }
     }
     
+    public func setNoShoppables(assetId: String) {
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for screenshot in results {
+                    screenshot.shoppablesCount = -1
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("setNoShoppables assetId:\(assetId) results with error:\(error)")
+            }
+        }
+    }
+
     // Update changes made in the background
     public func saveMain() {
         saveMoc(managedObjectContext: mainMoc())
