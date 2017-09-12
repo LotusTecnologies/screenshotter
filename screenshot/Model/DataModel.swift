@@ -85,7 +85,6 @@ class DataModel: NSObject {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
         request.predicate = NSPredicate(format: "isFashion == TRUE AND isHidden == FALSE AND shoppablesCount > 0")
-        request.fetchLimit = 100
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {
