@@ -36,6 +36,8 @@
 		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
 		C540FE131F52993F005863D7 /* UIDevice+Model.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE121F52993F005863D7 /* UIDevice+Model.m */; };
 		C540FE161F52ADBE005863D7 /* TutorialTrySlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */; };
+		C5448E821F6680C100CD063B /* InfoCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5448E811F6680C100CD063B /* InfoCollectionViewCell.m */; };
+		C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5448E841F66910700CD063B /* NotifySizeChangeView.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
 		C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */; };
 		C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */; };
@@ -115,6 +117,10 @@
 		C540FE121F52993F005863D7 /* UIDevice+Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+Model.m"; sourceTree = "<group>"; };
 		C540FE141F52ADBE005863D7 /* TutorialTrySlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialTrySlideView.h; sourceTree = "<group>"; };
 		C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialTrySlideView.m; sourceTree = "<group>"; };
+		C5448E801F6680C100CD063B /* InfoCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfoCollectionViewCell.h; sourceTree = "<group>"; };
+		C5448E811F6680C100CD063B /* InfoCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfoCollectionViewCell.m; sourceTree = "<group>"; };
+		C5448E831F66910700CD063B /* NotifySizeChangeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotifySizeChangeView.h; sourceTree = "<group>"; };
+		C5448E841F66910700CD063B /* NotifySizeChangeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotifySizeChangeView.m; sourceTree = "<group>"; };
 		C54F032B1F44361C00CF8CBD /* HelperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperView.h; sourceTree = "<group>"; };
 		C54F032C1F44361C00CF8CBD /* HelperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperView.m; sourceTree = "<group>"; };
 		C55184BA1F4AD3E000EE7855 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
@@ -298,6 +304,8 @@
 				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
 				C5921E951F433D4100DF4888 /* TappableTextView.h */,
 				C5921E961F433D4100DF4888 /* TappableTextView.m */,
+				C5448E831F66910700CD063B /* NotifySizeChangeView.h */,
+				C5448E841F66910700CD063B /* NotifySizeChangeView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -323,6 +331,8 @@
 				C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */,
 				C55184C01F4AD40500EE7855 /* ShoppableCollectionViewCell.h */,
 				C55184C11F4AD40500EE7855 /* ShoppableCollectionViewCell.m */,
+				C5448E801F6680C100CD063B /* InfoCollectionViewCell.h */,
+				C5448E811F6680C100CD063B /* InfoCollectionViewCell.m */,
 			);
 			path = CollectionViewCell;
 			sourceTree = "<group>";
@@ -660,6 +670,7 @@
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
+				C5448E821F6680C100CD063B /* InfoCollectionViewCell.m in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
@@ -685,6 +696,7 @@
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
 				C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */,
 				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
+				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
 				C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

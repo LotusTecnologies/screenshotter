@@ -8,6 +8,7 @@
 
 #import "ScreenshotsViewController.h"
 #import "ScreenshotCollectionViewCell.h"
+#import "InfoCollectionViewCell.h"
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 #import "HelperView.h"
@@ -20,10 +21,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionImages
 };
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol> {
+    CGFloat _infoCellBottomInset;
+}
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
+@property (nonatomic, strong) InfoCollectionViewCell *referencedInfoCell;
+
 @property (nonatomic, strong) HelperView *helperView;
 @property (nonatomic, strong) NSDate *lastVisited;
 
@@ -45,6 +50,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [DataModel sharedInstance].screenshotFrcDelegate = self;
         self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+        
+        _infoCellBottomInset = [Geometry padding];
     }
     return self;
 }
@@ -58,18 +65,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = p;
         layout.minimumLineSpacing = p;
-        layout.sectionInset = UIEdgeInsetsMake(p, 0.f, 0.f, 0.f);
         
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(0.f, p, p, p);
+        collectionView.contentInset = UIEdgeInsetsMake(p, p, p, p);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
         
-        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"info"];
+        [collectionView registerClass:[InfoCollectionViewCell class] forCellWithReuseIdentifier:@"info"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view addSubview:collectionView];
@@ -109,7 +115,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         helperView;
     });
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -259,8 +264,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     CGSize size = CGSizeZero;
     
     if (indexPath.section == ScreenshotsSectionInfo) {
+        // TODO: set this once the latestScreenshotFrc adds one
+        self.referencedInfoCell.type = InfoCollectionViewCellTypeNoFashion;
+        
         size.width = floor(collectionView.bounds.size.width - ([Geometry padding] * 2));
-        size.height = 100.f;
+        size.height = [self.referencedInfoCell sizeThatFits:size].height + _infoCellBottomInset;
         
     } else if (indexPath.section == ScreenshotsSectionImages) {
         NSInteger columns = [self numberOfCollectionViewColumns];
@@ -274,8 +282,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionInfo) {
-        UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"info" forIndexPath:indexPath];
-        cell.contentView.backgroundColor = [UIColor redColor];
+        InfoCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"info" forIndexPath:indexPath];
+        cell.contentView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, _infoCellBottomInset, 0.f);
+        cell.type = InfoCollectionViewCellTypeNoFashion;
+        [cell.closeButton addTarget:self action:@selector(infoCellCloseButtonAction) forControlEvents:UIControlEventTouchUpInside];
+        [cell.continueButton addTarget:self action:@selector(infoCellContinueButtonAction) forControlEvents:UIControlEventTouchUpInside];
         return cell;
         
     } else if (indexPath.section == ScreenshotsSectionImages) {
@@ -315,6 +326,24 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages]) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
     }
+}
+
+
+#pragma mark - Info Cell
+
+- (InfoCollectionViewCell *)referencedInfoCell {
+    if (!_referencedInfoCell) {
+        _referencedInfoCell = [[InfoCollectionViewCell alloc] init];
+    }
+    return _referencedInfoCell;
+}
+
+- (void)infoCellCloseButtonAction {
+    
+}
+
+- (void)infoCellContinueButtonAction {
+    
 }
 
 
