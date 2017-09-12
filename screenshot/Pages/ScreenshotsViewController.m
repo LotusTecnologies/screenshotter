@@ -413,21 +413,21 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Fetch Results Controller
 
-- (void)frcOneAddedAtIndexPath:(NSIndexPath *)indexPath {
+- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneAddedAt:(NSIndexPath *)indexPath {
     [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
     [self syncHelperViewVisibility];
 }
 
-- (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
+- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneDeletedAt:(NSIndexPath *)indexPath {
     [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
     [self syncHelperViewVisibility];
 }
 
-- (void)frcOneUpdatedAtIndexPath:(NSIndexPath *)indexPath {
+- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneUpdatedAt:(NSIndexPath *)indexPath {
     [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
 }
 
-- (void)frcReloadData {
+- (void)frcReloadData:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc {
     [self.collectionView reloadData];
     [self syncHelperViewVisibility];
 }

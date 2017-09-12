@@ -11,10 +11,10 @@ import CoreData
 import PromiseKit
 
 @objc public protocol FrcDelegateProtocol : class {
-    func frcOneAddedAt(indexPath: IndexPath)
-    func frcOneDeletedAt(indexPath: IndexPath)
-    func frcOneUpdatedAt(indexPath: IndexPath)
-    func frcReloadData()
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath)
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath)
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath)
+    func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>)
 }
 
 enum CZChangeKind {
@@ -200,33 +200,33 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         }
     }
     
-    func didChangeContent(changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, frcDelegate: FrcDelegateProtocol?) {
+    func didChangeContent(frc: NSFetchedResultsController<NSFetchRequestResult>, changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, frcDelegate: FrcDelegateProtocol?) {
         switch changeKind {
         case .none:
             print("DataModel didChangeContent no change. Weird")
         case .singleAdd:
             if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frcOneAddedAt(indexPath: changeIndexPath)
+                frcDelegate?.frc(frc, oneAddedAt: changeIndexPath)
             } else {
                 print("Error DataModel singleAdd changeIndexPath nil")
-                frcDelegate?.frcReloadData()
+                frcDelegate?.frcReloadData(frc)
             }
         case .singleDelete:
             if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frcOneDeletedAt(indexPath: changeIndexPath)
+                frcDelegate?.frc(frc, oneDeletedAt: changeIndexPath)
             } else {
                 print("Error DataModel singleDelete changeIndexPath nil")
-                frcDelegate?.frcReloadData()
+                frcDelegate?.frcReloadData(frc)
             }
         case .singleUpdate:
             if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frcOneUpdatedAt(indexPath: changeIndexPath)
+                frcDelegate?.frc(frc, oneUpdatedAt: changeIndexPath)
             } else {
                 print("Error DataModel singleAdd changeIndexPath nil")
-                frcDelegate?.frcReloadData()
+                frcDelegate?.frcReloadData(frc)
             }
         case .multiple:
-            frcDelegate?.frcReloadData()
+            frcDelegate?.frcReloadData(frc)
         }
         changeKind = .none
         changeIndexPath = nil
@@ -236,11 +236,11 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
         switch controller {
         case screenshotFrc:
-            didChangeContent(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
+            didChangeContent(frc: controller, changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
         case shoppableFrcStandIn:
-            didChangeContent(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
+            didChangeContent(frc: controller, changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
         case favoriteFrc:
-            didChangeContent(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
+            didChangeContent(frc: controller, changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
         default:
             print("Unknown controller:\(controller) in controllerDidChangeContent")
         }

@@ -39,19 +39,19 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
 }
 
 extension ShoppablesController {
-    func frcOneAddedAt(indexPath: IndexPath) {
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath) {
         collectionView?.insertItems(at: [indexPath])
     }
     
-    func frcOneDeletedAt(indexPath: IndexPath) {
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath) {
         collectionView?.deleteItems(at: [indexPath])
     }
     
-    func frcOneUpdatedAt(indexPath: IndexPath) {
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
         collectionView?.reloadItems(at: [indexPath])
     }
     
-    func frcReloadData() {
+    func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>) {
         collectionView?.reloadData()
     }
 }
