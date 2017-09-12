@@ -32,6 +32,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) HelperView *helperView;
 @property (nonatomic, strong) NSDate *lastVisited;
 
+@property (nonatomic) BOOL shouldDisplayInfoCell;
+
 @end
 
 @implementation ScreenshotsViewController
@@ -52,6 +54,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
         
         _infoCellBottomInset = [Geometry padding];
+        
+        self.shouldDisplayInfoCell = YES; // !!!: DEBUG
+        self.referencedInfoCell.type = InfoCollectionViewCellTypeNoFashion; // TODO: set this in the latestScreenshotFrc adds one
     }
     return self;
 }
@@ -250,7 +255,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ScreenshotsSectionInfo) {
-        return 1;
+        return self.shouldDisplayInfoCell;
         
     } else if (section == ScreenshotsSectionImages) {
         return self.screenshotFrc.fetchedObjects.count;
@@ -264,9 +269,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     CGSize size = CGSizeZero;
     
     if (indexPath.section == ScreenshotsSectionInfo) {
-        // TODO: set this once the latestScreenshotFrc adds one
-        self.referencedInfoCell.type = InfoCollectionViewCellTypeNoFashion;
-        
         size.width = floor(collectionView.bounds.size.width - ([Geometry padding] * 2));
         size.height = [self.referencedInfoCell sizeThatFits:size].height + _infoCellBottomInset;
         
@@ -338,12 +340,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     return _referencedInfoCell;
 }
 
-- (void)infoCellCloseButtonAction {
+- (void)dismissInfoCell {
+    self.shouldDisplayInfoCell = NO;
     
+    [self.collectionView performBatchUpdates:^{
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:ScreenshotsSectionInfo]];
+    } completion:nil];
+}
+
+- (void)infoCellCloseButtonAction {
+    [self dismissInfoCell];
 }
 
 - (void)infoCellContinueButtonAction {
-    
+    [self dismissInfoCell];
 }
 
 
