@@ -306,10 +306,15 @@
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
-    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    [[self screenshotAtIndexPath:indexPath] setHide];
-    
-    [AnalyticsManager track:@"Removed screenshot"];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Delete Screenshot?" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+        [[self screenshotAtIndexPath:indexPath] setHide];
+        
+        [AnalyticsManager track:@"Removed screenshot"];
+    }]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 
