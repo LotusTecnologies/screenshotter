@@ -265,10 +265,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self presentMailComposer];
             break;
         case RowTypeTellFriend: {
-            WebViewController *viewController = [[WebViewController alloc] init];
-            [viewController addNavigationItemLogo];
-            viewController.url = [NSURL URLWithString:@"http://crazeapp.com/app"];
-            [self.navigationController pushViewController:viewController animated:YES];
+            NSString *text = @"Download CRAZE, the app that lets you shop any screenshot, for free! https://crazeapp.com/app/";
+            UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[text] applicationActivities:nil];
+            activityViewController.popoverPresentationController.sourceView = self.view;
+            [self presentViewController:activityViewController animated:YES completion:nil];
         }
             break;
         case RowTypeTutorial: {
@@ -368,7 +368,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
         case RowTypeTutorial:
-        case RowTypeTellFriend:
         case RowTypeBug:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
