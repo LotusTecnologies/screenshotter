@@ -174,6 +174,9 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case screenshotFrc:
             screenshotChangeKind = .none
             screenshotChangeIndexPath = nil
+        case latestScreenshotFrc:
+            latestScreenshotChangeKind = .none
+            latestScreenshotChangeIndexPath = nil
         case shoppableFrcStandIn:
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
@@ -210,6 +213,8 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
+        case latestScreenshotFrc:
+            didChange(changeKind: &latestScreenshotChangeKind, changeIndexPath: &latestScreenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case shoppableFrcStandIn:
             didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
@@ -256,6 +261,8 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChangeContent(frc: controller, changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
+        case latestScreenshotFrc:
+            didChangeContent(frc: controller, changeKind: &latestScreenshotChangeKind, changeIndexPath: &latestScreenshotChangeIndexPath, frcDelegate: latestScreenshotFrcDelegate)
         case shoppableFrcStandIn:
             didChangeContent(frc: controller, changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
         case favoriteFrc:
