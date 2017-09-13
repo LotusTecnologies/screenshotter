@@ -285,13 +285,14 @@
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
     UIActivityViewController *activityViewController;
+    NSString *introductoryText = @"Check out this look on CRAZE!";
     if (screenshot.shareLink) {
         NSURL *shareURL = [NSURL URLWithString:screenshot.shareLink];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[shareURL] applicationActivities:nil];
+        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[introductoryText, shareURL] applicationActivities:nil];
     } else {
         NSURL *placeholderURL = [NSURL URLWithString:@"https://crazeapp.com/"];
         ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[screenshotActivityItemProvider] applicationActivities:nil];
+        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[introductoryText, screenshotActivityItemProvider] applicationActivities:nil];
     }
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
