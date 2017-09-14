@@ -353,7 +353,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)displayInfoCellIfNeeded {
     Screenshot *screenshot = self.lastScreenshotFrc.fetchedObjects.firstObject;
-
+    
     if (!screenshot.isFashion) {
         self.referencedInfoCell.type = InfoCollectionViewCellTypeNoFashion;
         self.shouldDisplayInfoCell = YES;
@@ -441,6 +441,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [self syncHelperViewVisibility];
         
     } else if (frc == self.lastScreenshotFrc) {
+        // ???: @Gershon why is this called when I delete a screenshot?
         [self displayInfoCellIfNeeded];
     }
 }
