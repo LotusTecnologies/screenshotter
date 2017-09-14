@@ -93,12 +93,20 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [imageView.leftAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.leftAnchor].active = YES;
         [imageView.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
         
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+        [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+        NSString *numberString = [formatter stringFromNumber:@(3)]; // TODO: @Gershon update this value
+        NSString *labelText = [NSString stringWithFormat:@"%@ screenshots", numberString];
+        
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
         label.textAlignment = NSTextAlignmentCenter;
-        label.text = [NSString stringWithFormat:@"%d screenshots", 3]; // TODO: @Gershon update this value
+        label.text = labelText;
         label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        label.adjustsFontSizeToFitWidth = YES;
+        label.minimumScaleFactor = .7f;
         [tableHeaderContentView addSubview:label];
+        [label setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
         [label.topAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.topAnchor].active = YES;
         [label.leftAnchor constraintEqualToAnchor:imageView.layoutMarginsGuide.rightAnchor].active = YES;
         [label.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
