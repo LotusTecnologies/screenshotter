@@ -76,10 +76,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         // pass the url to the handle deep link call
-        Branch.getInstance().application(app,
-                                         open: url,
-                                         options:options)
-        let _ = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        let branchHandled = Branch.getInstance().application(app,
+                                                             open: url,
+                                                             options:options)
+        if (!branchHandled) {
+            let _ = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        }
         return true
     }
     
@@ -115,13 +117,24 @@ extension AppDelegate {
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version" : UIApplication.versionBuild()])
         
-        Branch.getInstance().initSession(launchOptions: launchOptions) { params, error in
+#if DEV
+        Branch.setUseTestBranchKey(true)
+#endif
+        let branch = Branch.getInstance()
+        branch?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
-            print(params as? [String: AnyObject] ?? {})
-            if let link = params?["oogaBooga"] as? String,
-                let linkURL = URL(string: link) {
-                AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: linkURL)
+            guard error == nil else {
+                print("Branch initSession error:\(error!)")
+                return
+            }
+            guard let params = params as? [String : AnyObject] else {
+                print("Branch initSession no params")
+                return
+            }
+            print("Branch params:\(params)")
+            if let screenshotId = params["screenshotId"] as? String {
+                AssetSyncModel.sharedInstance.handleDynamicLink(screenshotId: screenshotId)
                 self.showScreenshotListTop()
             }
         }
@@ -235,6 +248,7 @@ extension AppDelegate {
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
+        Branch.getInstance().handlePushNotification(userInfo)
         completionHandler(.noData)
     }
 

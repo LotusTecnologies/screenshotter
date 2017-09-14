@@ -68,6 +68,7 @@ class AssetSyncModel: NSObject {
                                                      shareLink: nil,
                                                      createdAt: asset.creationDate,
                                                      isFashion: isFashion,
+                                                     isFromShare: false,
                                                      imageData: imageData)
                 }
                 if isFashion {
@@ -125,19 +126,15 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func downloadScreenshot(dynamicLink: String) {
+    func downloadScreenshot(screenshotId: String) {
         let dataModel = DataModel.sharedInstance
         firstly { _ -> Promise<[String : Any]> in
             // Get screenshot dict from Craze server. See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
-            let sDelimited = dynamicLink.components(separatedBy: "/s/")
-            print("downloadScreenshot dynamicLink:\(dynamicLink)  sDelimited:\(sDelimited)")
-            guard sDelimited.count > 1,
-              let lastComponent = sDelimited.last,
-              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + lastComponent) else {
-                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from dynamicLink:\(dynamicLink)"])
+            guard let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + screenshotId) else {
+                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from screenshotId:\(screenshotId)"])
                     return Promise(error: urlError)
             }
-            NSLog("dynamicLink:\(dynamicLink)  screenshotInfoUrl:\(screenshotInfoUrl)")
+            print("downloadScreenshot screenshotId:\(screenshotId)")
             return NetworkingPromise.downloadInfo(url: screenshotInfoUrl)
             }.then(on: self.processingQ) { screenshotDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
@@ -151,10 +148,11 @@ class AssetSyncModel: NSObject {
                 // Save screenshot to db.
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                    assetId: dynamicLink,
+                                                    assetId: screenshotId,
                                                     shareLink: screenshotDict["shareLink"] as? String,
                                                     createdAt: Date(),
                                                     isFashion: true,
+                                                    isFromShare: true,
                                                     imageData: imageData)
                 }
             }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
@@ -166,7 +164,7 @@ class AssetSyncModel: NSObject {
                     print(jsonError)
                     return
                 }
-                self.saveShoppables(assetId: dynamicLink, uploadedURLString: imageURLString, segments: segments)
+                self.saveShoppables(assetId: screenshotId, uploadedURLString: imageURLString, segments: segments)
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
             }.catch { error in
@@ -436,6 +434,7 @@ class AssetSyncModel: NSObject {
             }
             let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
             let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
+            self.incomingDynamicLinks.removeAll()
             // TODO: Remove changedAssetIds as each screenshot is successfully saved.
             //changedAssetIds = []
             self.countAndPrint(name: "dbSet", set: dbSet)
@@ -461,9 +460,9 @@ class AssetSyncModel: NSObject {
             if toDownload.count > 0 {
                 AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
-                for dynamicLink in toDownload {
+                for screenshotId in toDownload {
                     self.processingQ.async {
-                        self.downloadScreenshot(dynamicLink: dynamicLink)
+                        self.downloadScreenshot(screenshotId: screenshotId)
                     }
                 }
             }
@@ -532,8 +531,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    @objc public func handleDynamicLink(dynamicLink: URL) {
-        incomingDynamicLinks.append(dynamicLink.absoluteString)
+    @objc public func handleDynamicLink(screenshotId: String) {
+        incomingDynamicLinks.append(screenshotId)
         syncPhotos()
     }
     
