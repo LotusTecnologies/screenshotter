@@ -383,14 +383,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+    NSString *introductoryText = @"Check out this look on CRAZE!";
     NSArray *items;
     
     if (screenshot.shareLink) {
-        items = @[[NSURL URLWithString:screenshot.shareLink]];
+        items = @[introductoryText, [NSURL URLWithString:screenshot.shareLink]];
         
     } else {
         NSURL *placeholderURL = [NSURL URLWithString:@"https://crazeapp.com/"];
-        items = @[[[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL]];
+        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL];
+        
+        items = @[introductoryText, screenshotActivityItemProvider];
     }
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
@@ -401,7 +404,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [AnalyticsManager track:@"share incomplete"];
         }
     };
-    
     activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
     [self presentViewController:activityViewController animated:YES completion:nil];
     
