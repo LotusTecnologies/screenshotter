@@ -60,52 +60,62 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UIView *tableHeaderContentView;
     UIView *tableHeaderView = ({
         CGFloat p = [Geometry padding];
         
         UIView *view = [[UIView alloc] init];
         view.layoutMargins = UIEdgeInsetsMake(p, p, 0.f, p);
         
-        UIView *centerView = [[UIView alloc] init];
-        centerView.translatesAutoresizingMaskIntoConstraints = NO;
-        [view addSubview:centerView];
-        [centerView.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor].active = YES;
-        [centerView.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor].active = YES;
-        [centerView.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
-        [centerView.leftAnchor constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide.leftAnchor].active = YES;
-        [centerView.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor].active = YES;
+        tableHeaderContentView = [[UIView alloc] init];
+        tableHeaderContentView.translatesAutoresizingMaskIntoConstraints = NO;
+        tableHeaderContentView.backgroundColor = [UIColor whiteColor];
+        tableHeaderContentView.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
+        tableHeaderContentView.layer.cornerRadius = 10.f;
+        tableHeaderContentView.layer.shadowColor = [UIColor blackColor].CGColor;
+        tableHeaderContentView.layer.shadowOffset = CGSizeMake(0.f, 1.f);
+        tableHeaderContentView.layer.shadowRadius = 1.f;
+        tableHeaderContentView.layer.shadowOpacity = .3f;
+        [view addSubview:tableHeaderContentView];
+        [tableHeaderContentView.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor].active = YES;
+        [tableHeaderContentView.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor].active = YES;
+        [tableHeaderContentView.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
+        [tableHeaderContentView.leftAnchor constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide.leftAnchor].active = YES;
+        [tableHeaderContentView.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor].active = YES;
         
-        UIImageView *badgeImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Badge"]];
-        badgeImageView.translatesAutoresizingMaskIntoConstraints = NO;
-        badgeImageView.contentMode = UIViewContentModeScaleAspectFit;
-        badgeImageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, 0.f, -p);
-        [centerView addSubview:badgeImageView];
-        [badgeImageView setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
-        [badgeImageView.topAnchor constraintEqualToAnchor:centerView.topAnchor].active = YES;
-        [badgeImageView.leftAnchor constraintEqualToAnchor:centerView.leftAnchor].active = YES;
-        [badgeImageView.bottomAnchor constraintEqualToAnchor:centerView.bottomAnchor].active = YES;
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SettingsScreenshot"]];
+        imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        imageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, 0.f, -p);
+        [tableHeaderContentView addSubview:imageView];
+        [imageView setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [imageView.topAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.topAnchor].active = YES;
+        [imageView.leftAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.leftAnchor].active = YES;
+        [imageView.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
         
-        UIImageView *barImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Bar"]];
-        barImageView.translatesAutoresizingMaskIntoConstraints = NO;
-        barImageView.contentMode = UIViewContentModeScaleAspectFit;
-        barImageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -4.f, 0.f);
-        [centerView addSubview:barImageView];
-        [barImageView.layoutMarginsGuide.bottomAnchor constraintEqualToAnchor:centerView.centerYAnchor].active = YES;
-        [barImageView.leftAnchor constraintEqualToAnchor:badgeImageView.layoutMarginsGuide.rightAnchor].active = YES;
-        [barImageView.rightAnchor constraintEqualToAnchor:centerView.rightAnchor].active = YES;
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+        [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+        NSUInteger screenshotCount = 2; // TODO: @Gershon update this value
+        NSString *numberString = [formatter stringFromNumber:@(screenshotCount)];
+        NSString *sString = (screenshotCount == 1) ? @"" : @"s";
+        NSString *labelText = [NSString stringWithFormat:@"%@ screenshot%@", numberString, sString];
         
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
-        label.layoutMargins = UIEdgeInsetsMake(-4.f, 0.f, 0.f, 0.f);
         label.textAlignment = NSTextAlignmentCenter;
-        label.text = @"3 screenshots to next level";
-        [centerView addSubview:label];
-        [label.layoutMarginsGuide.topAnchor constraintEqualToAnchor:centerView.centerYAnchor].active = YES;
-        [label.leftAnchor constraintEqualToAnchor:barImageView.leftAnchor].active = YES;
-        [label.rightAnchor constraintEqualToAnchor:barImageView.rightAnchor].active = YES;
+        label.text = labelText;
+        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        label.adjustsFontSizeToFitWidth = YES;
+        label.minimumScaleFactor = .7f;
+        [tableHeaderContentView addSubview:label];
+        [label setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+        [label.topAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.topAnchor].active = YES;
+        [label.leftAnchor constraintEqualToAnchor:imageView.layoutMarginsGuide.rightAnchor].active = YES;
+        [label.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
+        [label.rightAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.rightAnchor].active = YES;
         
         CGRect rect = view.frame;
-        rect.size.height = badgeImageView.bounds.size.height + view.layoutMargins.top + view.layoutMargins.bottom;
+        rect.size.height = view.layoutMargins.top + view.layoutMargins.bottom + tableHeaderContentView.layoutMargins.top + tableHeaderContentView.layoutMargins.bottom + imageView.image.size.height;
         view.frame = rect;
         view;
     });
@@ -145,6 +155,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         tableView;
     });
+    
+    [tableHeaderContentView layoutIfNeeded];
+    tableHeaderContentView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:tableHeaderContentView.bounds cornerRadius:tableHeaderContentView.layer.cornerRadius].CGPath;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -379,9 +392,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)reloadPermissionIndexPaths {
     NSMutableArray *permissionIndexPaths = [NSMutableArray array];
+    NSInteger section = SectionTypePermissions;
     
-    for (NSNumber *permissionNumber in [self dataDict][@(SectionTypePermissions)]) {
-        [permissionIndexPaths addObject:[NSIndexPath indexPathForRow:[permissionNumber integerValue] inSection:0]];
+    for (NSNumber *permissionNumber in [self dataDict][@(section)]) {
+        [permissionIndexPaths addObject:[NSIndexPath indexPathForRow:[permissionNumber integerValue] inSection:section]];
     }
     
     [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];

@@ -32,10 +32,13 @@
     [[Branch getInstance] userCompletedAction:track];
 }
 
-+ (void)identify:(NSString *)email {
++ (void)identify:(NSString *)email name:(NSString *)name {
     [[SEGAnalytics sharedAnalytics] identify:nil traits:@{ @"email": email }];
     [Appsee setUserID:email];
+    
     [IntercomHelper.sharedInstance registerUserWithEmail:email];
+    IntercomHelper.sharedInstance.userName = name;
+
     [[Branch getInstance] userCompletedAction:@"identify"];
 }
 

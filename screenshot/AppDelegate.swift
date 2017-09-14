@@ -107,7 +107,7 @@ extension AppDelegate {
     // MARK: - Third Party
 
     func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
-        let configuration = SEGAnalyticsConfiguration(writeKey: "RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn")
+        let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
         configuration.recordScreenViews = true
         configuration.trackDeepLinks = true
