@@ -27,6 +27,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
+@property (nonatomic, strong) NSFetchedResultsController *lastScreenshotFrc;
 @property (nonatomic, strong) InfoCollectionViewCell *referencedInfoCell;
 
 @property (nonatomic, strong) HelperView *helperView;
@@ -53,10 +54,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [DataModel sharedInstance].screenshotFrcDelegate = self;
         self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
         
-        _infoCellBottomInset = [Geometry padding];
+        [DataModel sharedInstance].latestScreenshotFrcDelegate = self;
+        self.lastScreenshotFrc = [DataModel sharedInstance].latestScreenshotFrc;
         
-        self.shouldDisplayInfoCell = YES; // !!!: DEBUG
-        self.referencedInfoCell.type = InfoCollectionViewCellTypeNoFashion; // TODO: set this in the latestScreenshotFrc adds one
+        _infoCellBottomInset = [Geometry padding];
     }
     return self;
 }
@@ -179,6 +180,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     self.collectionView.dataSource = nil;
     
     [DataModel sharedInstance].screenshotFrcDelegate = nil;
+    [DataModel sharedInstance].latestScreenshotFrcDelegate = nil;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -286,7 +288,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionInfo) {
         InfoCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"info" forIndexPath:indexPath];
         cell.contentView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, _infoCellBottomInset, 0.f);
-        cell.type = InfoCollectionViewCellTypeNoFashion;
+        cell.type = self.referencedInfoCell.type;
         [cell.closeButton addTarget:self action:@selector(infoCellCloseButtonAction) forControlEvents:UIControlEventTouchUpInside];
         [cell.continueButton addTarget:self action:@selector(infoCellContinueButtonAction) forControlEvents:UIControlEventTouchUpInside];
         return cell;
@@ -298,7 +300,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         cell.delegate = self;
         cell.backgroundColor = [UIColor lightGrayColor];
         cell.screenshot = screenshot;
-        cell.badgeEnabled = [self badgeEnabledForScreenshot:screenshot];
+        cell.badgeEnabled = screenshot.isNew;
         return cell;
         
     } else {
@@ -321,7 +323,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (Screenshot *)screenshotAtIndex:(NSInteger)index {
-    return [self.screenshotFrc objectAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+    return [self.screenshotFrc objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
 }
 
 - (void)scrollTopTop {
@@ -340,20 +342,40 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     return _referencedInfoCell;
 }
 
-- (void)dismissInfoCell {
-    self.shouldDisplayInfoCell = NO;
-    
-    [self.collectionView performBatchUpdates:^{
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:ScreenshotsSectionInfo]];
-    } completion:nil];
-}
-
 - (void)infoCellCloseButtonAction {
     [self dismissInfoCell];
 }
 
 - (void)infoCellContinueButtonAction {
     [self dismissInfoCell];
+    // TODO: make request to bypass clarify
+}
+
+- (void)displayInfoCellIfNeeded {
+    Screenshot *screenshot = self.lastScreenshotFrc.fetchedObjects.firstObject;
+
+    if (!screenshot.isFashion) {
+        self.referencedInfoCell.type = InfoCollectionViewCellTypeNoFashion;
+        self.shouldDisplayInfoCell = YES;
+        [self reloadInfoCell];
+
+    } else if (screenshot.isFashion && screenshot.shoppablesCount < 0) {
+        // TODO: @Gershon how can we delay this methods call to give screenshot.shoppablesCount enough time to be -1?
+        self.referencedInfoCell.type = InfoCollectionViewCellTypeNoShoppables;
+        self.shouldDisplayInfoCell = YES;
+        [self reloadInfoCell];
+    }
+}
+
+- (void)dismissInfoCell {
+    self.shouldDisplayInfoCell = NO;
+    [self reloadInfoCell];
+}
+
+- (void)reloadInfoCell {
+    [self.collectionView performBatchUpdates:^{
+        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:ScreenshotsSectionInfo]];
+    } completion:nil];
 }
 
 
@@ -414,22 +436,41 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 #pragma mark - Fetch Results Controller
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneAddedAt:(NSIndexPath *)indexPath {
-    [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
-    [self syncHelperViewVisibility];
+    if (frc == self.screenshotFrc) {
+        [self.collectionView insertItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+        [self syncHelperViewVisibility];
+        
+    } else if (frc == self.lastScreenshotFrc) {
+        [self displayInfoCellIfNeeded];
+    }
 }
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneDeletedAt:(NSIndexPath *)indexPath {
-    [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
-    [self syncHelperViewVisibility];
+    if (frc == self.screenshotFrc) {
+        [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+        [self syncHelperViewVisibility];
+    }
 }
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneUpdatedAt:(NSIndexPath *)indexPath {
-    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    if (frc == self.screenshotFrc) {
+        [self.collectionView reloadItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+    }
 }
 
 - (void)frcReloadData:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc {
-    [self.collectionView reloadData];
-    [self syncHelperViewVisibility];
+    if (frc == self.screenshotFrc) {
+        [self.collectionView reloadData];
+        [self syncHelperViewVisibility];
+    }
+}
+
+- (NSIndexPath *)collectionViewToScreenshotFrcIndexPath:(NSInteger)index {
+    return [NSIndexPath indexPathForItem:index inSection:0];
+}
+
+- (NSIndexPath *)screenshotFrcToCollectionViewIndexPath:(NSInteger)index {
+    return [NSIndexPath indexPathForItem:index inSection:ScreenshotsSectionImages];
 }
 
 
@@ -438,13 +479,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)syncHelperViewVisibility {
     self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
-}
-
-
-#pragma mark - New Badge
-
-- (BOOL)badgeEnabledForScreenshot:(Screenshot *)screenshot {
-    return screenshot.isNew;
 }
 
 @end
