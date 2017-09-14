@@ -360,7 +360,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [self reloadInfoCell];
 
     } else if (screenshot.isFashion && screenshot.shoppablesCount < 0) {
-        // TODO: @Gershon how can we delay this methods call to give screenshot.shoppablesCount enough time to be -1?
         self.referencedInfoCell.type = InfoCollectionViewCellTypeNoShoppables;
         self.shouldDisplayInfoCell = YES;
         [self reloadInfoCell];
@@ -441,8 +440,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [self syncHelperViewVisibility];
         
     } else if (frc == self.lastScreenshotFrc) {
-        // ???: @Gershon why is this called when I delete a screenshot?
-        [self displayInfoCellIfNeeded];
+        if (indexPath.item == 0) {
+            [self displayInfoCellIfNeeded];
+        }
     }
 }
 
@@ -456,6 +456,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneUpdatedAt:(NSIndexPath *)indexPath {
     if (frc == self.screenshotFrc) {
         [self.collectionView reloadItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+        
+    } else if (frc == self.lastScreenshotFrc) {
+        if (indexPath.item == 0) {
+            [self displayInfoCellIfNeeded];
+        }
     }
 }
 
