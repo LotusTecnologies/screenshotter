@@ -43,6 +43,7 @@
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
+    productsViewController.hidesBottomBarWhenPushed = YES;
     Screenshot *screenshot = [viewController screenshotAtIndexPath:indexPath];
     productsViewController.screenshot = screenshot;
     
@@ -50,6 +51,7 @@
         [self pushViewController:productsViewController animated:YES];
         [screenshot setViewed];
         [[RatingFlow sharedInstance] recordSignificantEvent];
+        
     } else {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry"
                                                                       message:@"We had a problem with this screenshot."

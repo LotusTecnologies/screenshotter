@@ -285,13 +285,14 @@
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
     UIActivityViewController *activityViewController;
+    NSString *introductoryText = @"Check out this look on CRAZE!";
     if (screenshot.shareLink) {
         NSURL *shareURL = [NSURL URLWithString:screenshot.shareLink];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[shareURL] applicationActivities:nil];
+        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[introductoryText, shareURL] applicationActivities:nil];
     } else {
         NSURL *placeholderURL = [NSURL URLWithString:@"https://crazeapp.com/"];
         ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[screenshotActivityItemProvider] applicationActivities:nil];
+        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[introductoryText, screenshotActivityItemProvider] applicationActivities:nil];
     }
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
@@ -306,10 +307,15 @@
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
-    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    [[self screenshotAtIndexPath:indexPath] setHide];
-    
-    [AnalyticsManager track:@"Removed screenshot"];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Delete Screenshot?" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+        [[self screenshotAtIndexPath:indexPath] setHide];
+        
+        [AnalyticsManager track:@"Removed screenshot"];
+    }]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 

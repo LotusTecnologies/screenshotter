@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class ShoppablesToolbar;
-@class Screenshot, Shoppable;
+@class Shoppable;
 
 @protocol ShoppablesToolbarDelegate <UIToolbarDelegate>
 @required
@@ -22,10 +22,11 @@
 
 @property (nonatomic, weak) id<ShoppablesToolbarDelegate> delegate;
 
+@property (nonatomic, strong, readonly) UICollectionView *collectionView;
 @property (nonatomic, strong) NSArray<Shoppable *> *shoppables;
 @property (nonatomic, copy) UIImage *screenshotImage;
 
-- (void)selectFirstItem;
+- (void)selectFirstShoppable;
 - (NSInteger)selectedShoppableIndex;
 
 @end
