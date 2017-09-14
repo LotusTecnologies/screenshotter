@@ -95,8 +95,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
         
         NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
         [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-        NSString *numberString = [formatter stringFromNumber:@(3)]; // TODO: @Gershon update this value
-        NSString *labelText = [NSString stringWithFormat:@"%@ screenshots", numberString];
+        NSUInteger screenshotCount = 2; // TODO: @Gershon update this value
+        NSString *numberString = [formatter stringFromNumber:@(screenshotCount)];
+        NSString *sString = (screenshotCount == 1) ? @"" : @"s";
+        NSString *labelText = [NSString stringWithFormat:@"%@ screenshot%@", numberString, sString];
         
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
