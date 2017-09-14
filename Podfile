@@ -14,7 +14,7 @@ def shared_pods
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
     pod 'ImageEffects'
-    pod 'Firebase/DynamicLinks'
+    pod 'Branch'
     pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/add-disadvantaged-flow-customization'
     pod 'Intercom'
 end

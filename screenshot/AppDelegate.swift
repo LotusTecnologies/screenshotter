@@ -10,8 +10,9 @@ import UIKit
 import UserNotifications
 import Analytics
 import Appsee
-import Firebase
 import FBSDKLoginKit
+import RateView
+import Branch
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -52,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
-            self.bgTask = UIBackgroundTaskInvalid;
+            self.bgTask = UIBackgroundTaskInvalid
         }
     }
 
@@ -74,40 +75,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        if let dynamicLink = DynamicLinks.dynamicLinks()?.dynamicLink(fromCustomSchemeURL: url),
-          let link = dynamicLink.url,
-          dynamicLink.matchConfidence == .strong {
-            AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: link)
-            showScreenshotListTop()
-            return true
+        // pass the url to the handle deep link call
+        let branchHandled = Branch.getInstance().application(app,
+                                                             open: url,
+                                                             options:options)
+        if (!branchHandled) {
+            let _ = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
-        if let scheme = url.scheme,
-          let mainBundleIdentifier = Bundle.main.bundleIdentifier,
-          scheme == mainBundleIdentifier,
-          let host = url.host,
-          host == "s" {
-            AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: url)
-            showScreenshotListTop()
-            return true
-        }
-        let isHandled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
-        return isHandled;
+        return true
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
-        if let webpageURL = userActivity.webpageURL,
-            let isHandled = DynamicLinks.dynamicLinks()?.handleUniversalLink(webpageURL, completion: { (dynamicLink: DynamicLink?, error: Error?) in
-                if let dynamicLink = dynamicLink,
-                    let link = dynamicLink.url,
-                    dynamicLink.matchConfidence == .strong,
-                    error == nil {
-                    AssetSyncModel.sharedInstance.handleDynamicLink(dynamicLink: link)
-                    self.showScreenshotListTop()
-                }
-            }) {
-            return isHandled
-        }
-        return false
+        // pass the url to the handle deep link call
+        Branch.getInstance().continue(userActivity)
+        return true
     }
 }
 
@@ -136,7 +117,27 @@ extension AppDelegate {
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version" : UIApplication.versionBuild()])
         
-        FirebaseApp.configure()
+#if DEV
+        Branch.setUseTestBranchKey(true)
+#endif
+        let branch = Branch.getInstance()
+        branch?.initSession(launchOptions: launchOptions) { params, error in
+            // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
+            // params will be empty if no data found
+            guard error == nil else {
+                print("Branch initSession error:\(error!)")
+                return
+            }
+            guard let params = params as? [String : AnyObject] else {
+                print("Branch initSession no params")
+                return
+            }
+            print("Branch params:\(params)")
+            if let screenshotId = params["screenshotId"] as? String {
+                AssetSyncModel.sharedInstance.handleDynamicLink(screenshotId: screenshotId)
+                self.showScreenshotListTop()
+            }
+        }
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
@@ -179,12 +180,12 @@ extension AppDelegate {
             insets.top = UIDevice.is568h() ? 0 : 30
             
             let tutorialViewController = TutorialViewController()
-            tutorialViewController.delegate = self;
-            tutorialViewController.contentLayoutMargins = insets;
-            viewController = tutorialViewController;
+            tutorialViewController.delegate = self
+            tutorialViewController.contentLayoutMargins = insets
+            viewController = tutorialViewController
         }
         
-        return viewController;
+        return viewController
     }
     
     func prepareDataStackCompletionIfNeeded() {
@@ -247,6 +248,7 @@ extension AppDelegate {
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
+        Branch.getInstance().handlePushNotification(userInfo)
         completionHandler(.noData)
     }
 

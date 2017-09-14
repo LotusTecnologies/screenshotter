@@ -256,6 +256,7 @@ extension DataModel {
                         shareLink: String?,
                         createdAt: Date?,
                         isFashion: Bool,
+                        isFromShare: Bool,
                         imageData: Data?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
@@ -264,6 +265,7 @@ extension DataModel {
             screenshotToSave.createdAt = nsDate
         }
         screenshotToSave.isFashion = isFashion
+        screenshotToSave.isFromShare = isFromShare
         screenshotToSave.isNew = true
         if let nsData = imageData as NSData? {
             screenshotToSave.imageData = nsData
