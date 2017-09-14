@@ -7,8 +7,9 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:er42w.app.goo.gl</string>
-        <string>applinks:bo38.app.link</string>
-        <string>applinks:bo38-alternate.app.link</string>
+		<string>applinks:bo38.app.link</string>
+		<string>applinks:bo38-alternate.app.link</string>
+		<string>applinks:craze.shopping</string>
 	</array>
 </dict>
 </plist>
