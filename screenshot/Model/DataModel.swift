@@ -253,14 +253,12 @@ extension DataModel {
     // Save a new Screenshot to Core Data.
     func saveScreenshot(managedObjectContext: NSManagedObjectContext,
                         assetId: String,
-                        shareLink: String?,
                         createdAt: Date?,
                         isFashion: Bool,
                         isFromShare: Bool,
                         imageData: Data?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
-        screenshotToSave.shareLink = shareLink
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
         }
@@ -369,7 +367,7 @@ extension DataModel {
                        b1y: Double) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
-        let spellingMap = ["Neclesses" : "Necklaces"]
+        let spellingMap = ["Neclesses" : "Necklaces", "Cufflings" : "Cufflinks"]
         if let label = label, let correctedSpelling = spellingMap[label] {
             shoppableToSave.label = correctedSpelling
         } else {

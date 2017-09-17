@@ -29,7 +29,6 @@
 + (void)track:(NSString *)track {
     [[SEGAnalytics sharedAnalytics] track:track];
     [Appsee addEvent:track];
-    [[Branch getInstance] userCompletedAction:track];
 }
 
 + (void)identify:(NSString *)email name:(NSString *)name {
@@ -62,7 +61,6 @@
     }];
     
     [Appsee addEvent:track withProperties:appseeProperties];
-    [[Branch getInstance] userCompletedAction:track];
 }
 
 @end
