@@ -99,7 +99,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         
         NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
         [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-        NSUInteger screenshotCount = 2; // TODO: @Gershon update this value
+        NSUInteger screenshotCount = [[DataModel sharedInstance] countTotalScreenshots];
         NSString *numberString = [formatter stringFromNumber:@(screenshotCount)];
         NSString *sString = (screenshotCount == 1) ? @"" : @"s";
         NSString *labelText = [NSString stringWithFormat:@"%@ screenshot%@", numberString, sString];

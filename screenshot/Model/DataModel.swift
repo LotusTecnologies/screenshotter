@@ -460,6 +460,40 @@ extension DataModel {
         }
     }
     
+    // Must be called on main.
+    @objc public func countShared() -> Int {
+        let predicate = NSPredicate(format: "isFromShare == TRUE AND shoppablesCount > 0")
+        return countScreenshotWorkhorse(predicate: predicate)
+    }
+    
+    // Must be called on main.
+    @objc public func countScreenshotted() -> Int {
+        let predicate = NSPredicate(format: "isFromShare == FALSE AND shoppablesCount > 0")
+        return countScreenshotWorkhorse(predicate: predicate)
+    }
+    
+    // Must be called on main.
+    @objc public func countTotalScreenshots() -> Int {
+        let predicate = NSPredicate(format: "shoppablesCount > 0")
+        return countScreenshotWorkhorse(predicate: predicate)
+    }
+    
+    func countScreenshotWorkhorse(predicate: NSPredicate) -> Int {
+        let managedObjectContext = mainMoc()
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = predicate
+        fetchRequest.resultType = .countResultType
+        fetchRequest.includesSubentities = false
+        
+        var count: Int = 0
+        do {
+            count = try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            print("countScreenshotWorkhorse results with error:\(error)")
+        }
+        return count
+    }
+    
     // Update changes made in the background
     public func saveMain() {
         saveMoc(managedObjectContext: mainMoc())
