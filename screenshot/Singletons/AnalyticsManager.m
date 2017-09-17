@@ -11,6 +11,7 @@
 
 @import Analytics;
 @import Appsee;
+@import Branch;
 
 @implementation AnalyticsManager
 
@@ -28,12 +29,17 @@
 + (void)track:(NSString *)track {
     [[SEGAnalytics sharedAnalytics] track:track];
     [Appsee addEvent:track];
+    [[Branch getInstance] userCompletedAction:track];
 }
 
-+ (void)identify:(NSString *)email {
++ (void)identify:(NSString *)email name:(NSString *)name {
     [[SEGAnalytics sharedAnalytics] identify:nil traits:@{ @"email": email }];
     [Appsee setUserID:email];
+    
     [IntercomHelper.sharedInstance registerUserWithEmail:email];
+    IntercomHelper.sharedInstance.userName = name;
+
+    [[Branch getInstance] userCompletedAction:@"identify"];
 }
 
 + (void)track:(NSString *)track properties:(NSDictionary<NSString *, id> *)properties {
@@ -56,6 +62,7 @@
     }];
     
     [Appsee addEvent:track withProperties:appseeProperties];
+    [[Branch getInstance] userCompletedAction:track];
 }
 
 @end

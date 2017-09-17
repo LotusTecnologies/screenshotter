@@ -208,7 +208,7 @@
         [self informDelegateOfSubmittedEmailIfPossible];
         
         [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
-        [AnalyticsManager identify:trimmedEmail];        
+        [AnalyticsManager identify:trimmedEmail name:trimmedName];
     } else {
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }
