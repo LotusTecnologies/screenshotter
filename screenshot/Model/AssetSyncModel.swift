@@ -18,6 +18,7 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     var allScreenshotAssets: PHFetchResult<PHAsset>?
+    var selectedScreenshotAssets: [PHAsset]?
 //    var changedAssetIds: [String] = []
     var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
@@ -377,6 +378,18 @@ class AssetSyncModel: NSObject {
         return assetIds
     }
     
+    func retrieveSelectedScreenshotAssetIds() -> Set<String> {
+        var assetIds = Set<String>()
+        guard let selectedScreenshotAssets = selectedScreenshotAssets else {
+            return assetIds
+        }
+        for asset in selectedScreenshotAssets {
+            assetIds.insert(asset.localIdentifier)
+        }
+        self.selectedScreenshotAssets?.removeAll()
+        return assetIds
+    }
+    
     func beginSync() {
         isSyncing = true
         DispatchQueue.main.async {
@@ -419,7 +432,7 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let photosSet = self.retrieveAllScreenshotAssetIds()
+            let photosSet = self.retrieveSelectedScreenshotAssetIds().union(self.retrieveAllScreenshotAssetIds())
             let managedObjectContext = dataModel.adHocMoc()
             var dbSet = Set<String>()
             managedObjectContext.performAndWait {
@@ -468,6 +481,11 @@ class AssetSyncModel: NSObject {
                 self.endSync()
             }
         }
+    }
+    
+    @objc public func syncSelectedPhotos(assets: [PHAsset]) {
+        self.selectedScreenshotAssets = assets
+        syncPhotos()
     }
     
 }
