@@ -367,7 +367,7 @@ extension DataModel {
                        b1y: Double) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
-        let spellingMap = ["Neclesses" : "Necklaces"]
+        let spellingMap = ["Neclesses" : "Necklaces", "Cufflings" : "Cufflinks"]
         if let label = label, let correctedSpelling = spellingMap[label] {
             shoppableToSave.label = correctedSpelling
         } else {
