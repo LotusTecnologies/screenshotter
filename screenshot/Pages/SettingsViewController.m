@@ -39,6 +39,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) UIView *tableHeaderContentView;
+@property (nonatomic, strong) UILabel *screenshotsCountLabel;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
 
 @property (nonatomic, strong) UITextField *nameTextField;
@@ -64,14 +66,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIView *tableHeaderContentView;
     UIView *tableHeaderView = ({
         CGFloat p = [Geometry padding];
         
         UIView *view = [[UIView alloc] init];
         view.layoutMargins = UIEdgeInsetsMake(p, p, 0.f, p);
         
-        tableHeaderContentView = [[UIView alloc] init];
+        UIView *tableHeaderContentView = [[UIView alloc] init];
         tableHeaderContentView.translatesAutoresizingMaskIntoConstraints = NO;
         tableHeaderContentView.backgroundColor = [UIColor whiteColor];
         tableHeaderContentView.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
@@ -86,6 +87,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableHeaderContentView.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
         [tableHeaderContentView.leftAnchor constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide.leftAnchor].active = YES;
         [tableHeaderContentView.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor].active = YES;
+        self.tableHeaderContentView = tableHeaderContentView;
         
         UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SettingsScreenshot"]];
         imageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -97,17 +99,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [imageView.leftAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.leftAnchor].active = YES;
         [imageView.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
         
-        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-        [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-        NSUInteger screenshotCount = [[DataModel sharedInstance] countTotalScreenshots];
-        NSString *numberString = [formatter stringFromNumber:@(screenshotCount)];
-        NSString *sString = (screenshotCount == 1) ? @"" : @"s";
-        NSString *labelText = [NSString stringWithFormat:@"%@ screenshot%@", numberString, sString];
-        
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
         label.textAlignment = NSTextAlignmentCenter;
-        label.text = labelText;
         label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
         label.adjustsFontSizeToFitWidth = YES;
         label.minimumScaleFactor = .7f;
@@ -117,6 +111,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [label.leftAnchor constraintEqualToAnchor:imageView.layoutMarginsGuide.rightAnchor].active = YES;
         [label.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
         [label.rightAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.rightAnchor].active = YES;
+        self.screenshotsCountLabel = label;
         
         CGRect rect = view.frame;
         rect.size.height = view.layoutMargins.top + view.layoutMargins.bottom + tableHeaderContentView.layoutMargins.top + tableHeaderContentView.layoutMargins.bottom + imageView.image.size.height;
@@ -160,9 +155,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         tableView;
     });
-    
-    [tableHeaderContentView layoutIfNeeded];
-    tableHeaderContentView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:tableHeaderContentView.bounds cornerRadius:tableHeaderContentView.layer.cornerRadius].CGPath;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -170,6 +162,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     self.tableView.contentOffset = CGPointMake(0.f, -self.tableView.contentInset.top);
     
+    [self updateScreenshotsCount];
     [self reloadPermissionIndexPaths];
 }
 
@@ -181,6 +174,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
+        [self updateScreenshotsCount];
         [self reloadPermissionIndexPaths];
     }
 }
@@ -480,6 +474,28 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)dismissKeyboard {
     [self.tableView endEditing:YES];
+}
+
+
+#pragma mark - Screenshots Count
+
+- (NSString *)screenshotsCountText {
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    NSUInteger screenshotCount = [[DataModel sharedInstance] countTotalScreenshots];
+    NSString *numberString = [formatter stringFromNumber:@(screenshotCount)];
+    NSString *sString = (screenshotCount == 1) ? @"" : @"s";
+    return [NSString stringWithFormat:@"%@ screenshot%@", numberString, sString];
+}
+
+- (void)layoutScreenshotsCountShadow {
+    [self.tableHeaderContentView layoutIfNeeded];
+    self.tableHeaderContentView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.tableHeaderContentView.bounds cornerRadius:self.tableHeaderContentView.layer.cornerRadius].CGPath;
+}
+
+- (void)updateScreenshotsCount {
+    self.screenshotsCountLabel.text = [self screenshotsCountText];
+    [self layoutScreenshotsCountShadow];
 }
 
 
