@@ -19,7 +19,7 @@
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
-@property (nonatomic, strong) HelperView *helperView;
+@property (nonatomic, strong) ScreenshotsHelperView *helperView;
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @end
@@ -47,9 +47,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    CGFloat p = [Geometry padding];
+    
     self.collectionView = ({
-        CGFloat p = [Geometry padding];
-        
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = p;
         layout.minimumLineSpacing = p;
@@ -81,50 +81,23 @@
     self.helperView = ({
         CGFloat verticalPadding = 40.f;
         
-        HelperView *helperView = [[HelperView alloc] init];
+        ScreenshotsHelperView *helperView = [[ScreenshotsHelperView alloc] init];
         helperView.translatesAutoresizingMaskIntoConstraints = NO;
-        helperView.userInteractionEnabled = NO;
-        helperView.titleLabel.text = @"No Screenshots Yet";
-        helperView.subtitleLabel.text = @"Add screenshots you want to shop by pressing the power & home buttons at the same time";
+        helperView.layoutMargins = UIEdgeInsetsMake(verticalPadding, p, verticalPadding, p);
+        [helperView.button addTarget:self action:@selector(helperViewAllowAccessAction) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:helperView];
-        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:verticalPadding].active = YES;
+        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-verticalPadding].active = YES;
+        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        
-        UIImageView *imageView = [[UIImageView alloc] init];
-        imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        imageView.image = [UIImage imageNamed:@"ScreenshotEmptyListGraphic"];
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [helperView.contentView addSubview:imageView];
-        [imageView.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
-        [imageView.centerYAnchor constraintEqualToAnchor:helperView.contentView.centerYAnchor].active = YES;
-        
         helperView;
     });
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    // TODO: dispatch after to prevent presenting a view controller on dismissed view controller.
-    // this function is called before AppDelegate-transitionToViewController:(set window rootVC)
-    // Note: turn off photo permissions to enter this path
-    // the solution is to create a view controller which deals with the logic and to never change
-    // the window, only the underlying view controller.
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
-            UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto opened:nil];
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
-    });
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -284,16 +257,19 @@
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Screenshot *screenshot = [self screenshotAtIndexPath:indexPath];
-    UIActivityViewController *activityViewController;
+    NSArray *items;
     NSString *introductoryText = @"Check out this look on CRAZE!";
+    
     if (screenshot.shareLink) {
         NSURL *shareURL = [NSURL URLWithString:screenshot.shareLink];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[introductoryText, shareURL] applicationActivities:nil];
+        items = @[introductoryText, shareURL];
+        
     } else {
-        NSURL *placeholderURL = [NSURL URLWithString:@"https://crazeapp.com/"];
-        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:placeholderURL];
-        activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[introductoryText, screenshotActivityItemProvider] applicationActivities:nil];
+        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:[NSURL URLWithString:@"https://crazeapp.com/"]];
+        items = @[introductoryText, screenshotActivityItemProvider];
     }
+    
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
             [AnalyticsManager track:@"share completed"];
@@ -303,6 +279,7 @@
     };
     activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
     [self presentViewController:activityViewController animated:YES completion:nil];
+    
     [AnalyticsManager track:@"Shared screenshot"];
 }
 
@@ -355,8 +332,23 @@
 #pragma mark - Helper View
 
 - (void)syncHelperViewVisibility {
+    if ([[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
+        if (self.helperView.type != ScreenshotsHelperViewTypeScreenshot) {
+            self.helperView.type = ScreenshotsHelperViewTypeScreenshot;
+        }
+        
+    } else {
+        if (self.helperView.type != ScreenshotsHelperViewTypePermission) {
+            self.helperView.type = ScreenshotsHelperViewTypePermission;
+        }
+    }
+    
     self.helperView.hidden = ([self.collectionView numberOfItemsInSection:0] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
+}
+
+- (void)helperViewAllowAccessAction {
+    [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto openSettingsIfNeeded:YES response:nil];
 }
 
 
