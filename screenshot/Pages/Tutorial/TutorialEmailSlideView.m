@@ -87,7 +87,7 @@
             textField.translatesAutoresizingMaskIntoConstraints = NO;
             textField.delegate = self;
             textField.text = [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
-            textField.placeholder = @"you@website.com";
+            textField.placeholder = @"yourname@website.com";
             textField.keyboardType = UIKeyboardTypeEmailAddress;
             textField.backgroundColor = [UIColor whiteColor];
             textField.borderStyle = UITextBorderStyleRoundedRect;
