@@ -167,7 +167,7 @@
         trySlideView.delegate = self;
         
         _slides = @[welcomeSlideView,
-                    permissionsSlideView,
+//                    permissionsSlideView,
                     emailSlideView,
                     trySlideView
                     ];
