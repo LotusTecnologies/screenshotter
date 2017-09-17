@@ -18,8 +18,8 @@
 
 typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
+    SectionTypeInfo,
     SectionTypePermissions,
-    SectionTypeEmail,
     SectionTypeAbout
 };
 
@@ -28,6 +28,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypePushNotification,
     RowTypeLocationService,
     RowTypeEmail,
+    RowTypeName,
     RowTypeTutorial,
     RowTypeTellFriend,
     RowTypeContactUs,
@@ -35,10 +36,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeVersion
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) NSArray *data;
+@property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
+
+@property (nonatomic, strong) UITextField *nameTextField;
+@property (nonatomic, strong) UITextField *emailTextField;
 
 @end
 
@@ -148,6 +152,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         tableView.backgroundColor = [UIColor clearColor];
         tableView.tableHeaderView = tableHeaderView;
         tableView.tableFooterView = tableFooterTextView;
+        tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
         [self.view addSubview:tableView];
         [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -168,6 +173,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self reloadPermissionIndexPaths];
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self dismissKeyboard];
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
         [self reloadPermissionIndexPaths];
@@ -184,39 +195,32 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Data
 
-- (NSDictionary *)dataDict {
-    return @{@(SectionTypePermissions): @[@(RowTypeCameraRoll),
-                                          @(RowTypePushNotification),
-//                                          @(RowTypeLocationService)
-                                          ],
-             @(SectionTypeEmail): @[@(RowTypeEmail)
-                                    ],
-             @(SectionTypeAbout): @[@(RowTypeTutorial),
-                                    @(RowTypeTellFriend),
-                                    @(RowTypeContactUs),
-                                    @(RowTypeBug),
-                                    @(RowTypeVersion)
-                                    ]
-             };
-}
-
-- (NSArray *)data {
+- (NSDictionary<NSNumber *, NSArray *> *)data {
     if (!_data) {
-        NSDictionary *dict = [self dataDict];
-        
-        _data = @[[dict objectForKey:@(SectionTypePermissions)],
-                  [dict objectForKey:@(SectionTypeEmail)],
-                  [dict objectForKey:@(SectionTypeAbout)]];
+        _data = @{@(SectionTypePermissions): @[@(RowTypeCameraRoll),
+                                                   @(RowTypePushNotification),
+//                                                   @(RowTypeLocationService)
+                                                   ],
+                      @(SectionTypeInfo): @[@(RowTypeName),
+                                            @(RowTypeEmail)
+                                            ],
+                      @(SectionTypeAbout): @[@(RowTypeTutorial),
+                                             @(RowTypeTellFriend),
+                                             @(RowTypeContactUs),
+                                             @(RowTypeBug),
+                                             @(RowTypeVersion)
+                                             ]
+                      };
     }
     return _data;
 }
 
 - (RowType)rowTypeForIndexPath:(NSIndexPath *)indexPath {
-    return [self.data[indexPath.section][indexPath.row] integerValue];
+    return self.data[@(indexPath.section)][indexPath.row].integerValue;
 }
 
 - (NSIndexPath *)indexPathForRowType:(RowType)rowType inSectionType:(SectionType)sectionType {
-    NSInteger row = [[self dataDict][@(sectionType)] indexOfObject:@(rowType)];
+    NSInteger row = self.data[@(sectionType)][rowType].integerValue;
     
     return [NSIndexPath indexPathForRow:row inSection:sectionType];
 }
@@ -229,7 +233,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.data[section] count];
+    return self.data[@(section)].count;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
@@ -237,17 +241,55 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     RowType rowType = [self rowTypeForIndexPath:indexPath];
+    UITableViewCell *cell;
     
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    if (indexPath.section == SectionTypeInfo) {
+        UITextField *textField;
+        cell = [tableView dequeueReusableCellWithIdentifier:@"input"];
+
+        if (!cell) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"input"];
+
+            textField = [[UITextField alloc] init];
+            textField.translatesAutoresizingMaskIntoConstraints = NO;
+            textField.delegate = self;
+            textField.tag = 1;
+            textField.returnKeyType = UIReturnKeyDone;
+            [cell.contentView addSubview:textField];
+            [textField.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor].active = YES;
+            [textField.leadingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
+            [textField.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor].active = YES;
+            [textField.trailingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
+            
+        } else {
+            textField = [cell.contentView viewWithTag:1];
+        }
+        
+        if (rowType == RowTypeEmail) {
+            self.emailTextField = textField;
+            textField.keyboardType = UIKeyboardTypeEmailAddress;
+            
+        } else if (rowType == RowTypeName) {
+            self.nameTextField = textField;
+            textField.keyboardType = UIKeyboardTypeDefault;
+        }
+
+        textField.text = [self textForRowType:rowType];
+        textField.placeholder = [self detailTextForRowType:rowType];
+
+    } else {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+        
+        if (!cell) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+        }
+        
+        cell.textLabel.text = [self textForRowType:rowType];
+        cell.detailTextLabel.text = [self detailTextForRowType:rowType];
     }
     
-    cell.textLabel.text = [self textForRowType:rowType];
-    cell.detailTextLabel.text = [self detailTextForRowType:rowType];
     cell.accessoryType = [self accessoryTypeForRowType:rowType];
-    
     return cell;
 }
 
@@ -290,8 +332,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self.navigationController pushViewController:viewController animated:YES];
         }
             break;
-        case RowTypeEmail:
-            break;
         case RowTypeContactUs:
             [IntercomHelper.sharedInstance presentMessagingUI];
             break;
@@ -305,6 +345,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
             }];
         }
             break;
+        case RowTypeName:
+        case RowTypeEmail:
         case RowTypeVersion:
             break;
     }
@@ -320,8 +362,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case SectionTypeAbout:
             return @"About";
             break;
-        case SectionTypeEmail:
-            return @"Email";
+        case SectionTypeInfo:
+            return @"Your Info";
             break;
     }
 }
@@ -339,6 +381,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeTutorial:
             return @"Replay Tutorial";
+            break;
+        case RowTypeName:
+            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
             break;
         case RowTypeEmail:
             return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
@@ -368,6 +413,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeVersion:
             return [NSString stringWithFormat:@"%@%@", [UIApplication versionBuild], Constants.buildEnvironmentSuffix];
             break;
+        case RowTypeName:
+            return @"Enter Your Name";
+            break;
+        case RowTypeEmail:
+            return @"Enter Your Email";
+            break;
         default:
             return nil;
             break;
@@ -394,11 +445,41 @@ typedef NS_ENUM(NSUInteger, RowType) {
     NSMutableArray *permissionIndexPaths = [NSMutableArray array];
     NSInteger section = SectionTypePermissions;
     
-    for (NSNumber *permissionNumber in [self dataDict][@(section)]) {
+    for (NSNumber *permissionNumber in [self data][@(section)]) {
         [permissionIndexPaths addObject:[NSIndexPath indexPathForRow:[permissionNumber integerValue] inSection:section]];
     }
     
     [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];
+}
+
+
+#pragma mark - Text Field
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    NSString *key;
+    
+    if (textField == self.emailTextField) {
+        key = UserDefaultsKeys.email;
+        
+    } else if (textField == self.nameTextField) {
+        key = UserDefaultsKeys.name;
+    }
+    
+    if (key) {
+        [[NSUserDefaults standardUserDefaults] setValue:textField.text forKey:key];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if (textField.returnKeyType == UIReturnKeyDone) {
+        [textField resignFirstResponder];
+    }
+    return YES;
+}
+
+- (void)dismissKeyboard {
+    [self.tableView endEditing:YES];
 }
 
 
@@ -423,7 +504,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 #pragma mark - Tutorial
 
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
-    NSIndexPath *indexPath = [self indexPathForRowType:RowTypeEmail inSectionType:SectionTypeEmail];
+    NSIndexPath *indexPath = [self indexPathForRowType:RowTypeEmail inSectionType:SectionTypeInfo];
     [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     
     [self.navigationController popViewControllerAnimated:YES];

@@ -7,6 +7,7 @@
 //
 
 #import "TutorialTrySlideView.h"
+#import "PermissionsManager.h"
 #import "screenshot-Swift.h"
 
 @implementation TutorialTrySlideView
@@ -43,7 +44,10 @@
 - (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
     if (self.window) {
         [AssetSyncModel sharedInstance].isTutorialScreenshot = YES;
-        [self.delegate tutorialTrySlideViewDidComplete:self];
+        
+        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto response:^(BOOL granted) {
+            [self.delegate tutorialTrySlideViewDidComplete:self];
+        }];
     }
 }
 
