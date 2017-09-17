@@ -8,6 +8,7 @@
 
 #import "HelperView.h"
 #import "Geometry.h"
+#import "screenshot-Swift.h"
 
 @implementation HelperView
 
@@ -21,6 +22,7 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
+            label.textColor = [UIColor gray3];
             label.font = [UIFont fontWithDescriptor:fontDescriptor size:0.f];
             label.numberOfLines = 0;
             label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -[Geometry padding], 0.f);
@@ -36,6 +38,7 @@
             UILabel *label = [[UILabel alloc] init];
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
+            label.textColor = [UIColor gray3];
             label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle3];
             label.numberOfLines = 0;
             label.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, -[Geometry padding], 0.f);
