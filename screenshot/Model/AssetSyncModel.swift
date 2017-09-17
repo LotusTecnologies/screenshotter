@@ -65,7 +65,6 @@ class AssetSyncModel: NSObject {
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
-                                                     shareLink: nil,
                                                      createdAt: asset.creationDate,
                                                      isFashion: isFashion,
                                                      isFromShare: false,
@@ -149,7 +148,6 @@ class AssetSyncModel: NSObject {
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: screenshotId,
-                                                    shareLink: screenshotDict["shareLink"] as? String,
                                                     createdAt: Date(),
                                                     isFashion: true,
                                                     isFromShare: true,
@@ -553,8 +551,7 @@ extension Screenshot {
         let assetSyncModel = AssetSyncModel.sharedInstance
         return firstly { _ -> Promise<(String, String)> in
             // Post to Craze server, which returns deep share link.
-            let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
-            return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
+            return self.shareOrReshare()
             }.then(on: assetSyncModel.processingQ) { id, shareLink -> Promise<String> in
                 // Return the promise as soon as we have the shareLink, and concurrently or afterwards save shareLink to DB.
                 NSLog("id:\(id)  shareLink:\(shareLink)")
@@ -565,6 +562,15 @@ extension Screenshot {
                     }
                 }
                 return Promise(value: shareLink)
+        }
+    }
+    
+    private func shareOrReshare() -> Promise<(String, String)> {
+        let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
+        if self.isFromShare {
+            return NetworkingPromise.reshare(userName: userName, screenshotId: self.assetId)
+        } else {
+            return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
         }
     }
     
