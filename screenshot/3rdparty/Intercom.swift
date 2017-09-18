@@ -86,4 +86,8 @@ class IntercomHelper : NSObject {
     func hideMessagingUI() {
         Intercom.hideMessenger()
     }
+    
+    func recordUnsatisfactoryRating() {
+        Intercom.logEvent(withName: "Rated app less than 4 stars")
+    }
 }

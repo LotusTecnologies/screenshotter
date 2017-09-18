@@ -9,6 +9,16 @@
 import EggRating
 
 class RatingFlow : NSObject, RatingFlowControllerDelegate {
+    enum Rating {
+        case InApp(Double)
+        case AppStore
+    }
+    
+    enum Phase {
+        case Initial
+        case AppStore
+    }
+
     public static let sharedInstance = RatingFlow(significantEventThreshold: 3)
 
     // Using a closure to allow for immediate initialization of the RatingFlow without a concrete instance of a UIViewController.
@@ -36,15 +46,12 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
         return significantEventCount >= significantEventThreshold
     }
     
-    fileprivate var controller = RatingFlowController() {
-        didSet {
-           controller.delegate = self
-        }
-    }
+    fileprivate var controller = RatingFlowController()
     
     // MARK: Public methods
     
     func start() {
+        controller.delegate = self
         promptIfNecessary(delay: 3.5)
     }
     
@@ -76,40 +83,42 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
     
     // MARK: RatingFlowControllerDelegate
     
-    fileprivate func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating) {
+    fileprivate func controller(_ controller: RatingFlowController, didRate rating: RatingFlow.Rating) {
         if case .InApp(let ratingValue) = rating {
             AnalyticsManager.track("Rated app", properties: ["rating": "\(ratingValue)"])
+            
+            if ratingValue < 4.0 {
+                IntercomHelper.sharedInstance.recordUnsatisfactoryRating()
+            }
         } else {
             AnalyticsManager.track("Rated app on app store")
         }
+        
+        dismiss()
     }
     
-    fileprivate func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlowController.Phase) {
+    fileprivate func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlow.Phase) {
         if case .Initial = phase {
             AnalyticsManager.track("Ignored rating in app")
         } else {
             AnalyticsManager.track("Ignored rating on AppStore")
         }
+        
+        dismiss()
+    }
+    
+    private func dismiss() {
+        containerViewControllerClosure()?.dismiss(animated: false, completion: nil)
     }
 }
 
 fileprivate protocol RatingFlowControllerDelegate : class {
-    func controller(_ controller: RatingFlowController, didRate rating: RatingFlowController.Rating)
-    func controllerDidCancel(_ controller: RatingFlowController, inPhase phase:RatingFlowController.Phase)
+    func controller(_ controller: RatingFlowController, didRate rating: RatingFlow.Rating)
+    func controllerDidCancel(_ controller: RatingFlowController, inPhase phase:RatingFlow.Phase)
 }
 
 fileprivate class RatingFlowController : NSObject {
     weak var delegate: RatingFlowControllerDelegate?
-
-    enum Rating {
-        case InApp(Double)
-        case AppStore
-    }
-    
-    enum Phase {
-        case Initial
-        case AppStore
-    }
     
     // MARK: Initialization
     
