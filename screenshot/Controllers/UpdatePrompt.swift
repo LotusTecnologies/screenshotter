@@ -84,7 +84,14 @@ class UpdatePromptHandler {
             presentForceUpdateAlert()
         } else if suggestedVersionIsGreater {
             // Suggested update.
+            
+            // Ignore if we've already asked to update to this version.
+            if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String, lastVersionAskedToUpdate == state.suggestedVersion {
+                return
+            }
+            
             presentUpdateAlert()
+            UserDefaults.standard.set(state.suggestedVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
         }
     }
 
