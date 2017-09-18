@@ -367,13 +367,22 @@ extension DataModel {
                        b1y: Double) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
-        let spellingMap = ["Neclesses" : "Necklaces", "Cufflings" : "Cufflinks"]
+        let spellingMap = ["Neclesses" : "Necklaces", "Cufflings" : "Cufflinks", "Scarfs" : "Scarves", "Vestes" : "Vests", "PouchBag" : "Pouch Bags", "WalletsPurses" : "Wallets/Purses", "SportShoes" : "Sport Shoes", "SocksAndTights" : "Socks/Tights", "Bodypart" : "Body Part", "GlovesAndMitten" : "Gloves/Mittens", "NightMorning" : "Nightgowns", "NonFashion_PhoneCover" : "Phone Covers", "NonFashion_HeadPhone" : "Headphones", "NonFashion_Suitcases" : "Suitcases"]
         if let label = label, let correctedSpelling = spellingMap[label] {
             shoppableToSave.label = correctedSpelling
         } else {
             shoppableToSave.label = label
         }
-        let priorityMap = ["Jackets" : "00", "Skirts" : "01", "Shoes" : "02", "Bags" : "03"]
+        let priorityMap = ["Dresses" : "01", "Jumpsuits" : "02", "Swimwear" : "03", "Shirts" : "04",
+                           "Trousers" : "05", "Shorts" : "06", "Skirts" : "07", "Jackets" : "08",
+                           "Coats" : "09", "Vestes" : "10", "Backpacks" : "11", "Bags" : "12",
+                           "PouchBag" : "13", "WalletsPurses" : "14", "Shoes" : "15", "Boots" : "16",
+                           "SportShoes" : "17", "SocksAndTights" : "18", "Sunglasses" : "19", "Hats" : "20",
+                           "Scarfs" : "21", "Belts" : "22", "Bracelets" : "23", "Neclesses" : "24",
+                           "Earrings" : "25", "Rings" : "26", "Cufflings" : "27", "Ties" : "28",
+                           "Makeup" : "29", "GlovesAndMitten" : "30", "NonFashion_Suitcases" : "31",
+                           // Not ordered by Molly
+                           "Bodypart" : "32", "NightMorning" : "33", "NonFashion_PhoneCover" : "34", "NonFashion_HeadPhone" : "35", "Underwear" : "36", "Watches" : "37"]
         if let label = label, let priorityOrder = priorityMap[label] {
             shoppableToSave.order = priorityOrder
         } else {
