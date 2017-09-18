@@ -83,7 +83,8 @@ class UpdatePromptHandler {
             // Suggested update.
             
             // Ignore if we've already asked to update to this version.
-            if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String, lastVersionAskedToUpdate == state.suggestedVersion {
+            if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String,
+                lastVersionAskedToUpdate == state.suggestedVersion {
                 return
             }
             
