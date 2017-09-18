@@ -192,19 +192,19 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (NSDictionary<NSNumber *, NSArray *> *)data {
     if (!_data) {
         _data = @{@(SectionTypePermissions): @[@(RowTypeCameraRoll),
-                                                   @(RowTypePushNotification),
-//                                                   @(RowTypeLocationService)
-                                                   ],
-                      @(SectionTypeInfo): @[@(RowTypeName),
-                                            @(RowTypeEmail)
-                                            ],
-                      @(SectionTypeAbout): @[@(RowTypeTutorial),
-                                             @(RowTypeTellFriend),
-                                             @(RowTypeContactUs),
-                                             @(RowTypeBug),
-                                             @(RowTypeVersion)
-                                             ]
-                      };
+                                               @(RowTypePushNotification),
+//                                               @(RowTypeLocationService)
+                                               ],
+                  @(SectionTypeInfo): @[@(RowTypeName),
+                                        @(RowTypeEmail)
+                                        ],
+                  @(SectionTypeAbout): @[@(RowTypeTellFriend),
+                                         @(RowTypeTutorial),
+                                         @(RowTypeContactUs),
+                                         @(RowTypeBug),
+                                         @(RowTypeVersion)
+                                         ]
+                  };
     }
     return _data;
 }
