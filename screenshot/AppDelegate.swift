@@ -18,7 +18,13 @@ import Branch
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var rootVC: RootViewController {
+        return window!.rootViewController as! RootViewController
+    }
+    
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    
+    let updateHandler = UpdatePromptHandler()
 
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
@@ -36,9 +42,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         prepareDataStackCompletionIfNeeded()
         
+        let root = RootViewController()
+        root.containedViewController = nextViewController()
+        updateHandler.containerViewController = root
+        
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = nextViewController()
+        window?.rootViewController = root
         window?.makeKeyAndVisible()
+        
+        updateHandler.start()
         
         return true
     }
@@ -206,12 +218,7 @@ extension AppDelegate {
     }
     
     func transitionTo(_ toViewController: UIViewController) {
-        let options: UIViewAnimationOptions = [.transitionFlipFromLeft, .allowAnimatedContent, .layoutSubviews]
-        if let fromView = self.window?.rootViewController?.view {
-            UIView.transition(from: fromView, to: toViewController.view, duration: 0.5, options: options) { (finished) in
-                self.window?.rootViewController = toViewController
-            }
-        }
+        rootVC.transition(toViewController: toViewController)
     }
     
 }
