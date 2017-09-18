@@ -65,11 +65,8 @@ class UpdatePromptHandler {
             }
             
             return Promise(value: updateState)
-            }.then(on: .main) { state in
-                completion?(state)
-                
-                // TODO: Is this correct?
-                return AnyPromise(Promise())
+        }.then(on: .main) { state in
+            completion?(state)
         }
     }
     
