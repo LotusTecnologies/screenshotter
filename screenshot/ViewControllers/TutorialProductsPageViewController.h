@@ -7,10 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "screenshot-Swift.h"
 
 @interface TutorialProductsPageViewController : UIViewController
-
-@property (nonatomic, strong) Product *product;
 
 @end

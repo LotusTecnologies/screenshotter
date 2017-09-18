@@ -8,6 +8,7 @@
 
 #import "TutorialProductsPageViewController.h"
 #import "Geometry.h"
+#import "screenshot-Swift.h"
 
 @import SDWebImage.UIImageView_WebCache;
 
@@ -274,9 +275,9 @@
     
     self.view.clipsToBounds = YES;
     
-    [self.view.productImageView sd_setImageWithURL:[NSURL URLWithString:self.product.imageURL] placeholderImage:[UIImage imageNamed:@"DefaultProduct"] options:SDWebImageRetryFailed | SDWebImageHighPriority];
-    self.view.productBrandLabel.text = self.product.brand.length ? self.product.brand : self.product.merchant;
-    self.view.productPriceLabel.text = self.product.price;
+    self.view.productImageView.image = [UIImage imageNamed:@"TutorialProductsPageProduct"];
+    self.view.productBrandLabel.text = @"Asos";
+    self.view.productPriceLabel.text = @"$65";
     [self.view.button addTarget:self action:@selector(dismissViewController) forControlEvents:UIControlEventTouchUpInside];
 }
 
