@@ -43,8 +43,15 @@ class UpdatePromptHandler {
     }
     
     var containerViewController: UIViewController?
+    var didBecomeActiveObserver: Any?
     
     // MARK: Public methods
+    
+    deinit {
+        if let observer = didBecomeActiveObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
     
     func start() {
         startUpdateFlow()
@@ -108,9 +115,11 @@ class UpdatePromptHandler {
         containerViewController?.view.isUserInteractionEnabled = false
         
         // Restart the flow if users try to re-enter the app.
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationDidBecomeActive, object: nil, queue: nil) { note in
-            self.containerViewController?.dismiss(animated: false, completion: nil)
-            self.startUpdateFlow()
+        if didBecomeActiveObserver == nil {
+            didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationDidBecomeActive, object: nil, queue: nil) { note in
+                self.containerViewController?.dismiss(animated: false, completion: nil)
+                self.startUpdateFlow()
+            }
         }
         
         let controller = UIAlertController(title: "Update Required", message: "You need to update to the latest version to keep using Craze.", preferredStyle: .alert)
