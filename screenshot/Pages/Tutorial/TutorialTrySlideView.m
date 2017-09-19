@@ -43,8 +43,6 @@
 
 - (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
     if (self.window) {
-        [AssetSyncModel sharedInstance].isTutorialScreenshot = YES;
-        
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto response:^(BOOL granted) {
             [self.delegate tutorialTrySlideViewDidComplete:self];
         }];

@@ -13,6 +13,7 @@ class Constants: NSObject {
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
+    static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
