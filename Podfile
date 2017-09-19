@@ -4,7 +4,7 @@ platform :ios, '10.0'
 def shared_pods
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     use_frameworks!
-    pod 'Clarifai-Apple-SDK', '3.0.0-beta4'
+    pod 'Clarifai-Apple-SDK', '3.0.0-beta5'
     pod 'PromiseKit/Foundation'
     pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
@@ -14,7 +14,7 @@ def shared_pods
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
     pod 'ImageEffects'
-    pod 'Firebase/DynamicLinks'
+    pod 'Branch'
     pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/add-disadvantaged-flow-customization'
     pod 'Intercom'
 end

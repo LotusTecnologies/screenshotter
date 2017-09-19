@@ -6,7 +6,7 @@
 	<string>production</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:er42w.app.goo.gl</string>
+		<string>applinks:craze.shopping</string>
 	</array>
 </dict>
 </plist>

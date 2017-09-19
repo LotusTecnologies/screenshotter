@@ -32,6 +32,15 @@ class IntercomHelper : NSObject {
         }
     }
     
+    var userName: String? {
+        didSet {
+            let attrs = ICMUserAttributes()
+            attrs.name = userName ?? ""
+
+            Intercom.updateUser(attrs)
+        }
+    }
+    
     // MARK: -
     
     func start(withLaunchOptions launchOptions:[AnyHashable : Any]) {
@@ -40,11 +49,13 @@ class IntercomHelper : NSObject {
         #if DEBUG
             Intercom.enableLogging()
         #endif
-        
+
         // Register the user if we're already logged in.
         if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             registerUser(withEmail: email)
         }
+    
+        userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
         
         if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
             handleRemoteNotification(remoteNotification, opened: true)
@@ -74,5 +85,9 @@ class IntercomHelper : NSObject {
     
     func hideMessagingUI() {
         Intercom.hideMessenger()
+    }
+    
+    func recordUnsatisfactoryRating() {
+        Intercom.logEvent(withName: "Rated app less than 4 stars")
     }
 }

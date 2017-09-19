@@ -7,7 +7,6 @@
 //
 
 #import "TutorialViewController.h"
-#import "TutorialPermissionsSlideView.h"
 #import "TutorialEmailSlideView.h"
 #import "TutorialWelcomeSlideView.h"
 #import "TutorialTrySlideView.h"
@@ -17,8 +16,7 @@
 #import "AnalyticsManager.h"
 #import "screenshot-Swift.h"
 
-@interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialPermissionsSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
-    BOOL _shouldSlideNextFromPermissionsSlide;
+@interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
     BOOL _didPresentDeterminePushAlertController;
     BOOL _scrollViewIsScrollingAnimation;
 }
@@ -26,7 +24,6 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
-@property (nonatomic, strong) TutorialPermissionsSlideView *permissionsSlideView;
 
 @end
 
@@ -37,8 +34,6 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        
         self.title = @"Tutorial";
         
         [AnalyticsManager track:@"Started Tutorial"];
@@ -118,18 +113,6 @@
     } completion:nil];
 }
 
-- (void)applicationDidBecomeActive:(NSNotification *)notification {
-    if (self.view.window && _shouldSlideNextFromPermissionsSlide) {
-        _shouldSlideNextFromPermissionsSlide = NO;
-        
-        [self scrollToNextSlide];
-    }
-}
-
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
 
 #pragma mark - Layout
 
@@ -156,10 +139,6 @@
         TutorialWelcomeSlideView *welcomeSlideView = [[TutorialWelcomeSlideView alloc] init];
         welcomeSlideView.delegate = self;
         
-        TutorialPermissionsSlideView *permissionsSlideView = [[TutorialPermissionsSlideView alloc] init];
-        permissionsSlideView.delegate = self;
-        self.permissionsSlideView = permissionsSlideView;
-        
         TutorialEmailSlideView *emailSlideView = [[TutorialEmailSlideView alloc] init];
         emailSlideView.delegate = self;
         
@@ -167,7 +146,6 @@
         trySlideView.delegate = self;
         
         _slides = @[welcomeSlideView,
-                    permissionsSlideView,
                     emailSlideView,
                     trySlideView
                     ];
@@ -186,42 +164,6 @@
 - (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
     slideView.delegate = nil;
     [self scrollToNextSlide];
-}
-
-- (void)tutorialPermissionsSlideViewDidDenyPhotosPermission:(TutorialPermissionsSlideView *)slideView {
-    UIAlertController *alertController = [[PermissionsManager sharedPermissionsManager] deniedAlertControllerForType:PermissionTypePhoto opened:^(BOOL granted) {
-        // The delegate will be nil if the slide is completed
-        if (granted && slideView.delegate == nil) {
-            _shouldSlideNextFromPermissionsSlide = YES;
-        }
-    }];
-    [self presentViewController:alertController animated:YES completion:nil];
-}
-
-- (void)tutorialPermissionsSlideViewDidComplete:(TutorialPermissionsSlideView *)slideView {
-    if (self.presentedViewController) {
-        slideView.delegate = nil;
-        
-        // The photos permission denied alert has been presented.
-        // Enabling this permission will force quite the app. The
-        // only way to open the app where it was left off is to
-        // implement restoration.
-        
-    } else {
-        BOOL isPushUndetermined = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush] == PermissionStatusNotDetermined;
-        
-        if (isPushUndetermined && !_didPresentDeterminePushAlertController) {
-            _didPresentDeterminePushAlertController = YES;
-            
-            UIAlertController *alertController = [slideView determinePushAlertController];
-            [self presentViewController:alertController animated:YES completion:nil];
-            
-        } else {
-            slideView.delegate = nil;
-            
-            [self scrollToNextSlide];
-        }
-    }
 }
 
 - (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
@@ -282,23 +224,6 @@
     _scrollViewIsScrollingAnimation = NO;
     
     [[self currentSlide] didEnterSlide];
-    
-    if ([self currentSlideIndex] == [self.slides indexOfObject:self.permissionsSlideView]) {
-        PermissionStatus photoStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePhoto];
-        PermissionStatus pushStatus = [[PermissionsManager sharedPermissionsManager] permissionStatusForType:PermissionTypePush];
-        
-        if (photoStatus != PermissionStatusNotDetermined && pushStatus != PermissionStatusNotDetermined) {
-            // Create a delay before scrolling so it doesn't feel like a bug
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                // Check again to make sure the user didn't already move on
-                
-                if ([self currentSlideIndex] == [self.slides indexOfObject:self.permissionsSlideView]) {
-                    [self scrollToNextSlide];
-                }
-            });
-        }
-    }
 }
 
 

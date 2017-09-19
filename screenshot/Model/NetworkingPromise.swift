@@ -89,16 +89,29 @@ class NetworkingPromise: NSObject {
     }
     
     static func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
+        let parameterDict = ["userName" : userName, "image" : imageURLString, "syteJson" : syteJson]
+        guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
+            let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")  image:\(imageURLString ?? "-")  syteJson:\(syteJson ?? "-")"])
+            print(error)
+            return Promise(error: error)
+        }
+        return NetworkingPromise.shareWorkhorse(parameterData: parameterData)
+    }
+    
+    static func reshare(userName: String?, screenshotId: String?) -> Promise<(String, String)> {
+        let parameterDict = ["userName" : userName, "screenshotId" : screenshotId]
+        guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
+            let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")  screenshotId:\(screenshotId ?? "-")"])
+            print(error)
+            return Promise(error: error)
+        }
+        return NetworkingPromise.shareWorkhorse(parameterData: parameterData)
+    }
+    
+    static func shareWorkhorse(parameterData: Data) -> Promise<(String, String)> {
         return Promise { fulfill, reject in
             guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshot") else {
                 let error = NSError(domain: "Craze", code: 11, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-                print(error)
-                reject(error)
-                return
-            }
-            let parameterDict = ["userName" : userName, "image" : imageURLString, "syteJson" : syteJson]
-            guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
-                let error = NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")  image:\(imageURLString ?? "-")  syteJson:\(syteJson ?? "-")"])
                 print(error)
                 reject(error)
                 return
@@ -112,8 +125,9 @@ class NetworkingPromise: NSObject {
                     reject(error)
                 } else if let data = data,
                   let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any],
-                  let id = json["id"] as? String,
-                  let shareLink = json["shareLink"] as? String {
+                  let share = json["share"] as? [String : Any],
+                  let id = share["id"] as? String,
+                  let shareLink = share["link"] as? String {
                     fulfill((id, shareLink))
                 } else {
                     let error = NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "share unknown error"])

@@ -370,32 +370,16 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (void)presentTutorialHelperIfNeeded {
     BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedProductHelper];
-    NSString *tutorialScreenshotAssetId = [NSUserDefaults.standardUserDefaults stringForKey:UserDefaultsKeys. tutorialScreenshotAssetId];
-    BOOL isTutorialScreenshot = [self.screenshot.assetId isEqualToString:tutorialScreenshotAssetId];
     
-    if (!hasPresented && isTutorialScreenshot) {
+    if (!hasPresented) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedProductHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        self.transitioningController = [[TransitioningController alloc] init];
     
-        NSArray<Shoppable *> *shoppables = [self.shoppablesToolbar shoppables];
-        Product *product;
-        
-        for (Shoppable *shoppable in shoppables) {
-            if ([shoppable.label isEqualToString:@"Jackets"]) {
-                product = [[self productsForShoppable:shoppable] firstObject];
-            }
-        }
-        
-        if (!product) {
-            product = [self.products firstObject];
-        }
+        self.transitioningController = [[TransitioningController alloc] init];
     
         TutorialProductsPageViewController *viewController = [[TutorialProductsPageViewController alloc] init];
         viewController.modalPresentationStyle = UIModalPresentationCustom;
         viewController.transitioningDelegate = self.transitioningController;
-        viewController.product = product;
         [self presentViewController:viewController animated:YES completion:nil];
     }
 }

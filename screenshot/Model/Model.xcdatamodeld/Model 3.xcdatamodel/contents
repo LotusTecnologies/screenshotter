@@ -21,6 +21,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <attribute name="isFashion" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isFromShare" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isNew" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -44,7 +45,7 @@
     </entity>
     <elements>
         <element name="Product" positionX="124" positionY="189" width="128" height="255"/>
-        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="225"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="240"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="195"/>
     </elements>
 </model>

@@ -14,5 +14,7 @@
 #import "AnalyticsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
+#import "HelperView.h"
+#import "Geometry.h"
 
 #endif /* screenshot_Bridging_Header_h */

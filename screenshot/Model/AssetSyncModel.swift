@@ -18,6 +18,7 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     var allScreenshotAssets: PHFetchResult<PHAsset>?
+    var selectedScreenshotAssets: [PHAsset]?
 //    var changedAssetIds: [String] = []
     var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
@@ -65,9 +66,9 @@ class AssetSyncModel: NSObject {
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
-                                                     shareLink: nil,
                                                      createdAt: asset.creationDate,
                                                      isFashion: isFashion,
+                                                     isFromShare: false,
                                                      imageData: imageData)
                 }
                 if isFashion {
@@ -135,19 +136,15 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func downloadScreenshot(dynamicLink: String) {
+    func downloadScreenshot(screenshotId: String) {
         let dataModel = DataModel.sharedInstance
         firstly { _ -> Promise<[String : Any]> in
             // Get screenshot dict from Craze server. See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
-            let sDelimited = dynamicLink.components(separatedBy: "/s/")
-            print("downloadScreenshot dynamicLink:\(dynamicLink)  sDelimited:\(sDelimited)")
-            guard sDelimited.count > 1,
-              let lastComponent = sDelimited.last,
-              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + lastComponent) else {
-                    let urlError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from dynamicLink:\(dynamicLink)"])
+            guard let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + screenshotId) else {
+                    let urlError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from screenshotId:\(screenshotId)"])
                     return Promise(error: urlError)
             }
-            NSLog("dynamicLink:\(dynamicLink)  screenshotInfoUrl:\(screenshotInfoUrl)")
+            print("downloadScreenshot screenshotId:\(screenshotId)")
             return NetworkingPromise.downloadInfo(url: screenshotInfoUrl)
             }.then(on: self.processingQ) { screenshotDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
@@ -161,10 +158,10 @@ class AssetSyncModel: NSObject {
                 // Save screenshot to db.
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                    assetId: dynamicLink,
-                                                    shareLink: screenshotDict["shareLink"] as? String,
+                                                    assetId: screenshotId,
                                                     createdAt: Date(),
                                                     isFashion: true,
+                                                    isFromShare: true,
                                                     imageData: imageData)
                 }
             }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
@@ -176,7 +173,7 @@ class AssetSyncModel: NSObject {
                     print(jsonError)
                     return
                 }
-                self.saveShoppables(assetId: dynamicLink, uploadedURLString: imageURLString, segments: segments)
+                self.saveShoppables(assetId: screenshotId, uploadedURLString: imageURLString, segments: segments)
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
             }.catch { error in
@@ -391,6 +388,18 @@ class AssetSyncModel: NSObject {
         return assetIds
     }
     
+    func retrieveSelectedScreenshotAssetIds() -> Set<String> {
+        var assetIds = Set<String>()
+        guard let selectedScreenshotAssets = selectedScreenshotAssets else {
+            return assetIds
+        }
+        for asset in selectedScreenshotAssets {
+            assetIds.insert(asset.localIdentifier)
+        }
+        self.selectedScreenshotAssets?.removeAll()
+        return assetIds
+    }
+    
     func beginSync() {
         isSyncing = true
         DispatchQueue.main.async {
@@ -433,7 +442,7 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let photosSet = self.retrieveAllScreenshotAssetIds()
+            let photosSet = self.retrieveSelectedScreenshotAssetIds().union(self.retrieveAllScreenshotAssetIds())
             let managedObjectContext = dataModel.adHocMoc()
             var dbSet = Set<String>()
             managedObjectContext.performAndWait {
@@ -446,6 +455,7 @@ class AssetSyncModel: NSObject {
             }
             let toUpload = photosSet.subtracting(dbSet)//.union(changedAssetIds)
             let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
+            self.incomingDynamicLinks.removeAll()
             // TODO: Remove changedAssetIds as each screenshot is successfully saved.
             //changedAssetIds = []
             self.countAndPrint(name: "dbSet", set: dbSet)
@@ -471,9 +481,9 @@ class AssetSyncModel: NSObject {
             if toDownload.count > 0 {
                 AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
-                for dynamicLink in toDownload {
+                for screenshotId in toDownload {
                     self.processingQ.async {
-                        self.downloadScreenshot(dynamicLink: dynamicLink)
+                        self.downloadScreenshot(screenshotId: screenshotId)
                     }
                 }
             }
@@ -481,6 +491,11 @@ class AssetSyncModel: NSObject {
                 self.endSync()
             }
         }
+    }
+    
+    @objc public func syncSelectedPhotos(assets: [PHAsset]) {
+        self.selectedScreenshotAssets = assets
+        syncPhotos()
     }
     
 }
@@ -542,8 +557,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    @objc public func handleDynamicLink(dynamicLink: URL) {
-        incomingDynamicLinks.append(dynamicLink.absoluteString)
+    @objc public func handleDynamicLink(screenshotId: String) {
+        incomingDynamicLinks.append(screenshotId)
         syncPhotos()
     }
     
@@ -564,8 +579,7 @@ extension Screenshot {
         let assetSyncModel = AssetSyncModel.sharedInstance
         return firstly { _ -> Promise<(String, String)> in
             // Post to Craze server, which returns deep share link.
-            let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
-            return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
+            return self.shareOrReshare()
             }.then(on: assetSyncModel.processingQ) { id, shareLink -> Promise<String> in
                 // Return the promise as soon as we have the shareLink, and concurrently or afterwards save shareLink to DB.
                 NSLog("id:\(id)  shareLink:\(shareLink)")
@@ -576,6 +590,15 @@ extension Screenshot {
                     }
                 }
                 return Promise(value: shareLink)
+        }
+    }
+    
+    private func shareOrReshare() -> Promise<(String, String)> {
+        let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
+        if self.isFromShare {
+            return NetworkingPromise.reshare(userName: userName, screenshotId: self.assetId)
+        } else {
+            return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
         }
     }
     
