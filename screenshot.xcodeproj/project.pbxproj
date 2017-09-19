@@ -440,10 +440,10 @@
 				E4139D3C1F09083B00E8A53B /* Sources */,
 				E4139D3D1F09083B00E8A53B /* Frameworks */,
 				E4139D3E1F09083B00E8A53B /* Resources */,
-				38086E33D1327D16D87CDA61 /* [CP] Embed Pods Frameworks */,
-				1FF8BB3D1907C42520066B16 /* [CP] Copy Pods Resources */,
 				E4D495D31F4987B100312614 /* Upload Symbols To AppSee */,
 				E4D6D8A81F61B483009DD999 /* Copy Environment-Specific Files */,
+				062DDE6A3EEF8844E9956F39 /* [CP] Embed Pods Frameworks */,
+				6BC0B32A3406E11698F2E236 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -512,26 +512,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1FF8BB3D1907C42520066B16 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh",
-				"${PODS_ROOT}/Intercom/Intercom/Intercom.framework/Versions/A/Resources/Intercom.bundle",
-				"${PODS_ROOT}/Intercom/Intercom/Intercom.framework/Versions/A/Resources/IntercomTranslations.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		38086E33D1327D16D87CDA61 /* [CP] Embed Pods Frameworks */ = {
+		062DDE6A3EEF8844E9956F39 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -571,6 +552,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6BC0B32A3406E11698F2E236 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh",
+				"${PODS_ROOT}/Intercom/Intercom/Intercom.framework/Versions/A/Resources/Intercom.bundle",
+				"${PODS_ROOT}/Intercom/Intercom/Intercom.framework/Versions/A/Resources/IntercomTranslations.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		AE7846E2803BA1055B53CB98 /* [CP] Check Pods Manifest.lock */ = {
