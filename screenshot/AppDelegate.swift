@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-    
+
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
@@ -206,12 +206,12 @@ extension AppDelegate {
     }
     
     func transitionTo(_ toViewController: UIViewController) {
-        guard let window = window else { return }
-        
         let options: UIViewAnimationOptions = [.transitionFlipFromLeft, .allowAnimatedContent, .layoutSubviews]
-        UIView.transition(with: window, duration: 0.5, options: options, animations: {
-            window.rootViewController = toViewController
-        }, completion: nil)
+        if let fromView = self.window?.rootViewController?.view {
+            UIView.transition(from: fromView, to: toViewController.view, duration: 0.5, options: options) { (finished) in
+                self.window?.rootViewController = toViewController
+            }
+        }
     }
     
 }
