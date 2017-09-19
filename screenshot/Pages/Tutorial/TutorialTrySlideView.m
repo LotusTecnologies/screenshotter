@@ -43,10 +43,13 @@
 
 - (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
     if (self.window) {
+        UIGraphicsBeginImageContext(self.window.bounds.size);
+        [self.window drawViewHierarchyInRect:self.window.bounds afterScreenUpdates:NO];
+        UIImage *snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto response:^(BOOL granted) {
-            UIImage *image = [UIImage imageNamed:@"TutorialTryGraphic"]; // TODO: image from [UIScreen snapshot...]
-            
-            [[AssetSyncModel sharedInstance] syncTutorialPhotoWithImage:image];
+            [[AssetSyncModel sharedInstance] syncTutorialPhotoWithImage:snapshotImage];
             
             [self.delegate tutorialTrySlideViewDidComplete:self];
         }];
