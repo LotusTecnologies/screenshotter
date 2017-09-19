@@ -66,10 +66,6 @@ class IntercomHelper : NSObject {
         let isIntercomNotification = Intercom.isIntercomPushNotification(userInfo)
         let trackingPrefix = opened ? "Opened with" : "Received"
         
-        if isIntercomNotification {
-            Intercom.handlePushNotification(userInfo)
-        }
-
         AnalyticsManager.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
