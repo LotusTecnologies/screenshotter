@@ -59,6 +59,8 @@ class UpdatePromptHandler : NSObject {
     }
     
     func start() {
+        print("Starting update handler")
+
         startUpdateFlow()
     }
     
@@ -72,6 +74,8 @@ class UpdatePromptHandler : NSObject {
     
     private func fetchUpdatePayload(withCompletion completion: ((UpdatePromptState) -> Void)? = nil) {
         let _ = NetworkingPromise.appVersionRequirements().then(on: DispatchQueue.global(qos: .default)) { dictionary -> Promise<UpdatePromptState> in
+            print("Received update payload from server")
+            
             guard let updateState = try? UpdatePromptState(dictionaryRepresentation: dictionary) else {
                 throw NSError(domain: Bundle.main.infoDictionary!["CFBundleIdentifier"] as! String, code: 100, userInfo: [NSLocalizedDescriptionKey: "Can't create an UpdatePromptState from the given dictionary: \(dictionary.description)"])
             }
@@ -85,13 +89,19 @@ class UpdatePromptHandler : NSObject {
     // MARK: Alert presentation
     
     private func presentAppropriatePromptIfNecessary(withUpdateState state: UpdatePromptState) {
+        print("Determining appropriate prompt action (if any)...")
+        
         let forcedVersionIsGreater = state.forceVersion.compare(currentAppVersion, options: .numeric) == .orderedDescending
         let suggestedVersionIsGreater = state.suggestedVersion.compare(currentAppVersion, options: .numeric) == .orderedDescending
  
         if forcedVersionIsGreater {
+            print("forced version is greater")
+            
             // Force update.
             presentForceUpdateAlert()
         } else if suggestedVersionIsGreater {
+            print("suggested version is greater")
+            
             // Suggested update.
             
             // Ignore if we've already asked to update to this version.
@@ -102,6 +112,8 @@ class UpdatePromptHandler : NSObject {
             
             presentUpdateAlert()
             UserDefaults.standard.set(state.suggestedVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
+        } else {
+            print("No prompt action deemed necessary")
         }
     }
 
