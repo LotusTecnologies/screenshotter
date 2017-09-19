@@ -26,6 +26,7 @@
         _screenshotsViewController = ({
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
+            viewController.lifeCycleDelegate = self;
             viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
             viewController;
         });
@@ -43,6 +44,31 @@
 
 
 #pragma mark - View Controller Life Cycle
+
+- (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {
+    if (viewController == self.screenshotsViewController) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] &&
+            [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker] &&
+            [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
+        {
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Start Screenshotting" message:@"Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!" preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
+                    if (granted) {
+                        [AnalyticsManager track:@"Accepted Push Permissions"];
+                        
+                    } else {
+                        [AnalyticsManager track:@"Denied Push Permissions"];
+                    }
+                }];
+            }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+    }
+}
 
 - (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
     if ([viewController isKindOfClass:[ProductsViewController class]]) {

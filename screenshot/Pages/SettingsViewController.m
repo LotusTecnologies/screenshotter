@@ -24,9 +24,9 @@ typedef NS_ENUM(NSUInteger, SectionType) {
 };
 
 typedef NS_ENUM(NSUInteger, RowType) {
-    RowTypeCameraRoll,
-    RowTypePushNotification,
-    RowTypeLocationService,
+    RowTypePhotoPermission,
+    RowTypePushPermission,
+    RowTypeLocationPermission,
     RowTypeEmail,
     RowTypeName,
     RowTypeTutorial,
@@ -191,8 +191,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (NSDictionary<NSNumber *, NSArray *> *)data {
     if (!_data) {
-        _data = @{@(SectionTypePermissions): @[@(RowTypeCameraRoll),
-                                               @(RowTypePushNotification),
+        _data = @{@(SectionTypePermissions): @[@(RowTypePhotoPermission),
+                                               @(RowTypePushPermission),
 //                                               @(RowTypeLocationService)
                                                ],
                   @(SectionTypeInfo): @[@(RowTypeName),
@@ -295,9 +295,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeEmail:
             return NO;
             break;
-        case RowTypeLocationService:
-        case RowTypePushNotification:
-        case RowTypeCameraRoll:
+        case RowTypeLocationPermission:
+        case RowTypePushPermission:
+        case RowTypePhotoPermission:
             return ![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]];
             break;
         default:
@@ -329,9 +329,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeContactUs:
             [IntercomHelper.sharedInstance presentMessagingUI];
             break;
-        case RowTypeLocationService:
-        case RowTypePushNotification:
-        case RowTypeCameraRoll: {
+        case RowTypeLocationPermission:
+        case RowTypePushPermission:
+        case RowTypePhotoPermission: {
             [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] openSettingsIfNeeded:YES response:^(BOOL granted) {
                 if (granted) {
                     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
@@ -382,13 +382,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeEmail:
             return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
             break;
-        case RowTypeLocationService:
+        case RowTypeLocationPermission:
             return @"Location Services";
             break;
-        case RowTypePushNotification:
+        case RowTypePushPermission:
             return @"Push Notifications";
             break;
-        case RowTypeCameraRoll:
+        case RowTypePhotoPermission:
             return @"Camera Roll";
             break;
         case RowTypeVersion:
@@ -399,9 +399,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (NSString *)detailTextForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeCameraRoll:
-        case RowTypeLocationService:
-        case RowTypePushNotification:
+        case RowTypePhotoPermission:
+        case RowTypeLocationPermission:
+        case RowTypePushPermission:
             return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
@@ -503,13 +503,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (PermissionType)permissionTypeForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeCameraRoll:
+        case RowTypePhotoPermission:
             return PermissionTypePhoto;
             break;
-        case RowTypeLocationService:
+        case RowTypeLocationPermission:
             return PermissionTypeLocation;
             break;
-        case RowTypePushNotification:
+        case RowTypePushPermission:
         default:
             return PermissionTypePush;
             break;
