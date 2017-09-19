@@ -63,25 +63,29 @@ class AssetSyncModel: NSObject {
                                                      isFromShare: false,
                                                      imageData: imageData)
                 }
-                if isFashion {
-                    DispatchQueue.main.async {
-                        NotificationManager.shared().present(with: .products)
-                    }
-                    firstly { _ -> Promise<(String, [[String : Any]])> in
-                        return NetworkingPromise.uploadToSyte(imageData: imageData)
-                        }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                            AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
-                            self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
-                        }.always {
-                            NotificationManager.shared().dismiss(with: .products)
-                        }.catch { error in
-                            print("uploadScreenshot inner uploadToSyte catch error:\(error)")
-                    }
-                }
+                self.syteProcessing(shouldProcess: isFashion, imageData: imageData, assetId: asset.localIdentifier)
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
             }.catch { error in
                 print("uploadScreenshot outer Clarifai catch error:\(error)")
+        }
+    }
+    
+    func syteProcessing(shouldProcess: Bool, imageData: Data?, assetId: String) {
+        if shouldProcess {
+            DispatchQueue.main.async {
+                NotificationManager.shared().present(with: .products)
+            }
+            firstly { _ -> Promise<(String, [[String : Any]])> in
+                return NetworkingPromise.uploadToSyte(imageData: imageData)
+                }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
+                    AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
+                    self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments)
+                }.always {
+                    NotificationManager.shared().dismiss(with: .products)
+                }.catch { error in
+                    print("uploadScreenshot inner uploadToSyte catch error:\(error)")
+            }
         }
     }
     
@@ -545,6 +549,11 @@ class AssetSyncModel: NSObject {
             self.endSync()
         }
     }
+    
+    @objc public func syncRetryNonFashionLastScreenshot() {
+        
+    }
+    
 }
 
 extension AssetSyncModel {
