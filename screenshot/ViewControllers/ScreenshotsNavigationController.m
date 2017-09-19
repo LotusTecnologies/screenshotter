@@ -10,7 +10,9 @@
 #import "ProductsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface ScreenshotsNavigationController () <ScreenshotsViewControllerDelegate>
+@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate>
+
+@property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 
 @end
 
@@ -39,10 +41,27 @@
 }
 
 
+#pragma mark - View Controller Life Cycle
+
+- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
+    if ([viewController isKindOfClass:[ProductsViewController class]]) {
+        BOOL didPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+        
+        if (!didPresent) {
+//            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+//            [[NSUserDefaults standardUserDefaults] synchronize];
+        
+            [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+        }
+    }
+}
+
+
 #pragma mark - Screenshots View Controller
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
+    productsViewController.delegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
     Screenshot *screenshot = [viewController screenshotAtIndexPath:indexPath];
     productsViewController.screenshot = screenshot;
@@ -62,6 +81,31 @@
         [alert addAction:defaultAction];
         [self presentViewController:alert animated:YES completion:nil];
     }
+}
+
+
+#pragma mark - Screenshots Picker
+
+- (ScreenshotPickerNavigationController *)pickerNavigationController {
+    if (!_pickerNavigationController) {
+        _pickerNavigationController = [[ScreenshotPickerNavigationController alloc] init];
+        _pickerNavigationController.cancelButton.target = self;
+        _pickerNavigationController.cancelButton.action = @selector(pickerViewControllerDidCancel);
+        _pickerNavigationController.doneButton.target = self;
+        _pickerNavigationController.doneButton.action = @selector(pickerViewControllerDidFinish);
+    }
+    return _pickerNavigationController;
+}
+
+- (void)pickerViewControllerDidCancel {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)pickerViewControllerDidFinish {
+    NSArray<PHAsset *> *assets = [self.pickerNavigationController.screenshotPickerViewController selectedAssets];
+    [[AssetSyncModel sharedInstance] syncSelectedPhotosWithAssets:assets];
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

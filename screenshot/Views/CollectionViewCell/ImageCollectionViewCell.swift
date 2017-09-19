@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ImageCollectionViewCell: UICollectionViewCell {
+@objc class ImageCollectionViewCell: UICollectionViewCell {
     private(set) public var imageView: UIImageView!
     
     required init?(coder aDecoder: NSCoder) {

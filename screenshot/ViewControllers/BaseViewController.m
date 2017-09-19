@@ -9,16 +9,44 @@
 #import "BaseViewController.h"
 #import "screenshot-Swift.h"
 
-@interface BaseViewController ()
-
-@end
-
 @implementation BaseViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor background];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if ([self.delegate respondsToSelector:@selector(viewController:willAppear:)]) {
+        [self.delegate viewController:self willAppear:animated];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    if ([self.delegate respondsToSelector:@selector(viewController:didAppear:)]) {
+        [self.delegate viewController:self didAppear:animated];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+
+    if ([self.delegate respondsToSelector:@selector(viewController:willDisappear:)]) {
+        [self.delegate viewController:self willDisappear:animated];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+
+    if ([self.delegate respondsToSelector:@selector(viewController:didDisappear:)]) {
+        [self.delegate viewController:self didDisappear:animated];
+    }
 }
 
 - (void)addNavigationItemLogo {

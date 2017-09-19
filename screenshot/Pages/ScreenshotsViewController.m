@@ -100,13 +100,6 @@
     [self syncHelperViewVisibility];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    ScreenshotPickerNavigationController *screenshotPickerNavigationController = [[ScreenshotPickerNavigationController alloc] init];
-    [self presentViewController:screenshotPickerNavigationController animated:YES completion:nil];
-}
-
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     

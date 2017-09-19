@@ -10,6 +10,7 @@ import Foundation
 import Photos
 
 class ScreenshotPickerNavigationController: UINavigationController {
+    private(set) public var screenshotPickerViewController: ScreenshotPickerViewController!
     private(set) public var cancelButton: UIBarButtonItem!
     private(set) public var doneButton: UIBarButtonItem!
     
@@ -24,11 +25,11 @@ class ScreenshotPickerNavigationController: UINavigationController {
         doneButton = UIBarButtonItem.init(barButtonSystemItem: .done, target: nil, action: nil)
         doneButton.tintColor = UIColor.crazeRed
         
-        let viewController = ScreenshotPickerViewController.init(nibName: nil, bundle: nil)
-        viewController.title = "Add Your Screenshots"
-        viewController.navigationItem.leftBarButtonItem = cancelButton
-        viewController.navigationItem.rightBarButtonItem = doneButton
-        viewControllers = [viewController]
+        screenshotPickerViewController = ScreenshotPickerViewController.init(nibName: nil, bundle: nil)
+        screenshotPickerViewController.title = "Add Your Screenshots"
+        screenshotPickerViewController.navigationItem.leftBarButtonItem = cancelButton
+        screenshotPickerViewController.navigationItem.rightBarButtonItem = doneButton
+        viewControllers = [screenshotPickerViewController]
     }
 }
 
@@ -36,6 +37,7 @@ class ScreenshotPickerViewController: BaseViewController {
     fileprivate var collectionView: UICollectionView!
     fileprivate var screenshots: PHAssetCollection?
     fileprivate var assets: PHFetchResult<PHAsset>?
+    fileprivate var selectedIndexPaths: [IndexPath] = []
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -64,7 +66,8 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.dataSource = self
         collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = view.backgroundColor
-        collectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.allowsMultipleSelection = true
+        collectionView.register(PickerCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         view.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -79,24 +82,31 @@ class ScreenshotPickerViewController: BaseViewController {
             assets = PHAsset.fetchAssets(in: collection, options: nil)
         }
     }
+    
+    public func selectedAssets() -> [PHAsset] {
+        var selectedAssets: [PHAsset] = []
+        
+        assets?.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+            if self.selectedIndexPaths.contains(IndexPath.init(item: index, section: 0)) {
+                selectedAssets.append(asset)
+            }
+        })
+        
+        return selectedAssets
+    }
 }
 
 extension ScreenshotPickerViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let count = assets?.count else {
-            return 0
-        }
-        return count
+        return assets?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ImageCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! PickerCollectionViewCell
         
         if let asset = assets?[indexPath.item] {
             PHImageManager.default().requestImage(for: asset, targetSize: collectionViewItemSize(), contentMode: .aspectFill, options: nil) { (image, info) in
-                if image != nil {
-                    cell.imageView.image = image
-                }
+                cell.imageView.image = image
             }
         }
         
@@ -106,7 +116,13 @@ extension ScreenshotPickerViewController: UICollectionViewDataSource {
 
 extension ScreenshotPickerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        selectedIndexPaths.append(indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let index = selectedIndexPaths.index(of: indexPath) {
+            selectedIndexPaths.remove(at: index)
+        }
     }
 }
 
