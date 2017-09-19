@@ -83,6 +83,28 @@ class ScreenshotPickerViewController: BaseViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if !PermissionsManager.shared().hasPermission(for: .photo) {
+            let alertController = UIAlertController.init(title: "Shop Your Photos", message: "Pick screenshots from your gallery to scan for items to shop!", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction.init(title: "No Thanks", style: .cancel, handler: { (action) in
+                if let cancelButton = self.navigationItem.leftBarButtonItem,
+                    let cancelAction = cancelButton.action,
+                    let cancelTarget = cancelButton.target
+                {
+                    UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
+                }
+            }))
+            alertController.addAction(UIAlertAction.init(title: "Add Photos", style: .default, handler: { (action) in
+                if let alertController = PermissionsManager.shared().deniedAlertController(for: .photo, opened: nil) {
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }))
+            present(alertController, animated: true, completion: nil)
+        }
+    }
+    
     public func selectedAssets() -> [PHAsset] {
         var selectedAssets: [PHAsset] = []
         
