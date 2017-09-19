@@ -118,6 +118,9 @@
     NSArray<PHAsset *> *assets = [self.pickerNavigationController.screenshotPickerViewController selectedAssets];
     [[AssetSyncModel sharedInstance] syncSelectedPhotosWithAssets:assets];
     
+    // Remove picker to reset state
+    self.pickerNavigationController = nil;
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

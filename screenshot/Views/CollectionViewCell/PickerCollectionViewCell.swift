@@ -30,6 +30,7 @@ class PickerCollectionViewCell: ImageCollectionViewCell {
     override var isSelected: Bool {
         didSet {
             checkImageView.isHidden = !isSelected
+            imageView.alpha = isSelected ? 0.5 : 1
         }
     }
 }
