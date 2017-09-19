@@ -24,6 +24,7 @@ class ScreenshotPickerNavigationController: UINavigationController {
         cancelButton = UIBarButtonItem.init(barButtonSystemItem: .cancel, target: nil, action: nil)
         doneButton = UIBarButtonItem.init(barButtonSystemItem: .done, target: nil, action: nil)
         doneButton.tintColor = UIColor.crazeRed
+        doneButton.isEnabled = false
         
         screenshotPickerViewController = ScreenshotPickerViewController.init(nibName: nil, bundle: nil)
         screenshotPickerViewController.title = "Add Your Screenshots"
@@ -117,11 +118,16 @@ extension ScreenshotPickerViewController: UICollectionViewDataSource {
 extension ScreenshotPickerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndexPaths.append(indexPath)
+        navigationItem.rightBarButtonItem?.isEnabled = true
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if let index = selectedIndexPaths.index(of: indexPath) {
             selectedIndexPaths.remove(at: index)
+        }
+        
+        if (selectedIndexPaths.count == 0) {
+            navigationItem.rightBarButtonItem?.isEnabled = false
         }
     }
 }
