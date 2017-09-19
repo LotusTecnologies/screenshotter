@@ -29,6 +29,10 @@ class RootViewController : UIViewController {
     }
     
     func transition(toViewController: UIViewController) {
+        guard toViewController != childViewController else {
+            return
+        }
+        
         let options: UIViewAnimationOptions = [.transitionFlipFromLeft, .allowAnimatedContent, .layoutSubviews]
         UIView.transition(from: childViewController.view,
                           to: toViewController.view,
