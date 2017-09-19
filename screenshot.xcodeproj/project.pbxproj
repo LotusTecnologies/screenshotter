@@ -13,6 +13,10 @@
 		52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F50A1F61391C0032C5A9 /* Intercom.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */; };
+		C5233F041F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
+		C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */; };
+		C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */; };
+		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
 		C5278FE91F3C38510090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB51F3C38510090E422 /* Geometry.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
@@ -69,6 +73,10 @@
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
 		C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
+		C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPickerViewController.swift; sourceTree = "<group>"; };
+		C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
+		C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
+		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		C5278FB51F3C38510090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
@@ -185,6 +193,14 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		C5233F091F6FEFEB00F25C7C /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		C5278FB31F3C38510090E422 /* Appearance */ = {
 			isa = PBXGroup;
 			children = (
@@ -270,6 +286,7 @@
 				C55184C31F4C0DAA00EE7855 /* ScreenshotDisplay */,
 				C5278FE01F3C38510090E422 /* ScreenshotsNavigationController.h */,
 				C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */,
+				C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */,
 				C528DC0D1F57E9D700F4E723 /* TutorialProductsPageViewController.h */,
 				C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */,
 				C5CCBB411F41C3E600D6B392 /* WebViewController.h */,
@@ -318,6 +335,8 @@
 				C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */,
 				C55184C01F4AD40500EE7855 /* ShoppableCollectionViewCell.h */,
 				C55184C11F4AD40500EE7855 /* ShoppableCollectionViewCell.m */,
+				C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */,
+				C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */,
 			);
 			path = CollectionViewCell;
 			sourceTree = "<group>";
@@ -381,6 +400,7 @@
 				C528DC131F57F33900F4E723 /* Controllers */,
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
+				C5233F091F6FEFEB00F25C7C /* Protocols */,
 				C5278FD71F3C38510090E422 /* Singletons */,
 				C5278FDA1F3C38510090E422 /* ViewControllers */,
 				C5278FE21F3C38510090E422 /* Views */,
@@ -627,8 +647,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */,
 				C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */,
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
+				C5233F041F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift in Sources */,
 				C59A30461F5FDECB00463338 /* MainButton.swift in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
 				C5278FE91F3C38510090E422 /* Geometry.m in Sources */,
@@ -654,6 +676,7 @@
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */,
+				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */,
 				C55184CC1F4C557200EE7855 /* AnalyticsManager.m in Sources */,
 				C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */,
@@ -675,6 +698,7 @@
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
 				C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */,
 				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
+				C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */,
 				C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -317,6 +317,10 @@
 - (void)frcOneDeletedAtIndexPath:(NSIndexPath *)indexPath {
     [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
     [self syncHelperViewVisibility];
+    
+    if ([self.collectionView numberOfItemsInSection:0] == 0) {
+        [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
+    }
 }
 
 - (void)frcOneUpdatedAtIndexPath:(NSIndexPath *)indexPath {

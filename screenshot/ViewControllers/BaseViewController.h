@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol ViewControllerLifeCycle;
+
 @interface BaseViewController : UIViewController
+
+@property (nonatomic, weak) id<ViewControllerLifeCycle> lifeCycleDelegate;
 
 - (void)addNavigationItemLogo;
 
