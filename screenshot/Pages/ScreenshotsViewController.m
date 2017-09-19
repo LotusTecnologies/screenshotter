@@ -322,7 +322,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)infoCellContinueButtonAction {
     [self dismissInfoCell];
-    // TODO: make request to bypass clarify
+    [[AssetSyncModel sharedInstance] syncRetryNonFashionLastScreenshot];
 }
 
 - (void)displayInfoCellIfNeeded {
