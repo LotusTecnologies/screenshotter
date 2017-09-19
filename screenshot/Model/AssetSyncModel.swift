@@ -54,7 +54,7 @@ class AssetSyncModel: NSObject {
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
                 AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
-                let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
+                let imageData: Data? = isFashion ? self.data(for: image) : nil
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                      assetId: asset.localIdentifier,
@@ -68,6 +68,36 @@ class AssetSyncModel: NSObject {
                 self.decrementScreenshots()
             }.catch { error in
                 print("uploadScreenshot outer Clarifai catch error:\(error)")
+        }
+    }
+    
+    func retryScreenshot(asset: PHAsset) {
+        let dataModel = DataModel.sharedInstance
+        firstly {
+            return image(asset: asset)
+            }.then (on: processingQ) { image -> Promise<Data?> in
+                AnalyticsManager.track("bypassed Clarifai")
+                let imageData = self.data(for: image)
+                return Promise(value: imageData)
+            }.then (on: processingQ) { imageData -> Promise<(Data?, Bool)> in
+                return Promise { fulfill, reject in
+                    dataModel.performBackgroundTask { (managedObjectContext) in
+                        if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: dataModel.mainMoc(), assetId: asset.localIdentifier),
+                            screenshot.isFashion == false,
+                            screenshot.shoppablesCount == 0 {
+                            screenshot.imageData = imageData as NSData?
+                            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                            fulfill((imageData, true))
+                        } else {
+                            fulfill((imageData, false))
+                        }
+                    }
+                }
+            }.then (on: processingQ) { (imageData, shouldProcess) -> Void in
+                print("retryScreenshot shouldProcess:\(shouldProcess)")
+                self.syteProcessing(shouldProcess: shouldProcess, imageData: imageData, assetId: asset.localIdentifier)
+            }.catch { error in
+                print("retryScreenshot catch error:\(error)")
         }
     }
     
@@ -403,6 +433,10 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    func data(for image: UIImage) -> Data? {
+        return UIImageJPEGRepresentation(image, 0.80)
+    }
+    
     func setupAllScreenshotAssets() {
         let fetchOptions = PHFetchOptions()
         var installDate: NSDate
@@ -563,7 +597,7 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let imageData = UIImageJPEGRepresentation(image, 0.80)
+            let imageData = self.data(for: image)
             dataModel.performBackgroundTask { (managedObjectContext) in
                 let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                  assetId: Constants.tutorialScreenshotAssetId,
@@ -579,7 +613,20 @@ class AssetSyncModel: NSObject {
     }
     
     @objc public func syncRetryNonFashionLastScreenshot() {
-        
+        self.serialQ.async {
+            let dataModel = DataModel.sharedInstance
+            guard PermissionsManager.shared().hasPermission(for: .photo),
+              dataModel.isCoreDataStackReady,
+              self.isSyncReady(),
+              let lastAsset = self.allScreenshotAssets?.firstObject else {
+                    return
+            }
+            self.beginSync()
+            self.processingQ.async {
+                self.retryScreenshot(asset: lastAsset)
+            }
+            self.endSync()
+        }
     }
     
 }
