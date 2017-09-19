@@ -10,7 +10,6 @@
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
-		5298657F1F7035CC006F251C /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5298657E1F7035CC006F251C /* RootViewController.swift */; };
 		52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F50A1F61391C0032C5A9 /* Intercom.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
@@ -74,7 +73,6 @@
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
-		5298657E1F7035CC006F251C /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
@@ -285,7 +283,6 @@
 		C5278FDA1F3C38510090E422 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				5298657E1F7035CC006F251C /* RootViewController.swift */,
 				C5278FDB1F3C38510090E422 /* BaseViewController.h */,
 				C5278FDC1F3C38510090E422 /* BaseViewController.m */,
 				C528DC101F57EDD100F4E723 /* InsetPresentationController.h */,
@@ -702,7 +699,6 @@
 				C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */,
 				C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */,
 				C5278FF41F3C38510090E422 /* TutorialBaseSlideView.m in Sources */,
-				5298657F1F7035CC006F251C /* RootViewController.swift in Sources */,
 				C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */,
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */,

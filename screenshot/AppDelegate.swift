@@ -18,14 +18,8 @@ import Branch
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var rootVC: RootViewController {
-        return window!.rootViewController as! RootViewController
-    }
-    
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
-    let updateHandler = UpdatePromptHandler()
-
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
@@ -42,14 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         prepareDataStackCompletionIfNeeded()
         
-        let root = RootViewController(childViewController:  nextViewController())
-        updateHandler.containerViewController = root
-        
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = root
+        window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
-        
-        updateHandler.start()
         
         return true
     }
@@ -217,7 +206,12 @@ extension AppDelegate {
     }
     
     func transitionTo(_ toViewController: UIViewController) {
-        rootVC.transition(toViewController: toViewController)
+        guard let window = window else { return }
+        
+        let options: UIViewAnimationOptions = [.transitionFlipFromLeft, .allowAnimatedContent, .layoutSubviews]
+        UIView.transition(with: window, duration: 0.5, options: options, animations: {
+            window.rootViewController = toViewController
+        }, completion: nil)
     }
     
 }
