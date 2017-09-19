@@ -26,6 +26,7 @@
         _screenshotsViewController = ({
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
+            viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
             viewController;
         });
         
@@ -94,6 +95,10 @@
     return _pickerNavigationController;
 }
 
+- (void)presentPickerViewController {
+    [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+}
+
 - (void)presentPickerViewControllerIfNeeded {
     BOOL didPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
     
@@ -101,7 +106,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+        [self presentPickerViewController];
     }
 }
 

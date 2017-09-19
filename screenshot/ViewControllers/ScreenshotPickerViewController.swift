@@ -65,7 +65,6 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = view.backgroundColor
         collectionView.allowsMultipleSelection = true
         collectionView.register(PickerCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
