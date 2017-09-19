@@ -418,6 +418,12 @@ class AssetSyncModel: NSObject {
         allScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
     }
     
+    func fetchAssets(assetIds: Set<String>) -> PHFetchResult<PHAsset> {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "localIdentifier IN %@", assetIds)
+        return PHAsset.fetchAssets(with: .image, options: fetchOptions)
+    }
+    
     func retrieveAllScreenshotAssetIds() -> Set<String> {
         setupAllScreenshotAssets()
         var assetIds = Set<String>()
@@ -481,7 +487,9 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let photosSet = self.retrieveSelectedScreenshotAssetIds().union(self.retrieveAllScreenshotAssetIds())
+            let selectedSet = self.retrieveSelectedScreenshotAssetIds()
+            let allSet = self.retrieveAllScreenshotAssetIds()
+            let photosSet = allSet.union(selectedSet)
             let managedObjectContext = dataModel.adHocMoc()
             var dbSet = Set<String>()
             managedObjectContext.performAndWait {
@@ -516,6 +524,16 @@ class AssetSyncModel: NSObject {
                         }
                     }
                 })
+                let selectedToFetchSet = toUpload.subtracting(allSet)
+                if selectedToFetchSet.count > 0 {
+                    let selectedAssets = self.fetchAssets(assetIds: selectedToFetchSet)
+                    selectedAssets.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                        self.screenshotsToProcess += 1
+                        self.processingQ.async {
+                            self.uploadScreenshot(asset: asset)
+                        }
+                    })
+                }
             }
             if toDownload.count > 0 {
                 AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
