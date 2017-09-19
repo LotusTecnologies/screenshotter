@@ -9,25 +9,34 @@
 import UIKit
 
 class RootViewController : UIViewController {
-    var containedViewController: UIViewController? {
+    private(set) var childViewController: UIViewController {
         didSet {
-            guard let cvc = containedViewController else {
-                return
+            if !childViewControllers.contains(childViewController) {
+                addChildViewController(childViewController)
+                view.addSubview(childViewController.view)
+                childViewController.didMove(toParentViewController: self)
             }
-            
-            self.addChildViewController(cvc)
-            self.view.addSubview(cvc.view)
         }
+    }
+    
+    required init(childViewController child:UIViewController) {
+        childViewController = child
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func transition(toViewController: UIViewController) {
         let options: UIViewAnimationOptions = [.transitionFlipFromLeft, .allowAnimatedContent, .layoutSubviews]
-        if let fromView = containedViewController?.view {
-            UIView.transition(from: fromView, to: toViewController.view, duration: 0.5, options: options) { (finished) in
-                self.containedViewController?.removeFromParentViewController()
-                self.containedViewController?.view.removeFromSuperview()
-                self.containedViewController = toViewController
-            }
+        UIView.transition(from: childViewController.view,
+                          to: toViewController.view,
+                          duration: 0.5,
+                          options: options) { (finished) in
+            self.childViewController.removeFromParentViewController()
+            self.childViewController.view.removeFromSuperview()
+            self.childViewController = toViewController
         }
 
     }

@@ -42,8 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         prepareDataStackCompletionIfNeeded()
         
-        let root = RootViewController()
-        root.containedViewController = nextViewController()
+        let root = RootViewController(childViewController:  nextViewController())
         updateHandler.containerViewController = root
         
         window = UIWindow(frame: UIScreen.main.bounds)
