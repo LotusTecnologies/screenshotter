@@ -24,6 +24,7 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) NSArray<TutorialBaseSlideView *>* slides;
+@property (nonatomic, strong) UpdatePromptHandler *handler;
 
 @end
 
@@ -43,6 +44,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.handler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
+    [self.handler start];
     
     self.view.backgroundColor = [UIColor whiteColor];
     

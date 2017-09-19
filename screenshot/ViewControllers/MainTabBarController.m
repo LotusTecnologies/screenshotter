@@ -18,6 +18,7 @@
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
+@property (nonatomic, strong) UpdatePromptHandler *updatePromptHandler;
 
 @end
 
@@ -63,6 +64,12 @@
     return self;
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
+    [self.updatePromptHandler start];
+}
 
 #pragma mark - Tab Bar
 
