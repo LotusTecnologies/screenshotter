@@ -61,7 +61,11 @@ class UpdatePromptHandler : NSObject {
     func start() {
         print("Starting update handler")
 
-        startUpdateFlow()
+        #if DEV
+            print("Not running update flow because we are in development")
+        #else
+            startUpdateFlow()
+        #endif
     }
     
     // MARK: Fetching update payload
