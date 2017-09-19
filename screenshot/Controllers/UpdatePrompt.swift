@@ -42,8 +42,13 @@ class UpdatePromptHandler : NSObject {
         return URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     }
     
-    var containerViewController: UIViewController?
+    var containerViewController: UIViewController
     var didBecomeActiveObserver: Any?
+    
+    init(containerViewController controller: UIViewController) {
+        containerViewController = controller
+        super.init()
+    }
     
     // MARK: Public methods
     
@@ -108,15 +113,15 @@ class UpdatePromptHandler : NSObject {
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
-        containerViewController?.present(controller, animated: true, completion: nil)
+        containerViewController.present(controller, animated: true, completion: nil)
     }
     
     private func presentForceUpdateAlert() {
-        containerViewController?.view.isUserInteractionEnabled = false
+        containerViewController.view.isUserInteractionEnabled = false
         
         // Restart the flow if users try to re-enter the app.
         didBecomeActiveObserver = didBecomeActiveObserver ?? NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationDidBecomeActive, object: nil, queue: nil) { note in
-            self.containerViewController?.dismiss(animated: false, completion: nil)
+            self.containerViewController.dismiss(animated: false, completion: nil)
             self.startUpdateFlow()
         }
         
@@ -125,7 +130,7 @@ class UpdatePromptHandler : NSObject {
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
-        containerViewController?.present(controller, animated: true, completion: nil)
+        containerViewController.present(controller, animated: true, completion: nil)
     }
 
     private func navigateToAppStore(action: UIAlertAction) {
