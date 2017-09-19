@@ -44,6 +44,10 @@
 - (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
     if (self.window) {
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto response:^(BOOL granted) {
+            UIImage *image = [UIImage imageNamed:@"TutorialTryGraphic"]; // TODO: image from [UIScreen snapshot...]
+            
+            [[AssetSyncModel sharedInstance] syncTutorialPhotoWithImage:image];
+            
             [self.delegate tutorialTrySlideViewDidComplete:self];
         }];
     }
