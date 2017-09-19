@@ -133,8 +133,8 @@ extension AppDelegate {
                 return
             }
             print("Branch params:\(params)")
-            if let screenshotId = params["screenshotId"] as? String {
-                AssetSyncModel.sharedInstance.handleDynamicLink(screenshotId: screenshotId)
+            if let shareId = params["shareId"] as? String {
+                AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
                 self.showScreenshotListTop()
             }
         }

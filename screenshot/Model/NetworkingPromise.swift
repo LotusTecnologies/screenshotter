@@ -89,36 +89,43 @@ class NetworkingPromise: NSObject {
     }
     
     static func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
-        let parameterDict = ["userName" : userName, "image" : imageURLString, "syteJson" : syteJson]
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots?createShare=true") else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            print(error)
+            return Promise(error: error)
+        }
+        let parameterDict = ["screenshot" : ["userName" : userName, "image" : imageURLString, "syteJson" : syteJson]]
         guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
             let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")  image:\(imageURLString ?? "-")  syteJson:\(syteJson ?? "-")"])
             print(error)
             return Promise(error: error)
         }
-        return NetworkingPromise.shareWorkhorse(parameterData: parameterData)
+        return NetworkingPromise.shareWorkhorse(parameterData: parameterData, url: url)
     }
     
     static func reshare(userName: String?, screenshotId: String?) -> Promise<(String, String)> {
-        let parameterDict = ["userName" : userName, "screenshotId" : screenshotId]
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "shares") else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            print(error)
+            return Promise(error: error)
+        }
+        let parameterDict = ["share" : ["userName" : userName!, "screenshot" : ["id" : screenshotId]]]
         guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
             let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")  screenshotId:\(screenshotId ?? "-")"])
             print(error)
             return Promise(error: error)
         }
-        return NetworkingPromise.shareWorkhorse(parameterData: parameterData)
+        return NetworkingPromise.shareWorkhorse(parameterData: parameterData, url: url)
     }
     
-    static func shareWorkhorse(parameterData: Data) -> Promise<(String, String)> {
+    static func shareWorkhorse(parameterData: Data, url: URL) -> Promise<(String, String)> {
         return Promise { fulfill, reject in
-            guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshot") else {
-                let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-                print(error)
-                reject(error)
-                return
-            }
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.httpBody = parameterData
+            request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+            request.setValue("application/json", forHTTPHeaderField:"Content-Type")
+
             let session = URLSession.shared
             let dataTask = session.dataTask(with: request) { data, response, error in
                 if let error = error {

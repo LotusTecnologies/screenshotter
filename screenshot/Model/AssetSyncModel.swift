@@ -126,26 +126,35 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func downloadScreenshot(screenshotId: String) {
+    func downloadScreenshot(shareId: String) {
         let dataModel = DataModel.sharedInstance
         firstly { _ -> Promise<[String : Any]> in
-            // Get screenshot dict from Craze server. See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
-            guard let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + screenshotId) else {
-                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from screenshotId:\(screenshotId)"])
+            // Get screenshot dict from Craze server.
+            // See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
+            // and https://docs.google.com/document/d/16WsJMepl0Z3YrsRKxcFqkASUieRLKy_Aei8lmbpD2bo
+            guard let encoded = shareId.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "shares/" + encoded) else {
+                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from shareId:\(shareId)"])
                     return Promise(error: urlError)
             }
-            print("downloadScreenshot screenshotId:\(screenshotId)")
+            print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
             return NetworkingPromise.downloadInfo(url: screenshotInfoUrl)
-            }.then(on: self.processingQ) { screenshotDict -> Promise<(Data, [String : Any])> in
+            }.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
-                guard let imageURLString = screenshotDict["image"] as? String,
-                    let imageURL = URL(string: imageURLString) else {
-                        let imageURLError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from screenshotDict:\(screenshotDict)"])
+                guard let share = jsonDict["share"] as? [String : Any],
+                  let screenshotDict = share["screenshot"] as? [String : Any],
+                  let imageURLString = screenshotDict["image"] as? String,
+                  let imageURL = URL(string: imageURLString) else {
+                        let imageURLError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from jsonDict:\(jsonDict)"])
                         return Promise(error: imageURLError)
                 }
                 return NetworkingPromise.downloadImage(url: imageURL, screenshotDict: screenshotDict)
             }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
                 // Save screenshot to db.
+                guard let screenshotId = screenshotDict["id"] as? String else {
+                    let error = NSError(domain: "Craze", code: 15, userInfo: [NSLocalizedDescriptionKey : "Could not form screenshotId from screenshotDict:\(screenshotDict)"])
+                    return Promise(error: error)
+                }
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: screenshotId,
@@ -156,7 +165,8 @@ class AssetSyncModel: NSObject {
                 }
             }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
                 // Save shoppables to db.
-                guard let syteJsonString = screenshotDict["syteJson"] as? String,
+                guard let screenshotId = screenshotDict["id"] as? String,
+                  let syteJsonString = screenshotDict["syteJson"] as? String,
                   let segments = NetworkingPromise.jsonDestringify(string: syteJsonString),
                   let imageURLString = screenshotDict["image"] as? String else {
                     let jsonError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not extract syteJson from screenshotDict:\(screenshotDict)"])
@@ -471,9 +481,9 @@ class AssetSyncModel: NSObject {
             if toDownload.count > 0 {
                 AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
-                for screenshotId in toDownload {
+                for shareId in toDownload {
                     self.processingQ.async {
-                        self.downloadScreenshot(screenshotId: screenshotId)
+                        self.downloadScreenshot(shareId: shareId)
                     }
                 }
             }
@@ -547,8 +557,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    @objc public func handleDynamicLink(screenshotId: String) {
-        incomingDynamicLinks.append(screenshotId)
+    @objc public func handleDynamicLink(shareId: String) {
+        incomingDynamicLinks.append(shareId)
         syncPhotos()
     }
     
