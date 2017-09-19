@@ -15,6 +15,7 @@
 @required
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
+- (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController;
 
 @end
 

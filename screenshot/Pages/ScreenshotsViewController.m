@@ -424,6 +424,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (frc == self.screenshotFrc) {
         [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
         [self syncHelperViewVisibility];
+        
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] == 0) {
+            [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
+        }
     }
 }
 
