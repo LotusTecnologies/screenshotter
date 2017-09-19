@@ -33,7 +33,7 @@ struct UpdatePromptState {
     }
 }
 
-class UpdatePromptHandler {
+class UpdatePromptHandler : NSObject {
     private var currentAppVersion: String {
         return Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
     }
