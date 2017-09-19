@@ -25,7 +25,6 @@ class AssetSyncModel: NSObject {
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
     var isRegistered = false
     var isSyncing = false
-    var isTutorialScreenshot = false
     var shouldSyncAgain = false
     var screenshotsToProcess: Int = 0
     var shoppablesToProcess: Int = 0
@@ -51,17 +50,10 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
-                if self.isTutorialScreenshot {
-                    print("Bypassing Clarifai")
-                    return Promise(value: (true, image))
-                } else {
-                    AnalyticsManager.track("sent image to Clarifai")
-                    return ClarifaiModel.sharedInstance.isFashion(image: image)
-                }
+                AnalyticsManager.track("sent image to Clarifai")
+                return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
-                if !self.isTutorialScreenshot {
-                    AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
-                }
+                AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? UIImageJPEGRepresentation(image, 0.80) : nil
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -76,30 +68,9 @@ class AssetSyncModel: NSObject {
                         NotificationManager.shared().present(with: .products)
                     }
                     firstly { _ -> Promise<(String, [[String : Any]])> in
-                        if self.isTutorialScreenshot {
-                            UserDefaults.standard.setValue(asset.localIdentifier, forKey: UserDefaultsKeys.tutorialScreenshotAssetId)
-                            print("Bypassing Syte")
-                            let nativeSize = UIScreen.main.nativeBounds.size
-                            let deviceAspectRatio = nativeSize.height / nativeSize.width
-                            let aspectRatio5Digit = Int(deviceAspectRatio * 10000)
-                            print("nativeSize:\(nativeSize)  aspectRatio5Digit:\(aspectRatio5Digit)  deviceAspectRatio:\(deviceAspectRatio)")
-                            switch aspectRatio5Digit {
-                            case 17777: // iPhone 6,6+,6S,6S+,7,7+
-                                return self.promiseForRatio17777()
-                            case 17750: // iPhone 5C,5,5S
-                                return self.promiseForRatio17750()
-                            default:
-                                return self.promiseForRatio17750()
-                             }
-                        } else {
-                            return NetworkingPromise.uploadToSyte(imageData: imageData)
-                        }
+                        return NetworkingPromise.uploadToSyte(imageData: imageData)
                         }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                            if self.isTutorialScreenshot {
-                                self.isTutorialScreenshot = false
-                            } else {
-                                AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
-                            }
+                            AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
                             self.saveShoppables(assetId: asset.localIdentifier, uploadedURLString: uploadedURLString, segments: segments)
                         }.always {
                             NotificationManager.shared().dismiss(with: .products)
@@ -126,26 +97,35 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func downloadScreenshot(screenshotId: String) {
+    func downloadScreenshot(shareId: String) {
         let dataModel = DataModel.sharedInstance
         firstly { _ -> Promise<[String : Any]> in
-            // Get screenshot dict from Craze server. See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
-            guard let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "screenshot/" + screenshotId) else {
-                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from screenshotId:\(screenshotId)"])
+            // Get screenshot dict from Craze server.
+            // See end https://docs.google.com/document/d/12_IrBskNTGY8zQSM88uA6h0QjLnUtZF7yiUdzv0nxT8/
+            // and https://docs.google.com/document/d/16WsJMepl0Z3YrsRKxcFqkASUieRLKy_Aei8lmbpD2bo
+            guard let encoded = shareId.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+              let screenshotInfoUrl = URL(string: Constants.screenShotLambdaDomain + "shares/" + encoded) else {
+                    let urlError = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from shareId:\(shareId)"])
                     return Promise(error: urlError)
             }
-            print("downloadScreenshot screenshotId:\(screenshotId)")
+            print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
             return NetworkingPromise.downloadInfo(url: screenshotInfoUrl)
-            }.then(on: self.processingQ) { screenshotDict -> Promise<(Data, [String : Any])> in
+            }.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
-                guard let imageURLString = screenshotDict["image"] as? String,
-                    let imageURL = URL(string: imageURLString) else {
-                        let imageURLError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from screenshotDict:\(screenshotDict)"])
+                guard let share = jsonDict["share"] as? [String : Any],
+                  let screenshotDict = share["screenshot"] as? [String : Any],
+                  let imageURLString = screenshotDict["image"] as? String,
+                  let imageURL = URL(string: imageURLString) else {
+                        let imageURLError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from jsonDict:\(jsonDict)"])
                         return Promise(error: imageURLError)
                 }
                 return NetworkingPromise.downloadImage(url: imageURL, screenshotDict: screenshotDict)
             }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
                 // Save screenshot to db.
+                guard let screenshotId = screenshotDict["id"] as? String else {
+                    let error = NSError(domain: "Craze", code: 15, userInfo: [NSLocalizedDescriptionKey : "Could not form screenshotId from screenshotDict:\(screenshotDict)"])
+                    return Promise(error: error)
+                }
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: screenshotId,
@@ -156,7 +136,8 @@ class AssetSyncModel: NSObject {
                 }
             }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
                 // Save shoppables to db.
-                guard let syteJsonString = screenshotDict["syteJson"] as? String,
+                guard let screenshotId = screenshotDict["id"] as? String,
+                  let syteJsonString = screenshotDict["syteJson"] as? String,
                   let segments = NetworkingPromise.jsonDestringify(string: syteJsonString),
                   let imageURLString = screenshotDict["image"] as? String else {
                     let jsonError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not extract syteJson from screenshotDict:\(screenshotDict)"])
@@ -171,16 +152,43 @@ class AssetSyncModel: NSObject {
         }
     }
 
-    func promiseForRatio17777() -> Promise<(String, [[String : Any]])> {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/JjdvWeV7u5S75ZPl5pSOX"
-        let segments = [["label":"Skirts","gender":"female","b0":[0.4177178144454956,0.4898432493209839],"center":[0.5302261114120483,0.5905150771141052],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC42OTM3MDM3MDA2MDIwNTQ2LCJ5IjowLjQ4NzMyNjQ1MzYyNjE1NTg0LCJ4MiI6MC42NDU1NDcxMTU4MDI3NjQ5LCJ4IjowLjQxNDkwNTEwNzAyMTMzMTh9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.5819&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6427344083786011,0.6911869049072266]],["label":"Jackets","gender":"female","b0":[0.3964715600013733,0.4136771559715271],"center":[0.5247414112091064,0.4848739802837372],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC41NTc4NTA3MjUyMDM3NTI2LCJ5IjowLjQxMTg5NzIzNTM2MzcyMTg2LCJ4MiI6MC42NTYyMTgwMDg2OTcwMzMsIngiOjAuMzkzMjY0ODEzNzIxMTh9&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.5910&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6530112624168396,0.5560708045959473]],["label":"Shoes","gender":"female","b0":[0.4400824010372162,0.7088841199874878],"center":[0.4686053097248077,0.73576420545578],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC43NjMzMTYyOTMwNjA3Nzk1LCJ5IjowLjcwODIxMjExNzg1MDc4MDUsIngyIjowLjQ5Nzg0MTI5MTEyOTU4OTEsIngiOjAuNDM5MzY5MzI4MzIwMDI2NH0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5940&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4971282184123993,0.7626442909240723]],["label":"Bags","gender":"female","b0":[0.3904582262039185,0.5603976249694824],"center":[0.4276284575462341,0.6082033514976501],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC42NTcyMDQyMjExODkwMjIxLCJ5IjowLjU1OTIwMjQ4MTgwNjI3ODIsIngyIjowLjQ2NTcyNzk0NDY3MjEwNzcsIngiOjAuMzg5NTI4OTcwNDIwMzYwNTV9&cats=WyJIYW5kYmFncyJd&prob=0.5947&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4647986888885498,0.6560090780258179]],["label":"Shoes","gender":"female","b0":[0.5386749505996704,0.7097557187080383],"center":[0.5780842304229736,0.7361155152320862],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0pqZHZXZVY3dTVTNzVaUGw1cFNPWA%3D%3D&crop=eyJ5MiI6MC43NjMxMzQzMDY2NjkyMzUyLCJ5IjowLjcwOTA5NjcyMzc5NDkzNzIsIngyIjowLjYxODQ3ODc0MjI0MTg1OTQsIngiOjAuNTM3Njg5NzE4NjA0MDg3OX0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6584&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6174935102462769,0.762475311756134]]]
-        return Promise(value: (imageURL, segments))
+    func tupleForRatio17777() -> (String, [[String : Any]]) {
+        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/WB42KwmBD9R5PBlwBJcc4"
+        let segments = [
+            ["label":"Jackets","gender":"female","b0":[0.3839874267578125,0.4090573787689209],"center":[0.5158657431602478,0.4922292530536652], "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC41Nzc0ODA0MjQxOTU1MjgsInkiOjAuNDA2OTc4MDgxOTExODAyMywieDIiOjAuNjUxMDQxMDE3NDcyNzQ0LCJ4IjowLjM4MDY5MDQ2ODg0Nzc1MTY1fQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.4667&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6477440595626831,0.5754011273384094]],
+            ["label":"Dresses","gender":"female","b0":[0.3939443826675415,0.4749177694320679],"center":[0.5453779101371765,0.5901732444763184],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC43MDgzMTAxMDYzOTY2NzUxLCJ5IjowLjQ3MjAzNjM4MjU1NTk2MTY0LCJ4MiI6MC43MDA1OTcyNzU3OTM1NTI0LCJ4IjowLjM5MDE1ODU0NDQ4MDgwMDZ9&cats=WyJEcmVzc2VzIiwiTmlnaHRNb3JuaW5nRHJlc3NlcyJd&prob=0.4820&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6968114376068115,0.7054287195205688]],
+            ["label":"Shoes","gender":"female","b0":[0.5229871273040771,0.7103928923606873],"center":[0.5599767565727234,0.7359517812728882],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC43NjIxNDk2NDI0MDc4OTQyLCJ5IjowLjcwOTc1MzkyMDEzNzg4MjIsIngyIjowLjU5Nzg5MTEyNjU3MzA4NTcsIngiOjAuNTIyMDYyMzg2NTcyMzYxfQ%3D%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5856&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.5969663858413696,0.7615106701850891]],
+            ["label":"Shoes","gender":"female","b0":[0.4234914183616638,0.712901771068573],"center":[0.4535205662250519,0.7430610656738281],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC43NzM5NzQzNDI2NDQyMTQ2LCJ5IjowLjcxMjE0Nzc4ODcwMzQ0MTYsIngyIjowLjQ4NDMwMDQ0Mjc4NTAyNDY1LCJ4IjowLjQyMjc0MDY4OTY2NTA3OTF9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6671&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4835497140884399,0.7732203602790833]]
+        ]
+        return (imageURL, segments)
     }
     
-    func promiseForRatio17750() -> Promise<(String, [[String : Any]])> {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/Z0RCO7uhoIdjexiNYpnOa"
-        let segments = [["center":[0.4758209437131882,0.7562138438224792],"b1":[0.5065634846687317,0.7875601649284363],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1owUkNPN3Vob0lkamV4aU5ZcG5PYQ%3D%3D&crop=eyJ5MiI6MC43ODgzNDM4MjI5NTYwODUyLCJ5IjowLjcyNDA4Mzg2NDY4ODg3MzMsIngyIjowLjUwNzMzMjA0ODE5MjYyMDIsIngiOjAuNDQ0MzA5ODM5MjMzNzU2MDV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5962&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","gender":"female","b0":[0.4450784027576447,0.7248675227165222],"label":"Shoes"],["center":[0.5769312381744385,0.7599759697914124],"b1":[0.6138189435005188,0.790989100933075],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1owUkNPN3Vob0lkamV4aU5ZcG5PYQ%3D%3D&crop=eyJ5MiI6MC43OTE3NjQ0MjkyMTE2MTY1LCJ5IjowLjcyODE4NzUxMDM3MTIwODIsIngyIjowLjYxNDc0MTEzNjEzMzY3MDgsIngiOjAuNTM5MTIxMzQwMjE1MjA2Mn0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6680&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","gender":"female","b0":[0.5400435328483582,0.7289628386497498],"label":"Shoes"],["center":[0.5488517135381699,0.6003944724798203],"b1":[0.6968203783035278,0.7249109148979187],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1owUkNPN3Vob0lkamV4aU5ZcG5PYQ%3D%3D&crop=eyJ5MiI6MC43MjgwMjM4MjU5NTgzNzExLCJ5IjowLjQ3Mjc2NTExOTAwMTI2OTMzLCJ4MiI6MC43MDA1MTk1OTQ5MjI2NjE4LCJ4IjowLjM5NzE4MzgzMjE1MzY3OH0%3D&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.6826&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","gender":"female","b0":[0.4008830487728119,0.4758780300617218],"label":"Skirts"],["center":[0.5255868434906006,0.4789808094501495],"b1":[0.6664043664932251,0.5487481951713562],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1owUkNPN3Vob0lkamV4aU5ZcG5PYQ%3D%3D&crop=eyJ5MiI6MC41NTA0OTIzNzk4MTQzODY0LCJ5IjowLjQwNzQ2OTIzOTA4NTkxMjcsIngyIjowLjY2OTkyNDgwNDU2ODI5MDcsIngiOjAuMzgxMjQ4ODgyNDEyOTEwNX0%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.7033&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","gender":"female","b0":[0.3847693204879761,0.4092134237289429],"label":"Jackets"],["center":[0.4082863032817841,0.6220149397850037],"b1":[0.4480967223644257,0.6669795513153076],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1owUkNPN3Vob0lkamV4aU5ZcG5PYQ%3D%3D&crop=eyJ5MiI6MC42NjgxMDM2NjY2MDM1NjUyLCJ5IjowLjU3NTkyNjIxMjk2NjQ0MjEsIngyIjowLjQ0OTA5MTk4Mjg0MTQ5MTcsIngiOjAuMzY3NDgwNjIzNzIyMDc2NH0%3D&cats=WyJIYW5kYmFncyJd&prob=0.7323&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","gender":"female","b0":[0.3684758841991425,0.5770503282546997],"label":"Bags"]]
-        return Promise(value: (imageURL, segments))
+    func tupleForRatio17750() -> (String, [[String : Any]]) {
+        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/1nfaMAuRYUUcVz1SZJmN6"
+        let segments = [
+            ["label":"Bags","gender":"female","b0":[0.3559979498386383,0.5867233872413635],"center":[0.3952450752258301,0.6273453235626221],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC42Njg5ODI4MDgyOTE5MTIsInkiOjAuNTg1NzA3ODM4ODMzMzMyMSwieDIiOjAuNDM1NDczMzc4NzQ3NzAxNjQsIngiOjAuMzU1MDE2NzcxNzAzOTU4NX0%3D&cats=WyJIYW5kYmFncyJd&prob=0.4663&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4344922006130219,0.6679672598838806]],
+            ["label":"Shoes","gender":"female","b0":[0.5260283350944519,0.7322256565093994],"center":[0.5610288977622986,0.7572548985481262],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC43ODI5MDk4NzE2Mzc4MjEyLCJ5IjowLjczMTU5OTkyNTQ1ODQzMTIsIngyIjowLjU5NjkwNDQ3NDQ5Njg0MTUsIngiOjAuNTI1MTUzMzIxMDI3NzU1N30%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5192&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.5960294604301453,0.782284140586853]],
+            ["label":"Shirts","gender":"female","b0":[0.4629025161266327,0.4479158520698547],"center":[0.5166011899709702,0.4818636178970337],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC41MTY2NjAwNzc4Njk4OTIxLCJ5IjowLjQ0NzA2NzE1NzkyNDE3NTMsIngyIjowLjU3MTY0MjMzMDY2MTQxNiwieCI6MC40NjE1NjAwNDkyODA1MjQyNH0%3D&cats=WyJQdWxsb3ZlckFuZFNoaXJ0cyJd&prob=0.5469&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.5702998638153076,0.5158113837242126]],
+             ["label":"Shoes","gender":"female","b0":[0.420631468296051,0.7285764217376709],"center":[0.4537010490894318,0.7611680626869202],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC43OTQ1NzQ0OTQ2NTk5MDA3LCJ5IjowLjcyNzc2MTYzMDcxMzkzOTYsIngyIjowLjQ4NzU5NzM2OTQwMjY0NzAzLCJ4IjowLjQxOTgwNDcyODc3NjIxNjV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6263&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.4867706298828125,0.7937597036361694]],
+             ["label":"Jackets","gender":"female","b0":[0.3828337788581848,0.4187996685504913],"center":[0.5173066854476929,0.5072087794542313],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC41OTc4MjgxMTgxMzA1NjQ3LCJ5IjowLjQxNjU4OTQ0MDc3Nzg5NzgzLCJ4MiI6MC42NTUxNDE0MTQ3MDE5Mzg3LCJ4IjowLjM3OTQ3MTk1NjE5MzQ0NzE1fQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.6450&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6517795920372009,0.5956178903579712]],
+             ["label":"Skirts","gender":"female","b0":[0.3978304862976074,0.5245752334594727],"center":[0.5268206596374512,0.6211769580841064],"offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC43MjAxOTM3MjU4MjQzNTYsInkiOjAuNTIyMTYwMTkwMzQzODU2OSwieDIiOjAuNjU5MDM1NTg3MzEwNzkxLCJ4IjowLjM5NDYwNTczMTk2NDExMTM2fQ%3D%3D&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.7699&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D","b1":[0.6558108329772949,0.7177786827087402]]
+        ]
+        return (imageURL, segments)
+    }
+    
+    func tupleByAspectRatio() -> (String, [[String : Any]]) {
+        let nativeSize = UIScreen.main.nativeBounds.size
+        let deviceAspectRatio = nativeSize.height / nativeSize.width
+        let aspectRatio5Digit = Int(deviceAspectRatio * 10000)
+        print("nativeSize:\(nativeSize)  aspectRatio5Digit:\(aspectRatio5Digit)  deviceAspectRatio:\(deviceAspectRatio)")
+        switch aspectRatio5Digit {
+        case 17777: // iPhone 6,6+,6S,6S+,7,7+
+            return self.tupleForRatio17777()
+        case 17750: // iPhone 5C,5,5S
+            return self.tupleForRatio17750()
+        default:
+            return self.tupleForRatio17750()
+        }
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
@@ -471,9 +479,9 @@ class AssetSyncModel: NSObject {
             if toDownload.count > 0 {
                 AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
-                for screenshotId in toDownload {
+                for shareId in toDownload {
                     self.processingQ.async {
-                        self.downloadScreenshot(screenshotId: screenshotId)
+                        self.downloadScreenshot(shareId: shareId)
                     }
                 }
             }
@@ -488,6 +496,28 @@ class AssetSyncModel: NSObject {
         syncPhotos()
     }
     
+    @objc public func syncTutorialPhoto(image: UIImage) {
+        self.serialQ.async {
+            let dataModel = DataModel.sharedInstance
+            guard dataModel.isCoreDataStackReady,
+                self.isSyncReady() else {
+                    return
+            }
+            self.beginSync()
+            let imageData = UIImageJPEGRepresentation(image, 0.80)
+            dataModel.performBackgroundTask { (managedObjectContext) in
+                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                 assetId: Constants.tutorialScreenshotAssetId,
+                                                 createdAt: Date(),
+                                                 isFashion: true,
+                                                 isFromShare: false,
+                                                 imageData: imageData)
+            }
+            let tuple = self.tupleByAspectRatio()
+            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
+            self.endSync()
+        }
+    }
 }
 
 extension AssetSyncModel {
@@ -547,8 +577,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    @objc public func handleDynamicLink(screenshotId: String) {
-        incomingDynamicLinks.append(screenshotId)
+    @objc public func handleDynamicLink(shareId: String) {
+        incomingDynamicLinks.append(shareId)
         syncPhotos()
     }
     
