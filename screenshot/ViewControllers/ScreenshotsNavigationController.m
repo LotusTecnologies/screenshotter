@@ -45,14 +45,7 @@
 
 - (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
     if ([viewController isKindOfClass:[ProductsViewController class]]) {
-        BOOL didPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
-        
-        if (!didPresent) {
-//            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
-//            [[NSUserDefaults standardUserDefaults] synchronize];
-        
-            [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
-        }
+        [self presentPickerViewControllerIfNeeded];
     }
 }
 
@@ -61,7 +54,7 @@
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
-    productsViewController.delegate = self;
+    productsViewController.lifeCycleDelegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
     Screenshot *screenshot = [viewController screenshotAtIndexPath:indexPath];
     productsViewController.screenshot = screenshot;
@@ -83,6 +76,10 @@
     }
 }
 
+- (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
+    [self presentPickerViewControllerIfNeeded];
+}
+
 
 #pragma mark - Screenshots Picker
 
@@ -95,6 +92,17 @@
         _pickerNavigationController.doneButton.action = @selector(pickerViewControllerDidFinish);
     }
     return _pickerNavigationController;
+}
+
+- (void)presentPickerViewControllerIfNeeded {
+    BOOL didPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+    
+    if (!didPresent) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+    }
 }
 
 - (void)pickerViewControllerDidCancel {

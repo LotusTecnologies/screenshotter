@@ -20,32 +20,32 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    if ([self.delegate respondsToSelector:@selector(viewController:willAppear:)]) {
-        [self.delegate viewController:self willAppear:animated];
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:willAppear:)]) {
+        [self.lifeCycleDelegate viewController:self willAppear:animated];
     }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    if ([self.delegate respondsToSelector:@selector(viewController:didAppear:)]) {
-        [self.delegate viewController:self didAppear:animated];
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:didAppear:)]) {
+        [self.lifeCycleDelegate viewController:self didAppear:animated];
     }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
-    if ([self.delegate respondsToSelector:@selector(viewController:willDisappear:)]) {
-        [self.delegate viewController:self willDisappear:animated];
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:willDisappear:)]) {
+        [self.lifeCycleDelegate viewController:self willDisappear:animated];
     }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
-    if ([self.delegate respondsToSelector:@selector(viewController:didDisappear:)]) {
-        [self.delegate viewController:self didDisappear:animated];
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:didDisappear:)]) {
+        [self.lifeCycleDelegate viewController:self didDisappear:animated];
     }
 }
 
