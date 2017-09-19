@@ -499,8 +499,7 @@ class AssetSyncModel: NSObject {
     @objc public func syncTutorialPhoto(image: UIImage) {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
-            guard PermissionsManager.shared().hasPermission(for: .photo),
-                dataModel.isCoreDataStackReady,
+            guard dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
                     return
             }
