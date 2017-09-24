@@ -50,7 +50,7 @@
 }
 
 - (void)addNavigationItemLogo {
-    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Logo28h"]];
+    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Logo20h"]];
 }
 
 @end

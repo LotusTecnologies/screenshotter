@@ -25,7 +25,7 @@
         self.navigationBar.tintColor = [UIColor whiteColor];
         
         _screenshotDisplayViewController = ({
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"LogoWhite"]];
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"LogoWhite20h"]];
             
             ScreenshotDisplayViewController *viewController = [[ScreenshotDisplayViewController alloc] init];
             viewController.navigationItem.titleView = imageView;

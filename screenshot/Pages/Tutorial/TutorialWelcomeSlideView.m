@@ -43,7 +43,7 @@
     if (self) {
         self.titleLabel.attributedText = ({
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.image = [UIImage imageNamed:@"Logo36h"];
+            attachment.image = [UIImage imageNamed:@"Logo20h"];
             
             CGRect rect = attachment.bounds;
             rect.origin.y = -3.f;
