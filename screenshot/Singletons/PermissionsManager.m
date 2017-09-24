@@ -7,6 +7,7 @@
 //
 
 #import "PermissionsManager.h"
+#import "screenshot-Swift.h"
 
 //  Libraries
 @import CoreLocation;
@@ -35,8 +36,16 @@
     return shared;
 }
 
-
 #pragma mark - Status
+
+- (void)setPushStatus:(PermissionStatus)pushStatus {
+    if (_pushStatus != pushStatus) {
+        _pushStatus = pushStatus;
+        
+        BOOL enabled = _pushStatus == PermissionStatusAuthorized;
+        [IntercomHelper.sharedInstance recordPushNotificationStatus:enabled];
+    }
+}
 
 - (PermissionStatus)permissionStatusForType:(PermissionType)type {
     switch (type) {
