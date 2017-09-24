@@ -142,14 +142,8 @@ class ScreenshotPickerViewController: BaseViewController {
     
     private func reloadAssets() {
         if let collection = screenshots {
-            let hadAssets = assets != nil
-            
             assets = PHAsset.fetchAssets(in: collection, options: nil)
-            
-            if hadAssets {
-                collectionView.reloadData()
-            }
-            
+            collectionView.reloadData()
             helperView.isHidden = (assets?.count ?? 0) > 0
         }
     }
