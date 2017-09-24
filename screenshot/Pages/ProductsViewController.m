@@ -157,7 +157,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    [self.navigationController.navigationBar endEditing:YES];
+    [self dismissSortPicker];
 }
 
 - (void)dealloc {
@@ -288,6 +288,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 
+#pragma mark - Scroll View
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self dismissSortPicker];
+}
+
+
 #pragma mark - Sorting
 
 - (UIView *)currentTitleView {
@@ -333,6 +340,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     control.customInputView = picker;
     [control becomeFirstResponder];
+}
+
+- (void)dismissSortPicker {
+    [self.navigationItem.titleView endEditing:YES];
 }
 
 
