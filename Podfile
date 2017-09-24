@@ -15,7 +15,7 @@ def shared_pods
     pod 'FBSDKLoginKit'
     pod 'ImageEffects'
     pod 'Branch'
-    pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :commit => '7f86300619125dac919168d3f27b7b3778e4c638'
+    pod 'EggRating', :git => 'git@github.com:jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/ios-11-support'
     pod 'Intercom'
 end
 
