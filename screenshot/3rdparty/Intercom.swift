@@ -90,4 +90,10 @@ class IntercomHelper : NSObject {
     func recordUnsatisfactoryRating() {
         Intercom.logEvent(withName: "Rated app less than 4 stars")
     }
+    
+    func recordPushNotificationStatus(_ enabled:Bool) {
+        let name = "APN \(enabled ? "En" : "Dis")abled"
+        AnalyticsManager.track(name)
+        Intercom.logEvent(withName: name)
+    }
 }
