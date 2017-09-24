@@ -321,7 +321,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self presentMailComposer];
             break;
         case RowTypeTellFriend: {
-            NSString *text = @"Download CRAZE, the app that lets you shop any screenshot, for free! https://crazeapp.com/app/";
+            NSString *text = @"Download SCREENSHOP, the app that lets you shop any screenshot, for free! https://crazeapp.com/app/";
             UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[text] applicationActivities:nil];
             activityViewController.popoverPresentationController.sourceView = self.view;
             [self presentViewController:activityViewController animated:YES completion:nil];

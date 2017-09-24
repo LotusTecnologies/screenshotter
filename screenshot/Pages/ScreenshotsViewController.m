@@ -284,7 +284,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)screenshotCollectionViewCellDidTapShare:(ScreenshotCollectionViewCell *)cell {
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
-    NSString *introductoryText = @"Check out this look on CRAZE!";
+    NSString *introductoryText = @"Check out this look on SCREENSHOP!";
     NSArray *items;
         
     if (screenshot.shareLink) {
