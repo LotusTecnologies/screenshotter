@@ -118,14 +118,19 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     self.navigationItem.rightBarButtonItem = ({
         CGFloat buttonSize = 32.f;
-        
+
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
         button.imageView.contentMode = UIViewContentModeScaleAspectFill;
         [button setImage:self.image forState:UIControlStateNormal];
         [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
+
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
         
-        [[UIBarButtonItem alloc] initWithCustomView:button];
+        [button.widthAnchor constraintEqualToConstant:button.bounds.size.width].active = YES;
+        [button.heightAnchor constraintEqualToConstant:button.bounds.size.height].active = YES;
+        
+        barButtonItem;
     });
     
     [self reloadCollectionViewForIndex:0];
