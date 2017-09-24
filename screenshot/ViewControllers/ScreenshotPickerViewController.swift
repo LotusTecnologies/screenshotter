@@ -36,6 +36,7 @@ class ScreenshotPickerNavigationController: UINavigationController {
 
 class ScreenshotPickerViewController: BaseViewController {
     fileprivate var collectionView: UICollectionView!
+    fileprivate var helperView: HelperView!
     fileprivate var screenshots: PHAssetCollection?
     fileprivate var assets: PHFetchResult<PHAsset>?
     fileprivate var selectedIndexPaths: [IndexPath] = []
@@ -75,6 +76,27 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let verPadding = CGFloat(40)
+        let horPadding = CGFloat(Geometry.padding())
+        
+        helperView = HelperView.init()
+        helperView.translatesAutoresizingMaskIntoConstraints = false
+        helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding)
+        helperView.titleLabel.text = "No Photos!"
+        helperView.subtitleLabel.text = "Start taking screenshots of fashion items to fill up your gallery!"
+        view.addSubview(helperView)
+        helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+        helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let imageView = UIImageView.init(image: UIImage.init(named: "ScreenshotsNoPermissionGraphic"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        helperView.contentView.addSubview(imageView)
+        imageView.topAnchor.constraint(equalTo: helperView.contentView.topAnchor, constant: verPadding).isActive = true
+        imageView.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -127,6 +149,8 @@ class ScreenshotPickerViewController: BaseViewController {
             if hadAssets {
                 collectionView.reloadData()
             }
+            
+            helperView.isHidden = (assets?.count ?? 0) > 0
         }
     }
     
