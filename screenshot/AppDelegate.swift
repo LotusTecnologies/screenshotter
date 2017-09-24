@@ -16,10 +16,10 @@ import Branch
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-
+    
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
@@ -199,18 +199,17 @@ extension AppDelegate {
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {
-                    // TODO
+                    // TODO:
                 }
             }
         }
     }
     
     func transitionTo(_ toViewController: UIViewController) {
-        let options: UIViewAnimationOptions = [.transitionFlipFromLeft, .allowAnimatedContent, .layoutSubviews]
-        if let fromView = self.window?.rootViewController?.view {
-            UIView.transition(from: fromView, to: toViewController.view, duration: 0.5, options: options) { (finished) in
+        if let window = self.window {
+            UIView.transition(with: window, duration: 0.5, options: .transitionFlipFromLeft, animations: {
                 self.window?.rootViewController = toViewController
-            }
+            })
         }
     }
     
