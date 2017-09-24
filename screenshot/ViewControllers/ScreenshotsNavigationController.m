@@ -27,7 +27,7 @@
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
             viewController.lifeCycleDelegate = self;
-            viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
+//            viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
             viewController;
         });
         
