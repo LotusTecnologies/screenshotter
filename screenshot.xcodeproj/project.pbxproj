@@ -163,8 +163,6 @@
 		E41BB9361F652EA000A74F04 /* Model 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 3.xcdatamodel"; sourceTree = "<group>"; };
 		E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotActivityItemProvider.swift; sourceTree = "<group>"; };
 		E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
-		E42AC3D51F61484A0035A07C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		E42AC3D71F614ADE0035A07C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -434,7 +432,6 @@
 			children = (
 				E41BB9321F61BDD200A74F04 /* Info.plist */,
 				E4D6D8A61F61B047009DD999 /* screenshot.entitlements */,
-				E42AC3D51F61484A0035A07C /* GoogleService-Info.plist */,
 			);
 			path = dev;
 			sourceTree = "<group>";
@@ -444,7 +441,6 @@
 			children = (
 				E41BB9341F61BDD900A74F04 /* Info.plist */,
 				E4D6D8A51F61AF3A009DD999 /* screenshot.entitlements */,
-				E42AC3D71F614ADE0035A07C /* GoogleService-Info.plist */,
 			);
 			path = prd;
 			sourceTree = "<group>";
@@ -469,7 +465,6 @@
 				E4139D3D1F09083B00E8A53B /* Frameworks */,
 				E4139D3E1F09083B00E8A53B /* Resources */,
 				E4D495D31F4987B100312614 /* Upload Symbols To AppSee */,
-				E4D6D8A81F61B483009DD999 /* Copy Environment-Specific Files */,
 				062DDE6A3EEF8844E9956F39 /* [CP] Embed Pods Frameworks */,
 				6BC0B32A3406E11698F2E236 /* [CP] Copy Pods Resources */,
 			);
@@ -632,21 +627,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/screenshot/upload_symbols.sh\" \"${APPSEE_API_KEY}\"";
-		};
-		E4D6D8A81F61B483009DD999 /* Copy Environment-Specific Files */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Environment-Specific Files";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /usr/bin/ruby;
-			shellScript = "require 'fileutils'\n\nfolder = ENV[\"SRCROOT\"] + \"/\" + ENV[\"ENVIRONMENT_FOLDER\"]\nproductsFolder = ENV[\"BUILT_PRODUCTS_DIR\"] + \"/\" + ENV[\"PRODUCT_NAME\"] + \".app\"\nfilename = \"GoogleService-Info.plist\"\n\nFileUtils.cp folder + \"/\" + filename, productsFolder + \"/\" + filename";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
