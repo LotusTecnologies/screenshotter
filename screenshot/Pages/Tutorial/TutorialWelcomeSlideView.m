@@ -44,12 +44,7 @@
         self.titleLabel.attributedText = ({
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
             attachment.image = [UIImage imageNamed:@"Logo20h"];
-            
-            CGRect rect = attachment.bounds;
-            rect.origin.y = -3.f;
-            rect.size = attachment.image.size;
-            attachment.bounds = rect;
-            
+                        
             NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Welcome to "];
             [attributedString appendAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
             attributedString;
