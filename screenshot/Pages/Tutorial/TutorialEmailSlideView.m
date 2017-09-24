@@ -32,7 +32,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.titleLabel.text = @"Join The Craze";
+        self.titleLabel.text = @"Sign Up";
         self.subtitleLabel.text = @"Fill out your info below";
         
         CGFloat p = [Geometry padding];
