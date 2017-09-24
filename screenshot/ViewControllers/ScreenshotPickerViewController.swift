@@ -52,6 +52,8 @@ class ScreenshotPickerViewController: BaseViewController {
         if let collection = collections.firstObject {
             screenshots = collection
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
     }
     
     override func viewDidLoad() {
@@ -78,15 +80,7 @@ class ScreenshotPickerViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let collection = screenshots {
-            let hadAssets = assets != nil
-            
-            assets = PHAsset.fetchAssets(in: collection, options: nil)
-            
-            if hadAssets {
-                collectionView.reloadData()
-            }
-        }
+        reloadAssets()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -108,6 +102,31 @@ class ScreenshotPickerViewController: BaseViewController {
                 }
             }))
             present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    @objc private func applicationWillEnterForeground() {
+        if view.window != nil {
+            reloadAssets()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    
+    // MARK: Assets
+    
+    private func reloadAssets() {
+        if let collection = screenshots {
+            let hadAssets = assets != nil
+            
+            assets = PHAsset.fetchAssets(in: collection, options: nil)
+            
+            if hadAssets {
+                collectionView.reloadData()
+            }
         }
     }
     
