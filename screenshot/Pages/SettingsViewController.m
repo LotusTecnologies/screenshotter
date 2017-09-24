@@ -161,7 +161,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.tableView.contentOffset = CGPointMake(0.f, -self.tableView.contentInset.top);
+    CGFloat offsetY = -self.tableView.contentInset.top;
+    
+    if (@available(iOS 11.0, *)) {
+        offsetY = -self.tableView.adjustedContentInset.top;
+    }
+    
+    self.tableView.contentOffset = CGPointMake(0.f, offsetY);
     
     [self updateScreenshotsCount];
     [self reloadPermissionIndexPaths];
