@@ -88,13 +88,14 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
             AnalyticsManager.track("Rated app", properties: ["rating": "\(ratingValue)"])
             
             if ratingValue < 4.0 {
+                dismiss()
+                
                 IntercomHelper.sharedInstance.recordUnsatisfactoryRating()
             }
         } else {
             AnalyticsManager.track("Rated app on app store")
+            dismiss()
         }
-        
-        dismiss()
     }
     
     fileprivate func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlow.Phase) {
