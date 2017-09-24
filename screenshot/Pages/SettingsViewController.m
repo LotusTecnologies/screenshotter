@@ -527,9 +527,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 #pragma mark - Tutorial
 
 - (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
-    NSIndexPath *indexPath = [self indexPathForRowType:RowTypeEmail inSectionType:SectionTypeInfo];
-    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-    
     [self.navigationController popViewControllerAnimated:YES];
 }
 
