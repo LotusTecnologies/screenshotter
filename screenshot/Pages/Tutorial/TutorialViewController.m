@@ -167,16 +167,6 @@
 
 - (void)tutorialWelcomeSlideViewDidComplete:(TutorialWelcomeSlideView *)slideView {
     slideView.delegate = nil;
-    [self scrollToNextSlide];
-}
-
-- (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
-    UIAlertController *alertController = [slideView failedAlertController];
-    [self presentViewController:alertController animated:YES completion:nil];
-}
-
-- (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
-    slideView.delegate = nil;
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialCompleted]) {
         // The tutorial is being presented elsewhere and shouldn't
@@ -187,6 +177,16 @@
     } else {
         [self scrollToNextSlide];
     }
+}
+
+- (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
+    UIAlertController *alertController = [slideView failedAlertController];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
+    slideView.delegate = nil;
+    [self scrollToNextSlide];
 }
 
 - (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView {
