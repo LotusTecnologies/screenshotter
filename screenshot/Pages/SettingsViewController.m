@@ -148,6 +148,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         tableView.tableHeaderView = tableHeaderView;
         tableView.tableFooterView = tableFooterTextView;
         tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
+        tableView.rowHeight = 44.f;
         [self.view addSubview:tableView];
         [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
