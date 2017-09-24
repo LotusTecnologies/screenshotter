@@ -73,13 +73,13 @@ class ClarifaiModel: NSObject {
                 }
                 for concept in concepts {
                     switch concept.name {
-                    case "woman", "man", "fashion", "beauty", "glamour", "dress":
+                    case "woman", "man", "fashion", "beauty", "glamour", "dress", "style", "jewelry":
                         isFashion = true
                     default:
                         break
                     }
                     j += 1
-                    //print("\(j)  \(concept.score * 100.0)  \(concept.name ?? "-")")
+                    print("\(j)  \(concept.score * 100.0)  \(concept.name ?? "-")")
                 }
             }
             print("isFashion: \(isFashion ? "YES" : "NO")")
