@@ -35,6 +35,11 @@ xcode-select --install
 fastlane ios prd
 ```
 
+### ios dev
+```
+fastlane ios dev
+```
+
 
 ----
 

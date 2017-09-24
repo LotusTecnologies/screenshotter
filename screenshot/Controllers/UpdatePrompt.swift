@@ -42,8 +42,8 @@ class UpdatePromptHandler : NSObject {
         return URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     }
     
-    private(set) var containerViewController: UIViewController
-    var didBecomeActiveObserver: Any?
+    private var containerViewController: UIViewController
+    private var didBecomeActiveObserver: Any?
     
     init(containerViewController controller: UIViewController) {
         containerViewController = controller
@@ -53,9 +53,11 @@ class UpdatePromptHandler : NSObject {
     // MARK: Public methods
     
     deinit {
-        if let observer = didBecomeActiveObserver {
-            NotificationCenter.default.removeObserver(observer)
+        guard let observer = didBecomeActiveObserver else {
+            return
         }
+        
+        NotificationCenter.default.removeObserver(observer)
     }
     
     func start() {
@@ -146,7 +148,9 @@ class UpdatePromptHandler : NSObject {
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
-        containerViewController.present(controller, animated: true, completion: nil)
+        containerViewController.present(controller, animated: true) { [weak containerViewController] in
+            containerViewController?.view.isUserInteractionEnabled = true
+        }
     }
 
     private func navigateToAppStore(action: UIAlertAction) {
