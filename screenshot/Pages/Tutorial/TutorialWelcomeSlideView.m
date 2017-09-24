@@ -130,6 +130,7 @@
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
             imageView.contentMode = UIViewContentModeScaleAspectFit;
             [view addSubview:imageView];
+            [imageView setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
             [imageView.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
             [imageView.leadingAnchor constraintGreaterThanOrEqualToAnchor:view.leadingAnchor].active = YES;
             [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:view.trailingAnchor].active = YES;
