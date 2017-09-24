@@ -89,7 +89,7 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
             
             if ratingValue < EggRating.minRatingToAppStore {
                 IntercomHelper.sharedInstance.recordUnsatisfactoryRating()
-                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dismiss)
             }
         } else {
             AnalyticsManager.track("Rated app on app store")
