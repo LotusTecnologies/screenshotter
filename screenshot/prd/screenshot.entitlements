@@ -6,7 +6,7 @@
 	<string>production</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:craze.shopping</string>
+		<string>applinks:getscreenshop.com</string>
 	</array>
 </dict>
 </plist>
