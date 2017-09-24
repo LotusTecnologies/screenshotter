@@ -146,7 +146,9 @@ class UpdatePromptHandler : NSObject {
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
-        containerViewController.present(controller, animated: true, completion: nil)
+        containerViewController.present(controller, animated: true) { [weak containerViewController] in
+            containerViewController?.view.isUserInteractionEnabled = true
+        }
     }
 
     private func navigateToAppStore(action: UIAlertAction) {
