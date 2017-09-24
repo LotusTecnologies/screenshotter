@@ -144,4 +144,32 @@ class NetworkingPromise: NSObject {
             dataTask.resume()
         }
     }
+    
+    static func appVersionRequirements() -> Promise<[String : String]> {
+        return Promise { fulfill, reject in
+            guard let URL = URL(string: Constants.appUpdateDomain) else {
+                return
+            }
+            
+            let task = URLSession.shared.dataTask(with: URL) { (dataOpt, responseOpt, errorOpt) in
+                guard let data = dataOpt else {
+                    // TODO: Deal with error.
+                    return
+                }
+                
+                do {
+                    guard let JSON = try JSONSerialization.jsonObject(with: data) as? [String : String] else {
+                        // TODO: Deal with mismatched type?
+                        return
+                    }
+                    
+                    fulfill(JSON)
+                } catch {
+                    reject(error)
+                }
+            }
+            
+            task.resume()
+        }
+    }
 }
