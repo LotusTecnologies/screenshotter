@@ -79,7 +79,13 @@ class ScreenshotPickerViewController: BaseViewController {
         super.viewWillAppear(animated)
         
         if let collection = screenshots {
+            let hadAssets = assets != nil
+            
             assets = PHAsset.fetchAssets(in: collection, options: nil)
+            
+            if hadAssets {
+                collectionView.reloadData()
+            }
         }
     }
     
