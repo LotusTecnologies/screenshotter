@@ -122,17 +122,21 @@
 }
 
 - (void)presentPickerViewController {
-    [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+    [self presentPickerViewControllerWithCompletion:nil];
+}
+
+- (void)presentPickerViewControllerWithCompletion:(dispatch_block_t)completion {
+    [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
 }
 
 - (void)presentPickerViewControllerIfNeeded {
     BOOL didPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
     
     if (!didPresent) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        [self presentPickerViewController];
+        [self presentPickerViewControllerWithCompletion:^{
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }];
     }
 }
 
