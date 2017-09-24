@@ -265,6 +265,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     [self.navigationController pushViewController:webViewController animated:YES];
     
+    [AnalyticsManager branchEvent:@"Tapped product"];
     [AnalyticsManager track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
     
     [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];

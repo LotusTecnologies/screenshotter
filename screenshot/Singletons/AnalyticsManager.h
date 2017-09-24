@@ -13,6 +13,8 @@
 + (void)track:(NSString *)track;
 + (void)track:(NSString *)track properties:(NSDictionary<NSString *, id> *)properties;
 
++ (void)branchEvent:(NSString *)eventName;
+
 + (void)identify:(NSString *)email name:(NSString *)name;
 
 @end
