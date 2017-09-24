@@ -31,16 +31,6 @@
     [Appsee addEvent:track];
 }
 
-+ (void)identify:(NSString *)email name:(NSString *)name {
-    [[SEGAnalytics sharedAnalytics] identify:nil traits:@{ @"email": email }];
-    [Appsee setUserID:email];
-    
-    [IntercomHelper.sharedInstance registerUserWithEmail:email];
-    IntercomHelper.sharedInstance.userName = name;
-
-    [[Branch getInstance] userCompletedAction:@"identify"];
-}
-
 + (void)track:(NSString *)track properties:(NSDictionary<NSString *, id> *)properties {
     [[SEGAnalytics sharedAnalytics] track:track properties:properties];
     
@@ -61,6 +51,20 @@
     }];
     
     [Appsee addEvent:track withProperties:appseeProperties];
+}
+
++ (void)branchEvent:(NSString *)eventName {
+    [[Branch getInstance] userCompletedAction:eventName];
+}
+
++ (void)identify:(NSString *)email name:(NSString *)name {
+    [[SEGAnalytics sharedAnalytics] identify:nil traits:@{ @"email": email }];
+    [Appsee setUserID:email];
+    
+    [IntercomHelper.sharedInstance registerUserWithEmail:email];
+    IntercomHelper.sharedInstance.userName = name;
+
+    [[Branch getInstance] userCompletedAction:@"identify"];
 }
 
 @end
