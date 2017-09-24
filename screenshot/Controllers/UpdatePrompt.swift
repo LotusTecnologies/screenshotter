@@ -53,9 +53,11 @@ class UpdatePromptHandler : NSObject {
     // MARK: Public methods
     
     deinit {
-        if let observer = didBecomeActiveObserver {
-            NotificationCenter.default.removeObserver(observer)
+        guard let observer = didBecomeActiveObserver else {
+            return
         }
+        
+        NotificationCenter.default.removeObserver(observer)
     }
     
     func start() {
