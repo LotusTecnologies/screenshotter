@@ -70,6 +70,9 @@
             self.collectionView.contentInset = insets;
         }
     }
+    
+    // This is needed for iOS11
+    [self bringSubviewToFront:self.collectionView];
 }
 
 
