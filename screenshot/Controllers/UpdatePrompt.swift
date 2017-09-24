@@ -42,8 +42,8 @@ class UpdatePromptHandler : NSObject {
         return URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     }
     
-    private(set) var containerViewController: UIViewController
-    var didBecomeActiveObserver: Any?
+    private var containerViewController: UIViewController
+    private var didBecomeActiveObserver: Any?
     
     init(containerViewController controller: UIViewController) {
         containerViewController = controller
