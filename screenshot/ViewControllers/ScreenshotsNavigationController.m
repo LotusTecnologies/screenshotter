@@ -48,7 +48,7 @@
 - (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {
     if (viewController == self.screenshotsViewController) {
         if (![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] &&
-            [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker] &&
+            ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker] &&
             [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
         {
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
