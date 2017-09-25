@@ -291,7 +291,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         items = @[introductoryText, [NSURL URLWithString:screenshot.shareLink]];
         
     } else {
-        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:[NSURL URLWithString:@"https://crazeapp.com/"]];
+        ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:[NSURL URLWithString:@"https://getscreenshop.com/"]];
         items = @[introductoryText, screenshotActivityItemProvider];
     }
     
