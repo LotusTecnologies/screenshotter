@@ -16,6 +16,7 @@ class UserDefaultsKeys : NSObject {
     static let tutorialPresentedScreenshotHelper = "TutorialPresentedScreenshotHelper"
     static let tutorialPresentedProductHelper = "TutorialPresentedProductHelper"
     static let tutorialPresentedScreenshotPicker = "TutorialPresentedScreenshotPicker"
+    static let tutorialShouldPresentScreenshotPicker = "TutorialPresentedScreenshotPicker"
     static let tutorialScreenshotAssetId = "TutorialScreenshotAssetId" // !!!: Not being used, can be removed.
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     

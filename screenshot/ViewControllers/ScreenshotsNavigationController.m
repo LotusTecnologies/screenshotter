@@ -130,11 +130,11 @@
 }
 
 - (void)presentPickerViewControllerIfNeeded {
-    BOOL didPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+    BOOL shouldPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
     
-    if (!didPresent) {
+    if (shouldPresent) {
         [self presentPickerViewControllerWithCompletion:^{
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }];
     }

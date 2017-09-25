@@ -51,6 +51,11 @@
         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto response:^(BOOL granted) {
             [[AssetSyncModel sharedInstance] syncTutorialPhotoWithImage:snapshotImage];
             
+            if (!granted) {
+                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            }
+            
             [self.delegate tutorialTrySlideViewDidComplete:self];
         }];
     }
