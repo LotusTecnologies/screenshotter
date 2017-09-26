@@ -100,7 +100,7 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
 
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         let finalKeys = (properties ?? [:]).keys.filter {
-            let propertyLength = "\(event)\($0)\(String(describing:properties![$0]))".lengthOfBytes(using: .utf8)
+            let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
             return propertyLength < 300
         }
         
