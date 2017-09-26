@@ -100,26 +100,6 @@ class DataModel: NSObject {
     fileprivate var screenshotChangeKind: CZChangeKind = .none
     
     
-    public lazy var latestScreenshotFrc: NSFetchedResultsController<Screenshot> = {
-        let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = nil
-        request.fetchLimit = 1
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch latest screenshot from core data:\(error)")
-        }
-        return fetchedResultsController
-    }()
-    weak open var latestScreenshotFrcDelegate: FrcDelegateProtocol?
-    
-    fileprivate var latestScreenshotChangeIndexPath: IndexPath?
-    fileprivate var latestScreenshotChangeKind: CZChangeKind = .none
-
-    
     public func setupShoppableFrc(screenshot: Screenshot) -> NSFetchedResultsController<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
@@ -174,9 +154,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case screenshotFrc:
             screenshotChangeKind = .none
             screenshotChangeIndexPath = nil
-        case latestScreenshotFrc:
-            latestScreenshotChangeKind = .none
-            latestScreenshotChangeIndexPath = nil
         case shoppableFrcStandIn:
             shoppableChangeKind = .none
             shoppableChangeIndexPath = nil
@@ -213,8 +190,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case latestScreenshotFrc:
-            didChange(changeKind: &latestScreenshotChangeKind, changeIndexPath: &latestScreenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case shoppableFrcStandIn:
             didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
@@ -261,8 +236,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         switch controller {
         case screenshotFrc:
             didChangeContent(frc: controller, changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
-        case latestScreenshotFrc:
-            didChangeContent(frc: controller, changeKind: &latestScreenshotChangeKind, changeIndexPath: &latestScreenshotChangeIndexPath, frcDelegate: latestScreenshotFrcDelegate)
         case shoppableFrcStandIn:
             didChangeContent(frc: controller, changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
         case favoriteFrc:
