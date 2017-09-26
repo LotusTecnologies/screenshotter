@@ -50,10 +50,10 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
-                AnalyticsManager.track("sent image to Clarifai")
+                AnalyticsTrackers.standard.track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
             }.then(on: processingQ) { isFashion, image -> Void in
-                AnalyticsManager.track("received response from Clarifai", properties: ["isFashion" : isFashion])
+                AnalyticsTrackers.standard.track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? self.data(for: image) : nil
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -76,7 +76,7 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<Data?> in
-                AnalyticsManager.track("bypassed Clarifai")
+                AnalyticsTrackers.standard.track("bypassed Clarifai")
                 let imageData = self.data(for: image)
                 return Promise(value: imageData)
             }.then (on: processingQ) { imageData -> Promise<(Data?, Bool)> in
@@ -109,7 +109,7 @@ class AssetSyncModel: NSObject {
             firstly { _ -> Promise<(String, [[String : Any]])> in
                 return NetworkingPromise.uploadToSyte(imageData: imageData)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    AnalyticsManager.track("received response from Syte", properties: ["segmentCount" : segments.count])
+                    AnalyticsTrackers.standard.track("received response from Syte", properties: ["segmentCount" : segments.count])
                     self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments)
                 }.always {
                     NotificationManager.shared().dismiss(with: .products)
@@ -549,7 +549,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toUpload.count > 0 {
-                AnalyticsManager.track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
+                AnalyticsTrackers.standard.track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
                 self.allScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
@@ -570,7 +570,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toDownload.count > 0 {
-                AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
+                AnalyticsTrackers.standard.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
                 for shareId in toDownload {
                     self.processingQ.async {

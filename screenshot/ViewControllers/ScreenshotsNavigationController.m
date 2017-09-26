@@ -58,10 +58,10 @@
             [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
                     if (granted) {
-                        [AnalyticsManager track:@"Accepted Push Permissions"];
+                        [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
                         
                     } else {
-                        [AnalyticsManager track:@"Denied Push Permissions"];
+                        [AnalyticsTrackers.standard track:@"Denied Push Permissions"];
                     }
                 }];
             }]];

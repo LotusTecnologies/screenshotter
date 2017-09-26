@@ -11,7 +11,6 @@
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
-#import "AnalyticsManager.h"
 
 @interface MainTabBarController () <UITabBarControllerDelegate>
 
@@ -94,7 +93,7 @@
     }
     
     if (tab) {
-        [AnalyticsManager track:@"Tab Bar tapped" properties:@{@"tab": tab}];
+        [AnalyticsTrackers.standard track:@"Tab Bar tapped" properties:@{@"tab": tab}];
     }
 }
 

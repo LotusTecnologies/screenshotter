@@ -10,7 +10,6 @@
 #import "Geometry.h"
 #import "TappableTextView.h"
 #import "WebViewController.h"
-#import "AnalyticsManager.h"
 #import "screenshot-Swift.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
@@ -207,8 +206,10 @@
         
         [self informDelegateOfSubmittedEmailIfPossible];
         
-        [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
-        [AnalyticsManager identify:trimmedEmail name:trimmedName];
+        AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
+        [AnalyticsTrackers.standard identify:user];
+        
+        [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
     } else {
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }

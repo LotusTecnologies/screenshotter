@@ -33,13 +33,12 @@ class IntercomHelper : NSObject {
         }
     }
     
-    var userName: String? {
-        didSet {
-            let attrs = ICMUserAttributes()
-            attrs.name = userName ?? ""
-
-            Intercom.updateUser(attrs)
-        }
+    // MARK: -
+    
+    func performUserUpdate(_ closure:(ICMUserAttributes) -> ()) {
+        let attributes = ICMUserAttributes()
+        closure(attributes)
+        Intercom.updateUser(attributes)
     }
     
     // MARK: -
@@ -55,8 +54,6 @@ class IntercomHelper : NSObject {
         if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             registerUser(withEmail: email)
         }
-    
-        userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
         
         if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
             handleRemoteNotification(remoteNotification, opened: true)
@@ -67,13 +64,17 @@ class IntercomHelper : NSObject {
         let isIntercomNotification = Intercom.isIntercomPushNotification(userInfo)
         let trackingPrefix = opened ? "Opened with" : "Received"
         
-        AnalyticsManager.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
+        AnalyticsTrackers.standard.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
-    func registerUser(withEmail email: String) {
+    func registerUser(withEmail email: String, name: String? = nil) {
         updateIntercomDeviceToken()
-    
+        
         Intercom.registerUser(withEmail: email)
+        
+        performUserUpdate { attrs in
+            attrs.name = name
+        }
     }
     
     func logoutUser() {
@@ -94,7 +95,15 @@ class IntercomHelper : NSObject {
     
     func recordPushNotificationStatus(_ enabled:Bool) {
         let name = "APN \(enabled ? "En" : "Dis")abled"
-        AnalyticsManager.track(name)
+        AnalyticsTrackers.standard.track(name)
         Intercom.logEvent(withName: name)
+    }
+    
+    func record(event: String, properties: [AnyHashable : Any]? = nil) {
+        if let properties = properties {
+            Intercom.logEvent(withName: event, metaData: properties)
+        } else {
+            Intercom.logEvent(withName: event)
+        }
     }
 }
