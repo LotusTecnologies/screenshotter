@@ -49,7 +49,7 @@ public class CompositeAnalyticsTracker : NSObject {
         trackers.removeValue(forKey: String(describing: type(of:tracker)))
     }
     
-    // MARK: AnalyticsTracker
+    // MARK: -
     
     public func track(_ event: String) {
         trackers.values.forEach { $0.track(event) }
@@ -83,7 +83,7 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        _track(type: type(of:self), name: event, properties: properties) {
+        _track(name: event, properties: properties) {
             SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
     }
@@ -111,11 +111,11 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
                 return copy
             }
             
-            _track(type: type(of:self), name: event, properties: props) {
+            _track(name: event, properties: props) {
                 Appsee.addEvent(event, withProperties: props)
             }
         } else {
-            _track(type: type(of:self), name: event) {
+            _track(name: event) {
                 Appsee.addEvent(event)
             }
         }
@@ -132,7 +132,7 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 
     func track(_ event: String, properties: [AnyHashable : Any]?) {
-        _track(type: type(of:self), name: event, properties: properties) {
+        _track(name: event, properties: properties) {
             IntercomHelper.sharedInstance.record(event: event, properties: properties)
         }
     }
@@ -148,13 +148,13 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        _track(type: type(of: self), name: event) {
+        _track(name: event) {
             Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
         }
     }
     
     func identify(_ user: AnalyticsUser) {
-        _track(type: type(of: self), name: "identify") {
+        _track(name: "identify") {
             Branch.getInstance().userCompletedAction("identify")
         }
     }
@@ -169,8 +169,11 @@ public class AnalyticsTrackers : NSObject {
     static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee])
 }
 
-fileprivate func _track(type: AnalyticsTracker.Type, name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
-    print("[\(type)] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
-    
-    closure()
+extension AnalyticsTracker {
+    fileprivate func _track(name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
+        print("[\(type(of: self))] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
+        
+        closure()
+    }
 }
+
