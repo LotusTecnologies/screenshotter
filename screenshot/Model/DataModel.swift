@@ -83,7 +83,7 @@ class DataModel: NSObject {
 
     public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
         request.predicate = NSPredicate(format: "isHidden == FALSE AND shoppablesCount > 0")
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
