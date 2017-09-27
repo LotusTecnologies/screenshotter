@@ -116,6 +116,8 @@
         if (screenshot) {
             // TODO: set to default screenshot image
             self.imageView.image = [UIImage imageWithData:_screenshot.imageData];
+            
+            // TODO: create cache of these images for scrolling performance
             self.toolbarImageView.image = [self.imageView.image extraLightImage];
             
         } else {
