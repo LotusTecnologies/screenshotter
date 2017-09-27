@@ -7,3 +7,11 @@
 //
 
 import Foundation
+
+class FloatingActionButton: UIButton {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        layer.cornerRadius = bounds.size.width * 0.5
+    }
+}

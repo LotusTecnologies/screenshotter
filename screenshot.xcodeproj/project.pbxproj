@@ -18,6 +18,7 @@
 		C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */; };
 		C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
+		C525A5AF1F7B8D4600C2641E /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C525A5AE1F7B8D4600C2641E /* FloatingActionButton.swift */; };
 		C5278FE91F3C38510090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB51F3C38510090E422 /* Geometry.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
@@ -81,6 +82,7 @@
 		C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
+		C525A5AE1F7B8D4600C2641E /* FloatingActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		C5278FB51F3C38510090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 			children = (
 				C55184B91F4AD3E000EE7855 /* CollectionViewCell */,
 				C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */,
+				C525A5AE1F7B8D4600C2641E /* FloatingActionButton.swift */,
 				C54F032B1F44361C00CF8CBD /* HelperView.h */,
 				C54F032C1F44361C00CF8CBD /* HelperView.m */,
 				C56F2BF51F42C2DF00501AE9 /* Loader.h */,
@@ -693,6 +696,7 @@
 				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
 				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
 				C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */,
+				C525A5AF1F7B8D4600C2641E /* FloatingActionButton.swift in Sources */,
 				C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
