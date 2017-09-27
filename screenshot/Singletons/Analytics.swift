@@ -60,16 +60,9 @@ public class CompositeAnalyticsTracker : NSObject {
     }
     
     public func track(_ event: String, properties: [AnyHashable : Any]? = nil, excludingTrackers excluded: [AnalyticsTracker.Type]) {
-        trackers.values.reduce([], { (trackers, tracker) -> [AnalyticsTracker] in
-            var t = trackers
-            
-            if !excluded.contains(where: { $0 == type(of: tracker) }) {
-                t.append(tracker)
-            }
-            
-            
-            return t
-        }).forEach { $0.track(event, properties: properties) }
+        trackers.values.filter { tracker -> Bool in
+            return !excluded.contains(where: { $0 == type(of: tracker) })
+        }.forEach { $0.track(event, properties: properties) }
     }
     
     public func identify(_ user: AnalyticsUser) {
