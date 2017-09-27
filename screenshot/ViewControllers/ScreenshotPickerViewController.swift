@@ -40,9 +40,10 @@ class ScreenshotPickerViewController: BaseViewController {
     fileprivate var collectionView: UICollectionView!
     fileprivate var helperView: HelperView!
     fileprivate var segments: UISegmentedControl!
-    fileprivate var screenshots: PHAssetCollection?
     fileprivate var assets: PHFetchResult<PHAsset>?
     fileprivate var selectedIndexPaths: [IndexPath] = []
+    fileprivate var previousSegmentIndex = 0
+    fileprivate var isScreenshotsOnly = true
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -51,19 +52,13 @@ class ScreenshotPickerViewController: BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        let collections = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumScreenshots, options: nil)
-        
-        if let collection = collections.firstObject {
-            screenshots = collection
-        }
-        
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let toolbar = UIToolbar.init()
+        let toolbar = UIToolbar()
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         toolbar.delegate = self
         view.addSubview(toolbar)
@@ -71,16 +66,17 @@ class ScreenshotPickerViewController: BaseViewController {
         toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        segments = UISegmentedControl.init(items: ["Screenshots", "Gallery"])
+        segments = UISegmentedControl(items: ["Screenshots", "Gallery"])
         segments.tintColor = UIColor.crazeGreen
-        segments.selectedSegmentIndex = 0
+        segments.selectedSegmentIndex = previousSegmentIndex
+        segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem.init(customView: segments)]
         
-        let layout = UICollectionViewFlowLayout.init()
+        let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 1
         layout.minimumLineSpacing = 1
         
-        collectionView = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -98,7 +94,7 @@ class ScreenshotPickerViewController: BaseViewController {
         let verPadding = CGFloat(40)
         let horPadding = CGFloat(Geometry.padding())
         
-        helperView = HelperView.init()
+        helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding)
         helperView.titleLabel.text = "No Photos!"
@@ -109,27 +105,30 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let imageView = UIImageView.init(image: UIImage.init(named: "ScreenshotsNoPermissionGraphic"))
+        let imageView = UIImageView(image: UIImage.init(named: "ScreenshotsNoPermissionGraphic"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         helperView.contentView.addSubview(imageView)
         imageView.topAnchor.constraint(equalTo: helperView.contentView.topAnchor, constant: verPadding).isActive = true
         imageView.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        
+        let p = Geometry.padding()
+        
+        let fab = FloatingActionButton()
+        fab.translatesAutoresizingMaskIntoConstraints = false
+        fab.setImage(UIImage.init(named: "FABCamera"), for: .normal)
+        fab.backgroundColor = UIColor.crazeRed
+        fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
+        fab.adjustsImageWhenHighlighted = false
+        view.addSubview(fab)
+        fab.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -p / 2).isActive = true
+        fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         reloadAssets()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        let contentSize = collectionView.collectionViewLayout.collectionViewContentSize
-        if contentSize.height > collectionView.bounds.size.height {
-            collectionView.contentOffset = CGPoint.init(x: 0, y: contentSize.height - collectionView.bounds.size.height)
-        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -168,25 +167,49 @@ class ScreenshotPickerViewController: BaseViewController {
     // MARK: Assets
     
     private func reloadAssets() {
-        if let collection = screenshots {
-            assets = PHAsset.fetchAssets(in: collection, options: nil)
-            collectionView.reloadData()
-            helperView.isHidden = (assets?.count ?? 0) > 0
+        if assets == nil || previousSegmentIndex != segments.selectedSegmentIndex {
+            previousSegmentIndex = segments.selectedSegmentIndex
+            
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.predicate = screenshotsOnlyOrExcludedPredicate()
+            fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+            
+            if collectionView.numberOfItems(inSection: 0) > 0 {
+                collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
+            }
         }
+        
+        collectionView.reloadData()
+        helperView.isHidden = (assets?.count ?? 0) > 0
     }
     
     public func selectedAssets() -> [PHAsset] {
         var selectedAssets: [PHAsset] = []
         
         assets?.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-            if self.selectedIndexPaths.contains(IndexPath.init(item: index, section: 0)) {
+            if self.selectedIndexPaths.contains(IndexPath(item: index, section: 0)) {
                 selectedAssets.append(asset)
             }
         })
         
         return selectedAssets
     }
+    
+    private func screenshotsOnlyOrExcludedPredicate() -> NSPredicate {
+        let has = isScreenshotsOnly ? "" : "NOT"
+        return NSPredicate(format: "\(has) ((mediaSubtype & %d) != 0)", PHAssetMediaSubtype.photoScreenshot.rawValue)
+    }
+    
+    // MARK: Segment
+    
+    @objc private func segmentsChanged() {
+        isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
+        reloadAssets()
+    }
 }
+
+// MARK: - Collection View Data Source
 
 extension ScreenshotPickerViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -206,6 +229,8 @@ extension ScreenshotPickerViewController: UICollectionViewDataSource {
     }
 }
 
+// MARK: - Collection View Delegate
+
 extension ScreenshotPickerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndexPaths.append(indexPath)
@@ -223,6 +248,8 @@ extension ScreenshotPickerViewController: UICollectionViewDelegate {
     }
 }
 
+// MARK: - Collection View Delegate Flow Layout
+
 extension ScreenshotPickerViewController: UICollectionViewDelegateFlowLayout {
     func collectionViewItemSize() -> CGSize {
         let columnCount = CGFloat(4)
@@ -237,6 +264,8 @@ extension ScreenshotPickerViewController: UICollectionViewDelegateFlowLayout {
         return collectionViewItemSize()
     }
 }
+
+// MARK: - Toolbar
 
 extension ScreenshotPickerViewController: UIToolbarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
