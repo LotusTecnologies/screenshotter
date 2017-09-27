@@ -183,22 +183,12 @@
 
 #pragma mark - Submit
 
-- (BOOL)isValidEmail:(NSString *)email {
-    BOOL stricterFilter = NO; // Discussion http://blog.logichigh.com/2010/09/02/validating-an-e-mail-address/
-//    NSString *emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}";
-    NSString *stricterFilterString = @"^[A-Z0-9a-z\\._%+-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4}$";
-    NSString *laxString = @"^.+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2}[A-Za-z]*$";
-    NSString *emailRegex = stricterFilter ? stricterFilterString : laxString;
-    
-    return [[NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex] evaluateWithObject:email];
-}
-
 - (void)submitEmail {
-    if ([self isValidEmail:self.emailTextField.text]) {
+    if ([self.emailTextField.text isValidEmail]) {
         self.readyToSubmit = YES;
         
-        NSString *trimmedName = [self.nameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        NSString *trimmedEmail = [self.emailTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSString *trimmedName = [self.nameTextField.text trimWhitespace];
+        NSString *trimmedEmail = [self.emailTextField.text trimWhitespace];
         
         [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
         [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];

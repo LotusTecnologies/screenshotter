@@ -28,11 +28,11 @@ PODS:
   - Clarifai-Apple-SDK (3.0.0-beta7)
   - EggRating (0.1.2):
     - RateView
-  - FBSDKCoreKit (4.26.0):
+  - FBSDKCoreKit (4.27.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.26.0):
+  - FBSDKLoginKit (4.27.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.26.0):
+  - FBSDKShareKit (4.27.0):
     - FBSDKCoreKit
   - ImageEffects (1.0.0)
   - Intercom (4.0.3)
@@ -77,9 +77,9 @@ SPEC CHECKSUMS:
   Branch: c8181636136a8ac2477f42ec8b811f50aa359c8c
   Clarifai-Apple-SDK: a7fa32b4edcbb5d3c45a36e5fbe52ecece9d226c
   EggRating: ac37ed4dad156c9912a384464a25f554bd4198c8
-  FBSDKCoreKit: c8b8582311ec11b145451d8b9717dc6cc2ae5a76
-  FBSDKLoginKit: f3f03b94c21eb834af243c0a881d48641f47ca60
-  FBSDKShareKit: 320712d8293fde6392872c91eb80ef0da5d73cc3
+  FBSDKCoreKit: ebc6c5f5b3f0e72396041050e2266781a38ac587
+  FBSDKLoginKit: 887be4b7452e1c5a3cc4485ce152529965a0c41e
+  FBSDKShareKit: 4f83956d4ca2960730fe7588a168eb8d535c06dc
   ImageEffects: 6f92f55ae12c4010642f84dcc2d7e21246666cf9
   Intercom: ae00cdfc0cd0a12d38f73f6a93c55907add04606
   PromiseKit: ecf5fe92275d57ee77c9ede858af47a162e9b97e
