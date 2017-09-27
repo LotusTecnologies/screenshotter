@@ -83,7 +83,7 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        _track(name: event, properties: properties) {
+        log(name: event, properties: properties) {
             SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
     }
@@ -111,11 +111,11 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
                 return copy
             }
             
-            _track(name: event, properties: props) {
+            log(name: event, properties: props) {
                 Appsee.addEvent(event, withProperties: props)
             }
         } else {
-            _track(name: event) {
+            log(name: event) {
                 Appsee.addEvent(event)
             }
         }
@@ -132,7 +132,7 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 
     func track(_ event: String, properties: [AnyHashable : Any]?) {
-        _track(name: event, properties: properties) {
+        log(name: event, properties: properties) {
             IntercomHelper.sharedInstance.record(event: event, properties: properties)
         }
     }
@@ -148,13 +148,13 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        _track(name: event) {
+        log(name: event) {
             Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
         }
     }
     
     func identify(_ user: AnalyticsUser) {
-        _track(name: "identify") {
+        log(name: "identify") {
             Branch.getInstance().userCompletedAction("identify")
         }
     }
@@ -170,7 +170,7 @@ public class AnalyticsTrackers : NSObject {
 }
 
 extension AnalyticsTracker {
-    fileprivate func _track(name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
+    fileprivate func log(name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
         print("[\(type(of: self))] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
         
         closure()
