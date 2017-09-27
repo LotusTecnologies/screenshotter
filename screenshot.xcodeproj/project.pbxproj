@@ -52,6 +52,7 @@
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
 		C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184DB1F4D637400EE7855 /* NotificationManager.m */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
+		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C59A30461F5FDECB00463338 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* MainButton.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
@@ -146,6 +147,7 @@
 		C55184DB1F4D637400EE7855 /* NotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationManager.m; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
+		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
@@ -374,6 +376,7 @@
 				C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */,
 				C540FE111F52993F005863D7 /* UIDevice+Model.h */,
 				C540FE121F52993F005863D7 /* UIDevice+Model.m */,
+				C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -663,6 +666,7 @@
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
+				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
