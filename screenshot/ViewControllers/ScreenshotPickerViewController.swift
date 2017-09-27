@@ -27,16 +27,19 @@ class ScreenshotPickerNavigationController: UINavigationController {
         doneButton.isEnabled = false
         
         screenshotPickerViewController = ScreenshotPickerViewController.init(nibName: nil, bundle: nil)
-        screenshotPickerViewController.title = "Add Your Screenshots"
+        screenshotPickerViewController.title = "Add Photos"
         screenshotPickerViewController.navigationItem.leftBarButtonItem = cancelButton
         screenshotPickerViewController.navigationItem.rightBarButtonItem = doneButton
         viewControllers = [screenshotPickerViewController]
+        
+        navigationBar.shadowImage = UIImage.init()
     }
 }
 
 class ScreenshotPickerViewController: BaseViewController {
     fileprivate var collectionView: UICollectionView!
     fileprivate var helperView: HelperView!
+    fileprivate var segments: UISegmentedControl!
     fileprivate var screenshots: PHAssetCollection?
     fileprivate var assets: PHFetchResult<PHAsset>?
     fileprivate var selectedIndexPaths: [IndexPath] = []
@@ -60,6 +63,19 @@ class ScreenshotPickerViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let toolbar = UIToolbar.init()
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        toolbar.delegate = self
+        view.addSubview(toolbar)
+        toolbar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        segments = UISegmentedControl.init(items: ["Screenshots", "Gallery"])
+        segments.tintColor = UIColor.crazeGreen
+        segments.selectedSegmentIndex = 0
+        toolbar.items = [UIBarButtonItem.init(customView: segments)]
+        
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 1
         layout.minimumLineSpacing = 1
@@ -70,8 +86,10 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.dataSource = self
         collectionView.backgroundColor = view.backgroundColor
         collectionView.allowsMultipleSelection = true
+        collectionView.contentInset = UIEdgeInsetsMake(toolbar.intrinsicContentSize.height, 0, 0, 0)
+        collectionView.scrollIndicatorInsets = collectionView.contentInset
         collectionView.register(PickerCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        view.addSubview(collectionView)
+        view.insertSubview(collectionView, belowSubview: toolbar)
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -103,6 +121,15 @@ class ScreenshotPickerViewController: BaseViewController {
         super.viewWillAppear(animated)
         
         reloadAssets()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        let contentSize = collectionView.collectionViewLayout.collectionViewContentSize
+        if contentSize.height > collectionView.bounds.size.height {
+            collectionView.contentOffset = CGPoint.init(x: 0, y: contentSize.height - collectionView.bounds.size.height)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -208,5 +235,11 @@ extension ScreenshotPickerViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return collectionViewItemSize()
+    }
+}
+
+extension ScreenshotPickerViewController: UIToolbarDelegate {
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .topAttached
     }
 }
