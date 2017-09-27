@@ -125,7 +125,7 @@
         activityView.transform = CGAffineTransformMakeScale(.6f, .6f);
         [activityView startAnimating];
         [contentView addSubview:activityView];
-        [activityView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        [activityView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
         [activityView.centerYAnchor constraintEqualToAnchor:contentView.centerYAnchor].active = YES;
         
         switch (contentType) {
