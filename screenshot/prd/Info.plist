@@ -50,10 +50,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Coren needs to make copy. Edit the Info.plist</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Grant access to snap from Coren&apos;s camera?</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

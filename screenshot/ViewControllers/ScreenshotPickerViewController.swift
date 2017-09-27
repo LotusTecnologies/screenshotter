@@ -42,7 +42,6 @@ class ScreenshotPickerViewController: BaseViewController {
     fileprivate var segments: UISegmentedControl!
     fileprivate var assets: PHFetchResult<PHAsset>?
     fileprivate var selectedIndexPaths: [IndexPath] = []
-    fileprivate var previousSegmentIndex = 0
     fileprivate var isScreenshotsOnly = true
     
     required init?(coder aDecoder: NSCoder) {
@@ -68,7 +67,7 @@ class ScreenshotPickerViewController: BaseViewController {
         
         segments = UISegmentedControl(items: ["Screenshots", "Gallery"])
         segments.tintColor = UIColor.crazeGreen
-        segments.selectedSegmentIndex = previousSegmentIndex
+        segments.selectedSegmentIndex = 0
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem.init(customView: segments)]
         
@@ -120,16 +119,19 @@ class ScreenshotPickerViewController: BaseViewController {
         fab.backgroundColor = UIColor.crazeRed
         fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
         fab.adjustsImageWhenHighlighted = false
+        fab.addTarget(self, action: #selector(cameraButtonAction), for: .touchUpInside)
         view.addSubview(fab)
         fab.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -p / 2).isActive = true
         fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         
         reloadAssets()
     }
+    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//
+//        reloadAssets()
+//    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -167,17 +169,13 @@ class ScreenshotPickerViewController: BaseViewController {
     // MARK: Assets
     
     private func reloadAssets() {
-        if assets == nil || previousSegmentIndex != segments.selectedSegmentIndex {
-            previousSegmentIndex = segments.selectedSegmentIndex
-            
-            let fetchOptions = PHFetchOptions()
-            fetchOptions.predicate = screenshotsOnlyOrExcludedPredicate()
-            fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-            assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-            
-            if collectionView.numberOfItems(inSection: 0) > 0 {
-                collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
-            }
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = screenshotsOnlyOrExcludedPredicate()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        
+        if collectionView.numberOfItems(inSection: 0) > 0 {
+            collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
         }
         
         collectionView.reloadData()
@@ -206,6 +204,62 @@ class ScreenshotPickerViewController: BaseViewController {
     @objc private func segmentsChanged() {
         isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
         reloadAssets()
+    }
+    
+    fileprivate func setSegmentsIndex(_ index: Int) {
+        segments.selectedSegmentIndex = index
+        segmentsChanged()
+    }
+    
+    // MARK: Camera
+    
+    @objc private func cameraButtonAction() {
+        if PermissionsManager.shared().hasPermission(for: .camera) {
+            presentCameraViewController()
+            
+        } else {
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
+                PermissionsManager.shared().requestPermission(for: .camera, openSettingsIfNeeded: true, response: { (granted) in
+                    if granted {
+                        self.presentCameraViewController()
+                    }
+                })
+            }
+        }
+    }
+    
+    private func presentCameraViewController() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = UIImagePickerControllerSourceType.camera
+        present(imagePicker, animated: true, completion: nil)
+    }
+}
+
+extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+        }
+    }
+    
+    func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            dismiss(animated: true, completion: nil)
+            
+            let alertController = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Ok", style: .default))
+            present(alertController, animated: true)
+            
+        } else {
+            setSegmentsIndex(1)
+            
+            let indexPath = IndexPath(item: 0, section: 0)
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+            collectionView(collectionView, didSelectItemAt: indexPath)
+            
+            dismiss(animated: true, completion: nil)
+        }
     }
 }
 
