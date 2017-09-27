@@ -99,6 +99,9 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+        // Appsee properties can't exceed 300 bytes.
+        // https://www.appsee.com/docs/ios/api?section=events
+        
         let finalKeys = (properties ?? [:]).keys.filter {
             let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
             return propertyLength < 300
