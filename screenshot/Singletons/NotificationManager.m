@@ -86,7 +86,7 @@
         [contentView.bottomAnchor constraintEqualToAnchor:notificationView.bottomAnchor].active = YES;
 //        [contentView.trailingAnchor constraintLessThanOrEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
 //        [contentView.centerXAnchor constraintEqualToAnchor:notificationView.centerXAnchor].active = YES;
-        [contentView.trailingAnchor constraintEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
+        [contentView.leadingAnchor constraintEqualToAnchor:notificationView.layoutMarginsGuide.leadingAnchor].active = YES;
 
 //        CGFloat borderHeight = ([UIScreen mainScreen].scale > 1.f) ? .5f : 1.f;
 //        
