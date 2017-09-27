@@ -178,6 +178,9 @@ class ScreenshotPickerViewController: BaseViewController {
             collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
         }
         
+        selectedIndexPaths.removeAll()
+        syncDoneEnabledState()
+        
         collectionView.reloadData()
         helperView.isHidden = (assets?.count ?? 0) > 0
     }
@@ -234,6 +237,12 @@ class ScreenshotPickerViewController: BaseViewController {
         imagePicker.sourceType = UIImagePickerControllerSourceType.camera
         present(imagePicker, animated: true, completion: nil)
     }
+    
+    // MARK: - Navigation Bar
+    
+    fileprivate func syncDoneEnabledState() {
+        navigationItem.rightBarButtonItem?.isEnabled = (selectedIndexPaths.count > 0)
+    }
 }
 
 extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -288,7 +297,7 @@ extension ScreenshotPickerViewController: UICollectionViewDataSource {
 extension ScreenshotPickerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndexPaths.append(indexPath)
-        navigationItem.rightBarButtonItem?.isEnabled = true
+        syncDoneEnabledState()
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
@@ -296,9 +305,7 @@ extension ScreenshotPickerViewController: UICollectionViewDelegate {
             selectedIndexPaths.remove(at: index)
         }
         
-        if (selectedIndexPaths.count == 0) {
-            navigationItem.rightBarButtonItem?.isEnabled = false
-        }
+        syncDoneEnabledState()
     }
 }
 
