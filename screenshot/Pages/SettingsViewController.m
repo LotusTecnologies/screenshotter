@@ -56,6 +56,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         
         self.title = @"Settings";
@@ -292,6 +293,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     }
     
     cell.accessoryType = [self accessoryTypeForRowType:rowType];
+    cell.accessoryView = [self accessoryViewForRowType:rowType];
     return cell;
 }
 
@@ -439,6 +441,33 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         default:
             return UITableViewCellAccessoryNone;
+            break;
+    }
+}
+
+- (UIView *)accessoryViewForRowType:(RowType)rowType {
+    UILabel *label;
+    
+    if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]]) {
+        CGFloat size = 18.f;
+        
+        label = [[UILabel alloc] initWithFrame:CGRectMake(0.f, 0.f, size, size)];
+        label.backgroundColor = [UIColor crazeRed];
+        label.text = @"!";
+        label.textAlignment = NSTextAlignmentCenter;
+        label.font = [UIFont fontWithName:@"Optima-ExtraBlack" size:14.f];
+        label.textColor = [UIColor whiteColor];
+        label.layer.cornerRadius = size / 2.f;
+        label.layer.masksToBounds = YES;
+    }
+    
+    switch (rowType) {
+        case RowTypePhotoPermission:
+        case RowTypePushPermission:
+            return label;
+            break;
+        default:
+            return nil;
             break;
     }
 }
