@@ -73,6 +73,9 @@ class AssetSyncModel: NSObject {
                     }
                 }
             }.then (on: processingQ) { (imageData, isFashion) -> Void in
+                if isFashion && !shouldBypassClarifai {
+                    self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                }
                 self.syteProcessing(shouldProcess: isFashion, imageData: imageData, assetId: asset.localIdentifier)
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
@@ -86,7 +89,7 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<Data?> in
-                AnalyticsManager.track("bypassed Clarifai")
+                AnalyticsManager.track("bypassed Clarifai on retry")
                 let imageData = self.data(for: image)
                 return Promise(value: imageData)
             }.then (on: processingQ) { imageData -> Promise<(Data?, Bool)> in
@@ -370,9 +373,6 @@ class AssetSyncModel: NSObject {
                                     screenshot.uploadedImageURL = uploadedURLString
                                 }
                                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                                if screenshot.shoppablesCount == 1 {
-                                    self.sendScreenshotAddedLocalNotification(assetId: assetId)
-                                }
                             } else {
                                 print("AssetSyncModel extractProducts empty productsArray. productsDict:\(productsDict)\noffersUrl:\(url)")
                             }
