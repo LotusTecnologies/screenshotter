@@ -51,6 +51,7 @@
             UIImageView *imageView = [[UIImageView alloc] init];
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
             imageView.contentMode = self.imageView.contentMode;
+            imageView.backgroundColor = [UIColor colorWithWhite:1.f alpha:.7f];
             [toolbarBackgroundView addSubview:imageView];
             [imageView.topAnchor constraintEqualToAnchor:self.imageView.topAnchor].active = YES;
             [imageView.leadingAnchor constraintEqualToAnchor:self.imageView.leadingAnchor].active = YES;
@@ -118,7 +119,7 @@
             self.imageView.image = [UIImage imageWithData:_screenshot.imageData];
             
             // TODO: create cache of these images for scrolling performance
-            self.toolbarImageView.image = [self.imageView.image extraLightImage];
+//            self.toolbarImageView.image = [self.imageView.image extraLightImage];
             
         } else {
             self.imageView.image = nil;
