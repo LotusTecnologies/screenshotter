@@ -284,6 +284,10 @@ extension DataModel {
         return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isFashion != nil"))
     }
     
+    func retrieveHiddenAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
+        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isHidden == TRUE"))
+    }
+    
     func retrieveAssetIds(managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> Set<String> {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
         fetchRequest.predicate = predicate
@@ -297,21 +301,21 @@ extension DataModel {
         fetchRequest.shouldRefreshRefetchedObjects = false
         fetchRequest.returnsObjectsAsFaults = false
         
-        var allAssetIdsSet = Set<String>()
+        var assetIdsSet = Set<String>()
         do {
             guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]] else {
                 print("retrieveAssetIds failed to fetch dictionaries")
-                return allAssetIdsSet
+                return assetIdsSet
             }
             for result in results {
                 if let assetId = result["assetId"] {
-                    allAssetIdsSet.insert(assetId)
+                    assetIdsSet.insert(assetId)
                 }
             }
         } catch {
             print("retrieveAllAssetIds results with error:\(error)")
         }
-        return allAssetIdsSet
+        return assetIdsSet
     }
     
     func retrieveScreenshot(managedObjectContext: NSManagedObjectContext, assetId: String) -> Screenshot? {
