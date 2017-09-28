@@ -177,7 +177,7 @@
     
     switch (type) {
         case PermissionTypeCamera:
-            // TODO:
+            [self requestCameraPermissionWithResponse:responseCopyOnMainThread];
             break;
             
         case PermissionTypePhoto:

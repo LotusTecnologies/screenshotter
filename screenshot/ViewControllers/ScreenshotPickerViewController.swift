@@ -66,10 +66,15 @@ class ScreenshotPickerViewController: BaseViewController {
         toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         segments = UISegmentedControl(items: ["Screenshots", "Gallery"])
+        segments.translatesAutoresizingMaskIntoConstraints = false
         segments.tintColor = UIColor.crazeGreen
         segments.selectedSegmentIndex = 0
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem.init(customView: segments)]
+        segments.topAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.topAnchor).isActive = true
+        segments.leadingAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.leadingAnchor).isActive = true
+        segments.bottomAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.bottomAnchor).isActive = true
+        segments.trailingAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 1
@@ -111,27 +116,23 @@ class ScreenshotPickerViewController: BaseViewController {
         imageView.topAnchor.constraint(equalTo: helperView.contentView.topAnchor, constant: verPadding).isActive = true
         imageView.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
         
-        let p = Geometry.padding()
-        
-        let fab = FloatingActionButton()
-        fab.translatesAutoresizingMaskIntoConstraints = false
-        fab.setImage(UIImage.init(named: "FABCamera"), for: .normal)
-        fab.backgroundColor = UIColor.crazeRed
-        fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
-        fab.adjustsImageWhenHighlighted = false
-        fab.addTarget(self, action: #selector(cameraButtonAction), for: .touchUpInside)
-        view.addSubview(fab)
-        fab.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -p / 2).isActive = true
-        fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
+            let p = Geometry.padding()
+            
+            let fab = FloatingActionButton()
+            fab.translatesAutoresizingMaskIntoConstraints = false
+            fab.setImage(UIImage.init(named: "FABCamera"), for: .normal)
+            fab.backgroundColor = UIColor.crazeRed
+            fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
+            fab.adjustsImageWhenHighlighted = false
+            fab.addTarget(self, action: #selector(cameraButtonAction), for: .touchUpInside)
+            view.addSubview(fab)
+            fab.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -p / 2).isActive = true
+            fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
+        }
         
         reloadAssets()
     }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//
-//        reloadAssets()
-//    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -221,13 +222,11 @@ class ScreenshotPickerViewController: BaseViewController {
             presentCameraViewController()
             
         } else {
-            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
-                PermissionsManager.shared().requestPermission(for: .camera, openSettingsIfNeeded: true, response: { (granted) in
-                    if granted {
-                        self.presentCameraViewController()
-                    }
-                })
-            }
+            PermissionsManager.shared().requestPermission(for: .camera, openSettingsIfNeeded: true, response: { (granted) in
+                if granted {
+                    self.presentCameraViewController()
+                }
+            })
         }
     }
     

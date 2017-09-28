@@ -145,7 +145,9 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         
         @try {
             [self.settingsTabBarItem addObserver:self forKeyPath:TabBarBadgeFontKey options:NSKeyValueObservingOptionNew context:nil];
-        } @catch (id anException) {}
+        } @catch (id anException) {
+            NSLog(@"crap");
+        }
     }
 }
 
