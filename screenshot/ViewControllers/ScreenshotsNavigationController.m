@@ -27,7 +27,7 @@
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
             viewController.lifeCycleDelegate = self;
-            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
+            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"NavigationBarAddPhotos"] style:UIBarButtonItemStylePlain target:self action:@selector(presentPickerViewController)];
             viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor crazeRed];
             viewController;
         });
