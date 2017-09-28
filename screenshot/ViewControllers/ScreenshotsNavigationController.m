@@ -93,9 +93,9 @@
         [[RatingFlow sharedInstance] recordSignificantEvent];
         
     } else {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry"
-                                                                      message:@"We had a problem with this screenshot."
-                                                               preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"No Items Found"
+                                                                       message:@"No visually similar products were detected at this time."
+                                                                preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
                                                                 style:UIAlertActionStyleDefault
                                                               handler:nil];
