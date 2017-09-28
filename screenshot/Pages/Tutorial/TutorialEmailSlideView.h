@@ -13,7 +13,6 @@
 @protocol TutorialEmailSlideViewDelegate <NSObject>
 @required
 
-- (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView;
 - (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView;
 
 - (void)tutorialEmailSlideViewDidTapTermsOfService:(TutorialEmailSlideView *)slideView;
