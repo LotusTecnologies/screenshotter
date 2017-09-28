@@ -587,7 +587,7 @@ class AssetSyncModel: NSObject {
             if toDownload.count > 0 {
                 AnalyticsManager.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
-                for shareId in toDownload {
+                toDownload.forEach { shareId in
                     self.processingQ.async {
                         self.downloadScreenshot(shareId: shareId)
                     }
@@ -595,28 +595,24 @@ class AssetSyncModel: NSObject {
             }
             if toBypassClarifai.count > 0 {
                 AnalyticsManager.track("user imported old screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
-                if let selectedAssets = self.selectedScreenshotAssets {
-                    for asset in selectedAssets {
-                        if toBypassClarifai.contains(asset.localIdentifier) {
-                            self.screenshotsToProcess += 1
-                            self.processingQ.async {
-                                self.uploadScreenshot(asset: asset, shouldBypassClarifai: true)
-                            }
+                self.selectedScreenshotAssets?
+                    .filter { toBypassClarifai.contains($0.localIdentifier) }
+                    .forEach { asset in
+                        self.screenshotsToProcess += 1
+                        self.processingQ.async {
+                            self.uploadScreenshot(asset: asset, shouldBypassClarifai: true)
                         }
-                    }
                 }
             }
             if toRetry.count > 0 {
                 AnalyticsManager.track("user retried screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
-                if let selectedAssets = self.selectedScreenshotAssets {
-                    for asset in selectedAssets {
-                        if toRetry.contains(asset.localIdentifier) {
-                            self.screenshotsToProcess += 1
-                            self.processingQ.async {
-                                self.retryScreenshot(asset: asset)
-                            }
+                self.selectedScreenshotAssets?
+                    .filter { toRetry.contains($0.localIdentifier) }
+                    .forEach { asset in
+                        self.screenshotsToProcess += 1
+                        self.processingQ.async {
+                            self.retryScreenshot(asset: asset)
                         }
-                    }
                 }
             }
             self.selectedScreenshotAssets?.removeAll()
