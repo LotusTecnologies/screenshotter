@@ -45,6 +45,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 @property (nonatomic, strong) UITextField *nameTextField;
 @property (nonatomic, strong) UITextField *emailTextField;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *previousTexts;
 
 @end
 
@@ -456,20 +457,24 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Text Field
 
-- (void)textFieldDidEndEditing:(UITextField *)textField {
-    NSString *key;
-    
+- (NSMutableDictionary<NSString *,NSString *> *)previousTexts {
+    if (!_previousTexts) {
+        _previousTexts = [NSMutableDictionary dictionary];
+        _previousTexts[UserDefaultsKeys.name] = [self textForRowType:RowTypeName];
+        _previousTexts[UserDefaultsKeys.email] = [self textForRowType:RowTypeEmail];
+    }
+    return _previousTexts;
+}
+
+- (NSString *)keyForTextField:(UITextField *)textField {
     if (textField == self.emailTextField) {
-        key = UserDefaultsKeys.email;
+        return UserDefaultsKeys.email;
         
     } else if (textField == self.nameTextField) {
-        key = UserDefaultsKeys.name;
+        return UserDefaultsKeys.name;
     }
     
-    if (key) {
-        [[NSUserDefaults standardUserDefaults] setValue:textField.text forKey:key];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+    return nil;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -477,6 +482,30 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [textField resignFirstResponder];
     }
     return YES;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    NSString *key = [self keyForTextField:textField];
+    NSString *trimmedText = [textField.text trimWhitespace];
+    BOOL canContinue = NO;
+    
+    if ([key isEqualToString:UserDefaultsKeys.email]) {
+        canContinue = [textField.text isValidEmail];
+        
+    } else if ([key isEqualToString:UserDefaultsKeys.name]) {
+        canContinue = trimmedText.length > 0;
+    }
+    
+    if (canContinue) {
+        self.previousTexts[key] = trimmedText;
+        textField.text = trimmedText;
+        
+        [[NSUserDefaults standardUserDefaults] setValue:trimmedText forKey:key];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+    } else {
+        textField.text = self.previousTexts[key];
+    }
 }
 
 - (void)dismissKeyboard {

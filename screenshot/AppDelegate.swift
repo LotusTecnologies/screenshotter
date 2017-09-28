@@ -154,15 +154,17 @@ extension AppDelegate {
         let crazeRedColor = UIColor.crazeRed
         
         UINavigationBar.appearance().tintColor = UIColor.gray6
-        
         UINavigationBar.appearance().titleTextAttributes = [NSFontAttributeName : UIFont(name: "Futura-Medium", size: 20) ?? UIFont.systemFont(ofSize: 20), NSForegroundColorAttributeName : UIColor.gray3]
-
-        UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName : UIFont(name: "Futura", size: 16) ?? UIFont.systemFont(ofSize: 16)], for: .normal)
-
+        
+        let barButtonItemTitleTextAttributes = [NSFontAttributeName : UIFont(name: "Futura", size: 16) ?? UIFont.systemFont(ofSize: 16)]
+        UIBarButtonItem.appearance().setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
+        UIBarButtonItem.appearance().setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
+        UIBarButtonItem.appearance().setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
+        
         UITabBar.appearance().tintColor = crazeRedColor
         
         UIToolbar.appearance().tintColor = crazeRedColor
-    
+        
         UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [UIToolbar.self]).color = crazeRedColor
     }
     

@@ -86,7 +86,7 @@
         [contentView.bottomAnchor constraintEqualToAnchor:notificationView.bottomAnchor].active = YES;
 //        [contentView.trailingAnchor constraintLessThanOrEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
 //        [contentView.centerXAnchor constraintEqualToAnchor:notificationView.centerXAnchor].active = YES;
-        [contentView.trailingAnchor constraintEqualToAnchor:notificationView.layoutMarginsGuide.trailingAnchor].active = YES;
+        [contentView.leadingAnchor constraintEqualToAnchor:notificationView.layoutMarginsGuide.leadingAnchor].active = YES;
 
 //        CGFloat borderHeight = ([UIScreen mainScreen].scale > 1.f) ? .5f : 1.f;
 //        
@@ -125,7 +125,7 @@
         activityView.transform = CGAffineTransformMakeScale(.6f, .6f);
         [activityView startAnimating];
         [contentView addSubview:activityView];
-        [activityView.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
+        [activityView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
         [activityView.centerYAnchor constraintEqualToAnchor:contentView.centerYAnchor].active = YES;
         
         switch (contentType) {
