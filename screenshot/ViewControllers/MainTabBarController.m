@@ -13,16 +13,21 @@
 #import "screenshot-Swift.h"
 #import "AnalyticsManager.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate>
+@interface MainTabBarController () <UITabBarControllerDelegate> {
+    BOOL _isObservingSettingsBadgeFont;
+}
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
+@property (nonatomic, strong) UITabBarItem *settingsTabBarItem;
 @property (nonatomic, strong) UpdatePromptHandler *updatePromptHandler;
 
 @end
 
 @implementation MainTabBarController
+
+NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -53,6 +58,8 @@
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
             viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:2];
+            viewController.tabBarItem.badgeColor = [UIColor crazeRed];
+            _settingsTabBarItem = viewController.tabBarItem;
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.view.backgroundColor = [UIColor background];
@@ -60,6 +67,8 @@
         });
         
         self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
     return self;
 }
@@ -70,6 +79,36 @@
     self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
     [self.updatePromptHandler start];
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self refreshTabBarSettingsBadge];
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self refreshTabBarSettingsBadge];
+    }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:TabBarBadgeFontKey]) {
+        NSDictionary *badgeAttributes = @{NSFontAttributeName:[UIFont fontWithName:@"Optima-ExtraBlack" size:14.f]};
+        
+        // Remove the previous value so UIKit recognizes the update.
+        [self.settingsTabBarItem setBadgeTextAttributes:nil forState:UIControlStateNormal];
+        [self.settingsTabBarItem setBadgeTextAttributes:badgeAttributes forState:UIControlStateNormal];
+        
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void)dealloc {
+    [self dismissTabBarSettingsBadge];
+}
+
 
 #pragma mark - Tab Bar
 
@@ -95,6 +134,39 @@
     
     if (tab) {
         [AnalyticsManager track:@"Tab Bar tapped" properties:@{@"tab": tab}];
+    }
+}
+
+- (void)presentTabBarSettingsBadge {
+    if (!_isObservingSettingsBadgeFont) {
+        _isObservingSettingsBadgeFont = YES;
+        
+        self.settingsTabBarItem.badgeValue = @"!";
+        
+        @try {
+            [self.settingsTabBarItem addObserver:self forKeyPath:TabBarBadgeFontKey options:NSKeyValueObservingOptionNew context:nil];
+        } @catch (id anException) {}
+    }
+}
+
+- (void)dismissTabBarSettingsBadge {
+    if (_isObservingSettingsBadgeFont) {
+        _isObservingSettingsBadgeFont = NO;
+        
+        self.settingsTabBarItem.badgeValue = nil;
+        [self.settingsTabBarItem removeObserver:self forKeyPath:TabBarBadgeFontKey];
+    }
+}
+
+- (void)refreshTabBarSettingsBadge {
+    BOOL hasPhotoPermissions = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto];
+    BOOL hasPushPermissions = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePush];
+    
+    if (!hasPhotoPermissions || !hasPushPermissions) {
+        [self presentTabBarSettingsBadge];
+        
+    } else {
+        [self dismissTabBarSettingsBadge];
     }
 }
 
