@@ -68,7 +68,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         
         self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
     return self;
 }
@@ -86,7 +86,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [self refreshTabBarSettingsBadge];
 }
 
-- (void)applicationWillEnterForeground:(NSNotification *)notification {
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
         [self refreshTabBarSettingsBadge];
     }
