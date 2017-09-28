@@ -10,6 +10,7 @@
 #import "screenshot-Swift.h"
 
 //  Libraries
+@import AVFoundation;
 @import CoreLocation;
 @import Photos;
 @import UserNotifications;
@@ -49,6 +50,10 @@
 
 - (PermissionStatus)permissionStatusForType:(PermissionType)type {
     switch (type) {
+        case PermissionTypeCamera:
+            return [self permissionStatusForCamera:[AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo]];
+            break;
+            
         case PermissionTypePhoto:
             return [self permissionStatusForPhoto:[PHPhotoLibrary authorizationStatus]];
             break;
@@ -62,6 +67,26 @@
             break;
             
         default:
+            return PermissionStatusNotDetermined;
+            break;
+    }
+}
+
+- (PermissionStatus)permissionStatusForCamera:(AVAuthorizationStatus)status {
+    switch (status) {
+        case AVAuthorizationStatusRestricted:
+            return PermissionStatusRestricted;
+            break;
+            
+        case AVAuthorizationStatusDenied:
+            return PermissionStatusDenied;
+            break;
+            
+        case AVAuthorizationStatusAuthorized:
+            return PermissionStatusAuthorized;
+            break;
+            
+        case AVAuthorizationStatusNotDetermined:
             return PermissionStatusNotDetermined;
             break;
     }
@@ -151,6 +176,10 @@
     } copy];
     
     switch (type) {
+        case PermissionTypeCamera:
+            // TODO:
+            break;
+            
         case PermissionTypePhoto:
             [self requestPhotoPermissionWithResponse:responseCopyOnMainThread];
             break;
@@ -178,6 +207,23 @@
         
     } else {
         [self requestPermissionForType:type response:response];
+    }
+}
+
+- (void)requestCameraPermissionWithResponse:(PermissionBlock)response {
+    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    if (status == AVAuthorizationStatusNotDetermined) {
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+            if (response) {
+                response(granted);
+            }
+        }];
+        
+    } else {
+        if (response) {
+            response(status == AVAuthorizationStatusAuthorized);
+        }
     }
 }
 

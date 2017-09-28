@@ -27,7 +27,8 @@
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
             viewController.lifeCycleDelegate = self;
-//            viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
+            viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(presentPickerViewController)];
+            viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor crazeRed];
             viewController;
         });
         
@@ -110,22 +111,18 @@
 
 #pragma mark - Screenshots Picker
 
-- (ScreenshotPickerNavigationController *)pickerNavigationController {
-    if (!_pickerNavigationController) {
-        _pickerNavigationController = [[ScreenshotPickerNavigationController alloc] init];
-        _pickerNavigationController.cancelButton.target = self;
-        _pickerNavigationController.cancelButton.action = @selector(pickerViewControllerDidCancel);
-        _pickerNavigationController.doneButton.target = self;
-        _pickerNavigationController.doneButton.action = @selector(pickerViewControllerDidFinish);
-    }
-    return _pickerNavigationController;
-}
-
 - (void)presentPickerViewController {
     [self presentPickerViewControllerWithCompletion:nil];
 }
 
 - (void)presentPickerViewControllerWithCompletion:(dispatch_block_t)completion {
+    ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
+    picker.cancelButton.target = self;
+    picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
+    picker.doneButton.target = self;
+    picker.doneButton.action = @selector(pickerViewControllerDidFinish);
+    self.pickerNavigationController = picker;
+    
     [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
 }
 
