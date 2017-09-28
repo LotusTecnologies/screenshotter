@@ -138,15 +138,15 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 }
 
 - (void)presentTabBarSettingsBadge {
+    self.settingsTabBarItem.badgeValue = @"!";
+    
     if (!_isObservingSettingsBadgeFont) {
-        _isObservingSettingsBadgeFont = YES;
-        
-        self.settingsTabBarItem.badgeValue = @"!";
-        
         @try {
+            _isObservingSettingsBadgeFont = YES;
             [self.settingsTabBarItem addObserver:self forKeyPath:TabBarBadgeFontKey options:NSKeyValueObservingOptionNew context:nil];
+            
         } @catch (id anException) {
-            NSLog(@"crap");
+            _isObservingSettingsBadgeFont = NO;
         }
     }
 }
@@ -155,9 +155,10 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     if (_isObservingSettingsBadgeFont) {
         _isObservingSettingsBadgeFont = NO;
         
-        self.settingsTabBarItem.badgeValue = nil;
-        [self.settingsTabBarItem removeObserver:self forKeyPath:TabBarBadgeFontKey];
+        [self.settingsTabBarItem removeObserver:self forKeyPath:TabBarBadgeFontKey context:nil];
     }
+    
+    self.settingsTabBarItem.badgeValue = nil;
 }
 
 - (void)refreshTabBarSettingsBadge {

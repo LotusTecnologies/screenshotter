@@ -71,10 +71,13 @@ class ScreenshotPickerViewController: BaseViewController {
         segments.selectedSegmentIndex = 0
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem.init(customView: segments)]
-        segments.topAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.topAnchor).isActive = true
-        segments.leadingAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.leadingAnchor).isActive = true
-        segments.bottomAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.bottomAnchor).isActive = true
-        segments.trailingAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        if #available(iOS 11.0, *) {} else {
+            segments.topAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.topAnchor).isActive = true
+            segments.leadingAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.leadingAnchor).isActive = true
+            segments.bottomAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.bottomAnchor).isActive = true
+            segments.trailingAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.trailingAnchor).isActive = true
+        }
         
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 1
