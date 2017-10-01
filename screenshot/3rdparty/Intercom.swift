@@ -64,7 +64,7 @@ class IntercomHelper : NSObject {
         let isIntercomNotification = Intercom.isIntercomPushNotification(userInfo)
         let trackingPrefix = opened ? "Opened with" : "Received"
         
-        AnalyticsTrackers.standard.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
+        track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
     func registerUser(withEmail email: String, name: String? = nil) {
@@ -95,7 +95,7 @@ class IntercomHelper : NSObject {
     
     func recordPushNotificationStatus(_ enabled:Bool) {
         let name = "APN \(enabled ? "En" : "Dis")abled"
-        AnalyticsTrackers.standard.track(name)
+        track(name)
         Intercom.logEvent(withName: name)
     }
     

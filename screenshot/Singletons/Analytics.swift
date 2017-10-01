@@ -27,7 +27,7 @@ public class AnalyticsUser : NSObject {
     func identify(_ user: AnalyticsUser)
 }
 
-public class CompositeAnalyticsTracker : NSObject {
+public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     private var trackers: [String : AnalyticsTracker] = [:]
     
     init(trackers ts: [AnalyticsTracker] = []) {
@@ -49,7 +49,7 @@ public class CompositeAnalyticsTracker : NSObject {
         trackers.removeValue(forKey: String(describing: type(of:tracker)))
     }
     
-    // MARK: -
+    // MARK: - AnalyticsTracker
     
     public func track(_ event: String) {
         trackers.values.forEach { $0.track(event) }
@@ -173,5 +173,12 @@ extension AnalyticsTracker {
     }
 }
 
+public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
+    tracker.track(name, properties: properties)
+}
 
+public func identify(_ name: String, email: String, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
+    let user = AnalyticsUser(name: name, email: email)
+    tracker.identify(user)
+}
 
