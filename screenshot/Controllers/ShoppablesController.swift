@@ -34,6 +34,7 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
     }
     
     public func shoppable(at index: Int) -> Shoppable {
+        
         return shoppablesFrc.object(at: IndexPath.init(row: index, section: 0))
     }
 }
@@ -54,4 +55,8 @@ extension ShoppablesController {
     func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>) {
         collectionView?.reloadData()
     }
+}
+
+@objc protocol ShoppablesControllerProtocol {
+    var shoppablesController: ShoppablesController! { get set }
 }

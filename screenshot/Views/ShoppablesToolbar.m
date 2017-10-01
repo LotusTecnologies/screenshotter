@@ -7,7 +7,6 @@
 //
 
 #import "ShoppablesToolbar.h"
-#import "screenshot-Swift.h"
 #import "Geometry.h"
 #import "ShoppableCollectionViewCell.h"
 
@@ -17,6 +16,7 @@
 
 @implementation ShoppablesToolbar
 @dynamic delegate;
+@synthesize shoppablesController = _shoppablesController;
 
 #pragma mark - Life Cycle
 
@@ -57,10 +57,10 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    if (self.shoppables.count) {
+    if ([self.shoppablesController shoppables].count) {
         CGFloat lineSpacing = ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).minimumLineSpacing;
-        CGFloat spacingsWidth = lineSpacing * (self.shoppables.count - 1);
-        CGFloat shoppablesWidth = [self shoppableSize].width * self.shoppables.count;
+        CGFloat spacingsWidth = lineSpacing * ([self.shoppablesController shoppables].count - 1);
+        CGFloat shoppablesWidth = [self shoppableSize].width * [self.shoppablesController shoppables].count;
         CGFloat contentWidth = round(spacingsWidth + shoppablesWidth);
         CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
         
@@ -88,6 +88,13 @@
 
 #pragma mark - Shoppable
 
+- (void)setShoppablesController:(ShoppablesController *)shoppablesController {
+    if (_shoppablesController != shoppablesController) {
+        _shoppablesController = shoppablesController;
+        _shoppablesController.collectionView = shoppablesController ? self.collectionView : nil;
+    }
+}
+
 - (void)setScreenshotImage:(UIImage *)screenshotImage {
     if (_screenshotImage != screenshotImage) {
         _screenshotImage = screenshotImage;
@@ -112,7 +119,7 @@
 #pragma mark - Collection View
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.shoppables.count;
+    return [self.shoppablesController shoppables].count;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -121,7 +128,7 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ShoppableCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.image = [self.shoppables[indexPath.item] croppedWithImage:self.screenshotImage];
+    cell.image = [[self.shoppablesController shoppables][indexPath.item] croppedWithImage:self.screenshotImage];
     return cell;
 }
 

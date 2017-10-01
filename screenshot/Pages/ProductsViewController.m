@@ -24,14 +24,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeBrands
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesToolbarDelegate> {
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
 }
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
-@property (nonatomic, strong) ShoppablesController *shoppablesController;
 @property (nonatomic, strong) NSArray<Product *> *products;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSString *> *shoppableSortTitles;
 @property (nonatomic) ShoppableSortType currentSortType;
@@ -49,6 +48,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 @end
 
 @implementation ProductsViewController
+@synthesize shoppablesController = _shoppablesController;
+
 
 #pragma mark - Life Cycle
 
@@ -69,6 +70,11 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if (!self.shoppablesController) {
+        // You shall not pass!
+        return;
+    }
+    
     self.image = [UIImage imageWithData:self.screenshot.imageData];
     
     self.shoppablesToolbar = ({
@@ -78,7 +84,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
         toolbar.screenshotImage = self.image;
-        toolbar.shoppables = [self.shoppablesController shoppables];
+        toolbar.shoppablesController = self.shoppablesController;
         toolbar.delegate = self;
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
@@ -87,8 +93,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [toolbar.heightAnchor constraintEqualToConstant:toolbar.bounds.size.height].active = YES;
         toolbar;
     });
-    
-    self.shoppablesController.collectionView = self.shoppablesToolbar.collectionView;
     
     self.collectionView = ({
         CGFloat p = [Geometry padding];
@@ -180,7 +184,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)displayScreenshotAction {
     ScreenshotDisplayNavigationController *navigationController = [[ScreenshotDisplayNavigationController alloc] init];
     navigationController.screenshotDisplayViewController.image = self.image;
-    navigationController.screenshotDisplayViewController.shoppables = [self.shoppablesToolbar shoppables];
+    navigationController.screenshotDisplayViewController.shoppables = [self.shoppablesController shoppables];
     [self presentViewController:navigationController animated:YES completion:nil];
 }
 

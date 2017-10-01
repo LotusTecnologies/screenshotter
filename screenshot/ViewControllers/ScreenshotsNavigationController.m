@@ -87,21 +87,21 @@
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     productsViewController.screenshot = screenshot;
     
-    if ([productsViewController hasShoppables]) {
+//    if ([productsViewController hasShoppables]) {
         [self pushViewController:productsViewController animated:YES];
         [screenshot setViewed];
         [[RatingFlow sharedInstance] recordSignificantEvent];
         
-    } else {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"No Items Found"
-                                                                       message:@"No visually similar products were detected at this time."
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
-                                                                style:UIAlertActionStyleDefault
-                                                              handler:nil];
-        [alert addAction:defaultAction];
-        [self presentViewController:alert animated:YES completion:nil];
-    }
+//    } else {
+//        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"No Items Found"
+//                                                                       message:@"No visually similar products were detected at this time."
+//                                                                preferredStyle:UIAlertControllerStyleAlert];
+//        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+//                                                                style:UIAlertActionStyleDefault
+//                                                              handler:nil];
+//        [alert addAction:defaultAction];
+//        [self presentViewController:alert animated:YES completion:nil];
+//    }
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {

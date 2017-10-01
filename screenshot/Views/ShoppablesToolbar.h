@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "screenshot-Swift.h"
 
 @class ShoppablesToolbar;
 @class Shoppable;
@@ -18,12 +19,11 @@
 
 @end
 
-@interface ShoppablesToolbar : UIToolbar
+@interface ShoppablesToolbar : UIToolbar <ShoppablesControllerProtocol>
 
 @property (nonatomic, weak) id<ShoppablesToolbarDelegate> delegate;
 
 @property (nonatomic, strong, readonly) UICollectionView *collectionView;
-@property (nonatomic, strong) NSArray<Shoppable *> *shoppables;
 @property (nonatomic, copy) UIImage *screenshotImage;
 
 - (void)selectFirstShoppable;
