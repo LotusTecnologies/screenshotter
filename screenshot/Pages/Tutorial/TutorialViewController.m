@@ -13,7 +13,6 @@
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "WebViewController.h"
-#import "AnalyticsManager.h"
 #import "screenshot-Swift.h"
 
 @interface TutorialViewController () <UIScrollViewDelegate, TutorialWelcomeSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate> {
@@ -37,7 +36,7 @@
     if (self) {
         self.title = @"Tutorial";
         
-        [AnalyticsManager track:@"Started Tutorial"];
+        [AnalyticsTrackers.standard track:@"Started Tutorial"];
     }
     return self;
 }
@@ -200,7 +199,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialCompleted];
     
     [self.delegate tutorialViewControllerDidComplete:self];
-    [AnalyticsManager track:@"Finished Tutorial"];
+    [AnalyticsTrackers.standard track:@"Finished Tutorial"];
 }
 
 

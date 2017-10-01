@@ -12,7 +12,6 @@
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
 #import "WebViewController.h"
-#import "AnalyticsManager.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
 
@@ -265,8 +264,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     [self.navigationController pushViewController:webViewController animated:YES];
     
-    [AnalyticsManager branchEvent:@"Tapped product"];
-    [AnalyticsManager track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
+    [AnalyticsTrackers.branch track:@"Tapped product"];
+    [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
     
     [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }
@@ -282,7 +281,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [AnalyticsManager track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    [AnalyticsTrackers.standard track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
@@ -379,7 +378,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
     [self reloadCollectionViewForIndex:index];
     
-    [AnalyticsManager track:@"Tapped on shoppable"];
+    [AnalyticsTrackers.standard track:@"Tapped on shoppable"];
 }
 
 

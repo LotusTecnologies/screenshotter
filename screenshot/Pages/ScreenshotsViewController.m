@@ -12,7 +12,6 @@
 #import "screenshot-Swift.h"
 #import "HelperView.h"
 #import "PermissionsManager.h"
-#import "AnalyticsManager.h"
 @import PromiseKit;
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
@@ -264,7 +263,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionImages) {
         [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
         
-        [AnalyticsManager track:@"Tapped on screenshot"];
+        [AnalyticsTrackers.standard track:@"Tapped on screenshot"];
     }
 }
 
@@ -298,15 +297,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
-            [AnalyticsManager track:@"share completed"];
+            [AnalyticsTrackers.standard track:@"share completed"];
         } else {
-            [AnalyticsManager track:@"share incomplete"];
+            [AnalyticsTrackers.standard track:@"share incomplete"];
         }
     };
     activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
     [self presentViewController:activityViewController animated:YES completion:nil];
     
-    [AnalyticsManager track:@"Shared screenshot"];
+    [AnalyticsTrackers.standard track:@"Shared screenshot"];
 }
 
 - (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
@@ -316,7 +315,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
         [[self screenshotAtIndex:indexPath.item] setHide];
         
-        [AnalyticsManager track:@"Removed screenshot"];
+        [AnalyticsTrackers.standard track:@"Removed screenshot"];
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
