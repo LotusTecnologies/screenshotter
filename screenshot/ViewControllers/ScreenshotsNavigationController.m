@@ -81,27 +81,16 @@
 #pragma mark - Screenshots View Controller
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
+    
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
     productsViewController.lifeCycleDelegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
-    Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     productsViewController.screenshot = screenshot;
+    [self pushViewController:productsViewController animated:YES];
     
-//    if ([productsViewController hasShoppables]) {
-        [self pushViewController:productsViewController animated:YES];
-        [screenshot setViewed];
-        [[RatingFlow sharedInstance] recordSignificantEvent];
-        
-//    } else {
-//        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"No Items Found"
-//                                                                       message:@"No visually similar products were detected at this time."
-//                                                                preferredStyle:UIAlertControllerStyleAlert];
-//        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
-//                                                                style:UIAlertActionStyleDefault
-//                                                              handler:nil];
-//        [alert addAction:defaultAction];
-//        [self presentViewController:alert animated:YES completion:nil];
-//    }
+    [screenshot setViewed];
+    [[RatingFlow sharedInstance] recordSignificantEvent];
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {

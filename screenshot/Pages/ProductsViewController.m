@@ -15,6 +15,7 @@
 #import "AnalyticsManager.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
+#import "Loader.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
@@ -28,6 +29,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     BOOL _didViewDidAppear;
 }
 
+@property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
@@ -62,7 +64,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                  };
         
         self.title = @"Products";
-        [self updateSortView];
     }
     return self;
 }
@@ -137,6 +138,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         
         barButtonItem;
     });
+    
+    if (![self hasShoppables]) {
+        [self.loader startAnimation:LoaderAnimationSpin];
+    }
     
     [self reloadCollectionViewForIndex:0];
 }
@@ -222,6 +227,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
+    [self updateSortView];
+    
     if ([self hasShoppables]) {
         self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
         
@@ -375,7 +382,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     self.currentSortType = row;
-    [self updateSortView];
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     [self.navigationController.navigationBar endEditing:YES];
 }
@@ -389,9 +395,14 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
     if (!self.products && [self isViewLoaded]) {
+        if (_loader) {
+            [self.loader stopAnimation];
+            [self.loader removeFromSuperview];
+            _loader = nil;
+        }
+        
         toolbar.hidden = [self shouldHideToolbar];
         
-        [self updateSortView];
         [self reloadCollectionViewForIndex:0];
     }
 }
@@ -403,7 +414,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (BOOL)shouldHideToolbar {
-    return [self.shoppablesController shoppables].count == 0;
+    return ![self hasShoppables];
 }
 
 
@@ -423,6 +434,20 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         viewController.transitioningDelegate = self.transitioningController;
         [self presentViewController:viewController animated:YES completion:nil];
     }
+}
+
+
+#pragma mark - Loader
+
+- (Loader *)loader {
+    if (!_loader) {
+        _loader = [[Loader alloc] init];
+        _loader.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:_loader];
+        [_loader.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+        [_loader.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
+    }
+    return _loader;
 }
 
 @end

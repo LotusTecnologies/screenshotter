@@ -13,6 +13,4 @@
 
 @property (nonatomic, strong) Screenshot *screenshot;
 
-- (BOOL)hasShoppables;
-
 @end
