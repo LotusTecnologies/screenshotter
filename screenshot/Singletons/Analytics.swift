@@ -165,9 +165,13 @@ public class AnalyticsTrackers : NSObject {
 
 extension AnalyticsTracker {
     fileprivate func log(name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
-        print("[\(type(of: self))] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
+        #if DEV
+            print("[\(type(of: self))] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
+        #endif
         
         closure()
     }
 }
+
+
 
