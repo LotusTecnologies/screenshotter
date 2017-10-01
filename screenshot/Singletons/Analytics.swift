@@ -142,7 +142,7 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        log(name: event) {
+        log(name: event, properties: properties) {
             Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
         }
     }
