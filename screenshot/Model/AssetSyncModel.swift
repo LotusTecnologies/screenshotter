@@ -594,7 +594,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toBypassClarifai.count > 0 {
-                AnalyticsManager.track("user imported old screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
+                AnalyticsTrackers.standard.track("user imported old screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
                 self.selectedScreenshotAssets?
                     .filter { toBypassClarifai.contains($0.localIdentifier) }
                     .forEach { asset in
@@ -605,7 +605,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toRetry.count > 0 {
-                AnalyticsManager.track("user retried screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
+                AnalyticsTrackers.standard.track("user retried screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
                 self.selectedScreenshotAssets?
                     .filter { toRetry.contains($0.localIdentifier) }
                     .forEach { asset in

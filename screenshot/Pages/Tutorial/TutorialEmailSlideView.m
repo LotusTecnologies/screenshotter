@@ -200,8 +200,6 @@
         [AnalyticsTrackers.standard identify:user];
         
         [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
-    } else {
-        [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }
     
     [self informDelegateOfSubmittedEmailIfPossible];
