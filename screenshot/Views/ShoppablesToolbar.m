@@ -12,9 +12,7 @@
 
 @class ShoppablesCollectionView;
 
-@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource> {
-    BOOL _didInitialWillDisplayCellCall;
-}
+@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource>
 
 - (void)repositionShoppables;
 
@@ -91,7 +89,7 @@
         CGFloat contentWidth = round(spacingsWidth + shoppablesWidth);
         CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
         
-        if (width > contentWidth) {
+        if (width != contentWidth) {
             UIEdgeInsets insets = self.collectionView.contentInset;
             insets.left = insets.right = (self.collectionView.bounds.size.width - contentWidth) / 2.f;
             self.collectionView.contentInset = insets;
@@ -164,7 +162,14 @@
 - (void)setContentSize:(CGSize)contentSize {
     [super setContentSize:contentSize];
     
-    [self.delegate repositionShoppables];
+    if (self.delegate.didViewControllerAppear && [self numberOfItemsInSection:0] > 0) {
+        [UIView animateWithDuration:0.3 animations:^{
+            [self.delegate repositionShoppables];
+        }];
+        
+    } else {
+        [self.delegate repositionShoppables];
+    }
 }
 
 @end

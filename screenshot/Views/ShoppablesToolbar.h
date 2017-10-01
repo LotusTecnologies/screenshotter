@@ -23,6 +23,7 @@
 @interface ShoppablesToolbar : UIToolbar <ShoppablesControllerProtocol>
 
 @property (nonatomic, weak) id<ShoppablesToolbarDelegate> delegate;
+@property (nonatomic) BOOL didViewControllerAppear;
 
 @property (nonatomic, strong, readonly) UICollectionView *collectionView;
 @property (nonatomic, copy) UIImage *screenshotImage;

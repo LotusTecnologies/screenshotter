@@ -155,6 +155,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    self.shoppablesToolbar.didViewControllerAppear = YES;
+    
     if (_didViewDidAppear) {
         [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
     }
