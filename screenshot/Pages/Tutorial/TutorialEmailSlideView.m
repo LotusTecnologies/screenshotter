@@ -184,12 +184,12 @@
 #pragma mark - Submit
 
 - (void)submitEmail {
-    if ([self.emailTextField.text isValidEmail]) {
-        self.readyToSubmit = YES;
-        
-        NSString *trimmedName = [self.nameTextField.text trimWhitespace];
-        NSString *trimmedEmail = [self.emailTextField.text trimWhitespace];
-        
+    self.readyToSubmit = YES;
+    
+    NSString *trimmedName = [self.nameTextField.text trimWhitespace];
+    NSString *trimmedEmail = [self.emailTextField.text isValidEmail] ? [self.emailTextField.text trimWhitespace] : @"";
+    
+    if (trimmedName.length || trimmedEmail.length) {
         [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
         [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -204,6 +204,7 @@
         [self.delegate tutorialEmailSlideViewDidFailValidation:self];
     }
     
+    [self informDelegateOfSubmittedEmailIfPossible];
     [self.emailTextField resignFirstResponder];
 }
 
@@ -222,7 +223,7 @@
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         // Wait until the keyboardFrame has been set.
         
         CGRect toWindowRect = [self convertRect:self.frame toView:self.window];

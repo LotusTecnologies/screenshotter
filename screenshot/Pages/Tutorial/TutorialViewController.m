@@ -178,11 +178,6 @@
     }
 }
 
-- (void)tutorialEmailSlideViewDidFailValidation:(TutorialEmailSlideView *)slideView {
-    UIAlertController *alertController = [slideView failedAlertController];
-    [self presentViewController:alertController animated:YES completion:nil];
-}
-
 - (void)tutorialEmailSlideViewDidComplete:(TutorialEmailSlideView *)slideView {
     slideView.delegate = nil;
     [self scrollToNextSlide];
