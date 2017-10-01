@@ -160,7 +160,7 @@ public class AnalyticsTrackers : NSObject {
     static let intercom = IntercomAnalyticsTracker()
     static let branch = BranchAnalyticsTracker()
     
-    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee])
+    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom])
 }
 
 extension AnalyticsTracker {
