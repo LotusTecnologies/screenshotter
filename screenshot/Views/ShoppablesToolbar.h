@@ -15,6 +15,7 @@
 @protocol ShoppablesToolbarDelegate <UIToolbarDelegate>
 @required
 
+- (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar;
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index;
 
 @end

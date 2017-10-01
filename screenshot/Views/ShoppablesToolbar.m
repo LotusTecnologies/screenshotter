@@ -10,7 +10,28 @@
 #import "Geometry.h"
 #import "ShoppableCollectionViewCell.h"
 
+@class ShoppablesCollectionView;
+
 @interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource>
+
+- (void)repositionShoppables;
+
+@end
+
+@interface ShoppablesCollectionView : UICollectionView
+
+@property (nonatomic, weak) ShoppablesToolbar* delegate;
+
+@end
+
+@implementation ShoppablesCollectionView
+@dynamic delegate;
+
+- (void)setContentSize:(CGSize)contentSize {
+    [super setContentSize:contentSize];
+    
+    [self.delegate repositionShoppables];
+}
 
 @end
 
@@ -32,7 +53,7 @@
             layout.minimumLineSpacing = p;
             layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
             
-            UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
+            ShoppablesCollectionView *collectionView = [[ShoppablesCollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
             collectionView.translatesAutoresizingMaskIntoConstraints = NO;
             collectionView.delegate = self;
             collectionView.dataSource = self;
@@ -57,6 +78,21 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
+    // This is needed for iOS11
+    [self bringSubviewToFront:self.collectionView];
+}
+
+
+#pragma mark - Layout
+
+- (CGSize)shoppableSize {
+    CGSize size = CGSizeZero;
+    size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
+    size.width = size.height * .8f;
+    return size;
+}
+
+- (void)repositionShoppables {
     if ([self.shoppablesController shoppables].count) {
         CGFloat lineSpacing = ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).minimumLineSpacing;
         CGFloat spacingsWidth = lineSpacing * ([self.shoppablesController shoppables].count - 1);
@@ -70,19 +106,6 @@
             self.collectionView.contentInset = insets;
         }
     }
-    
-    // This is needed for iOS11
-    [self bringSubviewToFront:self.collectionView];
-}
-
-
-#pragma mark - Layout
-
-- (CGSize)shoppableSize {
-    CGSize size = CGSizeZero;
-    size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
-    size.width = size.height * .8f;
-    return size;
 }
 
 
@@ -130,6 +153,12 @@
     ShoppableCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.image = [[self.shoppablesController shoppables][indexPath.item] croppedWithImage:self.screenshotImage];
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    if ([collectionView indexPathsForVisibleItems].count == 0 && [collectionView numberOfItemsInSection:0] > 0 && indexPath.item == 0) {
+        [self.delegate shoppablesToolbarDidChange:self];
+    }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {

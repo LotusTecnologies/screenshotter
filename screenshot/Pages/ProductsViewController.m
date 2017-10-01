@@ -221,9 +221,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
-    self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
-    
     if ([self hasShoppables]) {
+        self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
+        
         [self.collectionView reloadData];
         
         if (self.products.count) {
@@ -380,6 +380,12 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
     return UIBarPositionTopAttached;
+}
+
+- (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
+    if (!self.products) {
+        [self reloadCollectionViewForIndex:0];
+    }
 }
 
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
