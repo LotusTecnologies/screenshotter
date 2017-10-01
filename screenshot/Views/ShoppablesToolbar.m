@@ -91,7 +91,7 @@
         
         if (width != contentWidth) {
             UIEdgeInsets insets = self.collectionView.contentInset;
-            insets.left = insets.right = (self.collectionView.bounds.size.width - contentWidth) / 2.f;
+            insets.left = insets.right = MAX(0, (self.collectionView.bounds.size.width - contentWidth) / 2.f);
             self.collectionView.contentInset = insets;
         }
     }
