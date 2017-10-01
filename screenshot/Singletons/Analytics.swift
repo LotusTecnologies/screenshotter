@@ -76,7 +76,9 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        SEGAnalytics.shared().identify(nil, traits: ["email": user.email, "name":user.name])
+        log(name: "identify", properties: ["email": user.email]) {
+            SEGAnalytics.shared().identify(nil, traits: ["email": user.email, "name":user.name])
+        }
     }
 }
 
@@ -112,7 +114,9 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        Appsee.setUserID(user.email)
+        log(name: "identify", properties: ["email": user.email]) {
+            Appsee.setUserID(user.email)
+        }
     }
 }
 
@@ -144,7 +148,7 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify") {
+        log(name: "identify", properties: ["email": user.email]) {
             Branch.getInstance().userCompletedAction("identify")
         }
     }
