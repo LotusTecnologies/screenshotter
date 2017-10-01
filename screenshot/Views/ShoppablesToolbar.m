@@ -12,7 +12,9 @@
 
 @class ShoppablesCollectionView;
 
-@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource> {
+    BOOL _didInitialWillDisplayCellCall;
+}
 
 - (void)repositionShoppables;
 
@@ -21,17 +23,6 @@
 @interface ShoppablesCollectionView : UICollectionView
 
 @property (nonatomic, weak) ShoppablesToolbar* delegate;
-
-@end
-
-@implementation ShoppablesCollectionView
-@dynamic delegate;
-
-- (void)setContentSize:(CGSize)contentSize {
-    [super setContentSize:contentSize];
-    
-    [self.delegate repositionShoppables];
-}
 
 @end
 
@@ -163,6 +154,17 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self.delegate shoppablesToolbar:self didSelectShoppableAtIndex:indexPath.item];
+}
+
+@end
+
+@implementation ShoppablesCollectionView
+@dynamic delegate;
+
+- (void)setContentSize:(CGSize)contentSize {
+    [super setContentSize:contentSize];
+    
+    [self.delegate repositionShoppables];
 }
 
 @end

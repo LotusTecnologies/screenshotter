@@ -62,7 +62,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                  };
         
         self.title = @"Products";
-        self.navigationItem.titleView = [self currentTitleView];
+        [self updateSortView];
     }
     return self;
 }
@@ -86,6 +86,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         toolbar.screenshotImage = self.image;
         toolbar.shoppablesController = self.shoppablesController;
         toolbar.delegate = self;
+        toolbar.hidden = [self shouldHideToolbar];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -304,7 +305,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 #pragma mark - Sorting
 
-- (UIView *)currentTitleView {
+- (UIView *)currentSortView {
     UILabel *label = [[UILabel alloc] init];
     label.adjustsFontSizeToFitWidth = YES;
     label.minimumScaleFactor = .7f;
@@ -336,6 +337,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [container addTarget:self action:@selector(presentSortPicker:) forControlEvents:UIControlEventTouchUpInside];
     [container addSubview:label];
     return container;
+}
+
+- (void)updateSortView {
+    self.navigationItem.titleView = [self hasShoppables] ? [self currentSortView] : nil;
 }
 
 - (void)presentSortPicker:(ProductsViewControllerControl *)control {
@@ -370,7 +375,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     self.currentSortType = row;
-    self.navigationItem.titleView = [self currentTitleView];
+    [self updateSortView];
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     [self.navigationController.navigationBar endEditing:YES];
 }
@@ -383,7 +388,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
-    if (!self.products) {
+    if (!self.products && [self isViewLoaded]) {
+        toolbar.hidden = [self shouldHideToolbar];
+        
+        [self updateSortView];
         [self reloadCollectionViewForIndex:0];
     }
 }
@@ -392,6 +400,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [self reloadCollectionViewForIndex:index];
     
     [AnalyticsManager track:@"Tapped on shoppable"];
+}
+
+- (BOOL)shouldHideToolbar {
+    return [self.shoppablesController shoppables].count == 0;
 }
 
 
