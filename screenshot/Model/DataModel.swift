@@ -542,6 +542,22 @@ extension DataModel {
         saveMoc(managedObjectContext: mainMoc())
     }
     
+    public func pinMain() {
+        do {
+            try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
+        } catch {
+            print("pinMain results with error:\(error)")
+        }
+    }
+    
+    public func unpinMain() {
+        do {
+            try mainMoc().setQueryGenerationFrom(nil)
+        } catch {
+            print("unpinMain results with error:\(error)")
+        }
+    }
+
     public func saveMoc(managedObjectContext: NSManagedObjectContext) {
         do {
             try managedObjectContext.save()
