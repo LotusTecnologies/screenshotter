@@ -34,7 +34,6 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
     }
     
     public func shoppable(at index: Int) -> Shoppable {
-        
         return shoppablesFrc.object(at: IndexPath.init(row: index, section: 0))
     }
 }

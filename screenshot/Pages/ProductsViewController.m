@@ -223,10 +223,12 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
     self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
     
-    [self.collectionView reloadData];
-    
-    if (self.products.count) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    if ([self hasShoppables]) {
+        [self.collectionView reloadData];
+        
+        if (self.products.count) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+        }
     }
 }
 
