@@ -36,12 +36,12 @@ class ClarifaiModel: NSObject {
     
     func modelDownloadStarted() {
         NSLog("modelDownloadStarted")
-        AnalyticsManager.track("started downloading Clarifai model")
+        track("started downloading Clarifai model")
     }
     
     func modelDownloadFinished() {
         NSLog("modelDownloadFinished")
-        AnalyticsManager.track("finished downloading Clarifai model")
+        track("finished downloading Clarifai model")
     }
     
     func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {

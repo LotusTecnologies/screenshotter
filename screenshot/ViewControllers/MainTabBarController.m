@@ -11,7 +11,6 @@
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
-#import "AnalyticsManager.h"
 
 @interface MainTabBarController () <UITabBarControllerDelegate> {
     BOOL _isObservingSettingsBadgeFont;
@@ -133,7 +132,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     }
     
     if (tab) {
-        [AnalyticsManager track:@"Tab Bar tapped" properties:@{@"tab": tab}];
+        [AnalyticsTrackers.standard track:@"Tab Bar tapped" properties:@{@"tab": tab}];
     }
 }
 

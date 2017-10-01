@@ -11,7 +11,6 @@
 #import "UIDevice+Model.h"
 #import "PermissionsManager.h"
 #import "NotificationManager.h"
-#import "AnalyticsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 #import "HelperView.h"

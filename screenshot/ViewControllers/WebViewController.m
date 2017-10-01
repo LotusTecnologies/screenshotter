@@ -10,7 +10,7 @@
 #import "Loader.h"
 #import "Geometry.h"
 #import "NetworkingModel.h"
-#import "AnalyticsManager.h"
+#import "screenshot-Swift.h"
 
 @import Appsee;
 @import WebKit;
@@ -208,7 +208,7 @@
 - (void)refreshAction {
     [self.view reload];
     
-    [AnalyticsManager track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsTrackers.standard track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)shareAction {
@@ -225,13 +225,13 @@
         [self updateToolbarItems];
     }];
     
-    [AnalyticsManager track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsTrackers.standard track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
 }
 
 - (void)safariAction {
     [[UIApplication sharedApplication] openURL:self.url options:@{} completionHandler:nil];
     
-    [AnalyticsManager track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
+    [AnalyticsTrackers.standard track:@"Opened webpage in Safari" properties:@{@"url": self.url.absoluteString}];
 }
 
 @end

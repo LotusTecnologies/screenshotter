@@ -10,7 +10,6 @@
 #import "Geometry.h"
 #import "TappableTextView.h"
 #import "WebViewController.h"
-#import "AnalyticsManager.h"
 #import "screenshot-Swift.h"
 
 @interface TutorialEmailSlideView () <UITextFieldDelegate, TappableTextViewDelegate>
@@ -195,8 +194,12 @@
         [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        [AnalyticsManager track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
-        [AnalyticsManager identify:trimmedEmail name:trimmedName];
+        [self informDelegateOfSubmittedEmailIfPossible];
+        
+        AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
+        [AnalyticsTrackers.standard identify:user];
+        
+        [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
     }
     
     [self informDelegateOfSubmittedEmailIfPossible];
