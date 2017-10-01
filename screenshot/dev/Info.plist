@@ -51,7 +51,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Grant access to snap from your camera?</string>
+	<string>This allows you to take photos of clothes and shop them!</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
 	<key>UIBackgroundModes</key>
