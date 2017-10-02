@@ -17,6 +17,8 @@
 @end
 
 @implementation ScreenshotsNavigationController
+@dynamic delegate;
+
 
 #pragma mark - Life Cycle
 
@@ -59,6 +61,8 @@
             [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
                     if (granted) {
+                        [self.delegate screenshotsNavigationControllerDidGrantPushPermissions:self];
+                        
                         [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
                         
                     } else {

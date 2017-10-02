@@ -250,11 +250,11 @@
     [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError * _Nullable error) {
         self.pushStatus = granted ? PermissionStatusAuthorized : PermissionStatusDenied;
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (granted) {
+        if (granted) {
+            dispatch_async(dispatch_get_main_queue(), ^{
                 [[UIApplication sharedApplication] registerForRemoteNotifications];
-            }
-        });
+            });
+        }
         
         if (response) {
             response(granted);
