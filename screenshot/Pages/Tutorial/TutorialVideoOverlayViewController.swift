@@ -9,6 +9,8 @@
 import UIKit
 
 class TutorialVideoOverlayViewController : UIViewController {
+    var doneButtonTapped: (() -> Void)?
+    
     override func viewDidLoad() {
         let doneButton = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
         doneButton.layer.borderColor = UIColor.white.cgColor
@@ -31,7 +33,13 @@ class TutorialVideoOverlayViewController : UIViewController {
         doneButton.heightAnchor.constraint(equalToConstant: 35).isActive = true
         doneButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
         doneButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 25).isActive = true
+     
+        doneButton.addTarget(self, action: #selector(didTapOnDoneButton), for: .touchUpInside)
         
         view.setNeedsLayout()
+    }
+    
+    @objc func didTapOnDoneButton() {
+        doneButtonTapped?()
     }
 }

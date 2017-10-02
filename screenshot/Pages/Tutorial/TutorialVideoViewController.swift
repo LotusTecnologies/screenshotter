@@ -34,6 +34,7 @@ protocol TutorialVideoViewControllerDelegate : class {
 
 class TutorialVideoViewController : UIViewController {
     let overlayViewController = TutorialVideoOverlayViewController()
+    
     weak var delegate: TutorialVideoViewControllerDelegate?
     
     private let playerLayer: AVPlayerLayer
@@ -75,6 +76,10 @@ class TutorialVideoViewController : UIViewController {
         overlayViewController.didMove(toParentViewController: self)
         view.addSubview(overlayViewController.view)
         
+        overlayViewController.doneButtonTapped = {
+            self.delegate?.tutorialVideoWantsToDismiss()
+        }
+
         // Add tap gesture recognizer
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
