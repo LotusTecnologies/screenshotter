@@ -9,15 +9,22 @@
 import UIKit
 import CoreData
 
+@objc protocol ShoppablesControllerDelegate {
+    func shoppablesControllerIsEmpty(_ controller: ShoppablesController)
+}
+
 class ShoppablesController: NSObject, FrcDelegateProtocol {
-    private var shoppablesFrc: NSFetchedResultsController<Shoppable>!
+    fileprivate var shoppablesFrc: ShoppableFrc!
+    fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>!
     public var collectionView: UICollectionView?
+    public var delegate: ShoppablesControllerDelegate?
     
     init(screenshot: Screenshot) {
         super.init()
         
         DataModel.sharedInstance.shoppableFrcDelegate = self
         shoppablesFrc = DataModel.sharedInstance.setupShoppableFrc(screenshot: screenshot)
+        hasShoppablesFrc = shoppablesFrc.hasShoppablesFrc
     }
     
     deinit {
@@ -40,19 +47,34 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
 
 extension ShoppablesController {
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath) {
-        collectionView?.insertItems(at: [indexPath])
+        if frc == shoppablesFrc {
+            collectionView?.insertItems(at: [indexPath])
+        }
     }
     
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath) {
-        collectionView?.deleteItems(at: [indexPath])
+        if frc == shoppablesFrc {
+            collectionView?.deleteItems(at: [indexPath])
+        }
     }
     
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
-        collectionView?.reloadItems(at: [indexPath])
+        if frc == shoppablesFrc {
+            collectionView?.reloadItems(at: [indexPath])
+            
+        } else if frc == hasShoppablesFrc {
+            let screenshot = hasShoppablesFrc.object(at: indexPath)
+            
+            if screenshot.shoppablesCount == -1 {
+                delegate?.shoppablesControllerIsEmpty(self)
+            }
+        }
     }
     
     func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>) {
-        collectionView?.reloadData()
+        if frc == shoppablesFrc {
+            collectionView?.reloadData()
+        }
     }
 }
 

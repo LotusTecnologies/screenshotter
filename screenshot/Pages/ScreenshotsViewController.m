@@ -85,11 +85,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [self.collectionView addSubview:refreshControl];
     
     self.helperView = ({
-        CGFloat verticalPadding = 40.f;
+        CGFloat p2 = [Geometry extendedPadding];
         
         ScreenshotsHelperView *helperView = [[ScreenshotsHelperView alloc] init];
         helperView.translatesAutoresizingMaskIntoConstraints = NO;
-        helperView.layoutMargins = UIEdgeInsetsMake(verticalPadding, p, verticalPadding, p);
+        helperView.layoutMargins = UIEdgeInsetsMake(p2, p, p2, p);
         [helperView.button addTarget:self action:@selector(helperViewAllowAccessAction) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:helperView];
         [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;

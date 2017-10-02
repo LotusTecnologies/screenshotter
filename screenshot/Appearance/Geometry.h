@@ -11,5 +11,6 @@
 @interface Geometry : NSObject
 
 + (CGFloat)padding;
++ (CGFloat)extendedPadding;
 
 @end

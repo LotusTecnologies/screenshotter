@@ -14,4 +14,7 @@
 @property (nonatomic, strong, readonly) UILabel *subtitleLabel;
 @property (nonatomic, strong, readonly) UIView *contentView;
 
+//  Setting this will center an imageView in the contentView
+@property (nonatomic, copy) UIImage *contentImage;
+
 @end

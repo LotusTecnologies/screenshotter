@@ -103,6 +103,8 @@
         });
         
         _button = ({
+            CGFloat p2 = [Geometry extendedPadding];
+            
             MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
             button.translatesAutoresizingMaskIntoConstraints = NO;
             [button setTitle:@"Submit" forState:UIControlStateNormal];
@@ -110,7 +112,7 @@
             [self.contentView addSubview:button];
             [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
             [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-            [button.topAnchor constraintEqualToAnchor:self.emailTextField.bottomAnchor constant:40.f].active = YES;
+            [button.topAnchor constraintEqualToAnchor:self.emailTextField.bottomAnchor constant:p2].active = YES;
             [button.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.contentView.leadingAnchor].active = YES;
             [button.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
             [button.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;

@@ -110,6 +110,7 @@ class DataModel: NSObject {
     
     public func setupShoppableFrc(screenshot: Screenshot) -> ShoppableFrc {
         let hasShoppablesRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        hasShoppablesRequest.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
         hasShoppablesRequest.predicate = NSPredicate(format: "SELF == %@", screenshot.objectID)
         let hasShoppablesFetchedResultsController = NSFetchedResultsController(fetchRequest: hasShoppablesRequest, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         hasShoppablesFrc = hasShoppablesFetchedResultsController

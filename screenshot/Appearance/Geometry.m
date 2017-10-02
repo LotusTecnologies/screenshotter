@@ -14,4 +14,8 @@
     return 16.f;
 }
 
++ (CGFloat)extendedPadding {
+    return 40.f;
+}
+
 @end

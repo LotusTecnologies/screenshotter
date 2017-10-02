@@ -24,11 +24,12 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeBrands
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesToolbarDelegate> {
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
 }
 
 @property (nonatomic, strong) Loader *loader;
+@property (nonatomic, strong) HelperView *noItemsHelperView;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
@@ -70,12 +71,30 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    if (!self.shoppablesController) {
+    self.image = [UIImage imageWithData:self.screenshot.imageData];
+    
+    self.navigationItem.rightBarButtonItem = ({
+        CGFloat buttonSize = 32.f;
+        
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
+        button.imageView.contentMode = UIViewContentModeScaleAspectFill;
+        [button setImage:self.image forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
+        
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        
+        [button.widthAnchor constraintEqualToConstant:button.bounds.size.width].active = YES;
+        [button.heightAnchor constraintEqualToConstant:button.bounds.size.height].active = YES;
+        
+        barButtonItem;
+    });
+    
+    if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
         // You shall not pass!
+        [self displayNoItemsHelperView];
         return;
     }
-    
-    self.image = [UIImage imageWithData:self.screenshot.imageData];
     
     self.shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
@@ -121,23 +140,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView;
     });
     
-    self.navigationItem.rightBarButtonItem = ({
-        CGFloat buttonSize = 32.f;
-
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
-        button.imageView.contentMode = UIViewContentModeScaleAspectFill;
-        [button setImage:self.image forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
-
-        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-        
-        [button.widthAnchor constraintEqualToConstant:button.bounds.size.width].active = YES;
-        [button.heightAnchor constraintEqualToConstant:button.bounds.size.height].active = YES;
-        
-        barButtonItem;
-    });
-    
     if (![self hasShoppables]) {
         [self.loader startAnimation:LoaderAnimationSpin];
     }
@@ -175,6 +177,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     self.shoppablesToolbar.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
+    self.shoppablesController.delegate = nil;
 }
 
 
@@ -185,6 +188,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         _screenshot = screenshot;
         
         self.shoppablesController = screenshot ? [[ShoppablesController alloc] initWithScreenshot:screenshot] : nil;
+        self.shoppablesController.delegate = self;
     }
 }
 
@@ -222,6 +226,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     }
     
     return [shoppable.products sortedArrayUsingDescriptors:descriptors];
+}
+
+- (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
+    if (!_noItemsHelperView) {
+        [self stopAndRemoveLoader];
+        [self displayNoItemsHelperView];
+    }
 }
 
 
@@ -396,11 +407,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
     if (!self.products && [self isViewLoaded]) {
-        if (_loader) {
-            [self.loader stopAnimation];
-            [self.loader removeFromSuperview];
-            _loader = nil;
-        }
+        [self stopAndRemoveLoader];
         
         toolbar.hidden = [self shouldHideToolbar];
         
@@ -449,6 +456,35 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [_loader.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
     }
     return _loader;
+}
+
+- (void)stopAndRemoveLoader {
+    if (_loader) {
+        [self.loader stopAnimation];
+        [self.loader removeFromSuperview];
+        _loader = nil;
+    }
+}
+
+
+#pragma mark - Helper View
+
+- (void)displayNoItemsHelperView {
+    CGFloat p2 = [Geometry extendedPadding];
+    
+    HelperView *helperView = [[HelperView alloc] init];
+    helperView.translatesAutoresizingMaskIntoConstraints = NO;
+    helperView.userInteractionEnabled = NO;
+    helperView.backgroundColor = self.view.backgroundColor;
+    helperView.titleLabel.text = @"No Items Found";
+    helperView.subtitleLabel.text = @"No visually similar products were detected";
+    helperView.contentImage = [UIImage imageNamed:@"ProductsEmptyListGraphic"];
+    [self.view addSubview:helperView];
+    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:p2].active = YES;
+    [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-p2].active = YES;
+    [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    self.noItemsHelperView = helperView;
 }
 
 @end

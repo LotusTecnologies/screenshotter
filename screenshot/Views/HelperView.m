@@ -10,6 +10,12 @@
 #import "Geometry.h"
 #import "screenshot-Swift.h"
 
+@interface HelperView ()
+
+@property (nonatomic, strong) UIImageView *imageView;
+
+@end
+
 @implementation HelperView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -62,6 +68,27 @@
         });
     }
     return self;
+}
+
+- (void)setContentImage:(UIImage *)contentImage {
+    if (_contentImage != contentImage) {
+        _contentImage = contentImage;
+        
+        if (contentImage) {
+            UIImageView *imageView = [[UIImageView alloc] init];
+            imageView.translatesAutoresizingMaskIntoConstraints = NO;
+            imageView.image = contentImage;
+            imageView.contentMode = UIViewContentModeScaleAspectFit;
+            [self.contentView addSubview:imageView];
+            [imageView.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
+            [imageView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor].active = YES;
+            self.imageView = imageView;
+            
+        } else {
+            [self.imageView removeFromSuperview];
+            self.imageView = nil;
+        }
+    }
 }
 
 @end
