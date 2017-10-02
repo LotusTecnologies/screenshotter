@@ -121,7 +121,7 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView.titleLabel.text = "No Photos!"
         helperView.subtitleLabel.text = "Start taking screenshots of fashion items to fill up your gallery!"
         view.addSubview(helperView)
-        helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        helperView.topAnchor.constraint(equalTo: toolbar.bottomAnchor).isActive = true
         helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -280,6 +280,8 @@ extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINav
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.presentingViewController?.dismiss(animated: true, completion: nil)
+        
         AnalyticsTrackers.standard.track("Canceled Photo Creation")
     }
     
