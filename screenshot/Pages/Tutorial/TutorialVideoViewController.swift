@@ -23,35 +23,75 @@ enum TutorialVideo {
     }
 }
 
+protocol TutorialVideoViewControllerDelegate : class {
+    func tutorialVideoDidPause()
+    func tutorialVideoDidPlay()
+    func tutorialVideoDidEnd()
+    
+    // Call when the “Done” button is tapped
+    func tutorialVideoWantsToDismiss()
+}
+
 class TutorialVideoViewController : UIViewController {
     let overlayViewController = TutorialVideoOverlayViewController()
+    weak var delegate: TutorialVideoViewControllerDelegate?
     
     private let playerLayer: AVPlayerLayer
     private let player: AVPlayer
     
     init(video: TutorialVideo) {
-        player = AVPlayer(url: video.url)
+        let playerItem = AVPlayerItem(url: video.url)
+
+        player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
         playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = AVLayerVideoGravityResizeAspect
         
         super.init(nibName: nil, bundle: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        playerLayer.frame = view.bounds
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        playerLayer.frame = view.bounds
-        self.view.layer.addSublayer(playerLayer)
-        
-        self.addChildViewController(overlayViewController)
+        // Add player layer
+        view.layer.addSublayer(playerLayer)
+
+        // Add overlay VC
+        addChildViewController(overlayViewController)
         overlayViewController.didMove(toParentViewController: self)
-        self.view.addSubview(overlayViewController.view)
+        view.addSubview(overlayViewController.view)
+        
+        // Add tap gesture recognizer
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        view.addGestureRecognizer(tap)
         
         player.play()
+    }
+    
+    @objc private func handleTap() {
+        // Toggle playback state.
+        if player.rate == 0 {
+            player.play()
+        } else {
+            player.pause()
+        }
+    }
+    
+    @objc private func playerDidFinishPlaying() {
+        print("DONE PLAYING!")
     }
 }
