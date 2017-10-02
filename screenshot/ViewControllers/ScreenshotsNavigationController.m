@@ -113,6 +113,8 @@
     self.pickerNavigationController = picker;
     
     [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
+    
+    [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
 
 - (void)presentPickerViewControllerIfNeeded {
@@ -131,9 +133,6 @@
 }
 
 - (void)pickerViewControllerDidFinish {
-    NSArray<PHAsset *> *assets = [self.pickerNavigationController.screenshotPickerViewController selectedAssets];
-    [[AssetSyncModel sharedInstance] syncSelectedPhotosWithAssets:assets];
-    
     // Remove picker to reset state
     self.pickerNavigationController = nil;
     

@@ -15,7 +15,6 @@
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */; };
-		C5233F041F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
 		C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */; };
 		C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
@@ -57,6 +56,7 @@
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C59A30461F5FDECB00463338 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* MainButton.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
+		C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
@@ -646,7 +646,6 @@
 				C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */,
 				C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */,
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
-				C5233F041F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift in Sources */,
 				C59A30461F5FDECB00463338 /* MainButton.swift in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
 				C5278FE91F3C38510090E422 /* Geometry.m in Sources */,
@@ -661,6 +660,7 @@
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
+				C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
