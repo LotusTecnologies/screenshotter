@@ -22,6 +22,14 @@ enum CZChangeKind {
 }
 
 
+class ShoppableFrc: NSFetchedResultsController<Shoppable> {
+    public let hasShoppablesFrc: NSFetchedResultsController<Screenshot>
+    init(fetchRequest: NSFetchRequest<Shoppable>, managedObjectContext: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName: String?, hasShoppablesFrc: NSFetchedResultsController<Screenshot>) {
+        self.hasShoppablesFrc = hasShoppablesFrc
+        super.init(fetchRequest: fetchRequest, managedObjectContext: managedObjectContext, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
+    }
+}
+
 class DataModel: NSObject {
     
     public static let sharedInstance = DataModel()
@@ -100,20 +108,20 @@ class DataModel: NSObject {
     fileprivate var screenshotChangeKind: CZChangeKind = .none
     
     
-    public func setupShoppableFrc(screenshot: Screenshot) -> NSFetchedResultsController<Shoppable> {
-        let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
-        request.predicate = NSPredicate(format: "screenshot == %@ AND productCount > 0", screenshot)
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        shoppableFrc = fetchedResultsController
-        shoppableFrc?.delegate = self
-        
+    public func setupShoppableFrc(screenshot: Screenshot) -> ShoppableFrc {
         let hasShoppablesRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         hasShoppablesRequest.predicate = NSPredicate(format: "SELF == %@", screenshot.objectID)
         let hasShoppablesFetchedResultsController = NSFetchedResultsController(fetchRequest: hasShoppablesRequest, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         hasShoppablesFrc = hasShoppablesFetchedResultsController
         hasShoppablesFrc?.delegate = self
-
+        
+        let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
+        request.predicate = NSPredicate(format: "screenshot == %@ AND productCount > 0", screenshot)
+        let fetchedResultsController = ShoppableFrc(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil, hasShoppablesFrc: hasShoppablesFrc!)
+        shoppableFrc = fetchedResultsController as NSFetchedResultsController<Shoppable>
+        shoppableFrc?.delegate = self
+        
         do {
             try fetchedResultsController.performFetch()
             try hasShoppablesFetchedResultsController.performFetch()
