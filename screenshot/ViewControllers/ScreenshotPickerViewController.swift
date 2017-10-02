@@ -13,6 +13,7 @@ class ScreenshotPickerNavigationController: UINavigationController {
     private(set) public var screenshotPickerViewController: ScreenshotPickerViewController!
     private(set) public var cancelButton: UIBarButtonItem!
     private(set) public var doneButton: UIBarButtonItem!
+    private var internalDoneButton: UIBarButtonItem!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -21,18 +22,31 @@ class ScreenshotPickerNavigationController: UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        cancelButton = UIBarButtonItem.init(barButtonSystemItem: .cancel, target: nil, action: nil)
-        doneButton = UIBarButtonItem.init(barButtonSystemItem: .done, target: nil, action: nil)
-        doneButton.tintColor = UIColor.crazeRed
-        doneButton.isEnabled = false
+        cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
+        doneButton = UIBarButtonItem()
+        internalDoneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneAction))
+        internalDoneButton.tintColor = UIColor.crazeRed
+        internalDoneButton.isEnabled = false
         
-        screenshotPickerViewController = ScreenshotPickerViewController.init(nibName: nil, bundle: nil)
+        screenshotPickerViewController = ScreenshotPickerViewController(nibName: nil, bundle: nil)
         screenshotPickerViewController.title = "Add Photos"
         screenshotPickerViewController.navigationItem.leftBarButtonItem = cancelButton
-        screenshotPickerViewController.navigationItem.rightBarButtonItem = doneButton
+        screenshotPickerViewController.navigationItem.rightBarButtonItem = internalDoneButton
         viewControllers = [screenshotPickerViewController]
         
-        navigationBar.shadowImage = UIImage.init()
+        navigationBar.shadowImage = UIImage()
+    }
+    
+    func doneAction() {
+        let assets = screenshotPickerViewController.selectedAssets()
+        AssetSyncModel.sharedInstance.syncSelectedPhotos(assets: assets)
+        
+        if let action = doneButton.action {
+            UIApplication.shared.sendAction(action, to: doneButton.target, from: self, for: nil)
+        }
+        
+        let title = screenshotPickerViewController.selectedSegmentTitle()
+        AnalyticsTrackers.standard.track("Imported Photos", properties: ["Section":title, "Count":assets.count])
     }
 }
 
@@ -70,7 +84,7 @@ class ScreenshotPickerViewController: BaseViewController {
         segments.tintColor = UIColor.crazeGreen
         segments.selectedSegmentIndex = 0
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
-        toolbar.items = [UIBarButtonItem.init(customView: segments)]
+        toolbar.items = [UIBarButtonItem(customView: segments)]
         
         if #available(iOS 11.0, *) {} else {
             segments.topAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.topAnchor).isActive = true
@@ -112,7 +126,7 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let imageView = UIImageView(image: UIImage.init(named: "ScreenshotsNoPermissionGraphic"))
+        let imageView = UIImageView(image: UIImage(named: "ScreenshotsNoPermissionGraphic"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         helperView.contentView.addSubview(imageView)
@@ -124,7 +138,7 @@ class ScreenshotPickerViewController: BaseViewController {
             
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false
-            fab.setImage(UIImage.init(named: "FABCamera"), for: .normal)
+            fab.setImage(UIImage(named: "FABCamera"), for: .normal)
             fab.backgroundColor = UIColor.crazeRed
             fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
             fab.adjustsImageWhenHighlighted = false
@@ -141,8 +155,8 @@ class ScreenshotPickerViewController: BaseViewController {
         super.viewDidAppear(animated)
         
         if !PermissionsManager.shared().hasPermission(for: .photo) {
-            let alertController = UIAlertController.init(title: "Shop Your Photos", message: "Pick screenshots from your gallery to scan for items to shop!", preferredStyle: .alert)
-            alertController.addAction(UIAlertAction.init(title: "No Thanks", style: .cancel, handler: { (action) in
+            let alertController = UIAlertController(title: "Shop Your Photos", message: "Pick screenshots from your gallery to scan for items to shop!", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "No Thanks", style: .cancel, handler: { (action) in
                 if let cancelButton = self.navigationItem.leftBarButtonItem,
                     let cancelAction = cancelButton.action,
                     let cancelTarget = cancelButton.target
@@ -150,7 +164,7 @@ class ScreenshotPickerViewController: BaseViewController {
                     UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
                 }
             }))
-            alertController.addAction(UIAlertAction.init(title: "Add Photos", style: .default, handler: { (action) in
+            alertController.addAction(UIAlertAction(title: "Add Photos", style: .default, handler: { (action) in
                 if let alertController = PermissionsManager.shared().deniedAlertController(for: .photo, opened: nil) {
                     self.present(alertController, animated: true, completion: nil)
                 }
@@ -211,11 +225,17 @@ class ScreenshotPickerViewController: BaseViewController {
     @objc private func segmentsChanged() {
         isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
         reloadAssets()
+        
+        AnalyticsTrackers.standard.track("Tapped \(selectedSegmentTitle()) Picker List")
     }
     
     fileprivate func setSegmentsIndex(_ index: Int) {
         segments.selectedSegmentIndex = index
         segmentsChanged()
+    }
+    
+    fileprivate func selectedSegmentTitle() -> String {
+        return segments.titleForSegment(at: segments.selectedSegmentIndex)!
     }
     
     // MARK: Camera
@@ -251,7 +271,13 @@ extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINav
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+            
+            AnalyticsTrackers.standard.track("Created Photo")
         }
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        AnalyticsTrackers.standard.track("Canceled Photo Creation")
     }
     
     func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
