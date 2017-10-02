@@ -80,18 +80,21 @@ class TutorialVideoViewController : UIViewController {
         view.addGestureRecognizer(tap)
         
         player.play()
+        delegate?.tutorialVideoDidPlay()
     }
     
     @objc private func handleTap() {
         // Toggle playback state.
         if player.rate == 0 {
             player.play()
+            delegate?.tutorialVideoDidPlay()
         } else {
+            delegate?.tutorialVideoDidPause()
             player.pause()
         }
     }
     
     @objc private func playerDidFinishPlaying() {
-        print("DONE PLAYING!")
+        delegate?.tutorialVideoDidEnd()
     }
 }
