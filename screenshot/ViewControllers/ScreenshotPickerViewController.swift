@@ -223,15 +223,18 @@ class ScreenshotPickerViewController: BaseViewController {
     // MARK: Segment
     
     @objc private func segmentsChanged() {
-        isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
-        reloadAssets()
-        
+        prepareSegmentReload()
         AnalyticsTrackers.standard.track("Tapped \(selectedSegmentTitle()) Picker List")
     }
     
     fileprivate func setSegmentsIndex(_ index: Int) {
         segments.selectedSegmentIndex = index
-        segmentsChanged()
+        prepareSegmentReload()
+    }
+    
+    private func prepareSegmentReload() {
+        isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
+        reloadAssets()
     }
     
     fileprivate func selectedSegmentTitle() -> String {
@@ -289,14 +292,32 @@ extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINav
             present(alertController, animated: true)
             
         } else {
+            let selectedIndexPaths = collectionView.indexPathsForSelectedItems
+            
             setSegmentsIndex(1)
             
-            let indexPath = IndexPath(item: 0, section: 0)
-            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
-            collectionView(collectionView, didSelectItemAt: indexPath)
+            if let selectedIndexPaths = selectedIndexPaths {
+                for selectedIndexPath in selectedIndexPaths {
+                    selectItem(at: selectedIndexPath.item + 1)
+                }
+            }
             
+            selectItem(at: 0)
             dismiss(animated: true, completion: nil)
+            
+            if selectedIndexPaths?.count == 0,
+                let doneButton = navigationItem.rightBarButtonItem,
+                let action = doneButton.action
+            {
+                UIApplication.shared.sendAction(action, to: doneButton.target, from: self, for: nil)
+            }
         }
+    }
+    
+    private func selectItem(at index: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+        collectionView(collectionView, didSelectItemAt: indexPath)
     }
 }
 
