@@ -8,7 +8,6 @@
 #import "TutorialViewController.h"
 #import "LoadingViewController.h"
 #import "UIApplication+Version.h"
-#import "UIDevice+Model.h"
 #import "PermissionsManager.h"
 #import "NotificationManager.h"
 #import "NetworkingModel.h"
