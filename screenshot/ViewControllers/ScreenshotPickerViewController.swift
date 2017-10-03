@@ -112,7 +112,7 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let verPadding = CGFloat(40)
+        let verPadding = CGFloat(Geometry.extendedPadding())
         let horPadding = CGFloat(Geometry.padding())
         
         helperView = HelperView()
@@ -120,18 +120,12 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding)
         helperView.titleLabel.text = "No Photos!"
         helperView.subtitleLabel.text = "Start taking screenshots of fashion items to fill up your gallery!"
+        helperView.contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
         view.addSubview(helperView)
         helperView.topAnchor.constraint(equalTo: toolbar.bottomAnchor).isActive = true
         helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
-        let imageView = UIImageView(image: UIImage(named: "ScreenshotsNoPermissionGraphic"))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        helperView.contentView.addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: helperView.contentView.topAnchor, constant: verPadding).isActive = true
-        imageView.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
         
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
             let p = Geometry.padding()
