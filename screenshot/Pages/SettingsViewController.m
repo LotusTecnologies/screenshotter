@@ -163,38 +163,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         tableView;
     });
-    
-    _tableViewFollowSectionFooter = ({
-        UIButton * (^createButton)(NSString *, SEL) = ^UIButton * (NSString *imageName, SEL action){
-            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-            button.translatesAutoresizingMaskIntoConstraints = NO;
-            button.imageView.contentMode = UIViewContentModeScaleAspectFit;
-            [button setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
-            [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-            button.adjustsImageWhenHighlighted = NO;
-            [button sizeToFit];
-            return button;
-        };
-        
-        UIButton *facebookButton = createButton(@"SettingsFacebook", @selector(facebookButtonAction));
-        UIButton *instagramButton = createButton(@"SettingsInstagram", @selector(instagramButtonAction));
-        
-        CGFloat tableSectionHeaderLabelOffsetY = 15.5f;
-        CGRect rect = CGRectZero;
-        rect.size.height = facebookButton.bounds.size.height + self.tableView.sectionFooterHeight + tableSectionHeaderLabelOffsetY;
-        UIView *view = [[UIView alloc] initWithFrame:rect];
-        
-        [view addSubview:instagramButton];
-        [instagramButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
-        [instagramButton.leadingAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leadingAnchor].active = YES;
-        
-        [view addSubview:facebookButton];
-        [facebookButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
-        [facebookButton.leadingAnchor constraintEqualToAnchor:instagramButton.trailingAnchor constant:20.0f].active = YES;
-        
-        [view layoutIfNeeded];
-        view;
-    });
 }
 
 - (void)viewDidLayoutSubviews {
@@ -289,14 +257,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
     return [self textForSectionType:section];
 }
 
-//- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-//    if (section == SectionTypeFollow) {
-//        return self.tableViewFollowSectionFooter;
-//        
-//    } else {
-//        return nil;
-//    }
-//}
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    if (section == SectionTypeFollow) {
+        return self.tableViewFollowSectionFooter;
+        
+    } else {
+        return nil;
+    }
+}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     if (section == SectionTypeFollow) {
@@ -643,12 +611,47 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Follow Buttons
 
+- (UIView *)tableViewFollowSectionFooter {
+    if (!_tableViewFollowSectionFooter) {
+        UIButton * (^createButton)(NSString *, SEL) = ^UIButton * (NSString *imageName, SEL action){
+            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+            button.translatesAutoresizingMaskIntoConstraints = NO;
+            button.imageView.contentMode = UIViewContentModeScaleAspectFit;
+            [button setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+            [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+            button.adjustsImageWhenHighlighted = NO;
+            [button sizeToFit];
+            return button;
+        };
+        
+        UIButton *facebookButton = createButton(@"SettingsFacebook", @selector(facebookButtonAction));
+        UIButton *instagramButton = createButton(@"SettingsInstagram", @selector(instagramButtonAction));
+        
+        CGFloat tableSectionHeaderLabelOffsetY = 15.5f;
+        CGRect rect = CGRectZero;
+        rect.size.height = facebookButton.bounds.size.height + self.tableView.sectionFooterHeight + tableSectionHeaderLabelOffsetY;
+        UIView *view = [[UIView alloc] initWithFrame:rect];
+        
+        [view addSubview:instagramButton];
+        [instagramButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
+        [instagramButton.leadingAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leadingAnchor].active = YES;
+        
+        [view addSubview:facebookButton];
+        [facebookButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
+        [facebookButton.leadingAnchor constraintEqualToAnchor:instagramButton.trailingAnchor constant:20.0f].active = YES;
+        
+        [view layoutIfNeeded];
+        _tableViewFollowSectionFooter = view;
+    }
+    return _tableViewFollowSectionFooter;
+}
+
 - (void)facebookButtonAction {
-    
+    // TODO:
 }
 
 - (void)instagramButtonAction {
-    
+    // TODO:
 }
 
 
