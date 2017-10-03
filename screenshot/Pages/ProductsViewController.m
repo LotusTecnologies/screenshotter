@@ -140,10 +140,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView;
     });
     
-    if (![self hasShoppables]) {
-        [self.loader startAnimation:LoaderAnimationSpin];
-    }
-    
     [self reloadCollectionViewForIndex:0];
 }
 
@@ -151,6 +147,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [super viewWillAppear:animated];
     
     [self.shoppablesToolbar selectFirstShoppable];
+    
+    if (![self hasShoppables] && !self.noItemsHelperView) {
+        [self.loader startAnimation:LoaderAnimationSpin];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -229,7 +229,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
-    if (!_noItemsHelperView) {
+    if (!self.noItemsHelperView) {
         [self stopAndRemoveLoader];
         [self displayNoItemsHelperView];
     }
