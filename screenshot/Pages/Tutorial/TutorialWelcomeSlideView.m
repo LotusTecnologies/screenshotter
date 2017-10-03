@@ -43,10 +43,16 @@
     if (self) {
         self.titleLabel.attributedText = ({
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.image = [UIImage imageNamed:@"Logo20h"];
-                        
-            NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Welcome to "];
-            [attributedString appendAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
+            attachment.image = [[UIImage imageNamed:@"Logo20h"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            
+            NSAttributedString *attachmentString = [NSAttributedString attributedStringWithAttachment:attachment];
+            
+            NSString *string = @"Welcome to ";
+            NSRange range2 = NSMakeRange(string.length - 1, attachmentString.length);
+            
+            NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+            [attributedString appendAttributedString:attachmentString];
+            [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor crazeRed] range:range2];
             attributedString;
         });
         
