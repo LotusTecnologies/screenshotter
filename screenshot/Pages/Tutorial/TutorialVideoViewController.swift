@@ -99,8 +99,8 @@ class TutorialVideoViewController : UIViewController {
             player.play()
             delegate?.tutorialVideoDidPlay()
         } else {
-            delegate?.tutorialVideoDidPause()
             player.pause()
+            delegate?.tutorialVideoDidPause()
         }
     }
     
