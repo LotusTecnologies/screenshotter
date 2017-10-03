@@ -39,7 +39,7 @@
             CGFloat p = [Geometry padding];
             CGFloat p2 = p * .5f;
             
-            _preservedCollectionViewContentInset = UIEdgeInsetsMake(p2, p2, p2, p2);
+            _preservedCollectionViewContentInset = UIEdgeInsetsMake(p2, p, p2, p);
             
             UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
             layout.minimumInteritemSpacing = p;
@@ -94,10 +94,10 @@
         CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
         
         if (width != contentWidth) {
-            CGFloat maxHorizontalInset = _preservedCollectionViewContentInset.left + _preservedCollectionViewContentInset.right;
+            CGFloat maxHorizontalInset = _preservedCollectionViewContentInset.left;
             
             UIEdgeInsets insets = self.collectionView.contentInset;
-            insets.left = insets.right = MAX(maxHorizontalInset, (self.collectionView.bounds.size.width - contentWidth) / 2.f);
+            insets.left = insets.right = MAX(maxHorizontalInset, floor((self.collectionView.bounds.size.width - contentWidth) / 2.f));
             self.collectionView.contentInset = insets;
         }
     }
