@@ -131,6 +131,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
         textView.text = @"Questions? Get in touch: (212) 202-0991\nOr info@crazeapp.com";
+        textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+                                        NSUnderlineColorAttributeName: [UIColor gray7]
+                                        };
         [textView sizeToFit];
         textView.frame = ({
             CGRect rect = textView.frame;

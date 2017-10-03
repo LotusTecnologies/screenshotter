@@ -7,6 +7,7 @@
 //
 
 #import "TappableTextView.h"
+#import "screenshot-Swift.h"
 
 @interface TappableTextView ()
 
@@ -44,7 +45,7 @@
             [tappableIndexes addObject:@(i)];
             fragmentAttributes = @{[NSString stringWithFormat:@"%lu", (unsigned long)i]: @(isTappable),
                                    NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
-                                   NSUnderlineColorAttributeName: [UIColor colorWithWhite:181.f/255.f alpha:1.f]
+                                   NSUnderlineColorAttributeName: [UIColor gray7]
                                    };
         }
         
