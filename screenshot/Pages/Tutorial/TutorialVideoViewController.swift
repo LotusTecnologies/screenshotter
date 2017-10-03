@@ -39,6 +39,7 @@ class TutorialVideoViewController : UIViewController {
     
     private let playerLayer: AVPlayerLayer
     private let player: AVPlayer
+    private var ended = false
     
     init(video: TutorialVideo) {
         let playerItem = AVPlayerItem(url: video.url)
@@ -89,6 +90,10 @@ class TutorialVideoViewController : UIViewController {
     }
     
     @objc private func handleTap() {
+        guard ended == false else {
+            return
+        }
+        
         // Toggle playback state.
         if player.rate == 0 {
             player.play()
@@ -100,6 +105,7 @@ class TutorialVideoViewController : UIViewController {
     }
     
     @objc private func playerDidFinishPlaying() {
+        ended = true
         delegate?.tutorialVideoDidEnd()
     }
 }
