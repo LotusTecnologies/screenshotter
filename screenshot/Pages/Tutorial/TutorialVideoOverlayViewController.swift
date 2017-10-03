@@ -36,7 +36,7 @@ class TutorialVideoOverlayViewController : UIViewController {
     }
     
     private func setupDoneButton() {
-        doneButton = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+        doneButton = UIButton(frame: .zero)
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 2
         
