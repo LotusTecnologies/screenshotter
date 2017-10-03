@@ -39,12 +39,8 @@ class TutorialVideoOverlayViewController : UIViewController {
         doneButton = UIButton(frame: .zero)
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 2
-        
-        if #available(iOS 11.0, *) {
-            doneButton.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMinYCorner]
-        } else {
-            doneButton.layer.cornerRadius = 5
-        }
+        doneButton.layer.masksToBounds = true
+        doneButton.layer.cornerRadius = 5
         
         doneButton.titleEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 5)
         doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
