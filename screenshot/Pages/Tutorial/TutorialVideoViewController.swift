@@ -41,6 +41,8 @@ class TutorialVideoViewController : UIViewController {
     private let player: AVPlayer
     private var ended = false
     
+    // MARK: - Initialization
+    
     init(video: TutorialVideo) {
         let playerItem = AVPlayerItem(url: video.url)
 
@@ -53,13 +55,15 @@ class TutorialVideoViewController : UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    // MARK: - UIViewController
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -88,6 +92,8 @@ class TutorialVideoViewController : UIViewController {
         player.play()
         delegate?.tutorialVideoDidPlay()
     }
+    
+    // MARK: - Actions
     
     @objc private func handleTap() {
         guard ended == false else {
