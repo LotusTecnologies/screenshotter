@@ -219,9 +219,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
             break;
             
         case ShoppableSortTypeBrands:
-            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"brand" ascending:YES],
-                            [[NSSortDescriptor alloc] initWithKey:@"merchant" ascending:YES]
-                            ];
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"displayTitle" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)],
+                            [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
     }
     
@@ -274,7 +273,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
-    cell.title = product.brand.length ? product.brand : product.merchant;
+    cell.title = product.displayTitle;
     cell.price = product.price;
     cell.imageUrl = product.imageURL;
     cell.favoriteButton.selected = product.isFavorite;

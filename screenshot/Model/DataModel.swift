@@ -686,4 +686,14 @@ extension Product {
         }
     }
     
+    override public func awakeFromFetch() {
+        super.awakeFromFetch()
+        if let displayBrand = brand,
+            !displayBrand.isEmpty {
+            displayTitle = displayBrand
+        } else {
+            displayTitle = merchant
+        }
+    }
+    
 }
