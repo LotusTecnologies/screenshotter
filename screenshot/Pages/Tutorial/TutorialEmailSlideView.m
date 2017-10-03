@@ -189,20 +189,17 @@
     self.readyToSubmit = YES;
     
     NSString *trimmedName = [self.nameTextField.text trimWhitespace];
-    NSString *trimmedEmail = [self.emailTextField.text isValidEmail] ? [self.emailTextField.text trimWhitespace] : @"";
+    NSString *trimmedEmail = [self.emailTextField.text isValidEmail] ? [self.emailTextField.text trimWhitespace] : nil;
     
-    if (trimmedName.length || trimmedEmail.length) {
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
-        [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        [self informDelegateOfSubmittedEmailIfPossible];
-        
-        AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
-        [AnalyticsTrackers.standard identify:user];
-        
-        [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"name": trimmedName, @"email": trimmedEmail}];
-    }
+    [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
+    [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
+    
+    AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
+    [AnalyticsTrackers.standard identify:user];
+    [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"id": user.identifier, @"name": trimmedName ?: @"", @"email": trimmedEmail ?: @""}];
+    
+    [[NSUserDefaults standardUserDefaults] setValue:user.identifier forKey:UserDefaultsKeys.userID];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self informDelegateOfSubmittedEmailIfPossible];
     [self.emailTextField resignFirstResponder];

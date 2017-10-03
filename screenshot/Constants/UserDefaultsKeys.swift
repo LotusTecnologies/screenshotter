@@ -11,6 +11,7 @@ import Foundation
 class UserDefaultsKeys : NSObject {
     static let email = "Email"
     static let name = "Name"
+    static let userID = "UserID"
     
     static let tutorialCompleted = "TutorialCompleted"
     static let tutorialPresentedScreenshotHelper = "TutorialPresentedScreenshotHelper"

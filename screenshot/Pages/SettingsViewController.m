@@ -535,9 +535,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [[NSUserDefaults standardUserDefaults] setValue:trimmedText forKey:key];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
+        [self reidentify];
     } else {
         textField.text = self.previousTexts[key];
     }
+}
+
+- (void)reidentify {
+    AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:[self.nameTextField.text trimWhitespace]
+                                                        email:[self.emailTextField.text trimWhitespace]];
+    [AnalyticsTrackers.standard identify:user];
 }
 
 - (void)dismissKeyboard {

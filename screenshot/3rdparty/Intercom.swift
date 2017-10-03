@@ -51,8 +51,15 @@ class IntercomHelper : NSObject {
         #endif
 
         // Register the user if we're already logged in.
-        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
-            registerUser(withEmail: email)
+        if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
+            if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
+                Intercom.registerUser(withUserId: id, email: email)
+            } else {
+                Intercom.registerUser(withUserId: id)
+            }
+        } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
+            // Backwards compatible w/version < 1.2
+            Intercom.registerUser(withEmail: email)
         }
         
         if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
@@ -67,12 +74,13 @@ class IntercomHelper : NSObject {
         track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
-    func registerUser(withEmail email: String, name: String? = nil) {
+    func registerUser(withID id:String, email: String? = nil, name: String? = nil) {
         updateIntercomDeviceToken()
         
-        Intercom.registerUser(withEmail: email)
+        Intercom.registerUser(withUserId: id)
         
         performUserUpdate { attrs in
+            attrs.email = email
             attrs.name = name
         }
     }

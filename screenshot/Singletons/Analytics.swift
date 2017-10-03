@@ -12,12 +12,17 @@ import Appsee
 import Branch
 
 public class AnalyticsUser : NSObject {
-    let name: String
-    let email: String
+    let identifier: String
     
-    init(name n: String, email e:String) {
+    let name: String?
+    let email: String?
+    
+    init(name n: String?, email e:String?) {
         name = n
-        email = e
+        email = (e?.count ?? 0 > 0) ? e : nil
+        
+        let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID)
+        identifier = persistedID ?? UUID().uuidString
     }
 }
 
@@ -76,8 +81,8 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: ["email": user.email]) {
-            SEGAnalytics.shared().identify(nil, traits: ["email": user.email, "name":user.name])
+        log(name: "identify", properties: ["email": user.email ?? ""]) {
+            SEGAnalytics.shared().identify(nil, traits: ["email": user.email ?? "", "name":user.name ?? ""])
         }
     }
 }
@@ -132,7 +137,9 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        IntercomHelper.sharedInstance.registerUser(withEmail: user.email, name: user.name)
+        log(name: "identify", properties: ["user" : user.identifier]) {
+            IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name)
+        }
     }
 }
 
@@ -148,7 +155,7 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: ["email": user.email]) {
+        log(name: "identify") {
             Branch.getInstance().userCompletedAction("identify")
         }
     }
@@ -177,7 +184,7 @@ public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracke
     tracker.track(name, properties: properties)
 }
 
-public func identify(_ name: String, email: String, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
+public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
     let user = AnalyticsUser(name: name, email: email)
     tracker.identify(user)
 }
