@@ -12,7 +12,9 @@
 
 @class ShoppablesCollectionView;
 
-@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource> {
+    UIEdgeInsets _preservedCollectionViewContentInset;
+}
 
 - (void)repositionShoppables;
 
@@ -37,6 +39,8 @@
             CGFloat p = [Geometry padding];
             CGFloat p2 = p * .5f;
             
+            _preservedCollectionViewContentInset = UIEdgeInsetsMake(p2, p2, p2, p2);
+            
             UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
             layout.minimumInteritemSpacing = p;
             layout.minimumLineSpacing = p;
@@ -48,7 +52,7 @@
             collectionView.dataSource = self;
             collectionView.backgroundColor = [UIColor clearColor];
             collectionView.scrollsToTop = NO;
-            collectionView.contentInset = UIEdgeInsetsMake(p2, p2, p2, p2);
+            collectionView.contentInset = _preservedCollectionViewContentInset;
             collectionView.showsHorizontalScrollIndicator = NO;
             
             [collectionView registerClass:[ShoppableCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -90,8 +94,10 @@
         CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
         
         if (width != contentWidth) {
+            CGFloat maxHorizontalInset = _preservedCollectionViewContentInset.left + _preservedCollectionViewContentInset.right;
+            
             UIEdgeInsets insets = self.collectionView.contentInset;
-            insets.left = insets.right = MAX(0, (self.collectionView.bounds.size.width - contentWidth) / 2.f);
+            insets.left = insets.right = MAX(maxHorizontalInset, (self.collectionView.bounds.size.width - contentWidth) / 2.f);
             self.collectionView.contentInset = insets;
         }
     }
