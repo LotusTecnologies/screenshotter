@@ -94,18 +94,32 @@ class TutorialVideoViewController : UIViewController {
             return
         }
         
-        // Toggle playback state.
-        if player.rate == 0 {
-            player.play()
-            delegate?.tutorialVideoDidPlay()
-        } else {
-            player.pause()
+        if player.togglePlayback() == .paused {
             delegate?.tutorialVideoDidPause()
+        } else {
+            delegate?.tutorialVideoDidPlay()
         }
     }
     
     @objc private func playerDidFinishPlaying() {
         ended = true
         delegate?.tutorialVideoDidEnd()
+    }
+}
+
+extension AVPlayer {
+    enum PlaybackState {
+        case playing
+        case paused
+    }
+    
+    func togglePlayback() -> PlaybackState {
+        guard rate > 0 else {
+            play()
+            return .playing
+        }
+        
+        pause()
+        return .paused
     }
 }
