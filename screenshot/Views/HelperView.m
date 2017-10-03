@@ -80,8 +80,8 @@
             imageView.image = contentImage;
             imageView.contentMode = UIViewContentModeScaleAspectFit;
             [self.contentView addSubview:imageView];
+            [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:[Geometry extendedPadding]].active = YES;
             [imageView.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
-            [imageView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor].active = YES;
             self.imageView = imageView;
             
         } else {

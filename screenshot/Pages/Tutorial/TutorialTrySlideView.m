@@ -29,19 +29,23 @@
         [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:self.contentView.trailingAnchor].active = YES;
         [imageView.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
         [imageView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor].active = YES;
+        
+        if ([UIDevice isSimulator]) {
+            [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(applicationUserDidTakeScreenshot)]];
+        }
     }
     return self;
 }
 
 - (void)didEnterSlide {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
 }
 
 - (void)willLeaveSlide {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
+- (void)applicationUserDidTakeScreenshot {
     if (self.window) {
         UIGraphicsBeginImageContext(self.window.bounds.size);
         [self.window drawViewHierarchyInRect:self.window.bounds afterScreenUpdates:NO];

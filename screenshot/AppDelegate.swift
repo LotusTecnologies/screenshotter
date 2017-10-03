@@ -181,7 +181,7 @@ extension AppDelegate {
             }
         } else {
             var insets = UIEdgeInsets.zero
-            insets.top = UIDevice.is568h() ? 0 : 30
+            insets.top = UIDevice.is568h ? 0 : 30
             
             let tutorialViewController = TutorialViewController()
             tutorialViewController.delegate = self
