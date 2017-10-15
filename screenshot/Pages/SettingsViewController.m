@@ -647,11 +647,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (void)facebookButtonAction {
-    // TODO:
+    NSURL *url = [NSURL URLWithString:@"https://www.facebook.com/join.the.crazeapp/"];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 - (void)instagramButtonAction {
-    // TODO:
+    NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/craze.app/"];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 
