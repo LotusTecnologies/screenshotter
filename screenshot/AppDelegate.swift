@@ -16,6 +16,7 @@ import Branch
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
+    var tutorialStartMode: TutorialViewController.StartMode = .Standard
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
@@ -138,6 +139,10 @@ extension AppDelegate {
                 AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
                 self.showScreenshotListTop()
             }
+            
+            if let channel = URL(string: params["channel"] as? String ?? "") {
+                self.tutorialStartMode = .AmbassadorLink(url: channel)
+            }
         }
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -181,8 +186,8 @@ extension AppDelegate {
         } else {
             var insets = UIEdgeInsets.zero
             insets.top = UIDevice.is568h ? 0 : 30
-            
-            let tutorialViewController = TutorialViewController()
+
+            let tutorialViewController = TutorialViewController(startMode: tutorialStartMode)
             tutorialViewController.delegate = self
             tutorialViewController.contentLayoutMargins = insets
             viewController = tutorialViewController

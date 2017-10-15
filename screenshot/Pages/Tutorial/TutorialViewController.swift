@@ -13,17 +13,30 @@ import UIKit
 }
 
 class TutorialViewController : UIViewController {
+    enum StartMode {
+        case Standard
+        case AmbassadorLink(url: URL)
+        case Replay
+        
+        var tutorialVideo: TutorialVideo? {
+            switch self {
+            case .AmbassadorLink(let url):
+                return .Ambassador(url: url)
+            case .Standard:
+                return .Standard
+            case .Replay:
+                return nil
+            }
+        }
+    }
+
     weak var delegate: TutorialViewControllerDelegate?
     
     var updatePromptHandler: UpdatePromptHandler!
     
+    var startMode: StartMode
     var scrollView: UIScrollView!
-    var contentView = UIView() {
-        didSet {
-            contentView.translatesAutoresizingMaskIntoConstraints = false
-        }
-    }
-    
+    var contentView = UIView()
     var contentLayoutMargins: UIEdgeInsets {
         get {
             return contentView.layoutMargins
@@ -64,8 +77,14 @@ class TutorialViewController : UIViewController {
     
     // MARK: - Initialization
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    override convenience init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.init(startMode: .Replay)
+    }
+    
+    public init(startMode mode: StartMode) {
+        startMode = mode
+
+        super.init(nibName: nil, bundle: nil)
         
         slides = buildSlides()
         updatePromptHandler = UpdatePromptHandler(containerViewController: self)
@@ -92,6 +111,7 @@ class TutorialViewController : UIViewController {
         addContentViewConstraints()
         
         prepareSlideViews()
+        presentTutorialVideo()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -113,7 +133,20 @@ class TutorialViewController : UIViewController {
     
     // MARK: -
     
-    fileprivate func scrollToNextSlide() {
+    private func presentTutorialVideo() {
+        guard let video = startMode.tutorialVideo else {
+            return
+        }
+        
+        let vc = TutorialVideoViewController(video: video)
+        vc.delegate = self
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.present(vc, animated: true, completion: nil)
+        }
+    }
+    
+    fileprivate func scrollToNextSlide(animated: Bool = true) {
         guard scrollViewIsScrollingAnimation == false else {
             return
         }
@@ -123,7 +156,7 @@ class TutorialViewController : UIViewController {
         
         var offset:CGPoint = .zero
         offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
-        scrollView.setContentOffset(offset, animated: true)
+        scrollView.setContentOffset(offset, animated: animated)
     }
     
     private func prepareSlideViews() {
@@ -239,3 +272,12 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
     }
 }
 
+extension TutorialViewController : TutorialVideoViewControllerDelegate {
+    func tutorialVideoDidEnd() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func tutorialVideoWantsToDismiss() {
+        dismiss(animated: true, completion: nil)
+    }
+}
