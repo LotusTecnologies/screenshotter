@@ -7,7 +7,6 @@
 //
 
 #import "SettingsViewController.h"
-#import "TutorialViewController.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"

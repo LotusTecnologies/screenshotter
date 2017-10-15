@@ -222,8 +222,7 @@ extension AppDelegate {
 // MARK: - Tutorial
 
 extension AppDelegate: TutorialViewControllerDelegate {
-    
-    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController) {
+    func tutorialDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
         self.prepareDataStackCompletionIfNeeded()
