@@ -20,6 +20,7 @@ typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
     SectionTypeInfo,
     SectionTypePermissions,
+    SectionTypeFollow,
     SectionTypeAbout
 };
 
@@ -40,6 +41,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
+@property (nonatomic, strong) UIView *tableViewFollowSectionFooter;
 @property (nonatomic, strong) UILabel *screenshotsCountLabel;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
 
@@ -89,7 +91,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableHeaderContentView.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = YES;
         [tableHeaderContentView.leftAnchor constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide.leftAnchor].active = YES;
         [tableHeaderContentView.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor].active = YES;
-        self.tableHeaderContentView = tableHeaderContentView;
+        _tableHeaderContentView = tableHeaderContentView;
         
         UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SettingsScreenshot"]];
         imageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -113,7 +115,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [label.leftAnchor constraintEqualToAnchor:imageView.layoutMarginsGuide.rightAnchor].active = YES;
         [label.bottomAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.bottomAnchor].active = YES;
         [label.rightAnchor constraintEqualToAnchor:tableHeaderContentView.layoutMarginsGuide.rightAnchor].active = YES;
-        self.screenshotsCountLabel = label;
+        _screenshotsCountLabel = label;
         
         CGRect rect = view.frame;
         rect.size.height = view.layoutMargins.top + view.layoutMargins.bottom + tableHeaderContentView.layoutMargins.top + tableHeaderContentView.layoutMargins.bottom + imageView.image.size.height;
@@ -143,7 +145,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView;
     });
     
-    self.tableView = ({
+    _tableView = ({
         UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
         tableView.translatesAutoresizingMaskIntoConstraints = NO;
         tableView.delegate = self;
@@ -161,6 +163,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         tableView;
     });
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    UIEdgeInsets insets = self.tableViewFollowSectionFooter.layoutMargins;
+    insets.left = [self.tableView headerViewForSection:SectionTypeFollow].layoutMargins.left;
+    self.tableViewFollowSectionFooter.layoutMargins = insets;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -215,7 +225,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
                                          @(RowTypeVersion)
-                                         ]
+                                         ],
+                  @(SectionTypeFollow): @[],
                   };
     }
     return _data;
@@ -246,57 +257,85 @@ typedef NS_ENUM(NSUInteger, RowType) {
     return [self textForSectionType:section];
 }
 
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    if (section == SectionTypeFollow) {
+        return self.tableViewFollowSectionFooter;
+        
+    } else {
+        return nil;
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if (section == SectionTypeFollow) {
+        return self.tableViewFollowSectionFooter.bounds.size.height;
+        
+    } else {
+        return tableView.sectionFooterHeight;
+    }
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     RowType rowType = [self rowTypeForIndexPath:indexPath];
     UITableViewCell *cell;
     
     if (indexPath.section == SectionTypeInfo) {
-        UITextField *textField;
-        cell = [tableView dequeueReusableCellWithIdentifier:@"input"];
-
-        if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"input"];
-
-            textField = [[UITextField alloc] init];
-            textField.translatesAutoresizingMaskIntoConstraints = NO;
-            textField.delegate = self;
-            textField.tag = 1;
-            textField.returnKeyType = UIReturnKeyDone;
-            [cell.contentView addSubview:textField];
-            [textField.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor].active = YES;
-            [textField.leadingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
-            [textField.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor].active = YES;
-            [textField.trailingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
-            
-        } else {
-            textField = [cell.contentView viewWithTag:1];
-        }
+        cell = [self tableView:tableView inputCellAtIndexPath:indexPath rowType:rowType];
         
-        if (rowType == RowTypeEmail) {
-            self.emailTextField = textField;
-            textField.keyboardType = UIKeyboardTypeEmailAddress;
-            
-        } else if (rowType == RowTypeName) {
-            self.nameTextField = textField;
-            textField.keyboardType = UIKeyboardTypeDefault;
-        }
-
-        textField.text = [self textForRowType:rowType];
-        textField.placeholder = [self detailTextForRowType:rowType];
-
     } else {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-        
-        if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-        }
-        
-        cell.textLabel.text = [self textForRowType:rowType];
-        cell.detailTextLabel.text = [self detailTextForRowType:rowType];
+        cell = [self tableView:tableView defaultCellAtIndexPath:indexPath rowType:rowType];
     }
     
     cell.accessoryType = [self accessoryTypeForRowType:rowType];
     cell.accessoryView = [self accessoryViewForRowType:rowType];
+    return cell;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView inputCellAtIndexPath:(NSIndexPath *)indexPath rowType:(RowType)rowType {
+    UITextField *textField;
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"input"];
+    
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"input"];
+        
+        textField = [[UITextField alloc] init];
+        textField.translatesAutoresizingMaskIntoConstraints = NO;
+        textField.delegate = self;
+        textField.tag = 1;
+        textField.returnKeyType = UIReturnKeyDone;
+        [cell.contentView addSubview:textField];
+        [textField.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor].active = YES;
+        [textField.leadingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
+        [textField.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor].active = YES;
+        [textField.trailingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
+        
+    } else {
+        textField = [cell.contentView viewWithTag:1];
+    }
+    
+    if (rowType == RowTypeEmail) {
+        self.emailTextField = textField;
+        textField.keyboardType = UIKeyboardTypeEmailAddress;
+        
+    } else if (rowType == RowTypeName) {
+        self.nameTextField = textField;
+        textField.keyboardType = UIKeyboardTypeDefault;
+    }
+    
+    textField.text = [self textForRowType:rowType];
+    textField.placeholder = [self detailTextForRowType:rowType];
+    return cell;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView defaultCellAtIndexPath:(NSIndexPath *)indexPath rowType:(RowType)rowType {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    }
+    
+    cell.textLabel.text = [self textForRowType:rowType];
+    cell.detailTextLabel.text = [self detailTextForRowType:rowType];
     return cell;
 }
 
@@ -371,6 +410,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case SectionTypeInfo:
             return @"Your Info";
+            break;
+        case SectionTypeFollow:
+            return @"Follow Us";
             break;
     }
 }
@@ -571,6 +613,54 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)updateScreenshotsCount {
     self.screenshotsCountLabel.text = [self screenshotsCountText];
     [self layoutScreenshotsCountShadow];
+}
+
+
+#pragma mark - Follow Buttons
+
+- (UIView *)tableViewFollowSectionFooter {
+    if (!_tableViewFollowSectionFooter) {
+        UIButton * (^createButton)(NSString *, SEL) = ^UIButton * (NSString *imageName, SEL action){
+            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+            button.translatesAutoresizingMaskIntoConstraints = NO;
+            button.imageView.contentMode = UIViewContentModeScaleAspectFit;
+            [button setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+            [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+            button.adjustsImageWhenHighlighted = NO;
+            [button sizeToFit];
+            return button;
+        };
+        
+        UIButton *facebookButton = createButton(@"SettingsFacebook", @selector(facebookButtonAction));
+        UIButton *instagramButton = createButton(@"SettingsInstagram", @selector(instagramButtonAction));
+        
+        CGFloat tableSectionHeaderLabelOffsetY = 15.5f;
+        CGRect rect = CGRectZero;
+        rect.size.height = facebookButton.bounds.size.height + self.tableView.sectionFooterHeight + tableSectionHeaderLabelOffsetY;
+        UIView *view = [[UIView alloc] initWithFrame:rect];
+        
+        [view addSubview:instagramButton];
+        [instagramButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
+        [instagramButton.leadingAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leadingAnchor].active = YES;
+        
+        [view addSubview:facebookButton];
+        [facebookButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
+        [facebookButton.leadingAnchor constraintEqualToAnchor:instagramButton.trailingAnchor constant:20.0f].active = YES;
+        
+        [view layoutIfNeeded];
+        _tableViewFollowSectionFooter = view;
+    }
+    return _tableViewFollowSectionFooter;
+}
+
+- (void)facebookButtonAction {
+    NSURL *url = [NSURL URLWithString:@"https://www.facebook.com/join.the.crazeapp/"];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+}
+
+- (void)instagramButtonAction {
+    NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/craze.app/"];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 
