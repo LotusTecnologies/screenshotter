@@ -274,17 +274,13 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
         }
     }
     
-    @objc private func dismissViewController() {
+    @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
 }
 
 extension TutorialViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoDidEnd() {
-        dismiss(animated: true, completion: nil)
-    }
-    
     func tutorialVideoWantsToDismiss() {
-        dismiss(animated: true, completion: nil)
+        dismissViewController()
     }
 }

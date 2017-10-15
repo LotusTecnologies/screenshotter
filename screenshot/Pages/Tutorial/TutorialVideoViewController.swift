@@ -34,8 +34,9 @@ protocol TutorialVideoViewControllerDelegate : class {
 
 extension TutorialVideoViewControllerDelegate {
     // Optionalize these methods
-    func tutorialVideoDidPause() {}    
+    func tutorialVideoDidPause() {}
     func tutorialVideoDidPlay() {}
+    func tutorialVideoDidEnd() {}
 }
 
 class TutorialVideoViewController : UIViewController {
@@ -132,6 +133,7 @@ class TutorialVideoViewController : UIViewController {
         }
         
         overlayViewController.showReplayButton()
+        delegate?.tutorialVideoDidEnd()
     }
 }
 
