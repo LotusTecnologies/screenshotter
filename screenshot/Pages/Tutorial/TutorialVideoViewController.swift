@@ -71,6 +71,10 @@ class TutorialVideoViewController : UIViewController {
     
     // MARK: - UIViewController
 
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         playerLayer.frame = view.bounds
