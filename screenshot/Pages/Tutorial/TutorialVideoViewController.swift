@@ -124,16 +124,17 @@ class TutorialVideoViewController : UIViewController {
     @objc private func playerDidFinishPlaying() {
         ended = true
         
-        overlayViewController.replayButtonTapped = {
-            self.overlayViewController.hideReplayButton()
-            self.ended = false
-
-            self.player.seek(to: CMTime(seconds: 0, preferredTimescale: self.player.currentTime().timescale))
-            self.player.playImmediately(atRate: 1)
-        }
-        
+        overlayViewController.replayButtonTapped = replayButtonTapped
         overlayViewController.showReplayButton()
         delegate?.tutorialVideoDidEnd()
+    }
+    
+    private func replayButtonTapped() {
+        overlayViewController.hideReplayButton()
+        ended = false
+        
+        player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale))
+        player.playImmediately(atRate: 1)
     }
 }
 
