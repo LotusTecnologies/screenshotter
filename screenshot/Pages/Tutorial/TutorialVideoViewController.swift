@@ -43,8 +43,8 @@ class TutorialVideoViewController : UIViewController {
     
     weak var delegate: TutorialVideoViewControllerDelegate?
     
-    private let playerLayer: AVPlayerLayer
-    private let player: AVPlayer
+    private let playerLayer: AVPlayerLayer!
+    private let player: AVPlayer!
     private var ended = false
     
     // MARK: - Initialization
@@ -54,6 +54,7 @@ class TutorialVideoViewController : UIViewController {
 
         player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
+        player.actionAtItemEnd = .pause
         playerLayer = AVPlayerLayer(player: player)
         
         super.init(nibName: nil, bundle: nil)
@@ -119,7 +120,16 @@ class TutorialVideoViewController : UIViewController {
     
     @objc private func playerDidFinishPlaying() {
         ended = true
-        delegate?.tutorialVideoDidEnd()
+        
+        overlayViewController.replayButtonTapped = {
+            self.overlayViewController.hideReplayButton()
+            self.ended = false
+
+            self.player.seek(to: CMTime(seconds: 0, preferredTimescale: self.player.currentTime().timescale))
+            self.player.playImmediately(atRate: 1)
+        }
+        
+        overlayViewController.showReplayButton()
     }
 }
 
