@@ -45,6 +45,9 @@ class TutorialViewController : UIViewController {
         }
     }
     
+    private var didPresentDeterminePushAlertController:Bool = false
+    fileprivate var scrollViewIsScrollingAnimation:Bool = false
+    
     // MARK: Slides
     
     var slides = [TutorialBaseSlideView]()
@@ -63,17 +66,16 @@ class TutorialViewController : UIViewController {
     }
     
     fileprivate var currentSlideIndex: Int {
+        guard scrollView.bounds != .zero else {
+            return 0
+        }
+        
         return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
     }
     
     fileprivate var currentSlide: TutorialBaseSlideView {
         return slides[currentSlideIndex]
     }
-    
-    // MARK: -
-    
-    private var didPresentDeterminePushAlertController:Bool = false
-    fileprivate var scrollViewIsScrollingAnimation:Bool = false
     
     // MARK: - Initialization
     
@@ -186,11 +188,12 @@ class TutorialViewController : UIViewController {
                 let previousSlide = slides[i - 1]
                 slide.leadingAnchor.constraint(equalTo: previousSlide.trailingAnchor).isActive = true
             }
-            
         }
     }
     
     private func addContentViewConstraints() {
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
         [contentView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
          contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
          contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
@@ -202,10 +205,14 @@ class TutorialViewController : UIViewController {
     }
     
     private func addScrollViewConstraints() {
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
         [scrollView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
          scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
          scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
-         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)].forEach {
+         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+         scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
+         scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)].forEach {
             $0.isActive = true
         }
         

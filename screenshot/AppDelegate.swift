@@ -259,16 +259,6 @@ extension AppDelegate {
     }
 }
 
-extension AppDelegate : TutorialVideoViewControllerDelegate {
-    func tutorialVideoDidEnd() {
-        
-    }
-    
-    func tutorialVideoWantsToDismiss() {
-        
-    }
-}
-
 extension AppDelegate: UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
