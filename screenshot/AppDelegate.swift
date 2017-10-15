@@ -11,7 +11,6 @@ import UserNotifications
 import Analytics
 import Appsee
 import FBSDKLoginKit
-import RateView
 import Branch
 
 @UIApplicationMain
@@ -253,7 +252,16 @@ extension AppDelegate {
         Branch.getInstance().handlePushNotification(userInfo)
         completionHandler(.noData)
     }
+}
 
+extension AppDelegate : TutorialVideoViewControllerDelegate {
+    func tutorialVideoDidEnd() {
+        
+    }
+    
+    func tutorialVideoWantsToDismiss() {
+        
+    }
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {

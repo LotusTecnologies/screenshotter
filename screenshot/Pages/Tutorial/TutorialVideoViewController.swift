@@ -32,6 +32,12 @@ protocol TutorialVideoViewControllerDelegate : class {
     func tutorialVideoWantsToDismiss()
 }
 
+extension TutorialVideoViewControllerDelegate {
+    // Optionalize these methods
+    func tutorialVideoDidPause() {}    
+    func tutorialVideoDidPlay() {}
+}
+
 class TutorialVideoViewController : UIViewController {
     let overlayViewController = TutorialVideoOverlayViewController()
     
