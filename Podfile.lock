@@ -15,34 +15,34 @@ PODS:
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
   - Analytics (3.6.7)
-  - Appsee (2.3.5)
+  - Appsee (2.3.6)
   - Bolts (1.8.4):
     - Bolts/AppLinks (= 1.8.4)
     - Bolts/Tasks (= 1.8.4)
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
-  - Branch (0.18.8):
-    - Branch/Core (= 0.18.8)
-  - Branch/Core (0.18.8)
+  - Branch (0.19.5):
+    - Branch/Core (= 0.19.5)
+  - Branch/Core (0.19.5)
   - Clarifai-Apple-SDK (3.0.0-beta7)
   - EggRating (0.1.2):
     - RateView
-  - FBSDKCoreKit (4.27.0):
+  - FBSDKCoreKit (4.27.1):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.27.0):
+  - FBSDKLoginKit (4.27.1):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.27.0):
+  - FBSDKShareKit (4.27.1):
     - FBSDKCoreKit
   - ImageEffects (1.0.0)
-  - Intercom (4.0.3)
-  - PromiseKit/CorePromise (4.4.0)
-  - PromiseKit/Foundation (4.4.0):
+  - Intercom (4.1.2)
+  - PromiseKit/CorePromise (4.4.3)
+  - PromiseKit/Foundation (4.4.3):
     - PromiseKit/CorePromise
   - RateView (1.2)
-  - SDWebImage (4.1.0):
-    - SDWebImage/Core (= 4.1.0)
-  - SDWebImage/Core (4.1.0)
+  - SDWebImage (4.1.2):
+    - SDWebImage/Core (= 4.1.2)
+  - SDWebImage/Core (4.1.2)
 
 DEPENDENCIES:
   - AFNetworking
@@ -72,19 +72,19 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
   Analytics: 2c09a50e3478a3a7ced08a22d00c43ba6f7011e6
-  Appsee: 7643d74bad4921c4df40e6977c756909365bd851
+  Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Branch: c8181636136a8ac2477f42ec8b811f50aa359c8c
+  Branch: 25312ed2f58a569df58e6560238433c2a9d58e99
   Clarifai-Apple-SDK: a7fa32b4edcbb5d3c45a36e5fbe52ecece9d226c
   EggRating: ac37ed4dad156c9912a384464a25f554bd4198c8
-  FBSDKCoreKit: ebc6c5f5b3f0e72396041050e2266781a38ac587
-  FBSDKLoginKit: 887be4b7452e1c5a3cc4485ce152529965a0c41e
-  FBSDKShareKit: 4f83956d4ca2960730fe7588a168eb8d535c06dc
+  FBSDKCoreKit: 03365dad5d790249196ffad8be4f6d8a2d98f932
+  FBSDKLoginKit: 66ff53b73cffd967ab773e32fac39e90a60e6d46
+  FBSDKShareKit: 6a6a0ef9e850c741e4e1d7a7d21335205e997ec1
   ImageEffects: 6f92f55ae12c4010642f84dcc2d7e21246666cf9
-  Intercom: ae00cdfc0cd0a12d38f73f6a93c55907add04606
-  PromiseKit: ecf5fe92275d57ee77c9ede858af47a162e9b97e
+  Intercom: 56b1c4405dda7b0c79bffd3cc9ae6aa1b5898bda
+  PromiseKit: fbb52a0d154402c57eeb6eccd36dd7724fcf6117
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 0e435c14e402a6730315a0fb79f95e68654d55a4
+  SDWebImage: cb6f9f266a9977741efcbc21e618e8be3734c774
 
 PODFILE CHECKSUM: ddd2c1fe83e53feac988dd349ce2e2785150a7a4
 
