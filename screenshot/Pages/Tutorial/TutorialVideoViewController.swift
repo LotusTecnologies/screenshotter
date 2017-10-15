@@ -112,6 +112,8 @@ class TutorialVideoViewController : UIViewController {
         }
         
         if player.togglePlayback() == .paused {
+            overlayViewController.flashPauseOverlay()
+            
             delegate?.tutorialVideoDidPause()
         } else {
             delegate?.tutorialVideoDidPlay()
