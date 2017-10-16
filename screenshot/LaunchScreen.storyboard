@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,18 +19,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LoaderBag" translatesAutoresizingMaskIntoConstraints="NO" id="bJA-YK-kox" userLabel="Logo Image View">
-                                <rect key="frame" x="156" y="305" width="102" height="126"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="102" id="Jzo-hl-kwx"/>
-                                    <constraint firstAttribute="height" constant="126" id="yfY-xw-frH"/>
-                                </constraints>
+                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="bJA-YK-kox" userLabel="Logo Image View">
+                                <rect key="frame" x="92.666666666666686" y="286" width="229" height="33"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="bJA-YK-kox" firstAttribute="centerY" secondItem="njx-n7-yjb" secondAttribute="centerY" id="Wvv-Fa-5II"/>
-                            <constraint firstItem="bJA-YK-kox" firstAttribute="centerX" secondItem="njx-n7-yjb" secondAttribute="centerX" id="nxC-mt-uTS"/>
+                            <constraint firstItem="bJA-YK-kox" firstAttribute="centerX" secondItem="eYw-IQ-0vz" secondAttribute="centerX" id="UsH-la-7tK"/>
+                            <constraint firstItem="bJA-YK-kox" firstAttribute="centerY" secondItem="eYw-IQ-0vz" secondAttribute="centerY" multiplier="0.8" id="brM-B9-Z6c"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="eYw-IQ-0vz"/>
                     </view>
@@ -40,6 +37,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LoaderBag" width="102" height="126"/>
+        <image name="LaunchLogo" width="229" height="33"/>
     </resources>
 </document>

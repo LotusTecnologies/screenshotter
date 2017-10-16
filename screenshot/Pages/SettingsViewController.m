@@ -658,7 +658,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (void)instagramButtonAction {
-    NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/craze.app/"];
+    NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/screenshopit/"];
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
