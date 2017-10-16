@@ -13,17 +13,17 @@ import UIKit
 }
 
 class TutorialViewController : UIViewController {
-    enum StartMode {
+    enum VideoStartMode {
         case Standard
-        case AmbassadorLink(url: URL)
+        case AmbassadorLink(username: String)
         case Replay
         
         var tutorialVideo: TutorialVideo? {
             switch self {
-            case .AmbassadorLink(let url):
-                return .Ambassador(url: url)
             case .Standard:
                 return .Standard
+            case .AmbassadorLink(let username):
+                return .Ambassador(username: username)
             case .Replay:
                 return nil
             }
@@ -33,7 +33,13 @@ class TutorialViewController : UIViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
     var updatePromptHandler: UpdatePromptHandler!
-    var startMode: StartMode = .Replay
+    var videoStartMode: VideoStartMode? {
+        didSet {
+            if let _ = videoStartMode {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: presentTutorialVideo)
+            }
+        }
+    }
     
     let scrollView = UIScrollView()
     let contentView = UIView()
@@ -131,7 +137,6 @@ class TutorialViewController : UIViewController {
         ])
         
         prepareSlideViews()
-        presentTutorialVideo()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -148,16 +153,14 @@ class TutorialViewController : UIViewController {
     // MARK: -
     
     private func presentTutorialVideo() {
-        guard let video = startMode.tutorialVideo else {
+        guard let video = videoStartMode?.tutorialVideo else {
             return
         }
         
         let vc = TutorialVideoViewController(video: video)
         vc.delegate = self
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.present(vc, animated: true, completion: nil)
-        }
+        vc.modalTransitionStyle = .crossDissolve
+        present(vc, animated: true, completion: nil)
     }
     
     fileprivate func scrollToNextSlide(animated: Bool = true) {

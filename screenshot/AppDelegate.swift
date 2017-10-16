@@ -15,8 +15,6 @@ import Branch
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
-    var tutorialStartMode: TutorialViewController.StartMode = .Standard
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
@@ -140,8 +138,13 @@ extension AppDelegate {
                 self.showScreenshotListTop()
             }
             
-            if let channel = URL(string: params["channel"] as? String ?? "") {
-                self.tutorialStartMode = .AmbassadorLink(url: channel)
+            // "channel" will be the Instagram username of the ambassador who shared this link.
+            if let channel = params["channel"] as? String {
+                if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
+                    tutorialVC.videoStartMode = .AmbassadorLink(username: channel)
+                }
+            } else if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
+                tutorialVC.videoStartMode = .Standard
             }
         }
         
@@ -188,7 +191,6 @@ extension AppDelegate {
             insets.top = UIDevice.is568h ? 0 : 30
 
             let tutorialViewController = TutorialViewController()
-            tutorialViewController.startMode = tutorialStartMode
             tutorialViewController.delegate = self
             tutorialViewController.contentLayoutMargins = insets
             viewController = tutorialViewController

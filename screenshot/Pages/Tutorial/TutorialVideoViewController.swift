@@ -11,14 +11,14 @@ import AVKit
 
 enum TutorialVideo {
     case Standard
-    case Ambassador(url: URL)
+    case Ambassador(username: String)
     
     var url: URL {
         switch self {
-        case .Ambassador(let url):
-            return url
+        case .Ambassador(let username):
+            return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!
         case .Standard:
-            return URL(string: "http://res.cloudinary.com/crazeapp/video/upload/v1506927835/Craze_App_bcf91q.mp4")!
+            return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/v1506927835/Craze_App_bcf91q.mp4")!
         }
     }
 }
