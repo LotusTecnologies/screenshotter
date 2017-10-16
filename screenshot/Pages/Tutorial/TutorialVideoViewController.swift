@@ -13,12 +13,12 @@ enum TutorialVideo {
     case Standard
     case Ambassador(username: String)
     
-    var url: URL {
+    var playerItem: AVPlayerItem {
         switch self {
         case .Ambassador(let username):
-            return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!
+            return AVPlayerItem(url: URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!)
         case .Standard:
-            return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/v1506927835/Craze_App_bcf91q.mp4")!
+            return AVPlayerItem(url: URL(string: "https://res.cloudinary.com/crazeapp/video/upload/v1506927835/Craze_App_bcf91q.mp4")!)
         }
     }
 }
@@ -36,22 +36,41 @@ class TutorialVideoViewController : UIViewController {
     
     weak var delegate: TutorialVideoViewControllerDelegate?
     
+    private(set) var video: TutorialVideo! {
+        didSet {
+            if let player = player {
+                let item = video.playerItem
+                
+                if item != player.currentItem {
+                    player.replaceCurrentItem(with: item)
+                    
+                    NotificationCenter.default.removeObserver(self)
+                    NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
+                    item.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
+                }
+            }
+        }
+    }
+    
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
     private var ended = false
     
     // MARK: - Initialization
     
-    init(video: TutorialVideo) {
-        let playerItem = AVPlayerItem(url: video.url)
-
+    init(video vid: TutorialVideo) {
+        let playerItem = vid.playerItem
+        
         player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
         player.actionAtItemEnd = .pause
+        
         playerLayer = AVPlayerLayer(player: player)
         
         super.init(nibName: nil, bundle: nil)
         
+        video = vid
+        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
     }
     
@@ -64,6 +83,7 @@ class TutorialVideoViewController : UIViewController {
     }
     
     deinit {
+        player.currentItem?.removeObserver(self, forKeyPath: "status")
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -97,8 +117,29 @@ class TutorialVideoViewController : UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
         
-        player.play()
+        player.playImmediately(atRate: 1)
         delegate?.tutorialVideoViewControllerDidPlay?(self)
+    }
+    
+    // MARK: - Player state observation
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard let video = video,
+            let playerItem = object as? AVPlayerItem,
+            playerItem == player.currentItem else {
+            return
+        }
+        
+        if case .Ambassador(_) = video,
+            playerItem.status == .failed {
+            guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
+                return
+            }
+
+            // Ambassador video failed to download, use standard one.
+            self.video = .Standard
+            player.playImmediately(atRate: 1)
+            delegate?.tutorialVideoViewControllerDidPlay?(self)
+        }
     }
     
     // MARK: - Actions
@@ -132,6 +173,7 @@ class TutorialVideoViewController : UIViewController {
         
         player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale))
         player.playImmediately(atRate: 1)
+        delegate?.tutorialVideoViewControllerDidPlay?(self)
     }
 }
 
