@@ -30,13 +30,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeEmail,
     RowTypeName,
     RowTypeTutorial,
+    RowTypeTutorialVideo,
     RowTypeTellFriend,
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
@@ -221,6 +222,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                         ],
                   @(SectionTypeAbout): @[@(RowTypeTellFriend),
                                          @(RowTypeTutorial),
+                                         @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
                                          @(RowTypeVersion)
@@ -377,6 +379,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self.navigationController pushViewController:viewController animated:YES];
         }
             break;
+        case RowTypeTutorialVideo: {
+            TutorialVideoViewController *viewController = [[TutorialVideoViewController alloc] init];
+            viewController.delegate = self;
+            viewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            [self presentViewController:viewController animated:YES completion:nil];
+        }
+            break;
         case RowTypeContactUs:
             [IntercomHelper.sharedInstance presentMessagingUI];
             break;
@@ -429,6 +438,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeTutorial:
             return @"Replay Tutorial";
+            break;
+        case RowTypeTutorialVideo:
+            return @"Replay Tutorial Video";
             break;
         case RowTypeName:
             return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
@@ -726,4 +738,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+#pragma mark - TutorialVideoViewControllerDelegate
+
+- (void)tutorialVideoViewControllerDoneButtonTapped:(TutorialVideoViewController *)viewController {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 @end
+
