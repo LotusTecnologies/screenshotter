@@ -12,7 +12,6 @@
 #import "screenshot-Swift.h"
 #import "HelperView.h"
 #import "PermissionsManager.h"
-@import PromiseKit;
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionImages
