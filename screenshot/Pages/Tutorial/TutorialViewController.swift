@@ -171,6 +171,10 @@ class TutorialViewController : UIViewController {
         }
     }
     
+    @objc fileprivate func dismissViewController() {
+        dismiss(animated: true, completion: nil)
+    }
+
     fileprivate func complete() {
         track("Finished Tutorial")
         delegate?.tutoriaViewControllerDidComplete(self)
@@ -185,14 +189,7 @@ extension TutorialViewController : UIScrollViewDelegate {
     }
 }
 
-extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
-    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView!) {
-        slideView.delegate = nil
-        
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
-        complete()
-    }
-    
+extension TutorialViewController : TutorialWelcomeSlideViewDelegate {
     func tutorialWelcomeSlideViewDidComplete(_ slideView: TutorialWelcomeSlideView!) {
         slideView.delegate = nil
         
@@ -202,7 +199,18 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
             scrollToNextSlide()
         }
     }
-    
+}
+
+extension TutorialViewController : TutorialTrySlideViewDelegate {
+    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView!) {
+        slideView.delegate = nil
+        
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
+        complete()
+    }
+}
+
+extension TutorialViewController : TutorialEmailSlideViewDelegate {
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView!) {
         slideView.delegate = nil
         scrollToNextSlide()
@@ -219,9 +227,4 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
             present(vc, animated: true, completion: nil)
         }
     }
-    
-    @objc fileprivate func dismissViewController() {
-        dismiss(animated: true, completion: nil)
-    }
 }
-
