@@ -23,20 +23,12 @@ enum TutorialVideo {
     }
 }
 
-protocol TutorialVideoViewControllerDelegate : class {
-    func tutorialVideoDidPause()
-    func tutorialVideoDidPlay()
-    func tutorialVideoDidEnd()
+@objc protocol TutorialVideoViewControllerDelegate {
+    @objc optional func tutorialVideoViewControllerDidPause(_ viewController:TutorialVideoViewController)
+    @objc optional func tutorialVideoViewControllerDidPlay(_ viewController:TutorialVideoViewController)
+    @objc optional func tutorialVideoViewControllerDidEnd(_ viewController:TutorialVideoViewController)
     
-    // Call when the “Done” button is tapped
-    func tutorialVideoWantsToDismiss()
-}
-
-extension TutorialVideoViewControllerDelegate {
-    // Optionalize these methods
-    func tutorialVideoDidPause() {}
-    func tutorialVideoDidPlay() {}
-    func tutorialVideoDidEnd() {}
+    func tutorialVideoViewControllerDoneButtonTapped(_ viewController:TutorialVideoViewController)
 }
 
 class TutorialVideoViewController : UIViewController {
@@ -94,7 +86,7 @@ class TutorialVideoViewController : UIViewController {
         view.addSubview(overlayViewController.view)
         
         overlayViewController.doneButtonTapped = {
-            self.delegate?.tutorialVideoWantsToDismiss()
+            self.delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
         }
 
         // Add tap gesture recognizer
@@ -102,7 +94,7 @@ class TutorialVideoViewController : UIViewController {
         view.addGestureRecognizer(tap)
         
         player.play()
-        delegate?.tutorialVideoDidPlay()
+        delegate?.tutorialVideoViewControllerDidPlay?(self)
     }
     
     // MARK: - Actions
@@ -115,9 +107,9 @@ class TutorialVideoViewController : UIViewController {
         if player.togglePlayback() == .paused {
             overlayViewController.flashPauseOverlay()
             
-            delegate?.tutorialVideoDidPause()
+            delegate?.tutorialVideoViewControllerDidPause?(self)
         } else {
-            delegate?.tutorialVideoDidPlay()
+            delegate?.tutorialVideoViewControllerDidPlay?(self)
         }
     }
     
@@ -126,7 +118,8 @@ class TutorialVideoViewController : UIViewController {
         
         overlayViewController.replayButtonTapped = replayButtonTapped
         overlayViewController.showReplayButton()
-        delegate?.tutorialVideoDidEnd()
+        
+        delegate?.tutorialVideoViewControllerDidEnd?(self)
     }
     
     private func replayButtonTapped() {

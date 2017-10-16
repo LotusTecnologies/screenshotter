@@ -280,7 +280,7 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
 }
 
 extension TutorialViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoWantsToDismiss() {
+    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
         dismissViewController()
     }
 }
