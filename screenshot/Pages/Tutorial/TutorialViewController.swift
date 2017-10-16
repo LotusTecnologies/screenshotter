@@ -9,7 +9,7 @@
 import UIKit
 
 @objc protocol TutorialViewControllerDelegate : class {
-    func tutorialDidComplete(_ viewController: TutorialViewController)
+    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController)
 }
 
 class TutorialViewController : UIViewController {
@@ -17,12 +17,8 @@ class TutorialViewController : UIViewController {
     
     var updatePromptHandler: UpdatePromptHandler!
     
-    var scrollView: UIScrollView!
-    var contentView = UIView() {
-        didSet {
-            contentView.translatesAutoresizingMaskIntoConstraints = false
-        }
-    }
+    let scrollView = UIScrollView()
+    let contentView = UIView()
     
     var contentLayoutMargins: UIEdgeInsets {
         get {
@@ -82,24 +78,41 @@ class TutorialViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        track("Started Tutorial")
+        
         updatePromptHandler.start()
         
         view.backgroundColor = .white
         
-        scrollView = buildScrollView()
+        // Setup scroll view
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.delegate = self
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.isPagingEnabled = true
+        scrollView.isScrollEnabled = false
         view.addSubview(scrollView)
-        addScrollViewConstraints()
         
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            ])
+        
+        // Setup content view
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
-        addContentViewConstraints()
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CGFloat(slides.count)),
+            contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
+            ])
         
         prepareSlideViews()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        track("Started Tutorial")
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -115,7 +128,7 @@ class TutorialViewController : UIViewController {
     
     // MARK: -
     
-    fileprivate func scrollToNextSlide() {
+    fileprivate func scrollToNextSlide(animated: Bool = true) {
         guard scrollViewIsScrollingAnimation == false else {
             return
         }
@@ -125,7 +138,7 @@ class TutorialViewController : UIViewController {
         
         var offset:CGPoint = .zero
         offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
-        scrollView.setContentOffset(offset, animated: true)
+        scrollView.setContentOffset(offset, animated: animated)
     }
     
     private func prepareSlideViews() {
@@ -140,7 +153,7 @@ class TutorialViewController : UIViewController {
             
             [slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
              slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor, constant: -top),
-             slide.topAnchor.constraint(equalTo: contentView.topAnchor)].forEach {
+             slide.topAnchor.constraint(equalTo: contentView.topAnchor, constant: top)].forEach {
                 $0.isActive = true
             }
             
@@ -150,7 +163,7 @@ class TutorialViewController : UIViewController {
             } else if i == slides.count - 1 {
                 slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             }
-        
+            
             if i > 0 {
                 let previousSlide = slides[i - 1]
                 slide.leadingAnchor.constraint(equalTo: previousSlide.trailingAnchor).isActive = true
@@ -158,41 +171,9 @@ class TutorialViewController : UIViewController {
         }
     }
     
-    private func addContentViewConstraints() {
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        
-        [contentView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
-         contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-         contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
-         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-         contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, multiplier: CGFloat(slides.count)),
-         contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)].forEach {
-            $0.isActive = true
-        }
-    }
-    
-    private func addScrollViewConstraints() {
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
-        [scrollView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
-         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-         scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
-         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-         scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
-         scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)].forEach {
-            $0.isActive = true
-        }
-        
-    }
-    
-    private func buildScrollView() -> UIScrollView {
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.delegate = self
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.isPagingEnabled = true
-        scrollView.isScrollEnabled = false
-        return scrollView
+    fileprivate func complete() {
+        track("Finished Tutorial")
+        delegate?.tutoriaViewControllerDidComplete(self)
     }
 }
 
@@ -209,16 +190,14 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
-        
-        delegate?.tutorialDidComplete(self)
-        track("Finished Tutorial")
+        complete()
     }
     
     func tutorialWelcomeSlideViewDidComplete(_ slideView: TutorialWelcomeSlideView!) {
         slideView.delegate = nil
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.tutorialCompleted) {
-            delegate?.tutorialDidComplete(self)
+            complete()
         } else {
             scrollToNextSlide()
         }
@@ -236,12 +215,12 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
     }
     
     func tutorialEmailSlideViewDidTapTerms(ofService slideView: TutorialEmailSlideView!) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self,  doneAction:#selector(dismissViewController)) {
+        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, doneAction:#selector(dismissViewController)) {
             present(vc, animated: true, completion: nil)
         }
     }
     
-    @objc private func dismissViewController() {
+    @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
 }
