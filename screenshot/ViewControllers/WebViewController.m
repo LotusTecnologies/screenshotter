@@ -19,6 +19,7 @@
     BOOL _isShorteningUrl;
 }
 
+@property (nonatomic, strong) UIView *loadingCoverView;
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UIBarButtonItem *backItem;
@@ -65,15 +66,6 @@
     });
     [self updateToolbarItems];
     
-    self.loader = ({
-        Loader *loader = [[Loader alloc] init];
-        loader.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.view addSubview:loader];
-        [loader.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-        [loader.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
-        loader;
-    });
-    
     self.view.scrollView.contentInset = ({
         UIEdgeInsets insets = self.view.scrollView.contentInset;
         insets.bottom = self.toolbar.bounds.size.height;
@@ -84,6 +76,27 @@
         UIEdgeInsets insets = self.view.scrollView.scrollIndicatorInsets;
         insets.bottom = self.toolbar.bounds.size.height;
         insets;
+    });
+    
+    _loadingCoverView = ({
+        UIView *view = [[UIView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        view.backgroundColor = [UIColor whiteColor];
+        [self.view addSubview:view];
+        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        view;
+    });
+    
+    _loader = ({
+        Loader *loader = [[Loader alloc] init];
+        loader.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.loadingCoverView addSubview:loader];
+        [loader.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+        [loader.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
+        loader;
     });
     
     if (self.url) {
@@ -185,10 +198,22 @@
 
 #pragma mark - Delegate
 
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    NSLog(@"||| did start navigation  %f", webView.estimatedProgress);
+}
+
+- (void)webView:(WKWebView *)webView didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *)navigation {
+    NSLog(@"||| did receive redirect  %f", webView.estimatedProgress);
+}
+
 - (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
-    if (![self.loader isHidden]) {
+    NSLog(@"||| did commit  %f", webView.estimatedProgress);
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    if (![self.loadingCoverView isHidden]) {
         [self.loader stopAnimation];
-        self.loader.hidden = YES;
+        self.loadingCoverView.hidden = YES;
     }
     
 //    [self syncToolbarNavigationItems];

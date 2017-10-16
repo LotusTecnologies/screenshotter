@@ -665,7 +665,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (void)facebookButtonAction {
-    NSURL *url = [NSURL URLWithString:@"https://www.facebook.com/join.the.crazeapp/"];
+    NSURL *url = [NSURL URLWithString:@"https://www.facebook.com/screenshopit/"];
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
