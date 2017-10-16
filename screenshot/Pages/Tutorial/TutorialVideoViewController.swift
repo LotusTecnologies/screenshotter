@@ -31,26 +31,21 @@ enum TutorialVideo {
     func tutorialVideoViewControllerDoneButtonTapped(_ viewController:TutorialVideoViewController)
 }
 
+// This factory is necessary to hide the `TutorialVideo` Swift enum from ObjC
+class TutorialVideoViewControllerFactory : NSObject {
+    class var replayViewController: TutorialVideoViewController {
+        let username = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername)
+        let video: TutorialVideo = (username != nil) ? .Ambassador(username: username!) : .Standard
+        return TutorialVideoViewController(video: video)
+    }
+}
+
 class TutorialVideoViewController : UIViewController {
     let overlayViewController = TutorialVideoOverlayViewController()
     
     weak var delegate: TutorialVideoViewControllerDelegate?
     
-    private(set) var video: TutorialVideo! {
-        didSet {
-            if let player = player {
-                let item = video.playerItem
-                
-                if item != player.currentItem {
-                    player.replaceCurrentItem(with: item)
-                    
-                    NotificationCenter.default.removeObserver(self)
-                    NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
-                    item.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
-                }
-            }
-        }
-    }
+    private(set) var video: TutorialVideo!
     
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
@@ -70,8 +65,7 @@ class TutorialVideoViewController : UIViewController {
         super.init(nibName: nil, bundle: nil)
         
         video = vid
-        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
+        beginObserving(playerItem: playerItem)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -116,9 +110,15 @@ class TutorialVideoViewController : UIViewController {
         // Add tap gesture recognizer
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        player.playImmediately(atRate: 1)
-        delegate?.tutorialVideoViewControllerDidPlay?(self)
+        if player.rate == 0 {
+            player.playImmediately(atRate: 1)
+            delegate?.tutorialVideoViewControllerDidPlay?(self)
+        }
     }
     
     // MARK: - Player state observation
@@ -136,10 +136,25 @@ class TutorialVideoViewController : UIViewController {
             }
 
             // Ambassador video failed to download, use standard one.
+            playerItem.removeObserver(self, forKeyPath: "status")
+
             self.video = .Standard
+            
+            let standardPlayerItem = self.video.playerItem
+            player.replaceCurrentItem(with: standardPlayerItem)
+            beginObserving(playerItem: standardPlayerItem)
             player.playImmediately(atRate: 1)
             delegate?.tutorialVideoViewControllerDidPlay?(self)
         }
+    }
+    
+    // MARK: - Private
+    
+    private func beginObserving(playerItem item:AVPlayerItem) {
+        NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
+        
+        item.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
     }
     
     // MARK: - Actions
@@ -183,13 +198,17 @@ extension AVPlayer {
         case paused
     }
     
+    var playbackState: PlaybackState {
+        return rate > 0 ? .playing : .paused
+    }
+    
     func togglePlayback() -> PlaybackState {
-        guard rate > 0 else {
+        if rate == 0 {
             play()
-            return .playing
+        } else {
+            pause()
         }
         
-        pause()
-        return .paused
+        return playbackState
     }
 }

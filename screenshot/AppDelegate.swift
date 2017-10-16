@@ -140,11 +140,13 @@ extension AppDelegate {
             
             // "channel" will be the Instagram username of the ambassador who shared this link.
             if let channel = params["channel"] as? String {
+                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.ambasssadorUsername)
+                
                 if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
-                    tutorialVC.videoStartMode = .AmbassadorLink(username: channel)
+                    tutorialVC.presentVideo(.Ambassador(username: channel))
                 }
             } else if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
-                tutorialVC.videoStartMode = .Standard
+                tutorialVC.presentVideo(.Standard)
             }
         }
         

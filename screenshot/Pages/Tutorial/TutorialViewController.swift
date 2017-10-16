@@ -13,34 +13,9 @@ import UIKit
 }
 
 class TutorialViewController : UIViewController {
-    enum VideoStartMode {
-        case Standard
-        case AmbassadorLink(username: String)
-        case Replay
-        
-        var tutorialVideo: TutorialVideo? {
-            switch self {
-            case .Standard:
-                return .Standard
-            case .AmbassadorLink(let username):
-                return .Ambassador(username: username)
-            case .Replay:
-                return nil
-            }
-        }
-    }
-
     weak var delegate: TutorialViewControllerDelegate?
     
     var updatePromptHandler: UpdatePromptHandler!
-    var videoStartMode: VideoStartMode? {
-        didSet {
-            if let _ = videoStartMode {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: presentTutorialVideo)
-            }
-        }
-    }
-    
     let scrollView = UIScrollView()
     let contentView = UIView()
     
@@ -152,11 +127,7 @@ class TutorialViewController : UIViewController {
     
     // MARK: -
     
-    private func presentTutorialVideo() {
-        guard let video = videoStartMode?.tutorialVideo else {
-            return
-        }
-        
+    func presentVideo(_ video: TutorialVideo) {
         let vc = TutorialVideoViewController(video: video)
         vc.delegate = self
         vc.modalTransitionStyle = .crossDissolve

@@ -380,7 +380,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         }
             break;
         case RowTypeTutorialVideo: {
-            TutorialVideoViewController *viewController = [[TutorialVideoViewController alloc] init];
+            TutorialVideoViewController *viewController = [TutorialVideoViewControllerFactory replayViewController];
             viewController.delegate = self;
             viewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             [self presentViewController:viewController animated:YES completion:nil];
