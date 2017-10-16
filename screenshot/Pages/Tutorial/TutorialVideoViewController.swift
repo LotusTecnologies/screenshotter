@@ -59,6 +59,10 @@ class TutorialVideoViewController : UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    convenience override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.init(video: .Standard)
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
