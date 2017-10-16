@@ -195,7 +195,7 @@ class TutorialViewController : UIViewController {
             } else if i == slides.count - 1 {
                 slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             }
-        
+            
             if i > 0 {
                 let previousSlide = slides[i - 1]
                 slide.leadingAnchor.constraint(equalTo: previousSlide.trailingAnchor).isActive = true
@@ -247,7 +247,7 @@ extension TutorialViewController : TutorialWelcomeSlideViewDelegate, TutorialEma
     }
     
     func tutorialEmailSlideViewDidTapTerms(ofService slideView: TutorialEmailSlideView!) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self,  doneAction:#selector(dismissViewController)) {
+        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, doneAction:#selector(dismissViewController)) {
             present(vc, animated: true, completion: nil)
         }
     }
