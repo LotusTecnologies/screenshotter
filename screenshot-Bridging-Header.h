@@ -9,7 +9,6 @@
 #import "LoadingViewController.h"
 #import "UIApplication+Version.h"
 #import "PermissionsManager.h"
-#import "NotificationManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 #import "HelperView.h"

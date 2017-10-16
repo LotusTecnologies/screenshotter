@@ -13,10 +13,10 @@ import CoreData // NSManagedObjectContext
 import PromiseKit
 import UserNotifications
 
-
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
+    public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
     var selectedScreenshotAssets: [PHAsset]?
 //    var changedAssetIds: [String] = []
@@ -126,7 +126,7 @@ class AssetSyncModel: NSObject {
     func syteProcessing(shouldProcess: Bool, imageData: Data?, assetId: String) {
         if shouldProcess {
             DispatchQueue.main.async {
-                NotificationManager.shared().present(with: .products)
+                self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
             firstly { _ -> Promise<(String, [[String : Any]])> in
                 return NetworkingPromise.uploadToSyte(imageData: imageData)
@@ -134,7 +134,7 @@ class AssetSyncModel: NSObject {
                     track("received response from Syte", properties: ["segmentCount" : segments.count])
                     self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments)
                 }.always {
-                    NotificationManager.shared().dismiss(with: .products)
+                    self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Product)
                 }.catch { error in
                     let nsError = error as NSError
                     if nsError.domain == "Craze" {
@@ -155,7 +155,7 @@ class AssetSyncModel: NSObject {
         self.screenshotsToProcess -= 1
         if self.screenshotsToProcess == 0 {
             DispatchQueue.main.async {
-                NotificationManager.shared().dismiss(with: .screenshots)
+                self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Screenshot)
             }
             self.endSync()
         } else if self.screenshotsToProcess < 0 {
@@ -570,7 +570,7 @@ class AssetSyncModel: NSObject {
             self.countAndPrint(name: "toDownload", set: toDownload)
             if toUpload.count > 0 || toDownload.count > 0 || toBypassClarifai.count > 0 || toRetry.count > 0 {
                 DispatchQueue.main.async {
-                    NotificationManager.shared().present(with: .screenshots)
+                    self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Screenshot)
                 }
             }
             if toUpload.count > 0 {

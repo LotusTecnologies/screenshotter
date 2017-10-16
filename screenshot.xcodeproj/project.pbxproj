@@ -49,7 +49,6 @@
 		C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */; };
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
-		C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184DB1F4D637400EE7855 /* NotificationManager.m */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
@@ -57,6 +56,7 @@
 		C59A30461F5FDECB00463338 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* MainButton.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
 		C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
+		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
@@ -143,8 +143,6 @@
 		C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayNavigationController.m; sourceTree = "<group>"; };
 		C55184CD1F4D5DC600EE7855 /* LoadingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingViewController.h; sourceTree = "<group>"; };
 		C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingViewController.m; sourceTree = "<group>"; };
-		C55184DA1F4D637400EE7855 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationManager.h; sourceTree = "<group>"; };
-		C55184DB1F4D637400EE7855 /* NotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationManager.m; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
@@ -152,6 +150,7 @@
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
+		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
 		C5CCBB3E1F41BC1400D6B392 /* UIApplication+Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Version.h"; sourceTree = "<group>"; };
@@ -205,6 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */,
+				C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -271,8 +271,6 @@
 			children = (
 				5273E3801F7ACE0300C832F8 /* Analytics.swift */,
 				52D8F50A1F61391C0032C5A9 /* Intercom.swift */,
-				C55184DA1F4D637400EE7855 /* NotificationManager.h */,
-				C55184DB1F4D637400EE7855 /* NotificationManager.m */,
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
 			);
@@ -663,6 +661,7 @@
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
+				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
@@ -687,7 +686,6 @@
 				C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */,
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
-				C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */,
 				C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */,
 				C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
