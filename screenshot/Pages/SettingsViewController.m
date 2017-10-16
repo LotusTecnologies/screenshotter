@@ -695,7 +695,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Tutorial
 
-- (void)tutorialDidComplete:(TutorialViewController *)viewController {
+- (void)tutoriaViewControllerDidComplete:(TutorialViewController *)viewController {
     [self.navigationController popViewControllerAnimated:YES];
 }
 

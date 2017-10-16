@@ -187,7 +187,8 @@ extension AppDelegate {
             var insets = UIEdgeInsets.zero
             insets.top = UIDevice.is568h ? 0 : 30
 
-            let tutorialViewController = TutorialViewController(startMode: tutorialStartMode)
+            let tutorialViewController = TutorialViewController()
+            tutorialViewController.startMode = tutorialStartMode
             tutorialViewController.delegate = self
             tutorialViewController.contentLayoutMargins = insets
             viewController = tutorialViewController
@@ -226,7 +227,7 @@ extension AppDelegate {
 // MARK: - Tutorial
 
 extension AppDelegate: TutorialViewControllerDelegate {
-    func tutorialDidComplete(_ viewController: TutorialViewController) {
+    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
         self.prepareDataStackCompletionIfNeeded()
@@ -236,13 +237,11 @@ extension AppDelegate: TutorialViewControllerDelegate {
             self.transitionTo(self.nextViewController())
         }
     }
-
 }
 
 // MARK: - Push Notifications
 
 extension AppDelegate {
-    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         IntercomHelper.sharedInstance.deviceToken = deviceToken
     }
