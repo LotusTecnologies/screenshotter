@@ -7,7 +7,6 @@
 //
 
 #import "SettingsViewController.h"
-#import "TutorialViewController.h"
 #import "Geometry.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
@@ -684,7 +683,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Tutorial
 
-- (void)tutorialViewControllerDidComplete:(TutorialViewController *)viewController {
+- (void)tutoriaViewControllerDidComplete:(TutorialViewController *)viewController {
     [self.navigationController popViewControllerAnimated:YES];
 }
 

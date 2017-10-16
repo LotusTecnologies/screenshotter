@@ -216,14 +216,12 @@ extension AppDelegate {
             })
         }
     }
-    
 }
 
 // MARK: - Tutorial
 
 extension AppDelegate: TutorialViewControllerDelegate {
-    
-    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController) {
+    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
         self.prepareDataStackCompletionIfNeeded()
@@ -233,7 +231,6 @@ extension AppDelegate: TutorialViewControllerDelegate {
             self.transitionTo(self.nextViewController())
         }
     }
-
 }
 
 // MARK: - Push Notifications
@@ -254,11 +251,9 @@ extension AppDelegate {
         Branch.getInstance().handlePushNotification(userInfo)
         completionHandler(.noData)
     }
-
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : String],
           let openingScreen = userInfo[Constants.openingScreenKey],
