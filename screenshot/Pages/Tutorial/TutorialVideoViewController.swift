@@ -13,12 +13,12 @@ enum TutorialVideo {
     case Standard
     case Ambassador(username: String)
     
-    var playerItem: AVPlayerItem {
+    var url: URL {
         switch self {
         case .Ambassador(let username):
-            return AVPlayerItem(url: URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!)
+            return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!
         case .Standard:
-            return AVPlayerItem(url: URL(string: "https://res.cloudinary.com/crazeapp/video/upload/v1506927835/Craze_App_bcf91q.mp4")!)
+            return Bundle.main.url(forResource: "Craze_Video", withExtension: "mp4")!
         }
     }
 }
@@ -54,7 +54,7 @@ class TutorialVideoViewController : UIViewController {
     // MARK: - Initialization
     
     init(video vid: TutorialVideo) {
-        let playerItem = vid.playerItem
+        let playerItem = AVPlayerItem(url: vid.url)
         
         player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
@@ -140,7 +140,7 @@ class TutorialVideoViewController : UIViewController {
 
             self.video = .Standard
             
-            let standardPlayerItem = self.video.playerItem
+            let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
             player.replaceCurrentItem(with: standardPlayerItem)
             beginObserving(playerItem: standardPlayerItem)
             player.playImmediately(atRate: 1)

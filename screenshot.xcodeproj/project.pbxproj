@@ -14,6 +14,7 @@
 		523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
+		52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 52807FF81F9530D30075111D /* Craze_Video.mp4 */; };
 		52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F50A1F61391C0032C5A9 /* Intercom.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
@@ -79,6 +80,7 @@
 		522AF64D1F93348B00A7A151 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		52807FF81F9530D30075111D /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
 		52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
@@ -192,6 +194,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		52807FFA1F9530E70075111D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				52807FF81F9530D30075111D /* Craze_Video.mp4 */,
+				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
+				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -414,12 +426,11 @@
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
 				C5233F091F6FEFEB00F25C7C /* Protocols */,
-				C5278FD71F3C38510090E422 /* Singletons */,
 				C5278FDA1F3C38510090E422 /* ViewControllers */,
 				C5278FE21F3C38510090E422 /* Views */,
+				C5278FD71F3C38510090E422 /* Singletons */,
+				52807FFA1F9530E70075111D /* Resources */,
 				E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */,
-				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
-				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				E4139D431F09083B00E8A53B /* Supporting Files */,
 			);
 			path = screenshot;
@@ -536,6 +547,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 			);
