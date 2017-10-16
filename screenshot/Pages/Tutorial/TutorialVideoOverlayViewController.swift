@@ -24,9 +24,9 @@ class TutorialVideoOverlayViewController : UIViewController {
         setupDoneButton()
         setupReplayButton()
         setupPauseButton()
-
-        setupDoneButtonConstraints()
     }
+
+    // MARK: - Public
     
     func flashPauseOverlay() {
         pauseButton.alpha = 0
@@ -35,7 +35,7 @@ class TutorialVideoOverlayViewController : UIViewController {
         UIView.animate(withDuration: 0.1, animations: {
             self.pauseButton.alpha = 1
         }, completion: { finished in
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: 0.2, animations: {
                 self.pauseButton.alpha = 0.0
             }, completion: { finished in
                 self.pauseButton.isHidden = true
@@ -72,17 +72,17 @@ class TutorialVideoOverlayViewController : UIViewController {
         replayButtonTapped?()
     }
     
-    // MARK: - Private
+    // MARK: - Button Setup
     
     private func setupPauseButton() {
         pauseButton = UIButton(frame: .zero)
+        pauseButton.translatesAutoresizingMaskIntoConstraints = false
         pauseButton.setImage(UIImage(named: "Pause"), for: .normal)
         pauseButton.isHidden = true
         
         view.addSubview(pauseButton)
         
-        pauseButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        // layout
         NSLayoutConstraint.activate([
             pauseButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pauseButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -93,13 +93,14 @@ class TutorialVideoOverlayViewController : UIViewController {
     
     private func setupReplayButton() {
         replayButton = UIButton(frame: .zero)
+        replayButton.translatesAutoresizingMaskIntoConstraints = false
         replayButton.setImage(UIImage(named: "Replay"), for: .normal)
         replayButton.isHidden = true
         replayButton.addTarget(self, action: #selector(didTapOnReplayButton), for: .touchUpInside)
         
         view.addSubview(replayButton)
         
-        replayButton.translatesAutoresizingMaskIntoConstraints = false
+        // layout
         
         NSLayoutConstraint.activate([
             replayButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -109,15 +110,6 @@ class TutorialVideoOverlayViewController : UIViewController {
         ])
     }
 
-    private func setupDoneButtonConstraints() {
-        NSLayoutConstraint.activate([
-            doneButton.widthAnchor.constraint(equalToConstant: 70),
-            doneButton.heightAnchor.constraint(equalToConstant: 35),
-            doneButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-            doneButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 25)
-        ])
-    }
-    
     private func setupDoneButton() {
         let effect = UIBlurEffect(style: .dark)
         let blurView = UIVisualEffectView(effect: effect)
@@ -126,20 +118,35 @@ class TutorialVideoOverlayViewController : UIViewController {
         blurView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         
         doneButton = UIButton(frame: .zero)
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.backgroundColor = UIColor(white: 0, alpha: 0)
+        
+        // add border
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 0.8
+        
+        // rounded corners
         doneButton.layer.masksToBounds = true
         doneButton.layer.cornerRadius = 5
-        doneButton.insertSubview(blurView, at: 0)
         
+        // title
         doneButton.titleEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 5)
         doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         doneButton.setTitle("Done", for: .normal)
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        doneButton.insertSubview(blurView, at: 0)
+
         doneButton.addTarget(self, action: #selector(didTapOnDoneButton), for: .touchUpInside)
         
         view.addSubview(doneButton)
+        
+        // layout
+        NSLayoutConstraint.activate([
+            doneButton.widthAnchor.constraint(equalToConstant: 70),
+            doneButton.heightAnchor.constraint(equalToConstant: 35),
+            doneButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
+            doneButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 25)
+        ])
     }
 }
 

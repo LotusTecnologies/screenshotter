@@ -78,7 +78,6 @@
 		5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayViewController.swift; sourceTree = "<group>"; };
 		522AF64D1F93348B00A7A151 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
-		5258FE9D1F83AB6200186C84 /* TutorialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
@@ -193,14 +192,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		522AF64C1F93345100A7A151 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				5258FE9D1F83AB6200186C84 /* TutorialViewController.swift */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -402,7 +393,6 @@
 				BEBA23337A8F69FF9EF80643 /* Pods */,
 				EED5E55462B98A9C783AC0F5 /* Frameworks */,
 				E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */,
-				522AF64C1F93345100A7A151 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};

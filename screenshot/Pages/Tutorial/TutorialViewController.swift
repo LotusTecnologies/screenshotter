@@ -125,7 +125,7 @@ class TutorialViewController : UIViewController {
         }, completion: nil)
     }
     
-    // MARK: -
+    // MARK: - Public
     
     func presentVideo(_ video: TutorialVideo) {
         let vc = TutorialVideoViewController(video: video)
@@ -133,6 +133,8 @@ class TutorialViewController : UIViewController {
         vc.modalTransitionStyle = .crossDissolve
         present(vc, animated: true, completion: nil)
     }
+    
+    // MARK: - Private
     
     fileprivate func scrollToNextSlide(animated: Bool = true) {
         guard scrollViewIsScrollingAnimation == false else {
