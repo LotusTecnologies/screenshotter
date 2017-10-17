@@ -18,9 +18,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var movePipesAndRemove:SKAction!
     var moving:SKNode!
     var pipes:SKNode!
+    var didInitialStart = Bool()
     var canRestart = Bool()
     var scoreLabelNode:SKLabelNode!
     var score = NSInteger()
+    var ceilingSprite:SKSpriteNode!
     
     let birdCategory: UInt32 = 1 << 0
     let worldCategory: UInt32 = 1 << 1
@@ -46,7 +48,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         
         // ground
         let groundTexture = SKTexture(imageNamed: "GameLand")
-        groundTexture.filteringMode = .nearest // shorter form for SKTextureFilteringMode.Nearest
+        groundTexture.filteringMode = .nearest
         
         let moveGroundSprite = SKAction.moveBy(x: -groundTexture.size().width * 2.0, y: 0, duration: TimeInterval(0.02 * groundTexture.size().width * 2.0))
         let resetGroundSprite = SKAction.moveBy(x: groundTexture.size().width * 2.0, y: 0, duration: 0.0)
@@ -114,13 +116,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         ground.physicsBody?.categoryBitMask = worldCategory
         self.addChild(ground)
         
+        // create the ceiling
+        ceilingSprite = SKSpriteNode(color: .white, size: CGSize(width: self.frame.size.width, height: 100))
+        ceilingSprite.position = CGPoint(x: frame.size.width / 2.0, y: frame.size.height - (ceilingSprite.frame.size.height / 2.0))
+        self.addChild(ceilingSprite)
+        
+        let ceiling = SKNode()
+        ceiling.position = ceilingSprite.position
+        ceiling.physicsBody = SKPhysicsBody(rectangleOf: ceilingSprite.frame.size)
+        ceiling.physicsBody?.isDynamic = false
+        ceiling.physicsBody?.categoryBitMask = worldCategory
+        self.addChild(ceiling)
+        
+        // Tap to load
+        
         // Initialize label and create a label which holds the score
-        score = 0
+        score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
         scoreLabelNode = SKLabelNode(fontNamed:"MarkerFelt-Wide")
-        scoreLabelNode.position = CGPoint( x: self.frame.midX, y: 3 * self.frame.size.height / 4 )
+        scoreLabelNode.position = CGPoint(x: self.frame.midX, y: ceiling.frame.midY - 10)
         scoreLabelNode.zPosition = 100
-        scoreLabelNode.text = String(score)
+        scoreLabelNode.text = scoreLabelText()
+        scoreLabelNode.fontColor = .black
         self.addChild(scoreLabelNode)
+    }
+    
+    func scoreLabelText() -> String {
+        return "My coins: " + String(score)
     }
     
     func spawnPipes() {
@@ -128,7 +149,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         pipePair.position = CGPoint( x: self.frame.size.width + pipeTextureUp.size().width * 2, y: 0 )
         pipePair.zPosition = -10
         
-        let height = UInt32( self.frame.size.height / 4)
+        let height = UInt32((self.frame.size.height - ceilingSprite.frame.size.height) / 4)
         let y = Double(arc4random_uniform(height) + height)
         
         let pipeDown = SKSpriteNode(texture: pipeTextureDown)
@@ -164,6 +185,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     }
     
     func startScene() {
+        didInitialStart = true
+        
         // Apply bird physics
         bird.physicsBody = SKPhysicsBody(circleOfRadius: bird.size.height / 2.0)
         bird.physicsBody?.isDynamic = true
@@ -197,10 +220,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         // Reset _canRestart
         canRestart = false
         
-        // Reset score
-        score = 0
-        scoreLabelNode.text = String(score)
-        
         // Restart animation
         moving.speed = 1
     }
@@ -211,9 +230,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
                 bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 30))
             }
+            
         } else if canRestart {
             self.resetScene()
-        } else {
+            
+        } else if !didInitialStart {
             self.startScene()
         }
     }
@@ -229,19 +250,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     
     func didBegin(_ contact: SKPhysicsContact) {
         if moving.speed > 0 {
-            if ( contact.bodyA.categoryBitMask & scoreCategory ) == scoreCategory || ( contact.bodyB.categoryBitMask & scoreCategory ) == scoreCategory {
+            if (contact.bodyA.categoryBitMask & scoreCategory) == scoreCategory ||
+                (contact.bodyB.categoryBitMask & scoreCategory) == scoreCategory {
                 // Bird has contact with score entity
                 score += 1
-                scoreLabelNode.text = String(score)
+                scoreLabelNode.text = scoreLabelText()
                 
                 // Add a little visual feedback for the score increment
                 scoreLabelNode.run(SKAction.sequence([SKAction.scale(to: 1.5, duration:TimeInterval(0.1)), SKAction.scale(to: 1.0, duration:TimeInterval(0.1))]))
-            } else {
                 
+                // Save the score
+                UserDefaults.standard.set(score, forKey: UserDefaultsKeys.gameScore)
+                
+            } else {
                 moving.speed = 0
                 
                 bird.physicsBody?.collisionBitMask = worldCategory
-                bird.run(  SKAction.rotate(byAngle: CGFloat(Double.pi) * CGFloat(bird.position.y) * 0.01, duration:1), completion:{self.bird.speed = 0 })
+                bird.run(SKAction.rotate(byAngle: CGFloat(Double.pi) * CGFloat(bird.position.y) * 0.01, duration:1), completion: {
+                    self.bird.speed = 0
+                })
                 
                 
                 // Flash background if contact is detected

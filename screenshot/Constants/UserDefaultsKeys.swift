@@ -25,4 +25,6 @@ class UserDefaultsKeys : NSObject {
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
+    
+    static let gameScore = "GameScore"
 }
