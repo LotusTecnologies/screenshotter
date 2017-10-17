@@ -62,7 +62,7 @@ class TutorialViewController : UIViewController {
     // MARK: - Initialization
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nil, bundle: nil)
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         slides = buildSlides()
         updatePromptHandler = UpdatePromptHandler(containerViewController: self)
