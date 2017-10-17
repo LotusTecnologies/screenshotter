@@ -15,6 +15,7 @@ import UIKit
 class TutorialViewController : UIViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
+    var video = TutorialVideo.Standard
     var updatePromptHandler: UpdatePromptHandler!
     let scrollView = UIScrollView()
     let contentView = UIView()
@@ -36,10 +37,11 @@ class TutorialViewController : UIViewController {
     
     private func buildSlides() -> [TutorialBaseSlideView] {
         let welcomeSlide = TutorialWelcomeSlideView()
-        welcomeSlide.delegate = self
+        welcomeSlide.getStartedButtonTapped = presentVideo
         
         let emailSlide = TutorialEmailSlideView()
         emailSlide.delegate = self
+        
         
         let trySlide = TutorialTrySlideView()
         trySlide.delegate = self
@@ -127,7 +129,7 @@ class TutorialViewController : UIViewController {
     
     // MARK: - Public
     
-    func presentVideo(_ video: TutorialVideo) {
+    func presentVideo() {
         let vc = TutorialVideoViewController(video: video)
         vc.modalTransitionStyle = .crossDissolve
         vc.delegate = self
@@ -197,18 +199,6 @@ extension TutorialViewController : UIScrollViewDelegate {
     }
 }
 
-extension TutorialViewController : TutorialWelcomeSlideViewDelegate {
-    func tutorialWelcomeSlideViewDidComplete(_ slideView: TutorialWelcomeSlideView!) {
-        slideView.delegate = nil
-        
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.tutorialCompleted) {
-            complete()
-        } else {
-            scrollToNextSlide()
-        }
-    }
-}
-
 extension TutorialViewController : TutorialTrySlideViewDelegate {
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView!) {
         slideView.delegate = nil
@@ -240,5 +230,6 @@ extension TutorialViewController : TutorialEmailSlideViewDelegate {
 extension TutorialViewController : TutorialVideoViewControllerDelegate {
     func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
         dismissViewController()
+        scrollToNextSlide()
     }
 }

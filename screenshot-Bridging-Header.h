@@ -11,13 +11,8 @@
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 #import "HelperView.h"
-#import "TutorialBaseSlideView.h"
-#import "TutorialWelcomeSlideView.h"
-#import "TutorialEmailSlideView.h"
-#import "TutorialTrySlideView.h"
 #import "Geometry.h"
 #import "TutorialBaseSlideView.h"
-#import "TutorialWelcomeSlideView.h"
 #import "TutorialEmailSlideView.h"
 #import "TutorialTrySlideView.h"
 
