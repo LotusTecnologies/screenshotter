@@ -10,7 +10,7 @@
 #import "ProductsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate>
+@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 
@@ -35,6 +35,8 @@
         });
         
         self.viewControllers = @[self.screenshotsViewController];
+        
+        [AssetSyncModel sharedInstance].networkingIndicatorDelegate = self;
     }
     return self;
 }
@@ -43,6 +45,10 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor background];
+}
+
+- (void)dealloc {
+    [AssetSyncModel sharedInstance].networkingIndicatorDelegate = nil;
 }
 
 
@@ -141,6 +147,23 @@
     self.pickerNavigationController = nil;
     
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+#pragma mark - Networking Indicator
+
+- (void)networkingIndicatorDidStartWithType:(enum NetworkingIndicatorType)type {
+    if (!self.screenshotsViewController.navigationItem.leftBarButtonItem) {
+        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        activityView.color = [UIColor crazeRed];
+        [activityView startAnimating];
+        
+        self.screenshotsViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activityView];
+    }
+}
+
+- (void)networkingIndicatorDidCompleteWithType:(enum NetworkingIndicatorType)type {
+    self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
 }
 
 @end

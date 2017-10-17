@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */; };
+		522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522AF64D1F93348B00A7A151 /* TutorialViewController.swift */; };
+		522AF6541F935AC500A7A151 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
+		5249EF931F960AC2001A6220 /* TutorialWelcomeSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
+		52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 52807FF81F9530D30075111D /* Craze_Video.mp4 */; };
 		52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F50A1F61391C0032C5A9 /* Intercom.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
@@ -29,7 +34,6 @@
 		C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC71F3C38510090E422 /* ScreenshotsViewController.m */; };
 		C5278FF41F3C38510090E422 /* TutorialBaseSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FCC1F3C38510090E422 /* TutorialBaseSlideView.m */; };
 		C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FCE1F3C38510090E422 /* TutorialEmailSlideView.m */; };
-		C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FD61F3C38510090E422 /* TutorialViewController.m */; };
 		C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FD91F3C38510090E422 /* PermissionsManager.m */; };
 		C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDC1F3C38510090E422 /* BaseViewController.m */; };
 		C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FDE1F3C38510090E422 /* MainTabBarController.m */; };
@@ -39,7 +43,6 @@
 		C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC151F57F34E00F4E723 /* TransitioningController.m */; };
 		C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC191F5D7C2D00F4E723 /* Appearance.swift */; };
 		C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */; };
-		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
 		C540FE161F52ADBE005863D7 /* TutorialTrySlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */; };
 		C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5448E841F66910700CD063B /* NotifySizeChangeView.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
@@ -49,7 +52,6 @@
 		C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */; };
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
-		C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184DB1F4D637400EE7855 /* NotificationManager.m */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
@@ -57,6 +59,7 @@
 		C59A30461F5FDECB00463338 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* MainButton.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
 		C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
+		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
@@ -73,10 +76,15 @@
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayViewController.swift; sourceTree = "<group>"; };
+		522AF64D1F93348B00A7A151 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
+		5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideView.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		52807FF81F9530D30075111D /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
+		52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
 		C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
@@ -104,8 +112,6 @@
 		C5278FCC1F3C38510090E422 /* TutorialBaseSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialBaseSlideView.m; sourceTree = "<group>"; };
 		C5278FCD1F3C38510090E422 /* TutorialEmailSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialEmailSlideView.h; sourceTree = "<group>"; };
 		C5278FCE1F3C38510090E422 /* TutorialEmailSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialEmailSlideView.m; sourceTree = "<group>"; };
-		C5278FD51F3C38510090E422 /* TutorialViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialViewController.h; sourceTree = "<group>"; };
-		C5278FD61F3C38510090E422 /* TutorialViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialViewController.m; sourceTree = "<group>"; };
 		C5278FD81F3C38510090E422 /* PermissionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PermissionsManager.h; sourceTree = "<group>"; };
 		C5278FD91F3C38510090E422 /* PermissionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PermissionsManager.m; sourceTree = "<group>"; };
 		C5278FDB1F3C38510090E422 /* BaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseViewController.h; sourceTree = "<group>"; };
@@ -123,8 +129,6 @@
 		C528DC171F5D74BD00F4E723 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
 		C528DC191F5D7C2D00F4E723 /* Appearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
 		C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
-		C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialWelcomeSlideView.h; sourceTree = "<group>"; };
-		C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialWelcomeSlideView.m; sourceTree = "<group>"; };
 		C540FE141F52ADBE005863D7 /* TutorialTrySlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialTrySlideView.h; sourceTree = "<group>"; };
 		C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialTrySlideView.m; sourceTree = "<group>"; };
 		C5448E831F66910700CD063B /* NotifySizeChangeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotifySizeChangeView.h; sourceTree = "<group>"; };
@@ -143,8 +147,6 @@
 		C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayNavigationController.m; sourceTree = "<group>"; };
 		C55184CD1F4D5DC600EE7855 /* LoadingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingViewController.h; sourceTree = "<group>"; };
 		C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingViewController.m; sourceTree = "<group>"; };
-		C55184DA1F4D637400EE7855 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationManager.h; sourceTree = "<group>"; };
-		C55184DB1F4D637400EE7855 /* NotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationManager.m; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
+		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
 		C5CCBB3E1F41BC1400D6B392 /* UIApplication+Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+Version.h"; sourceTree = "<group>"; };
@@ -190,6 +193,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		52807FFA1F9530E70075111D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				52807FF81F9530D30075111D /* Craze_Video.mp4 */,
+				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -205,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */,
+				C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -258,10 +271,10 @@
 				C5278FCE1F3C38510090E422 /* TutorialEmailSlideView.m */,
 				C540FE141F52ADBE005863D7 /* TutorialTrySlideView.h */,
 				C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */,
-				C5278FD51F3C38510090E422 /* TutorialViewController.h */,
-				C5278FD61F3C38510090E422 /* TutorialViewController.m */,
-				C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */,
-				C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */,
+				5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */,
+				522AF64D1F93348B00A7A151 /* TutorialViewController.swift */,
+				52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */,
+				5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -271,8 +284,6 @@
 			children = (
 				5273E3801F7ACE0300C832F8 /* Analytics.swift */,
 				52D8F50A1F61391C0032C5A9 /* Intercom.swift */,
-				C55184DA1F4D637400EE7855 /* NotificationManager.h */,
-				C55184DB1F4D637400EE7855 /* NotificationManager.m */,
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
 			);
@@ -412,12 +423,12 @@
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
 				C5233F091F6FEFEB00F25C7C /* Protocols */,
-				C5278FD71F3C38510090E422 /* Singletons */,
 				C5278FDA1F3C38510090E422 /* ViewControllers */,
 				C5278FE21F3C38510090E422 /* Views */,
+				C5278FD71F3C38510090E422 /* Singletons */,
+				52807FFA1F9530E70075111D /* Resources */,
 				E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */,
 				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
-				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				E4139D431F09083B00E8A53B /* Supporting Files */,
 			);
 			path = screenshot;
@@ -534,6 +545,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 			);
@@ -642,11 +654,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				522AF6541F935AC500A7A151 /* TutorialVideoViewController.swift in Sources */,
 				C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */,
 				C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */,
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
 				C59A30461F5FDECB00463338 /* MainButton.swift in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
+				5249EF931F960AC2001A6220 /* TutorialWelcomeSlideView.swift in Sources */,
 				C5278FE91F3C38510090E422 /* Geometry.m in Sources */,
 				C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */,
 				C540FE161F52ADBE005863D7 /* TutorialTrySlideView.m in Sources */,
@@ -655,14 +669,15 @@
 				C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
-				C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */,
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
+				522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */,
 				C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */,
 				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
+				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
@@ -687,7 +702,6 @@
 				C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */,
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
-				C55184DC1F4D637400EE7855 /* NotificationManager.m in Sources */,
 				C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */,
 				C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
@@ -698,7 +712,7 @@
 				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
 				C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */,
 				C525A5AF1F7B8D4600C2641E /* FloatingActionButton.swift in Sources */,
-				C5278FF91F3C38510090E422 /* TutorialViewController.m in Sources */,
+				521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
