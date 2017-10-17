@@ -101,6 +101,7 @@ class TutorialVideoViewController : UIViewController {
         view.layer.addSublayer(playerLayer)
 
         // Add overlay VC
+        overlayViewController.willMove(toParentViewController: self)
         addChildViewController(overlayViewController)
         overlayViewController.didMove(toParentViewController: self)
         view.addSubview(overlayViewController.view)

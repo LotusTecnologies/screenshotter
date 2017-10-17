@@ -95,6 +95,8 @@ class TutorialVideoOverlayViewController : UIViewController {
         NSLayoutConstraint.activate([
             pauseButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pauseButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            // Scale to intrinsic content size
             pauseButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
             pauseButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
         ])
@@ -114,6 +116,8 @@ class TutorialVideoOverlayViewController : UIViewController {
         NSLayoutConstraint.activate([
             replayButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             replayButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        
+            // Scale to intrinsic content size
             replayButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
             replayButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
         ])
