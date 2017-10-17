@@ -12,6 +12,7 @@
 #import "MainTabBarController.h"
 #import "HelperView.h"
 #import "Geometry.h"
+#import "WebViewController.h"
 #import "TutorialBaseSlideView.h"
 #import "TutorialEmailSlideView.h"
 #import "TutorialTrySlideView.h"

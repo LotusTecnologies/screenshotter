@@ -9,8 +9,9 @@
 #import "BaseViewController.h"
 
 @import WebKit.WKWebView;
+@import WebKit.WKNavigationDelegate;
 
-@interface WebViewController : BaseViewController
+@interface WebViewController : BaseViewController <WKNavigationDelegate>
 
 @property (nonatomic, strong) WKWebView *view;
 @property (nonatomic, copy) NSURL *url;

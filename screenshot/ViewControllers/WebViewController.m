@@ -15,7 +15,7 @@
 @import Appsee;
 @import WebKit;
 
-@interface WebViewController () <WKNavigationDelegate> {
+@interface WebViewController () {
     BOOL _isShorteningUrl;
 }
 
