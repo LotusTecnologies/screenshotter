@@ -28,7 +28,7 @@ class TutorialWelcomeSlideView : TutorialBaseSlideView {
         
         button.layer.cornerRadius = 5
         button.layer.masksToBounds = true
-        button.backgroundColor = UIColor(red: 47/255.0, green: 191/255.0, blue: 161/255.0, alpha: 1)
+        button.backgroundColor = .crazeGreen
         button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
         
         return button
