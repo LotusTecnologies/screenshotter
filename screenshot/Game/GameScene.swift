@@ -128,14 +128,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         ceiling.physicsBody?.categoryBitMask = worldCategory
         self.addChild(ceiling)
         
-        // Tap to load
-        
         // Initialize label and create a label which holds the score
         score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
         scoreLabelNode = SKLabelNode(fontNamed:"MarkerFelt-Wide")
         scoreLabelNode.position = CGPoint(x: self.frame.midX, y: ceiling.frame.midY - 10)
         scoreLabelNode.zPosition = 100
-        scoreLabelNode.text = scoreLabelText()
+        scoreLabelNode.text = "Tap to load your store"
         scoreLabelNode.fontColor = .black
         self.addChild(scoreLabelNode)
     }
@@ -204,6 +202,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         
         // Start animation
         moving.speed = 1
+        
+        // Update score
+        scoreLabelNode.text = scoreLabelText()
     }
     
     func resetScene() {
