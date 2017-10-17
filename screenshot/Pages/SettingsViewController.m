@@ -381,6 +381,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeTutorialVideo: {
             TutorialVideoViewController *viewController = [TutorialVideoViewControllerFactory replayViewController];
+            viewController.showsReplayButtonUponFinishing = NO;
             viewController.delegate = self;
             viewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             [self presentViewController:viewController animated:YES completion:nil];
@@ -745,7 +746,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video"];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self dismissViewControllerAnimated:YES completion:nil];
+    });
 }
 
 @end

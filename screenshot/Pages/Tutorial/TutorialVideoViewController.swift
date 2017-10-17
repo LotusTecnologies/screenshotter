@@ -41,6 +41,8 @@ class TutorialVideoViewControllerFactory : NSObject {
 }
 
 class TutorialVideoViewController : UIViewController {
+    var showsReplayButtonUponFinishing: Bool = true
+    
     let overlayViewController = TutorialVideoOverlayViewController()
     
     weak var delegate: TutorialVideoViewControllerDelegate?
@@ -105,6 +107,8 @@ class TutorialVideoViewController : UIViewController {
         
         overlayViewController.replayButtonTapped = replayButtonTapped
         overlayViewController.doneButtonTapped = {
+            track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
+            
             self.delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
         }
         
@@ -115,12 +119,14 @@ class TutorialVideoViewController : UIViewController {
         if self.player.playbackState == .paused {
             self.player.play()
             self.delegate?.tutorialVideoViewControllerDidPlay?(self)
+            
+            track("Started Tutorial Video")
         }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+      
         player.pause()
     }
     
@@ -175,8 +181,10 @@ class TutorialVideoViewController : UIViewController {
         if player.togglePlayback() == .paused {
             overlayViewController.flashPauseOverlay()
             
+            track("Paused Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPause?(self)
         } else {
+            track("Continued Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPlay?(self)
         }
     }
@@ -184,8 +192,11 @@ class TutorialVideoViewController : UIViewController {
     @objc private func playerDidFinishPlaying() {
         ended = true
         
-        overlayViewController.showReplayButton()
+        if showsReplayButtonUponFinishing {
+            overlayViewController.showReplayButton()
+        }
         
+        track("Completed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidEnd?(self)
     }
     
@@ -195,6 +206,8 @@ class TutorialVideoViewController : UIViewController {
         
         player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale))
         player.playImmediately(atRate: 1)
+        
+        track("Replayed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidPlay?(self)
     }
 }
