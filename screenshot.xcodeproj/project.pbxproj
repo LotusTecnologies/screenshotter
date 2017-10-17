@@ -56,6 +56,8 @@
 		C59A30461F5FDECB00463338 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* MainButton.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
 		C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
+		C5AA81901F95ED6E00421909 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA818F1F95ED6D00421909 /* GameScene.swift */; };
+		C5AA81921F95F97300421909 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5AA81911F95F97300421909 /* GameScene.sks */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
@@ -150,6 +152,8 @@
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
+		C5AA818F1F95ED6D00421909 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		C5AA81911F95F97300421909 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
@@ -377,6 +381,15 @@
 			path = Constants;
 			sourceTree = "<group>";
 		};
+		C5AA818E1F95ED6D00421909 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				C5AA81911F95F97300421909 /* GameScene.sks */,
+				C5AA818F1F95ED6D00421909 /* GameScene.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -415,6 +428,7 @@
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
 				C528DC131F57F33900F4E723 /* Controllers */,
+				C5AA818E1F95ED6D00421909 /* Game */,
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
 				C5233F091F6FEFEB00F25C7C /* Protocols */,
@@ -541,6 +555,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
+				C5AA81921F95F97300421909 /* GameScene.sks in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -679,6 +694,7 @@
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
+				C5AA81901F95ED6E00421909 /* GameScene.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
