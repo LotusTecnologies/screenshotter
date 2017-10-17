@@ -205,8 +205,11 @@ class TutorialVideoViewController : UIViewController {
         overlayViewController.hideReplayButton()
         ended = false
         
-        player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale))
-        player.playImmediately(atRate: 1)
+        player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale)) { finished in
+            if finished {
+                self.player.play()
+            }
+        }
         
         track("Replayed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidPlay?(self)
