@@ -198,6 +198,11 @@
     [AnalyticsTrackers.standard identify:user];
     [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"id": user.identifier, @"name": trimmedName ?: @"", @"email": trimmedEmail ?: @""}];
     
+    NSString *ambassadorUsername = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys ambasssadorUsername]];
+    if (ambassadorUsername != nil) {
+        [AnalyticsTrackers.standard track:@"Referring Ambassador" properties:@{ @"username": ambassadorUsername}];
+    }
+    
     [[NSUserDefaults standardUserDefaults] setValue:user.identifier forKey:UserDefaultsKeys.userID];
     [[NSUserDefaults standardUserDefaults] synchronize];
     

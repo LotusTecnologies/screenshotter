@@ -11,12 +11,10 @@ import UserNotifications
 import Analytics
 import Appsee
 import FBSDKLoginKit
-import RateView
 import Branch
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
@@ -139,6 +137,17 @@ extension AppDelegate {
                 AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
                 self.showScreenshotListTop()
             }
+            
+            // "channel" will be the Instagram username of the ambassador who shared this link.
+            if let channel = params["channel"] as? String {
+                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.ambasssadorUsername)
+                
+                if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
+                    tutorialVC.presentVideo(.Ambassador(username: channel))
+                }
+            } else if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
+                tutorialVC.presentVideo(.Standard)
+            }
         }
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -182,7 +191,7 @@ extension AppDelegate {
         } else {
             var insets = UIEdgeInsets.zero
             insets.top = UIDevice.is568h ? 0 : 30
-            
+
             let tutorialViewController = TutorialViewController()
             tutorialViewController.delegate = self
             tutorialViewController.contentLayoutMargins = insets
@@ -236,7 +245,6 @@ extension AppDelegate: TutorialViewControllerDelegate {
 // MARK: - Push Notifications
 
 extension AppDelegate {
-    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         IntercomHelper.sharedInstance.deviceToken = deviceToken
     }

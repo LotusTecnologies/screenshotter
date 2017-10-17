@@ -16,7 +16,6 @@ class TutorialViewController : UIViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
     var updatePromptHandler: UpdatePromptHandler!
-    
     let scrollView = UIScrollView()
     let contentView = UIView()
     
@@ -97,7 +96,7 @@ class TutorialViewController : UIViewController {
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-            ])
+        ])
         
         // Setup content view
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -110,7 +109,7 @@ class TutorialViewController : UIViewController {
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CGFloat(slides.count)),
             contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
-            ])
+        ])
         
         prepareSlideViews()
     }
@@ -126,7 +125,16 @@ class TutorialViewController : UIViewController {
         }, completion: nil)
     }
     
-    // MARK: -
+    // MARK: - Public
+    
+    func presentVideo(_ video: TutorialVideo) {
+        let vc = TutorialVideoViewController(video: video)
+        vc.modalTransitionStyle = .crossDissolve
+        vc.delegate = self
+        present(vc, animated: true, completion: nil)
+    }
+    
+    // MARK: - Private
     
     fileprivate func scrollToNextSlide(animated: Bool = true) {
         guard scrollViewIsScrollingAnimation == false else {
@@ -226,5 +234,11 @@ extension TutorialViewController : TutorialEmailSlideViewDelegate {
         if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, doneAction:#selector(dismissViewController)) {
             present(vc, animated: true, completion: nil)
         }
+    }
+}
+
+extension TutorialViewController : TutorialVideoViewControllerDelegate {
+    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+        dismissViewController()
     }
 }
