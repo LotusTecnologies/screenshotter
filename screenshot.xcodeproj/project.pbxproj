@@ -198,7 +198,6 @@
 			isa = PBXGroup;
 			children = (
 				52807FF81F9530D30075111D /* Craze_Video.mp4 */,
-				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -431,6 +430,7 @@
 				C5278FD71F3C38510090E422 /* Singletons */,
 				52807FFA1F9530E70075111D /* Resources */,
 				E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */,
+				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
 				E4139D431F09083B00E8A53B /* Supporting Files */,
 			);
 			path = screenshot;
