@@ -29,7 +29,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeLocationPermission,
     RowTypeEmail,
     RowTypeName,
-    RowTypeTutorial,
     RowTypeTutorialVideo,
     RowTypeTellFriend,
     RowTypeContactUs,
@@ -221,7 +220,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                         @(RowTypeEmail)
                                         ],
                   @(SectionTypeAbout): @[@(RowTypeTellFriend),
-                                         @(RowTypeTutorial),
                                          @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
@@ -373,12 +371,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self presentViewController:activityViewController animated:YES completion:nil];
         }
             break;
-        case RowTypeTutorial: {
-            TutorialViewController *viewController = [[TutorialViewController alloc] init];
-            viewController.delegate = self;
-            [self.navigationController pushViewController:viewController animated:YES];
-        }
-            break;
         case RowTypeTutorialVideo: {
             TutorialVideoViewController *viewController = [TutorialVideoViewControllerFactory replayViewController];
             viewController.showsReplayButtonUponFinishing = NO;
@@ -437,11 +429,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeContactUs:
             return @"Contact Us";
             break;
-        case RowTypeTutorial:
-            return @"Replay Tutorial";
-            break;
         case RowTypeTutorialVideo:
-            return @"Replay Tutorial Video";
+            return @"Replay Tutorial";
             break;
         case RowTypeName:
             return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
@@ -492,7 +481,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeTutorial:
         case RowTypeBug:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
