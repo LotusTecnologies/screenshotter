@@ -42,7 +42,6 @@ class TutorialViewController : UIViewController {
         let emailSlide = TutorialEmailSlideView()
         emailSlide.delegate = self
         
-        
         let trySlide = TutorialTrySlideView()
         trySlide.delegate = self
         
@@ -146,7 +145,7 @@ class TutorialViewController : UIViewController {
         scrollViewIsScrollingAnimation = true
         currentSlide.willLeaveSlide()
         
-        var offset:CGPoint = .zero
+        var offset = CGPoint.zero
         offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
         scrollView.setContentOffset(offset, animated: animated)
     }
@@ -161,15 +160,16 @@ class TutorialViewController : UIViewController {
             
             slide.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
             
-            [slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-             slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor, constant: -top),
-             slide.topAnchor.constraint(equalTo: contentView.topAnchor, constant: top)].forEach {
-                $0.isActive = true
-            }
+            NSLayoutConstraint.activate([
+                slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+                slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor, constant: -top),
+                slide.topAnchor.constraint(equalTo: contentView.topAnchor, constant: top)
+                ])
             
             if i == 0 {
                 slide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
                 slide.didEnterSlide()
+                
             } else if i == slides.count - 1 {
                 slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             }
@@ -184,11 +184,6 @@ class TutorialViewController : UIViewController {
     @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
-
-    fileprivate func complete() {
-        track("Finished Tutorial")
-        delegate?.tutoriaViewControllerDidComplete(self)
-    }
 }
 
 extension TutorialViewController : UIScrollViewDelegate {
@@ -199,12 +194,10 @@ extension TutorialViewController : UIScrollViewDelegate {
     }
 }
 
-extension TutorialViewController : TutorialTrySlideViewDelegate {
-    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView!) {
-        slideView.delegate = nil
-        
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
-        complete()
+extension TutorialViewController : TutorialVideoViewControllerDelegate {
+    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+        dismissViewController()
+        scrollToNextSlide()
     }
 }
 
@@ -227,9 +220,13 @@ extension TutorialViewController : TutorialEmailSlideViewDelegate {
     }
 }
 
-extension TutorialViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
-        dismissViewController()
-        scrollToNextSlide()
+extension TutorialViewController : TutorialTrySlideViewDelegate {
+    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView!) {
+        slideView.delegate = nil
+        
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
+        track("Finished Tutorial")
+        
+        delegate?.tutoriaViewControllerDidComplete(self)
     }
 }
