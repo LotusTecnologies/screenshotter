@@ -134,6 +134,8 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
     func identify(_ user: AnalyticsUser) {
         log(name: "identify", properties: user.analyticsProperties) {
             Appsee.setUserID(user.email ?? user.identifier)
+            
+            track("User Properties", properties: user.analyticsProperties)
         }
     }
 }
