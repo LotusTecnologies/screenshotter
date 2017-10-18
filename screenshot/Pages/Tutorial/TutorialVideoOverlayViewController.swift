@@ -86,7 +86,7 @@ class TutorialVideoOverlayViewController : UIViewController {
     private func setupPauseButton() {
         pauseButton = UIButton(frame: .zero)
         pauseButton.translatesAutoresizingMaskIntoConstraints = false
-        pauseButton.setImage(UIImage(named: "Pause"), for: .normal)
+        pauseButton.setImage(UIImage(named: "TutorialVideoPause"), for: .normal)
         pauseButton.isHidden = true
         
         view.addSubview(pauseButton)
@@ -105,7 +105,7 @@ class TutorialVideoOverlayViewController : UIViewController {
     private func setupReplayButton() {
         replayButton = UIButton(frame: .zero)
         replayButton.translatesAutoresizingMaskIntoConstraints = false
-        replayButton.setImage(UIImage(named: "Replay"), for: .normal)
+        replayButton.setImage(UIImage(named: "TutorialVideoReplay"), for: .normal)
         replayButton.isHidden = true
         replayButton.addTarget(self, action: #selector(didTapOnReplayButton), for: .touchUpInside)
         
