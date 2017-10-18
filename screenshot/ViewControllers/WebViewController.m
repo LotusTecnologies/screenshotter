@@ -38,6 +38,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _toolbarEnabled = YES;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
     return self;
 }
@@ -99,6 +101,12 @@
     [self.loader startAnimation:LoaderAnimationPoseThenSpin];
 }
 
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self.loader startAnimation:LoaderAnimationSpin];
+    }
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (object == self.webView) {
         if ([keyPath isEqualToString:NSStringFromSelector(@selector(canGoBack))] ||
@@ -112,6 +120,8 @@
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     if ([self isViewLoaded]) {
         [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack))];
         [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward))];
