@@ -164,7 +164,7 @@ class NetworkingPromise: NSObject {
                 }
                 
                 do {
-                    guard let JSON = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any] else {
+                    guard let JSON = try JSONSerialization.jsonObject(with: data) as? [String : Any] else {
                         // TODO: Deal with mismatched type?
                         return
                     }
