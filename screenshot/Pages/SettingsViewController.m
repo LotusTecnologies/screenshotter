@@ -33,7 +33,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeTellFriend,
     RowTypeContactUs,
     RowTypeBug,
-    RowTypeVersion
+    RowTypeVersion,
+    RowTypeCoins
 };
 
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
@@ -223,6 +224,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                          @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
+                                         @(RowTypeCoins),
                                          @(RowTypeVersion)
                                          ],
                   @(SectionTypeFollow): @[],
@@ -344,6 +346,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     switch (rowType) {
         case RowTypeVersion:
         case RowTypeEmail:
+        case RowTypeCoins:
             return NO;
             break;
         case RowTypeLocationPermission:
@@ -395,6 +398,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeName:
         case RowTypeEmail:
         case RowTypeVersion:
+        case RowTypeCoins:
             break;
     }
     
@@ -450,6 +454,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeVersion:
             return @"App Version";
             break;
+        case RowTypeCoins:
+            return @"Coins Collected";
+            break;
     }
 }
 
@@ -468,6 +475,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeEmail:
             return @"Enter Your Email";
+            break;
+        case RowTypeCoins:
+            return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:UserDefaultsKeys.gameScore]];
             break;
         default:
             return nil;
