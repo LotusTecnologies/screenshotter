@@ -1,3 +1,4 @@
+
 //
 //  DiscoverWebViewController.swift
 //  screenshot
@@ -14,7 +15,8 @@ class DiscoverWebViewController : WebViewController {
     
     override func viewDidLoad() {
         toolbarEnabled = false
-        url = URL(string: "https://screenshopit.tumblr.com")
+        
+        url = URL(string: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverUrl) ?? "https://screenshopit.tumblr.com")
         
         let refresh = UIBarButtonItem(image: #imageLiteral(resourceName: "Refresh"), style: .plain, target: self, action: #selector(refreshButtonTapped))
         let share = UIBarButtonItem(image: #imageLiteral(resourceName: "ScreenshotShare"), style: .plain, target: self, action: #selector(shareButtonTapped))
