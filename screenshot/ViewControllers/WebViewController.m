@@ -7,6 +7,7 @@
 //
 
 #import "WebViewController.h"
+#import "Loader.h"
 #import "Geometry.h"
 #import "NetworkingModel.h"
 #import "screenshot-Swift.h"
@@ -19,9 +20,9 @@
     BOOL _isShorteningUrl;
 }
 
+@property (nonatomic, strong) UIView *loadingCoverView;
+@property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) WKWebView *webView;
-@property (nonatomic, strong) SKView *gameView;
-@property (nonatomic, strong) GameScene *gameScene;
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UIBarButtonItem *backItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardItem;
@@ -85,39 +86,18 @@
         insets;
     });
     
-    _gameView = ({
-        SKView *view = [[SKView alloc] init];
-        view.translatesAutoresizingMaskIntoConstraints = NO;
-        view.backgroundColor = [UIColor whiteColor];
-        view.ignoresSiblingOrder = YES;
-        [self.view addSubview:view];
-        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
-        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [view.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        view;
-    });
+    [self showLoadingView];
     
     if (self.url) {
         [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    _gameScene = ({
-        GameScene *scene = (GameScene *)[GameScene unarchiveFromFile:@"GameScene"];
-        scene.scaleMode = SKSceneScaleModeAspectFill;
-        [self.gameView presentScene:scene];
-        scene;
-    });
-}
-
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
     [Appsee startScreen:@"WebView"];
+    [self.loader startAnimation:LoaderAnimationPoseThenSpin];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -199,15 +179,70 @@
 }
 
 
-#pragma mark - Delegate
+#pragma mark - Web View
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    if (![self.gameView isHidden]) {
-        self.gameView.hidden = YES;
-        self.gameScene = nil;
-    }
+    [self hideLoadingView];
+}
+
+
+#pragma mark - Loading
+
+- (void)showLoadingView {
+    _loadingCoverView = ({
+        UIView *view = [[UIView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        view.backgroundColor = [UIColor whiteColor];
+        [self.view addSubview:view];
+        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        view;
+    });
     
-//    [self syncToolbarNavigationItems];
+    _loader = ({
+        Loader *loader = [[Loader alloc] init];
+        loader.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.loadingCoverView addSubview:loader];
+        [loader.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+        [NSLayoutConstraint constraintWithItem:loader attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.loadingCoverView attribute:NSLayoutAttributeCenterY multiplier:0.8f constant:0.f].active = YES;
+        loader;
+    });
+    
+    MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
+    button.translatesAutoresizingMaskIntoConstraints = NO;
+    button.backgroundColor = [UIColor crazeGreen];
+    [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
+    [self.loadingCoverView addSubview:button];
+    [button.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:[Geometry extendedPadding]].active = YES;
+    [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+}
+
+- (void)hideLoadingView {
+    [self.loadingCoverView removeFromSuperview];
+    self.loadingCoverView = nil;
+    
+    [self.loader stopAnimation];
+    self.loader = nil;
+}
+
+- (void)showLoadingGame {
+    SKView *gameView = [[SKView alloc] init];
+    gameView.translatesAutoresizingMaskIntoConstraints = NO;
+    gameView.ignoresSiblingOrder = YES;
+    [self.loadingCoverView addSubview:gameView];
+    [gameView.topAnchor constraintEqualToAnchor:self.loadingCoverView.topAnchor].active = YES;
+    [gameView.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor].active = YES;
+    [gameView.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor].active = YES;
+    [gameView.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor].active = YES;
+    
+    GameScene *scene = (GameScene *)[GameScene unarchiveFromFile:@"GameScene"];
+    scene.scaleMode = SKSceneScaleModeAspectFill;
+    [gameView presentScene:scene];
+    
+    [self.loader stopAnimation];
 }
 
 

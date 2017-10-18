@@ -133,7 +133,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         scoreLabelNode = SKLabelNode(fontNamed:"MarkerFelt-Wide")
         scoreLabelNode.position = CGPoint(x: self.frame.midX, y: ceiling.frame.midY - 10)
         scoreLabelNode.zPosition = 100
-        scoreLabelNode.text = "Tap to load your store"
+        scoreLabelNode.text = "Tap to get more coins"
         scoreLabelNode.fontColor = .black
         self.addChild(scoreLabelNode)
     }
@@ -147,7 +147,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         pipePair.position = CGPoint( x: self.frame.size.width + pipeTextureUp.size().width * 2, y: 0 )
         pipePair.zPosition = -10
         
-        let height = UInt32((self.frame.size.height - ceilingSprite.frame.size.height) / 4)
+        let height = UInt32((self.frame.size.height - ceilingSprite.frame.size.height) / 5.0)
         let y = Double(arc4random_uniform(height) + height)
         
         let pipeDown = SKSpriteNode(texture: pipeTextureDown)
@@ -171,7 +171,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         pipePair.addChild(pipeUp)
         
         let contactNode = SKNode()
-        contactNode.position = CGPoint( x: pipeDown.size.width + bird.size.width / 2, y: self.frame.midY )
+        contactNode.position = CGPoint( x: pipeDown.size.width + bird.size.width / 2.0, y: self.frame.midY )
         contactNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize( width: pipeUp.size.width, height: self.frame.size.height ))
         contactNode.physicsBody?.isDynamic = false
         contactNode.physicsBody?.categoryBitMask = scoreCategory
@@ -221,6 +221,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         // Reset _canRestart
         canRestart = false
         
+        // Update score
+        scoreLabelNode.text = scoreLabelText()
+        
         // Restart animation
         moving.speed = 1
     }
@@ -265,6 +268,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 
             } else {
                 moving.speed = 0
+                
+                scoreLabelNode.text = "Tap to play again"
                 
                 bird.physicsBody?.collisionBitMask = worldCategory
                 bird.run(SKAction.rotate(byAngle: CGFloat(Double.pi) * CGFloat(bird.position.y) * 0.01, duration:1), completion: {
