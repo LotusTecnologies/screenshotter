@@ -269,6 +269,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     if (section == SectionTypeFollow) {
+        // FIXME: tableview first section title animation
+        // this section is causing the first sections title to animate down
+        // scroll to bottom, tap on another tab, tap back to settings
         return self.tableViewFollowSectionFooter.bounds.size.height;
         
     } else {
