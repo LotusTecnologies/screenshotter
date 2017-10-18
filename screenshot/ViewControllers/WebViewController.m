@@ -196,7 +196,7 @@
         [self.view addSubview:view];
         [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [view.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         view;
     });
@@ -210,13 +210,26 @@
         loader;
     });
     
+    CGFloat padding = [Geometry padding];
+    
+    UILabel *loaderLabel = [[UILabel alloc] init];
+    loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    loaderLabel.text = @"Loading your store";
+    loaderLabel.textColor = [UIColor gray6];
+    loaderLabel.textAlignment = NSTextAlignmentCenter;
+    loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    [self.loadingCoverView addSubview:loaderLabel];
+    [loaderLabel.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:padding].active = YES;
+    [loaderLabel.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor constant:padding].active = YES;
+    [loaderLabel.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor constant:-padding].active = YES;
+    
     MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
     button.translatesAutoresizingMaskIntoConstraints = NO;
     button.backgroundColor = [UIColor crazeGreen];
     [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
     [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
     [self.loadingCoverView addSubview:button];
-    [button.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:[Geometry extendedPadding]].active = YES;
+    [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
     [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
 }
 
