@@ -9,6 +9,12 @@
 #import "BaseViewController.h"
 #import "screenshot-Swift.h"
 
+@interface BaseViewController()
+
+@property (nonatomic) BOOL isStatusBarHidden;
+
+@end
+
 @implementation BaseViewController
 
 - (void)viewDidLoad {
@@ -48,6 +54,26 @@
         [self.lifeCycleDelegate viewController:self didDisappear:animated];
     }
 }
+
+
+#pragma mark - Status Bar
+
+- (BOOL)prefersStatusBarHidden {
+    return self.isStatusBarHidden;
+}
+
+- (void)showStatusBar {
+    self.isStatusBarHidden = NO;
+    [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (void)hideStatusBar {
+    self.isStatusBarHidden = YES;
+    [self setNeedsStatusBarAppearanceUpdate];
+}
+
+
+#pragma mark - Extra
 
 - (void)addNavigationItemLogo {
     self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Logo20h"]];

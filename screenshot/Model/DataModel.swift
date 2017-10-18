@@ -518,7 +518,7 @@ extension DataModel {
         }
     }
     
-    public func setNoShoppables(assetId: String) {
+    public func setNoShoppables(assetId: String, uploadedURLString: String?) {
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
@@ -528,6 +528,7 @@ extension DataModel {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for screenshot in results {
                     screenshot.shoppablesCount = -1
+                    screenshot.uploadedImageURL = uploadedURLString
                 }
                 try managedObjectContext.save()
             } catch {

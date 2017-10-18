@@ -13,7 +13,6 @@
 #import "HelperView.h"
 #import "Geometry.h"
 #import "TutorialBaseSlideView.h"
-#import "TutorialWelcomeSlideView.h"
 #import "TutorialEmailSlideView.h"
 #import "TutorialTrySlideView.h"
 

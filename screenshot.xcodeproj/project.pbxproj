@@ -7,19 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		522AF64E1F93348B00A7A151 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522AF64D1F93348B00A7A151 /* TutorialViewController.swift */; };
+		521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */; };
+		522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522AF64D1F93348B00A7A151 /* TutorialViewController.swift */; };
+		522AF6541F935AC500A7A151 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4851F5EF92A00873D78 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC91F3C38510090E422 /* SettingsViewController.m */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
+		5249EF931F960AC2001A6220 /* TutorialWelcomeSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
+		52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 52807FF81F9530D30075111D /* Craze_Video.mp4 */; };
 		52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F50A1F61391C0032C5A9 /* Intercom.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */; };
-		C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */; };
-		C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
-		C525A5AF1F7B8D4600C2641E /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C525A5AE1F7B8D4600C2641E /* FloatingActionButton.swift */; };
 		C5278FE91F3C38510090E422 /* Geometry.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB51F3C38510090E422 /* Geometry.m */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
@@ -38,14 +39,9 @@
 		C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC111F57EDD100F4E723 /* InsetPresentationController.m */; };
 		C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC151F57F34E00F4E723 /* TransitioningController.m */; };
 		C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC191F5D7C2D00F4E723 /* Appearance.swift */; };
-		C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */; };
-		C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */; };
 		C540FE161F52ADBE005863D7 /* TutorialTrySlideView.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */; };
 		C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5448E841F66910700CD063B /* NotifySizeChangeView.m */; };
 		C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */ = {isa = PBXBuildFile; fileRef = C54F032C1F44361C00CF8CBD /* HelperView.m */; };
-		C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */; };
-		C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */; };
-		C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C11F4AD40500EE7855 /* ShoppableCollectionViewCell.m */; };
 		C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */; };
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
@@ -53,11 +49,18 @@
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
-		C59A30461F5FDECB00463338 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528DC171F5D74BD00F4E723 /* MainButton.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
 		C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
-		C5AA81901F95ED6E00421909 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA818F1F95ED6D00421909 /* GameScene.swift */; };
-		C5AA81921F95F97300421909 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5AA81911F95F97300421909 /* GameScene.sks */; };
+		C5AA81A01F97228100421909 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA81941F97227E00421909 /* MainButton.swift */; };
+		C5AA81A11F97228100421909 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA81951F97227E00421909 /* FavoriteButton.swift */; };
+		C5AA81A21F97228100421909 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA81961F97227E00421909 /* FloatingActionButton.swift */; };
+		C5AA81A31F97228100421909 /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA81991F97227E00421909 /* PickerCollectionViewCell.swift */; };
+		C5AA81A41F97228100421909 /* ScreenshotCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819B1F97227E00421909 /* ScreenshotCollectionViewCell.m */; };
+		C5AA81A51F97228100421909 /* ShoppableCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819C1F97227E00421909 /* ShoppableCollectionViewCell.m */; };
+		C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819D1F97227E00421909 /* ImageCollectionViewCell.swift */; };
+		C5AA81A71F97228100421909 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */; };
+		C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5C8465F1F9740D400BCCB3E /* GameScene.sks */; };
+		C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C846601F9740D400BCCB3E /* GameScene.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
@@ -75,20 +78,20 @@
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayViewController.swift; sourceTree = "<group>"; };
 		522AF64D1F93348B00A7A151 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
-		5258FE9D1F83AB6200186C84 /* TutorialViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
+		5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideView.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		52807FF81F9530D30075111D /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
+		52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
 		C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
 		C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPickerViewController.swift; sourceTree = "<group>"; };
-		C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
-		C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
-		C525A5AE1F7B8D4600C2641E /* FloatingActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C5278FB41F3C38510090E422 /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
 		C5278FB51F3C38510090E422 /* Geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Geometry.m; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
@@ -122,23 +125,13 @@
 		C528DC111F57EDD100F4E723 /* InsetPresentationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InsetPresentationController.m; sourceTree = "<group>"; };
 		C528DC141F57F34E00F4E723 /* TransitioningController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransitioningController.h; sourceTree = "<group>"; };
 		C528DC151F57F34E00F4E723 /* TransitioningController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransitioningController.m; sourceTree = "<group>"; };
-		C528DC171F5D74BD00F4E723 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
 		C528DC191F5D7C2D00F4E723 /* Appearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
-		C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
-		C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialWelcomeSlideView.h; sourceTree = "<group>"; };
-		C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialWelcomeSlideView.m; sourceTree = "<group>"; };
 		C540FE141F52ADBE005863D7 /* TutorialTrySlideView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialTrySlideView.h; sourceTree = "<group>"; };
 		C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialTrySlideView.m; sourceTree = "<group>"; };
 		C5448E831F66910700CD063B /* NotifySizeChangeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotifySizeChangeView.h; sourceTree = "<group>"; };
 		C5448E841F66910700CD063B /* NotifySizeChangeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotifySizeChangeView.m; sourceTree = "<group>"; };
 		C54F032B1F44361C00CF8CBD /* HelperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperView.h; sourceTree = "<group>"; };
 		C54F032C1F44361C00CF8CBD /* HelperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperView.m; sourceTree = "<group>"; };
-		C55184BA1F4AD3E000EE7855 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
-		C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCollectionViewCell.m; sourceTree = "<group>"; };
-		C55184BC1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotCollectionViewCell.h; sourceTree = "<group>"; };
-		C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
-		C55184C01F4AD40500EE7855 /* ShoppableCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppableCollectionViewCell.h; sourceTree = "<group>"; };
-		C55184C11F4AD40500EE7855 /* ShoppableCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppableCollectionViewCell.m; sourceTree = "<group>"; };
 		C55184C41F4C0DAA00EE7855 /* ScreenshotDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayViewController.h; sourceTree = "<group>"; };
 		C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayViewController.m; sourceTree = "<group>"; };
 		C55184C71F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayNavigationController.h; sourceTree = "<group>"; };
@@ -152,8 +145,19 @@
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
-		C5AA818F1F95ED6D00421909 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
-		C5AA81911F95F97300421909 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		C5AA81941F97227E00421909 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
+		C5AA81951F97227E00421909 /* FavoriteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
+		C5AA81961F97227E00421909 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
+		C5AA81981F97227E00421909 /* ShoppableCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppableCollectionViewCell.h; sourceTree = "<group>"; };
+		C5AA81991F97227E00421909 /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
+		C5AA819A1F97227E00421909 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
+		C5AA819B1F97227E00421909 /* ScreenshotCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotCollectionViewCell.m; sourceTree = "<group>"; };
+		C5AA819C1F97227E00421909 /* ShoppableCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppableCollectionViewCell.m; sourceTree = "<group>"; };
+		C5AA819D1F97227E00421909 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
+		C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCollectionViewCell.m; sourceTree = "<group>"; };
+		C5AA819F1F97227E00421909 /* ScreenshotCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotCollectionViewCell.h; sourceTree = "<group>"; };
+		C5C8465F1F9740D400BCCB3E /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		C5C846601F9740D400BCCB3E /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
@@ -193,12 +197,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		522AF64C1F93345100A7A151 /* Recovered References */ = {
+		52807FFA1F9530E70075111D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				5258FE9D1F83AB6200186C84 /* TutorialViewController.swift */,
+				52807FF81F9530D30075111D /* Craze_Video.mp4 */,
+				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 			);
-			name = "Recovered References";
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
@@ -270,9 +275,10 @@
 				C5278FCE1F3C38510090E422 /* TutorialEmailSlideView.m */,
 				C540FE141F52ADBE005863D7 /* TutorialTrySlideView.h */,
 				C540FE151F52ADBE005863D7 /* TutorialTrySlideView.m */,
-				C540FE0B1F4EB86A005863D7 /* TutorialWelcomeSlideView.h */,
-				C540FE0C1F4EB86A005863D7 /* TutorialWelcomeSlideView.m */,
+				5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */,
 				522AF64D1F93348B00A7A151 /* TutorialViewController.swift */,
+				52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */,
+				5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -314,14 +320,12 @@
 		C5278FE21F3C38510090E422 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C55184B91F4AD3E000EE7855 /* CollectionViewCell */,
-				C528DC1B1F5D806100F4E723 /* FavoriteButton.swift */,
-				C525A5AE1F7B8D4600C2641E /* FloatingActionButton.swift */,
+				C5AA81931F97227E00421909 /* Buttons */,
+				C5AA81971F97227E00421909 /* CollectionViewCells */,
 				C54F032B1F44361C00CF8CBD /* HelperView.h */,
 				C54F032C1F44361C00CF8CBD /* HelperView.m */,
 				C56F2BF51F42C2DF00501AE9 /* Loader.h */,
 				C56F2BF61F42C2DF00501AE9 /* Loader.m */,
-				C528DC171F5D74BD00F4E723 /* MainButton.swift */,
 				C5448E831F66910700CD063B /* NotifySizeChangeView.h */,
 				C5448E841F66910700CD063B /* NotifySizeChangeView.m */,
 				C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */,
@@ -346,21 +350,6 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		C55184B91F4AD3E000EE7855 /* CollectionViewCell */ = {
-			isa = PBXGroup;
-			children = (
-				C55184BA1F4AD3E000EE7855 /* ProductCollectionViewCell.h */,
-				C55184BB1F4AD3E000EE7855 /* ProductCollectionViewCell.m */,
-				C55184BC1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.h */,
-				C55184BD1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m */,
-				C55184C01F4AD40500EE7855 /* ShoppableCollectionViewCell.h */,
-				C55184C11F4AD40500EE7855 /* ShoppableCollectionViewCell.m */,
-				C5233F051F6FB4A600F25C7C /* ImageCollectionViewCell.swift */,
-				C5233F071F6FCA4300F25C7C /* PickerCollectionViewCell.swift */,
-			);
-			path = CollectionViewCell;
-			sourceTree = "<group>";
-		};
 		C55184C31F4C0DAA00EE7855 /* ScreenshotDisplay */ = {
 			isa = PBXGroup;
 			children = (
@@ -381,11 +370,36 @@
 			path = Constants;
 			sourceTree = "<group>";
 		};
-		C5AA818E1F95ED6D00421909 /* Game */ = {
+		C5AA81931F97227E00421909 /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
-				C5AA81911F95F97300421909 /* GameScene.sks */,
-				C5AA818F1F95ED6D00421909 /* GameScene.swift */,
+				C5AA81941F97227E00421909 /* MainButton.swift */,
+				C5AA81951F97227E00421909 /* FavoriteButton.swift */,
+				C5AA81961F97227E00421909 /* FloatingActionButton.swift */,
+			);
+			path = Buttons;
+			sourceTree = "<group>";
+		};
+		C5AA81971F97227E00421909 /* CollectionViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				C5AA81981F97227E00421909 /* ShoppableCollectionViewCell.h */,
+				C5AA81991F97227E00421909 /* PickerCollectionViewCell.swift */,
+				C5AA819A1F97227E00421909 /* ProductCollectionViewCell.h */,
+				C5AA819B1F97227E00421909 /* ScreenshotCollectionViewCell.m */,
+				C5AA819C1F97227E00421909 /* ShoppableCollectionViewCell.m */,
+				C5AA819D1F97227E00421909 /* ImageCollectionViewCell.swift */,
+				C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */,
+				C5AA819F1F97227E00421909 /* ScreenshotCollectionViewCell.h */,
+			);
+			path = CollectionViewCells;
+			sourceTree = "<group>";
+		};
+		C5C8465E1F9740D400BCCB3E /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				C5C8465F1F9740D400BCCB3E /* GameScene.sks */,
+				C5C846601F9740D400BCCB3E /* GameScene.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -409,7 +423,6 @@
 				BEBA23337A8F69FF9EF80643 /* Pods */,
 				EED5E55462B98A9C783AC0F5 /* Frameworks */,
 				E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */,
-				522AF64C1F93345100A7A151 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -428,16 +441,16 @@
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
 				C528DC131F57F33900F4E723 /* Controllers */,
-				C5AA818E1F95ED6D00421909 /* Game */,
+				C5C8465E1F9740D400BCCB3E /* Game */,
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
 				C5233F091F6FEFEB00F25C7C /* Protocols */,
-				C5278FD71F3C38510090E422 /* Singletons */,
 				C5278FDA1F3C38510090E422 /* ViewControllers */,
 				C5278FE21F3C38510090E422 /* Views */,
+				C5278FD71F3C38510090E422 /* Singletons */,
+				52807FFA1F9530E70075111D /* Resources */,
 				E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */,
 				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
-				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				E4139D431F09083B00E8A53B /* Supporting Files */,
 			);
 			path = screenshot;
@@ -554,8 +567,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */,
+				52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
-				C5AA81921F95F97300421909 /* GameScene.sks in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -663,26 +677,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C5233F061F6FB4A600F25C7C /* ImageCollectionViewCell.swift in Sources */,
+				522AF6541F935AC500A7A151 /* TutorialVideoViewController.swift in Sources */,
 				C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */,
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
-				C59A30461F5FDECB00463338 /* MainButton.swift in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
+				5249EF931F960AC2001A6220 /* TutorialWelcomeSlideView.swift in Sources */,
+				C5AA81A41F97228100421909 /* ScreenshotCollectionViewCell.m in Sources */,
+				C5AA81A31F97228100421909 /* PickerCollectionViewCell.swift in Sources */,
+				C5AA81A71F97228100421909 /* ProductCollectionViewCell.m in Sources */,
 				C5278FE91F3C38510090E422 /* Geometry.m in Sources */,
 				C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */,
 				C540FE161F52ADBE005863D7 /* TutorialTrySlideView.m in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
+				C5AA81A11F97228100421909 /* FavoriteButton.swift in Sources */,
 				C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
-				C540FE0D1F4EB86A005863D7 /* TutorialWelcomeSlideView.m in Sources */,
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
-				522AF64E1F93348B00A7A151 /* TutorialViewController.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
+				522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */,
 				C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */,
-				C55184BE1F4AD3E000EE7855 /* ProductCollectionViewCell.m in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
@@ -691,10 +707,11 @@
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
+				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
-				C55184BF1F4AD3E000EE7855 /* ScreenshotCollectionViewCell.m in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
-				C5AA81901F95ED6E00421909 /* GameScene.swift in Sources */,
+				C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */,
+				C5AA81A01F97228100421909 /* MainButton.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
@@ -702,12 +719,12 @@
 				C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
 				C5278FF51F3C38510090E422 /* TutorialEmailSlideView.m in Sources */,
-				C55184C21F4AD40500EE7855 /* ShoppableCollectionViewCell.m in Sources */,
 				C5278FF41F3C38510090E422 /* TutorialBaseSlideView.m in Sources */,
 				C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */,
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
+				C5AA81A51F97228100421909 /* ShoppableCollectionViewCell.m in Sources */,
 				C5278FFC1F3C38510090E422 /* MainTabBarController.m in Sources */,
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
@@ -716,11 +733,10 @@
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
-				C528DC1C1F5D806100F4E723 /* FavoriteButton.swift in Sources */,
 				C54F032D1F44361C00CF8CBD /* HelperView.m in Sources */,
 				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
-				C5233F081F6FCA4300F25C7C /* PickerCollectionViewCell.swift in Sources */,
-				C525A5AF1F7B8D4600C2641E /* FloatingActionButton.swift in Sources */,
+				C5AA81A21F97228100421909 /* FloatingActionButton.swift in Sources */,
+				521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -843,7 +859,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -868,7 +884,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -948,7 +964,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1024,7 +1040,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

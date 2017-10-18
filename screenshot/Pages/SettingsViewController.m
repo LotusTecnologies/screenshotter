@@ -29,14 +29,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeLocationPermission,
     RowTypeEmail,
     RowTypeName,
-    RowTypeTutorial,
+    RowTypeTutorialVideo,
     RowTypeTellFriend,
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
@@ -220,7 +220,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                         @(RowTypeEmail)
                                         ],
                   @(SectionTypeAbout): @[@(RowTypeTellFriend),
-                                         @(RowTypeTutorial),
+                                         @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
                                          @(RowTypeVersion)
@@ -371,10 +371,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self presentViewController:activityViewController animated:YES completion:nil];
         }
             break;
-        case RowTypeTutorial: {
-            TutorialViewController *viewController = [[TutorialViewController alloc] init];
+        case RowTypeTutorialVideo: {
+            TutorialVideoViewController *viewController = [TutorialVideoViewControllerFactory replayViewController];
+            viewController.showsReplayButtonUponFinishing = NO;
             viewController.delegate = self;
-            [self.navigationController pushViewController:viewController animated:YES];
+            viewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            [self presentViewController:viewController animated:YES completion:nil];
         }
             break;
         case RowTypeContactUs:
@@ -427,7 +429,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeContactUs:
             return @"Contact Us";
             break;
-        case RowTypeTutorial:
+        case RowTypeTutorialVideo:
             return @"Replay Tutorial";
             break;
         case RowTypeName:
@@ -479,7 +481,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeTutorial:
         case RowTypeBug:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
@@ -726,4 +727,19 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+#pragma mark - TutorialVideoViewControllerDelegate
+
+- (void)tutorialVideoViewControllerDoneButtonTapped:(TutorialVideoViewController *)viewController {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
+    [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video"];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self dismissViewControllerAnimated:YES completion:nil];
+    });
+}
+
 @end
+

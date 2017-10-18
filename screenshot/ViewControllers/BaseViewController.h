@@ -16,4 +16,7 @@
 
 - (void)addNavigationItemLogo;
 
+- (void)showStatusBar;
+- (void)hideStatusBar;
+
 @end
