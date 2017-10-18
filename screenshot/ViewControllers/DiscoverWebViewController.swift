@@ -17,6 +17,7 @@ class DiscoverWebViewController : WebViewController {
         toolbarEnabled = false
         
         url = URL(string: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverUrl) ?? "https://screenshopit.tumblr.com")
+        track("Loaded Discover Web Page", properties: ["url" : url])
         
         let refresh = UIBarButtonItem(image: #imageLiteral(resourceName: "Refresh"), style: .plain, target: self, action: #selector(refreshButtonTapped))
         let share = UIBarButtonItem(image: #imageLiteral(resourceName: "ScreenshotShare"), style: .plain, target: self, action: #selector(shareButtonTapped))
@@ -33,7 +34,7 @@ class DiscoverWebViewController : WebViewController {
 
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
     }
-
+    
     // MARK: - Actions
     
     @objc private func backButtonTapped() {
