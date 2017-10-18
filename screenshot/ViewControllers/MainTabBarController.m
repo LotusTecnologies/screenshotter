@@ -18,6 +18,7 @@
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
+@property (nonatomic, strong) UINavigationController *discoverNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
 @property (nonatomic, strong) UITabBarItem *settingsTabBarItem;
 @property (nonatomic, strong) UpdatePromptHandler *updatePromptHandler;
@@ -53,11 +54,20 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             viewController;
         });
         
+        _discoverNavigationController = ({
+            DiscoverWebViewController *viewController = [[DiscoverWebViewController alloc] init];
+            
+            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+            navigationController.view.backgroundColor = [UIColor background];
+            navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Discover" image:nil tag:2];
+            navigationController;
+        });
+
         _settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
-            viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:2];
+            viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:image tag:3];
             viewController.tabBarItem.badgeColor = [UIColor crazeRed];
             _settingsTabBarItem = viewController.tabBarItem;
             
@@ -66,7 +76,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             navigationController;
         });
         
-        self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.settingsNavigationController];
+        self.viewControllers = @[self.screenshotsNavigationController, self.favoritesNavigationController, self.discoverNavigationController, self.settingsNavigationController];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
@@ -126,12 +136,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     
     if (self.selectedViewController == self.favoritesNavigationController) {
         tab = @"Favorites";
-        
     } else if (self.selectedViewController == self.screenshotsNavigationController) {
         tab = @"Screenshots";
-        
     } else if (self.selectedViewController == self.settingsNavigationController) {
         tab = @"Settings";
+    } else if (self.selectedViewController == self.discoverNavigationController) {
+        tab = @"Discover";
     }
     
     if (tab) {
