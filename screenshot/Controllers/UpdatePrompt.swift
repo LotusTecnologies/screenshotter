@@ -10,26 +10,17 @@ import Foundation
 import PromiseKit
 
 struct UpdatePromptState {
-    let suggestedVersion: String
-    let forceVersion: String
+    let suggestedVersion: String?
+    let forceVersion: String?
     
     enum JSONKeys : String {
         case Suggested = "SuggestedUpdateVersion"
         case Force = "ForceUpdateVersion"
     }
     
-    var dictionaryRepresentation: [String : String] {
-        return [JSONKeys.Suggested.rawValue: suggestedVersion, JSONKeys.Force.rawValue: forceVersion]
-    }
-    
-    init(dictionaryRepresentation representation: [String : String]) throws {
-        guard let suggested = representation[JSONKeys.Suggested.rawValue], let force = representation[JSONKeys.Force.rawValue] else {
-            // TODO: Use a better error value here.
-            throw NSError(domain: "io.crazeapp.screenshot.validation-error", code: 3, userInfo: representation)
-        }
-        
-        suggestedVersion = suggested
-        forceVersion = force
+    init(dictionaryRepresentation representation: [AnyHashable : Any]) {
+        suggestedVersion = representation[JSONKeys.Suggested.rawValue] as? String
+        forceVersion = representation[JSONKeys.Force.rawValue] as? String
     }
 }
 
@@ -63,32 +54,67 @@ class UpdatePromptHandler : NSObject {
     func start() {
         print("Starting update handler")
 
-        #if DEV
-            print("Not running update flow because we are in development")
-        #else
-            startUpdateFlow()
-        #endif
+        startUpdateFlow()
     }
     
     // MARK: Fetching update payload
     
     private func startUpdateFlow() {
-        fetchUpdatePayload() { state in
-            self.presentAppropriatePromptIfNecessary(withUpdateState: state)
+        fetchSettingsPayload() { state in
+//            #if DEV
+//                print("Not running update flow because we are in development")
+//            #else
+                self.presentAppropriatePromptIfNecessary(withUpdateState: state)
+//            #endif
         }
     }
     
-    private func fetchUpdatePayload(withCompletion completion: ((UpdatePromptState) -> Void)? = nil) {
-        let _ = NetworkingPromise.appVersionRequirements().then(on: DispatchQueue.global(qos: .default)) { dictionary -> Promise<UpdatePromptState> in
-            print("Received update payload from server")
+    private func fetchSettingsPayload(withCompletion completion: ((UpdatePromptState) -> Void)? = nil) {
+        let _ = NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { dictionary -> Promise<UpdatePromptState> in
+            print("Received settings payload from server")
             
-            guard let updateState = try? UpdatePromptState(dictionaryRepresentation: dictionary) else {
-                throw NSError(domain: Bundle.main.infoDictionary!["CFBundleIdentifier"] as! String, code: 100, userInfo: [NSLocalizedDescriptionKey: "Can't create an UpdatePromptState from the given dictionary: \(dictionary.description)"])
-            }
+            self.processDiscoverURLs(dictionary)
             
-            return Promise(value: updateState)
+            return Promise(value: UpdatePromptState(dictionaryRepresentation: dictionary))
         }.then(on: .main) { state in
             completion?(state)
+        }
+    }
+    
+    // MARK: Discover URL handling
+    
+    private func processDiscoverURLs(_ dictionary: [String : Any]) {
+        let currentlyRecordedUrl = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverUrl)
+        
+        if let discoverURLHash = dictionary["DiscoverURL"] as? [String : String] {
+            var needsToUpdatePersistedURL = true
+            if let recordedURL = currentlyRecordedUrl {
+                needsToUpdatePersistedURL = !discoverURLHash.values.contains(recordedURL)
+            }
+            
+            if (needsToUpdatePersistedURL) {
+                // Figure out which key in the hash to use based on the A-B test parameters
+                
+                let integerKeys = discoverURLHash.keys.flatMap { Int($0) }
+                let total = integerKeys.reduce(0, +)
+                let randomKey = arc4random_uniform(UInt32(total - 1)) + 1
+                
+                var resultKey = ""
+                var runningSum = 0
+                
+                for key in integerKeys {
+                    runningSum += key
+                    
+                    if randomKey <= runningSum {
+                        resultKey = "\(key)"
+                        break
+                    }
+                }
+                
+                if let discoverURL = discoverURLHash[resultKey], discoverURL.count > 0 {
+                    UserDefaults.standard.set(discoverURL, forKey: UserDefaultsKeys.discoverUrl)
+                }
+            }
         }
     }
     
@@ -97,8 +123,8 @@ class UpdatePromptHandler : NSObject {
     private func presentAppropriatePromptIfNecessary(withUpdateState state: UpdatePromptState) {
         print("Determining appropriate prompt action (if any)...")
         
-        let forcedVersionIsGreater = state.forceVersion.compare(currentAppVersion, options: .numeric) == .orderedDescending
-        let suggestedVersionIsGreater = state.suggestedVersion.compare(currentAppVersion, options: .numeric) == .orderedDescending
+        let forcedVersionIsGreater = state.forceVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
+        let suggestedVersionIsGreater = state.suggestedVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
  
         if forcedVersionIsGreater {
             print("forced version is greater")

@@ -151,9 +151,9 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func appVersionRequirements() -> Promise<[String : String]> {
+    static func appSettings() -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
-            guard let URL = URL(string: Constants.appUpdateDomain) else {
+            guard let URL = URL(string: Constants.appSettingsDomain) else {
                 return
             }
             
@@ -164,7 +164,7 @@ class NetworkingPromise: NSObject {
                 }
                 
                 do {
-                    guard let JSON = try JSONSerialization.jsonObject(with: data) as? [String : String] else {
+                    guard let JSON = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any] else {
                         // TODO: Deal with mismatched type?
                         return
                     }
