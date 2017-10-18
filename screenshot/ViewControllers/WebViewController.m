@@ -214,7 +214,7 @@
     
     UILabel *loaderLabel = [[UILabel alloc] init];
     loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    loaderLabel.text = @"Loading your store";
+    loaderLabel.text = @"Loading your store...";
     loaderLabel.textColor = [UIColor gray6];
     loaderLabel.textAlignment = NSTextAlignmentCenter;
     loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
