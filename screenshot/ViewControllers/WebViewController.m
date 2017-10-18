@@ -14,6 +14,7 @@
 
 @import Appsee;
 @import WebKit;
+@import SpriteKit;
 
 @interface WebViewController () {
     BOOL _isShorteningUrl;
@@ -21,6 +22,7 @@
 
 @property (nonatomic, strong) UIView *loadingCoverView;
 @property (nonatomic, strong) Loader *loader;
+@property (nonatomic, strong) WKWebView *webView;
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UIBarButtonItem *backItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardItem;
@@ -41,19 +43,25 @@
     return self;
 }
 
-- (void)loadView {
-    self.view = [[WKWebView alloc] init];
-    self.view.navigationDelegate = self;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.view addObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack)) options:NSKeyValueObservingOptionNew context:NULL];
-    [self.view addObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward)) options:NSKeyValueObservingOptionNew context:NULL];
-    [self.view addObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress)) options:NSKeyValueObservingOptionNew context:NULL];
+    _webView = ({
+        WKWebView *view = [[WKWebView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        view.navigationDelegate = self;
+        [self.view addSubview:view];
+        [view.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        
+        [view addObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack)) options:NSKeyValueObservingOptionNew context:NULL];
+        [view addObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward)) options:NSKeyValueObservingOptionNew context:NULL];
+        view;
+    });
     
-    self.toolbar = ({
+    _toolbar = ({
         UIToolbar *toolbar = [[UIToolbar alloc] init];
         toolbar.frame = CGRectMake(0.f, 0.f, 0.f, [toolbar intrinsicContentSize].height);
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
@@ -66,41 +74,22 @@
     });
     [self updateToolbarItems];
     
-    self.view.scrollView.contentInset = ({
-        UIEdgeInsets insets = self.view.scrollView.contentInset;
+    self.webView.scrollView.contentInset = ({
+        UIEdgeInsets insets = self.webView.scrollView.contentInset;
+        insets.bottom = self.toolbar.bounds.size.height;
+        insets;
+    });
+
+    self.webView.scrollView.scrollIndicatorInsets = ({
+        UIEdgeInsets insets = self.webView.scrollView.scrollIndicatorInsets;
         insets.bottom = self.toolbar.bounds.size.height;
         insets;
     });
     
-    self.view.scrollView.scrollIndicatorInsets = ({
-        UIEdgeInsets insets = self.view.scrollView.scrollIndicatorInsets;
-        insets.bottom = self.toolbar.bounds.size.height;
-        insets;
-    });
-    
-    _loadingCoverView = ({
-        UIView *view = [[UIView alloc] init];
-        view.translatesAutoresizingMaskIntoConstraints = NO;
-        view.backgroundColor = [UIColor whiteColor];
-        [self.view addSubview:view];
-        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
-        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [view.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        view;
-    });
-    
-    _loader = ({
-        Loader *loader = [[Loader alloc] init];
-        loader.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.loadingCoverView addSubview:loader];
-        [loader.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-        [loader.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
-        loader;
-    });
+    [self showLoadingView];
     
     if (self.url) {
-        [self.view loadRequest:[NSURLRequest requestWithURL:self.url]];
+        [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
     }
 }
 
@@ -112,16 +101,11 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if (object == self.view) {
+    if (object == self.webView) {
         if ([keyPath isEqualToString:NSStringFromSelector(@selector(canGoBack))] ||
             [keyPath isEqualToString:NSStringFromSelector(@selector(canGoForward))]) {
             [self syncToolbarNavigationItems];
             
-        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(estimatedProgress))]) {
-//            NSLog(@"||| %f", self.view.estimatedProgress);
-            // TODO: hidding the loader should be done once the estimatedProgress hits above 0.5
-            // however we first need to detect if there is a redirect before implementing this
-        
         } else {
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
@@ -130,9 +114,8 @@
 
 - (void)dealloc {
     if ([self isViewLoaded]) {
-        [self.view removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack))];
-        [self.view removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward))];
-        [self.view removeObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress))];
+        [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack))];
+        [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward))];
     }
 }
 
@@ -180,8 +163,8 @@
 }
 
 - (void)syncToolbarNavigationItems {
-    self.backItem.enabled = [self.view canGoBack];
-    self.forwardItem.enabled = [self.view canGoForward];
+    self.backItem.enabled = [self.webView canGoBack];
+    self.forwardItem.enabled = [self.webView canGoForward];
 }
 
 
@@ -191,47 +174,103 @@
     _url = url;
     
     if (url && [self isViewLoaded]) {
-        [self.view loadRequest:[NSURLRequest requestWithURL:url]];
+        [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
     }
 }
 
 
-#pragma mark - Delegate
-
-- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-    NSLog(@"||| did start navigation  %f", webView.estimatedProgress);
-}
-
-- (void)webView:(WKWebView *)webView didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *)navigation {
-    NSLog(@"||| did receive redirect  %f", webView.estimatedProgress);
-}
-
-- (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
-    NSLog(@"||| did commit  %f", webView.estimatedProgress);
-}
+#pragma mark - Web View
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    if (![self.loadingCoverView isHidden]) {
-        [self.loader stopAnimation];
-        self.loadingCoverView.hidden = YES;
-    }
+    [self hideLoadingView];
+}
+
+
+#pragma mark - Loading
+
+- (void)showLoadingView {
+    _loadingCoverView = ({
+        UIView *view = [[UIView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        view.backgroundColor = [UIColor whiteColor];
+        [self.view addSubview:view];
+        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
+        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        view;
+    });
     
-//    [self syncToolbarNavigationItems];
+    _loader = ({
+        Loader *loader = [[Loader alloc] init];
+        loader.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.loadingCoverView addSubview:loader];
+        [loader.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+        [NSLayoutConstraint constraintWithItem:loader attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.loadingCoverView attribute:NSLayoutAttributeCenterY multiplier:0.8f constant:0.f].active = YES;
+        loader;
+    });
+    
+    CGFloat padding = [Geometry padding];
+    
+    UILabel *loaderLabel = [[UILabel alloc] init];
+    loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    loaderLabel.text = @"Loading your store...";
+    loaderLabel.textColor = [UIColor gray6];
+    loaderLabel.textAlignment = NSTextAlignmentCenter;
+    loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    [self.loadingCoverView addSubview:loaderLabel];
+    [loaderLabel.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:padding].active = YES;
+    [loaderLabel.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor constant:padding].active = YES;
+    [loaderLabel.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor constant:-padding].active = YES;
+    
+    MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
+    button.translatesAutoresizingMaskIntoConstraints = NO;
+    button.backgroundColor = [UIColor crazeGreen];
+    [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
+    [self.loadingCoverView addSubview:button];
+    [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
+    [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+}
+
+- (void)hideLoadingView {
+    [self.loadingCoverView removeFromSuperview];
+    self.loadingCoverView = nil;
+    
+    [self.loader stopAnimation];
+    self.loader = nil;
+}
+
+- (void)showLoadingGame {
+    SKView *gameView = [[SKView alloc] init];
+    gameView.translatesAutoresizingMaskIntoConstraints = NO;
+    gameView.ignoresSiblingOrder = YES;
+    [self.loadingCoverView addSubview:gameView];
+    [gameView.topAnchor constraintEqualToAnchor:self.loadingCoverView.topAnchor].active = YES;
+    [gameView.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor].active = YES;
+    [gameView.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor].active = YES;
+    [gameView.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor].active = YES;
+    
+    GameScene *scene = (GameScene *)[GameScene unarchiveFromFile:@"GameScene"];
+    scene.scaleMode = SKSceneScaleModeAspectFill;
+    [gameView presentScene:scene];
+    
+    [self.loader stopAnimation];
 }
 
 
 #pragma mark - Actions
 
 - (void)backAction {
-    [self.view goBack];
+    [self.webView goBack];
 }
 
 - (void)forwardAction {
-    [self.view goForward];
+    [self.webView goForward];
 }
 
 - (void)refreshAction {
-    [self.view reload];
+    [self.webView reload];
     
     [AnalyticsTrackers.standard track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
 }

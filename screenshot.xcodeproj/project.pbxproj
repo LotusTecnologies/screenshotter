@@ -60,6 +60,8 @@
 		C5AA81A51F97228100421909 /* ShoppableCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819C1F97227E00421909 /* ShoppableCollectionViewCell.m */; };
 		C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819D1F97227E00421909 /* ImageCollectionViewCell.swift */; };
 		C5AA81A71F97228100421909 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */; };
+		C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5C8465F1F9740D400BCCB3E /* GameScene.sks */; };
+		C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C846601F9740D400BCCB3E /* GameScene.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
@@ -156,6 +158,8 @@
 		C5AA819D1F97227E00421909 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCollectionViewCell.m; sourceTree = "<group>"; };
 		C5AA819F1F97227E00421909 /* ScreenshotCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotCollectionViewCell.h; sourceTree = "<group>"; };
+		C5C8465F1F9740D400BCCB3E /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		C5C846601F9740D400BCCB3E /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
@@ -394,6 +398,15 @@
 			path = CollectionViewCells;
 			sourceTree = "<group>";
 		};
+		C5C8465E1F9740D400BCCB3E /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				C5C8465F1F9740D400BCCB3E /* GameScene.sks */,
+				C5C846601F9740D400BCCB3E /* GameScene.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -431,6 +444,7 @@
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
 				C528DC131F57F33900F4E723 /* Controllers */,
+				C5C8465E1F9740D400BCCB3E /* Game */,
 				C5278FB81F3C38510090E422 /* Model */,
 				C5278FC11F3C38510090E422 /* Pages */,
 				C5233F091F6FEFEB00F25C7C /* Protocols */,
@@ -556,6 +570,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */,
 				52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
@@ -695,6 +710,7 @@
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
+				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */,
