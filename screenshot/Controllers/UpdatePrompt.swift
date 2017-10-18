@@ -61,11 +61,11 @@ class UpdatePromptHandler : NSObject {
     
     private func startUpdateFlow() {
         fetchSettingsPayload() { state in
-//            #if DEV
-//                print("Not running update flow because we are in development")
-//            #else
+            #if DEV
+                print("Not running update flow because we are in development")
+            #else
                 self.presentAppropriatePromptIfNecessary(withUpdateState: state)
-//            #endif
+            #endif
         }
     }
     
