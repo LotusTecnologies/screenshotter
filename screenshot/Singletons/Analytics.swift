@@ -31,6 +31,10 @@ public class AnalyticsUser : NSObject {
             props["email"] = email
         }
         
+        if let name = name {
+            props["name"] = name
+        }
+        
         return props
     }
 }
@@ -91,7 +95,7 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         log(name: "identify", properties: user.analyticsProperties) {
-            SEGAnalytics.shared().identify(nil, traits: ["email": user.email ?? "", "name":user.name ?? ""])
+            SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
         }
     }
 }
