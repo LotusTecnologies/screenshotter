@@ -22,7 +22,6 @@
 
 @property (nonatomic, strong) UIView *loadingCoverView;
 @property (nonatomic, strong) Loader *loader;
-@property (nonatomic, strong) WKWebView *webView;
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UIBarButtonItem *backItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardItem;

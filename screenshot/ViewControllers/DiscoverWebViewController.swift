@@ -29,25 +29,25 @@ class DiscoverWebViewController : WebViewController {
         
         super.viewDidLoad()
 
-        view.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
     }
 
     // MARK: - Actions
     
     @objc private func backButtonTapped() {
-        self.view.goBack()
+        webView.goBack()
     }
 
     @objc private func forwardButtonTapped() {
-        self.view.goForward()
+        webView.goForward()
     }
     
     @objc private func refreshButtonTapped() {
-        self.view.reload()
+        webView.reload()
     }
     
     @objc private func shareButtonTapped() {
-        guard let url = view.url else {
+        guard let url = webView.url else {
             return
         }
         
