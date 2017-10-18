@@ -86,7 +86,7 @@ class IntercomHelper : NSObject {
     }
     
     func logoutUser() {
-        Intercom.reset()
+        Intercom.logout()
     }
     
     func presentMessagingUI() {

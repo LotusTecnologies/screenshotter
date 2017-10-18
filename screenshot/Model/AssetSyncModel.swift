@@ -141,7 +141,8 @@ class AssetSyncModel: NSObject {
                         switch nsError.code {
                         case 3, 4:
                             // Syte returned no segments
-                            DataModel.sharedInstance.setNoShoppables(assetId: assetId)
+                            let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
+                            DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
                         default:
                             break
                         }

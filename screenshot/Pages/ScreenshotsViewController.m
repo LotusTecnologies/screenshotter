@@ -284,6 +284,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
     NSString *introductoryText = @"Check out this look on SCREENSHOP!";
     NSArray *items;
+    
+    if (screenshot.shoppablesCount <= 0) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry" message:@"We could not find similar items to share." preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alertController animated:YES completion:nil];
+        return;
+    }
         
     if (screenshot.shareLink) {
         items = @[introductoryText, [NSURL URLWithString:screenshot.shareLink]];

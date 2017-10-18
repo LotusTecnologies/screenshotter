@@ -188,7 +188,7 @@
 - (void)submitEmail {
     self.readyToSubmit = YES;
     
-    NSString *trimmedName = [self.nameTextField.text trimWhitespace];
+    NSString *trimmedName = [self.nameTextField.text trimWhitespace] ?: @"";
     NSString *trimmedEmail = [self.emailTextField.text isValidEmail] ? [self.emailTextField.text trimWhitespace] : nil;
     
     [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
@@ -196,7 +196,17 @@
     
     AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
     [AnalyticsTrackers.standard identify:user];
-    [AnalyticsTrackers.standard track:@"Submitted email" properties:@{@"id": user.identifier, @"name": trimmedName ?: @"", @"email": trimmedEmail ?: @""}];
+    
+    if (trimmedEmail.length > 0) {
+        [AnalyticsTrackers.standard track:@"Submitted email" properties:@{ @"id": user.identifier, @"name": trimmedName, @"email": trimmedEmail ?: @"" }];
+    } else {
+        [AnalyticsTrackers.standard track:@"Submitted blank email" properties:@{ @"id" : user.identifier, @"name": trimmedName }];
+    }
+    
+    NSString *ambassadorUsername = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys ambasssadorUsername]];
+    if (ambassadorUsername != nil) {
+        [AnalyticsTrackers.standard track:@"Referring Ambassador" properties:@{ @"username": ambassadorUsername}];
+    }
     
     [[NSUserDefaults standardUserDefaults] setValue:user.identifier forKey:UserDefaultsKeys.userID];
     [[NSUserDefaults standardUserDefaults] synchronize];
