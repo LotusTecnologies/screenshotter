@@ -226,6 +226,7 @@ extension TutorialViewController : TutorialTrySlideViewDelegate {
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
         track("Finished Tutorial")
+        AnalyticsTrackers.branch.track("Finished Tutorial")
         
         delegate?.tutoriaViewControllerDidComplete(self)
     }

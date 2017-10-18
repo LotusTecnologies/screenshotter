@@ -304,6 +304,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
             [AnalyticsTrackers.standard track:@"share completed"];
+            [AnalyticsTrackers.branch track:@"share completed"];
         } else {
             [AnalyticsTrackers.standard track:@"share incomplete"];
         }

@@ -171,7 +171,9 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         log(name: "identify", properties: user.analyticsProperties) {
-            Branch.getInstance().userCompletedAction("identify")
+            if let isEmpty = user.email?.isEmpty, isEmpty == false {
+                Branch.getInstance().userCompletedAction("Submitted email")
+            }
         }
     }
 }

@@ -196,6 +196,8 @@
     
     AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
     [AnalyticsTrackers.standard identify:user];
+    [AnalyticsTrackers.branch identify:user];
+
     
     if (trimmedEmail.length > 0) {
         [AnalyticsTrackers.standard track:@"Submitted email" properties:@{ @"id": user.identifier, @"name": trimmedName, @"email": trimmedEmail ?: @"" }];

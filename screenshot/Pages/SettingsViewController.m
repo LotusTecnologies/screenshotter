@@ -587,6 +587,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:[self.nameTextField.text trimWhitespace]
                                                         email:[self.emailTextField.text trimWhitespace]];
     [AnalyticsTrackers.standard identify:user];
+    [AnalyticsTrackers.branch identify:user];
 }
 
 - (void)dismissKeyboard {

@@ -176,6 +176,7 @@
     [self.navigationController pushViewController:webViewController animated:YES];
     
     [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Favorites"}];
+    [AnalyticsTrackers.branch track:@"Tapped on product"];
     
     [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }
