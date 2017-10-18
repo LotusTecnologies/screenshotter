@@ -24,6 +24,19 @@ public class AnalyticsUser : NSObject {
         let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID)
         identifier = persistedID ?? UUID().uuidString
     }
+    
+    var analyticsProperties: [String : String] {
+        var props = ["identifier" : identifier]
+        if let email = email {
+            props["email"] = email
+        }
+        
+        if let name = name {
+            props["name"] = name
+        }
+        
+        return props
+    }
 }
 
 @objc public protocol AnalyticsTracker {
@@ -81,8 +94,8 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: ["email": user.email ?? ""]) {
-            SEGAnalytics.shared().identify(nil, traits: ["email": user.email ?? "", "name":user.name ?? ""])
+        log(name: "identify", properties: user.analyticsProperties) {
+            SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
         }
     }
 }
@@ -119,8 +132,10 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: ["identifier": user.identifier]) {
-            Appsee.setUserID(user.identifier)
+        log(name: "identify", properties: user.analyticsProperties) {
+            Appsee.setUserID(user.email ?? user.identifier)
+            
+            track("User Properties", properties: user.analyticsProperties)
         }
     }
 }
@@ -137,7 +152,7 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: ["user" : user.identifier]) {
+        log(name: "identify", properties: user.analyticsProperties) {
             IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name)
         }
     }
@@ -155,7 +170,7 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify") {
+        log(name: "identify", properties: user.analyticsProperties) {
             Branch.getInstance().userCompletedAction("identify")
         }
     }

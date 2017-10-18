@@ -56,8 +56,12 @@
     
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        NSURL *url = [NSURL URLWithString:[json objectForKey:@"short"]];
+        NSURL *url;
+        
+        if (data) {
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            url = [NSURL URLWithString:[json objectForKey:@"short"]];
+        }
         
         if ([NSThread isMainThread]) {
             completion(url);
