@@ -121,6 +121,8 @@
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     if ([self isViewLoaded]) {
         [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack))];
         [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward))];
