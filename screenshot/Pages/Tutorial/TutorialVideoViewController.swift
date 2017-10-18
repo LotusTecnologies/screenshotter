@@ -40,7 +40,7 @@ class TutorialVideoViewControllerFactory : NSObject {
     }
 }
 
-class TutorialVideoViewController : UIViewController {
+class TutorialVideoViewController : BaseViewController {
     var showsReplayButtonUponFinishing: Bool = true
     
     let overlayViewController = TutorialVideoOverlayViewController()
@@ -83,19 +83,11 @@ class TutorialVideoViewController : UIViewController {
     }
     
     // MARK: - UIViewController
-
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        playerLayer.frame = view.bounds
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.backgroundColor = nil
         
         // Add player layer
         view.layer.addSublayer(playerLayer)
@@ -125,13 +117,26 @@ class TutorialVideoViewController : UIViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        hideStatusBar()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
       
         player.pause()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        playerLayer.frame = view.bounds
+    }
+    
     // MARK: - Player state observation
+    
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         guard let video = video,
             let playerItem = object as? AVPlayerItem,

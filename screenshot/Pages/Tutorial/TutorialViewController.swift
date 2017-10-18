@@ -28,8 +28,8 @@ class TutorialViewController : UIViewController {
         }
     }
     
-    private var didPresentDeterminePushAlertController:Bool = false
-    fileprivate var scrollViewIsScrollingAnimation:Bool = false
+    private var didPresentDeterminePushAlertController = false
+    fileprivate var scrollViewIsScrollingAnimation = false
     
     // MARK: Slides
     
