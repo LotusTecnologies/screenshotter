@@ -308,7 +308,7 @@
 }
 
 - (void)refreshAction {
-    [self.webView reload];
+    self.webView.URL ? [self.webView reload] : [self setUrl:self.url];
     
     [AnalyticsTrackers.standard track:@"Refreshed webpage" properties:@{@"url": self.url.absoluteString}];
 }
