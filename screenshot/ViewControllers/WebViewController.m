@@ -38,7 +38,7 @@
         _toolbarEnabled = YES;
         [self setupBarButtonItems];
         
-        _loaderLabelText = @"Loading your store...";
+        _loaderLabelText = @"Loading...";
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
