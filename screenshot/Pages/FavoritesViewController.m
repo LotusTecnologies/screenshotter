@@ -32,13 +32,16 @@
 
 #pragma mark - Life Cycle
 
+- (NSString *)title {
+    return @"Favorites";
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
-        self.title = @"Favorites";
         [self addNavigationItemLogo];
         
         self.favoriteFrc = [DataModel sharedInstance].favoriteFrc;

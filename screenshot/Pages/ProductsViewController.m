@@ -286,6 +286,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     WebViewController *webViewController = [[WebViewController alloc] init];
     [webViewController addNavigationItemLogo];
     webViewController.hidesBottomBarWhenPushed = YES;
+    webViewController.loaderLabelText = @"Loading your store...";
     webViewController.url = [NSURL URLWithString:product.offer];
     
     [self.navigationController pushViewController:webViewController animated:YES];
