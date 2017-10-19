@@ -55,13 +55,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Life Cycle
 
+- (NSString *)title {
+    return @"Settings";
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         
-        self.title = @"Settings";
         [self addNavigationItemLogo];
     }
     return self;

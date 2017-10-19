@@ -10,63 +10,59 @@
 import WebKit.WKWebView
 
 class DiscoverWebViewController : WebViewController {
-    let backButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "Back"), style: .plain, target: self, action: #selector(backButtonTapped))
-    let forwardButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "Forward"), style: .plain, target: self, action: #selector(forwardButtonTapped))
+    override var title: String? {
+        set {}
+        get {
+            return "Discover"
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        toolbarEnabled = false
+        
+        loaderLabelText = "Loading Discover..."
+        
+        navigationItem.leftBarButtonItems = leftBarButtonItems()
+        navigationItem.rightBarButtonItems = rightBarButtonItems()
+        
+        addNavigationItemLogo()
+    }
     
     override func viewDidLoad() {
-        toolbarEnabled = false
+        super.viewDidLoad()
+        
+        webView.scrollView.delegate = self
+        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
         
         url = URL(string: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverUrl) ?? "https://screenshopit.tumblr.com")
         track("Loaded Discover Web Page", properties: ["url" : url])
-        
-        let refresh = UIBarButtonItem(image: #imageLiteral(resourceName: "Refresh"), style: .plain, target: self, action: #selector(refreshButtonTapped))
-        let share = UIBarButtonItem(image: #imageLiteral(resourceName: "ScreenshotShare"), style: .plain, target: self, action: #selector(shareButtonTapped))
-        let leftItems = [backButtonItem, forwardButtonItem]
-        let rightItems = [share, refresh]
-        
-        navigationItem.titleView = UIImageView(image: UIImage(named: "Logo20h"))
-        navigationItem.leftBarButtonItems = leftItems
-        navigationItem.rightBarButtonItems = rightItems
-        
-        (leftItems + rightItems).forEach { $0.isEnabled = false }
-        
-        super.viewDidLoad()
-
-        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
     }
     
-    // MARK: - Actions
+    // MARK: Bar Button Item
     
-    @objc private func backButtonTapped() {
-        webView.goBack()
-    }
-
-    @objc private func forwardButtonTapped() {
-        webView.goForward()
+    func leftBarButtonItems() -> [UIBarButtonItem] {
+        return [backItem!, forwardItem!]
     }
     
-    @objc private func refreshButtonTapped() {
-        webView.reload()
+    func rightBarButtonItems() -> [UIBarButtonItem] {
+        return [shareItem!, refreshItem!]
     }
     
-    @objc private func shareButtonTapped() {
-        guard let url = webView.url else {
-            return
-        }
+    override func updateShareItem() {
+        super.updateShareItem()
         
-        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-        present(activityViewController, animated: true, completion: nil)
-    }
-    
-    // MARK: - Navigation Delegate
-    
-    override func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        super.webView(webView, didFinish: navigation)
-        
-        navigationItem.rightBarButtonItems?.forEach { $0.isEnabled = true }
-
-        self.backButtonItem.isEnabled = webView.canGoBack
-        self.forwardButtonItem.isEnabled = webView.canGoForward
+        navigationItem.rightBarButtonItems = rightBarButtonItems()
     }
 }
 
+extension DiscoverWebViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return nil
+    }
+}
