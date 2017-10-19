@@ -26,6 +26,8 @@ class DiscoverWebViewController : WebViewController {
         
         toolbarEnabled = false
         
+        loaderLabelText = "Loading Discover..."
+        
         navigationItem.leftBarButtonItems = leftBarButtonItems()
         navigationItem.rightBarButtonItems = rightBarButtonItems()
         

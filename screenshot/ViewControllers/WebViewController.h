@@ -25,4 +25,6 @@
 
 @property (nonatomic, strong) WKWebView *webView;
 
+@property (nonatomic, copy) NSString *loaderLabelText; // Set this early, it's not persistent
+
 @end

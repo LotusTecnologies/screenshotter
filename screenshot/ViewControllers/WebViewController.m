@@ -38,6 +38,8 @@
         _toolbarEnabled = YES;
         [self setupBarButtonItems];
         
+        _loaderLabelText = @"Loading your store...";
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
     return self;
@@ -250,7 +252,7 @@
     
     UILabel *loaderLabel = [[UILabel alloc] init];
     loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    loaderLabel.text = @"Loading your store...";
+    loaderLabel.text = self.loaderLabelText;
     loaderLabel.textColor = [UIColor gray6];
     loaderLabel.textAlignment = NSTextAlignmentCenter;
     loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
