@@ -18,6 +18,7 @@
 
 @interface WebViewController () {
     BOOL _isShorteningUrl;
+    BOOL _isPlayingGame;
 }
 
 @property (nonatomic, strong) UIView *loadingCoverView;
@@ -40,6 +41,7 @@
         
         _loaderLabelText = @"Loading...";
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
     return self;
@@ -79,9 +81,27 @@
     [self.loader startAnimation:LoaderAnimationPoseThenSpin];
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if (_isPlayingGame) {
+        [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"User Navigating"}];
+    }
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    if (self.view.window && _isPlayingGame) {
+        [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"App Backgrounding"}];
+    }
+}
+
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self.loader startAnimation:LoaderAnimationSpin];
+        
+        if (_isPlayingGame) {
+            [AnalyticsTrackers.standard track:@"Game Resumed" properties:@{@"From": @"App Backgrounding"}];
+        }
     }
 }
 
@@ -277,9 +297,17 @@
     
     [self.loader stopAnimation];
     self.loader = nil;
+    
+    if (_isPlayingGame) {
+        _isPlayingGame = NO;
+        
+        [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"Page Loading"}];
+    }
 }
 
 - (void)showLoadingGame {
+    _isPlayingGame = YES;
+    
     SKView *gameView = [[SKView alloc] init];
     gameView.translatesAutoresizingMaskIntoConstraints = NO;
     gameView.ignoresSiblingOrder = YES;
