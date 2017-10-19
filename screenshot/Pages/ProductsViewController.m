@@ -92,7 +92,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
         // You shall not pass!
-        [self displayNoItemsHelperView];
+        [self showNoItemsHelperView];
         return;
     }
     
@@ -230,7 +230,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
     if (!self.noItemsHelperView) {
         [self stopAndRemoveLoader];
-        [self displayNoItemsHelperView];
+        [self showNoItemsHelperView];
     }
 }
 
@@ -468,12 +468,11 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 #pragma mark - Helper View
 
-- (void)displayNoItemsHelperView {
+- (void)showNoItemsHelperView {
     CGFloat p2 = [Geometry extendedPadding];
     
     HelperView *helperView = [[HelperView alloc] init];
     helperView.translatesAutoresizingMaskIntoConstraints = NO;
-    helperView.userInteractionEnabled = NO;
     helperView.backgroundColor = self.view.backgroundColor;
     helperView.titleLabel.text = @"No Items Found";
     helperView.subtitleLabel.text = @"No visually similar products were detected";
@@ -484,6 +483,26 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-p2].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
+    
+    MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
+    retryButton.translatesAutoresizingMaskIntoConstraints = NO;
+    retryButton.backgroundColor = [UIColor crazeGreen];
+    [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
+    [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
+    [helperView.contentView addSubview:retryButton];
+    [retryButton.bottomAnchor constraintEqualToAnchor:helperView.contentView.bottomAnchor].active = YES;
+    [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+}
+
+- (void)hideNoItemsHelperView {
+    [self.noItemsHelperView removeFromSuperview];
+    self.noItemsHelperView = nil;
+}
+
+- (void)noItemsRetryAction {
+    [self.shoppablesController fetchShoppables]; // TODO: why does the delegate not return?
+    [self hideNoItemsHelperView];
+    [self.loader startAnimation:LoaderAnimationSpin];
 }
 
 @end
