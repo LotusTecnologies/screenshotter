@@ -501,7 +501,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)noItemsRetryAction {
-    [self.shoppablesController fetchShoppables]; // TODO: why does the delegate not return?
+    [self.shoppablesController refetchShoppables];
     [self hideNoItemsHelperView];
     [self.loader startAnimation:LoaderAnimationSpin];
 }
