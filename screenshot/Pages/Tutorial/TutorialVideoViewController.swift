@@ -51,6 +51,8 @@ class TutorialVideoViewController : BaseViewController {
     
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
+    
+    private var observers = [NSKeyValueObservation]()
     private var ended = false
     
     // MARK: - Initialization
@@ -91,7 +93,7 @@ class TutorialVideoViewController : BaseViewController {
         
         // Add player layer
         view.layer.addSublayer(playerLayer)
-
+        
         // Add overlay VC
         overlayViewController.willMove(toParentViewController: self)
         addChildViewController(overlayViewController)
@@ -99,19 +101,50 @@ class TutorialVideoViewController : BaseViewController {
         view.addSubview(overlayViewController.view)
         
         overlayViewController.replayButtonTapped = replayButtonTapped
+        overlayViewController.volumeToggleButtonTapped = {
+            guard let button = self.overlayViewController.volumeToggleButton else {
+                return
+            }
+            
+            if AVAudioSession.sharedInstance().outputVolume == 0 && button.isSelected {
+                // Volume is muted, ask user to turn up the volume?
+ 
+                let alert = UIAlertController(title: "Turn up the volume!", message: "In order to hear the sound in the video, please turn up the volume on your phone!", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                    alert.dismiss(animated: true, completion: nil)
+                }))
+                
+                self.present(alert, animated: true)
+                
+                return
+            }
+            
+            button.isSelected = !button.isSelected
+            self.player.isMuted = button.isSelected
+        }
+        
         overlayViewController.doneButtonTapped = {
             track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
             
             self.delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
         }
         
+        observers.removeAll()
+        observers.append(AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.new, .initial]) { session, change in
+            guard let newVolume = change.newValue else {
+                return
+            }
+            
+            self.overlayViewController.volumeToggleButton.isSelected = newVolume == 0
+        })
+        
         // Add tap gesture recognizer
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
         
-        if self.player.playbackState == .paused {
-            self.player.play()
-            self.delegate?.tutorialVideoViewControllerDidPlay?(self)
+        if player.playbackState == .paused {
+            player.play()
+            delegate?.tutorialVideoViewControllerDidPlay?(self)
             
             track("Started Tutorial Video")
         }
@@ -135,45 +168,39 @@ class TutorialVideoViewController : BaseViewController {
         playerLayer.frame = view.bounds
     }
     
-    // MARK: - Player state observation
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard let video = video,
-            let playerItem = object as? AVPlayerItem,
-            playerItem == player.currentItem else {
-            return
-        }
-        
-        if case .Ambassador(_) = video,
-            playerItem.status == .failed {
-            guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
-                return
-            }
-
-            // Ambassador video failed to download, use standard one.
-            playerItem.removeObserver(self, forKeyPath: "status")
-
-            self.video = .Standard
-            
-            let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
-            player.replaceCurrentItem(with: standardPlayerItem)
-            beginObserving(playerItem: standardPlayerItem)
-            player.play()
-            delegate?.tutorialVideoViewControllerDidPlay?(self)
-        }
-    }
-    
     // MARK: - Private
     
     private func beginObserving(playerItem item:AVPlayerItem) {
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
-        
-        item.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
+
+        observers.append(item.observe(\.status, options: [.new, .initial]) { playerItem, change in
+            guard let video = self.video, playerItem == self.player.currentItem else {
+                return
+            }
+            
+            if case .Ambassador(_) = video,
+                playerItem.status == .failed {
+                guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
+                    return
+                }
+                
+                // Ambassador video failed to download, use standard one
+                
+                self.video = .Standard
+                
+                let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
+                self.player.replaceCurrentItem(with: standardPlayerItem)
+                self.beginObserving(playerItem: standardPlayerItem)
+                self.player.play()
+                self.delegate?.tutorialVideoViewControllerDidPlay?(self)
+            }
+        })
     }
     
     private func endObserving() {
-        player.currentItem?.removeObserver(self, forKeyPath: "status")
+        observers.forEach { $0.invalidate() }
+        
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -202,6 +229,8 @@ class TutorialVideoViewController : BaseViewController {
             overlayViewController.showReplayButton()
         }
         
+        overlayViewController.hideVolumeToggleButton()
+        
         track("Completed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidEnd?(self)
     }
@@ -213,6 +242,7 @@ class TutorialVideoViewController : BaseViewController {
         player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale)) { finished in
             if finished {
                 self.player.play()
+                self.overlayViewController.showVolumeToggleButton()
             }
         }
         

@@ -13,11 +13,16 @@ class TutorialVideoOverlayViewController : UIViewController {
     private var replayButton: UIButton!
     private var pauseButton: UIButton!
     
+    var volumeToggleButton: UIButton!
+    
     // Closure to be executed when the done button is tapped
     var doneButtonTapped: (() -> Void)?
 
     // Closure to be executed when the replay button is tapped
     var replayButtonTapped: (() -> Void)?
+    
+    // Closure to be executed when the volume toggle button is tapped
+    var volumeToggleButtonTapped: (() -> Void)?
     
     // MARK: - UIViewController
     override func viewDidLoad() {
@@ -31,11 +36,27 @@ class TutorialVideoOverlayViewController : UIViewController {
             }, completion: nil)
         }
         
+        setupVolumeToggleButton()
         setupReplayButton()
         setupPauseButton()
     }
 
     // MARK: - Public
+    
+    func hideVolumeToggleButton() {
+        UIView.animate(withDuration: 0.5) {
+            self.volumeToggleButton.alpha = 0
+            self.volumeToggleButton.isHidden = true
+        }
+    }
+    
+    func showVolumeToggleButton() {
+        volumeToggleButton.isHidden = false
+        
+        UIView.animate(withDuration: 0.5) {
+            self.volumeToggleButton.alpha = 1
+        }
+    }
     
     func flashPauseOverlay() {
         pauseButton.alpha = 0
@@ -81,7 +102,29 @@ class TutorialVideoOverlayViewController : UIViewController {
         replayButtonTapped?()
     }
     
+    @objc func didTapOnVolumeToggleButton() {
+        volumeToggleButtonTapped?()
+    }
+    
     // MARK: - Button Setup
+    
+    private func setupVolumeToggleButton() {
+        volumeToggleButton = UIButton(frame: .zero)
+        volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
+        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoUnmuted"), for: .normal)
+        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoMuted"), for: .selected)
+        volumeToggleButton.backgroundColor = .clear
+        volumeToggleButton.addTarget(self, action: #selector(didTapOnVolumeToggleButton), for: .touchUpInside)
+        
+        view.addSubview(volumeToggleButton)
+        
+        NSLayoutConstraint.activate([
+            volumeToggleButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -Geometry.padding()),
+            volumeToggleButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -Geometry.padding()),
+            volumeToggleButton.widthAnchor.constraint(equalToConstant: 50),
+            volumeToggleButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
     
     private func setupPauseButton() {
         pauseButton = UIButton(frame: .zero)
