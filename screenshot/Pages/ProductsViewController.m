@@ -485,6 +485,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-p2].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
+    
+    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
 }
 
 @end
