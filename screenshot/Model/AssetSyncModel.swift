@@ -651,6 +651,10 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    @objc public func refetchShoppables(screenshot: Screenshot) {
+        
+    }
+
 }
 
 extension AssetSyncModel {
