@@ -47,8 +47,14 @@
 
 - (void)applicationUserDidTakeScreenshot {
     if (self.window) {
-        UIGraphicsBeginImageContext(self.window.bounds.size);
-        [self.window drawViewHierarchyInRect:self.window.bounds afterScreenUpdates:NO];
+        CGFloat screenScale = [UIScreen mainScreen].scale;
+        
+        CGRect rect = CGRectZero;
+        rect.size.width = self.window.bounds.size.width * screenScale;
+        rect.size.height = self.window.bounds.size.height * screenScale;
+        
+        UIGraphicsBeginImageContext(rect.size);
+        [self.window drawViewHierarchyInRect:rect afterScreenUpdates:NO];
         UIImage *snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         
