@@ -38,7 +38,8 @@ class DiscoverWebViewController : WebViewController {
         (leftItems + rightItems).forEach { $0.isEnabled = false }
         
         super.viewDidLoad()
-
+        
+        webView.scrollView.delegate = self
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
     }
     
@@ -77,3 +78,8 @@ class DiscoverWebViewController : WebViewController {
     }
 }
 
+extension DiscoverWebViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return nil
+    }
+}
