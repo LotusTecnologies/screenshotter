@@ -23,8 +23,6 @@
 @property (nonatomic, strong) UIView *loadingCoverView;
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) UIToolbar *toolbar;
-@property (nonatomic, strong) UIBarButtonItem *backItem;
-@property (nonatomic, strong) UIBarButtonItem *forwardItem;
 
 @end
 
@@ -38,6 +36,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _toolbarEnabled = YES;
+        [self setupBarButtonItems];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     }
@@ -62,30 +61,7 @@
         view;
     });
     
-    _toolbar = ({
-        UIToolbar *toolbar = [[UIToolbar alloc] init];
-        toolbar.frame = CGRectMake(0.f, 0.f, 0.f, [toolbar intrinsicContentSize].height);
-        toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-        toolbar.hidden = !self.toolbarEnabled;
-        [self.view addSubview:toolbar];
-        [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        toolbar;
-    });
-    [self updateToolbarItems];
-    
-    self.webView.scrollView.contentInset = ({
-        UIEdgeInsets insets = self.webView.scrollView.contentInset;
-        insets.bottom = self.toolbar.bounds.size.height;
-        insets;
-    });
-
-    self.webView.scrollView.scrollIndicatorInsets = ({
-        UIEdgeInsets insets = self.webView.scrollView.scrollIndicatorInsets;
-        insets.bottom = self.toolbar.bounds.size.height;
-        insets;
-    });
+    [self setBarButtonItemsToToolbarIfPossible];
     
     [self showLoadingView];
     
@@ -131,44 +107,95 @@
 
 #pragma mark - Toolbar
 
-- (void)setToolbarEnabled:(BOOL)toolbarEnabled {
-    _toolbarEnabled = toolbarEnabled;
-    self.toolbar.hidden = !toolbarEnabled;
+- (UIToolbar *)toolbar {
+    if (!_toolbar) {
+        UIToolbar *toolbar = [[UIToolbar alloc] init];
+        toolbar.frame = CGRectMake(0.f, 0.f, 0.f, [toolbar intrinsicContentSize].height);
+        toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+        toolbar.hidden = !self.toolbarEnabled;
+        [self.view addSubview:toolbar];
+        [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+        [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        _toolbar = toolbar;
+        
+        self.webView.scrollView.contentInset = ({
+            UIEdgeInsets insets = self.webView.scrollView.contentInset;
+            insets.bottom = self.toolbar.bounds.size.height;
+            insets;
+        });
+        
+        self.webView.scrollView.scrollIndicatorInsets = ({
+            UIEdgeInsets insets = self.webView.scrollView.scrollIndicatorInsets;
+            insets.bottom = self.toolbar.bounds.size.height;
+            insets;
+        });
+    }
+    return _toolbar;
 }
 
-- (void)updateToolbarItems {
-    UIBarButtonItem *fixed = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    fixed.width = [Geometry padding];
+- (void)setToolbarEnabled:(BOOL)toolbarEnabled {
+    _toolbarEnabled = toolbarEnabled;
+    _toolbar.hidden = !toolbarEnabled;
+}
+
+- (void)setupBarButtonItems {
+    _backItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(backAction)];
     
-    UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    
-    self.backItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(backAction)];
-    
-    self.forwardItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardAction)];
+    _forwardItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardAction)];
     
     [self syncToolbarNavigationItems];
     
-    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Refresh"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshAction)];
+    _refreshItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Refresh"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshAction)];
     
-    UIBarButtonItem *share = ({
-        UIBarButtonItem *item;
+    _shareItem = [self createShareItem];
+    
+    _safariItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Safari"] style:UIBarButtonItemStylePlain target:self action:@selector(safariAction)];
+    
+    UIColor *color = [UIColor crazeRed];
+    self.backItem.tintColor = color;
+    self.forwardItem.tintColor = color;
+    self.refreshItem.tintColor = color;
+    self.safariItem.tintColor = color;
+}
+
+- (void)setBarButtonItemsToToolbarIfPossible {
+    if (self.toolbarEnabled) {
+        UIBarButtonItem *fixed = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+        fixed.width = [Geometry padding];
         
-        if (_isShorteningUrl) {
-            UIActivityIndicatorView *activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-            [activityIndicatorView startAnimating];
-            
-            item = [[UIBarButtonItem alloc] initWithCustomView:activityIndicatorView];
-            
-        } else {
-            item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareAction)];
-        }
+        UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
         
-        item;
-    });
+        self.toolbar.items = @[self.backItem, fixed, self.forwardItem, fixed, self.refreshItem, flexible, self.shareItem, fixed, self.safariItem];
+    }
+}
+
+- (UIBarButtonItem *)createShareItem {
+    UIBarButtonItem *item;
     
-    UIBarButtonItem *safari = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Safari"] style:UIBarButtonItemStylePlain target:self action:@selector(safariAction)];
+    if (_isShorteningUrl) {
+        UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        activityView.color = [UIColor crazeRed];
+        [activityView startAnimating];
+        
+        // Resize the width to the share icon's size to prevent sibling views from jumping
+        CGRect rect = activityView.frame;
+        rect.size.width = 30.f;
+        activityView.frame = rect;
+        
+        item = [[UIBarButtonItem alloc] initWithCustomView:activityView];
+        
+    } else {
+        item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareAction)];
+    }
     
-    self.toolbar.items = @[self.backItem, fixed, self.forwardItem, fixed, refresh, flexible, share, fixed, safari];
+    item.tintColor = [UIColor crazeRed];
+    return item;
+}
+
+- (void)updateShareItem {
+    _shareItem = [self createShareItem];
+    [self setBarButtonItemsToToolbarIfPossible];
 }
 
 - (void)syncToolbarNavigationItems {
@@ -286,7 +313,7 @@
 
 - (void)shareAction {
     _isShorteningUrl = YES;
-    [self updateToolbarItems];
+    [self updateShareItem];
     
     [NetworkingModel shortenUrl:self.url completion:^(NSURL * _Nullable url) {
         if (url) {
@@ -295,7 +322,7 @@
         }
         
         _isShorteningUrl = NO;
-        [self updateToolbarItems];
+        [self updateShareItem];
     }];
     
     [AnalyticsTrackers.standard track:@"Shared webpage" properties:@{@"url": self.url.absoluteString}];
