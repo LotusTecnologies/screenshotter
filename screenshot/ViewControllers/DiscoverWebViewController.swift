@@ -13,6 +13,13 @@ class DiscoverWebViewController : WebViewController {
     let backButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "Back"), style: .plain, target: self, action: #selector(backButtonTapped))
     let forwardButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "Forward"), style: .plain, target: self, action: #selector(forwardButtonTapped))
     
+    override var title: String? {
+        set {}
+        get {
+            return "Discover"
+        }
+    }
+    
     override func viewDidLoad() {
         toolbarEnabled = false
         
