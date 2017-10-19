@@ -160,10 +160,16 @@
         
         self.screenshotsViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activityView];
     }
+    
+    self.screenshotsViewController.navigationItem.leftBarButtonItem.tag += 1;
 }
 
 - (void)networkingIndicatorDidCompleteWithType:(enum NetworkingIndicatorType)type {
-    self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    self.screenshotsViewController.navigationItem.leftBarButtonItem.tag -= 1;
+    
+    if (self.screenshotsViewController.navigationItem.leftBarButtonItem.tag == 0) {
+        self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    }
 }
 
 @end
