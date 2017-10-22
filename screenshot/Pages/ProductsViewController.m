@@ -402,14 +402,19 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)presentSortPicker:(ProductsViewControllerControl *)control {
-    UIPickerView *picker = [[UIPickerView alloc] init];
-    picker.delegate = self;
-    picker.dataSource = self;
-    picker.backgroundColor = [UIColor whiteColor];
-    [picker selectRow:self.currentSortType inComponent:0 animated:NO];
-    
-    control.customInputView = picker;
-    [control becomeFirstResponder];
+    if ([control isFirstResponder]) {
+        [control resignFirstResponder];
+        
+    } else {
+        UIPickerView *picker = [[UIPickerView alloc] init];
+        picker.delegate = self;
+        picker.dataSource = self;
+        picker.backgroundColor = [UIColor whiteColor];
+        [picker selectRow:self.currentSortType inComponent:0 animated:NO];
+        
+        control.customInputView = picker;
+        [control becomeFirstResponder];
+    }
 }
 
 - (void)dismissSortPicker {
