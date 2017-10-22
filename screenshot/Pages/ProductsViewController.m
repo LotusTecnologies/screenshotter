@@ -95,6 +95,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                  @(ShoppableSortTypeBrands): [ShoppableSortItem title:@"Brands"]
                                  };
         
+        _currentSortType = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productSort]];
+        
         self.title = @"Products";
     }
     return self;
@@ -431,6 +433,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     self.currentSortType = row;
+    [[NSUserDefaults standardUserDefaults] setInteger:row forKey:[UserDefaultsKeys productSort]];
+    
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     [self.navigationController.navigationBar endEditing:YES];
 }
