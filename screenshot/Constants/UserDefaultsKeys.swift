@@ -12,15 +12,14 @@ class UserDefaultsKeys : NSObject {
     static let email = "Email"
     static let name = "Name"
     static let userID = "UserID"
-    static let ambasssadorUsername = "ambasssadorUsername"
+    static let ambasssadorUsername = "AmbasssadorUsername"
     
-    static let discoverUrl = "discoverUrl"
+    static let discoverUrl = "DiscoverUrl"
     
     static let tutorialCompleted = "TutorialCompleted"
     static let tutorialPresentedScreenshotHelper = "TutorialPresentedScreenshotHelper"
     static let tutorialPresentedProductHelper = "TutorialPresentedProductHelper"
     static let tutorialShouldPresentScreenshotPicker = "TutorialShouldPresentScreenshotPicker"
-    static let tutorialScreenshotAssetId = "TutorialScreenshotAssetId" // !!!: Not being used, can be removed.
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     
     static let dateInstalled = "DateInstalled"
