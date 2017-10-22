@@ -49,32 +49,6 @@ public class TutorialTrySlideView : HelperView {
     // MARK: Screenshot handling
     
     @objc func applicationUserDidTakeScreenshot() {
-        /*
-         if (self.window) {
-         CGFloat screenScale = [UIScreen mainScreen].scale;
-         
-         CGRect rect = CGRectZero;
-         rect.size.width = self.window.bounds.size.width * screenScale;
-         rect.size.height = self.window.bounds.size.height * screenScale;
-         
-         UIGraphicsBeginImageContext(rect.size);
-         [self.window drawViewHierarchyInRect:rect afterScreenUpdates:NO];
-         UIImage *snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
-         UIGraphicsEndImageContext();
-         
-         [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto response:^(BOOL granted) {
-         [[AssetSyncModel sharedInstance] syncTutorialPhotoWithImage:snapshotImage];
-         
-         if (!granted) {
-         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-         [[NSUserDefaults standardUserDefaults] synchronize];
-         }
-         
-         [self.delegate tutorialTrySlideViewDidComplete:self];
-         }];
-         }
- */
-        
         guard let window = window else {
             return
         }
@@ -89,8 +63,21 @@ public class TutorialTrySlideView : HelperView {
         window.drawHierarchy(in: rect, afterScreenUpdates: false)
         snapshotImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-    
         
+        guard let image = snapshotImage else {
+            return
+        }
+    
+        PermissionsManager.shared().requestPermission(for: .photo) { granted in
+            AssetSyncModel.sharedInstance.syncTutorialPhoto(image: image)
+            
+            if granted == false {
+                UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialShouldPresentScreenshotPicker)
+                UserDefaults.standard.synchronize()
+            }
+            
+            self.delegate?.tutorialTrySlideViewDidComplete(self)
+        }
     }
 }
 

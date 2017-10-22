@@ -18,13 +18,7 @@ public class HelperView : UIView {
     //  Setting this will center an imageView in the contentView
     public var contentImage: UIImage? {
         didSet {
-            guard let _ = contentImage else {
-                imageView?.removeFromSuperview()
-                imageView = nil
-                return
-            }
-            
-            if imageView == nil {
+            if imageView == nil && contentImage != nil {
                 let imageView = UIImageView()
                 imageView.translatesAutoresizingMaskIntoConstraints = false
                 imageView.contentMode = .scaleAspectFit
@@ -37,6 +31,8 @@ public class HelperView : UIView {
                 
                 self.imageView = imageView
             }
+            
+            imageView?.image = contentImage
         }
     }
     
@@ -45,6 +41,8 @@ public class HelperView : UIView {
     }
     
     override init(frame: CGRect) {
+        super.init(frame: frame)
+        
         titleLabel = { _ -> UILabel in
             let label = UILabel()
 
@@ -94,6 +92,7 @@ public class HelperView : UIView {
         
         contentView = { _ -> UIView in
             let view = UIView()
+            addSubview(view)
             view.translatesAutoresizingMaskIntoConstraints = false
             
             NSLayoutConstraint.activate([

@@ -7,7 +7,7 @@
 //
 
 #import "InsetPresentationController.h"
-
+#import "screenshot-Swift.h"
 
 @interface InsetPresentationController ()
 

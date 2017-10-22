@@ -21,10 +21,10 @@ public class TutorialEmailSlideView : HelperView {
     let emailTextField = UITextField()
     let textView = TappableTextView()
     let button = MainButton()
-    var expandableViewHeightConstraint: NSLayoutConstraint
+    var expandableViewHeightConstraint: NSLayoutConstraint!
     
-    var keyboardFrame: CGRect
-    var readyToSubmit: Bool
+    var keyboardFrame: CGRect = .zero
+    var readyToSubmit: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -101,105 +101,96 @@ public class TutorialEmailSlideView : HelperView {
             return label
         }()
         
-        emailTextField = { _ -> UITextField in
-            let textField = UITextField()
-            textField.translatesAutoresizingMaskIntoConstraints = false
-            textField.delegate = self
-            textField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-            textField.placeholder = "yourname@website.com"
-            textField.keyboardType = .emailAddress
-            textField.backgroundColor = .white
-            textField.borderStyle = .roundedRect
-            textField.spellCheckingType = .no
-            textField.autocorrectionType = .no
-            textField.autocapitalizationType = .none
+        ({ _ in
+            emailTextField.translatesAutoresizingMaskIntoConstraints = false
+            emailTextField.delegate = self
+            emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
+            emailTextField.placeholder = "yourname@website.com"
+            emailTextField.keyboardType = .emailAddress
+            emailTextField.backgroundColor = .white
+            emailTextField.borderStyle = .roundedRect
+            emailTextField.spellCheckingType = .no
+            emailTextField.autocorrectionType = .no
+            emailTextField.autocapitalizationType = .none
             
-            contentView.addSubview(textField)
-            textField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
+            contentView.addSubview(emailTextField)
+            emailTextField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
             
             NSLayoutConstraint.activate([
-                textField.topAnchor.constraint(equalTo: emailLabel.layoutMarginsGuide.bottomAnchor),
-                textField.leadingAnchor.constraint(equalTo: emailLabel.leadingAnchor),
-                textField.trailingAnchor.constraint(equalTo: emailLabel.trailingAnchor),
-                textField.heightAnchor.constraint(equalTo: nameTextField.heightAnchor)
+                emailTextField.topAnchor.constraint(equalTo: emailLabel.layoutMarginsGuide.bottomAnchor),
+                emailTextField.leadingAnchor.constraint(equalTo: emailLabel.leadingAnchor),
+                emailTextField.trailingAnchor.constraint(equalTo: emailLabel.trailingAnchor),
+                emailTextField.heightAnchor.constraint(equalTo: nameTextField.heightAnchor)
             ])
-            
-            return textField
-        }()
-        
-        button = { _ -> MainButton in
+        })()
+
+        ({ _ in
             let p2 = Geometry.extendedPadding
 
-            let button = MainButton(type: .custom)
             button.translatesAutoresizingMaskIntoConstraints = false
             button.setTitle("Submit", for: .normal)
             button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
-            
+        
             contentView.addSubview(button)
             button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            
+        
             NSLayoutConstraint.activate([
                 button.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: p2),
                 button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
                 button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
                 button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
             ])
-            
-            return button
-        }()
+        })()
         
-        textView = { _ -> TappableTextView in
-            let textView = TappableTextView()
-            return textView
+        ({
+            textView.delegate = self
+            textView.translatesAutoresizingMaskIntoConstraints = false
+            textView.backgroundColor = .clear
+            textView.textColor = .gray6
+            textView.textAlignment = .center
+            textView.font = UIFont.preferredFont(forTextStyle: .footnote)
+            textView.isEditable = false
+            textView.isScrollEnabled = false
+            textView.scrollsToTop = false
             
-            /*
- TappableTextView *textView = [[TappableTextView alloc] init];
- textView.delegate = self;
- textView.translatesAutoresizingMaskIntoConstraints = NO;
- textView.backgroundColor = [UIColor clearColor];
- textView.textColor = [UIColor gray6];
- textView.textAlignment = NSTextAlignmentCenter;
- textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
- textView.editable = NO;
- textView.scrollEnabled = NO;
- textView.scrollsToTop = NO;
- [self.contentView addSubview:textView];
- [textView setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
- [textView.topAnchor constraintGreaterThanOrEqualToAnchor:self.button.bottomAnchor constant:p].active = YES;
- [textView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
- [textView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
- [textView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
- 
- NSArray *tappableText = @[@{@"By tapping \"Submit\" above, you agree to our\n ": @NO},
- @{@"Terms of Service": @YES},
- @{@" and ": @NO},
- @{@"Privacy Policy": @YES},
- @{@" ": @NO}
- ];
- 
- NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
- paragraph.alignment = textView.textAlignment;
- 
- NSDictionary *attributes = @{NSFontAttributeName: textView.font,
- NSParagraphStyleAttributeName: paragraph
- };
- 
- [textView applyTappableText:tappableText withAttributes:attributes];
- textView;
- });
- */
-        }()
+            contentView.addSubview(textView)
+            
+            textView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+            
+            NSLayoutConstraint.activate([
+                textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor),
+                textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: p),
+                textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+                textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            ])
+            
+            let tappableText:[[String: NSNumber]] = [
+                ["By tapping \"Submit\" above, you agree to our\n": NSNumber(value:false)],
+                ["Terms of Service": NSNumber(value:true)],
+                [" and ": NSNumber(value:false)],
+                ["Privacy Policy": NSNumber(value:true)],
+                [" ": NSNumber(value:false)]
+            ]
+            
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.alignment = textView.textAlignment
+            
+            let attributes = [ NSFontAttributeName : textView.font!,
+                               NSParagraphStyleAttributeName : paragraph ] as [String : Any]
+            textView.applyTappableText(tappableText, withAttributes: attributes)
+        })()
+
+        ({ _ in
+            let expandableView = UIView()
+            expandableView.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(expandableView)
+            
+            expandableView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+            expandableViewHeightConstraint = NSLayoutConstraint(item: expandableView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0)
+            expandableViewHeightConstraint.isActive = true
+        })()
         
-        /*
- UIView *expandableView = [[UIView alloc] init];
- expandableView.translatesAutoresizingMaskIntoConstraints = NO;
- [self.contentView addSubview:expandableView];
- [expandableView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
- _expandableViewHeightConstraint = [NSLayoutConstraint constraintWithItem:expandableView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:0.f];
- self.expandableViewHeightConstraint.active = YES;
- 
- [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resignTextField)]];
-*/
+        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -215,42 +206,38 @@ public class TutorialEmailSlideView : HelperView {
     // MARK: Actions
     
     @objc private func submitEmail() {
-        /*
- self.readyToSubmit = YES;
- 
- NSString *trimmedName = [self.nameTextField.text trimWhitespace] ?: @"";
- NSString *trimmedEmail = [self.emailTextField.text isValidEmail] ? [self.emailTextField.text trimWhitespace] : nil;
- 
- [[NSUserDefaults standardUserDefaults] setValue:trimmedName forKey:UserDefaultsKeys.name];
- [[NSUserDefaults standardUserDefaults] setValue:trimmedEmail forKey:UserDefaultsKeys.email];
- 
- AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:trimmedName email:trimmedEmail];
- [AnalyticsTrackers.standard identify:user];
- [AnalyticsTrackers.branch identify:user];
- 
- 
- if (trimmedEmail.length > 0) {
- [AnalyticsTrackers.standard track:@"Submitted email" properties:@{ @"id": user.identifier, @"name": trimmedName, @"email": trimmedEmail ?: @"" }];
- } else {
- [AnalyticsTrackers.standard track:@"Submitted blank email" properties:@{ @"id" : user.identifier, @"name": trimmedName }];
- }
- 
- NSString *ambassadorUsername = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys ambasssadorUsername]];
- if (ambassadorUsername != nil) {
- [AnalyticsTrackers.standard track:@"Referring Ambassador" properties:@{ @"username": ambassadorUsername}];
- }
- 
- [[NSUserDefaults standardUserDefaults] setValue:user.identifier forKey:UserDefaultsKeys.userID];
- [[NSUserDefaults standardUserDefaults] synchronize];
- 
- [self informDelegateOfSubmittedEmailIfPossible];
- [self.emailTextField resignFirstResponder];
-
-         */
+        readyToSubmit = true
         
+        let trimmedName = nameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
+        let trimmedEmail = (emailTextField.text?.isValidEmail() ?? false) ? (emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? "") : ""
+        
+        UserDefaults.standard.set(trimmedName, forKey: UserDefaultsKeys.name)
+        UserDefaults.standard.set(trimmedEmail, forKey: UserDefaultsKeys.email)
+        
+        let user = identify(trimmedName, email: trimmedEmail)
+        _ = identify(trimmedName, email: trimmedEmail, tracker: AnalyticsTrackers.branch)
+        
+        if trimmedEmail.count > 0 {
+            track("Submitted email", properties: ["id" : user.identifier,
+                                                  "name" : trimmedName,
+                                                  "email": trimmedEmail])
+        } else {
+            track("Submitted blank email", properties: [ "id" : user.identifier,
+                                                         "name" : trimmedName])
+        }
+
+        if let ambassadorUsername = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername) {
+            track("Referring Ambassador", properties: ["username": ambassadorUsername])
+        }
+        
+        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
+        UserDefaults.standard.synchronize()
+        
+        informDelegateOfSubmittedEmailIfPossible()
+        emailTextField.resignFirstResponder()
     }
     
-    private func resignTextField() {
+    @objc private func resignTextField() {
         endEditing(true)
     }
     
@@ -322,7 +309,17 @@ public class TutorialEmailSlideView : HelperView {
 }
 
 extension TutorialEmailSlideView : TappableTextViewDelegate {
-    
+    public func tappableTextView(_ textView: TappableTextView!, tappedTextAt index: UInt) {
+        switch index {
+        case 3:
+            delegate?.tutorialEmailSlideViewDidTapPrivacyPolicy(self)
+        case 1:
+            delegate?.tutorialEmailSlideViewDidTapTermsOfService(self)
+            break
+        default:
+            break
+        }
+    }
 }
 
 extension TutorialEmailSlideView : UITextFieldDelegate {
@@ -360,17 +357,6 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
         return true
     }
 }
-
-//extension TutorialEmailSlideView : TappableTextViewDelegate {
-    /*
- if (index == 1) {
- [self.delegate tutorialEmailSlideViewDidTapTermsOfService:self];
- 
- } else if (index == 3) {
- [self.delegate tutorialEmailSlideViewDidTapPrivacyPolicy:self];
- }
-*/
-//}
 
 extension TutorialEmailSlideView : TutorialSlideView {
     public func didEnterSlide() {
