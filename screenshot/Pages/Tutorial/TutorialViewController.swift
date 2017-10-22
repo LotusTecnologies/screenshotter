@@ -33,9 +33,9 @@ class TutorialViewController : UIViewController {
     
     // MARK: Slides
     
-    var slides = [TutorialBaseSlideView]()
+    var slides = [UIView]()
     
-    private func buildSlides() -> [TutorialBaseSlideView] {
+    private func buildSlides() -> [UIView] {
         let welcomeSlide = TutorialWelcomeSlideView()
         welcomeSlide.getStartedButtonTapped = presentVideo
         
@@ -56,7 +56,7 @@ class TutorialViewController : UIViewController {
         return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
     }
     
-    fileprivate var currentSlide: TutorialBaseSlideView {
+    fileprivate var currentSlide: UIView {
         return slides[currentSlideIndex]
     }
     
@@ -143,7 +143,7 @@ class TutorialViewController : UIViewController {
         }
         
         scrollViewIsScrollingAnimation = true
-        currentSlide.willLeaveSlide()
+        (currentSlide as? TutorialSlideView)?.willLeaveSlide()
         
         var offset = CGPoint.zero
         offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
@@ -151,7 +151,7 @@ class TutorialViewController : UIViewController {
     }
     
     private func prepareSlideViews() {
-        let padding = Geometry.padding()
+        let padding = Geometry.padding
         let top = contentView.layoutMargins.top
         
         slides.enumerated().forEach { i, slide in
@@ -168,7 +168,7 @@ class TutorialViewController : UIViewController {
             
             if i == 0 {
                 slide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-                slide.didEnterSlide()
+                (slide as? TutorialSlideView)?.didEnterSlide()
                 
             } else if i == slides.count - 1 {
                 slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -190,7 +190,9 @@ extension TutorialViewController : UIScrollViewDelegate {
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         scrollViewIsScrollingAnimation = false
         
-        currentSlide.didEnterSlide()
+        if let slide = currentSlide as? TutorialSlideView {
+            slide.didEnterSlide()
+        }
     }
 }
 
@@ -202,26 +204,25 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate {
 }
 
 extension TutorialViewController : TutorialEmailSlideViewDelegate {
-    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView!) {
+    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView) {
         slideView.delegate = nil
         scrollToNextSlide()
     }
     
-    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView!) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, doneAction: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
+        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {            present(vc, animated: true, completion: nil)
         }
     }
     
-    func tutorialEmailSlideViewDidTapTerms(ofService slideView: TutorialEmailSlideView!) {
-        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, doneAction:#selector(dismissViewController)) {
+    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView) {
+        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
             present(vc, animated: true, completion: nil)
         }
     }
 }
 
 extension TutorialViewController : TutorialTrySlideViewDelegate {
-    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView!) {
+    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)

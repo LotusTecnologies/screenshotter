@@ -8,7 +8,7 @@
 
 #import "WebViewController.h"
 #import "Loader.h"
-#import "Geometry.h"
+
 #import "NetworkingModel.h"
 #import "screenshot-Swift.h"
 

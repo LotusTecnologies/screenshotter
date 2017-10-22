@@ -47,7 +47,7 @@ class ScreenshotsHelperView: HelperView {
         
         typeConstraints = [
             .permission: [
-                imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Geometry.padding())
+                imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Geometry.padding)
             ],
             .screenshot: [
                 imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)

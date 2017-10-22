@@ -8,7 +8,7 @@
 
 import Foundation
 
-class TutorialWelcomeSlideView : TutorialBaseSlideView {
+class TutorialWelcomeSlideView : HelperView {
     var getStartedButtonTapped: (() -> Void)?
     
     override init(frame: CGRect) {
@@ -24,12 +24,12 @@ class TutorialWelcomeSlideView : TutorialBaseSlideView {
         button.backgroundColor = .crazeGreen
         button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
         contentView.addSubview(button)
-        button.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -Geometry.extendedPadding()).isActive = true
+        button.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -Geometry.extendedPadding).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Actions
