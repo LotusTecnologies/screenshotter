@@ -12,6 +12,8 @@ import Analytics
 import Appsee
 import FBSDKLoginKit
 import Branch
+import Firebase
+import GoogleSignIn
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -76,12 +78,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         // pass the url to the handle deep link call
-        let branchHandled = Branch.getInstance().application(app,
-                                                             open: url,
-                                                             options:options)
-        if (!branchHandled) {
+        var handled = Branch.getInstance().application(app, open: url, options:options)
+        
+        if (!handled) {
+            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: [:])
+        }
+        
+        if (!handled) {
             let _ = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
+        
         return true
     }
     
@@ -153,6 +160,11 @@ extension AppDelegate {
         RatingFlow.sharedInstance.start()
         
         IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
+        
+        FirebaseApp.configure()
+        
+        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+        GIDSignIn.sharedInstance().delegate = self
     }
 
     // MARK: - Appearance
@@ -222,6 +234,28 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
+    }
+}
+
+extension AppDelegate: GIDSignInDelegate {
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
+        // ...
+        if let error = error {
+            print("google sign in error: \(error)")
+            return
+        }
+        
+        guard let authentication = user.authentication else {
+            return
+        }
+        
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
+        print("google sign in credentials: \(credential)")
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        // Perform any operations when the user disconnects from app here.
+        // ...
     }
 }
 

@@ -12,7 +12,9 @@
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate> {
+@import GoogleSignIn;
+
+@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, GIDSignInUIDelegate> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -98,6 +100,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
     self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
     [self.updatePromptHandler start];
+    
+    [GIDSignIn sharedInstance].uiDelegate = self;
+    [[GIDSignIn sharedInstance] signIn];
+    
+    // TODO(developer) Configure the sign-in button look/feel
+    // ...
 }
 
 - (void)viewWillAppear:(BOOL)animated {

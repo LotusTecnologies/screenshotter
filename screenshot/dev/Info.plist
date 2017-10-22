@@ -36,6 +36,14 @@
 				<string>io.crazeapp.screenshot.dev</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.483336611267-9stav0igcmcqht8oae703lrndk0gqti6</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>40</string>
@@ -52,6 +60,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>This allows you to take photos of clothes and shop them!</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Sharing is caring</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
 	<key>UIBackgroundModes</key>
