@@ -20,6 +20,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
@@ -57,7 +58,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     CGFloat p = [Geometry padding];
     
-    self.collectionView = ({
+    _collectionView = ({
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = p;
         layout.minimumLineSpacing = p;
@@ -81,12 +82,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView;
     });
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.tintColor = [UIColor crazeRed];
-    [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
-    [self.collectionView addSubview:refreshControl];
+    _refreshControl = ({
+        UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+        refreshControl.tintColor = [UIColor crazeRed];
+        [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
+        [self.collectionView addSubview:refreshControl];
+        
+        // Recenter view
+        CGRect rect = refreshControl.subviews[0].frame;
+        rect.origin.x = -self.collectionView.contentInset.left / 2.f;
+        refreshControl.subviews[0].frame = rect;
+        refreshControl;
+    });
     
-    self.helperView = ({
+    _helperView = ({
         CGFloat p2 = [Geometry extendedPadding];
         
         ScreenshotsHelperView *helperView = [[ScreenshotsHelperView alloc] init];
