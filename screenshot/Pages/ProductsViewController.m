@@ -20,9 +20,21 @@
 
 typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeSimilar,
-    ShoppableSortTypePrice,
+    ShoppableSortTypePriceAsc,
+    ShoppableSortTypePriceDes,
     ShoppableSortTypeBrands
 };
+
+@interface ShoppableSortItem: NSObject
+
++ (ShoppableSortItem *)title:(NSString *)title;
++ (ShoppableSortItem *)title:(NSString *)title detail:(NSString *)detail;
+
+@property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *detail;
+@property (nonatomic, copy, readonly) NSString *detailedTitle;
+
+@end
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
@@ -34,7 +46,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
-@property (nonatomic, strong) NSDictionary<NSNumber *, NSString *> *shoppableSortTitles;
+@property (nonatomic, strong) NSDictionary<NSNumber *, ShoppableSortItem *> *shoppableSortTitles;
 @property (nonatomic) ShoppableSortType currentSortType;
 
 @property (nonatomic, copy) UIImage *image;
@@ -49,6 +61,25 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 @end
 
+@implementation ShoppableSortItem
+
++ (ShoppableSortItem *)title:(NSString *)title {
+    return [self title:title detail:nil];
+}
+
++ (ShoppableSortItem *)title:(NSString *)title detail:(NSString *)detail {
+    ShoppableSortItem *item = [[ShoppableSortItem alloc] init];
+    item.title = title;
+    item.detail = detail;
+    return item;
+}
+
+- (NSString *)detailedTitle {
+    return self.detail.length ? [NSString stringWithFormat:@"%@ %@", self.title, self.detail] : self.title;
+}
+
+@end
+
 @implementation ProductsViewController
 @synthesize shoppablesController = _shoppablesController;
 
@@ -58,9 +89,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _shoppableSortTitles = @{@(ShoppableSortTypeSimilar): @"Similar",
-                                 @(ShoppableSortTypePrice): @"Price",
-                                 @(ShoppableSortTypeBrands): @"Brands"
+        _shoppableSortTitles = @{@(ShoppableSortTypeSimilar): [ShoppableSortItem title:@"Similar"],
+                                 @(ShoppableSortTypePriceAsc): [ShoppableSortItem title:@"Price" detail:@"(lowest first)"],
+                                 @(ShoppableSortTypePriceDes): [ShoppableSortItem title:@"Price" detail:@"(highest first)"],
+                                 @(ShoppableSortTypeBrands): [ShoppableSortItem title:@"Brands"]
                                  };
         
         self.title = @"Products";
@@ -214,8 +246,12 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
             
-        case ShoppableSortTypePrice:
+        case ShoppableSortTypePriceAsc:
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
+            break;
+            
+        case ShoppableSortTypePriceDes:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:NO]];
             break;
             
         case ShoppableSortTypeBrands:
@@ -335,7 +371,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     [attributes setObject:[UIColor crazeGreen] forKey:NSForegroundColorAttributeName];
     
-    NSAttributedString *sortString = [[NSAttributedString alloc] initWithString:self.shoppableSortTitles[@(self.currentSortType)] attributes:attributes];
+    ShoppableSortItem *sortItem = self.shoppableSortTitles[@(self.currentSortType)];
+    NSAttributedString *sortString = [[NSAttributedString alloc] initWithString:sortItem.title attributes:attributes];
     [attributedString appendAttributedString:sortString];
     
     CGFloat offset = 3.f;
@@ -389,7 +426,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return self.shoppableSortTitles[@(row)];
+    return [self.shoppableSortTitles[@(row)] detailedTitle];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
