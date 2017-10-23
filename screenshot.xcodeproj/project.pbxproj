@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		521373E61F9CB1FD00763A80 /* TutorialExternalAppSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521373E51F9CB1FD00763A80 /* TutorialExternalAppSlideView.swift */; };
 		521373E81F9CB21C00763A80 /* TutorialSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521373E71F9CB21C00763A80 /* TutorialSlideView.swift */; };
 		521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */; };
 		522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522AF64D1F93348B00A7A151 /* TutorialViewController.swift */; };
@@ -80,7 +79,6 @@
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		521373E51F9CB1FD00763A80 /* TutorialExternalAppSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialExternalAppSlideView.swift; sourceTree = "<group>"; };
 		521373E71F9CB21C00763A80 /* TutorialSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialSlideView.swift; sourceTree = "<group>"; };
 		5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayViewController.swift; sourceTree = "<group>"; };
 		522AF64D1F93348B00A7A151 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
@@ -270,7 +268,6 @@
 				521373E71F9CB21C00763A80 /* TutorialSlideView.swift */,
 				525BBCF71F9CB8FF00330C95 /* TutorialEmailSlideView.swift */,
 				52F972EE1F9CE47D00946C8E /* TutorialTrySlideView.swift */,
-				521373E51F9CB1FD00763A80 /* TutorialExternalAppSlideView.swift */,
 				5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */,
 				522AF64D1F93348B00A7A151 /* TutorialViewController.swift */,
 				52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */,
@@ -734,7 +731,6 @@
 				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
 				C5AA81A21F97228100421909 /* FloatingActionButton.swift in Sources */,
 				521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */,
-				521373E61F9CB1FD00763A80 /* TutorialExternalAppSlideView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
