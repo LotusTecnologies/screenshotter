@@ -116,7 +116,7 @@
 - (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     Product *product = [viewController productAtIndex:indexPath.item];
     
-    [self.webViewController clearUrl];
+    [self.webViewController clearUrl]; // ???: doesnt seem to be clearing the previous page
     self.webViewController.url = [NSURL URLWithString:product.offer];
     [self pushViewController:self.webViewController animated:YES];
 }

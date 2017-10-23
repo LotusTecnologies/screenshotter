@@ -67,11 +67,15 @@
     
     [self setBarButtonItemsToToolbarIfPossible];
     
-    [self showLoadingView];
-    
     if (self.url) {
         [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
     }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self showLoadingView];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -245,6 +249,10 @@
 
 #pragma mark - Web View
 
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    [self showLoadingView];
+}
+
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self hideLoadingView];
 }
@@ -253,48 +261,50 @@
 #pragma mark - Loading
 
 - (void)showLoadingView {
-    _loadingCoverView = ({
-        UIView *view = [[UIView alloc] init];
-        view.translatesAutoresizingMaskIntoConstraints = NO;
-        view.backgroundColor = [UIColor whiteColor];
-        [self.view addSubview:view];
-        [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
-        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
-        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        view;
-    });
-    
-    _loader = ({
-        Loader *loader = [[Loader alloc] init];
-        loader.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.loadingCoverView addSubview:loader];
-        [loader.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
-        [NSLayoutConstraint constraintWithItem:loader attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.loadingCoverView attribute:NSLayoutAttributeCenterY multiplier:0.8f constant:0.f].active = YES;
-        loader;
-    });
-    
-    CGFloat padding = [Geometry padding];
-    
-    UILabel *loaderLabel = [[UILabel alloc] init];
-    loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    loaderLabel.text = self.loaderLabelText;
-    loaderLabel.textColor = [UIColor gray6];
-    loaderLabel.textAlignment = NSTextAlignmentCenter;
-    loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    [self.loadingCoverView addSubview:loaderLabel];
-    [loaderLabel.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:padding].active = YES;
-    [loaderLabel.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor constant:padding].active = YES;
-    [loaderLabel.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor constant:-padding].active = YES;
-    
-    MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
-    button.translatesAutoresizingMaskIntoConstraints = NO;
-    button.backgroundColor = [UIColor crazeGreen];
-    [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
-    [self.loadingCoverView addSubview:button];
-    [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
-    [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+    if (!self.loadingCoverView) {
+        _loadingCoverView = ({
+            UIView *view = [[UIView alloc] init];
+            view.translatesAutoresizingMaskIntoConstraints = NO;
+            view.backgroundColor = [UIColor whiteColor];
+            [self.view addSubview:view];
+            [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+            [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+            [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
+            [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+            view;
+        });
+        
+        _loader = ({
+            Loader *loader = [[Loader alloc] init];
+            loader.translatesAutoresizingMaskIntoConstraints = NO;
+            [self.loadingCoverView addSubview:loader];
+            [loader.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+            [NSLayoutConstraint constraintWithItem:loader attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.loadingCoverView attribute:NSLayoutAttributeCenterY multiplier:0.8f constant:0.f].active = YES;
+            loader;
+        });
+        
+        CGFloat padding = [Geometry padding];
+        
+        UILabel *loaderLabel = [[UILabel alloc] init];
+        loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        loaderLabel.text = self.loaderLabelText;
+        loaderLabel.textColor = [UIColor gray6];
+        loaderLabel.textAlignment = NSTextAlignmentCenter;
+        loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+        [self.loadingCoverView addSubview:loaderLabel];
+        [loaderLabel.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:padding].active = YES;
+        [loaderLabel.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor constant:padding].active = YES;
+        [loaderLabel.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor constant:-padding].active = YES;
+        
+        MainButton *button = [MainButton buttonWithType:UIButtonTypeCustom];
+        button.translatesAutoresizingMaskIntoConstraints = NO;
+        button.backgroundColor = [UIColor crazeGreen];
+        [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
+        [self.loadingCoverView addSubview:button];
+        [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
+        [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
+    }
 }
 
 - (void)hideLoadingView {
