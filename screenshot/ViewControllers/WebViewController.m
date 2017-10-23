@@ -51,7 +51,7 @@
     [super viewDidLoad];
     
     _webView = ({
-        WKWebView *view = [[WKWebView alloc] init];
+        WebView *view = [[WebView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
         view.navigationDelegate = self;
         [self.view addSubview:view];
@@ -120,14 +120,19 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    BOOL shouldCallSuper = YES;
+    
     if (object == self.webView) {
         if ([keyPath isEqualToString:NSStringFromSelector(@selector(canGoBack))] ||
             [keyPath isEqualToString:NSStringFromSelector(@selector(canGoForward))]) {
-            [self syncToolbarNavigationItems];
+            shouldCallSuper = NO;
             
-        } else {
-            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+            [self syncToolbarNavigationItems];
         }
+    }
+    
+    if (shouldCallSuper) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 
@@ -137,6 +142,18 @@
     if ([self isViewLoaded]) {
         [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoBack))];
         [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(canGoForward))];
+    }
+}
+
+
+#pragma mark - Url
+
+- (void)setUrl:(NSURL *)url {
+    _url = url;
+    
+    if (url && [self isViewLoaded]) {
+        [self.webView removeAllBackForwardListItems];
+        [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
     }
 }
 
@@ -237,17 +254,6 @@
 - (void)syncToolbarNavigationItems {
     self.backItem.enabled = [self.webView canGoBack];
     self.forwardItem.enabled = [self.webView canGoForward];
-}
-
-
-#pragma mark - Url
-
-- (void)setUrl:(NSURL *)url {
-    _url = url;
-    
-    if (url && [self isViewLoaded]) {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
-    }
 }
 
 
