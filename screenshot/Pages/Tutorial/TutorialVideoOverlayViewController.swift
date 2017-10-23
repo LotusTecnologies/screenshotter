@@ -46,13 +46,10 @@ class TutorialVideoOverlayViewController : UIViewController {
     func hideVolumeToggleButton() {
         UIView.animate(withDuration: 0.5) {
             self.volumeToggleButton.alpha = 0
-            self.volumeToggleButton.isHidden = true
         }
     }
     
     func showVolumeToggleButton() {
-        volumeToggleButton.isHidden = false
-        
         UIView.animate(withDuration: 0.5) {
             self.volumeToggleButton.alpha = 1
         }
