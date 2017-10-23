@@ -93,9 +93,19 @@
     }
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    [self hideLoadingView];
+}
+
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
-    if (self.view.window && _isPlayingGame) {
-        [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"App Backgrounding"}];
+    if (self.view.window) {
+        [self.loader stopAnimation];
+        
+        if (_isPlayingGame) {
+            [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"App Backgrounding"}];
+        }
     }
 }
 
@@ -240,17 +250,13 @@
     }
 }
 
-- (void)clearUrl {
-    if ([self isViewLoaded]) {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
-    }
-}
-
 
 #pragma mark - Web View
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
     [self showLoadingView];
+    
+    [self.loader startAnimation:LoaderAnimationPoseThenSpin];
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
