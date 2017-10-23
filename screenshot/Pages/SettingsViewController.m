@@ -72,7 +72,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+        
     UIView *tableHeaderView = ({
         CGFloat p = [Geometry padding];
         
