@@ -374,10 +374,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self presentMailComposer];
             break;
         case RowTypeTellFriend: {
-            NSString *text = @"Download SCREENSHOP, the app that lets you shop any screenshot, for free! https://crazeapp.com/app/";
-            UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[text] applicationActivities:nil];
-            activityViewController.popoverPresentationController.sourceView = self.view;
-            [self presentViewController:activityViewController animated:YES completion:nil];
+            InviteViewController *viewController = [[InviteViewController alloc] init];
+            [self.navigationController pushViewController:viewController animated:YES];
         }
             break;
         case RowTypeTutorialVideo: {
@@ -497,7 +495,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeBug:
+        case RowTypeTellFriend:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
         default:

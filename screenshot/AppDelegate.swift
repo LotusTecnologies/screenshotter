@@ -82,7 +82,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if (!handled) {
             let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: [:])
+//            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: [:])
+            
+            handled = self.application(app, open: url, sourceApplication: sourceApplication, annotation: "")
+
         }
         
         if (!handled) {
@@ -90,6 +93,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         return true
+    }
+    
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        if let invite = Invites.handle(url, sourceApplication: sourceApplication, annotation: annotation) as? ReceivedInvite {
+            let matchType = (invite.matchType == .weak) ? "Weak" : "Strong"
+            
+            print("||| Invite received from: \(sourceApplication ?? "") Deeplink: \(invite.deepLink), Id: \(invite.inviteId), Type: \(matchType)")
+            
+            return true
+        }
+        
+        print("||| handle sign in")
+        
+        return GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
@@ -163,8 +180,9 @@ extension AppDelegate {
         
         FirebaseApp.configure()
         
+        
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
-        GIDSignIn.sharedInstance().delegate = self
+//        GIDSignIn.sharedInstance().delegate = self
     }
 
     // MARK: - Appearance
@@ -234,28 +252,6 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
-    }
-}
-
-extension AppDelegate: GIDSignInDelegate {
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
-        // ...
-        if let error = error {
-            print("google sign in error: \(error)")
-            return
-        }
-        
-        guard let authentication = user.authentication else {
-            return
-        }
-        
-        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
-        print("google sign in credentials: \(credential)")
-    }
-    
-    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
-        // Perform any operations when the user disconnects from app here.
-        // ...
     }
 }
 
