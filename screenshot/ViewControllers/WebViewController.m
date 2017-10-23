@@ -236,6 +236,12 @@
     }
 }
 
+- (void)clearUrl {
+    if ([self isViewLoaded]) {
+        [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+    }
+}
+
 
 #pragma mark - Web View
 

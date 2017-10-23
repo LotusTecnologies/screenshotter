@@ -11,7 +11,6 @@
 #import "Geometry.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
-#import "WebViewController.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
 #import "Loader.h"
@@ -272,6 +271,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     }
 }
 
+- (Product *)productAtIndex:(NSInteger)index {
+    return self.products[index];
+}
+
 
 #pragma mark - Collection View
 
@@ -307,7 +310,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = self.products[indexPath.item];
+    Product *product = [self productAtIndex:indexPath.item];
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
@@ -319,15 +322,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = self.products[indexPath.item];
+    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
     
-    WebViewController *webViewController = [[WebViewController alloc] init];
-    [webViewController addNavigationItemLogo];
-    webViewController.hidesBottomBarWhenPushed = YES;
-    webViewController.loaderLabelText = @"Loading your store...";
-    webViewController.url = [NSURL URLWithString:product.offer];
-    
-    [self.navigationController pushViewController:webViewController animated:YES];
+    Product *product = [self productAtIndex:indexPath.item];
     
     [AnalyticsTrackers.branch track:@"Tapped on product"];
     [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
@@ -342,7 +339,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     BOOL isFavorited = [cell.favoriteButton isSelected];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    Product *product = self.products[indexPath.item];
+    Product *product = [self productAtIndex:indexPath.item];
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";

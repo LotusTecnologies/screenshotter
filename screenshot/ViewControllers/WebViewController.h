@@ -14,6 +14,7 @@
 @interface WebViewController : BaseViewController <WKNavigationDelegate>
 
 @property (nonatomic, copy) NSURL *url;
+- (void)clearUrl;
 
 @property (nonatomic) BOOL toolbarEnabled;
 @property (nonatomic, strong, readonly) UIBarButtonItem *backItem;

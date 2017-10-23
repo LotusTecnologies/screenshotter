@@ -8,11 +8,13 @@
 
 #import "ScreenshotsNavigationController.h"
 #import "ProductsViewController.h"
+#import "WebViewController.h"
 #import "screenshot-Swift.h"
 
-@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
+@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
+@property (nonatomic, strong) WebViewController *webViewController;
 
 @end
 
@@ -94,6 +96,7 @@
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
+    productsViewController.delegate = self;
     productsViewController.lifeCycleDelegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
     productsViewController.screenshot = screenshot;
@@ -105,6 +108,17 @@
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
     [self presentPickerViewControllerIfNeeded];
+}
+
+
+#pragma mark - Products View Controller
+
+- (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    Product *product = [viewController productAtIndex:indexPath.item];
+    
+    [self.webViewController clearUrl];
+    self.webViewController.url = [NSURL URLWithString:product.offer];
+    [self pushViewController:self.webViewController animated:YES];
 }
 
 
@@ -147,6 +161,20 @@
     self.pickerNavigationController = nil;
     
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+#pragma mark - Web View
+
+- (WebViewController *)webViewController {
+    if (!_webViewController) {
+        WebViewController *webViewController = [[WebViewController alloc] init];
+        [webViewController addNavigationItemLogo];
+        webViewController.hidesBottomBarWhenPushed = YES;
+        webViewController.loaderLabelText = @"Loading your store...";
+        _webViewController = webViewController;
+    }
+    return _webViewController;
 }
 
 
