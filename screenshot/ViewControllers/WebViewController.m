@@ -17,6 +17,7 @@
 @import SpriteKit;
 
 @interface WebViewController () {
+    BOOL _didViewAppear;
     BOOL _isShorteningUrl;
     BOOL _isPlayingGame;
 }
@@ -24,6 +25,8 @@
 @property (nonatomic, strong) UIView *loadingCoverView;
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) UIToolbar *toolbar;
+
+@property (nonatomic) BOOL didLoadInitialPage;
 
 @end
 
@@ -68,21 +71,27 @@
     [self setBarButtonItemsToToolbarIfPossible];
     
     if (self.url) {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
+        [self loadRequestUrl:self.url];
     }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self showLoadingView];
+    if (!self.didLoadInitialPage) {
+        [self showLoadingView];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    _didViewAppear = YES;
+    
+    if (!self.didLoadInitialPage) {
+        [self.loader startAnimation:LoaderAnimationPoseThenSpin];
+    }
     
     [Appsee startScreen:@"WebView"];
-    [self.loader startAnimation:LoaderAnimationPoseThenSpin];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -95,6 +104,9 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
+    
+    _didViewAppear = NO;
+    self.didLoadInitialPage = NO;
     
     [self hideLoadingView];
 }
@@ -153,8 +165,14 @@
     
     if (url && [self isViewLoaded]) {
         [self.webView removeAllBackForwardListItems];
-        [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+        [self loadRequestUrl:url];
     }
+}
+
+- (void)loadRequestUrl:(NSURL *)url {
+    self.didLoadInitialPage = NO;
+    
+    [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
 }
 
 
@@ -260,12 +278,18 @@
 #pragma mark - Web View
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-    [self showLoadingView];
-    
-    [self.loader startAnimation:LoaderAnimationPoseThenSpin];
+    if (!self.didLoadInitialPage) {
+        [self showLoadingView];
+        
+        if (_didViewAppear) {
+            [self.loader startAnimation:LoaderAnimationPoseThenSpin];
+        }
+    }
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    self.didLoadInitialPage = YES;
+    
     [self hideLoadingView];
 }
 
