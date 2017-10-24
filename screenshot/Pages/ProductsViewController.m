@@ -524,7 +524,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [self.view addSubview:helperView];
     [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:p2].active = YES;
     [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-p2].active = YES;
+    [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-p2].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
     
