@@ -411,10 +411,7 @@ class AssetSyncModel: NSObject {
         imageRequestOptions.deliveryMode = .opportunistic
         imageRequestOptions.resizeMode = .none
         imageRequestOptions.isNetworkAccessAllowed = false
-        let screen = UIScreen.main
-        let screenSizePx = screen.nativeBounds.size
-        let targetSize = CGSize(width: screenSizePx.width / screen.nativeScale, height: screenSizePx.height / screen.nativeScale)
-//        let targetSize = CGSize(width: 180, height: 320)
+        let targetSize = self.targetSize()
         PHImageManager.default().requestImage(for: asset,
                                               targetSize: targetSize,
                                               contentMode: .aspectFill,
@@ -452,8 +449,28 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    func targetSize() -> CGSize {
+        let screenSizePx = UIScreen.main.nativeBounds.size
+        let targetSize = CGSize(width: screenSizePx.width / 2, height: screenSizePx.height / 2)
+        return targetSize
+    }
+    
     func data(for image: UIImage) -> Data? {
-        return UIImageJPEGRepresentation(image, 0.80)
+        let actualToTargetRatio = image.size.width / targetSize().width
+        let compressionQuality: CGFloat
+        switch actualToTargetRatio {
+        case 0..<0.8:
+            compressionQuality = 0.99
+        case 2.0..<4.0:
+            compressionQuality = 0.25
+        case 4.0...:
+            compressionQuality = 0.10
+        default:
+            compressionQuality = 0.75
+        }
+        let data = UIImageJPEGRepresentation(image, compressionQuality)
+        print("image.size:\(image.size)  targetSize:\(targetSize())  actualToTargetRatio:\(actualToTargetRatio)  compressionQuality:\(compressionQuality)  data.count:\(data?.count ?? 0)")
+        return data
     }
     
     func setupFutureScreenshotAssets() {
