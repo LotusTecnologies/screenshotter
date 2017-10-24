@@ -27,6 +27,7 @@ class UserDefaultsKeys : NSObject {
     static let tutorialPresentedProductHelper = "TutorialPresentedProductHelper"
     static let tutorialShouldPresentScreenshotPicker = "TutorialShouldPresentScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
+    static let shouldPresentPushPermissionsPage = "ShouldPresentPushPermissionsPage"
     
     // Device / Version
     static let dateInstalled = "DateInstalled"

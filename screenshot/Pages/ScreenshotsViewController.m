@@ -27,6 +27,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @property (nonatomic) BOOL shouldDisplayInfoCell;
+@property (nonatomic) BOOL didTapOnScreenshot;
 
 @end
 
@@ -115,6 +116,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (self.didTapOnScreenshot && self.screenshotFrc.fetchedObjects.count == 1 && ![[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys shouldPresentPushPermissionsPage]]) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys shouldPresentPushPermissionsPage]];
+        
+        UIViewController *controller = [[InvokeScreenshotViewController alloc] init];
+        [self presentViewController:controller animated:YES completion:nil];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -272,6 +284,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImages) {
+        _didTapOnScreenshot = YES;
+
         [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
         
         [AnalyticsTrackers.standard track:@"Tapped on screenshot"];

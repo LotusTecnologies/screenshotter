@@ -139,12 +139,7 @@
 }
 
 - (void)pickerViewControllerDidCancel {
-    [self dismissViewControllerAnimated:YES completion:^{
-        if ([PermissionsManager.sharedPermissionsManager hasPermissionForType:PermissionTypePhoto]) {
-            InvokeScreenshotViewController *vc = [[InvokeScreenshotViewController alloc] init];
-            [self presentViewController:vc animated:YES completion:nil];
-        }
-    }];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)pickerViewControllerDidFinish {
