@@ -16,6 +16,8 @@
     BOOL _isObservingSettingsBadgeFont;
 }
 
+@property (nonatomic, strong) id didTakeScreenshotObserver;
+
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *discoverNavigationController;
@@ -93,9 +95,30 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     return self;
 }
 
+- (void)dealloc {
+    [self dismissTabBarSettingsBadge];
+    
+    self.screenshotsNavigationController.delegate = nil;
+
+    if (self.didTakeScreenshotObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self.didTakeScreenshotObserver];
+        self.didTakeScreenshotObserver = nil;
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.didTakeScreenshotObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationUserDidTakeScreenshotNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        NSArray<UIWindow *> *windows = [[UIApplication sharedApplication] windows];
+        for (UIWindow *window in windows) {
+            if ([window isKindOfClass:NSClassFromString(@"ICMWindow")]) {
+                [AnalyticsTrackers.standard track:@"Took Screenshot While Showing Intercom Window" properties:nil];
+                break;
+            }
+        }
+    }];
+    
     self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
     [self.updatePromptHandler start];
 }
@@ -124,13 +147,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
-
-- (void)dealloc {
-    [self dismissTabBarSettingsBadge];
-    
-    self.screenshotsNavigationController.delegate = nil;
-}
-
 
 #pragma mark - Tab Bar
 
