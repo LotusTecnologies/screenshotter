@@ -11,7 +11,6 @@
 #import "Geometry.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
-#import "WebViewController.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
 #import "Loader.h"
@@ -20,9 +19,21 @@
 
 typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeSimilar,
-    ShoppableSortTypePrice,
+    ShoppableSortTypePriceAsc,
+    ShoppableSortTypePriceDes,
     ShoppableSortTypeBrands
 };
+
+@interface ShoppableSortItem: NSObject
+
++ (ShoppableSortItem *)title:(NSString *)title;
++ (ShoppableSortItem *)title:(NSString *)title detail:(NSString *)detail;
+
+@property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *detail;
+@property (nonatomic, copy, readonly) NSString *detailedTitle;
+
+@end
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate> {
     BOOL _didViewDidAppear;
@@ -34,7 +45,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
-@property (nonatomic, strong) NSDictionary<NSNumber *, NSString *> *shoppableSortTitles;
+@property (nonatomic, strong) NSDictionary<NSNumber *, ShoppableSortItem *> *shoppableSortTitles;
 @property (nonatomic) ShoppableSortType currentSortType;
 
 @property (nonatomic, copy) UIImage *image;
@@ -49,6 +60,25 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 @end
 
+@implementation ShoppableSortItem
+
++ (ShoppableSortItem *)title:(NSString *)title {
+    return [self title:title detail:nil];
+}
+
++ (ShoppableSortItem *)title:(NSString *)title detail:(NSString *)detail {
+    ShoppableSortItem *item = [[ShoppableSortItem alloc] init];
+    item.title = title;
+    item.detail = detail;
+    return item;
+}
+
+- (NSString *)detailedTitle {
+    return self.detail.length ? [NSString stringWithFormat:@"%@ %@", self.title, self.detail] : self.title;
+}
+
+@end
+
 @implementation ProductsViewController
 @synthesize shoppablesController = _shoppablesController;
 
@@ -58,10 +88,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _shoppableSortTitles = @{@(ShoppableSortTypeSimilar): @"Similar",
-                                 @(ShoppableSortTypePrice): @"Price",
-                                 @(ShoppableSortTypeBrands): @"Brands"
+        _shoppableSortTitles = @{@(ShoppableSortTypeSimilar): [ShoppableSortItem title:@"Similar"],
+                                 @(ShoppableSortTypePriceAsc): [ShoppableSortItem title:@"Price" detail:@"(lowest first)"],
+                                 @(ShoppableSortTypePriceDes): [ShoppableSortItem title:@"Price" detail:@"(highest first)"],
+                                 @(ShoppableSortTypeBrands): [ShoppableSortItem title:@"Brands"]
                                  };
+        
+        _currentSortType = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productSort]];
         
         self.title = @"Products";
     }
@@ -214,8 +247,12 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
             
-        case ShoppableSortTypePrice:
+        case ShoppableSortTypePriceAsc:
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
+            break;
+            
+        case ShoppableSortTypePriceDes:
+            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:NO]];
             break;
             
         case ShoppableSortTypeBrands:
@@ -232,6 +269,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [self stopAndRemoveLoader];
         [self showNoItemsHelperView];
     }
+}
+
+- (Product *)productAtIndex:(NSInteger)index {
+    return self.products[index];
 }
 
 
@@ -269,7 +310,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = self.products[indexPath.item];
+    Product *product = [self productAtIndex:indexPath.item];
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
@@ -281,15 +322,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = self.products[indexPath.item];
+    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
     
-    WebViewController *webViewController = [[WebViewController alloc] init];
-    [webViewController addNavigationItemLogo];
-    webViewController.hidesBottomBarWhenPushed = YES;
-    webViewController.loaderLabelText = @"Loading your store...";
-    webViewController.url = [NSURL URLWithString:product.offer];
-    
-    [self.navigationController pushViewController:webViewController animated:YES];
+    Product *product = [self productAtIndex:indexPath.item];
     
     [AnalyticsTrackers.branch track:@"Tapped on product"];
     [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
@@ -304,7 +339,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     BOOL isFavorited = [cell.favoriteButton isSelected];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    Product *product = self.products[indexPath.item];
+    Product *product = [self productAtIndex:indexPath.item];
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
@@ -335,7 +370,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     [attributes setObject:[UIColor crazeGreen] forKey:NSForegroundColorAttributeName];
     
-    NSAttributedString *sortString = [[NSAttributedString alloc] initWithString:self.shoppableSortTitles[@(self.currentSortType)] attributes:attributes];
+    ShoppableSortItem *sortItem = self.shoppableSortTitles[@(self.currentSortType)];
+    NSAttributedString *sortString = [[NSAttributedString alloc] initWithString:sortItem.title attributes:attributes];
     [attributedString appendAttributedString:sortString];
     
     CGFloat offset = 3.f;
@@ -363,14 +399,19 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)presentSortPicker:(ProductsViewControllerControl *)control {
-    UIPickerView *picker = [[UIPickerView alloc] init];
-    picker.delegate = self;
-    picker.dataSource = self;
-    picker.backgroundColor = [UIColor whiteColor];
-    [picker selectRow:self.currentSortType inComponent:0 animated:NO];
-    
-    control.customInputView = picker;
-    [control becomeFirstResponder];
+    if ([control isFirstResponder]) {
+        [control resignFirstResponder];
+        
+    } else {
+        UIPickerView *picker = [[UIPickerView alloc] init];
+        picker.delegate = self;
+        picker.dataSource = self;
+        picker.backgroundColor = [UIColor whiteColor];
+        [picker selectRow:self.currentSortType inComponent:0 animated:NO];
+        
+        control.customInputView = picker;
+        [control becomeFirstResponder];
+    }
 }
 
 - (void)dismissSortPicker {
@@ -389,11 +430,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return self.shoppableSortTitles[@(row)];
+    return [self.shoppableSortTitles[@(row)] detailedTitle];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     self.currentSortType = row;
+    [[NSUserDefaults standardUserDefaults] setInteger:row forKey:[UserDefaultsKeys productSort]];
+    
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     [self.navigationController.navigationBar endEditing:YES];
 }
@@ -493,6 +536,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [helperView.contentView addSubview:retryButton];
     [retryButton.bottomAnchor constraintEqualToAnchor:helperView.contentView.bottomAnchor].active = YES;
     [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+    
+    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
 }
 
 - (void)hideNoItemsHelperView {

@@ -48,6 +48,7 @@
 		C55184CF1F4D5DC600EE7855 /* LoadingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */ = {isa = PBXBuildFile; fileRef = C56F2BF61F42C2DF00501AE9 /* Loader.m */; };
+		C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F2C5B1F9E35AD00488C0D /* WebView.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
@@ -143,6 +144,7 @@
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C56F2BF51F42C2DF00501AE9 /* Loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Loader.h; sourceTree = "<group>"; };
 		C56F2BF61F42C2DF00501AE9 /* Loader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Loader.m; sourceTree = "<group>"; };
+		C56F2C5B1F9E35AD00488C0D /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
 				C5921E951F433D4100DF4888 /* TappableTextView.h */,
 				C5921E961F433D4100DF4888 /* TappableTextView.m */,
+				C56F2C5B1F9E35AD00488C0D /* WebView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -683,6 +686,7 @@
 				522AF6541F935AC500A7A151 /* TutorialVideoViewController.swift in Sources */,
 				C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */,
 				C5278FF11F3C38510090E422 /* ProductsViewController.m in Sources */,
+				C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
 				5249EF931F960AC2001A6220 /* TutorialWelcomeSlideView.swift in Sources */,
 				C5AA81A41F97228100421909 /* ScreenshotCollectionViewCell.m in Sources */,

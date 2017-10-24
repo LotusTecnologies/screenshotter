@@ -8,7 +8,14 @@
 
 import SpriteKit
 
-class GameScene: SKScene, SKPhysicsContactDelegate{
+@objc protocol GameSceneDelegate {
+    func gameSceneDidStartGame(_ gameScene: GameScene)
+    func gameSceneDidEndGame(_ gameScene: GameScene)
+}
+
+class GameScene: SKScene, SKPhysicsContactDelegate {
+    public var gameDelegate: GameSceneDelegate?
+    
     let verticalPipeGap = 150.0
     
     var bird:SKSpriteNode!
@@ -30,6 +37,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     let scoreCategory: UInt32 = 1 << 3
     
     override func didMove(to view: SKView) {
+        AnalyticsTrackers.standard.track("Game Opened")
+        
         canRestart = false
         
         // setup physics
@@ -183,6 +192,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     }
     
     func startScene() {
+        AnalyticsTrackers.standard.track("Game Started")
+        
         didInitialStart = true
         
         // Apply bird physics
@@ -205,9 +216,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         
         // Update score
         scoreLabelNode.text = scoreLabelText()
+        
+        gameDelegate?.gameSceneDidStartGame(self)
     }
     
     func resetScene() {
+        AnalyticsTrackers.standard.track("Game Restarted")
+        
         // Move bird to original position and reset velocity
         bird.position = CGPoint(x: self.frame.size.width / 2.5, y: self.frame.midY)
         bird.physicsBody?.velocity = CGVector( dx: 0, dy: 0 )
@@ -266,7 +281,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                 // Save the score
                 UserDefaults.standard.set(score, forKey: UserDefaultsKeys.gameScore)
                 
+                AnalyticsTrackers.standard.track("Game Score Increased")
+                
             } else {
+                AnalyticsTrackers.standard.track("Game Collision")
+                
                 moving.speed = 0
                 
                 bird.physicsBody?.collisionBitMask = worldCategory
@@ -274,6 +293,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                     self.bird.speed = 0
                     self.scoreLabelNode.text = "Tap to play again"
                     self.canRestart = true
+                    self.gameDelegate?.gameSceneDidEndGame(self)
                 })
                 
                 // Flash background if contact is detected
