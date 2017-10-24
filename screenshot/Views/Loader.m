@@ -10,7 +10,9 @@
 
 @import QuartzCore;
 
-@interface Loader ()
+@interface Loader () {
+    BOOL _isAnimating;
+}
 
 @property (nonatomic, strong) UIImageView *bagImageView;
 @property (nonatomic, strong) UIImageView *cImageView;
@@ -66,6 +68,14 @@
 
 #pragma mark - Animation
 
+- (CABasicAnimation *)rotationAnimation {
+    CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    animation.toValue = @(M_PI * 2.0);
+    animation.duration = 1.5;
+    animation.repeatCount = HUGE_VALF;
+    return animation;
+}
+
 - (void)startAnimation:(LoaderAnimation)loaderAnimation {
     switch (loaderAnimation) {
         case LoaderAnimationSpin:
@@ -79,42 +89,41 @@
 }
 
 - (void)startSpinAnimation {
-    self.cImageViewCenterXConstraint.active = YES;
-    
-    CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotationAnimation.toValue = @(M_PI * 2.0);
-    rotationAnimation.duration = 1.5;
-//    rotationAnimation.cumulative = YES; // ???:
-    rotationAnimation.repeatCount = HUGE_VALF;
-    
-    [self.cImageView.layer addAnimation:rotationAnimation forKey:@"rotation"];
+    if (![self isAnimating]) {
+        _isAnimating = YES;
+        self.cImageViewCenterXConstraint.active = YES;
+        
+        [self.cImageView.layer addAnimation:[self rotationAnimation] forKey:@"rotation"];
+    }
 }
 
 - (void)startPoseThenSpinAnimation {
-    self.cImageViewCenterXConstraint.active = YES;
-    
-    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        [self layoutIfNeeded];
+    if (![self isAnimating]) {
+        _isAnimating = YES;
+        self.cImageViewCenterXConstraint.active = YES;
         
-    } completion:^(BOOL finished) {
-        if (finished) {
-            [self startSpinAnimation];
-        }
-    }];
+        [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            [self layoutIfNeeded];
+            
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [self.cImageView.layer addAnimation:[self rotationAnimation] forKey:@"rotation"];
+            }
+        }];
+    }
 }
 
 - (void)stopAnimation {
-    // TODO: the animation should complete the circle then slide back to center before being removed
-    
-    
-//    CABasicAnimation* rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-//    rotationAnimation.fromValue = [NSValue valueWithCATransform3D:self.cImageView.layer.transform];
-//    rotationAnimation.toValue = @(M_PI * 2.0);
-//    rotationAnimation.duration = 1.5;
-//    
-//    [self.cImageView.layer addAnimation:rotationAnimation forKey:@"rotation"];
-    
-    [self.cImageView.layer removeAnimationForKey:@"rotation"];
+    if ([self isAnimating]) {
+        _isAnimating = NO;
+        self.cImageViewCenterXConstraint.active = NO;
+        
+        [self.cImageView.layer removeAnimationForKey:@"rotation"];
+    }
+}
+
+- (BOOL)isAnimating {
+    return _isAnimating;
 }
 
 @end

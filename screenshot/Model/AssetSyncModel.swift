@@ -471,12 +471,6 @@ class AssetSyncModel: NSObject {
         futureScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
     }
     
-    func fetchAssets(assetIds: Set<String>) -> PHFetchResult<PHAsset> {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "localIdentifier IN %@", assetIds)
-        return PHAsset.fetchAssets(with: .image, options: fetchOptions)
-    }
-    
     func retrieveFutureScreenshotAssetIds() -> Set<String> {
         setupFutureScreenshotAssets()
         var assetIds = Set<String>()
@@ -606,7 +600,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toRetry.count > 0 {
-                track("user retried screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
+                track("user retried screenshots", properties: ["numScreenshots" : toRetry.count])
                 self.selectedScreenshotAssets?
                     .filter { toRetry.contains($0.localIdentifier) }
                     .forEach { asset in
@@ -651,6 +645,20 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    @objc public func refetchShoppables(screenshot: Screenshot) {
+        guard screenshot.shoppablesCount < 0,
+          let assetId = screenshot.assetId else {
+                return
+        }
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
+        let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        if let asset = fetchResult.firstObject {
+            self.selectedScreenshotAssets = [asset]
+            syncPhotos()
+        }
+    }
+
 }
 
 extension AssetSyncModel {
