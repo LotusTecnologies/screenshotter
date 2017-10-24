@@ -107,7 +107,6 @@
     [super viewDidDisappear:animated];
     
     _didViewAppear = NO;
-    self.didLoadInitialPage = NO;
     
     [self hideLoadingView];
 }
