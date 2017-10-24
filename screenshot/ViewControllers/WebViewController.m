@@ -16,9 +16,10 @@
 @import WebKit;
 @import SpriteKit;
 
-@interface WebViewController () {
+@interface WebViewController () <GameSceneDelegate> {
     BOOL _didViewAppear;
     BOOL _isShorteningUrl;
+    BOOL _isShowingGame;
     BOOL _isPlayingGame;
 }
 
@@ -97,7 +98,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    if (_isPlayingGame) {
+    if (_isShowingGame) {
         [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"User Navigating"}];
     }
 }
@@ -115,7 +116,7 @@
     if (self.view.window) {
         [self.loader stopAnimation];
         
-        if (_isPlayingGame) {
+        if (_isShowingGame) {
             [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"App Backgrounding"}];
         }
     }
@@ -125,7 +126,7 @@
     if (self.view.window) {
         [self.loader startAnimation:LoaderAnimationSpin];
         
-        if (_isPlayingGame) {
+        if (_isShowingGame) {
             [AnalyticsTrackers.standard track:@"Game Resumed" properties:@{@"From": @"App Backgrounding"}];
         }
     }
@@ -290,7 +291,9 @@
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     self.didLoadInitialPage = YES;
     
-    [self hideLoadingView];
+    if (!_isPlayingGame) {
+        [self hideLoadingView];
+    }
 }
 
 
@@ -350,15 +353,18 @@
     [self.loader stopAnimation];
     self.loader = nil;
     
-    if (_isPlayingGame) {
-        _isPlayingGame = NO;
+    if (_isShowingGame) {
+        _isShowingGame = NO;
         
         [AnalyticsTrackers.standard track:@"Game Interrupted" properties:@{@"From": @"Page Loading"}];
     }
 }
 
+
+#pragma mark - Game
+
 - (void)showLoadingGame {
-    _isPlayingGame = YES;
+    _isShowingGame = YES;
     
     SKView *gameView = [[SKView alloc] init];
     gameView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -370,10 +376,23 @@
     [gameView.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor].active = YES;
     
     GameScene *scene = (GameScene *)[GameScene unarchiveFromFile:@"GameScene"];
+    scene.gameDelegate = self;
     scene.scaleMode = SKSceneScaleModeAspectFill;
     [gameView presentScene:scene];
     
     [self.loader stopAnimation];
+}
+
+- (void)gameSceneDidStartGame:(GameScene *)gameScene {
+    _isPlayingGame = YES;
+}
+
+- (void)gameSceneDidEndGame:(GameScene *)gameScene {
+    _isPlayingGame = NO;
+    
+    if (self.didLoadInitialPage) {
+        [self hideLoadingView];
+    }
 }
 
 
