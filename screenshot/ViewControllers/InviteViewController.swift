@@ -9,44 +9,58 @@
 import Foundation
 import GoogleSignIn
 import Firebase
-//import FirebaseInvites
 
-class InviteViewController: BaseViewController {
+class InviteViewController: BaseViewController, GIDSignInUIDelegate {
+    let shareText = "Download SCREENSHOP, the app that lets you shop any screenshot, for free!"
+    
+    fileprivate var googleButton: MainButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let extendedPadding = Geometry.extendedPadding()
         
+        let helperView = HelperView()
+        helperView.translatesAutoresizingMaskIntoConstraints = false
+        helperView.titleLabel.text = "Tell a Friend"
+        helperView.backgroundColor = view.backgroundColor
+        view.addSubview(helperView)
+        helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: extendedPadding).isActive = true
+        helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
         let separator = UIView()
         separator.translatesAutoresizingMaskIntoConstraints = false
         separator.backgroundColor = .gray8
-        view.addSubview(separator)
+        helperView.contentView.addSubview(separator)
         separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
         separator.widthAnchor.constraint(equalToConstant: 240).isActive = true
-        separator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        NSLayoutConstraint(item: separator, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1.1, constant: 0).isActive = true
+        separator.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        NSLayoutConstraint(item: separator, attribute: .centerY, relatedBy: .equal, toItem: helperView.contentView, attribute: .centerY, multiplier: 0.9, constant: 0).isActive = true
         
-        let googleButton = MainButton()
+        googleButton = MainButton()
         googleButton.translatesAutoresizingMaskIntoConstraints = false
         googleButton.backgroundColor = .white
         googleButton.setTitleColor(.black, for: .normal)
-        googleButton.setTitle("Google Sign In", for: .normal)
+        googleButton.setTitle("Google Invite", for: .normal)
+        googleButton.setImage(UIImage(named: "InviteGoogleIcon"), for: .normal)
         googleButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
-        view.addSubview(googleButton)
+        helperView.contentView.addSubview(googleButton)
         googleButton.bottomAnchor.constraint(equalTo: separator.topAnchor, constant: -extendedPadding).isActive = true
-        googleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        googleButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
         
         let noLoginButton = MainButton()
         noLoginButton.translatesAutoresizingMaskIntoConstraints = false
-        noLoginButton.setTitle("Without Login", for: .normal)
+        noLoginButton.setTitle("Share", for: .normal)
         noLoginButton .addTarget(self, action: #selector(presentActivityViewController), for: .touchUpInside)
-        view.addSubview(noLoginButton)
+        helperView.contentView.addSubview(noLoginButton)
         noLoginButton.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: extendedPadding).isActive = true
-        noLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        noLoginButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
     }
     
     func presentActivityViewController() {
-        let text = "Download SCREENSHOP, the app that lets you shop any screenshot, for free! https://crazeapp.com/app/"
+        let text = shareText + " https://crazeapp.com/app/"
         let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = view
         present(activityViewController, animated: true, completion: nil)
@@ -56,13 +70,25 @@ class InviteViewController: BaseViewController {
     
     func googleSignIn() {
         GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance().uiDelegate = self
         
-        if GIDSignIn.sharedInstance().hasAuthInKeychain() {
-            GIDSignIn.sharedInstance().signInSilently()
+        var isLoading = false
+        
+        if (GIDSignIn.sharedInstance().currentUser != nil) {
             presentGoogleInvite()
+            
+        } else if GIDSignIn.sharedInstance().hasAuthInKeychain() {
+            GIDSignIn.sharedInstance().signInSilently()
+            isLoading = true
             
         } else {
             GIDSignIn.sharedInstance().signIn()
+            isLoading = true
+        }
+        
+        if isLoading {
+            googleButton.activityIndicator?.color = .crazeRed
+            googleButton.isLoading = true
         }
     }
     
@@ -73,14 +99,11 @@ class InviteViewController: BaseViewController {
             // NOTE: You must have the App Store ID set in your developer console project
             // in order for invitations to successfully be sent.
             
-            // A message hint for the dialog. Note this manifests differently depending on the
-            // received invitation type. For example, in an email invite this appears as the subject.
-            invite.setMessage("Try this out!\n -\(GIDSignIn.sharedInstance().currentUser.profile.name)")
-            // Title for the dialog, this is what the user sees before sending the invites.
-            invite.setTitle("Invites Example")
-            invite.setDeepLink("app_url")
+            invite.setTitle("Invites Your Friends")
+            invite.setMessage(shareText)
+            invite.setDeepLink("io.crazeapp.screenshot.dev") // TODO:
             invite.setCallToActionText("Install!")
-            invite.setCustomImage("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png")
+            invite.setCustomImage("https://static.crazeapp.com/screenshop-icon-500.png")
             invite.open()
         }
     }
@@ -88,50 +111,59 @@ class InviteViewController: BaseViewController {
 
 extension InviteViewController: GIDSignInDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
-        // ...
         if let error = error {
-            print("||| google sign in error: \(error)")
+            googleButton.isLoading = false
+            
+            AnalyticsTrackers.standard.track("Google Sign In", properties: ["Error": error.localizedDescription])
             return
         }
         
         guard let authentication = user.authentication else {
+            googleButton.isLoading = false
+            
+            AnalyticsTrackers.standard.track("Google Sign In", properties: ["Error": "No User Authentication"])
             return
         }
         
         let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
-        print("||| google sign in credentials: \(credential)")
         
         Auth.auth().signIn(with: credential) { (user, error) in
+            self.googleButton.isLoading = false
+            
+            var analyticsProperties = [String: Any]()
+            
+            if let displayName = user?.displayName {
+                analyticsProperties["User Name"] = displayName
+            }
+            if let email = user?.email {
+                analyticsProperties["User Email"] = email
+            }
+            
             if let error = error {
-                print("||| google sign in auth error: \(error)")
+                analyticsProperties["Error"] = error.localizedDescription
+                AnalyticsTrackers.standard.track("Google Sign In", properties: analyticsProperties)
                 return
             }
             
-            // User is signed in
-            // ...
             self.presentGoogleInvite()
             
-            print("||| signed in, hurray!")
+            AnalyticsTrackers.standard.track("Google Sign In", properties: analyticsProperties)
         }
     }
     
     func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
         // Perform any operations when the user disconnects from app here.
-        // ...
+        // TODO: ???
     }
 }
 
 extension InviteViewController: InviteDelegate {
     func inviteFinished(withInvitations invitationIds: [String], error: Error?) {
-        
+        if let error = error {
+            AnalyticsTrackers.standard.track("Google Invite", properties: ["Error": error.localizedDescription])
+            
+        } else {
+            AnalyticsTrackers.standard.track("Google Invite", properties: ["Sent": invitationIds.count])
+        }
     }
-    
-//    - (void)inviteFinishedWithInvitations:(NSArray<NSString *> *)invitationIds error:(NSError *)error {
-//    if (error) {
-//    NSLog(@"||| %@", error.localizedDescription);
-//
-//    } else {
-//    NSLog(@"||| %li invites sent", invitationIds.count);
-//    }
-//    }
 }

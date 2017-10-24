@@ -375,7 +375,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeTellFriend: {
             InviteViewController *viewController = [[InviteViewController alloc] init];
-            viewController.title = [self textForRowType:rowType];
+            [viewController addNavigationItemLogo];
+            viewController.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:viewController animated:YES];
         }
             break;
