@@ -16,29 +16,107 @@ struct AttributedStringData {
 struct SocialApp {
     let image: UIImage
     let urlScheme: String
-    let appStoreID: String
+    let appStoreID: Int
+    let notInstalled: (InvokeScreenshotViewController) -> Void
+    
+    private var appStoreURL: URL {
+        return URL(string:"itms://itunes.apple.com/us/app/apple-store/id\(appStoreID)")!
+    }
+
+    private var appOpenURL: URL {
+        return URL(string: "\(urlScheme)://")!
+    }
+    
+    var isInstalled: Bool {
+        return UIApplication.shared.canOpenURL(appOpenURL)
+    }
+    
+    func open(completion: @escaping (Bool) -> Void = { _ in }) {
+        UIApplication.shared.open(appOpenURL, options: [:], completionHandler: completion)
+    }
 }
 
 class InvokeScreenshotViewController : UIViewController {
-    private var socialApps = [
-        SocialApp(image: #imageLiteral(resourceName: "SettingsScreenshot"), urlScheme: "snapchat", appStoreID: "447188370"),
-        SocialApp(image: #imageLiteral(resourceName: "SettingsInstagram"), urlScheme: "instagram", appStoreID: "389801252"),
-        SocialApp(image: #imageLiteral(resourceName: "SettingsFacebook"), urlScheme: "fb", appStoreID: "284882215"),
-        SocialApp(image: #imageLiteral(resourceName: "SettingsScreenshot"), urlScheme: "google", appStoreID: "284815942")
-    ]
+    private lazy var socialApps = { _ -> [SocialApp] in
+        return [
+            SocialApp(image: #imageLiteral(resourceName: "SettingsScreenshot"), urlScheme: "snapchat", appStoreID: 447188370) { vc in
+                let alert = UIAlertController(title: "Oops!", message: "You don't have Snapchat installed.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                vc.present(alert, animated: true, completion: nil)
+            },
+            SocialApp(image: #imageLiteral(resourceName: "SettingsInstagram"), urlScheme: "instagram", appStoreID: 389801252) { vc in
+                UIApplication.shared.open(URL(string: "http://instagram.com")!, options: [:], completionHandler: nil)
+            },
+            SocialApp(image: #imageLiteral(resourceName: "SettingsFacebook"), urlScheme: "fb", appStoreID: 284882215) { vc in
+                UIApplication.shared.open(URL(string: "http://facebook.com")!, options: [:], completionHandler: nil)
+            },
+            SocialApp(image: #imageLiteral(resourceName: "SettingsScreenshot"), urlScheme: "google", appStoreID: 284815942) { vc in
+                UIApplication.shared.open(URL(string: "http://google.com")!, options: [:], completionHandler: nil)
+            }
+        ]
+    }()
     
     private var label = UILabel()
     private var buttonView = UIView()
     private var notificationLabel = UILabel()
+    private var notificationSwitch = UISwitch()
+    private var didResignActiveObserver: Any? = nil
+    private var didBecomeActiveObserver: Any? = nil
+    private var ignoringResignActiveEvent = false
+    
+    deinit {
+        if let observer = didResignActiveObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
+        if let observer = didBecomeActiveObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
+        didBecomeActiveObserver = nil
+        didResignActiveObserver = nil
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .white
         
+        didResignActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: nil) { note in
+            guard self.ignoringResignActiveEvent == false else {
+                return
+            }
+            
+            guard self.presentingViewController?.presentedViewController == self else {
+                return
+            }
+            
+            self.presentingViewController?.dismiss(animated: false, completion: nil)
+        }
+        
+        didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: nil) { note in
+            self.updateNotificationSwitchStatus()
+        }
+        
         setupLabel()
         setupNotificationView()
         setupButtons()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        ignoringResignActiveEvent = false
+        updateNotificationSwitchStatus()
+    }
+    
+    // MARK: -
+    
+    private func updateNotificationSwitchStatus() {
+        PermissionsManager.shared().requestPermission(for: .push) {
+            self.notificationSwitch.isOn = $0
+            self.notificationSwitch.isEnabled = $0 == false
+        }
     }
     
     private func setupLabel() {
@@ -120,7 +198,7 @@ class InvokeScreenshotViewController : UIViewController {
         notificationLabel.numberOfLines = 0
         view.addSubview(notificationLabel)
         
-        let notificationSwitch = UISwitch()
+        notificationSwitch.addTarget(self, action: #selector(notificationSwitchChanged(_:)), for: .valueChanged)
         notificationSwitch.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(notificationSwitch)
         
@@ -137,20 +215,57 @@ class InvokeScreenshotViewController : UIViewController {
     
     // MARK: Actions
     
+    @objc func notificationSwitchChanged(_ aSwitch: UISwitch) {
+        if aSwitch.isOn {
+            if PermissionsManager.shared().permissionStatus(for: .push) == .denied {
+                // We're about to go to the native Settings screen, ignore the resign active event
+                self.ignoringResignActiveEvent = true
+            }
+                
+            PermissionsManager.shared().requestPermission(for: .push, openSettingsIfNeeded: true) { accepted in
+                aSwitch.isOn = accepted
+                aSwitch.isEnabled = accepted == false
+            }
+        }
+    }
+    
     @objc func socialButtonTapped(button: UIButton) {
-        guard button.tag < socialApps.count else {
+        guard PermissionsManager.shared().hasPermission(for: .push) == false else {
+            // Already has permission, navigate to the app.
+            self.navigateToSocialApp(withTag: button.tag)
             return
         }
-    
-        let app = socialApps[button.tag]
-        guard let schemeURL = URL(string: "\(app.urlScheme)://"), UIApplication.shared.canOpenURL(schemeURL) else {
-            if let appStoreURL = URL(string:"itms://itunes.apple.com/us/app/apple-store/id\(app.appStoreID)") {
-                UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
+        
+        let alert = UIAlertController(title: "Turn on Notifications!", message: "We’ll let you know when your screenshots are shoppable", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Later", style: .cancel) { action in
+            self.navigateToSocialApp(withTag: button.tag)
+        })
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { action in
+            PermissionsManager.shared().requestPermission(for: .push) { accepted in
+                self.navigateToSocialApp(withTag: button.tag)
             }
+        })
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func navigateToSocialApp(withTag tag: Int) {
+        guard tag < socialApps.count else {
+            return
+        }
+
+        let app = socialApps[tag]
+        guard app.isInstalled else {
+            app.notInstalled(self)
             
             return
         }
-    
-        UIApplication.shared.open(schemeURL, options: [:], completionHandler: nil)
+        
+        app.open() { opened in
+             if opened == false {
+                app.notInstalled(self)
+            }
+        }
     }
 }
