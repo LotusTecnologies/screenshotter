@@ -69,7 +69,6 @@ class TutorialVideoViewController : BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         video = vid
-        beginObserving(playerItem: playerItem)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -100,6 +99,10 @@ class TutorialVideoViewController : BaseViewController {
         overlayViewController.didMove(toParentViewController: self)
         view.addSubview(overlayViewController.view)
         
+        if let item = player.currentItem {
+            beginObserving(playerItem: item)
+        }
+
         overlayViewController.replayButtonTapped = replayButtonTapped
         overlayViewController.volumeToggleButtonTapped = {
             guard let button = self.overlayViewController.volumeToggleButton else {
@@ -110,10 +113,7 @@ class TutorialVideoViewController : BaseViewController {
                 // Volume is muted, ask user to turn up the volume?
  
                 let alert = UIAlertController(title: "Turn up the volume!", message: "In order to hear the sound in the video, please turn up the volume on your phone!", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-                    alert.dismiss(animated: true, completion: nil)
-                }))
-                
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true)
                 
                 return
