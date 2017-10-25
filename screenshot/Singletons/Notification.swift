@@ -11,9 +11,8 @@ import Foundation
 final class NotificationManager: NSObject {
     static let shared = NotificationManager()
     
-    var window: UIWindow!
-    fileprivate var notificationView: NotificationView!
-    var notificationViewTopConstraint: NSLayoutConstraint!
+    fileprivate var window: UIWindow!
+    fileprivate var notifications = [NotificationWrapper]()
     
     private override init() {
         super.init()
@@ -21,15 +20,17 @@ final class NotificationManager: NSObject {
         let windowFrame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 64)
         window = UIWindow(frame: windowFrame)
         window.windowLevel = UIWindowLevelAlert
-        
-        notificationView = NotificationView()
+    }
+    
+    // MARK: Notification View
+    
+    private func createNotificationView() -> NotificationView {
+        let notificationView = NotificationView()
         notificationView.translatesAutoresizingMaskIntoConstraints = false
         window.addSubview(notificationView)
         notificationView.leadingAnchor.constraint(equalTo: window.leadingAnchor).isActive = true
         notificationView.trailingAnchor.constraint(equalTo: window.trailingAnchor).isActive = true
         notificationView.heightAnchor.constraint(equalTo: window.heightAnchor).isActive = true
-        
-        notificationViewTopConstraint = notificationView.topAnchor.constraint(equalTo: window.topAnchor)
         
         let bottomConstraint = notificationView.bottomAnchor.constraint(equalTo: window.topAnchor)
         bottomConstraint.priority = UILayoutPriorityDefaultLow
@@ -42,6 +43,8 @@ final class NotificationManager: NSObject {
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(notificationView:)))
         swipeGesture.direction = .up
         notificationView.addGestureRecognizer(swipeGesture)
+        
+        return notificationView
     }
     
     // MARK: Gestures
@@ -57,9 +60,10 @@ final class NotificationManager: NSObject {
     // MARK: Present / Dismiss
     
     public func presentScreenshot(completion: (() -> Void)? = nil) {
+        let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
         notificationView.label.text = "Import new screenshot?"
-        present(completion: completion)
+        present(notificationView: notificationView, completion: completion)
     }
     
     public func presentScreenshot(withCount screenshotCount: UInt, completion: (() -> Void)? = nil) {
@@ -67,22 +71,37 @@ final class NotificationManager: NSObject {
             presentScreenshot()
             
         } else if screenshotCount > 1 {
+            let notificationView = createNotificationView()
             notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
             notificationView.label.text = "You have \(screenshotCount) new screenshots."
-            present(completion: completion)
+            present(notificationView: notificationView, completion: completion)
         }
     }
     
-    private func present(completion: (() -> Void)? = nil) {
+    private func present(notificationView: NotificationView, completion: (() -> Void)? = nil) {
+        let constraint = notificationView.topAnchor.constraint(equalTo: window.topAnchor)
+        let wrapper = NotificationWrapper(view: notificationView, constraint: constraint, callback: completion)
+        notifications.append(wrapper)
+        
         window.makeKeyAndVisible()
         window.layoutIfNeeded()
         
-        notificationViewTopConstraint.isActive = true
+        constraint.isActive = true
         
-        UIView.animate(withDuration: 2, animations: {
+        UIView.animate(withDuration: 1, animations: {
             self.window.layoutIfNeeded()
             
         }) { (completed) in
+            
+            if self.notifications.count > 1 {
+                for i in 0...(self.notifications.count - 2) {
+                    print("||| number: \(i)")
+                    
+                    self.dismiss(notificationWrapper: self.notifications[i], animated: false)
+                }
+                // TODO: remove other notifications
+            }
+            
             if completed {
                 completion?()
             }
@@ -90,14 +109,19 @@ final class NotificationManager: NSObject {
     }
     
     public func dismiss() {
-        notificationViewTopConstraint.isActive = false
+        if let notificationWrapper = notifications.last {
+            dismiss(notificationWrapper: notificationWrapper, animated: true)
+        }
+    }
+    
+    private func dismiss(notificationWrapper: NotificationWrapper, animated: Bool) {
+        notificationWrapper.constraint.isActive = false
         
-        UIView.animate(withDuration: 2, animations: {
+        UIView.animate(withDuration: 1, animations: {
             self.window.layoutIfNeeded()
             
         }) { (completed) in
             self.window.isHidden = true
-            self.notificationView.reset()
         }
     }
 }
@@ -156,11 +180,6 @@ private class NotificationView: UIView {
         bottomBorder.heightAnchor.constraint(equalToConstant: Geometry.halfPoint()).isActive = true
     }
     
-    func reset() {
-        image = nil
-        label.text = nil
-    }
-    
     // MARK: Image
     
     var image: UIImage? {
@@ -173,4 +192,10 @@ private class NotificationView: UIView {
             return self.imageView.image
         }
     }
+}
+
+private struct NotificationWrapper {
+    var view: NotificationView
+    var constraint: NSLayoutConstraint
+    var callback: (() -> Void)?
 }
