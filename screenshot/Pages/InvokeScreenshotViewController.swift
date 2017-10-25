@@ -39,7 +39,7 @@ struct SocialApp {
 class InvokeScreenshotViewController : UIViewController {
     private lazy var socialApps = { _ -> [SocialApp] in
         return [
-            SocialApp(image: #imageLiteral(resourceName: "SettingsScreenshot"), urlScheme: "snapchat", appStoreID: 447188370) { vc in
+            SocialApp(image: #imageLiteral(resourceName: "snap-ghost-yellow"), urlScheme: "snapchat", appStoreID: 447188370) { vc in
                 let alert = UIAlertController(title: "Oops!", message: "You don't have Snapchat installed.", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 vc.present(alert, animated: true, completion: nil)
@@ -50,7 +50,7 @@ class InvokeScreenshotViewController : UIViewController {
             SocialApp(image: #imageLiteral(resourceName: "SettingsFacebook"), urlScheme: "fb", appStoreID: 284882215) { vc in
                 UIApplication.shared.open(URL(string: "http://facebook.com")!, options: [:], completionHandler: nil)
             },
-            SocialApp(image: #imageLiteral(resourceName: "SettingsScreenshot"), urlScheme: "google", appStoreID: 284815942) { vc in
+            SocialApp(image: #imageLiteral(resourceName: "google-favicon"), urlScheme: "google", appStoreID: 284815942) { vc in
                 UIApplication.shared.open(URL(string: "http://google.com")!, options: [:], completionHandler: nil)
             }
         ]
