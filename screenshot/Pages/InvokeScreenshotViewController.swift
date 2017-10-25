@@ -60,21 +60,15 @@ class InvokeScreenshotViewController : UIViewController {
     private var buttonView = UIView()
     private var notificationLabel = UILabel()
     private var notificationSwitch = UISwitch()
-    private var didResignActiveObserver: Any? = nil
     private var didBecomeActiveObserver: Any? = nil
-    private var ignoringResignActiveEvent = false
+    private var dismissesOnBecomingActive = true
     
     deinit {
-        if let observer = didResignActiveObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        
         if let observer = didBecomeActiveObserver {
             NotificationCenter.default.removeObserver(observer)
         }
         
         didBecomeActiveObserver = nil
-        didResignActiveObserver = nil
     }
     
     override func viewDidLoad() {
@@ -82,20 +76,13 @@ class InvokeScreenshotViewController : UIViewController {
         
         view.backgroundColor = .white
         
-        didResignActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: nil) { note in
-            guard self.ignoringResignActiveEvent == false else {
-                return
+        didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
+            if (self.dismissesOnBecomingActive) {
+                self.presentingViewController?.dismiss(animated: false, completion: nil)
+            } else {
+                self.updateNotificationSwitchStatus()
+                self.dismissesOnBecomingActive = true
             }
-            
-            guard self.presentingViewController?.presentedViewController == self else {
-                return
-            }
-            
-            self.presentingViewController?.dismiss(animated: false, completion: nil)
-        }
-        
-        didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: nil) { note in
-            self.updateNotificationSwitchStatus()
         }
         
         setupLabel()
@@ -103,20 +90,19 @@ class InvokeScreenshotViewController : UIViewController {
         setupButtons()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        ignoringResignActiveEvent = false
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    
         updateNotificationSwitchStatus()
     }
     
     // MARK: -
     
     private func updateNotificationSwitchStatus() {
-        PermissionsManager.shared().requestPermission(for: .push) {
-            self.notificationSwitch.isOn = $0
-            self.notificationSwitch.isEnabled = $0 == false
-        }
+        let hasPermission = PermissionsManager.shared().hasPermission(for: .push)
+        
+        self.notificationSwitch.setOn(hasPermission, animated: true)
+        self.notificationSwitch.isEnabled = !hasPermission
     }
     
     private func setupLabel() {
@@ -218,12 +204,12 @@ class InvokeScreenshotViewController : UIViewController {
     @objc func notificationSwitchChanged(_ aSwitch: UISwitch) {
         if aSwitch.isOn {
             if PermissionsManager.shared().permissionStatus(for: .push) == .denied {
-                // We're about to go to the native Settings screen, ignore the resign active event
-                self.ignoringResignActiveEvent = true
+                // We're about to go to the native Settings screen, don't dismiss the view when we become active again
+                self.dismissesOnBecomingActive = false
             }
-                
+            
             PermissionsManager.shared().requestPermission(for: .push, openSettingsIfNeeded: true) { accepted in
-                aSwitch.isOn = accepted
+                aSwitch.setOn(accepted, animated: true)
                 aSwitch.isEnabled = accepted == false
             }
         }
@@ -243,7 +229,11 @@ class InvokeScreenshotViewController : UIViewController {
         
         alert.addAction(UIAlertAction(title: "OK", style: .default) { action in
             PermissionsManager.shared().requestPermission(for: .push) { accepted in
-                self.navigateToSocialApp(withTag: button.tag)
+                self.updateNotificationSwitchStatus()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75, execute: {
+                    self.navigateToSocialApp(withTag: button.tag)
+                })
             }
         })
         
