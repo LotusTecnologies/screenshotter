@@ -117,7 +117,7 @@ class TutorialVideoOverlayViewController : UIViewController {
         
         NSLayoutConstraint.activate([
             volumeToggleButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -Geometry.padding()),
-            volumeToggleButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -Geometry.padding()),
+            volumeToggleButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: Geometry.padding()),
             volumeToggleButton.widthAnchor.constraint(equalToConstant: 50),
             volumeToggleButton.heightAnchor.constraint(equalToConstant: 50)
         ])
@@ -199,7 +199,7 @@ class TutorialVideoOverlayViewController : UIViewController {
             doneButton.widthAnchor.constraint(equalToConstant: 70),
             doneButton.heightAnchor.constraint(equalToConstant: 35),
             doneButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
-            doneButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 25)
+            doneButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -Geometry.padding())
         ])
     }
 }
