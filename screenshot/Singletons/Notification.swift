@@ -92,19 +92,13 @@ final class NotificationManager: NSObject {
             self.window.layoutIfNeeded()
             
         }) { (completed) in
-            
             if self.notifications.count > 1 {
                 for i in 0...(self.notifications.count - 2) {
-                    print("||| number: \(i)")
-                    
                     self.dismiss(notificationWrapper: self.notifications[i], animated: false)
                 }
-                // TODO: remove other notifications
             }
             
-            if completed {
-                completion?()
-            }
+            completion?()
         }
     }
     
@@ -115,13 +109,29 @@ final class NotificationManager: NSObject {
     }
     
     private func dismiss(notificationWrapper: NotificationWrapper, animated: Bool) {
-        notificationWrapper.constraint.isActive = false
+        if let index = notifications.index(of: notificationWrapper) {
+            notifications.remove(at: index)
+        }
         
-        UIView.animate(withDuration: 1, animations: {
-            self.window.layoutIfNeeded()
+        if animated {
+            notificationWrapper.constraint.isActive = false
             
-        }) { (completed) in
-            self.window.isHidden = true
+            UIView.animate(withDuration: 1, animations: {
+                self.window.layoutIfNeeded()
+                
+            }) { (completed) in
+                self.hideIfNeeded()
+            }
+            
+        } else {
+            notificationWrapper.view.removeFromSuperview()
+            hideIfNeeded()
+        }
+    }
+    
+    private func hideIfNeeded() {
+        if notifications.count == 0 {
+            window.isHidden = true
         }
     }
 }
@@ -194,8 +204,15 @@ private class NotificationView: UIView {
     }
 }
 
-private struct NotificationWrapper {
+private class NotificationWrapper: NSObject {
     var view: NotificationView
     var constraint: NSLayoutConstraint
     var callback: (() -> Void)?
+    
+    init(view: NotificationView, constraint: NSLayoutConstraint, callback: (() -> Void)?) {
+        self.view = view
+        self.constraint = constraint
+        self.callback = callback
+        super.init()
+    }
 }
