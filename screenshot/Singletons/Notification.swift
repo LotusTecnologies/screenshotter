@@ -101,6 +101,12 @@ final class NotificationManager: NSObject {
             completion?()
         }
         
+        Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] timer in
+            if wrapper.view.superview != nil {
+                self?.dismiss(notificationWrapper: wrapper, animated: true)
+            }
+        }
+        
         TapticHelper.peek()
     }
     
@@ -122,6 +128,7 @@ final class NotificationManager: NSObject {
                 self.window.layoutIfNeeded()
                 
             }) { (completed) in
+                notificationWrapper.view.removeFromSuperview()
                 self.hideIfNeeded()
             }
             
