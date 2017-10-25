@@ -88,7 +88,7 @@ final class NotificationManager: NSObject {
         
         constraint.isActive = true
         
-        UIView.animate(withDuration: 1, animations: {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseOut, animations: {
             self.window.layoutIfNeeded()
             
         }) { (completed) in
@@ -100,6 +100,8 @@ final class NotificationManager: NSObject {
             
             completion?()
         }
+        
+        TapticHelper.peek()
     }
     
     public func dismiss() {
@@ -116,7 +118,7 @@ final class NotificationManager: NSObject {
         if animated {
             notificationWrapper.constraint.isActive = false
             
-            UIView.animate(withDuration: 1, animations: {
+            UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
                 self.window.layoutIfNeeded()
                 
             }) { (completed) in
