@@ -9,25 +9,32 @@
 import Foundation
 
 class UserDefaultsKeys : NSObject {
+    // User
     static let email = "Email"
     static let name = "Name"
     static let userID = "UserID"
-    static let ambasssadorUsername = "ambasssadorUsername"
+    static let ambasssadorUsername = "AmbasssadorUsername"
     
-    static let discoverUrl = "discoverUrl"
+    // Discover
+    static let discoverUrl = "DiscoverUrl"
     
+    // Product
+    static let productSort = "ProductSort"
+    
+    // Onboarding
     static let tutorialCompleted = "TutorialCompleted"
     static let tutorialPresentedScreenshotHelper = "TutorialPresentedScreenshotHelper"
     static let tutorialPresentedProductHelper = "TutorialPresentedProductHelper"
     static let tutorialShouldPresentScreenshotPicker = "TutorialShouldPresentScreenshotPicker"
-    static let tutorialScreenshotAssetId = "TutorialScreenshotAssetId" // !!!: Not being used, can be removed.
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     
+    // Device / Version
     static let dateInstalled = "DateInstalled"
     static let dateLastSound = "DateLastSound"
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
     
+    // Game
     static let gameScore = "GameScore"
 }

@@ -18,11 +18,14 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
     fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>!
     public var collectionView: UICollectionView?
     public var delegate: ShoppablesControllerDelegate?
+    private var screenshot: Screenshot!
     
     init(screenshot: Screenshot) {
         super.init()
         
+        self.screenshot = screenshot
         DataModel.sharedInstance.shoppableFrcDelegate = self
+        
         shoppablesFrc = DataModel.sharedInstance.setupShoppableFrc(screenshot: screenshot)
         hasShoppablesFrc = shoppablesFrc.hasShoppablesFrc
     }
@@ -30,6 +33,10 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
     deinit {
         DataModel.sharedInstance.shoppableFrcDelegate = nil
         DataModel.sharedInstance.clearShoppableFrc();
+    }
+    
+    public func refetchShoppables() {
+        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot)
     }
     
     public func shoppableCount() -> Int {
