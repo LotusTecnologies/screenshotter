@@ -17,5 +17,6 @@ typedef NS_ENUM(NSUInteger, LoaderAnimation) {
 
 - (void)startAnimation:(LoaderAnimation)loaderAnimation;
 - (void)stopAnimation;
+- (BOOL)isAnimating;
 
 @end

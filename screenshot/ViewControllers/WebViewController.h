@@ -11,6 +11,8 @@
 @import WebKit.WKWebView;
 @import WebKit.WKNavigationDelegate;
 
+@class WebView;
+
 @interface WebViewController : BaseViewController <WKNavigationDelegate>
 
 @property (nonatomic, copy) NSURL *url;
@@ -23,7 +25,7 @@
 @property (nonatomic, strong, readonly) UIBarButtonItem *safariItem;
 - (void)updateShareItem;
 
-@property (nonatomic, strong) WKWebView *webView;
+@property (nonatomic, strong, readonly) WebView *webView;
 
 @property (nonatomic, copy) NSString *loaderLabelText; // Set this early, it's not persistent
 

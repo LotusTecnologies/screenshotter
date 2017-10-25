@@ -8,7 +8,14 @@
 
 import SpriteKit
 
-class GameScene: SKScene, SKPhysicsContactDelegate{
+@objc protocol GameSceneDelegate {
+    func gameSceneDidStartGame(_ gameScene: GameScene)
+    func gameSceneDidEndGame(_ gameScene: GameScene)
+}
+
+class GameScene: SKScene, SKPhysicsContactDelegate {
+    public var gameDelegate: GameSceneDelegate?
+    
     let verticalPipeGap = 150.0
     
     var bird:SKSpriteNode!
@@ -209,6 +216,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         
         // Update score
         scoreLabelNode.text = scoreLabelText()
+        
+        gameDelegate?.gameSceneDidStartGame(self)
     }
     
     func resetScene() {
@@ -284,6 +293,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
                     self.bird.speed = 0
                     self.scoreLabelNode.text = "Tap to play again"
                     self.canRestart = true
+                    self.gameDelegate?.gameSceneDidEndGame(self)
                 })
                 
                 // Flash background if contact is detected

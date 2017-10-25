@@ -84,38 +84,13 @@ class UpdatePromptHandler : NSObject {
     // MARK: Discover URL handling
     
     private func processDiscoverURLs(_ dictionary: [String : Any]) {
-        let currentlyRecordedUrl = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverUrl)
-        
-        if let discoverURLHash = dictionary["DiscoverURL"] as? [String : String] {
-            var needsToUpdatePersistedURL = true
-            if let recordedURL = currentlyRecordedUrl {
-                needsToUpdatePersistedURL = !discoverURLHash.values.contains(recordedURL)
-            }
-            
-            if (needsToUpdatePersistedURL) {
-                // Figure out which key in the hash to use based on the A-B test parameters
-                
-                let integerKeys = discoverURLHash.keys.flatMap { Int($0) }
-                let total = integerKeys.reduce(0, +)
-                let randomKey = arc4random_uniform(UInt32(total - 1)) + 1
-                
-                var resultKey = ""
-                var runningSum = 0
-                
-                for key in integerKeys {
-                    runningSum += key
-                    
-                    if randomKey <= runningSum {
-                        resultKey = "\(key)"
-                        break
-                    }
-                }
-                
-                if let discoverURL = discoverURLHash[resultKey], discoverURL.count > 0 {
-                    UserDefaults.standard.set(discoverURL, forKey: UserDefaultsKeys.discoverUrl)
-                }
-            }
+        guard let discoverURLs = dictionary["DiscoverURLs"] as? [String] else {
+            return
         }
+        
+        let randomIndex = Int(arc4random_uniform(UInt32(discoverURLs.count)))
+        let randomURL = discoverURLs[randomIndex]
+        UserDefaults.standard.set(randomURL, forKey: UserDefaultsKeys.discoverUrl)
     }
     
     // MARK: Alert presentation
