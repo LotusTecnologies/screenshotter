@@ -63,6 +63,7 @@ class TutorialVideoViewController : BaseViewController {
         player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
         player.actionAtItemEnd = .pause
+        player.isMuted = true
         
         playerLayer = AVPlayerLayer(player: player)
         
@@ -104,6 +105,8 @@ class TutorialVideoViewController : BaseViewController {
         }
 
         overlayViewController.replayButtonTapped = replayButtonTapped
+        
+        overlayViewController.volumeToggleButton.isSelected = true
         overlayViewController.volumeToggleButtonTapped = {
             guard let button = self.overlayViewController.volumeToggleButton else {
                 return
@@ -130,12 +133,11 @@ class TutorialVideoViewController : BaseViewController {
         }
         
         observers.removeAll()
-        observers.append(AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.new, .initial]) { session, change in
-            guard let newVolume = change.newValue else {
-                return
-            }
+        observers.append(AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.new]) { session, change in
+            let shouldMute = (change.newValue ?? 1) == 0
             
-            self.overlayViewController.volumeToggleButton.isSelected = newVolume == 0
+            self.overlayViewController.volumeToggleButton.isSelected = shouldMute
+            self.player.isMuted = shouldMute
         })
         
         // Add tap gesture recognizer
