@@ -67,6 +67,7 @@
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
+		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
@@ -169,6 +170,7 @@
 		C5CCBB3F1F41BC1400D6B392 /* UIApplication+Version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+Version.m"; sourceTree = "<group>"; };
 		C5CCBB411F41C3E600D6B392 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		C5CCBB421F41C3E600D6B392 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
+		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E41449FF1F41890900B1F039 /* ClarifaiModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiModel.swift; sourceTree = "<group>"; };
@@ -294,6 +296,7 @@
 				52D8F50A1F61391C0032C5A9 /* Intercom.swift */,
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
+				C5F8D63C1FA05AE40067C26A /* Notification.swift */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";
@@ -721,6 +724,7 @@
 				C5AA81A01F97228100421909 /* MainButton.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */,
+				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */,
 				C528DC161F57F34E00F4E723 /* TransitioningController.m in Sources */,
