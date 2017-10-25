@@ -55,7 +55,20 @@ final class NotificationManager: NSObject {
     
     // MARK: Present / Dismiss
     
-    public func present() {
+    public func presentScreenshot() {
+        present()
+    }
+    
+    public func presentScreenshot(withCount screenshotCount: UInt) {
+        if screenshotCount == 1 {
+            presentScreenshot()
+            
+        } else if screenshotCount > 1 {
+            present()
+        }
+    }
+    
+    private func present() {
         window.makeKeyAndVisible()
         window.layoutIfNeeded()
         
