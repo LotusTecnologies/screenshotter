@@ -13,6 +13,27 @@ import CoreData // NSManagedObjectContext
 import PromiseKit
 import UserNotifications
 
+
+class AccumulatorModel {
+    
+    public static let sharedInstance = AccumulatorModel()
+    
+    private var newScreenshots: Int = 0
+    
+    public func getNewScreenshots() -> Int {
+        return newScreenshots
+    }
+    
+    public func resetNewScreenshots() {
+        newScreenshots = 0
+    }
+    
+    fileprivate func addToNewScreenshots(screenshotCount: Int) {
+        newScreenshots += screenshotCount
+    }
+    
+}
+
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
@@ -623,9 +644,7 @@ class AssetSyncModel: NSObject {
             }
             if toUpload.count > 0 {
                 track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
-                DispatchQueue.main.async {
-                    NotificationManager.shared.presentScreenshot(withCount: UInt(toUpload.count))
-                }
+                AccumulatorModel.sharedInstance.addToNewScreenshots(screenshotCount: toUpload.count)
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
