@@ -121,7 +121,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [super viewDidAppear:animated];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [[NotificationManager shared] presentScreenshotWithCount:27];
+        [[NotificationManager shared] presentScreenshotWithCount:27 completion:^{
+            NSLog(@"|||| oh snap!");
+        }];
     });
 }
 

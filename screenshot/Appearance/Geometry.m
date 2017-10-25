@@ -18,4 +18,8 @@
     return 40.f;
 }
 
++ (CGFloat)halfPoint {
+    return [UIScreen mainScreen].scale > 1.0f ? 0.5f : 1.0f;
+}
+
 @end

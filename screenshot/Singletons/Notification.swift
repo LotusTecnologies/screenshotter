@@ -12,6 +12,7 @@ final class NotificationManager: NSObject {
     static let shared = NotificationManager()
     
     var window: UIWindow!
+    fileprivate var notificationView: NotificationView!
     var notificationViewTopConstraint: NSLayoutConstraint!
     
     private override init() {
@@ -21,7 +22,7 @@ final class NotificationManager: NSObject {
         window = UIWindow(frame: windowFrame)
         window.windowLevel = UIWindowLevelAlert
         
-        let notificationView = NotificationView()
+        notificationView = NotificationView()
         notificationView.translatesAutoresizingMaskIntoConstraints = false
         window.addSubview(notificationView)
         notificationView.leadingAnchor.constraint(equalTo: window.leadingAnchor).isActive = true
@@ -55,27 +56,36 @@ final class NotificationManager: NSObject {
     
     // MARK: Present / Dismiss
     
-    public func presentScreenshot() {
-        present()
+    public func presentScreenshot(completion: (() -> Void)? = nil) {
+        notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
+        notificationView.label.text = "Import new screenshot?"
+        present(completion: completion)
     }
     
-    public func presentScreenshot(withCount screenshotCount: UInt) {
+    public func presentScreenshot(withCount screenshotCount: UInt, completion: (() -> Void)? = nil) {
         if screenshotCount == 1 {
             presentScreenshot()
             
         } else if screenshotCount > 1 {
-            present()
+            notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
+            notificationView.label.text = "You have \(screenshotCount) new screenshots."
+            present(completion: completion)
         }
     }
     
-    private func present() {
+    private func present(completion: (() -> Void)? = nil) {
         window.makeKeyAndVisible()
         window.layoutIfNeeded()
         
         notificationViewTopConstraint.isActive = true
         
-        UIView.animate(withDuration: 2) {
+        UIView.animate(withDuration: 2, animations: {
             self.window.layoutIfNeeded()
+            
+        }) { (completed) in
+            if completed {
+                completion?()
+            }
         }
     }
     
@@ -87,18 +97,15 @@ final class NotificationManager: NSObject {
             
         }) { (completed) in
             self.window.isHidden = true
+            self.notificationView.reset()
         }
     }
 }
 
-private enum NotificationViewImageType {
-    case none
-    case screenshot
-}
-
 private class NotificationView: UIView {
-    var imageView: UIImageView!
-    var label: UILabel!
+    private var imageView: UIImageView!
+    private(set) var label: UILabel!
+    private var labelLeadingConstraint: NSLayoutConstraint!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -109,12 +116,12 @@ private class NotificationView: UIView {
         
         let padding = Geometry.padding()
         
-        backgroundColor = .red
+        backgroundColor = .white
         layoutMargins = UIEdgeInsetsMake(padding, padding, padding, padding)
         
         imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = .green
+        imageView.tintColor = .crazeRed
         imageView.isHidden = true
         addSubview(imageView)
         imageView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
@@ -124,33 +131,46 @@ private class NotificationView: UIView {
         
         label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.backgroundColor = .blue
+        label.backgroundColor = .clear
+        label.textAlignment = .center
+        label.textColor = .gray3
         addSubview(label)
         label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
-        label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor)
         label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        labelLeadingConstraint = label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor)
+        labelLeadingConstraint.isActive = true
+        
+        let labelToImageViewLeadingConstraint = label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: padding)
+        labelToImageViewLeadingConstraint.priority = UILayoutPriorityDefaultHigh
+        labelToImageViewLeadingConstraint.isActive = true
+        
+        let bottomBorder = UIView()
+        bottomBorder.translatesAutoresizingMaskIntoConstraints = false
+        bottomBorder.backgroundColor = .crazeRed
+        addSubview(bottomBorder)
+        bottomBorder.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        bottomBorder.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        bottomBorder.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        bottomBorder.heightAnchor.constraint(equalToConstant: Geometry.halfPoint()).isActive = true
+    }
+    
+    func reset() {
+        image = nil
+        label.text = nil
     }
     
     // MARK: Image
     
-    var imageType = NotificationViewImageType.none {
-        didSet {
-            self.imageView.isHidden = imageType == .none
-            self.imageView.image = image(for: imageType)
+    var image: UIImage? {
+        set {
+            self.imageView.image = newValue
+            self.imageView.isHidden = image == nil
+            self.labelLeadingConstraint.isActive = self.imageView.isHidden
         }
-    }
-    
-    func image(for type: NotificationViewImageType) -> UIImage? {
-        var image: UIImage?
-        
-        switch type {
-        case .none:
-            break
-        case .screenshot:
-            image = UIImage(named: "") // TODO:
-            break
+        get {
+            return self.imageView.image
         }
-        
-        return image
     }
 }
