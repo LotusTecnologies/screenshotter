@@ -88,6 +88,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
                                  self.settingsNavigationController
                                  ];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
     return self;
@@ -110,6 +111,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [super viewDidAppear:animated];
     
     [self attemptPresentNotification];
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self attemptPresentNotification];
+    }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -204,10 +211,14 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)attemptPresentNotification {
     NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
     
+    NSLog(@"||| new screenshot count = %ld", (long)newScreenshotsCount);
+    
     if (newScreenshotsCount > 0) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSLog(@"|||| about to call notification");
+            
             [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount completion:^{
-                NSLog(@"|||| oh snap!");
+                NSLog(@"|||| did tap notification");
             }];
         });
     }
