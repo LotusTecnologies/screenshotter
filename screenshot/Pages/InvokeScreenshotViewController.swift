@@ -166,7 +166,6 @@ class InvokeScreenshotViewController : UIViewController {
         
         view.addSubview(stackView)
         
-        var constraints = [NSLayoutConstraint]()
         socialApps.enumerated().forEach { i, app in
             let button = UIButton()
             button.tag = i
@@ -175,19 +174,13 @@ class InvokeScreenshotViewController : UIViewController {
             button.addTarget(self, action: #selector(socialButtonTapped(button:)), for: .touchUpInside)
             
             stackView.addArrangedSubview(button)
-            
-            constraints.append(contentsOf: [
-                button.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
-                button.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
-            ])
         }
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             stackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 50),
-            stackView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
-        ] + constraints)
+        ])
     }
     
     private func setupNotificationView() {
