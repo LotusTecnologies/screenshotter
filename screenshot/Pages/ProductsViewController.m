@@ -8,7 +8,6 @@
 
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
-#import "Geometry.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
 #import "TutorialProductsPageViewController.h"
