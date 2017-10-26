@@ -314,6 +314,7 @@ extension TutorialEmailSlideView : TappableTextViewDelegate {
         switch index {
         case 3:
             delegate?.tutorialEmailSlideViewDidTapPrivacyPolicy(self)
+            break
         case 1:
             delegate?.tutorialEmailSlideViewDidTapTermsOfService(self)
             break
