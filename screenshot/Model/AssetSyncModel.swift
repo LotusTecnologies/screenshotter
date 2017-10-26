@@ -20,11 +20,11 @@ class AccumulatorModel: NSObject {
     
     private var newScreenshotsCount: Int = 0
     
-    public func getNewScreenshotsCount() -> Int {
+    @objc public func getNewScreenshotsCount() -> Int {
         return newScreenshotsCount
     }
     
-    public func resetNewScreenshotsCount() {
+    @objc public func resetNewScreenshotsCount() {
         newScreenshotsCount = 0
     }
     
@@ -735,6 +735,16 @@ class AssetSyncModel: NSObject {
         syncPhotos()
     }
 
+    // Called from UI thread.
+    @objc public func refetchLastScreenshot() {
+        let dataModel = DataModel.sharedInstance
+        guard let lastScreenshotAssetId = dataModel.retrieveLastScreenshotAssetId(managedObjectContext: dataModel.mainMoc()) else {
+            return
+        }
+        addToSelected(assetId: lastScreenshotAssetId)
+        syncPhotos()
+    }
+    
 }
 
 extension AssetSyncModel {
