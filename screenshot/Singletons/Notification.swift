@@ -36,11 +36,11 @@ final class NotificationManager: NSObject {
         bottomConstraint.priority = UILayoutPriorityDefaultLow
         bottomConstraint.isActive = true
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAction(notificationView:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAction(tapGesture:)))
         notificationView.addGestureRecognizer(tapGesture)
         
         // TODO: change to pan gesture
-        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(notificationView:)))
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(swipeGesture:)))
         swipeGesture.direction = .up
         notificationView.addGestureRecognizer(swipeGesture)
         
@@ -49,24 +49,29 @@ final class NotificationManager: NSObject {
     
     // MARK: Gestures
     
-    @objc private func tapAction(notificationView: NotificationView) {
+    @objc private func tapAction(tapGesture: UITapGestureRecognizer) {
+        if let notificationView = tapGesture.view,
+            let index = notifications.index(where: { $0.view == notificationView }) {
+            notifications[index].callback?()
+        }
+        
         dismiss()
     }
     
-    @objc private func swipeAction(notificationView: NotificationView) {
+    @objc private func swipeAction(swipeGesture: UISwipeGestureRecognizer) {
         dismiss()
     }
     
     // MARK: Present / Dismiss
     
-    public func presentScreenshot(completion: (() -> Void)? = nil) {
+    public func presentScreenshot(with userTapped: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
         notificationView.label.text = "Import new screenshot?"
-        present(notificationView: notificationView, completion: completion)
+        present(notificationView: notificationView, userTapped: userTapped)
     }
     
-    public func presentScreenshot(withCount screenshotCount: UInt, completion: (() -> Void)? = nil) {
+    public func presentScreenshot(withCount screenshotCount: UInt, userTapped: (() -> Void)? = nil) {
         if screenshotCount == 1 {
             presentScreenshot()
             
@@ -74,13 +79,13 @@ final class NotificationManager: NSObject {
             let notificationView = createNotificationView()
             notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
             notificationView.label.text = "You have \(screenshotCount) new screenshots."
-            present(notificationView: notificationView, completion: completion)
+            present(notificationView: notificationView, userTapped: userTapped)
         }
     }
     
-    private func present(notificationView: NotificationView, completion: (() -> Void)? = nil) {
+    private func present(notificationView: NotificationView, userTapped: (() -> Void)? = nil) {
         let constraint = notificationView.topAnchor.constraint(equalTo: window.topAnchor)
-        let wrapper = NotificationWrapper(view: notificationView, constraint: constraint, callback: completion)
+        let wrapper = NotificationWrapper(view: notificationView, constraint: constraint, callback: userTapped)
         notifications.append(wrapper)
         
         window.makeKeyAndVisible()
@@ -97,8 +102,6 @@ final class NotificationManager: NSObject {
                     self.dismiss(notificationWrapper: self.notifications[i], animated: false)
                 }
             }
-            
-            completion?()
         }
         
         Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] timer in

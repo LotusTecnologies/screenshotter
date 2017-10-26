@@ -23,4 +23,6 @@
 @property (nonatomic, weak) id<ScreenshotsNavigationControllerDelegate> delegate;
 @property (nonatomic, strong, readonly) ScreenshotsViewController *screenshotsViewController;
 
+- (void)presentPickerViewController;
+
 @end

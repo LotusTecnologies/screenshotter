@@ -210,6 +210,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)attemptPresentNotification {
     NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+//    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
     
     NSLog(@"||| new screenshot count = %ld", (long)newScreenshotsCount);
     
@@ -217,9 +218,20 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             NSLog(@"|||| about to call notification");
             
-            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount completion:^{
-                NSLog(@"|||| did tap notification");
-            }];
+            if (newScreenshotsCount == 1) {
+                [[NotificationManager shared] presentScreenshotWith:^{
+                    NSLog(@"|||| did tap single notification");
+                    
+                    
+                }];
+                
+            } else {
+                [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
+                    NSLog(@"|||| did tap multiple notification");
+                    
+                    [self.screenshotsNavigationController presentPickerViewController];
+                }];
+            }
         });
     }
 }
