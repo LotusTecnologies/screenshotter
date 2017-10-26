@@ -104,7 +104,7 @@ final class NotificationManager: NSObject {
             }
         }
         
-        Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { [weak self] timer in
+        Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] timer in
             if wrapper.view.superview != nil {
                 self?.dismiss(notificationWrapper: wrapper, animated: true)
             }
