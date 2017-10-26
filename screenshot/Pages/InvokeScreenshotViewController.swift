@@ -60,15 +60,15 @@ class InvokeScreenshotViewController : UIViewController {
     private var descriptionLabel = UILabel()
     private var buttonView = UIView()
     private var notificationSwitch = UISwitch()
-    private var didBecomeActiveObserver: Any? = nil
+    private var willEnterForegroundObserver: Any? = nil
     private var dismissesOnBecomingActive = true
     
     deinit {
-        if let observer = didBecomeActiveObserver {
+        if let observer = willEnterForegroundObserver {
             NotificationCenter.default.removeObserver(observer)
         }
         
-        didBecomeActiveObserver = nil
+        willEnterForegroundObserver = nil
     }
     
     override func viewDidLoad() {
@@ -77,7 +77,7 @@ class InvokeScreenshotViewController : UIViewController {
         view.backgroundColor = .white
         view.layoutMargins = UIEdgeInsets(top: Geometry.extendedPadding, left: 5 + Geometry.padding, bottom: Geometry.extendedPadding, right: 5 + Geometry.padding)
         
-        didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
+        willEnterForegroundObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
             if (self.dismissesOnBecomingActive) {
                 self.presentingViewController?.dismiss(animated: false, completion: nil)
             } else {
