@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		521373E81F9CB21C00763A80 /* TutorialSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521373E71F9CB21C00763A80 /* TutorialSlideView.swift */; };
-		521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */; };
+		521736101F826220009F7CFB /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5217360F1F826220009F7CFB /* TutorialVideoOverlayView.swift */; };
 		522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522AF64D1F93348B00A7A151 /* TutorialViewController.swift */; };
 		522AF6541F935AC500A7A151 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -19,6 +18,7 @@
 		525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCF91F9CBA6800330C95 /* HelperView.swift */; };
 		525BBCFC1F9CBC7000330C95 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCFB1F9CBC7000330C95 /* Geometry.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
+		527F17481FA2167E008082BC /* TutorialSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527F17471FA2167E008082BC /* TutorialSlideView.swift */; };
 		52807FF91F9530D30075111D /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 52807FF81F9530D30075111D /* Craze_Video.mp4 */; };
 		52D8F50B1F61391C0032C5A9 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8F50A1F61391C0032C5A9 /* Intercom.swift */; };
 		52F972EF1F9CE47D00946C8E /* TutorialTrySlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F972EE1F9CE47D00946C8E /* TutorialTrySlideView.swift */; };
@@ -82,8 +82,7 @@
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		521373E71F9CB21C00763A80 /* TutorialSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialSlideView.swift; sourceTree = "<group>"; };
-		5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayViewController.swift; sourceTree = "<group>"; };
+		5217360F1F826220009F7CFB /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
 		522AF64D1F93348B00A7A151 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideView.swift; sourceTree = "<group>"; };
@@ -91,6 +90,7 @@
 		525BBCF91F9CBA6800330C95 /* HelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		525BBCFB1F9CBC7000330C95 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		527F17471FA2167E008082BC /* TutorialSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialSlideView.swift; sourceTree = "<group>"; };
 		52807FF81F9530D30075111D /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		52D8F50A1F61391C0032C5A9 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Intercom.swift; path = ../3rdparty/Intercom.swift; sourceTree = "<group>"; };
@@ -271,13 +271,13 @@
 		C5278FCA1F3C38510090E422 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
-				521373E71F9CB21C00763A80 /* TutorialSlideView.swift */,
+				527F17471FA2167E008082BC /* TutorialSlideView.swift */,
 				525BBCF71F9CB8FF00330C95 /* TutorialEmailSlideView.swift */,
 				52F972EE1F9CE47D00946C8E /* TutorialTrySlideView.swift */,
 				5249EF921F960AC2001A6220 /* TutorialWelcomeSlideView.swift */,
 				522AF64D1F93348B00A7A151 /* TutorialViewController.swift */,
 				52E2756A1F811BEB00B6EC60 /* TutorialVideoViewController.swift */,
-				5217360F1F826220009F7CFB /* TutorialVideoOverlayViewController.swift */,
+				5217360F1F826220009F7CFB /* TutorialVideoOverlayView.swift */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -697,6 +697,7 @@
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
+				527F17481FA2167E008082BC /* TutorialSlideView.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C5CCBB401F41BC1400D6B392 /* UIApplication+Version.m in Sources */,
 				522AF6511F93479F00A7A151 /* TutorialViewController.swift in Sources */,
@@ -713,7 +714,6 @@
 				C5278FF21F3C38510090E422 /* ScreenshotsViewController.m in Sources */,
 				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
-				521373E81F9CB21C00763A80 /* TutorialSlideView.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */,
 				C5AA81A01F97228100421909 /* MainButton.swift in Sources */,
@@ -742,7 +742,7 @@
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
 				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
 				C5AA81A21F97228100421909 /* FloatingActionButton.swift in Sources */,
-				521736101F826220009F7CFB /* TutorialVideoOverlayViewController.swift in Sources */,
+				521736101F826220009F7CFB /* TutorialVideoOverlayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
