@@ -56,7 +56,6 @@
 
 #pragma mark - View Controller Life Cycle
 
-- (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {}
 - (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
     if ([viewController isKindOfClass:[ProductsViewController class]]) {
         [self presentAppropriateModalViewControllerIfNecessary];
