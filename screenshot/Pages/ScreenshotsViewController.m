@@ -117,24 +117,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [self syncHelperViewVisibility];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [[NotificationManager shared] presentScreenshotWithCount:27 completion:^{
-            NSLog(@"|||| oh snap!");
-        }];
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [[NotificationManager shared] presentScreenshotWithCount:2 completion:nil];
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [[NotificationManager shared] presentScreenshotWithCount:2 completion:nil];
-            });
-        });
-    });
-}
-
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     

@@ -106,6 +106,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [self refreshTabBarSettingsBadge];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self attemptPresentNotification];
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
         [self refreshTabBarSettingsBadge];
@@ -190,6 +196,21 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)screenshotsNavigationControllerDidGrantPushPermissions:(ScreenshotsNavigationController *)navigationController {
     [self refreshTabBarSettingsBadge];
+}
+
+
+#pragma mark - Notifications
+
+- (void)attemptPresentNotification {
+    NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+    
+    if (newScreenshotsCount > 0) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount completion:^{
+                NSLog(@"|||| oh snap!");
+            }];
+        });
+    }
 }
 
 @end

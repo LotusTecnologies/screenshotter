@@ -14,22 +14,22 @@ import PromiseKit
 import UserNotifications
 
 
-class AccumulatorModel {
+class AccumulatorModel: NSObject {
     
     public static let sharedInstance = AccumulatorModel()
     
-    private var newScreenshots: Int = 0
+    private var newScreenshotsCount: Int = 0
     
-    public func getNewScreenshots() -> Int {
-        return newScreenshots
+    public func getNewScreenshotsCount() -> Int {
+        return newScreenshotsCount
     }
     
-    public func resetNewScreenshots() {
-        newScreenshots = 0
+    public func resetNewScreenshotsCount() {
+        newScreenshotsCount = 0
     }
     
-    fileprivate func addToNewScreenshots(screenshotCount: Int) {
-        newScreenshots += screenshotCount
+    fileprivate func addToNewScreenshots(count: Int) {
+        newScreenshotsCount += count
     }
     
 }
@@ -644,7 +644,7 @@ class AssetSyncModel: NSObject {
             }
             if toUpload.count > 0 {
                 track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
-                AccumulatorModel.sharedInstance.addToNewScreenshots(screenshotCount: toUpload.count)
+                AccumulatorModel.sharedInstance.addToNewScreenshots(count: toUpload.count)
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
