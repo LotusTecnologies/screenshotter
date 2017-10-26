@@ -232,23 +232,20 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 #pragma mark - Notifications
 
 - (void)attemptPresentNotification {
-    NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
-    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
-    
-    if (newScreenshotsCount > 0) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (newScreenshotsCount == 1) {
-                [[NotificationManager shared] presentScreenshotWith:^{
-                    [[AssetSyncModel sharedInstance] refetchLastScreenshot];
-                }];
-                
-            } else {
-                [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
-                    [self.screenshotsNavigationController presentPickerViewController];
-                }];
-            }
-        });
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+        [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+        if (newScreenshotsCount == 1) {
+            [[NotificationManager shared] presentScreenshotWith:^{
+                [[AssetSyncModel sharedInstance] refetchLastScreenshot];
+            }];
+            
+        } else if (newScreenshotsCount > 1) {
+            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
+                [self.screenshotsNavigationController presentPickerViewController];
+            }];
+        }
+    });
 }
 
 @end
