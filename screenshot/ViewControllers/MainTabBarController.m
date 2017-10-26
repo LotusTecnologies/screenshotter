@@ -16,6 +16,8 @@
     BOOL _isObservingSettingsBadgeFont;
 }
 
+@property (nonatomic, strong) id didTakeScreenshotObserver;
+
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *discoverNavigationController;
@@ -94,9 +96,37 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     return self;
 }
 
+- (void)dealloc {
+    [self dismissTabBarSettingsBadge];
+    
+    self.screenshotsNavigationController.delegate = nil;
+
+    if (self.didTakeScreenshotObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self.didTakeScreenshotObserver];
+        self.didTakeScreenshotObserver = nil;
+    }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.didTakeScreenshotObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationUserDidTakeScreenshotNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        BOOL foundIntercomWindow = NO;
+        
+        NSArray<UIWindow *> *windows = [[UIApplication sharedApplication] windows];
+        for (UIWindow *window in windows) {
+            if ([window isKindOfClass:NSClassFromString(@"ICMWindow")]) {
+                foundIntercomWindow = YES;
+                break;
+            }
+        }
+        
+        NSString *eventName = foundIntercomWindow ? @"Took Screenshot While Showing Intercom Window" : @"Took Screenshot";
+        [AnalyticsTrackers.standard track:eventName properties:nil];
+    }];
+    
     self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
     [self.updatePromptHandler start];
 }
@@ -137,14 +167,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
-
-- (void)dealloc {
-    [self dismissTabBarSettingsBadge];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    self.screenshotsNavigationController.delegate = nil;
-}
-
 
 #pragma mark - Tab Bar
 
@@ -210,23 +232,20 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 #pragma mark - Notifications
 
 - (void)attemptPresentNotification {
-    NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
-    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
-    
-    if (newScreenshotsCount > 0) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (newScreenshotsCount == 1) {
-                [[NotificationManager shared] presentScreenshotWith:^{
-                    [[AssetSyncModel sharedInstance] refetchLastScreenshot];
-                }];
-                
-            } else {
-                [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
-                    [self.screenshotsNavigationController presentPickerViewController];
-                }];
-            }
-        });
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+        [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+        if (newScreenshotsCount == 1) {
+            [[NotificationManager shared] presentScreenshotWith:^{
+                [[AssetSyncModel sharedInstance] refetchLastScreenshot];
+            }];
+            
+        } else if (newScreenshotsCount > 1) {
+            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
+                [self.screenshotsNavigationController presentPickerViewController];
+            }];
+        }
+    });
 }
 
 @end
