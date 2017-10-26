@@ -13,4 +13,6 @@
 + (CGFloat)padding;
 + (CGFloat)extendedPadding;
 
++ (CGFloat)halfPoint;
+
 @end

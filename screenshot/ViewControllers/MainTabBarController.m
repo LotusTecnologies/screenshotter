@@ -88,6 +88,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
                                  self.settingsNavigationController
                                  ];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
     return self;
@@ -104,6 +105,18 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [super viewWillAppear:animated];
     
     [self refreshTabBarSettingsBadge];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self attemptPresentNotification];
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self attemptPresentNotification];
+    }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -127,6 +140,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)dealloc {
     [self dismissTabBarSettingsBadge];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     self.screenshotsNavigationController.delegate = nil;
 }
@@ -190,6 +204,29 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)screenshotsNavigationControllerDidGrantPushPermissions:(ScreenshotsNavigationController *)navigationController {
     [self refreshTabBarSettingsBadge];
+}
+
+
+#pragma mark - Notifications
+
+- (void)attemptPresentNotification {
+    NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+    
+    if (newScreenshotsCount > 0) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (newScreenshotsCount == 1) {
+                [[NotificationManager shared] presentScreenshotWith:^{
+                    [[AssetSyncModel sharedInstance] refetchLastScreenshot];
+                }];
+                
+            } else {
+                [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
+                    [self.screenshotsNavigationController presentPickerViewController];
+                }];
+            }
+        });
+    }
 }
 
 @end
