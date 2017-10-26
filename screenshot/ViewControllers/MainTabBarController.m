@@ -105,6 +105,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [[NSNotificationCenter defaultCenter] removeObserver:self.didTakeScreenshotObserver];
         self.didTakeScreenshotObserver = nil;
     }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidLoad {
@@ -165,14 +167,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
-
-- (void)dealloc {
-    [self dismissTabBarSettingsBadge];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    self.screenshotsNavigationController.delegate = nil;
-}
-
 
 #pragma mark - Tab Bar
 
