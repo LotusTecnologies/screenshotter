@@ -104,9 +104,9 @@ class TutorialVideoOverlayView : UIView {
     // MARK: - Button Setup
     
     private func setupVolumeToggleButton() {
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoUnmuted"), for: .normal)
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoMuted") , for: .selected)
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoMuted"), for: [.highlighted, .selected])
+        volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerSound"), for: .normal)
+        volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute") , for: .selected)
+        volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute"), for: [.highlighted, .selected])
         volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
         volumeToggleButton.showsTouchWhenHighlighted = true
         
@@ -116,9 +116,9 @@ class TutorialVideoOverlayView : UIView {
     private func setupReplayPauseButton() {
         replayPauseButton.translatesAutoresizingMaskIntoConstraints = false
         replayPauseButton.showsTouchWhenHighlighted = true
-        replayPauseButton.setImage(#imageLiteral(resourceName: "TutorialVideoPause"), for: .normal)
-        replayPauseButton.setImage(#imageLiteral(resourceName: "TutorialVideoReplay"), for: .selected)
-        replayPauseButton.setImage(#imageLiteral(resourceName: "TutorialVideoReplay"), for: [.highlighted, .selected])
+        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: .normal)
+        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: .selected)
+        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: [.highlighted, .selected])
         replayPauseButton.alpha = 0
         
         addSubview(replayPauseButton)

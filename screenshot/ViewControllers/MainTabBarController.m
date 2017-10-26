@@ -166,14 +166,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     }
 }
 
-- (void)dealloc {
-    [self dismissTabBarSettingsBadge];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    self.screenshotsNavigationController.delegate = nil;
-}
-
-
 #pragma mark - Tab Bar
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
