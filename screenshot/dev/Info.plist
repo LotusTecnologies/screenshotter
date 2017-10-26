@@ -23,10 +23,6 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>google</string>
-				<string>instagram</string>
-				<string>snapchat</string>
-				<string>fb</string>
 				<string>fb1960379067541863</string>
 			</array>
 		</dict>
@@ -40,6 +36,13 @@
 				<string>io.crazeapp.screenshot.dev</string>
 			</array>
 		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>google</string>
+		<string>snapchat</string>
+		<string>fb</string>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>40</string>

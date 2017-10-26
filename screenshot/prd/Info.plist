@@ -18,15 +18,18 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.3</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>google</string>
+		<string>snapchat</string>
+		<string>fb</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>google</string>
-				<string>instagram</string>
-				<string>snapchat</string>
-				<string>fb</string>
 				<string>fb1960379067541863</string>
 			</array>
 		</dict>
