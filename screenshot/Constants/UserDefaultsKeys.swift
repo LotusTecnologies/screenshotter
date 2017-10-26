@@ -18,6 +18,9 @@ class UserDefaultsKeys : NSObject {
     // Discover
     static let discoverUrl = "DiscoverUrl"
     
+    // Screenshot
+    static let newScreenshotsCount = "NewScreenshotsCount"
+    
     // Product
     static let productSort = "ProductSort"
     

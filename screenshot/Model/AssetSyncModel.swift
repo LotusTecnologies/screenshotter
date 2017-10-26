@@ -18,7 +18,7 @@ class AccumulatorModel: NSObject {
     
     public static let sharedInstance = AccumulatorModel()
     
-    private var newScreenshotsCount: Int = 0
+    private var newScreenshotsCount: Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.newScreenshotsCount)
     
     @objc public func getNewScreenshotsCount() -> Int {
         return newScreenshotsCount
@@ -26,10 +26,12 @@ class AccumulatorModel: NSObject {
     
     @objc public func resetNewScreenshotsCount() {
         newScreenshotsCount = 0
+        UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
     }
     
     fileprivate func addToNewScreenshots(count: Int) {
         newScreenshotsCount += count
+        UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
     }
     
 }
