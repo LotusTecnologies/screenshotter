@@ -7,7 +7,7 @@
 //
 
 #import "ShoppablesToolbar.h"
-#import "Geometry.h"
+
 #import "ShoppableCollectionViewCell.h"
 
 @class ShoppablesCollectionView;

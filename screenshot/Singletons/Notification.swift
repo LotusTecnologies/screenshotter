@@ -160,7 +160,7 @@ private class NotificationView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let padding = Geometry.padding()
+        let padding = Geometry.padding
         
         backgroundColor = .white
         layoutMargins = UIEdgeInsetsMake(padding, padding, padding, padding)
@@ -199,7 +199,7 @@ private class NotificationView: UIView {
         bottomBorder.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         bottomBorder.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         bottomBorder.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        bottomBorder.heightAnchor.constraint(equalToConstant: Geometry.halfPoint()).isActive = true
+        bottomBorder.heightAnchor.constraint(equalToConstant: Geometry.halfPoint).isActive = true
     }
     
     // MARK: Image
