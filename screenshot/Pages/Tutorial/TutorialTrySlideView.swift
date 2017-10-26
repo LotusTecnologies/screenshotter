@@ -46,6 +46,10 @@ public class TutorialTrySlideView : HelperView {
         super.init(coder: aDecoder)
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     // MARK: Screenshot handling
     
     @objc func applicationUserDidTakeScreenshot() {
