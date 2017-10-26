@@ -50,7 +50,7 @@ class TutorialVideoViewController : BaseViewController {
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
     
-    private let overlayView = TutorialVideoOverlayView(frame: .zero)
+    private let overlayView = TutorialVideoOverlayView()
     
     private var observers = [NSKeyValueObservation]()
     private var ended = false
