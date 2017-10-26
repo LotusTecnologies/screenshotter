@@ -352,12 +352,12 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
     }
     
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard textField == nameTextField else {
+        if textField == nameTextField {
+            emailTextField.becomeFirstResponder()
+        } else {
             textField.resignFirstResponder()
-            return true
         }
         
-        emailTextField.becomeFirstResponder()
         return true
     }
 }
