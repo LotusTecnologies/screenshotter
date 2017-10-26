@@ -323,6 +323,34 @@ extension DataModel {
         return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isHidden == TRUE"))
     }
     
+    func retrieveLastScreenshotAssetId(managedObjectContext: NSManagedObjectContext) -> String? {
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
+        fetchRequest.predicate = NSPredicate(format: "isFashion == TRUE AND isFromShare == FALSE AND isHidden == TRUE") // match uploadScreenshotWithClarifai
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        fetchRequest.includesSubentities = false
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.includesPendingChanges = false
+        fetchRequest.propertiesToFetch = ["assetId"]
+        fetchRequest.returnsDistinctResults = true
+        fetchRequest.includesPropertyValues = true
+        fetchRequest.shouldRefreshRefetchedObjects = false
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        do {
+            guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]],
+              let result = results.first,
+              let assetId = result["assetId"] else {
+                print("retrieveLastScreenshotAssetId failed to fetch dictionaries")
+                return nil
+            }
+            return assetId
+        } catch {
+            print("retrieveAllAssetIds results with error:\(error)")
+        }
+        return nil
+    }
+    
     func retrieveAssetIds(managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> Set<String> {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
         fetchRequest.predicate = predicate
@@ -348,7 +376,7 @@ extension DataModel {
                 }
             }
         } catch {
-            print("retrieveAllAssetIds results with error:\(error)")
+            print("retrieveAssetIds results with error:\(error)")
         }
         return assetIdsSet
     }
