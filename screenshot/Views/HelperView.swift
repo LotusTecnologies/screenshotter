@@ -30,6 +30,9 @@ public class HelperView : UIView {
                 ])
                 
                 self.imageView = imageView
+            } else if contentImage == nil {
+                imageView?.removeFromSuperview()
+                imageView = nil
             }
             
             imageView?.image = contentImage
