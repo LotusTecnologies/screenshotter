@@ -190,9 +190,7 @@ extension TutorialViewController : UIScrollViewDelegate {
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         scrollViewIsScrollingAnimation = false
         
-        if let slide = currentSlide as? TutorialSlideView {
-            slide.didEnterSlide()
-        }
+        (currentSlide as? TutorialSlideView)?.didEnterSlide()
     }
 }
 
