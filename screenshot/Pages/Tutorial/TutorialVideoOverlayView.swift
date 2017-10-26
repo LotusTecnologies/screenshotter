@@ -81,7 +81,10 @@ class TutorialVideoOverlayView : UIView {
     
     func showReplayButton() {
         replayPauseButton.isSelected = true
-        replayPauseButton.alpha = 0
+
+        guard replayPauseButton.alpha == 0 else {
+            return
+        }
         
         UIView.animate(withDuration: animationDuration) {
             self.replayPauseButton.alpha = 1
@@ -89,7 +92,9 @@ class TutorialVideoOverlayView : UIView {
     }
     
     func hideReplayButton() {
-        replayPauseButton.alpha = 1
+        guard replayPauseButton.alpha > 0 else {
+            return
+        }
         
         UIView.animate(withDuration: animationDuration) {
             self.replayPauseButton.alpha = 0
@@ -100,8 +105,7 @@ class TutorialVideoOverlayView : UIView {
     
     private func setupVolumeToggleButton() {
         volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoUnmuted"), for: .normal)
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "TutorialVideoMuted"), for: .selected)
+        volumeToggleButton.showsTouchWhenHighlighted = true
         
         addSubview(volumeToggleButton)
     }
