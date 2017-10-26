@@ -325,6 +325,8 @@ extension TutorialEmailSlideView : TappableTextViewDelegate {
 
 extension TutorialEmailSlideView : UITextFieldDelegate {
     public func textFieldDidBeginEditing(_ textField: UITextField) {
+        // Wait until keyboard frame has been set!
+        
         DispatchQueue.main.async {
             guard let window = self.window else {
                 return
