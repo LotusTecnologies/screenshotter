@@ -591,7 +591,7 @@ class AssetSyncModel: NSObject {
         return true
     }
     
-    func addToSelected(assetId: String) {
+    func addToSelected(assetId: String) -> Bool {
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
         let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
@@ -601,7 +601,9 @@ class AssetSyncModel: NSObject {
             } else {
                 self.selectedScreenshotAssets = [asset]
             }
+            return true
         }
+        return false
     }
     
     @objc public func syncPhotos() {
@@ -724,26 +726,32 @@ class AssetSyncModel: NSObject {
     }
     
     public func refetchOpenedFromNotification(assetId: String) {
-        addToSelected(assetId: assetId)
+        guard addToSelected(assetId: assetId) else {
+            return
+        }
+        let accumulator = AccumulatorModel.sharedInstance
+        if accumulator.getNewScreenshotsCount() > 0 {
+            accumulator.addToNewScreenshots(count: -1)
+        }
         syncPhotos()
     }
     
     @objc public func refetchShoppables(screenshot: Screenshot) {
         guard screenshot.shoppablesCount < 0,
-          let assetId = screenshot.assetId else {
+          let assetId = screenshot.assetId,
+          addToSelected(assetId: assetId) else {
                 return
         }
-        addToSelected(assetId: assetId)
         syncPhotos()
     }
 
     // Called from UI thread.
     @objc public func refetchLastScreenshot() {
         let dataModel = DataModel.sharedInstance
-        guard let lastScreenshotAssetId = dataModel.retrieveLastScreenshotAssetId(managedObjectContext: dataModel.mainMoc()) else {
+        guard let lastScreenshotAssetId = dataModel.retrieveLastScreenshotAssetId(managedObjectContext: dataModel.mainMoc()),
+          addToSelected(assetId: lastScreenshotAssetId) else {
             return
         }
-        addToSelected(assetId: lastScreenshotAssetId)
         syncPhotos()
     }
     
