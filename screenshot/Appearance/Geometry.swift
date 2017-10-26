@@ -16,4 +16,12 @@ public class Geometry : NSObject {
     class var extendedPadding: CGFloat {
         return 40
     }
+    
+    class var halfPoint: CGFloat {
+        if UIScreen.main.scale == 1 {
+            return 0.5
+        }
+        
+        return 1
+    }
 }

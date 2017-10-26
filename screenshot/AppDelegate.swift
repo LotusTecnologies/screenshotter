@@ -263,7 +263,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : String],
           let openingScreen = userInfo[Constants.openingScreenKey],
-          openingScreen == Constants.openingScreenValueScreenshot {
+          openingScreen == Constants.openingScreenValueScreenshot,
+          let openingAssetId = userInfo[Constants.openingAssetIdKey] {
+            AssetSyncModel.sharedInstance.refetchOpenedFromNotification(assetId: openingAssetId)
             showScreenshotListTop()
         }
         
