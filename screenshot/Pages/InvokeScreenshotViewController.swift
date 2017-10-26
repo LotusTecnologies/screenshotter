@@ -56,9 +56,9 @@ class InvokeScreenshotViewController : UIViewController {
         ]
     }()
     
-    private var label = UILabel()
+    private var titleLabel = UILabel()
+    private var descriptionLabel = UILabel()
     private var buttonView = UIView()
-    private var notificationLabel = UILabel()
     private var notificationSwitch = UISwitch()
     private var didBecomeActiveObserver: Any? = nil
     private var dismissesOnBecomingActive = true
@@ -75,6 +75,7 @@ class InvokeScreenshotViewController : UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
+        view.layoutMargins = UIEdgeInsets(top: Geometry.extendedPadding, left: 5 + Geometry.padding, bottom: Geometry.extendedPadding, right: 5 + Geometry.padding)
         
         didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
             if (self.dismissesOnBecomingActive) {
@@ -85,7 +86,8 @@ class InvokeScreenshotViewController : UIViewController {
             }
         }
         
-        setupLabel()
+        setupTitleLabel()
+        setupDescriptionLabel()
         setupNotificationView()
         setupButtons()
     }
@@ -101,19 +103,36 @@ class InvokeScreenshotViewController : UIViewController {
     private func updateNotificationSwitchStatus() {
         let hasPermission = PermissionsManager.shared().hasPermission(for: .push)
         
-        self.notificationSwitch.setOn(hasPermission, animated: true)
-        self.notificationSwitch.isEnabled = !hasPermission
+        notificationSwitch.setOn(hasPermission, animated: true)
+        notificationSwitch.isEnabled = !hasPermission
     }
     
-    private func setupLabel() {
+    private func setupTitleLabel() {
+        titleLabel.text = "Now leave the app!"
+        titleLabel.textAlignment = .center
+        titleLabel.textColor = .red
+        titleLabel.minimumScaleFactor = 0.7
+        titleLabel.adjustsFontSizeToFitWidth = true
+        titleLabel.font = UIFont.preferredFont(forTextStyle: .title1)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    
+        view.addSubview(titleLabel)
+        
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+        ])
+    }
+    
+    private func setupDescriptionLabel() {
         let attributedText = NSMutableAttributedString()
         let attributedStringData = [
-            AttributedStringData(text: "Now leave the app!\n\n", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title1), NSForegroundColorAttributeName : UIColor.red ]),
             AttributedStringData(text: "No, seriously. ", attributes:[ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
             AttributedStringData(text: "Close this app.\n\n", attributes:[ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.black ]),
-            AttributedStringData(text: "Go to your favorite places for\nfashion inspiration - Instagram,\nSnapchat, Google, anywhere -\n", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
+            AttributedStringData(text: "Go to your favorite places for fashion inspiration - Instagram, Snapchat, Google, anywhere -- ", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
             AttributedStringData(text: "take screenshots", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.black ]),
-            AttributedStringData(text: ", then come back\nand ", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
+            AttributedStringData(text: ", then come back and ", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
             AttributedStringData(text: "shop them here!", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.black ])
         ]
         
@@ -124,19 +143,17 @@ class InvokeScreenshotViewController : UIViewController {
             currentStringIndex += data.text.count
         }
         
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.attributedText = attributedText
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.attributedText = attributedText
+        descriptionLabel.numberOfLines = 0
+        descriptionLabel.lineBreakMode = .byWordWrapping
         
-        view.addSubview(label)
+        view.addSubview(descriptionLabel)
         
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: 20),
-            label.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            label.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor),
-            label.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Geometry.padding),
+            descriptionLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
         ])
     }
     
@@ -168,34 +185,45 @@ class InvokeScreenshotViewController : UIViewController {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            stackView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
+            stackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 50),
             stackView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
         ] + constraints)
     }
     
     private func setupNotificationView() {
-        let attributedText = NSMutableAttributedString()
-        let firstLine = "Enable notifications\n\n"
-        attributedText.insert(NSAttributedString(string: firstLine), at: 0)
-        attributedText.insert(NSAttributedString(string: "We'll send you a notification when your\nscreenshot is ready to be shopped.", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .subheadline), NSForegroundColorAttributeName : UIColor.gray]), at: firstLine.count)
+        let topLabel = UILabel()
+        let bottomLabel = UILabel()
         
-        notificationLabel.translatesAutoresizingMaskIntoConstraints = false
-        notificationLabel.attributedText = attributedText
-        notificationLabel.numberOfLines = 0
-        view.addSubview(notificationLabel)
+        topLabel.translatesAutoresizingMaskIntoConstraints = false
+        topLabel.text = "Enable notifications"
+        topLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+        
+        view.addSubview(topLabel)
+        
+        bottomLabel.translatesAutoresizingMaskIntoConstraints = false
+        bottomLabel.text = "We'll send you a notification when your\nscreenshot is ready to be shopped."
+        bottomLabel.numberOfLines = 0
+        bottomLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        bottomLabel.textColor = .gray6
+        
+        view.addSubview(bottomLabel)
         
         notificationSwitch.addTarget(self, action: #selector(notificationSwitchChanged(_:)), for: .valueChanged)
         notificationSwitch.translatesAutoresizingMaskIntoConstraints = false
+        notificationSwitch.onTintColor = .crazeRed
         view.addSubview(notificationSwitch)
         
         NSLayoutConstraint.activate([
-            notificationLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            notificationLabel.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor, constant: -10),
-            notificationLabel.trailingAnchor.constraint(equalTo: notificationSwitch.leadingAnchor, constant: -10),
+            topLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            topLabel.bottomAnchor.constraint(equalTo: bottomLabel.topAnchor, constant: -Geometry.padding),
+            topLabel.trailingAnchor.constraint(equalTo: notificationSwitch.leadingAnchor, constant: -Geometry.padding),
             
-            notificationSwitch.topAnchor.constraint(equalTo: notificationLabel.topAnchor, constant: 0),
-            notificationSwitch.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -10),
-            notificationSwitch.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor, constant: -10),
+            bottomLabel.leadingAnchor.constraint(equalTo: topLabel.leadingAnchor),
+            bottomLabel.trailingAnchor.constraint(equalTo: notificationSwitch.leadingAnchor, constant: -Geometry.padding),
+            bottomLabel.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
+            
+            notificationSwitch.centerYAnchor.constraint(equalTo: topLabel.centerYAnchor),
+            notificationSwitch.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
         ])
     }
     
