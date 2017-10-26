@@ -105,6 +105,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [[NSNotificationCenter defaultCenter] removeObserver:self.didTakeScreenshotObserver];
         self.didTakeScreenshotObserver = nil;
     }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidLoad {
