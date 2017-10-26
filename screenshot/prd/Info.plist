@@ -18,13 +18,6 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.3</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>instagram</string>
-		<string>google</string>
-		<string>snapchat</string>
-		<string>fb</string>
-	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -43,6 +36,13 @@
 				<string>io.crazeapp.screenshot</string>
 			</array>
 		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>google</string>
+		<string>snapchat</string>
+		<string>fb</string>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>41</string>
