@@ -163,7 +163,6 @@ private class NotificationView: UIView {
         let padding = Geometry.padding
         
         backgroundColor = .white
-        layoutMargins = UIEdgeInsetsMake(padding, padding, padding, padding)
         
         imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -171,9 +170,9 @@ private class NotificationView: UIView {
         imageView.tintColor = .crazeRed
         imageView.isHidden = true
         addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        imageView.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding).isActive = true
+        imageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding).isActive = true
         imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
         
         label = UILabel()
@@ -182,9 +181,9 @@ private class NotificationView: UIView {
         label.textAlignment = .center
         label.textColor = .gray3
         addSubview(label)
-        label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
-        label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
-        label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        label.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
+        label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding).isActive = true
+        label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding).isActive = true
         
         labelLeadingConstraint = label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor)
         labelLeadingConstraint.isActive = true
