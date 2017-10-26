@@ -8,10 +8,8 @@
 
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
-#import "Geometry.h"
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
-#import "WebViewController.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
 #import "Loader.h"
@@ -126,7 +124,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
         // You shall not pass!
-        [self displayNoItemsHelperView];
+        [self showNoItemsHelperView];
         return;
     }
     
@@ -268,8 +266,12 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
     if (!self.noItemsHelperView) {
         [self stopAndRemoveLoader];
-        [self displayNoItemsHelperView];
+        [self showNoItemsHelperView];
     }
+}
+
+- (Product *)productAtIndex:(NSInteger)index {
+    return self.products[index];
 }
 
 
@@ -307,7 +309,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = self.products[indexPath.item];
+    Product *product = [self productAtIndex:indexPath.item];
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
@@ -319,15 +321,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = self.products[indexPath.item];
+    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
     
-    WebViewController *webViewController = [[WebViewController alloc] init];
-    [webViewController addNavigationItemLogo];
-    webViewController.hidesBottomBarWhenPushed = YES;
-    webViewController.loaderLabelText = @"Loading your store...";
-    webViewController.url = [NSURL URLWithString:product.offer];
-    
-    [self.navigationController pushViewController:webViewController animated:YES];
+    Product *product = [self productAtIndex:indexPath.item];
     
     [AnalyticsTrackers.branch track:@"Tapped on product"];
     [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
@@ -342,7 +338,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     BOOL isFavorited = [cell.favoriteButton isSelected];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-    Product *product = self.products[indexPath.item];
+    Product *product = [self productAtIndex:indexPath.item];
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
@@ -515,12 +511,11 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 #pragma mark - Helper View
 
-- (void)displayNoItemsHelperView {
+- (void)showNoItemsHelperView {
     CGFloat p2 = [Geometry extendedPadding];
     
     HelperView *helperView = [[HelperView alloc] init];
     helperView.translatesAutoresizingMaskIntoConstraints = NO;
-    helperView.userInteractionEnabled = NO;
     helperView.backgroundColor = self.view.backgroundColor;
     helperView.titleLabel.text = @"No Items Found";
     helperView.subtitleLabel.text = @"No visually similar products were detected";
@@ -528,11 +523,31 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [self.view addSubview:helperView];
     [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:p2].active = YES;
     [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-p2].active = YES;
+    [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-p2].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
     
+    MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
+    retryButton.translatesAutoresizingMaskIntoConstraints = NO;
+    retryButton.backgroundColor = [UIColor crazeGreen];
+    [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
+    [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
+    [helperView.contentView addSubview:retryButton];
+    [retryButton.bottomAnchor constraintEqualToAnchor:helperView.contentView.bottomAnchor].active = YES;
+    [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+    
     [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
+}
+
+- (void)hideNoItemsHelperView {
+    [self.noItemsHelperView removeFromSuperview];
+    self.noItemsHelperView = nil;
+}
+
+- (void)noItemsRetryAction {
+    [self.shoppablesController refetchShoppables];
+    [self hideNoItemsHelperView];
+    [self.loader startAnimation:LoaderAnimationSpin];
 }
 
 @end

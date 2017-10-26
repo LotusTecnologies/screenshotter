@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 enum TutorialVideo {
     case Standard

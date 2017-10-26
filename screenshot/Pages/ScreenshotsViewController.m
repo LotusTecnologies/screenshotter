@@ -6,11 +6,12 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
+#import <CoreData/CoreData.h>
+
 #import "ScreenshotsViewController.h"
 #import "ScreenshotCollectionViewCell.h"
-#import "Geometry.h"
 #import "screenshot-Swift.h"
-#import "HelperView.h"
+
 #import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
