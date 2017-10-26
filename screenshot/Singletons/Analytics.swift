@@ -201,8 +201,9 @@ public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracke
     tracker.track(name, properties: properties)
 }
 
-public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
+public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
     let user = AnalyticsUser(name: name, email: email)
     tracker.identify(user)
+    return user
 }
 

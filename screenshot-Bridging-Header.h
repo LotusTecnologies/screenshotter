@@ -10,11 +10,7 @@
 #import "PermissionsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
-#import "HelperView.h"
-#import "Geometry.h"
 #import "WebViewController.h"
-#import "TutorialBaseSlideView.h"
-#import "TutorialEmailSlideView.h"
-#import "TutorialTrySlideView.h"
+#import "TappableTextView.h"
 
 #endif /* screenshot_Bridging_Header_h */

@@ -13,6 +13,29 @@ import CoreData // NSManagedObjectContext
 import PromiseKit
 import UserNotifications
 
+
+class AccumulatorModel: NSObject {
+    
+    public static let sharedInstance = AccumulatorModel()
+    
+    private var newScreenshotsCount: Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.newScreenshotsCount)
+    
+    @objc public func getNewScreenshotsCount() -> Int {
+        return newScreenshotsCount
+    }
+    
+    @objc public func resetNewScreenshotsCount() {
+        newScreenshotsCount = 0
+        UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
+    }
+    
+    fileprivate func addToNewScreenshots(count: Int) {
+        newScreenshotsCount += count
+        UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
+    }
+    
+}
+
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
@@ -45,21 +68,15 @@ class AssetSyncModel: NSObject {
         isRegistered = true
     }
     
-    func uploadScreenshot(asset: PHAsset, shouldBypassClarifai: Bool) {
+    func uploadScreenshotWithClarifai(asset: PHAsset) {
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
-                if shouldBypassClarifai {
-                    track("bypassed Clarifai")
-                    return Promise(value: (true, image))
-                }
                 track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
-            }.then(on: processingQ) { isFashion, image -> Promise<(Data?, Bool)> in
-                if !shouldBypassClarifai {
-                    track("received response from Clarifai", properties: ["isFashion" : isFashion])
-                }
+            }.then(on: processingQ) { isFashion, image -> Promise<Bool> in
+                track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? self.data(for: image) : nil
                 return Promise { fulfill, reject in
                     dataModel.performBackgroundTask { (managedObjectContext) in
@@ -68,19 +85,47 @@ class AssetSyncModel: NSObject {
                                                          createdAt: asset.creationDate,
                                                          isFashion: isFashion,
                                                          isFromShare: false,
+                                                         isHidden: true,
                                                          imageData: imageData)
-                        fulfill((imageData, isFashion))
+                        fulfill(isFashion)
                     }
                 }
-            }.then (on: processingQ) { (imageData, isFashion) -> Void in
-                if isFashion && !shouldBypassClarifai {
+            }.then (on: processingQ) { isFashion -> Void in
+                if isFashion {
                     self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
                 }
-                self.syteProcessing(shouldProcess: isFashion, imageData: imageData, assetId: asset.localIdentifier)
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
             }.catch { error in
-                print("uploadScreenshot outer Clarifai catch error:\(error)")
+                print("uploadScreenshotWithClarifai catch error:\(error)")
+        }
+    }
+    
+    func uploadPhotoBypassClarifai(asset: PHAsset) {
+        let dataModel = DataModel.sharedInstance
+        firstly {
+            return image(asset: asset)
+            }.then(on: processingQ) { image -> Promise<Data?> in
+                track("bypassed Clarifai")
+                let imageData: Data? = self.data(for: image)
+                return Promise { fulfill, reject in
+                    dataModel.performBackgroundTask { (managedObjectContext) in
+                        let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                         assetId: asset.localIdentifier,
+                                                         createdAt: asset.creationDate,
+                                                         isFashion: true,
+                                                         isFromShare: false,
+                                                         isHidden: false,
+                                                         imageData: imageData)
+                        fulfill(imageData)
+                    }
+                }
+            }.then (on: processingQ) { imageData -> Void in
+                self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: asset.localIdentifier)
+            }.always(on: self.serialQ) {
+                self.decrementScreenshots()
+            }.catch { error in
+                print("uploadPhotoBypassClarifai outer catch error:\(error)")
         }
     }
     
@@ -199,6 +244,7 @@ class AssetSyncModel: NSObject {
                                                     createdAt: Date(),
                                                     isFashion: true,
                                                     isFromShare: true,
+                                                    isHidden: false,
                                                     imageData: imageData)
                 }
             }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
@@ -545,6 +591,21 @@ class AssetSyncModel: NSObject {
         return true
     }
     
+    func addToSelected(assetId: String) -> Bool {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
+        let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        if let asset = fetchResult.firstObject {
+            if self.selectedScreenshotAssets != nil {
+                self.selectedScreenshotAssets?.append(asset)
+            } else {
+                self.selectedScreenshotAssets = [asset]
+            }
+            return true
+        }
+        return false
+    }
+    
     @objc public func syncPhotos() {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
@@ -587,11 +648,12 @@ class AssetSyncModel: NSObject {
             }
             if toUpload.count > 0 {
                 track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
+                AccumulatorModel.sharedInstance.addToNewScreenshots(count: toUpload.count)
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
                         self.processingQ.async {
-                            self.uploadScreenshot(asset: asset, shouldBypassClarifai: false)
+                            self.uploadScreenshotWithClarifai(asset: asset)
                         }
                     }
                 })
@@ -612,7 +674,7 @@ class AssetSyncModel: NSObject {
                     .forEach { asset in
                         self.screenshotsToProcess += 1
                         self.processingQ.async {
-                            self.uploadScreenshot(asset: asset, shouldBypassClarifai: true)
+                            self.uploadPhotoBypassClarifai(asset: asset)
                         }
                 }
             }
@@ -654,6 +716,7 @@ class AssetSyncModel: NSObject {
                                                  createdAt: Date(),
                                                  isFashion: true,
                                                  isFromShare: false,
+                                                 isHidden: false,
                                                  imageData: imageData)
             }
             let tuple = self.tupleByAspectRatio()
@@ -662,20 +725,36 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    public func refetchOpenedFromNotification(assetId: String) {
+        guard addToSelected(assetId: assetId) else {
+            return
+        }
+        let accumulator = AccumulatorModel.sharedInstance
+        if accumulator.getNewScreenshotsCount() > 0 {
+            accumulator.addToNewScreenshots(count: -1)
+        }
+        syncPhotos()
+    }
+    
     @objc public func refetchShoppables(screenshot: Screenshot) {
         guard screenshot.shoppablesCount < 0,
-          let assetId = screenshot.assetId else {
+          let assetId = screenshot.assetId,
+          addToSelected(assetId: assetId) else {
                 return
         }
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
-        let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        if let asset = fetchResult.firstObject {
-            self.selectedScreenshotAssets = [asset]
-            syncPhotos()
-        }
+        syncPhotos()
     }
 
+    // Called from UI thread.
+    @objc public func refetchLastScreenshot() {
+        let dataModel = DataModel.sharedInstance
+        guard let lastScreenshotAssetId = dataModel.retrieveLastScreenshotAssetId(managedObjectContext: dataModel.mainMoc()),
+          addToSelected(assetId: lastScreenshotAssetId) else {
+            return
+        }
+        syncPhotos()
+    }
+    
 }
 
 extension AssetSyncModel {
@@ -695,7 +774,8 @@ extension AssetSyncModel {
             content.sound = UNNotificationSound.default()
         }
         UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
-        content.userInfo = [ Constants.openingScreenKey : Constants.openingScreenValueScreenshot ]
+        content.userInfo = [Constants.openingScreenKey : Constants.openingScreenValueScreenshot,
+                            Constants.openingAssetIdKey : assetId]
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let identifier = "CrazeLocal" + assetId
         let request = UNNotificationRequest(identifier: identifier,
