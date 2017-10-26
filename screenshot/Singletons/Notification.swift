@@ -167,6 +167,7 @@ private class NotificationView: UIView {
         
         imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .crazeRed
         imageView.isHidden = true
         addSubview(imageView)
