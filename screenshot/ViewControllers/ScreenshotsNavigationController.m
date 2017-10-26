@@ -97,8 +97,10 @@
 #pragma mark -
 
 - (void)presentAppropriateModalViewControllerIfNecessary {
-    BOOL shouldPresentPushPermissions = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
-    if (![self presentPickerViewControllerIfNeeded] && shouldPresentPushPermissions) {
+    BOOL shouldPresentPushPermissionsVC = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
+    if ([self canPresentPickerViewController]) {
+        [self presentPickerViewControllerIfNeeded];
+    } else if (shouldPresentPushPermissionsVC) {
         UIViewController *controller = [[InvokeScreenshotViewController alloc] init];
         [self presentViewController:controller animated:YES completion:^{
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
@@ -108,6 +110,10 @@
 }
 
 #pragma mark - Screenshots Picker
+
+- (BOOL)canPresentPickerViewController {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
+}
 
 - (void)presentPickerViewController {
     [self presentPickerViewControllerWithCompletion:nil];
@@ -126,17 +132,13 @@
     [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
 
-- (BOOL)presentPickerViewControllerIfNeeded {
-    BOOL shouldPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-    
-    if (shouldPresent) {
+- (void)presentPickerViewControllerIfNeeded {
+    if ([self canPresentPickerViewController]) {
         [self presentPickerViewControllerWithCompletion:^{
             [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }];
     }
-    
-    return shouldPresent;
 }
 
 - (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
