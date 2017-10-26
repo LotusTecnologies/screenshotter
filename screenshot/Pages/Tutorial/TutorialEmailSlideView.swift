@@ -133,7 +133,8 @@ public class TutorialEmailSlideView : HelperView {
         
             contentView.addSubview(button)
             button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        
+            button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+            
             NSLayoutConstraint.activate([
                 button.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: p2),
                 button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
@@ -158,8 +159,8 @@ public class TutorialEmailSlideView : HelperView {
             textView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
             
             NSLayoutConstraint.activate([
-                textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor),
-                textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: p),
+                textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor, constant: p),
+                textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
                 textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
                 textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
             ])
@@ -361,7 +362,7 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
 extension TutorialEmailSlideView : TutorialSlideView {
     public func didEnterSlide() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardDidHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
     }
     
     public func willLeaveSlide() {
