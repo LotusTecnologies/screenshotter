@@ -232,13 +232,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 #pragma mark - Notifications
 
 - (void)attemptPresentNotification {
-    // !!!: debug
-    [[NotificationManager shared] presentScreenshotWithUserTapped:nil];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [[NotificationManager shared] presentScreenshotWithUserTapped:nil];
-    });
-    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
         [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];

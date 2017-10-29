@@ -76,7 +76,7 @@ final class NotificationManager: NSObject {
     public func presentScreenshot(withUserTapped userTapped: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
-        notificationView.label.text = "Import new screenshot? and heres a bunch more text to fill in this notification view. yeah!"
+        notificationView.label.text = "Import new screenshot?"
         present(notificationView: notificationView, userTapped: userTapped)
     }
     
