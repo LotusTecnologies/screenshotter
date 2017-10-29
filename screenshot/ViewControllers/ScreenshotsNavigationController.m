@@ -113,7 +113,7 @@
 }
 
 - (void)presentPushPermissionsViewController {
-    UIViewController *controller = [[InvokeScreenshotViewController alloc] init];
+    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
     [self presentViewController:controller animated:YES completion:^{
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
     }];
