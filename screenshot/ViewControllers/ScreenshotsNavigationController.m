@@ -101,19 +101,15 @@
 - (void)presentAppropriateModalViewControllerIfNecessary {
     if ([self canPresentPickerViewController]) {
         [self presentPickerViewController];
-    } else if ([self canPresentPushPermissionsVC]) {
+    } else if ([self canPresentPushPermissionsViewController]) {
         [self presentPushPermissionsViewController];
     }
 }
 
-#pragma mark - Screenshots Picker
+#pragma mark - Push Permissions
 
-- (BOOL)canPresentPushPermissionsVC {
+- (BOOL)canPresentPushPermissionsViewController {
     return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
-}
-
-- (BOOL)canPresentPickerViewController {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
 }
 
 - (void)presentPushPermissionsViewController {
@@ -121,6 +117,12 @@
     [self presentViewController:controller animated:YES completion:^{
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
     }];
+}
+
+#pragma mark - Screenshots Picker
+
+- (BOOL)canPresentPickerViewController {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
 }
 
 - (void)presentPickerViewController {
