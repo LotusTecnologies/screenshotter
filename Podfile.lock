@@ -35,7 +35,7 @@ PODS:
   - FBSDKShareKit (4.27.1):
     - FBSDKCoreKit
   - ImageEffects (1.0.0)
-  - Intercom (4.1.2)
+  - Intercom (4.1.3)
   - PromiseKit/CorePromise (4.4.3)
   - PromiseKit/Foundation (4.4.3):
     - PromiseKit/CorePromise
@@ -81,7 +81,7 @@ SPEC CHECKSUMS:
   FBSDKLoginKit: 66ff53b73cffd967ab773e32fac39e90a60e6d46
   FBSDKShareKit: 6a6a0ef9e850c741e4e1d7a7d21335205e997ec1
   ImageEffects: 6f92f55ae12c4010642f84dcc2d7e21246666cf9
-  Intercom: 56b1c4405dda7b0c79bffd3cc9ae6aa1b5898bda
+  Intercom: 72319a42bcec50f5e377c160f10363de925ef23c
   PromiseKit: fbb52a0d154402c57eeb6eccd36dd7724fcf6117
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: cb6f9f266a9977741efcbc21e618e8be3734c774
