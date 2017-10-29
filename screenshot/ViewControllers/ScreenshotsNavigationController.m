@@ -83,7 +83,7 @@
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
-    [self presentPickerViewControllerWithCompletion:nil];
+    [self presentPickerViewController];
 }
 
 
@@ -126,12 +126,6 @@
 }
 
 - (void)presentPickerViewController {
-    [self presentPickerViewControllerWithCompletion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-    }];
-}
-
-- (void)presentPickerViewControllerWithCompletion:(dispatch_block_t)completion {
     ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
     picker.cancelButton.target = self;
     picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
@@ -139,7 +133,9 @@
     picker.doneButton.action = @selector(pickerViewControllerDidFinish);
     self.pickerNavigationController = picker;
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
+    [self presentViewController:self.pickerNavigationController animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
+    }];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
