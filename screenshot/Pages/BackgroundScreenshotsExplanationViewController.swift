@@ -1,5 +1,5 @@
 //
-//  InvokeScreenshotViewController.swift
+//  BackgroundScreenshotsExplanationViewController.swift
 //  screenshot
 //
 //  Created by Jacob Relkin on 10/23/17.
@@ -8,16 +8,16 @@
 
 import UIKit
 
-struct AttributedStringData {
+fileprivate struct AttributedStringData {
     let text:String
     let attributes:[String : Any]?
 }
 
-struct SocialApp {
+fileprivate struct SocialApp {
     let image: UIImage
     let urlScheme: String
     let appStoreID: Int
-    let notInstalled: (InvokeScreenshotViewController) -> Void
+    let notInstalled: (BackgroundScreenshotsExplanationViewController) -> Void
     
     private var appStoreURL: URL {
         return URL(string:"itms://itunes.apple.com/us/app/apple-store/id\(appStoreID)")!
@@ -36,7 +36,7 @@ struct SocialApp {
     }
 }
 
-class InvokeScreenshotViewController : UIViewController {
+class BackgroundScreenshotsExplanationViewController : UIViewController {
     private lazy var socialApps = { _ -> [SocialApp] in
         return [
             SocialApp(image: #imageLiteral(resourceName: "insta-launch"), urlScheme: "instagram", appStoreID: 389801252) { vc in
