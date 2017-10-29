@@ -30,7 +30,7 @@ public class TutorialEmailSlideView : HelperView {
         super.init(frame: frame)
         
         titleLabel.text = "Sign Up"
-        subtitleLabel.text = "Fill out your info belows"
+        subtitleLabel.text = "Fill out your info below"
         
         let p = Geometry.padding
         
