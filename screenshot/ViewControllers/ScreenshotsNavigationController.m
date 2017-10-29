@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) WebViewController *webViewController;
+@property (nonatomic, strong, nullable) Class previousViewControllerClass;
 
 @end
 
@@ -56,10 +57,12 @@
 
 #pragma mark - View Controller Life Cycle
 
-- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
-    if ([viewController isKindOfClass:[ProductsViewController class]]) {
+- (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {
+    if ([viewController isKindOfClass:[ScreenshotsViewController class]] && self.previousViewControllerClass == [ProductsViewController class]) {
         [self presentAppropriateModalViewControllerIfNecessary];
     }
+    
+    self.previousViewControllerClass = [viewController class];
 }
 
 
@@ -80,7 +83,7 @@
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
-    [self presentPickerViewControllerIfNeeded];
+    [self presentPickerViewControllerWithCompletion:nil];
 }
 
 
@@ -96,26 +99,34 @@
 #pragma mark -
 
 - (void)presentAppropriateModalViewControllerIfNecessary {
-    BOOL shouldPresentPushPermissionsVC = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
     if ([self canPresentPickerViewController]) {
-        [self presentPickerViewControllerIfNeeded];
-    } else if (shouldPresentPushPermissionsVC) {
-        UIViewController *controller = [[InvokeScreenshotViewController alloc] init];
-        [self presentViewController:controller animated:YES completion:^{
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }];
+        [self presentPickerViewController];
+    } else if ([self canPresentPushPermissionsVC]) {
+        [self presentPushPermissionsViewController];
     }
 }
 
 #pragma mark - Screenshots Picker
 
+- (BOOL)canPresentPushPermissionsVC {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
+}
+
 - (BOOL)canPresentPickerViewController {
     return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
 }
 
+- (void)presentPushPermissionsViewController {
+    UIViewController *controller = [[InvokeScreenshotViewController alloc] init];
+    [self presentViewController:controller animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
+    }];
+}
+
 - (void)presentPickerViewController {
-    [self presentPickerViewControllerWithCompletion:nil];
+    [self presentPickerViewControllerWithCompletion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
+    }];
 }
 
 - (void)presentPickerViewControllerWithCompletion:(dispatch_block_t)completion {
@@ -129,15 +140,6 @@
     [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
-}
-
-- (void)presentPickerViewControllerIfNeeded {
-    if ([self canPresentPickerViewController]) {
-        [self presentPickerViewControllerWithCompletion:^{
-            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }];
-    }
 }
 
 - (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
