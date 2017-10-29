@@ -1,5 +1,5 @@
 //
-//  InvokeScreenshotViewController.swift
+//  BackgroundScreenshotsExplanationViewController.swift
 //  screenshot
 //
 //  Created by Jacob Relkin on 10/23/17.
@@ -8,12 +8,12 @@
 
 import UIKit
 
-struct AttributedStringData {
+fileprivate struct AttributedStringData {
     let text:String
     let attributes:[String : Any]?
 }
 
-struct SocialApp {
+fileprivate struct SocialApp {
     let image: UIImage
     let urlScheme: String
     let appStoreID: Int
