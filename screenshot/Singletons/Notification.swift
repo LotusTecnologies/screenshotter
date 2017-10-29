@@ -8,6 +8,12 @@
 
 import Foundation
 
+private enum NotificationAnimation {
+    case none
+    case slide
+    case fade
+}
+
 final class NotificationManager: NSObject {
     static let shared = NotificationManager()
     
@@ -17,8 +23,11 @@ final class NotificationManager: NSObject {
     private override init() {
         super.init()
         
-        let windowFrame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 64)
+        let padding = CGFloat(8)
+        
+        let windowFrame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 0)
         window = UIWindow(frame: windowFrame)
+        window.layoutMargins = UIEdgeInsetsMake(padding, padding, padding, padding)
         window.windowLevel = UIWindowLevelAlert
     }
     
@@ -28,9 +37,9 @@ final class NotificationManager: NSObject {
         let notificationView = NotificationView()
         notificationView.translatesAutoresizingMaskIntoConstraints = false
         window.addSubview(notificationView)
-        notificationView.leadingAnchor.constraint(equalTo: window.leadingAnchor).isActive = true
-        notificationView.trailingAnchor.constraint(equalTo: window.trailingAnchor).isActive = true
-        notificationView.heightAnchor.constraint(equalTo: window.heightAnchor).isActive = true
+        notificationView.leadingAnchor.constraint(equalTo: window.layoutMarginsGuide.leadingAnchor).isActive = true
+        notificationView.trailingAnchor.constraint(equalTo: window.layoutMarginsGuide.trailingAnchor).isActive = true
+        notificationView.heightAnchor.constraint(greaterThanOrEqualToConstant: 64).isActive = true
         
         let bottomConstraint = notificationView.bottomAnchor.constraint(equalTo: window.topAnchor)
         bottomConstraint.priority = UILayoutPriorityDefaultLow
@@ -64,10 +73,10 @@ final class NotificationManager: NSObject {
     
     // MARK: Present / Dismiss
     
-    public func presentScreenshot(with userTapped: (() -> Void)? = nil) {
+    public func presentScreenshot(withUserTapped userTapped: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
-        notificationView.label.text = "Import new screenshot?"
+        notificationView.label.text = "Import new screenshot? and heres a bunch more text to fill in this notification view. yeah!"
         present(notificationView: notificationView, userTapped: userTapped)
     }
     
@@ -84,12 +93,18 @@ final class NotificationManager: NSObject {
     }
     
     private func present(notificationView: NotificationView, userTapped: (() -> Void)? = nil) {
-        let constraint = notificationView.topAnchor.constraint(equalTo: window.topAnchor)
+        let constraint = notificationView.topAnchor.constraint(equalTo: window.layoutMarginsGuide.topAnchor)
         let wrapper = NotificationWrapper(view: notificationView, constraint: constraint, callback: userTapped)
         notifications.append(wrapper)
         
         window.makeKeyAndVisible()
         window.layoutIfNeeded()
+        
+        var windowFrame = window.frame
+        windowFrame.size.height = notificationView.frame.size.height + window.layoutMargins.top + window.layoutMargins.bottom
+        window.frame = windowFrame
+        
+        notificationView.applyShadow()
         
         constraint.isActive = true
         
@@ -99,14 +114,14 @@ final class NotificationManager: NSObject {
         }) { (completed) in
             if self.notifications.count > 1 {
                 for i in 0...(self.notifications.count - 2) {
-                    self.dismiss(notificationWrapper: self.notifications[i], animated: false)
+                    self.dismiss(notificationWrapper: self.notifications[i], animation: .fade)
                 }
             }
         }
         
         Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] timer in
             if wrapper.view.superview != nil {
-                self?.dismiss(notificationWrapper: wrapper, animated: true)
+                self?.dismiss(notificationWrapper: wrapper, animation: .slide)
             }
         }
         
@@ -115,33 +130,45 @@ final class NotificationManager: NSObject {
     
     public func dismiss() {
         if let notificationWrapper = notifications.last {
-            dismiss(notificationWrapper: notificationWrapper, animated: true)
+            dismiss(notificationWrapper: notificationWrapper, animation: .slide)
         }
     }
     
-    private func dismiss(notificationWrapper: NotificationWrapper, animated: Bool) {
+    private func dismiss(notificationWrapper: NotificationWrapper, animation: NotificationAnimation) {
         if let index = notifications.index(of: notificationWrapper) {
             notifications.remove(at: index)
         }
         
-        if animated {
+        switch animation {
+        case .slide:
             notificationWrapper.constraint.isActive = false
             
             UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
                 self.window.layoutIfNeeded()
                 
             }) { (completed) in
-                notificationWrapper.view.removeFromSuperview()
-                self.hideIfNeeded()
+                self.hideWindowAndNotificationIfPossible(notificationWrapper.view)
             }
+            break
             
-        } else {
-            notificationWrapper.view.removeFromSuperview()
-            hideIfNeeded()
+        case .fade:
+            UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
+                notificationWrapper.view.alpha = 0
+                
+            }) { (completed) in
+                self.hideWindowAndNotificationIfPossible(notificationWrapper.view)
+            }
+            break
+            
+        case .none:
+            hideWindowAndNotificationIfPossible(notificationWrapper.view)
+            break
         }
     }
     
-    private func hideIfNeeded() {
+    private func hideWindowAndNotificationIfPossible(_ notificationView: NotificationView) {
+        notificationView.removeFromSuperview()
+        
         if notifications.count == 0 {
             window.isHidden = true
         }
@@ -149,6 +176,8 @@ final class NotificationManager: NSObject {
 }
 
 private class NotificationView: UIView {
+    private let cornerRadius = CGFloat(5)
+    
     private var imageView: UIImageView!
     private(set) var label: UILabel!
     private var labelLeadingConstraint: NSLayoutConstraint!
@@ -162,7 +191,16 @@ private class NotificationView: UIView {
         
         let padding = Geometry.padding
         
-        backgroundColor = .white
+        let backgroundView = UIView()
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundView.backgroundColor = .white
+        backgroundView.layer.cornerRadius = cornerRadius
+        backgroundView.layer.masksToBounds = true
+        addSubview(backgroundView)
+        backgroundView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -172,7 +210,7 @@ private class NotificationView: UIView {
         addSubview(imageView)
         imageView.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding).isActive = true
+        imageView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -padding).isActive = true
         imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
         
         label = UILabel()
@@ -180,7 +218,9 @@ private class NotificationView: UIView {
         label.backgroundColor = .clear
         label.textAlignment = .center
         label.textColor = .gray3
+        label.numberOfLines = 0
         addSubview(label)
+        label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         label.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
         label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding).isActive = true
         label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding).isActive = true
@@ -191,15 +231,6 @@ private class NotificationView: UIView {
         let labelToImageViewLeadingConstraint = label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: padding)
         labelToImageViewLeadingConstraint.priority = UILayoutPriorityDefaultHigh
         labelToImageViewLeadingConstraint.isActive = true
-        
-        let bottomBorder = UIView()
-        bottomBorder.translatesAutoresizingMaskIntoConstraints = false
-        bottomBorder.backgroundColor = .crazeRed
-        addSubview(bottomBorder)
-        bottomBorder.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        bottomBorder.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        bottomBorder.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        bottomBorder.heightAnchor.constraint(equalToConstant: Geometry.halfPoint).isActive = true
     }
     
     // MARK: Image
@@ -213,6 +244,16 @@ private class NotificationView: UIView {
         get {
             return self.imageView.image
         }
+    }
+    
+    // MARK: Shadow
+    
+    func applyShadow() {
+        layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOffset = CGSize(width: 0, height: 2)
+        layer.shadowRadius = 4
+        layer.shadowOpacity = 0.5
     }
 }
 

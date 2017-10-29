@@ -17,7 +17,7 @@ class Constants: NSObject {
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     static let uploadedURLStringKey = "uploadedURLStringKey"
     
-    static let defaultAnimationDuration = 0.3
+    static let defaultAnimationDuration = 0.25
     
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
