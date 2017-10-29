@@ -48,27 +48,61 @@ final class NotificationManager: NSObject {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAction(tapGesture:)))
         notificationView.addGestureRecognizer(tapGesture)
         
-        // TODO: change to pan gesture
-        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(swipeGesture:)))
-        swipeGesture.direction = .up
-        notificationView.addGestureRecognizer(swipeGesture)
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panAction(panGesture:)))
+        notificationView.addGestureRecognizer(panGesture)
         
         return notificationView
+    }
+    
+    private func notificationWrapper(for notificationView: NotificationView) -> NotificationWrapper? {
+        if let index = notifications.index(where: { $0.view == notificationView }) {
+            return notifications[index]
+            
+        } else {
+            return nil
+        }
     }
     
     // MARK: Gestures
     
     @objc private func tapAction(tapGesture: UITapGestureRecognizer) {
-        if let notificationView = tapGesture.view,
-            let index = notifications.index(where: { $0.view == notificationView }) {
-            notifications[index].callback?()
+        if let notificationView = tapGesture.view as? NotificationView,
+            let notificationWrapper = notificationWrapper(for: notificationView) {
+            notificationWrapper.callback?()
         }
         
         dismiss()
     }
     
-    @objc private func swipeAction(swipeGesture: UISwipeGestureRecognizer) {
-        dismiss()
+    @objc private func panAction(panGesture: UIPanGestureRecognizer) {
+        guard let notificationView = panGesture.view as? NotificationView,
+            let notificationWrapper = notificationWrapper(for: notificationView) else {
+            return
+        }
+        
+        if panGesture.state == .began || panGesture.state == .changed {
+            let translation = panGesture.translation(in: notificationView)
+            
+            notificationWrapper.constraint.constant = min(0, notificationWrapper.constraint.constant + translation.y)
+            notificationWrapper.isPanning = true
+            
+            panGesture.setTranslation(.zero, in: notificationView)
+            
+            if notificationView.frame.maxY <= 0 {
+                dismiss(notificationWrapper: notificationWrapper, animation: .none)
+            }
+            
+        } else if panGesture.state == .ended || panGesture.state == .cancelled {
+            let maxY = window.layoutMargins.top + notificationView.bounds.size.height
+            let currentY = notificationView.frame.maxY
+            let minVelocity = maxY * 2
+            let velocity = max(minVelocity, fabs(panGesture.velocity(in: notificationView).y))
+            let springVelocity = currentY / maxY
+            let durationAdjustment = 0.2
+            let duration = Double(maxY / velocity) + durationAdjustment
+            
+            dismiss(notificationWrapper: notificationWrapper, duration: duration, initialSpringVelocity: springVelocity)
+        }
     }
     
     // MARK: Present / Dismiss
@@ -100,6 +134,19 @@ final class NotificationManager: NSObject {
         window.makeKeyAndVisible()
         window.layoutIfNeeded()
         
+        if self.notifications.count > 1 {
+            for i in 0...(self.notifications.count - 2) {
+                let notificationWrapper = self.notifications[i]
+                
+                if notificationWrapper.isPanning {
+                    dismiss(notificationWrapper: notificationWrapper, animation: .slide)
+                    
+                } else {
+                    notificationWrapper.view.isUserInteractionEnabled = false
+                }
+            }
+        }
+        
         var windowFrame = window.frame
         windowFrame.size.height = notificationView.frame.size.height + window.layoutMargins.top + window.layoutMargins.bottom
         window.frame = windowFrame
@@ -120,7 +167,7 @@ final class NotificationManager: NSObject {
         }
         
         Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] timer in
-            if wrapper.view.superview != nil {
+            if wrapper.view.superview != nil && !wrapper.isPanning {
                 self?.dismiss(notificationWrapper: wrapper, animation: .slide)
             }
         }
@@ -166,6 +213,17 @@ final class NotificationManager: NSObject {
         }
     }
     
+    private func dismiss(notificationWrapper: NotificationWrapper, duration: TimeInterval, initialSpringVelocity: CGFloat) {
+        notificationWrapper.constraint.isActive = false
+        
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: initialSpringVelocity, options: .curveEaseIn, animations: {
+            self.window.layoutIfNeeded()
+            
+        }, completion: { (completed) in
+            self.dismiss(notificationWrapper: notificationWrapper, animation: .none)
+        })
+    }
+    
     private func hideWindowAndNotificationIfPossible(_ notificationView: NotificationView) {
         notificationView.removeFromSuperview()
         
@@ -208,10 +266,12 @@ private class NotificationView: UIView {
         imageView.tintColor = .crazeRed
         imageView.isHidden = true
         addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
+        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        imageView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: padding).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding).isActive = true
         imageView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -padding).isActive = true
-        imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
+        imageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 44).isActive = true
         
         label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -261,6 +321,7 @@ private class NotificationWrapper: NSObject {
     var view: NotificationView
     var constraint: NSLayoutConstraint
     var callback: (() -> Void)?
+    var isPanning = false
     
     init(view: NotificationView, constraint: NSLayoutConstraint, callback: (() -> Void)?) {
         self.view = view
