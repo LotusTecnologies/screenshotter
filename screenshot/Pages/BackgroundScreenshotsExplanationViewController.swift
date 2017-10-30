@@ -107,7 +107,7 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
     private func setupTitleLabel() {
         titleLabel.text = "Now leave the app!"
         titleLabel.textAlignment = .center
-        titleLabel.textColor = .red
+        titleLabel.textColor = .crazeRed
         titleLabel.minimumScaleFactor = 0.7
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.font = UIFont.preferredFont(forTextStyle: .title1)
