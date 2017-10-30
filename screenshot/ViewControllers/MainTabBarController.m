@@ -12,7 +12,7 @@
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate> {
+@interface MainTabBarController () <UITabBarControllerDelegate, SettingsViewControllerDelegate> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -71,6 +71,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
+            viewController.delegate = self;
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.title = viewController.title;
@@ -213,6 +214,13 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     } else {
         [self dismissTabBarSettingsBadge];
     }
+}
+
+
+#pragma mark - Settings View Controller
+
+- (void)settingsViewControllerDidGrantPermission:(SettingsViewController *)viewController {
+    [self refreshTabBarSettingsBadge];
 }
 
 
