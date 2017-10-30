@@ -15,29 +15,30 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     
     fileprivate var googleButton: MainButton!
     
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        title = "Tell a Friend"
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let padding = Geometry.padding
         let extendedPadding = Geometry.extendedPadding
         
-        let helperView = HelperView()
-        helperView.translatesAutoresizingMaskIntoConstraints = false
-        helperView.titleLabel.text = "Tell a Friend"
-        helperView.backgroundColor = view.backgroundColor
-        view.addSubview(helperView)
-        helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: extendedPadding).isActive = true
-        helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        helperView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
-        let separator = UIView()
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        separator.backgroundColor = .gray8
-        helperView.contentView.addSubview(separator)
-        separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        separator.widthAnchor.constraint(equalToConstant: 240).isActive = true
-        separator.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
-        NSLayoutConstraint(item: separator, attribute: .centerY, relatedBy: .equal, toItem: helperView.contentView, attribute: .centerY, multiplier: 0.9, constant: 0).isActive = true
+        let containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(containerView)
+        containerView.topAnchor.constraint(greaterThanOrEqualTo: topLayoutGuide.bottomAnchor, constant: extendedPadding).isActive = true
+        containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding).isActive = true
+        containerView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -extendedPadding).isActive = true
+        containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding).isActive = true
+        NSLayoutConstraint(item: containerView, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1.1, constant: 0).isActive = true
         
         googleButton = MainButton()
         googleButton.translatesAutoresizingMaskIntoConstraints = false
@@ -46,17 +47,27 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         googleButton.setTitle("Google Invite", for: .normal)
         googleButton.setImage(UIImage(named: "InviteGoogleIcon"), for: .normal)
         googleButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
-        helperView.contentView.addSubview(googleButton)
-        googleButton.bottomAnchor.constraint(equalTo: separator.topAnchor, constant: -extendedPadding).isActive = true
-        googleButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        containerView.addSubview(googleButton)
+        googleButton.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        googleButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        
+        let separator = UIView()
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        separator.backgroundColor = .gray8
+        containerView.addSubview(separator)
+        separator.topAnchor.constraint(equalTo: googleButton.bottomAnchor, constant: extendedPadding).isActive = true
+        separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        separator.widthAnchor.constraint(equalToConstant: 240).isActive = true
+        separator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
         let noLoginButton = MainButton()
         noLoginButton.translatesAutoresizingMaskIntoConstraints = false
         noLoginButton.setTitle("Share", for: .normal)
         noLoginButton .addTarget(self, action: #selector(presentActivityViewController), for: .touchUpInside)
-        helperView.contentView.addSubview(noLoginButton)
+        containerView.addSubview(noLoginButton)
         noLoginButton.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: extendedPadding).isActive = true
-        noLoginButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        noLoginButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        noLoginButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
     }
     
     func presentActivityViewController() {

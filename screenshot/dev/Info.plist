@@ -33,7 +33,7 @@
 			<string>Bundle ID</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>io.crazeapp.screenshot.dev</string>
+				<string>io.crazeapp.screenshot</string>
 			</array>
 		</dict>
 		<dict>
@@ -41,16 +41,9 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.483336611267-9stav0igcmcqht8oae703lrndk0gqti6</string>
+				<string>com.googleusercontent.apps.483336611267-focqhnidb8ag47pkklb47ojrfo3ulppg</string>
 			</array>
 		</dict>
-	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>instagram</string>
-		<string>google</string>
-		<string>snapchat</string>
-		<string>fb</string>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>46</string>
@@ -58,6 +51,13 @@
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
 	<string>Craze</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>google</string>
+		<string>snapchat</string>
+		<string>fb</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -67,10 +67,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>This allows you to take photos of clothes and shop them!</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We scan your screenshots to match for similar products.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Sharing is caring</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We scan your screenshots to match for similar products.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
