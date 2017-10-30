@@ -16,8 +16,6 @@
     BOOL _isObservingSettingsBadgeFont;
 }
 
-@property (nonatomic, strong) id didTakeScreenshotObserver;
-
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *discoverNavigationController;
@@ -91,38 +89,13 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
     }
     return self;
 }
 
-- (void)dealloc {
-    [self dismissTabBarSettingsBadge];
-    
-    if (self.didTakeScreenshotObserver) {
-        [[NSNotificationCenter defaultCenter] removeObserver:self.didTakeScreenshotObserver];
-        self.didTakeScreenshotObserver = nil;
-    }
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    self.didTakeScreenshotObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationUserDidTakeScreenshotNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        BOOL foundIntercomWindow = NO;
-        
-        NSArray<UIWindow *> *windows = [[UIApplication sharedApplication] windows];
-        for (UIWindow *window in windows) {
-            if ([window isKindOfClass:NSClassFromString(@"ICMWindow")]) {
-                foundIntercomWindow = YES;
-                break;
-            }
-        }
-        
-        NSString *eventName = foundIntercomWindow ? @"Took Screenshot While Showing Intercom Window" : @"Took Screenshot";
-        [AnalyticsTrackers.standard track:eventName properties:nil];
-    }];
     
     self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
     [self.updatePromptHandler start];
@@ -152,6 +125,23 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     }
 }
 
+- (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
+    if (self.view.window) {
+        BOOL foundIntercomWindow = NO;
+        
+        NSArray<UIWindow *> *windows = [[UIApplication sharedApplication] windows];
+        for (UIWindow *window in windows) {
+            if ([window isKindOfClass:NSClassFromString(@"ICMWindow")]) {
+                foundIntercomWindow = YES;
+                break;
+            }
+        }
+        
+        NSString *eventName = foundIntercomWindow ? @"Took Screenshot While Showing Intercom Window" : @"Took Screenshot";
+        [AnalyticsTrackers.standard track:eventName properties:nil];
+    }
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:TabBarBadgeFontKey]) {
         NSDictionary *badgeAttributes = @{NSFontAttributeName:[UIFont fontWithName:@"Optima-ExtraBlack" size:14.f]};
@@ -164,6 +154,13 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
+
+- (void)dealloc {
+    [self dismissTabBarSettingsBadge];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 
 #pragma mark - Tab Bar
 
