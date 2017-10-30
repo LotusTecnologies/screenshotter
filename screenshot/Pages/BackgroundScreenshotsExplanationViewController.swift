@@ -14,7 +14,7 @@ fileprivate struct AttributedStringData {
 }
 
 fileprivate struct SocialApp {
-    let image: UIImage
+    let image: UIImage?
     let urlScheme: String
     let appStoreID: Int
     let notInstalled: (BackgroundScreenshotsExplanationViewController) -> Void
@@ -39,18 +39,18 @@ fileprivate struct SocialApp {
 class BackgroundScreenshotsExplanationViewController : UIViewController {
     private lazy var socialApps = { _ -> [SocialApp] in
         return [
-            SocialApp(image: #imageLiteral(resourceName: "insta-launch"), urlScheme: "instagram", appStoreID: 389801252) { vc in
+            SocialApp(image: UIImage(named: "TutorialInstagram"), urlScheme: "instagram", appStoreID: 389801252) { vc in
                 UIApplication.shared.open(URL(string: "http://instagram.com")!, options: [:], completionHandler: nil)
             },
-            SocialApp(image: #imageLiteral(resourceName: "snapchat-launch"), urlScheme: "snapchat", appStoreID: 447188370) { vc in
+            SocialApp(image: UIImage(named: "TutorialSnapchat"), urlScheme: "snapchat", appStoreID: 447188370) { vc in
                 let alert = UIAlertController(title: "Oops!", message: "You don't have Snapchat installed.", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 vc.present(alert, animated: true, completion: nil)
             },
-            SocialApp(image: #imageLiteral(resourceName: "fb-launch"), urlScheme: "fb", appStoreID: 284882215) { vc in
+            SocialApp(image: UIImage(named: "TutorialFacebook"), urlScheme: "fb", appStoreID: 284882215) { vc in
                 UIApplication.shared.open(URL(string: "http://facebook.com")!, options: [:], completionHandler: nil)
             },
-            SocialApp(image: #imageLiteral(resourceName: "google-launch"), urlScheme: "google", appStoreID: 284815942) { vc in
+            SocialApp(image: UIImage(named: "TutorialGoogle"), urlScheme: "google", appStoreID: 284815942) { vc in
                 UIApplication.shared.open(URL(string: "http://google.com")!, options: [:], completionHandler: nil)
             }
         ]
