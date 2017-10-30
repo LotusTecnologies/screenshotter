@@ -102,18 +102,18 @@ class TutorialVideoOverlayView : UIView {
     // MARK: - Button Setup
     
     private func setupVolumeToggleButton() {
+        volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
+        volumeToggleButton.adjustsImageWhenHighlighted = true
         volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerSound"), for: .normal)
         volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute") , for: .selected)
         volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute"), for: [.highlighted, .selected])
-        volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
-        volumeToggleButton.showsTouchWhenHighlighted = true
         
         addSubview(volumeToggleButton)
     }
     
     private func setupReplayPauseButton() {
         replayPauseButton.translatesAutoresizingMaskIntoConstraints = false
-        replayPauseButton.showsTouchWhenHighlighted = true
+        replayPauseButton.adjustsImageWhenHighlighted = true
         replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: .normal)
         replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: .selected)
         replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: [.highlighted, .selected])
@@ -132,11 +132,11 @@ class TutorialVideoOverlayView : UIView {
         doneButton = UIButton()
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.alpha = 0
-        doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
+        doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 12, 8, 12)
         doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         doneButton.setTitle("Done", for: .normal)
         doneButton.layer.borderColor = UIColor.white.cgColor
-        doneButton.layer.borderWidth = 0.8
+        doneButton.layer.borderWidth = 1
         doneButton.layer.masksToBounds = true
         doneButton.layer.cornerRadius = 5
         
