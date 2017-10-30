@@ -197,7 +197,7 @@ class TutorialVideoViewController : BaseViewController {
     // MARK: - Actions
     
     @objc private func replayPauseButtonTapped() {
-        guard overlayView.replayPauseButton.isSelected == true else {
+        guard overlayView.replayPauseButton.isSelected == false else {
             // Ensure we are in the replay state before doing anything.
             return
         }
