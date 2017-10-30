@@ -64,7 +64,7 @@ class TutorialVideoOverlayView : UIView {
     }
     
     func flashPauseOverlay() {
-        replayPauseButton.isSelected = false
+        replayPauseButton.isSelected = true
         replayPauseButton.alpha = 0
         
         UIView.animateKeyframes(withDuration: Constants.defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
@@ -78,7 +78,7 @@ class TutorialVideoOverlayView : UIView {
     }
     
     func showReplayButton() {
-        replayPauseButton.isSelected = true
+        replayPauseButton.isSelected = false
 
         guard replayPauseButton.alpha < 1 else {
             return
@@ -114,9 +114,9 @@ class TutorialVideoOverlayView : UIView {
     private func setupReplayPauseButton() {
         replayPauseButton.translatesAutoresizingMaskIntoConstraints = false
         replayPauseButton.adjustsImageWhenHighlighted = true
-        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: .normal)
-        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: .selected)
-        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: [.highlighted, .selected])
+        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: .normal)
+        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: .selected)
+        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: [.highlighted, .selected])
         replayPauseButton.alpha = 0
         
         addSubview(replayPauseButton)
