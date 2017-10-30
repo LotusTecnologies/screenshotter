@@ -7,13 +7,13 @@
 //
 
 #import "ShoppablesToolbar.h"
-
 #import "ShoppableCollectionViewCell.h"
 
 @class ShoppablesCollectionView;
 
 @interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource> {
     UIEdgeInsets _preservedCollectionViewContentInset;
+    BOOL _needsToSelectFirstShoppable;
 }
 
 - (void)repositionShoppables;
@@ -124,8 +124,11 @@
 }
 
 - (void)selectFirstShoppable {
-    if ([self.collectionView numberOfItemsInSection:0]) {
+    if ([self.collectionView numberOfItemsInSection:0] > 0) {
         [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+        
+    } else {
+        _needsToSelectFirstShoppable = YES;
     }
 }
 
@@ -152,6 +155,16 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     if ([collectionView indexPathsForVisibleItems].count == 0 && [collectionView numberOfItemsInSection:0] > 0 && indexPath.item == 0) {
+        if (_needsToSelectFirstShoppable) {
+            _needsToSelectFirstShoppable = NO;
+            [self selectFirstShoppable];
+            
+            // selectItemAtIndexPath: should auto select the cell however
+            // since the cell isnt visible it wont appear selected until
+            // the next layout. Force the selected state.
+            cell.selected = YES;
+        }
+        
         [self.delegate shoppablesToolbarDidChange:self];
     }
 }
@@ -169,7 +182,7 @@
     [super setContentSize:contentSize];
     
     if (self.delegate.didViewControllerAppear && [self numberOfItemsInSection:0] > 0) {
-        [UIView animateWithDuration:0.3 animations:^{
+        [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
             [self.delegate repositionShoppables];
         }];
         
