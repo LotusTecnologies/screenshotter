@@ -63,13 +63,8 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
     private var willEnterForegroundObserver: Any? = nil
     private var dismissesOnBecomingActive = true
     
-    deinit {
-        if let observer = willEnterForegroundObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        
-        willEnterForegroundObserver = nil
-    }
+    
+    // MARK: Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,18 +87,20 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
         setupButtons()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    
-        updateNotificationSwitchStatus()
+    deinit {
+        if let observer = willEnterForegroundObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
+        willEnterForegroundObserver = nil
     }
     
     // MARK: -
     
-    private func updateNotificationSwitchStatus() {
+    private func updateNotificationSwitchStatus(animated: Bool = true) {
         let hasPermission = PermissionsManager.shared().hasPermission(for: .push)
         
-        notificationSwitch.setOn(hasPermission, animated: true)
+        notificationSwitch.setOn(hasPermission, animated: animated)
         notificationSwitch.isEnabled = !hasPermission
     }
     
@@ -218,6 +215,8 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
             notificationSwitch.centerYAnchor.constraint(equalTo: topLabel.centerYAnchor),
             notificationSwitch.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
         ])
+        
+        updateNotificationSwitchStatus(animated: false)
     }
     
     // MARK: Actions
@@ -267,9 +266,9 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
         }
 
         let app = socialApps[tag]
+        
         guard app.isInstalled else {
             app.notInstalled(self)
-            
             return
         }
         
