@@ -191,7 +191,7 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
         view.addSubview(topLabel)
         
         bottomLabel.translatesAutoresizingMaskIntoConstraints = false
-        bottomLabel.text = "We'll send you a notification when your\nscreenshot is ready to be shopped."
+        bottomLabel.text = "We'll send you a notification when your screenshot is ready to be shopped"
         bottomLabel.numberOfLines = 0
         bottomLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         bottomLabel.textColor = .gray6
