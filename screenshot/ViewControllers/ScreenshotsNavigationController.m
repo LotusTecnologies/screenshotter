@@ -102,7 +102,6 @@
 - (void)presentAppropriateModalViewControllerIfNecessary {
     if ([self canPresentPickerViewController]) {
         [self presentPickerViewController];
-        
     } else if ([self canPresentPushPermissionsViewController]) {
         [self presentPushPermissionsViewController];
     }
@@ -126,7 +125,7 @@
 #pragma mark - Screenshots Picker
 
 - (BOOL)canPresentPickerViewController {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
+    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker] == NO;
 }
 
 - (void)presentPickerViewController {
@@ -138,7 +137,7 @@
     self.pickerNavigationController = picker;
     
     [self presentViewController:self.pickerNavigationController animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
     }];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];

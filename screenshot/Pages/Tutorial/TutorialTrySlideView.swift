@@ -74,12 +74,6 @@ public class TutorialTrySlideView : HelperView {
     
         PermissionsManager.shared().requestPermission(for: .photo) { granted in
             AssetSyncModel.sharedInstance.syncTutorialPhoto(image: image)
-            
-            if granted == false {
-                UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialShouldPresentScreenshotPicker)
-                UserDefaults.standard.synchronize()
-            }
-            
             self.delegate?.tutorialTrySlideViewDidComplete(self)
         }
     }
