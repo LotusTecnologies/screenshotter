@@ -12,7 +12,7 @@
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate> {
+@interface MainTabBarController () <UITabBarControllerDelegate> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -41,7 +41,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             
             ScreenshotsNavigationController *navigationController = [[ScreenshotsNavigationController alloc] init];
             navigationController.title = navigationController.screenshotsViewController.title;
-            navigationController.delegate = self;
             navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:navigationController.title image:image tag:0];
             navigationController;
         });
@@ -99,8 +98,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)dealloc {
     [self dismissTabBarSettingsBadge];
     
-    self.screenshotsNavigationController.delegate = nil;
-
     if (self.didTakeScreenshotObserver) {
         [[NSNotificationCenter defaultCenter] removeObserver:self.didTakeScreenshotObserver];
         self.didTakeScreenshotObserver = nil;
@@ -219,13 +216,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     } else {
         [self dismissTabBarSettingsBadge];
     }
-}
-
-
-#pragma mark - Screenshot View Controller
-
-- (void)screenshotsNavigationControllerDidGrantPushPermissions:(ScreenshotsNavigationController *)navigationController {
-    [self refreshTabBarSettingsBadge];
 }
 
 

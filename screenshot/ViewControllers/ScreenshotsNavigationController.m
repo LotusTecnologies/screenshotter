@@ -96,15 +96,18 @@
     [self pushViewController:self.webViewController animated:YES];
 }
 
+
 #pragma mark -
 
 - (void)presentAppropriateModalViewControllerIfNecessary {
     if ([self canPresentPickerViewController]) {
         [self presentPickerViewController];
+        
     } else if ([self canPresentPushPermissionsViewController]) {
         [self presentPushPermissionsViewController];
     }
 }
+
 
 #pragma mark - Push Permissions
 
@@ -118,6 +121,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
     }];
 }
+
 
 #pragma mark - Screenshots Picker
 
