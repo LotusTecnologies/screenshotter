@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>483336611267-focqhnidb8ag47pkklb47ojrfo3ulppg.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.483336611267-focqhnidb8ag47pkklb47ojrfo3ulppg</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAJ5WJIUC8m7LX7-J5IOs0ITGr30s0-fxY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>483336611267</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>io.crazeapp.screenshot</string>
+	<key>PROJECT_ID</key>
+	<string>craze-screenshop</string>
+	<key>STORAGE_BUCKET</key>
+	<string>craze-screenshop.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:483336611267:ios:62cf2d6127c4177e</string>
+	<key>DATABASE_URL</key>
+	<string>https://craze-screenshop.firebaseio.com</string>
+</dict>
+</plist>

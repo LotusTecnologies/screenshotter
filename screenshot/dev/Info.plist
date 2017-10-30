@@ -67,10 +67,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>This allows you to take photos of clothes and shop them!</string>
-	<key>NSContactsUsageDescription</key>
-	<string>Sharing is caring</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Sharing is caring</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
