@@ -24,15 +24,14 @@ class TutorialVideoOverlayView : UIView {
         setupDoneButton()
         
         NSLayoutConstraint.activate([
-            volumeToggleButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-            volumeToggleButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            volumeToggleButton.bottomAnchor.constraint(equalTo: bottomAnchor),
+            volumeToggleButton.leadingAnchor.constraint(equalTo: leadingAnchor),
             
             replayPauseButton.centerXAnchor.constraint(equalTo: centerXAnchor),
             replayPauseButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             
             doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
-            doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-            doneButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
+            doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ])
     }
     
@@ -102,8 +101,13 @@ class TutorialVideoOverlayView : UIView {
     // MARK: - Button Setup
     
     private func setupVolumeToggleButton() {
+        let x = layoutMargins.left
+        let y = layoutMargins.bottom
+        
         volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
         volumeToggleButton.adjustsImageWhenHighlighted = true
+        volumeToggleButton.contentEdgeInsets = UIEdgeInsetsMake(y, x, y, x)
+        volumeToggleButton.imageView?.contentMode = .scaleAspectFit
         volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerSound"), for: .normal)
         volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute") , for: .selected)
         volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute"), for: [.highlighted, .selected])
@@ -114,6 +118,7 @@ class TutorialVideoOverlayView : UIView {
     private func setupReplayPauseButton() {
         replayPauseButton.translatesAutoresizingMaskIntoConstraints = false
         replayPauseButton.adjustsImageWhenHighlighted = true
+        replayPauseButton.imageView?.contentMode = .scaleAspectFit
         replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: .normal)
         replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: .selected)
         replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: [.highlighted, .selected])
