@@ -18,10 +18,6 @@ public class Geometry : NSObject {
     }
     
     class var halfPoint: CGFloat {
-        if UIScreen.main.scale == 1 {
-            return 0.5
-        }
-        
-        return 1
+        return UIScreen.main.scale > 1 ? 0.5 : 1
     }
 }
