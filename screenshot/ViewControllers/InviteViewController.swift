@@ -48,6 +48,7 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         googleButton.setImage(UIImage(named: "InviteGoogleIcon"), for: .normal)
         googleButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
         containerView.addSubview(googleButton)
+        googleButton.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
         googleButton.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         googleButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         
@@ -57,17 +58,20 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         containerView.addSubview(separator)
         separator.topAnchor.constraint(equalTo: googleButton.bottomAnchor, constant: extendedPadding).isActive = true
         separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        separator.widthAnchor.constraint(equalToConstant: 240).isActive = true
+        separator.widthAnchor.constraint(equalToConstant: 260).isActive = true
         separator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        let noLoginButton = MainButton()
-        noLoginButton.translatesAutoresizingMaskIntoConstraints = false
-        noLoginButton.setTitle("Share", for: .normal)
-        noLoginButton .addTarget(self, action: #selector(presentActivityViewController), for: .touchUpInside)
-        containerView.addSubview(noLoginButton)
-        noLoginButton.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: extendedPadding).isActive = true
-        noLoginButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
-        noLoginButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        let shareButton = MainButton()
+        shareButton.translatesAutoresizingMaskIntoConstraints = false
+        shareButton.setTitle("Share To Other Apps", for: .normal)
+        shareButton.setImage(UIImage(named: "InviteShare"), for: .normal)
+        shareButton .addTarget(self, action: #selector(presentActivityViewController), for: .touchUpInside)
+        containerView.addSubview(shareButton)
+        shareButton.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
+        shareButton.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: extendedPadding).isActive = true
+        shareButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        shareButton.widthAnchor.constraint(equalTo: googleButton.widthAnchor).isActive = true
+        shareButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
     }
     
     func presentActivityViewController() {
