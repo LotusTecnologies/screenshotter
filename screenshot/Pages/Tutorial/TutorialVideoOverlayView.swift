@@ -8,9 +8,6 @@
 
 import UIKit
 
-// TODO: Use @corey's new constant for default animation duration
-fileprivate let animationDuration = 0.3
-
 class TutorialVideoOverlayView : UIView {
     private(set) var doneButton = UIButton()
     private(set) var replayPauseButton = UIButton()
@@ -48,20 +45,20 @@ class TutorialVideoOverlayView : UIView {
     func scaleInDoneButton() {
         self.doneButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         
-        UIView.animateKeyframes(withDuration: 0.2, delay: 0, options: [.calculationModeCubic], animations: {
+        UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0, options: UIViewAnimationOptions(rawValue: 0), animations: {
             self.doneButton.alpha = 1
             self.doneButton.transform = .identity
-        }, completion: nil)
+        })
     }
     
     func hideVolumeToggleButton() {
-        UIView.animate(withDuration: animationDuration) {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
             self.volumeToggleButton.alpha = 0
         }
     }
     
     func showVolumeToggleButton() {
-        UIView.animate(withDuration: animationDuration) {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
             self.volumeToggleButton.alpha = 1
         }
     }
@@ -70,10 +67,11 @@ class TutorialVideoOverlayView : UIView {
         replayPauseButton.isSelected = false
         replayPauseButton.alpha = 0
         
-        UIView.animate(withDuration: animationDuration / 2, animations: {
-            self.replayPauseButton.alpha = 1
-        }, completion: { finished in
-            UIView.animate(withDuration: animationDuration, animations: {
+        UIView.animateKeyframes(withDuration: Constants.defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.33, animations: {
+                self.replayPauseButton.alpha = 1
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.66, relativeDuration: 1, animations: {
                 self.replayPauseButton.alpha = 0.0
             })
         })
@@ -86,7 +84,7 @@ class TutorialVideoOverlayView : UIView {
             return
         }
         
-        UIView.animate(withDuration: animationDuration) {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
             self.replayPauseButton.alpha = 1
         }
     }
@@ -96,7 +94,7 @@ class TutorialVideoOverlayView : UIView {
             return
         }
         
-        UIView.animate(withDuration: animationDuration) {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
             self.replayPauseButton.alpha = 0
         }
     }
@@ -127,23 +125,22 @@ class TutorialVideoOverlayView : UIView {
     private func setupDoneButton() {
         let effect = UIBlurEffect(style: .dark)
         let blurView = UIVisualEffectView(effect: effect)
-        blurView.alpha = 0.6
+        blurView.alpha = 0.9
         blurView.isUserInteractionEnabled = false
         blurView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         
-        doneButton = UIButton(frame: .zero)
-        doneButton.alpha = 0
+        doneButton = UIButton()
         doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.alpha = 0
+        doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
+        doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
+        doneButton.setTitle("Done", for: .normal)
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 0.8
         doneButton.layer.masksToBounds = true
         doneButton.layer.cornerRadius = 5
-        doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
-        doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        doneButton.setTitle("Done", for: .normal)
         
         doneButton.insertSubview(blurView, at: 0)
         addSubview(doneButton)
     }
 }
-
