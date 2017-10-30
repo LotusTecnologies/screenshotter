@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import AVKit
+import AVFoundation
 
 enum TutorialVideo {
     case Standard
@@ -43,14 +43,16 @@ class TutorialVideoViewControllerFactory : NSObject {
 class TutorialVideoViewController : BaseViewController {
     var showsReplayButtonUponFinishing: Bool = true
     
-    let overlayViewController = TutorialVideoOverlayViewController()
-    
     weak var delegate: TutorialVideoViewControllerDelegate?
     
     private(set) var video: TutorialVideo!
     
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
+    
+    private let overlayView = TutorialVideoOverlayView()
+    
+    private var observers = [NSKeyValueObservation]()
     private var ended = false
     
     // MARK: - Initialization
@@ -61,13 +63,13 @@ class TutorialVideoViewController : BaseViewController {
         player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
         player.actionAtItemEnd = .pause
+        player.isMuted = true
         
         playerLayer = AVPlayerLayer(player: player)
         
         super.init(nibName: nil, bundle: nil)
         
         video = vid
-        beginObserving(playerItem: playerItem)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -91,27 +93,40 @@ class TutorialVideoViewController : BaseViewController {
         
         // Add player layer
         view.layer.addSublayer(playerLayer)
-
-        // Add overlay VC
-        overlayViewController.willMove(toParentViewController: self)
-        addChildViewController(overlayViewController)
-        overlayViewController.didMove(toParentViewController: self)
-        view.addSubview(overlayViewController.view)
         
-        overlayViewController.replayButtonTapped = replayButtonTapped
-        overlayViewController.doneButtonTapped = {
-            track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
-            
-            self.delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
+        // Add overlay view
+        view.addSubview(overlayView)
+
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        if let item = player.currentItem {
+            beginObserving(playerItem: item)
         }
+
+        overlayView.volumeToggleButton.isSelected = true
+        overlayView.volumeToggleButton.addTarget(self, action: #selector(volumeToggleButtonTapped), for: .touchUpInside)
+        overlayView.replayPauseButton.addTarget(self, action: #selector(replayPauseButtonTapped), for: .touchUpInside)
+        overlayView.doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
+        
+        observers.append(AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.new]) { session, change in
+            let shouldMute = (change.newValue ?? 1) == 0
+            
+            self.overlayView.volumeToggleButton.isSelected = shouldMute
+            self.player.isMuted = shouldMute
+        })
         
         // Add tap gesture recognizer
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         view.addGestureRecognizer(tap)
         
-        if self.player.playbackState == .paused {
-            self.player.play()
-            self.delegate?.tutorialVideoViewControllerDidPlay?(self)
+        if player.playbackState == .paused {
+            player.play()
+            delegate?.tutorialVideoViewControllerDidPlay?(self)
             
             track("Started Tutorial Video")
         }
@@ -121,6 +136,14 @@ class TutorialVideoViewController : BaseViewController {
         super.viewWillAppear(animated)
         
         hideStatusBar()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.overlayView.scaleInDoneButton()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -135,49 +158,86 @@ class TutorialVideoViewController : BaseViewController {
         playerLayer.frame = view.bounds
     }
     
-    // MARK: - Player state observation
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard let video = video,
-            let playerItem = object as? AVPlayerItem,
-            playerItem == player.currentItem else {
-            return
-        }
-        
-        if case .Ambassador(_) = video,
-            playerItem.status == .failed {
-            guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
-                return
-            }
-
-            // Ambassador video failed to download, use standard one.
-            playerItem.removeObserver(self, forKeyPath: "status")
-
-            self.video = .Standard
-            
-            let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
-            player.replaceCurrentItem(with: standardPlayerItem)
-            beginObserving(playerItem: standardPlayerItem)
-            player.play()
-            delegate?.tutorialVideoViewControllerDidPlay?(self)
-        }
-    }
-    
     // MARK: - Private
     
     private func beginObserving(playerItem item:AVPlayerItem) {
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
-        
-        item.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
+
+        observers.append(item.observe(\.status, options: [.new, .initial]) { playerItem, change in
+            guard let video = self.video, playerItem == self.player.currentItem else {
+                return
+            }
+            
+            if case .Ambassador(_) = video,
+                playerItem.status == .failed {
+                guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
+                    return
+                }
+                
+                // Ambassador video failed to download, use standard one
+                
+                self.video = .Standard
+                
+                let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
+                self.player.replaceCurrentItem(with: standardPlayerItem)
+                self.beginObserving(playerItem: standardPlayerItem)
+                self.player.play()
+                self.delegate?.tutorialVideoViewControllerDidPlay?(self)
+            }
+        })
     }
     
     private func endObserving() {
-        player.currentItem?.removeObserver(self, forKeyPath: "status")
+        observers.forEach { $0.invalidate() }
+        
         NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Actions
+    
+    @objc private func replayPauseButtonTapped() {
+        guard overlayView.replayPauseButton.isSelected == false else {
+            // Ensure we are in the replay state before doing anything.
+            return
+        }
+        
+        overlayView.hideReplayButton()
+        ended = false
+        
+        player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale)) { finished in
+            if finished {
+                self.player.play()
+                self.overlayView.showVolumeToggleButton()
+            }
+        }
+        
+        track("Replayed Tutorial Video")
+        delegate?.tutorialVideoViewControllerDidPlay?(self)
+    }
+    
+    @objc private func doneButtonTapped() {
+        track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
+        
+        delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
+    }
+    
+    @objc private func volumeToggleButtonTapped() {
+        let button = overlayView.volumeToggleButton
+        
+        if AVAudioSession.sharedInstance().outputVolume == 0 && button.isSelected {
+            // Volume is muted, ask user to turn up the volume?
+            
+            let alert = UIAlertController(title: "Turn up the volume!", message: "In order to hear the sound in the video, please turn up the volume on your phone!", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true)
+            
+            return
+        }
+        
+        button.isSelected = !button.isSelected
+        player.isMuted = button.isSelected
+    }
     
     @objc private func handleTap() {
         guard ended == false else {
@@ -185,7 +245,7 @@ class TutorialVideoViewController : BaseViewController {
         }
         
         if player.togglePlayback() == .paused {
-            overlayViewController.flashPauseOverlay()
+            overlayView.flashPauseOverlay()
             
             track("Paused Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPause?(self)
@@ -199,25 +259,13 @@ class TutorialVideoViewController : BaseViewController {
         ended = true
         
         if showsReplayButtonUponFinishing {
-            overlayViewController.showReplayButton()
+            overlayView.showReplayButton()
         }
+        
+        overlayView.hideVolumeToggleButton()
         
         track("Completed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidEnd?(self)
-    }
-    
-    private func replayButtonTapped() {
-        overlayViewController.hideReplayButton()
-        ended = false
-        
-        player.seek(to: CMTime(seconds: 0, preferredTimescale: player.currentTime().timescale)) { finished in
-            if finished {
-                self.player.play()
-            }
-        }
-        
-        track("Replayed Tutorial Video")
-        delegate?.tutorialVideoViewControllerDidPlay?(self)
     }
 }
 

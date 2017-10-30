@@ -112,8 +112,8 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let verPadding = CGFloat(Geometry.extendedPadding())
-        let horPadding = CGFloat(Geometry.padding())
+        let verPadding = CGFloat(Geometry.extendedPadding)
+        let horPadding = CGFloat(Geometry.padding)
         
         helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
@@ -128,7 +128,7 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
-            let p = Geometry.padding()
+            let p = Geometry.padding
             
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false

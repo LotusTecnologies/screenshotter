@@ -7,7 +7,7 @@
 //
 
 #import "ScreenshotDisplayViewController.h"
-#import "Geometry.h"
+
 #import "screenshot-Swift.h"
 
 @interface ScreenshotDisplayViewController () <UIScrollViewDelegate>

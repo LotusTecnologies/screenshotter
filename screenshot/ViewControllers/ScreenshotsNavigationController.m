@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) WebViewController *webViewController;
+@property (nonatomic, strong, nullable) Class previousViewControllerClass;
 
 @end
 
@@ -57,36 +58,11 @@
 #pragma mark - View Controller Life Cycle
 
 - (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {
-    if (viewController == self.screenshotsViewController) {
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] &&
-            ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker] &&
-            [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
-        {
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Start Screenshotting" message:@"Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!" preferredStyle:UIAlertControllerStyleAlert];
-            [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
-                    if (granted) {
-                        [self.delegate screenshotsNavigationControllerDidGrantPushPermissions:self];
-                        
-                        [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
-                        
-                    } else {
-                        [AnalyticsTrackers.standard track:@"Denied Push Permissions"];
-                    }
-                }];
-            }]];
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
+    if ([viewController isKindOfClass:[ScreenshotsViewController class]] && self.previousViewControllerClass == [ProductsViewController class]) {
+        [self presentAppropriateModalViewControllerIfNecessary];
     }
-}
-
-- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
-    if ([viewController isKindOfClass:[ProductsViewController class]]) {
-        [self presentPickerViewControllerIfNeeded];
-    }
+    
+    self.previousViewControllerClass = [viewController class];
 }
 
 
@@ -107,7 +83,7 @@
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
-    [self presentPickerViewControllerIfNeeded];
+    [self presentPickerViewController];
 }
 
 
@@ -121,13 +97,38 @@
 }
 
 
-#pragma mark - Screenshots Picker
+#pragma mark -
 
-- (void)presentPickerViewController {
-    [self presentPickerViewControllerWithCompletion:nil];
+- (void)presentAppropriateModalViewControllerIfNecessary {
+    if ([self canPresentPickerViewController]) {
+        [self presentPickerViewController];
+    } else if ([self canPresentPushPermissionsViewController]) {
+        [self presentPushPermissionsViewController];
+    }
 }
 
-- (void)presentPickerViewControllerWithCompletion:(dispatch_block_t)completion {
+
+#pragma mark - Push Permissions
+
+- (BOOL)canPresentPushPermissionsViewController {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
+}
+
+- (void)presentPushPermissionsViewController {
+    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
+    [self presentViewController:controller animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
+    }];
+}
+
+
+#pragma mark - Screenshots Picker
+
+- (BOOL)canPresentPickerViewController {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker] == NO;
+}
+
+- (void)presentPickerViewController {
     ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
     picker.cancelButton.target = self;
     picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
@@ -135,24 +136,21 @@
     picker.doneButton.action = @selector(pickerViewControllerDidFinish);
     self.pickerNavigationController = picker;
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
+    [self presentViewController:self.pickerNavigationController animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+    }];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
 
-- (void)presentPickerViewControllerIfNeeded {
-    BOOL shouldPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-    
-    if (shouldPresent) {
-        [self presentPickerViewControllerWithCompletion:^{
-            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }];
-    }
+- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
+    [super dismissViewControllerAnimated:flag completion:completion];
 }
 
 - (void)pickerViewControllerDidCancel {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        [self presentAppropriateModalViewControllerIfNecessary];
+    }];
 }
 
 - (void)pickerViewControllerDidFinish {

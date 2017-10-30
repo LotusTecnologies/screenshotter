@@ -8,8 +8,6 @@
 
 #import "ScreenshotCollectionViewCell.h"
 
-#import <ImageEffects/ImageEffects.h>
-
 @interface ScreenshotCollectionViewCell ()
 
 @property (nonatomic, strong) UIImageView *imageView;

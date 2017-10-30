@@ -18,6 +18,9 @@ class UserDefaultsKeys : NSObject {
     // Discover
     static let discoverUrl = "DiscoverUrl"
     
+    // Screenshot
+    static let newScreenshotsCount = "NewScreenshotsCount"
+    
     // Product
     static let productSort = "ProductSort"
     
@@ -25,8 +28,8 @@ class UserDefaultsKeys : NSObject {
     static let tutorialCompleted = "TutorialCompleted"
     static let tutorialPresentedScreenshotHelper = "TutorialPresentedScreenshotHelper"
     static let tutorialPresentedProductHelper = "TutorialPresentedProductHelper"
-    static let tutorialShouldPresentScreenshotPicker = "TutorialShouldPresentScreenshotPicker"
-    static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
+    static let tutorialPresentedScreenshotPicker = "TutorialShouldPresentedScreenshotPicker"
+    static let onboardingPresentedPushPermissionsPage = "OnboardingPresentedPushPermissionsPage"
     
     // Device / Version
     static let dateInstalled = "DateInstalled"

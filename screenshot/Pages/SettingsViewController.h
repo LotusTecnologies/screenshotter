@@ -8,6 +8,17 @@
 
 #import "BaseViewController.h"
 
+@class SettingsViewController;
+
+@protocol SettingsViewControllerDelegate
+@required
+
+- (void)settingsViewControllerDidGrantPermission:(SettingsViewController *)viewController;
+
+@end
+
 @interface SettingsViewController : BaseViewController
+
+@property (nonatomic, weak) id<SettingsViewControllerDelegate> delegate;
 
 @end

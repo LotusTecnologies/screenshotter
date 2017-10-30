@@ -8,7 +8,7 @@
 
 #import "WebViewController.h"
 #import "Loader.h"
-#import "Geometry.h"
+
 #import "NetworkingModel.h"
 #import "screenshot-Swift.h"
 
@@ -20,7 +20,6 @@
     BOOL _didViewAppear;
     BOOL _isShorteningUrl;
     BOOL _isShowingGame;
-    BOOL _isPlayingGame;
 }
 
 @property (nonatomic, strong) UIView *loadingCoverView;
@@ -290,7 +289,7 @@
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     self.didLoadInitialPage = YES;
     
-    if (!_isPlayingGame) {
+    if (!_isShowingGame) {
         [self hideLoadingView];
     }
 }
@@ -383,12 +382,10 @@
 }
 
 - (void)gameSceneDidStartGame:(GameScene *)gameScene {
-    _isPlayingGame = YES;
+    
 }
 
 - (void)gameSceneDidEndGame:(GameScene *)gameScene {
-    _isPlayingGame = NO;
-    
     if (self.didLoadInitialPage) {
         [self hideLoadingView];
     }

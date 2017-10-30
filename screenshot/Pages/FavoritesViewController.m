@@ -8,10 +8,10 @@
 
 #import "FavoritesViewController.h"
 #import "ProductCollectionViewCell.h"
-#import "Geometry.h"
+
 #import "screenshot-Swift.h"
 #import "WebViewController.h"
-#import "HelperView.h"
+
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;

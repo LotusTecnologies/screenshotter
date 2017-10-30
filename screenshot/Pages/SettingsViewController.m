@@ -7,7 +7,6 @@
 //
 
 #import "SettingsViewController.h"
-#import "Geometry.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
 #import "WebViewController.h"
@@ -397,6 +396,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] openSettingsIfNeeded:YES response:^(BOOL granted) {
                 if (granted) {
                     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                    [self.delegate settingsViewControllerDidGrantPermission:self];
                 }
             }];
         }
@@ -594,14 +594,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self reidentify];
+        
     } else {
         textField.text = self.previousTexts[key];
     }
 }
 
 - (void)reidentify {
-    AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:[self.nameTextField.text trimWhitespace]
-                                                        email:[self.emailTextField.text trimWhitespace]];
+    AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:[self.nameTextField.text trimWhitespace] email:[self.emailTextField.text trimWhitespace]];
+    
     [AnalyticsTrackers.standard identify:user];
     [AnalyticsTrackers.branch identify:user];
 }
@@ -744,6 +745,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+
 #pragma mark - TutorialVideoViewControllerDelegate
 
 - (void)tutorialVideoViewControllerDoneButtonTapped:(TutorialVideoViewController *)viewController {
@@ -753,6 +755,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
     [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video"];
     
+    // TODO: look into why this is here - corey
     dispatch_async(dispatch_get_main_queue(), ^{
         [self dismissViewControllerAnimated:YES completion:nil];
     });

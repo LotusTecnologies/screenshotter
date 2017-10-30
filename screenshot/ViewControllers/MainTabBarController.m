@@ -12,7 +12,7 @@
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate> {
+@interface MainTabBarController () <UITabBarControllerDelegate, SettingsViewControllerDelegate> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -39,7 +39,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             
             ScreenshotsNavigationController *navigationController = [[ScreenshotsNavigationController alloc] init];
             navigationController.title = navigationController.screenshotsViewController.title;
-            navigationController.delegate = self;
             navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:navigationController.title image:image tag:0];
             navigationController;
         });
@@ -72,6 +71,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
             SettingsViewController *viewController = [[SettingsViewController alloc] init];
+            viewController.delegate = self;
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.title = viewController.title;
@@ -88,14 +88,16 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
                                  self.settingsNavigationController
                                  ];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
     [self.updatePromptHandler start];
 }
@@ -106,9 +108,38 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [self refreshTabBarSettingsBadge];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self attemptPresentNotification];
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self attemptPresentNotification];
+    }
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
         [self refreshTabBarSettingsBadge];
+    }
+}
+
+- (void)applicationUserDidTakeScreenshot:(NSNotification *)notification {
+    if (self.view.window) {
+        BOOL foundIntercomWindow = NO;
+        
+        NSArray<UIWindow *> *windows = [[UIApplication sharedApplication] windows];
+        for (UIWindow *window in windows) {
+            if ([window isKindOfClass:NSClassFromString(@"ICMWindow")]) {
+                foundIntercomWindow = YES;
+                break;
+            }
+        }
+        
+        NSString *eventName = foundIntercomWindow ? @"Took Screenshot While Showing Intercom Window" : @"Took Screenshot";
+        [AnalyticsTrackers.standard track:eventName properties:nil];
     }
 }
 
@@ -128,7 +159,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)dealloc {
     [self dismissTabBarSettingsBadge];
     
-    self.screenshotsNavigationController.delegate = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -186,10 +217,31 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 }
 
 
-#pragma mark - Screenshot View Controller
+#pragma mark - Settings View Controller
 
-- (void)screenshotsNavigationControllerDidGrantPushPermissions:(ScreenshotsNavigationController *)navigationController {
+- (void)settingsViewControllerDidGrantPermission:(SettingsViewController *)viewController {
     [self refreshTabBarSettingsBadge];
+}
+
+
+#pragma mark - Notifications
+
+- (void)attemptPresentNotification {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSInteger newScreenshotsCount = [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+        [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+        
+        if (newScreenshotsCount == 1) {
+            [[NotificationManager shared] presentScreenshotWithUserTapped:^{
+                [[AssetSyncModel sharedInstance] refetchLastScreenshot];
+            }];
+            
+        } else if (newScreenshotsCount > 1) {
+            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
+                [self.screenshotsNavigationController presentPickerViewController];
+            }];
+        }
+    });
 }
 
 @end

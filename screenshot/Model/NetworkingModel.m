@@ -14,7 +14,7 @@
 +(void)uploadToSyte:(NSData *_Nonnull)imageData completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
     NSDictionary *dictParams = @{@"account_id"      : @(6677),
                                  @"sig"             : @"GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=",
-                                 @"feed"            : @"default",
+                                 @"feed"            : @"default",//@"awin_asos",
                                  @"payload_type"    : @"image_bin"};
     NSString *strService = @"https://syteapi.com/offers/bb";
     
