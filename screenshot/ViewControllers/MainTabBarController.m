@@ -12,7 +12,7 @@
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, SettingsViewControllerDelegate> {
+@interface MainTabBarController () <UITabBarControllerDelegate, SettingsViewControllerDelegate, ForegroundScreenshotProtocol> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -91,6 +91,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
+        
+        [AssetSyncModel sharedInstance].foregroundScreenshotDelegate = self;
     }
     return self;
 }
@@ -130,8 +132,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     if (self.view.window) {
         BOOL foundIntercomWindow = NO;
         
-        NSArray<UIWindow *> *windows = [[UIApplication sharedApplication] windows];
-        for (UIWindow *window in windows) {
+        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
             if ([window isKindOfClass:NSClassFromString(@"ICMWindow")]) {
                 foundIntercomWindow = YES;
                 break;
@@ -158,6 +159,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)dealloc {
     [self dismissTabBarSettingsBadge];
+    
+    [AssetSyncModel sharedInstance].foregroundScreenshotDelegate = nil;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -242,6 +245,15 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             }];
         }
     });
+}
+
+
+#pragma mark - Foreground Screenshots
+
+- (void)foregroundScreenshotTakenWithAssetId:(NSString *)assetId {
+    [[NotificationManager shared] presentScreenshotWithUserTapped:^{
+        [[AssetSyncModel sharedInstance] refetchOpenedFromNotificationWithAssetId:assetId];
+    }];
 }
 
 @end
