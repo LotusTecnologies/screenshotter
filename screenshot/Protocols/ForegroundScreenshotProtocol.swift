@@ -9,5 +9,5 @@
 import Foundation
 
 @objc protocol ForegroundScreenshotProtocol: NSObjectProtocol {
-    @objc func foregroundScreenshotTaken()
+    @objc func foregroundScreenshotTaken(assetId: String)
 }

@@ -93,7 +93,13 @@ class AssetSyncModel: NSObject {
                 }
             }.then (on: processingQ) { isFashion -> Void in
                 if isFashion {
-                    self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                    if UIApplication.shared.applicationState == .active {
+                        DispatchQueue.main.async {
+                            self.foregroundScreenshotDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                        }
+                    } else {
+                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                    }
                 }
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
