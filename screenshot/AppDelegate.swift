@@ -12,6 +12,8 @@ import Analytics
 import Appsee
 import FBSDKLoginKit
 import Branch
+import Firebase
+import GoogleSignIn
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,7 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DataModel.setup() // Sets up Core Data stack on a background queue.
         return true
     }
-
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         PermissionsManager.shared().fetchPushPermissionStatus()
@@ -40,12 +41,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
-
+    
 //    func applicationWillResignActive(_ application: UIApplication) {
 //        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 //        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 //    }
-
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -55,34 +56,62 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.bgTask = UIBackgroundTaskInvalid
         }
     }
-
+    
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         track("sessionStarted")
     }
-
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         FBSDKAppEvents.activateApp()
     }
-
+    
 //    func applicationWillTerminate(_ application: UIApplication) {
 //        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 //    }
-
+    
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         completionHandler(.noData)
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        // pass the url to the handle deep link call
-        let branchHandled = Branch.getInstance().application(app,
-                                                             open: url,
-                                                             options:options)
-        if (!branchHandled) {
-            let _ = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        
+        var handled = Branch.getInstance().application(app, open: url, options:options)
+        
+        if !handled {
+            handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
-        return true
+        
+        if !handled {
+            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
+        }
+        
+        if !handled {
+            // Facebook
+//            let parsedURL = BFURL(inboundURL: url, sourceApplication: sourceApplication)
+//
+//            if parsedURL?.appLinkData != nil {
+//                // this is an applink url, handle it here
+//                let alert = UIAlertController(title: "Received link:", message: parsedURL?.targetURL.absoluteString, preferredStyle: .alert)
+//                window?.rootViewController?.present(alert, animated: true, completion: nil)
+//
+//                return true
+//            }
+            
+            // Google
+//            if let invite = Invites.handle(url, sourceApplication: sourceApplication, annotation: annotation) as? ReceivedInvite {
+//                let matchType = (invite.matchType == .weak) ? "Weak" : "Strong"
+//
+//                print("||| Invite received from: \(sourceApplication ?? "") Deeplink: \(invite.deepLink), Id: \(invite.inviteId), Type: \(matchType)")
+//
+//                return true
+//            }
+        }
+        
+        return handled
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
@@ -153,6 +182,9 @@ extension AppDelegate {
         RatingFlow.sharedInstance.start()
         
         IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
+        
+        FirebaseApp.configure()
+        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
     }
 
     // MARK: - Appearance
