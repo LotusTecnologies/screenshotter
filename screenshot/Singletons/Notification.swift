@@ -110,7 +110,7 @@ final class NotificationManager: NSObject {
     public func presentScreenshot(withUserTapped userTapped: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
-        notificationView.label.text = "Import new screenshot?"
+        notificationView.label.text = "Tap to import your latest screenshot"
         present(notificationView: notificationView, userTapped: userTapped)
     }
     
@@ -121,7 +121,7 @@ final class NotificationManager: NSObject {
         } else if screenshotCount > 1 {
             let notificationView = createNotificationView()
             notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
-            notificationView.label.text = "You have \(screenshotCount) new screenshots."
+            notificationView.label.text = "Tap to import your new screenshots"
             present(notificationView: notificationView, userTapped: userTapped)
         }
     }
