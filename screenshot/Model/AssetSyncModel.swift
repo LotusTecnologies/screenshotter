@@ -40,6 +40,7 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
+    public weak var foregroundScreenshotDelegate: ForegroundScreenshotProtocol?
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
     var selectedScreenshotAssets = Set<PHAsset>()
 //    var changedAssetIds: [String] = []
@@ -92,7 +93,13 @@ class AssetSyncModel: NSObject {
                 }
             }.then (on: processingQ) { isFashion -> Void in
                 if isFashion {
-                    self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                    if UIApplication.shared.applicationState == .active {
+                        DispatchQueue.main.async {
+                            self.foregroundScreenshotDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                        }
+                    } else {
+                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                    }
                 }
             }.always(on: self.serialQ) {
                 self.decrementScreenshots()
