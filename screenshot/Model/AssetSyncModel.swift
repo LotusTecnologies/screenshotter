@@ -40,6 +40,7 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
+    public weak var foregroundScreenshotDelegate: ForegroundScreenshotProtocol?
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
     var selectedScreenshotAssets = Set<PHAsset>()
 //    var changedAssetIds: [String] = []

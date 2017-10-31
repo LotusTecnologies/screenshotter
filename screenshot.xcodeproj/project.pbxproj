@@ -75,6 +75,7 @@
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
+		E4A671631FA88AAA00250410 /* ForegroundScreenshotProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A671621FA88AAA00250410 /* ForegroundScreenshotProtocol.swift */; };
 		E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */; };
 		E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -181,6 +182,7 @@
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		E4A671621FA88AAA00250410 /* ForegroundScreenshotProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForegroundScreenshotProtocol.swift; sourceTree = "<group>"; };
 		E4D495D11F49834900312614 /* upload_symbols.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = upload_symbols.sh; sourceTree = "<group>"; };
 		E4D5900D1F8367A3006A3C89 /* Model 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 4.xcdatamodel"; sourceTree = "<group>"; };
 		E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 			children = (
 				C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */,
 				C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */,
+				E4A671621FA88AAA00250410 /* ForegroundScreenshotProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -738,6 +741,7 @@
 				C56F2BF71F42C2DF00501AE9 /* Loader.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */,
+				E4A671631FA88AAA00250410 /* ForegroundScreenshotProtocol.swift in Sources */,
 				C528DC1A1F5D7C2D00F4E723 /* Appearance.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
