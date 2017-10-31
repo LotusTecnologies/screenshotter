@@ -68,7 +68,7 @@ final class NotificationManager: NSObject {
     @objc private func tapAction(tapGesture: UITapGestureRecognizer) {
         if let notificationView = tapGesture.view as? NotificationView,
             let notificationWrapper = notificationWrapper(for: notificationView) {
-            notificationWrapper.callback?()
+            notificationWrapper.action?()
         }
         
         dismiss()
@@ -107,14 +107,14 @@ final class NotificationManager: NSObject {
     
     // MARK: Present / Dismiss
     
-    public func presentScreenshot(withUserTapped userTapped: (() -> Void)? = nil) {
+    public func presentScreenshot(withAction action: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
         notificationView.label.text = "Tap to import your latest screenshot"
-        present(notificationView: notificationView, userTapped: userTapped)
+        present(notificationView: notificationView, action: action)
     }
     
-    public func presentScreenshot(withCount screenshotCount: UInt, userTapped: (() -> Void)? = nil) {
+    public func presentScreenshot(withCount screenshotCount: UInt, action: (() -> Void)? = nil) {
         if screenshotCount == 1 {
             presentScreenshot()
             
@@ -122,13 +122,24 @@ final class NotificationManager: NSObject {
             let notificationView = createNotificationView()
             notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
             notificationView.label.text = "Tap to import your new screenshots"
-            present(notificationView: notificationView, userTapped: userTapped)
+            present(notificationView: notificationView, action: action)
         }
     }
     
-    private func present(notificationView: NotificationView, userTapped: (() -> Void)? = nil) {
+    public func presentForegroundScreenshot(withAssetId assetId: String, action: (() -> Void)? = nil) {
+        let notificationView = createNotificationView()
+        notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
+        notificationView.label.text = "Your screenshot is shoppable in the screenshot tab"
+        present(notificationView: notificationView, action: action)
+        
+        AssetSyncModel.sharedInstance.image(assetId: assetId) { (image, info) in
+            notificationView.image = image
+        }
+    }
+    
+    private func present(notificationView: NotificationView, action: (() -> Void)? = nil) {
         let constraint = notificationView.topAnchor.constraint(equalTo: window.layoutMarginsGuide.topAnchor)
-        let wrapper = NotificationWrapper(view: notificationView, constraint: constraint, callback: userTapped)
+        let wrapper = NotificationWrapper(view: notificationView, constraint: constraint, action: action)
         notifications.append(wrapper)
         
         window.makeKeyAndVisible()
@@ -236,8 +247,8 @@ final class NotificationManager: NSObject {
 private class NotificationView: UIView {
     private let cornerRadius = CGFloat(5)
     
-    private var imageView: UIImageView!
-    private(set) var label: UILabel!
+    private let imageView = UIImageView()
+    fileprivate let label = UILabel()
     private var labelLeadingConstraint: NSLayoutConstraint!
     
     required init?(coder aDecoder: NSCoder) {
@@ -260,20 +271,19 @@ private class NotificationView: UIView {
         backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
-        imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .crazeRed
         imageView.isHidden = true
-        addSubview(imageView)
+        addSubview(imageView)                   // TODO: less padding for the image
         imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
         imageView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: padding).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding).isActive = true
         imageView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -padding).isActive = true
         imageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 44).isActive = true
+        imageView.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor).isActive = true // TODO: test on ios10
         
-        label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.backgroundColor = .clear
         label.textAlignment = .center
@@ -281,6 +291,7 @@ private class NotificationView: UIView {
         label.numberOfLines = 0
         addSubview(label)
         label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
         label.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
         label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding).isActive = true
         label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding).isActive = true
@@ -320,13 +331,13 @@ private class NotificationView: UIView {
 private class NotificationWrapper: NSObject {
     var view: NotificationView
     var constraint: NSLayoutConstraint
-    var callback: (() -> Void)?
+    var action: (() -> Void)?
     var isPanning = false
     
-    init(view: NotificationView, constraint: NSLayoutConstraint, callback: (() -> Void)?) {
+    init(view: NotificationView, constraint: NSLayoutConstraint, action: (() -> Void)?) {
         self.view = view
         self.constraint = constraint
-        self.callback = callback
+        self.action = action
         super.init()
     }
 }

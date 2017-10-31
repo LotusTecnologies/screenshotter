@@ -235,12 +235,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
         
         if (newScreenshotsCount == 1) {
-            [[NotificationManager shared] presentScreenshotWithUserTapped:^{
+            [[NotificationManager shared] presentScreenshotWithAction:^{
                 [[AssetSyncModel sharedInstance] refetchLastScreenshot];
             }];
             
         } else if (newScreenshotsCount > 1) {
-            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount userTapped:^{
+            [[NotificationManager shared] presentScreenshotWithCount:newScreenshotsCount action:^{
                 [self.screenshotsNavigationController presentPickerViewController];
             }];
         }
@@ -251,9 +251,11 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 #pragma mark - Foreground Screenshots
 
 - (void)foregroundScreenshotTakenWithAssetId:(NSString *)assetId {
-    [[NotificationManager shared] presentScreenshotWithUserTapped:^{
-        [[AssetSyncModel sharedInstance] refetchOpenedFromNotificationWithAssetId:assetId];
-    }];
+    if (self.selectedViewController != self.screenshotsNavigationController) {
+        [[NotificationManager shared] presentForegroundScreenshotWithAssetId:assetId action:^{
+            self.selectedViewController = self.screenshotsNavigationController;
+        }];
+    }
 }
 
 @end
