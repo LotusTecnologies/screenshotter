@@ -210,7 +210,12 @@ extension InviteViewController: InviteDelegate {
 
 extension InviteViewController: FBSDKAppInviteDialogDelegate {
     func appInviteDialog(_ appInviteDialog: FBSDKAppInviteDialog!, didCompleteWithResults results: [AnyHashable : Any]!) {
-        AnalyticsTrackers.standard.track("Facebook Invite", properties: ["Sent": results])
+        if let results = results, results.count > 0 {
+            AnalyticsTrackers.standard.track("Facebook Invite", properties: ["Sent": results])
+            
+        } else {
+            AnalyticsTrackers.standard.track("Facebook Invite Cancelled")
+        }
     }
     
     func appInviteDialog(_ appInviteDialog: FBSDKAppInviteDialog!, didFailWithError error: Error!) {
