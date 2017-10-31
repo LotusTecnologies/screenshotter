@@ -41,7 +41,7 @@ class AssetSyncModel: NSObject {
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
-    var selectedScreenshotAssets: [PHAsset]?
+    var selectedScreenshotAssets = Set<PHAsset>()
 //    var changedAssetIds: [String] = []
     var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
@@ -544,14 +544,9 @@ class AssetSyncModel: NSObject {
     }
     
     func retrieveSelectedScreenshotAssetIds() -> Set<String> {
-        var assetIds = Set<String>()
-        guard let selectedScreenshotAssets = selectedScreenshotAssets else {
-            return assetIds
-        }
-        for asset in selectedScreenshotAssets {
-            assetIds.insert(asset.localIdentifier)
-        }
-        return assetIds
+        let assetIdArray = selectedScreenshotAssets.map { $0.localIdentifier }
+        let assetIdSet = Set<String>(assetIdArray)
+        return assetIdSet
     }
     
     func beginSync() {
@@ -595,15 +590,11 @@ class AssetSyncModel: NSObject {
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
         let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        if let asset = fetchResult.firstObject {
-            if self.selectedScreenshotAssets != nil {
-                self.selectedScreenshotAssets?.append(asset)
-            } else {
-                self.selectedScreenshotAssets = [asset]
-            }
-            return true
+        guard let asset = fetchResult.firstObject else {
+            return false
         }
-        return false
+        let tuple = self.selectedScreenshotAssets.insert(asset)
+        return tuple.inserted
     }
     
     @objc public func syncPhotos() {
@@ -669,7 +660,7 @@ class AssetSyncModel: NSObject {
             }
             if toBypassClarifai.count > 0 {
                 track("user imported old screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
-                self.selectedScreenshotAssets?
+                self.selectedScreenshotAssets
                     .filter { toBypassClarifai.contains($0.localIdentifier) }
                     .forEach { asset in
                         self.screenshotsToProcess += 1
@@ -680,7 +671,7 @@ class AssetSyncModel: NSObject {
             }
             if toRetry.count > 0 {
                 track("user retried screenshots", properties: ["numScreenshots" : toRetry.count])
-                self.selectedScreenshotAssets?
+                self.selectedScreenshotAssets
                     .filter { toRetry.contains($0.localIdentifier) }
                     .forEach { asset in
                         self.screenshotsToProcess += 1
@@ -689,7 +680,8 @@ class AssetSyncModel: NSObject {
                         }
                 }
             }
-            self.selectedScreenshotAssets?.removeAll()
+            // Remove selected assets that were processed, i.e. their assetId is in selectedSet.
+            self.selectedScreenshotAssets.subtract(self.selectedScreenshotAssets.filter { selectedSet.contains($0.localIdentifier) })
             if self.screenshotsToProcess == 0 {
                 self.endSync()
             }
@@ -697,7 +689,7 @@ class AssetSyncModel: NSObject {
     }
     
     @objc public func syncSelectedPhotos(assets: [PHAsset]) {
-        self.selectedScreenshotAssets = assets
+        self.selectedScreenshotAssets.formUnion(assets)
         syncPhotos()
     }
     

@@ -58,6 +58,12 @@
 		<string>snapchat</string>
 		<string>fb</string>
 	</array>
+	<key>CFBundleVersion</key>
+	<string>47</string>
+	<key>FacebookAppID</key>
+	<string>1960379067541863</string>
+	<key>FacebookDisplayName</key>
+	<string>Craze</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
