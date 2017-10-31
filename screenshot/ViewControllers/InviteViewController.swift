@@ -9,11 +9,13 @@
 import Foundation
 import GoogleSignIn
 import Firebase
+import FBSDKShareKit
 
 class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     let shareText = "Download SCREENSHOP, the app that lets you shop any screenshot, for free!"
     
-    fileprivate var googleButton: MainButton!
+    fileprivate let googleButton = MainButton()
+    fileprivate let facebookButton = MainButton()
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -40,7 +42,16 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding).isActive = true
         NSLayoutConstraint(item: containerView, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1.1, constant: 0).isActive = true
         
-        googleButton = MainButton()
+        facebookButton.translatesAutoresizingMaskIntoConstraints = false
+        facebookButton.backgroundColor = UIColor(red: 60/255, green: 90/255, blue: 150/255, alpha: 1)
+        facebookButton.setTitle("Facebook Invite", for: .normal)
+        facebookButton.setImage(UIImage(named: "InviteFacebookIcon"), for: .normal)
+        facebookButton.addTarget(self, action: #selector(presentFacebookInvite), for: .touchUpInside)
+        containerView.addSubview(facebookButton)
+        facebookButton.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
+        facebookButton.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        facebookButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        
         googleButton.translatesAutoresizingMaskIntoConstraints = false
         googleButton.backgroundColor = .white
         googleButton.setTitleColor(.black, for: .normal)
@@ -49,12 +60,13 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         googleButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
         containerView.addSubview(googleButton)
         googleButton.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
-        googleButton.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        googleButton.topAnchor.constraint(equalTo: facebookButton.bottomAnchor, constant: extendedPadding).isActive = true
+        googleButton.widthAnchor.constraint(equalTo: facebookButton.widthAnchor).isActive = true
         googleButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         
         let separator = UIView()
         separator.translatesAutoresizingMaskIntoConstraints = false
-        separator.backgroundColor = .gray8
+        separator.backgroundColor = .gray9
         containerView.addSubview(separator)
         separator.topAnchor.constraint(equalTo: googleButton.bottomAnchor, constant: extendedPadding).isActive = true
         separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
@@ -72,13 +84,6 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         shareButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         shareButton.widthAnchor.constraint(equalTo: googleButton.widthAnchor).isActive = true
         shareButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
-    }
-    
-    func presentActivityViewController() {
-        let text = shareText + " https://crazeapp.com/app/"
-        let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-        activityViewController.popoverPresentationController?.sourceView = view
-        present(activityViewController, animated: true, completion: nil)
     }
     
     // MARK: Google
@@ -108,19 +113,36 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     }
     
     func presentGoogleInvite() {
-        if let invite = Invites.inviteDialog() {
+        if let invite = Invites.inviteDialog(), let bundleIdentifier = Bundle.main.bundleIdentifier {
             invite.setInviteDelegate(self)
-            
-            // NOTE: You must have the App Store ID set in your developer console project
-            // in order for invitations to successfully be sent.
-            
             invite.setTitle("Invites Your Friends")
             invite.setMessage(shareText)
-            invite.setDeepLink("io.crazeapp.screenshot.dev") // TODO:
+            invite.setDeepLink(bundleIdentifier)
             invite.setCallToActionText("Install!")
             invite.setCustomImage("https://static.crazeapp.com/screenshop-icon-500.png")
             invite.open()
         }
+    }
+    
+    // MARK: Facebook
+    
+    func presentFacebookInvite() {
+        // https://developers.facebook.com/quickstarts/1960379067541863/?platform=app-links-host
+        
+        let content = FBSDKAppInviteContent()
+        content.appLinkURL = URL(string: "https://fb.me/1992192421027194")
+        content.appInvitePreviewImageURL = URL(string: "https://static.crazeapp.com/screenshop-logo-1200x628.png")
+        
+        FBSDKAppInviteDialog.show(from: self, with: content, delegate: self)
+    }
+    
+    // MARK: Share
+    
+    func presentActivityViewController() {
+        let text = shareText + " https://screenshopit.com/"
+        let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = view
+        present(activityViewController, animated: true, completion: nil)
     }
 }
 
@@ -147,8 +169,8 @@ extension InviteViewController: GIDSignInDelegate {
             
             var analyticsProperties = [String: Any]()
             
-            if let displayName = user?.displayName {
-                analyticsProperties["User Name"] = displayName
+            if let name = user?.displayName {
+                analyticsProperties["User Name"] = name
             }
             if let email = user?.email {
                 analyticsProperties["User Email"] = email
@@ -167,8 +189,11 @@ extension InviteViewController: GIDSignInDelegate {
     }
     
     func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
-        // Perform any operations when the user disconnects from app here.
-        // TODO: ???
+        AnalyticsTrackers.standard.track("Google Sign Out", properties: [
+            "User Name": user.profile.name,
+            "User Email": user.profile.email,
+            "Error": error.localizedDescription
+            ])
     }
 }
 
@@ -180,5 +205,15 @@ extension InviteViewController: InviteDelegate {
         } else {
             AnalyticsTrackers.standard.track("Google Invite", properties: ["Sent": invitationIds.count])
         }
+    }
+}
+
+extension InviteViewController: FBSDKAppInviteDialogDelegate {
+    func appInviteDialog(_ appInviteDialog: FBSDKAppInviteDialog!, didCompleteWithResults results: [AnyHashable : Any]!) {
+        AnalyticsTrackers.standard.track("Facebook Invite", properties: ["Sent": results])
+    }
+    
+    func appInviteDialog(_ appInviteDialog: FBSDKAppInviteDialog!, didFailWithError error: Error!) {
+        AnalyticsTrackers.standard.track("Facebook Invite", properties: ["Error": error.localizedDescription])
     }
 }

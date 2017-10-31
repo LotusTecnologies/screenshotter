@@ -44,26 +44,29 @@
 				<string>com.googleusercontent.apps.483336611267-focqhnidb8ag47pkklb47ojrfo3ulppg</string>
 			</array>
 		</dict>
-	</array>
-	<key>CFBundleVersion</key>
-	<string>46</string>
-	<key>FacebookAppID</key>
-	<string>1960379067541863</string>
-	<key>FacebookDisplayName</key>
-	<string>Craze</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>instagram</string>
-		<string>google</string>
-		<string>snapchat</string>
-		<string>fb</string>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>screenshop</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>47</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
-	<string>Craze</string>
+	<string>Screenshop</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram</string>
+		<string>google</string>
+		<string>snapchat</string>
+		<string>fb</string>
+		<string>fbauth2</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

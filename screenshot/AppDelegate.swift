@@ -76,36 +76,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        // pass the url to the handle deep link call
+        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
-        if (!handled) {
-            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-//            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: [:])
-            
-            handled = self.application(app, open: url, sourceApplication: sourceApplication, annotation: "")
-
+        if !handled {
+            handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
-        if (!handled) {
-            let _ = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        if !handled {
+            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
-        return true
-    }
-    
-    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-        if let invite = Invites.handle(url, sourceApplication: sourceApplication, annotation: annotation) as? ReceivedInvite {
-            let matchType = (invite.matchType == .weak) ? "Weak" : "Strong"
+        if !handled {
+            // Facebook
+//            let parsedURL = BFURL(inboundURL: url, sourceApplication: sourceApplication)
+//
+//            if parsedURL?.appLinkData != nil {
+//                // this is an applink url, handle it here
+//                let alert = UIAlertController(title: "Received link:", message: parsedURL?.targetURL.absoluteString, preferredStyle: .alert)
+//                window?.rootViewController?.present(alert, animated: true, completion: nil)
+//
+//                return true
+//            }
             
-            print("||| Invite received from: \(sourceApplication ?? "") Deeplink: \(invite.deepLink), Id: \(invite.inviteId), Type: \(matchType)")
-            
-            return true
+            // Google
+//            if let invite = Invites.handle(url, sourceApplication: sourceApplication, annotation: annotation) as? ReceivedInvite {
+//                let matchType = (invite.matchType == .weak) ? "Weak" : "Strong"
+//
+//                print("||| Invite received from: \(sourceApplication ?? "") Deeplink: \(invite.deepLink), Id: \(invite.inviteId), Type: \(matchType)")
+//
+//                return true
+//            }
         }
         
-        print("||| handle sign in")
-        
-        return GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
+        return handled
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
