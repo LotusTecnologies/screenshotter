@@ -86,7 +86,7 @@ class AssetSyncModel: NSObject {
                                                          createdAt: asset.creationDate,
                                                          isFashion: isFashion,
                                                          isFromShare: false,
-                                                         isHidden: true,
+                                                         isHidden: !(isFashion && UIApplication.shared.applicationState == .active),
                                                          imageData: imageData)
                         fulfill((isFashion, imageData))
                     }
