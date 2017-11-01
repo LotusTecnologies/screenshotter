@@ -77,7 +77,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This allows you to take photos of clothes and shop them!</string>
 	<key>NSContactsUsageDescription</key>
-	<string>This allows you to invite your phone contacts.</string>
+	<string>This allows you to invite friends from your address book.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
 	<key>UIBackgroundModes</key>
