@@ -114,6 +114,38 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [super viewDidAppear:animated];
     
     [self attemptPresentNotification];
+    
+    
+    
+    ClipView *v = [[ClipView alloc] init];
+    v.translatesAutoresizingMaskIntoConstraints = NO;
+    v.backgroundColor = [UIColor colorWithWhite:0 alpha:0.5];
+    [self.view addSubview:v];
+    [v.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    [v.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [v.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [v.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    
+    
+    UIView *rightBarButtonView = self.screenshotsNavigationController.screenshotsViewController.navigationItem.rightBarButtonItem.targetView;
+    
+    CGRect rect = [rightBarButtonView convertRect:rightBarButtonView.frame toView:self.view];
+    
+    UIBezierPath *croppedPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:6];
+    
+    v.clippings = @[croppedPath];
+    
+    
+//    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.view.bounds];
+//    UIBezierPath *croppedPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:6];
+//    [path appendPath:croppedPath];
+//    [path setUsesEvenOddFillRule:YES];
+//
+//    CAShapeLayer *mask = [CAShapeLayer layer];
+//    mask.path = path.CGPath;
+//    mask.fillRule = kCAFillRuleEvenOdd;
+//    v.layer.mask = mask;
+    
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
