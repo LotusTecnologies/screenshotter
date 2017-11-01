@@ -76,7 +76,7 @@ class AssetSyncModel: NSObject {
             }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
                 track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.isFashion(image: image)
-            }.then(on: processingQ) { isFashion, image -> Promise<Bool> in
+            }.then(on: processingQ) { isFashion, image -> Promise<(Bool, Data?)> in
                 track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? self.data(for: image) : nil
                 return Promise { fulfill, reject in
@@ -86,17 +86,18 @@ class AssetSyncModel: NSObject {
                                                          createdAt: asset.creationDate,
                                                          isFashion: isFashion,
                                                          isFromShare: false,
-                                                         isHidden: true,
+                                                         isHidden: !(isFashion && UIApplication.shared.applicationState == .active),
                                                          imageData: imageData)
-                        fulfill(isFashion)
+                        fulfill((isFashion, imageData))
                     }
                 }
-            }.then (on: processingQ) { isFashion -> Void in
+            }.then (on: processingQ) { isFashion, imageData -> Void in
                 if isFashion {
                     if UIApplication.shared.applicationState == .active {
                         DispatchQueue.main.async {
                             self.foregroundScreenshotDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
                         }
+                        self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: asset.localIdentifier)
                     } else {
                         self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
                     }
