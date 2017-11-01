@@ -212,7 +212,7 @@ extension AppDelegate {
     func nextViewController() -> UIViewController {
         var viewController: UIViewController
         
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.tutorialCompleted) {
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
                 viewController = MainTabBarController()
             } else {
@@ -232,7 +232,7 @@ extension AppDelegate {
     }
     
     func prepareDataStackCompletionIfNeeded() {
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.tutorialCompleted) {
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
                 AssetSyncModel.sharedInstance.syncPhotos()
             } else {

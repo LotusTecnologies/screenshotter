@@ -223,7 +223,7 @@ extension TutorialViewController : TutorialTrySlideViewDelegate {
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {
         slideView.delegate = nil
         
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.tutorialCompleted)
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
         track("Finished Tutorial")
         AnalyticsTrackers.branch.track("Finished Tutorial")
         

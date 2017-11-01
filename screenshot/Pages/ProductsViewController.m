@@ -471,10 +471,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 #pragma mark - Tutorial
 
 - (void)presentTutorialHelperIfNeeded {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedProductHelper];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedProductHelper];
     
     if (!hasPresented) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedProductHelper];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedProductHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
         self.transitioningController = [[TransitioningController alloc] init];

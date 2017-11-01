@@ -15,7 +15,8 @@
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) WebViewController *webViewController;
-@property (nonatomic, strong, nullable) Class previousViewControllerClass;
+
+@property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
 
 @end
 
@@ -58,11 +59,23 @@
 #pragma mark - View Controller Life Cycle
 
 - (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {
-    if ([viewController isKindOfClass:[ScreenshotsViewController class]] && self.previousViewControllerClass == [ProductsViewController class]) {
-        [self presentAppropriateModalViewControllerIfNecessary];
+    if (viewController == self.screenshotsViewController &&
+        self.previousDidAppearViewControllerClass == [ProductsViewController class])
+    {
+        if ([self needsToPresentPickerViewController]) {
+            [self presentPickerViewController];
+            
+            // Go back into Products before presenting the next view
+            self.previousDidAppearViewControllerClass = nil;
+            
+        } else if ([self needsToPresentBackgroundScreenshotViewController] &&
+                   [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
+        {
+            [self presentBackgroundScreenshotViewController];
+        }
     }
     
-    self.previousViewControllerClass = [viewController class];
+    self.previousDidAppearViewControllerClass = [viewController class];
 }
 
 
@@ -97,35 +110,10 @@
 }
 
 
-#pragma mark -
-
-- (void)presentAppropriateModalViewControllerIfNecessary {
-    if ([self canPresentPickerViewController]) {
-        [self presentPickerViewController];
-    } else if ([self canPresentPushPermissionsViewController]) {
-        [self presentPushPermissionsViewController];
-    }
-}
-
-
-#pragma mark - Push Permissions
-
-- (BOOL)canPresentPushPermissionsViewController {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage] == NO;
-}
-
-- (void)presentPushPermissionsViewController {
-    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
-    [self presentViewController:controller animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushPermissionsPage];
-    }];
-}
-
-
 #pragma mark - Screenshots Picker
 
-- (BOOL)canPresentPickerViewController {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker] == NO;
+- (BOOL)needsToPresentPickerViewController {
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
 }
 
 - (void)presentPickerViewController {
@@ -137,20 +125,14 @@
     self.pickerNavigationController = picker;
     
     [self presentViewController:self.pickerNavigationController animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotPicker];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
     }];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
 
-- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
-    [super dismissViewControllerAnimated:flag completion:completion];
-}
-
 - (void)pickerViewControllerDidCancel {
-    [self dismissViewControllerAnimated:YES completion:^{
-        [self presentAppropriateModalViewControllerIfNecessary];
-    }];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)pickerViewControllerDidFinish {
@@ -158,6 +140,21 @@
     self.pickerNavigationController = nil;
     
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+#pragma mark - Background Screenshot
+
+- (BOOL)needsToPresentBackgroundScreenshotViewController {
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
+}
+
+- (void)presentBackgroundScreenshotViewController {
+    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
+    
+    [self presentViewController:controller animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
+    }];
 }
 
 

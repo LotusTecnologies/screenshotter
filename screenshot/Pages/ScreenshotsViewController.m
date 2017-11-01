@@ -165,10 +165,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)insertScreenshotHelperView {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
     
     if (!hasPresented && [self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] == 1) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;

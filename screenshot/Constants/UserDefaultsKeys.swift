@@ -25,11 +25,11 @@ class UserDefaultsKeys : NSObject {
     static let productSort = "ProductSort"
     
     // Onboarding
-    static let tutorialCompleted = "TutorialCompleted"
-    static let tutorialPresentedScreenshotHelper = "TutorialPresentedScreenshotHelper"
-    static let tutorialPresentedProductHelper = "TutorialPresentedProductHelper"
-    static let tutorialPresentedScreenshotPicker = "TutorialShouldPresentedScreenshotPicker"
-    static let onboardingPresentedPushPermissionsPage = "OnboardingPresentedPushPermissionsPage"
+    static let onboardingCompleted = "OnboardingCompleted"
+    static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
+    static let onboardingPresentedProductHelper = "OnboardingPresentedProductHelper"
+    static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
+    static let onboardingPresentedBackgroundScreenshotHelper = "OnboardingPresentedBackgroundScreenshotHelper"
     
     // Device / Version
     static let dateInstalled = "DateInstalled"
