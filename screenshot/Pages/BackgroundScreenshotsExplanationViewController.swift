@@ -9,8 +9,8 @@
 import UIKit
 
 fileprivate struct AttributedStringData {
-    let text:String
-    let attributes:[String : Any]?
+    let text: String
+    let attributes: [String : Any]?
 }
 
 fileprivate struct SocialApp {
@@ -60,51 +60,28 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
     private var descriptionLabel = UILabel()
     private var buttonView = UIView()
     private var notificationSwitch = UISwitch()
-    private var willEnterForegroundObserver: Any? = nil
     private var dismissesOnBecomingActive = true
     
     
     // MARK: Life Cycle
     
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let padding = Geometry.padding
+        
         view.backgroundColor = .white
-        view.layoutMargins = UIEdgeInsets(top: Geometry.extendedPadding, left: 5 + Geometry.padding, bottom: Geometry.extendedPadding, right: 5 + Geometry.padding)
         
-        willEnterForegroundObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { note in
-            if (self.dismissesOnBecomingActive) {
-                self.presentingViewController?.dismiss(animated: false, completion: nil)
-            } else {
-                self.updateNotificationSwitchStatus()
-                self.dismissesOnBecomingActive = true
-            }
-        }
-        
-        setupTitleLabel()
-        setupDescriptionLabel()
-        setupNotificationView()
-        setupButtons()
-    }
-    
-    deinit {
-        if let observer = willEnterForegroundObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        
-        willEnterForegroundObserver = nil
-    }
-    
-    // MARK: -
-    
-    private func updateNotificationSwitchStatus(animated: Bool = true) {
-        let hasPermission = PermissionsManager.shared().hasPermission(for: .push)
-        
-        notificationSwitch.setOn(hasPermission, animated: animated)
-        notificationSwitch.isEnabled = !hasPermission
-    }
-    
-    private func setupTitleLabel() {
         titleLabel.text = "Now leave the app!"
         titleLabel.textAlignment = .center
         titleLabel.textColor = .crazeRed
@@ -112,57 +89,121 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.font = UIFont.preferredFont(forTextStyle: .title1)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    
         view.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            titleLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-        ])
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.attributedText = descriptionAttributedText()
+        descriptionLabel.numberOfLines = 0
+        descriptionLabel.lineBreakMode = .byWordWrapping
+        view.addSubview(descriptionLabel)
+        descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: padding).isActive = true
+        descriptionLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        descriptionLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.alignment = .center
+        stackView.axis = .horizontal
+        stackView.distribution = .equalCentering
+        view.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        addSocialAppsToView(stackView)
+        
+        notificationSwitch.translatesAutoresizingMaskIntoConstraints = false
+        notificationSwitch.onTintColor = .crazeRed
+        notificationSwitch.addTarget(self, action: #selector(notificationSwitchChanged(_:)), for: .valueChanged)
+        view.addSubview(notificationSwitch)
+        notificationSwitch.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: padding).isActive = true
+        notificationSwitch.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        updateNotificationSwitchStatus(animated: false)
+        
+        let notificationLabel = UILabel()
+        notificationLabel.translatesAutoresizingMaskIntoConstraints = false
+        notificationLabel.text = "Enable notifications"
+        notificationLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+        view.addSubview(notificationLabel)
+        notificationLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        notificationLabel.trailingAnchor.constraint(equalTo: notificationSwitch.leadingAnchor, constant: -padding).isActive = true
+        notificationLabel.centerYAnchor.constraint(equalTo: notificationSwitch.centerYAnchor).isActive = true
+        
+        let notificationDescription = UILabel()
+        notificationDescription.translatesAutoresizingMaskIntoConstraints = false
+        notificationDescription.text = "We'll send you a notification when your screenshot is ready to be shopped"
+        notificationDescription.numberOfLines = 0
+        notificationDescription.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        notificationDescription.textColor = .gray6
+        view.addSubview(notificationDescription)
+        notificationDescription.topAnchor.constraint(equalTo: notificationSwitch.bottomAnchor, constant: padding).isActive = true
+        notificationDescription.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        notificationDescription.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        notificationDescription.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
     }
     
-    private func setupDescriptionLabel() {
-        let attributedText = NSMutableAttributedString()
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        
+        let offset = CGPoint(x: Geometry.padding, y: Geometry.extendedPadding)
+        view.layoutMargins = UIEdgeInsets(top: offset.y, left: offset.x, bottom: offset.y, right: offset.x)
+    }
+    
+    func applicationWillEnterForeground(_ notification: Notification) {
+        if view.window != nil {
+            if dismissesOnBecomingActive {
+                presentingViewController?.dismiss(animated: false, completion: nil)
+                
+            } else {
+                updateNotificationSwitchStatus()
+                dismissesOnBecomingActive = true
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: Description
+    
+    private func descriptionAttributedText() -> NSAttributedString {
+        let defaultAttributes = [
+            NSFontAttributeName: UIFont.preferredFont(forTextStyle: .title2),
+            NSForegroundColorAttributeName: UIColor.gray6
+        ]
+        let highlightedAttributes = [
+            NSFontAttributeName: UIFont.preferredFont(forTextStyle: .title2),
+            NSForegroundColorAttributeName: UIColor.black
+        ]
         let attributedStringData = [
-            AttributedStringData(text: "No, seriously. ", attributes:[ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
-            AttributedStringData(text: "Close this app.\n\n", attributes:[ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.black ]),
-            AttributedStringData(text: "Go to your favorite places for fashion inspiration - Instagram, Snapchat, Google, anywhere -- ", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
-            AttributedStringData(text: "take screenshots", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.black ]),
-            AttributedStringData(text: ", then come back and ", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.gray ]),
-            AttributedStringData(text: "shop them here!", attributes: [ NSFontAttributeName : UIFont.preferredFont(forTextStyle: .title2), NSForegroundColorAttributeName : UIColor.black ])
+            AttributedStringData(text: "No, seriously. ", attributes: defaultAttributes),
+            AttributedStringData(text: "Close this app.\n\n", attributes: highlightedAttributes),
+            AttributedStringData(text: "Go to your favorite places for fashion inspiration - Instagram, Snapchat, Google, anywhere -- ", attributes: defaultAttributes),
+            AttributedStringData(text: "take screenshots", attributes: highlightedAttributes),
+            AttributedStringData(text: ", then come back and ", attributes: defaultAttributes),
+            AttributedStringData(text: "shop them here!", attributes: highlightedAttributes)
         ]
         
+        let attributedText = NSMutableAttributedString()
         var currentStringIndex = 0
+        
         attributedStringData.forEach { data in
             let string = NSAttributedString(string: data.text, attributes: data.attributes ?? [:])
             attributedText.insert(string, at: currentStringIndex)
             currentStringIndex += data.text.count
         }
         
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.attributedText = attributedText
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.lineBreakMode = .byWordWrapping
-        
-        view.addSubview(descriptionLabel)
-        
-        NSLayoutConstraint.activate([
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Geometry.padding),
-            descriptionLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
-        ])
+        return attributedText
     }
     
-    private func setupButtons() {
-        let stackView = UIStackView()
-        stackView.alignment = .center
-        stackView.axis = .horizontal
-        stackView.distribution = .equalCentering
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(stackView)
-        
+    // MARK: Social
+    
+    private func addSocialAppsToView(_ stackView: UIStackView) {
         socialApps.enumerated().forEach { i, app in
             let button = UIButton()
             button.tag = i
@@ -172,51 +213,15 @@ class BackgroundScreenshotsExplanationViewController : UIViewController {
             
             stackView.addArrangedSubview(button)
         }
-        
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            stackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 50),
-        ])
     }
     
-    private func setupNotificationView() {
-        let topLabel = UILabel()
-        let bottomLabel = UILabel()
+    // MARK: - Notification
+    
+    private func updateNotificationSwitchStatus(animated: Bool = true) {
+        let hasPermission = PermissionsManager.shared().hasPermission(for: .push)
         
-        topLabel.translatesAutoresizingMaskIntoConstraints = false
-        topLabel.text = "Enable notifications"
-        topLabel.font = UIFont.preferredFont(forTextStyle: .title3)
-        
-        view.addSubview(topLabel)
-        
-        bottomLabel.translatesAutoresizingMaskIntoConstraints = false
-        bottomLabel.text = "We'll send you a notification when your screenshot is ready to be shopped"
-        bottomLabel.numberOfLines = 0
-        bottomLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        bottomLabel.textColor = .gray6
-        
-        view.addSubview(bottomLabel)
-        
-        notificationSwitch.addTarget(self, action: #selector(notificationSwitchChanged(_:)), for: .valueChanged)
-        notificationSwitch.translatesAutoresizingMaskIntoConstraints = false
-        notificationSwitch.onTintColor = .crazeRed
-        view.addSubview(notificationSwitch)
-        
-        NSLayoutConstraint.activate([
-            topLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            topLabel.bottomAnchor.constraint(equalTo: bottomLabel.topAnchor, constant: -Geometry.padding),
-            topLabel.trailingAnchor.constraint(equalTo: notificationSwitch.leadingAnchor, constant: -Geometry.padding),
-            
-            bottomLabel.leadingAnchor.constraint(equalTo: topLabel.leadingAnchor),
-            bottomLabel.trailingAnchor.constraint(equalTo: notificationSwitch.leadingAnchor, constant: -Geometry.padding),
-            bottomLabel.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
-            
-            notificationSwitch.centerYAnchor.constraint(equalTo: topLabel.centerYAnchor),
-            notificationSwitch.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor)
-        ])
-        
-        updateNotificationSwitchStatus(animated: false)
+        notificationSwitch.setOn(hasPermission, animated: animated)
+        notificationSwitch.isEnabled = !hasPermission
     }
     
     // MARK: Actions
