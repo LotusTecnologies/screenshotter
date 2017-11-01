@@ -20,22 +20,7 @@ public class TutorialTrySlideView : HelperView {
         
         titleLabel.text = "Try It Out"
         subtitleLabel.text = "Press the home & power buttons to take a screenshot of this page"
-        
-        let imageView = UIImageView(image: UIImage(named: "TutorialTryGraphic"))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        contentView.addSubview(imageView)
-        
-        imageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .vertical)
-        
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor),
-            imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
-            imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
-            imageView.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
-            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
+        contentImage = UIImage(named: "TutorialTryGraphic")
         
         if UIDevice.isSimulator {
             addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(applicationUserDidTakeScreenshot)))

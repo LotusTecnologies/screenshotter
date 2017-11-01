@@ -15,7 +15,7 @@ public class HelperView : UIView {
 
     private var imageView: UIImageView?
     
-    //  Setting this will center an imageView in the contentView
+    // Setting this will center an imageView in the contentView
     public var contentImage: UIImage? {
         didSet {
             if imageView == nil && contentImage != nil {
@@ -26,10 +26,12 @@ public class HelperView : UIView {
                 
                 NSLayoutConstraint.activate([
                     imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Geometry.extendedPadding),
+                    imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
                     imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
                 ])
                 
                 self.imageView = imageView
+                
             } else if contentImage == nil {
                 imageView?.removeFromSuperview()
                 imageView = nil
@@ -60,7 +62,6 @@ public class HelperView : UIView {
             label.font = UIFont(descriptor: descriptor, size: 0)
             label.numberOfLines = 0
             label.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.padding, right: 0)
-            
             addSubview(label)
             label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
             
@@ -80,7 +81,6 @@ public class HelperView : UIView {
             label.textColor = .gray3
             label.font = UIFont.preferredFont(forTextStyle: .title3)
             label.numberOfLines = 0
-            
             addSubview(label)
             label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
             
@@ -95,8 +95,8 @@ public class HelperView : UIView {
         
         contentView = { _ -> UIView in
             let view = UIView()
-            addSubview(view)
             view.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(view)
             
             NSLayoutConstraint.activate([
                 view.topAnchor.constraint(equalTo: subtitleLabel.layoutMarginsGuide.bottomAnchor),
