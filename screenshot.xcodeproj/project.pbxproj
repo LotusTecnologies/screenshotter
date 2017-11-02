@@ -313,6 +313,7 @@
 			children = (
 				C5278FDB1F3C38510090E422 /* BaseViewController.h */,
 				C5278FDC1F3C38510090E422 /* BaseViewController.m */,
+				52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */,
 				C528DC101F57EDD100F4E723 /* InsetPresentationController.h */,
 				C528DC111F57EDD100F4E723 /* InsetPresentationController.m */,
 				C5F8D64B1FA74DE30067C26A /* InviteViewController.swift */,
@@ -320,7 +321,6 @@
 				C55184CE1F4D5DC600EE7855 /* LoadingViewController.m */,
 				C5278FDD1F3C38510090E422 /* MainTabBarController.h */,
 				C5278FDE1F3C38510090E422 /* MainTabBarController.m */,
-				52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */,
 				C55184C31F4C0DAA00EE7855 /* ScreenshotDisplay */,
 				C5278FE01F3C38510090E422 /* ScreenshotsNavigationController.h */,
 				C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */,

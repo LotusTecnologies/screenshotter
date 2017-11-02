@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) WebViewController *webViewController;
+@property (nonatomic, strong) ClipView *clipView;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
 
@@ -63,11 +64,14 @@
         self.previousDidAppearViewControllerClass == [ProductsViewController class])
     {
         if ([self needsToPresentPickerViewController]) {
-            [self presentPickerViewController];
-            
+            // Allow the view controller transition view to cleanup
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self presentPickerClipView];
+            });
+
             // Go back into Products before presenting the next view
             self.previousDidAppearViewControllerClass = nil;
-            
+
         } else if ([self needsToPresentBackgroundScreenshotViewController] &&
                    [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
         {
@@ -96,7 +100,9 @@
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
-    [self presentPickerViewController];
+    if ([self needsToPresentPickerViewController]) {
+        [self presentPickerClipView];
+    }
 }
 
 
@@ -117,6 +123,8 @@
 }
 
 - (void)presentPickerViewController {
+    [self dismissPickerClipView];
+    
     ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
     picker.cancelButton.target = self;
     picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
@@ -191,6 +199,47 @@
     
     if (self.screenshotsViewController.navigationItem.leftBarButtonItem.tag == 0) {
         self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    }
+}
+
+
+#pragma mark - Clip View
+
+- (void)presentPickerClipView {
+    if (!self.clipView) {
+        UIView *rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem.targetView;
+        CGRect rect = [rightBarButtonView convertRect:rightBarButtonView.frame toView:self.view];
+        CGFloat radius = MIN(rect.size.height / 2.f, rect.size.width / 2.f);
+        UIBezierPath *croppedPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:radius];
+        
+        UIView *tabBarView = self.tabBarController.view;
+        
+        ClipView *clipView = [[ClipView alloc] init];
+        clipView.translatesAutoresizingMaskIntoConstraints = NO;
+        clipView.clippings = @[croppedPath];
+        clipView.alpha = 0.f;
+        [tabBarView addSubview:clipView];
+        [clipView.topAnchor constraintEqualToAnchor:tabBarView.topAnchor].active = YES;
+        [clipView.leadingAnchor constraintEqualToAnchor:tabBarView.leadingAnchor].active = YES;
+        [clipView.bottomAnchor constraintEqualToAnchor:tabBarView.bottomAnchor].active = YES;
+        [clipView.trailingAnchor constraintEqualToAnchor:tabBarView.trailingAnchor].active = YES;
+        self.clipView = clipView;
+        
+        [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
+            self.clipView.alpha = 1.f;
+        }];
+    }
+}
+
+- (void)dismissPickerClipView {
+    if (self.clipView) {
+        [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
+            self.clipView.alpha = 0.f;
+            
+        } completion:^(BOOL finished) {
+            [self.clipView removeFromSuperview];
+            self.clipView = nil;
+        }];
     }
 }
 

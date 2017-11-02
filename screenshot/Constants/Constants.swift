@@ -17,8 +17,10 @@ class Constants: NSObject {
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     static let uploadedURLStringKey = "uploadedURLStringKey"
     
+    // Default UI / UX
     static let defaultAnimationDuration = 0.25
     
+    // Keys
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
     static let screenShotLambdaDomain = "https://euqm1pl241.execute-api.us-east-1.amazonaws.com/dev/"

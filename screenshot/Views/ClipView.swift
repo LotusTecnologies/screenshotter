@@ -9,44 +9,70 @@
 import Foundation
 
 class ClipView: UIView {
+    // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        backgroundColor = UIColor(white: 0, alpha: 0.55)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateMask()
+    }
+    
     override var frame: CGRect {
         didSet {
-            // TODO: call common setup code if we have a frame and clippings
+            updateMask()
         }
     }
+    
+    // MARK: Mask
     
     public var clippings: [UIBezierPath]? {
         didSet {
-            // TODO: check we have a frame
-            guard let clippings = clippings, clippings.count > 0 else {
-                layer.mask = nil
-                return
-            }
-            
-            //    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.view.bounds];
-            //    UIBezierPath *croppedPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:6];
-            //    [path appendPath:croppedPath];
-            //    [path setUsesEvenOddFillRule:YES];
-            //
-            //    CAShapeLayer *mask = [CAShapeLayer layer];
-            //    mask.path = path.CGPath;
-            //    mask.fillRule = kCAFillRuleEvenOdd;
-            //    v.layer.mask = mask;
-            
-            let path = UIBezierPath(rect: bounds)
-            path.append(clippings.first!)
-            path.usesEvenOddFillRule = true
-            
-//            clippings.forEach({ clippedPath in
-//                path.append(clippedPath)
-//            })
-            
-            let mask = CAShapeLayer()
-            mask.path = path.cgPath
-            mask.fillRule = kCAFillRuleEvenOdd
-            layer.mask = mask
+            updateMask()
         }
     }
     
+    private func updateMask() {
+        guard let clippings = clippings, clippings.count > 0, !bounds.size.equalTo(.zero) else {
+            layer.mask = nil
+            return
+        }
+        
+        let path = UIBezierPath(rect: bounds)
+        path.usesEvenOddFillRule = true
+        
+        clippings.forEach({ clippedPath in
+            path.append(clippedPath)
+        })
+        
+        let mask = CAShapeLayer()
+        mask.path = path.cgPath
+        mask.fillRule = kCAFillRuleEvenOdd
+        layer.mask = mask
+    }
     
+    // MARK: User Interaction
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        var isInside = super.point(inside: point, with: event)
+        
+        if let clippings = clippings {
+            for (_, clippedPath) in clippings.enumerated() {
+                if clippedPath.bounds.contains(point) {
+                    isInside = false
+                    break
+                }
+            }
+        }
+        
+        return isInside
+    }
 }
