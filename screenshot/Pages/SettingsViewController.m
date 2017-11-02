@@ -7,7 +7,6 @@
 //
 
 #import "SettingsViewController.h"
-#import "Geometry.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
 #import "WebViewController.h"
@@ -33,7 +32,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeTellFriend,
     RowTypeContactUs,
     RowTypeBug,
-    RowTypeVersion
+    RowTypeVersion,
+    RowTypeCoins
 };
 
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
@@ -54,13 +54,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 #pragma mark - Life Cycle
 
+- (NSString *)title {
+    return @"Settings";
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         
-        self.title = @"Settings";
         [self addNavigationItemLogo];
     }
     return self;
@@ -223,6 +226,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                          @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
+                                         @(RowTypeCoins),
                                          @(RowTypeVersion)
                                          ],
                   @(SectionTypeFollow): @[],
@@ -267,6 +271,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     if (section == SectionTypeFollow) {
+        // FIXME: tableview first section title animation
+        // this section is causing the first sections title to animate down
+        // scroll to bottom, tap on another tab, tap back to settings
         return self.tableViewFollowSectionFooter.bounds.size.height;
         
     } else {
@@ -344,6 +351,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     switch (rowType) {
         case RowTypeVersion:
         case RowTypeEmail:
+        case RowTypeCoins:
             return NO;
             break;
         case RowTypeLocationPermission:
@@ -365,10 +373,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self presentMailComposer];
             break;
         case RowTypeTellFriend: {
-            NSString *text = @"Download SCREENSHOP, the app that lets you shop any screenshot, for free! https://crazeapp.com/app/";
-            UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[text] applicationActivities:nil];
-            activityViewController.popoverPresentationController.sourceView = self.view;
-            [self presentViewController:activityViewController animated:YES completion:nil];
+            InviteViewController *viewController = [[InviteViewController alloc] init];
+            viewController.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:viewController animated:YES];
         }
             break;
         case RowTypeTutorialVideo: {
@@ -388,6 +395,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [[PermissionsManager sharedPermissionsManager] requestPermissionForType:[self permissionTypeForRowType:rowType] openSettingsIfNeeded:YES response:^(BOOL granted) {
                 if (granted) {
                     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                    [self.delegate settingsViewControllerDidGrantPermission:self];
                 }
             }];
         }
@@ -395,6 +403,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeName:
         case RowTypeEmail:
         case RowTypeVersion:
+        case RowTypeCoins:
             break;
     }
     
@@ -450,6 +459,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeVersion:
             return @"App Version";
             break;
+        case RowTypeCoins:
+            return @"Coins Collected";
+            break;
     }
 }
 
@@ -469,6 +481,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeEmail:
             return @"Enter Your Email";
             break;
+        case RowTypeCoins:
+            return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:UserDefaultsKeys.gameScore]];
+            break;
         default:
             return nil;
             break;
@@ -481,7 +496,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
-        case RowTypeBug:
+        case RowTypeTellFriend:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
         default:
@@ -578,15 +593,17 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self reidentify];
+        
     } else {
         textField.text = self.previousTexts[key];
     }
 }
 
 - (void)reidentify {
-    AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:[self.nameTextField.text trimWhitespace]
-                                                        email:[self.emailTextField.text trimWhitespace]];
+    AnalyticsUser *user = [[AnalyticsUser alloc] initWithName:[self.nameTextField.text trimWhitespace] email:[self.emailTextField.text trimWhitespace]];
+    
     [AnalyticsTrackers.standard identify:user];
+    [AnalyticsTrackers.branch identify:user];
 }
 
 - (void)dismissKeyboard {
@@ -727,6 +744,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+
 #pragma mark - TutorialVideoViewControllerDelegate
 
 - (void)tutorialVideoViewControllerDoneButtonTapped:(TutorialVideoViewController *)viewController {
@@ -736,6 +754,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
     [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video"];
     
+    // TODO: look into why this is here - corey
     dispatch_async(dispatch_get_main_queue(), ^{
         [self dismissViewControllerAnimated:YES completion:nil];
     });

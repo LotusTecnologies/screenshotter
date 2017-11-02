@@ -4,7 +4,7 @@ platform :ios, '10.0'
 def shared_pods
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     use_frameworks!
-    pod 'Clarifai-Apple-SDK', '3.0.0-beta9'
+    pod 'Clarifai-Apple-SDK', '3.0.0-beta10'
     pod 'PromiseKit/Foundation'
     pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
@@ -13,10 +13,12 @@ def shared_pods
     pod 'FBSDKCoreKit'
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
-    pod 'ImageEffects'
     pod 'Branch'
     pod 'EggRating', :git => 'https://github.com/jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/ios-11-support'
     pod 'Intercom'
+    pod 'Firebase/Invites'
+    pod 'Firebase/Auth'
+    pod 'GoogleSignIn'
 end
 
 target 'screenshot' do

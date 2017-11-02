@@ -112,8 +112,8 @@ class ScreenshotPickerViewController: BaseViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let verPadding = CGFloat(Geometry.extendedPadding())
-        let horPadding = CGFloat(Geometry.padding())
+        let verPadding = CGFloat(Geometry.extendedPadding)
+        let horPadding = CGFloat(Geometry.padding)
         
         helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
@@ -128,7 +128,7 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
-            let p = Geometry.padding()
+            let p = Geometry.padding
             
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false
@@ -149,21 +149,7 @@ class ScreenshotPickerViewController: BaseViewController {
         super.viewDidAppear(animated)
         
         if !PermissionsManager.shared().hasPermission(for: .photo) {
-            let alertController = UIAlertController(title: "Shop Your Photos", message: "Pick screenshots from your gallery to scan for items to shop!", preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "No Thanks", style: .cancel, handler: { (action) in
-                if let cancelButton = self.navigationItem.leftBarButtonItem,
-                    let cancelAction = cancelButton.action,
-                    let cancelTarget = cancelButton.target
-                {
-                    UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
-                }
-            }))
-            alertController.addAction(UIAlertAction(title: "Add Photos", style: .default, handler: { (action) in
-                if let alertController = PermissionsManager.shared().deniedAlertController(for: .photo, opened: nil) {
-                    self.present(alertController, animated: true, completion: nil)
-                }
-            }))
-            present(alertController, animated: true, completion: nil)
+            presentPhotoPermissionsAlert()
         }
     }
     
@@ -176,7 +162,6 @@ class ScreenshotPickerViewController: BaseViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
     
     // MARK: Assets
     
@@ -235,11 +220,34 @@ class ScreenshotPickerViewController: BaseViewController {
         return segments.titleForSegment(at: segments.selectedSegmentIndex)!
     }
     
+    // MARK: Photo
+    
+    private func presentPhotoPermissionsAlert() {
+        let alertController = UIAlertController(title: "Shop Your Photos", message: "Pick screenshots from your gallery to scan for items to shop!", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "No Thanks", style: .cancel, handler: { (action) in
+            if let cancelButton = self.navigationItem.leftBarButtonItem,
+                let cancelAction = cancelButton.action,
+                let cancelTarget = cancelButton.target
+            {
+                UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
+            }
+        }))
+        alertController.addAction(UIAlertAction(title: "Add Photos", style: .default, handler: { (action) in
+            if let alertController = PermissionsManager.shared().deniedAlertController(for: .photo, opened: nil) {
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }))
+        present(alertController, animated: true, completion: nil)
+    }
+    
     // MARK: Camera
     
     @objc private func cameraButtonAction() {
         if PermissionsManager.shared().hasPermission(for: .camera) {
             presentCameraViewController()
+            
+        } else if !PermissionsManager.shared().hasPermission(for: .photo) {
+            presentPhotoPermissionsAlert()
             
         } else {
             PermissionsManager.shared().requestPermission(for: .camera, openSettingsIfNeeded: true, response: { (granted) in

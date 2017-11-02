@@ -13,8 +13,11 @@ class Constants: NSObject {
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
+    static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     static let uploadedURLStringKey = "uploadedURLStringKey"
+    
+    static let defaultAnimationDuration = 0.25
     
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
@@ -23,7 +26,7 @@ class Constants: NSObject {
     static let intercomAppID = "z57orduu"
     static let segmentWriteKey = "54lr3LDCEhRCTa13eEt2xaDTqnaQxbsC"
     static let buildEnvironmentSuffix = "d"
-    static let appUpdateDomain = "https://api.craze-dev.com/static/config.json"
+    static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
@@ -31,7 +34,7 @@ class Constants: NSObject {
     static let intercomAppID = "avy9hyuz"
     static let segmentWriteKey = "RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"
     static let buildEnvironmentSuffix = ""
-    static let appUpdateDomain = "https://api.craze-api.com/static/config.json"
+    static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
 #endif
 
 }

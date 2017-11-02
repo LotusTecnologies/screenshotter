@@ -9,12 +9,24 @@
 #import "BaseViewController.h"
 
 @import WebKit.WKWebView;
+@import WebKit.WKNavigationDelegate;
 
-@interface WebViewController : BaseViewController
+@class WebView;
 
-@property (nonatomic, strong) WKWebView *view;
+@interface WebViewController : BaseViewController <WKNavigationDelegate>
+
 @property (nonatomic, copy) NSURL *url;
 
 @property (nonatomic) BOOL toolbarEnabled;
+@property (nonatomic, strong, readonly) UIBarButtonItem *backItem;
+@property (nonatomic, strong, readonly) UIBarButtonItem *forwardItem;
+@property (nonatomic, strong, readonly) UIBarButtonItem *refreshItem;
+@property (nonatomic, strong, readonly) UIBarButtonItem *shareItem;
+@property (nonatomic, strong, readonly) UIBarButtonItem *safariItem;
+- (void)updateShareItem;
+
+@property (nonatomic, strong, readonly) WebView *webView;
+
+@property (nonatomic, copy) NSString *loaderLabelText; // Set this early, it's not persistent
 
 @end

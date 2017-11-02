@@ -6,11 +6,12 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
+#import <CoreData/CoreData.h>
+
 #import "ScreenshotsViewController.h"
 #import "ScreenshotCollectionViewCell.h"
-#import "Geometry.h"
 #import "screenshot-Swift.h"
-#import "HelperView.h"
+
 #import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
@@ -20,6 +21,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
@@ -33,13 +35,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Life Cycle
 
+- (NSString *)title {
+    return @"Screenshots";
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
-        self.title = @"Screenshots";
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
         
@@ -54,7 +59,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     CGFloat p = [Geometry padding];
     
-    self.collectionView = ({
+    _collectionView = ({
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = p;
         layout.minimumLineSpacing = p;
@@ -78,12 +83,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView;
     });
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.tintColor = [UIColor crazeRed];
-    [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
-    [self.collectionView addSubview:refreshControl];
+    _refreshControl = ({
+        UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+        refreshControl.tintColor = [UIColor crazeRed];
+        [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
+        [self.collectionView addSubview:refreshControl];
+        
+        // Recenter view
+        CGRect rect = refreshControl.subviews[0].frame;
+        rect.origin.x = -self.collectionView.contentInset.left / 2.f;
+        refreshControl.subviews[0].frame = rect;
+        refreshControl;
+    });
     
-    self.helperView = ({
+    _helperView = ({
         CGFloat p2 = [Geometry extendedPadding];
         
         ScreenshotsHelperView *helperView = [[ScreenshotsHelperView alloc] init];
@@ -152,10 +165,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)insertScreenshotHelperView {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
+    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
     
     if (!hasPresented && [self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] == 1) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.tutorialPresentedScreenshotHelper];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
@@ -304,6 +317,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
             [AnalyticsTrackers.standard track:@"share completed"];
+            [AnalyticsTrackers.branch track:@"share completed"];
         } else {
             [AnalyticsTrackers.standard track:@"share incomplete"];
         }

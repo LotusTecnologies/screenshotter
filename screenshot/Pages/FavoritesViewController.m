@@ -8,10 +8,10 @@
 
 #import "FavoritesViewController.h"
 #import "ProductCollectionViewCell.h"
-#import "Geometry.h"
+
 #import "screenshot-Swift.h"
 #import "WebViewController.h"
-#import "HelperView.h"
+
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 @import Analytics;
@@ -32,13 +32,16 @@
 
 #pragma mark - Life Cycle
 
+- (NSString *)title {
+    return @"Favorites";
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
-        self.title = @"Favorites";
         [self addNavigationItemLogo];
         
         self.favoriteFrc = [DataModel sharedInstance].favoriteFrc;
@@ -176,6 +179,7 @@
     [self.navigationController pushViewController:webViewController animated:YES];
     
     [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Favorites"}];
+    [AnalyticsTrackers.branch track:@"Tapped on product"];
     
     [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
 }

@@ -8,11 +8,15 @@
 
 #import "ScreenshotsNavigationController.h"
 #import "ProductsViewController.h"
+#import "WebViewController.h"
 #import "screenshot-Swift.h"
 
-@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
+@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
+@property (nonatomic, strong) WebViewController *webViewController;
+
+@property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
 
 @end
 
@@ -55,36 +59,23 @@
 #pragma mark - View Controller Life Cycle
 
 - (void)viewController:(UIViewController *)viewController didAppear:(BOOL)animated {
-    if (viewController == self.screenshotsViewController) {
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] &&
-            ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker] &&
-            [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
-        {
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+    if (viewController == self.screenshotsViewController &&
+        self.previousDidAppearViewControllerClass == [ProductsViewController class])
+    {
+        if ([self needsToPresentPickerViewController]) {
+            [self presentPickerViewController];
             
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Start Screenshotting" message:@"Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!" preferredStyle:UIAlertControllerStyleAlert];
-            [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
-                    if (granted) {
-                        [self.delegate screenshotsNavigationControllerDidGrantPushPermissions:self];
-                        
-                        [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
-                        
-                    } else {
-                        [AnalyticsTrackers.standard track:@"Denied Push Permissions"];
-                    }
-                }];
-            }]];
-            [self presentViewController:alertController animated:YES completion:nil];
+            // Go back into Products before presenting the next view
+            self.previousDidAppearViewControllerClass = nil;
+            
+        } else if ([self needsToPresentBackgroundScreenshotViewController] &&
+                   [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
+        {
+            [self presentBackgroundScreenshotViewController];
         }
     }
-}
-
-- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
-    if ([viewController isKindOfClass:[ProductsViewController class]]) {
-        [self presentPickerViewControllerIfNeeded];
-    }
+    
+    self.previousDidAppearViewControllerClass = [viewController class];
 }
 
 
@@ -94,6 +85,7 @@
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
+    productsViewController.delegate = self;
     productsViewController.lifeCycleDelegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
     productsViewController.screenshot = screenshot;
@@ -104,17 +96,27 @@
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
-    [self presentPickerViewControllerIfNeeded];
+    [self presentPickerViewController];
+}
+
+
+#pragma mark - Products View Controller
+
+- (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    Product *product = [viewController productAtIndex:indexPath.item];
+    
+    self.webViewController.url = [NSURL URLWithString:product.offer];
+    [self pushViewController:self.webViewController animated:YES];
 }
 
 
 #pragma mark - Screenshots Picker
 
-- (void)presentPickerViewController {
-    [self presentPickerViewControllerWithCompletion:nil];
+- (BOOL)needsToPresentPickerViewController {
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
 }
 
-- (void)presentPickerViewControllerWithCompletion:(dispatch_block_t)completion {
+- (void)presentPickerViewController {
     ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
     picker.cancelButton.target = self;
     picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
@@ -122,20 +124,11 @@
     picker.doneButton.action = @selector(pickerViewControllerDidFinish);
     self.pickerNavigationController = picker;
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:completion];
+    [self presentViewController:self.pickerNavigationController animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
+    }];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
-}
-
-- (void)presentPickerViewControllerIfNeeded {
-    BOOL shouldPresent = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-    
-    if (shouldPresent) {
-        [self presentPickerViewControllerWithCompletion:^{
-            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:UserDefaultsKeys.tutorialShouldPresentScreenshotPicker];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }];
-    }
 }
 
 - (void)pickerViewControllerDidCancel {
@@ -150,6 +143,35 @@
 }
 
 
+#pragma mark - Background Screenshot
+
+- (BOOL)needsToPresentBackgroundScreenshotViewController {
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
+}
+
+- (void)presentBackgroundScreenshotViewController {
+    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
+    
+    [self presentViewController:controller animated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
+    }];
+}
+
+
+#pragma mark - Web View
+
+- (WebViewController *)webViewController {
+    if (!_webViewController) {
+        WebViewController *webViewController = [[WebViewController alloc] init];
+        [webViewController addNavigationItemLogo];
+        webViewController.hidesBottomBarWhenPushed = YES;
+        webViewController.loaderLabelText = @"Loading your store...";
+        _webViewController = webViewController;
+    }
+    return _webViewController;
+}
+
+
 #pragma mark - Networking Indicator
 
 - (void)networkingIndicatorDidStartWithType:(enum NetworkingIndicatorType)type {
@@ -160,10 +182,16 @@
         
         self.screenshotsViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activityView];
     }
+    
+    self.screenshotsViewController.navigationItem.leftBarButtonItem.tag += 1;
 }
 
 - (void)networkingIndicatorDidCompleteWithType:(enum NetworkingIndicatorType)type {
-    self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    self.screenshotsViewController.navigationItem.leftBarButtonItem.tag -= 1;
+    
+    if (self.screenshotsViewController.navigationItem.leftBarButtonItem.tag == 0) {
+        self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    }
 }
 
 @end

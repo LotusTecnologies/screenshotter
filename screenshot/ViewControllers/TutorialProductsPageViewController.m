@@ -7,7 +7,7 @@
 //
 
 #import "TutorialProductsPageViewController.h"
-#import "Geometry.h"
+
 #import "screenshot-Swift.h"
 
 @import SDWebImage.UIImageView_WebCache;
