@@ -29,7 +29,7 @@ platform :ios do
     push_to_git_remote
 
     gym(scheme: "devScreenshot") # Build your app - more options available
-    testflight(skip_waiting_for_build_processing: true) # to only upload the build
+    testflight(skip_waiting_for_build_processing: true, app_identifier: "io.crazeapp.screenshot.dev") # to only upload the build
     add_git_tag
     push_to_git_remote
   end

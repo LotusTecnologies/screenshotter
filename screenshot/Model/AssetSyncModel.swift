@@ -70,6 +70,7 @@ class AssetSyncModel: NSObject {
     }
     
     func uploadScreenshotWithClarifai(asset: PHAsset) {
+        let isBackground = ApplicationStateModel.sharedInstance.isBackground()
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
@@ -86,20 +87,22 @@ class AssetSyncModel: NSObject {
                                                          createdAt: asset.creationDate,
                                                          isFashion: isFashion,
                                                          isFromShare: false,
-                                                         isHidden: !(isFashion && UIApplication.shared.applicationState == .active),
+                                                         isHidden: !isFashion || isBackground,
                                                          imageData: imageData)
                         fulfill((isFashion, imageData))
                     }
                 }
             }.then (on: processingQ) { isFashion, imageData -> Void in
                 if isFashion {
-                    if UIApplication.shared.applicationState == .active {
+                    if ApplicationStateModel.sharedInstance.isBackground() {
+                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                    } else {
                         DispatchQueue.main.async {
                             self.foregroundScreenshotDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
                         }
+                    }
+                    if !isBackground {
                         self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: asset.localIdentifier)
-                    } else {
-                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
                     }
                 }
             }.always(on: self.serialQ) {
