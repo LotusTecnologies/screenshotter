@@ -121,10 +121,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
-    if (self.collectionView.backgroundView) {
-        [self.collectionView.backgroundView removeFromSuperview];
-        self.collectionView.backgroundView = nil;
-    }
+    [self removeScreenshotHelperView];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -135,10 +132,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
     if (self.view.window) {
-        if (self.collectionView.backgroundView) {
-            [self.collectionView.backgroundView removeFromSuperview];
-            self.collectionView.backgroundView = nil;
-        }
+        [self removeScreenshotHelperView];
     }
 }
 
@@ -213,6 +207,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [imageView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
         [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:contentView.trailingAnchor].active = YES;
         [imageView.bottomAnchor constraintLessThanOrEqualToAnchor:contentView.bottomAnchor].active = YES;
+    }
+}
+
+- (void)removeScreenshotHelperView {
+    if (self.collectionView.backgroundView) {
+        [self.collectionView.backgroundView removeFromSuperview];
+        self.collectionView.backgroundView = nil;
     }
 }
 
@@ -334,6 +335,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
         [[self screenshotAtIndex:indexPath.item] setHide];
+        
+        [self removeScreenshotHelperView];
         
         [AnalyticsTrackers.standard track:@"Removed screenshot"];
     }]];
