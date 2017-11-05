@@ -22,8 +22,6 @@
 @end
 
 @implementation ScreenshotsNavigationController
-@dynamic delegate;
-
 
 #pragma mark - Life Cycle
 
@@ -72,10 +70,10 @@
             // Go back into Products before presenting the next view
             self.previousDidAppearViewControllerClass = nil;
 
-        } else if ([self needsToPresentBackgroundScreenshotViewController] &&
+        } else if ([self needsToPresentPushAlert] &&
                    [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
         {
-            [self presentBackgroundScreenshotViewController];
+            [self presentPushAlert];
         }
     }
     
@@ -132,9 +130,10 @@
     picker.doneButton.action = @selector(pickerViewControllerDidFinish);
     self.pickerNavigationController = picker;
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
-    }];
+    [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+    
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
@@ -151,18 +150,30 @@
 }
 
 
-#pragma mark - Background Screenshot
+#pragma mark - Push Permission
 
-- (BOOL)needsToPresentBackgroundScreenshotViewController {
-    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
+- (BOOL)needsToPresentPushAlert {
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert];
 }
 
-- (void)presentBackgroundScreenshotViewController {
-    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
+- (void)presentPushAlert {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Start Screenshotting" message:@"Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!" preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
+            if (granted) {
+                [self.screenshotsNavigationControllerDelegate screenshotsNavigationControllerDidGrantPushPermissions:self];
+                
+                [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
+                
+            } else {
+                [AnalyticsTrackers.standard track:@"Denied Push Permissions"];
+            }
+        }];
+    }]];
+    [self presentViewController:alertController animated:YES completion:nil];
     
-    [self presentViewController:controller animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
-    }];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 

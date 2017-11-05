@@ -9,8 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "ScreenshotsViewController.h"
 
+@class ScreenshotsNavigationController;
+
+@protocol ScreenshotsNavigationControllerDelegate
+
+- (void)screenshotsNavigationControllerDidGrantPushPermissions:(ScreenshotsNavigationController *)navigationController;
+
+@end
+
 @interface ScreenshotsNavigationController : UINavigationController
 
+@property (nonatomic, weak) id<ScreenshotsNavigationControllerDelegate> screenshotsNavigationControllerDelegate;
 @property (nonatomic, strong, readonly) ScreenshotsViewController *screenshotsViewController;
 
 - (void)presentPickerViewController;
