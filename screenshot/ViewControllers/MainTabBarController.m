@@ -35,11 +35,11 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         self.delegate = self;
         
         _screenshotsNavigationController = ({
-            UIImage *image = [UIImage imageNamed:@"TabBarSnapshot"];
+            UIImage *image = [UIImage imageNamed:@"TabBarScreenshot"];
             
             ScreenshotsNavigationController *navigationController = [[ScreenshotsNavigationController alloc] init];
             navigationController.title = navigationController.screenshotsViewController.title;
-            navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:navigationController.title image:image tag:0];
+            navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:0];
             navigationController;
         });
         
@@ -51,7 +51,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.title = viewController.title;
             navigationController.view.backgroundColor = [UIColor background];
-            navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:navigationController.title image:image tag:1];
+            navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:1];
             navigationController;
         });
         
@@ -63,7 +63,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.title = viewController.title;
             navigationController.view.backgroundColor = [UIColor background];
-            navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:navigationController.title image:image tag:2];
+            navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:2];
             navigationController;
         });
 
@@ -76,7 +76,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.title = viewController.title;
             navigationController.view.backgroundColor = [UIColor background];
-            navigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:navigationController.title image:image tag:3];
+            navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:3];
             navigationController.tabBarItem.badgeColor = [UIColor crazeRed];
             _settingsTabBarItem = navigationController.tabBarItem;
             navigationController;
@@ -167,6 +167,15 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 
 #pragma mark - Tab Bar
+
+- (UITabBarItem *)tabBarItemWithTitle:(NSString *)title image:(UIImage *)image tag:(NSInteger)tag {
+    CGFloat offset = 6.f;
+    
+    UITabBarItem *tabBarItem = [[UITabBarItem alloc] initWithTitle:title image:image tag:tag];
+    tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0.f, -offset, 0.f);
+    tabBarItem.titlePositionAdjustment = UIOffsetMake(0.f, 20.f);
+    return tabBarItem;
+}
 
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
     if (self.selectedViewController == self.settingsNavigationController) {

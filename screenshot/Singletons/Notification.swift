@@ -109,7 +109,7 @@ final class NotificationManager: NSObject {
     
     public func presentScreenshot(withAction action: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
-        notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
+        notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
         notificationView.label.text = "Tap to import your latest screenshot"
         present(notificationView: notificationView, action: action)
     }
@@ -120,7 +120,7 @@ final class NotificationManager: NSObject {
             
         } else if screenshotCount > 1 {
             let notificationView = createNotificationView()
-            notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
+            notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
             notificationView.label.text = "Tap to import your new screenshots"
             present(notificationView: notificationView, action: action)
         }
@@ -128,7 +128,7 @@ final class NotificationManager: NSObject {
     
     public func presentForegroundScreenshot(withAssetId assetId: String, action: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
-        notificationView.image = UIImage(named: "TabBarSnapshot")?.withRenderingMode(.alwaysTemplate)
+        notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
         notificationView.label.text = "Your screenshot is shoppable in the screenshot tab"
         present(notificationView: notificationView, action: action)
         
