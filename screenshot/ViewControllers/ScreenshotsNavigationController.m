@@ -219,7 +219,7 @@
 - (void)presentPickerClipView {
     if (!self.clipView) {
         UIView *rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem.targetView;
-        CGRect rect = [rightBarButtonView convertRect:rightBarButtonView.frame toView:self.view];
+        CGRect rect = [rightBarButtonView.superview convertRect:rightBarButtonView.frame toView:self.view];
         CGFloat radius = MIN(rect.size.height / 2.f, rect.size.width / 2.f);
         UIBezierPath *croppedPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:radius];
         
