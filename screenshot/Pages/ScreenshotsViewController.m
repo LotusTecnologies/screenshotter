@@ -260,7 +260,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
         cell.delegate = self;
-        cell.backgroundColor = [UIColor lightGrayColor];
         cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.screenshot = screenshot;
         cell.badgeEnabled = screenshot.isNew;
