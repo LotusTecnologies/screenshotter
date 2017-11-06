@@ -91,18 +91,14 @@ class TutorialVideoViewController : BaseViewController {
         
         view.backgroundColor = nil
         
-        // Add player layer
         view.layer.addSublayer(playerLayer)
         
-        // Add overlay view
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(overlayView)
-
-        NSLayoutConstraint.activate([
-            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
-            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        overlayView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         if let item = player.currentItem {
             beginObserving(playerItem: item)

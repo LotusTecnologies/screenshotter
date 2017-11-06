@@ -18,21 +18,48 @@ class TutorialVideoOverlayView : UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        translatesAutoresizingMaskIntoConstraints = false
-        setupVolumeToggleButton()
-        setupReplayPauseButton()
-        setupDoneButton()
+        replayPauseButton.translatesAutoresizingMaskIntoConstraints = false
+        replayPauseButton.adjustsImageWhenHighlighted = true
+        replayPauseButton.imageView?.contentMode = .scaleAspectFit
+        replayPauseButton.setImage(UIImage(named: "PlayerPlay"), for: .normal)
+        replayPauseButton.setImage(UIImage(named: "PlayerPause"), for: .selected)
+        replayPauseButton.setImage(UIImage(named: "PlayerPause"), for: [.highlighted, .selected])
+        replayPauseButton.alpha = 0
+        addSubview(replayPauseButton)
+        replayPauseButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        replayPauseButton.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
-        NSLayoutConstraint.activate([
-            volumeToggleButton.bottomAnchor.constraint(equalTo: bottomAnchor),
-            volumeToggleButton.leadingAnchor.constraint(equalTo: leadingAnchor),
-            
-            replayPauseButton.centerXAnchor.constraint(equalTo: centerXAnchor),
-            replayPauseButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            
-            doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
-            doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
-        ])
+        let effect = UIBlurEffect(style: .dark)
+        let blurView = UIVisualEffectView(effect: effect)
+        blurView.alpha = 0.9
+        blurView.isUserInteractionEnabled = false
+        blurView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        
+        doneButton = UIButton()
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.alpha = 0
+        doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 12, 8, 12)
+        doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
+        doneButton.setTitle("Done", for: .normal)
+        doneButton.layer.borderColor = UIColor.white.cgColor
+        doneButton.layer.borderWidth = 1
+        doneButton.layer.masksToBounds = true
+        doneButton.layer.cornerRadius = 5
+        doneButton.insertSubview(blurView, at: 0)
+        addSubview(doneButton)
+        doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        
+        volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
+        volumeToggleButton.adjustsImageWhenHighlighted = true
+        volumeToggleButton.contentEdgeInsets = layoutMargins
+        volumeToggleButton.imageView?.contentMode = .scaleAspectFit
+        volumeToggleButton.setImage(UIImage(named: "PlayerSound"), for: .normal)
+        volumeToggleButton.setImage(UIImage(named: "PlayerMute"), for: .selected)
+        volumeToggleButton.setImage(UIImage(named: "PlayerMute"), for: [.highlighted, .selected])
+        addSubview(volumeToggleButton)
+        volumeToggleButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        volumeToggleButton.centerYAnchor.constraint(equalTo: doneButton.centerYAnchor).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -96,56 +123,5 @@ class TutorialVideoOverlayView : UIView {
         UIView.animate(withDuration: Constants.defaultAnimationDuration) {
             self.replayPauseButton.alpha = 0
         }
-    }
-    
-    // MARK: - Button Setup
-    
-    private func setupVolumeToggleButton() {
-        let x = layoutMargins.left
-        let y = layoutMargins.bottom
-        
-        volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
-        volumeToggleButton.adjustsImageWhenHighlighted = true
-        volumeToggleButton.contentEdgeInsets = UIEdgeInsetsMake(y, x, y, x)
-        volumeToggleButton.imageView?.contentMode = .scaleAspectFit
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerSound"), for: .normal)
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute") , for: .selected)
-        volumeToggleButton.setImage(#imageLiteral(resourceName: "PlayerMute"), for: [.highlighted, .selected])
-        
-        addSubview(volumeToggleButton)
-    }
-    
-    private func setupReplayPauseButton() {
-        replayPauseButton.translatesAutoresizingMaskIntoConstraints = false
-        replayPauseButton.adjustsImageWhenHighlighted = true
-        replayPauseButton.imageView?.contentMode = .scaleAspectFit
-        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPlay"), for: .normal)
-        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: .selected)
-        replayPauseButton.setImage(#imageLiteral(resourceName: "PlayerPause"), for: [.highlighted, .selected])
-        replayPauseButton.alpha = 0
-        
-        addSubview(replayPauseButton)
-    }
-    
-    private func setupDoneButton() {
-        let effect = UIBlurEffect(style: .dark)
-        let blurView = UIVisualEffectView(effect: effect)
-        blurView.alpha = 0.9
-        blurView.isUserInteractionEnabled = false
-        blurView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        
-        doneButton = UIButton()
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.alpha = 0
-        doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 12, 8, 12)
-        doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        doneButton.setTitle("Done", for: .normal)
-        doneButton.layer.borderColor = UIColor.white.cgColor
-        doneButton.layer.borderWidth = 1
-        doneButton.layer.masksToBounds = true
-        doneButton.layer.cornerRadius = 5
-        
-        doneButton.insertSubview(blurView, at: 0)
-        addSubview(doneButton)
     }
 }
