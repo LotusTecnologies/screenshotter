@@ -26,11 +26,15 @@ struct UpdatePromptState {
 
 class UpdatePromptHandler : NSObject {
     private var currentAppVersion: String {
-        return Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+        return Bundle.main.shortVersion!
     }
     
     private var appStoreURL: URL {
         return URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
+    }
+    
+    private var appDisplayName: String {
+        return Bundle.main.displayName!
     }
     
     private var containerViewController: UIViewController
@@ -125,7 +129,7 @@ class UpdatePromptHandler : NSObject {
     }
 
     private func presentUpdateAlert() {
-        let controller = UIAlertController(title: "New Version Available", message: "Update now for the best Craze experience!", preferredStyle: .alert)
+        let controller = UIAlertController(title: "New Version Available", message: "Update now for the best \(appDisplayName) experience!", preferredStyle: .alert)
         let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
         
         controller.addAction(UIAlertAction(title: "Later", style: .cancel, handler: nil))
@@ -144,7 +148,7 @@ class UpdatePromptHandler : NSObject {
             self.startUpdateFlow()
         }
         
-        let controller = UIAlertController(title: "Update Required", message: "You need to update to the latest version to keep using Craze.", preferredStyle: .alert)
+        let controller = UIAlertController(title: "Update Required", message: "You need to update to the latest version to keep using \(appDisplayName).", preferredStyle: .alert)
         let updateAction = UIAlertAction(title: "Update", style: .cancel, handler: navigateToAppStore)
         controller.addAction(updateAction)
         controller.preferredAction = updateAction

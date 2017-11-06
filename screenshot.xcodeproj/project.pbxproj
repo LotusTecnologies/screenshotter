@@ -17,6 +17,7 @@
 		525BBCF81F9CB8FF00330C95 /* TutorialEmailSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCF71F9CB8FF00330C95 /* TutorialEmailSlideView.swift */; };
 		525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCF91F9CBA6800330C95 /* HelperView.swift */; };
 		525BBCFC1F9CBC7000330C95 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCFB1F9CBC7000330C95 /* Geometry.swift */; };
+		5272ADE31FB066AE0029D60A /* Bundle_Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5272ADE21FB066AE0029D60A /* Bundle_Extensions.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
 		527F17481FA2167E008082BC /* TutorialSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527F17471FA2167E008082BC /* TutorialSlideView.swift */; };
 		527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 527F17491FA21CA6008082BC /* Craze_Video.mp4 */; };
@@ -95,6 +96,7 @@
 		525BBCF71F9CB8FF00330C95 /* TutorialEmailSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideView.swift; sourceTree = "<group>"; };
 		525BBCF91F9CBA6800330C95 /* HelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		525BBCFB1F9CBC7000330C95 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		5272ADE21FB066AE0029D60A /* Bundle_Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle_Extensions.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		527F17471FA2167E008082BC /* TutorialSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialSlideView.swift; sourceTree = "<group>"; };
 		527F17491FA21CA6008082BC /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 				C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */,
 				C553563B1F8369DE00849E64 /* DeviceHelper.swift */,
 				C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */,
+				5272ADE21FB066AE0029D60A /* Bundle_Extensions.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -726,6 +729,7 @@
 				C5F8D64C1FA74DE30067C26A /* InviteViewController.swift in Sources */,
 				C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */,
 				C5278FF01F3C38510090E422 /* FavoritesViewController.m in Sources */,
+				5272ADE31FB066AE0029D60A /* Bundle_Extensions.swift in Sources */,
 				C5EE6EF81FAA0817008CBC3A /* ClipView.swift in Sources */,
 				525BBCFC1F9CBC7000330C95 /* Geometry.swift in Sources */,
 				5249EF931F960AC2001A6220 /* TutorialWelcomeSlideView.swift in Sources */,
