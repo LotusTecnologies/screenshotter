@@ -117,6 +117,17 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [self attemptPresentNotification];
 }
 
+- (void)viewSafeAreaInsetsDidChange {
+    [super viewSafeAreaInsetsDidChange];
+    
+    if (self.view.window.safeAreaInsets.bottom > 0) {
+        for (UIViewController *viewController in self.viewControllers) {
+            CGFloat offset = 16.f;
+            viewController.tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0.f, -offset, 0.f);
+        }
+    }
+}
+
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self attemptPresentNotification];
@@ -174,7 +185,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     
     UITabBarItem *tabBarItem = [[UITabBarItem alloc] initWithTitle:title image:image tag:tag];
     tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0.f, -offset, 0.f);
-    tabBarItem.titlePositionAdjustment = UIOffsetMake(0.f, 20.f);
+    tabBarItem.titlePositionAdjustment = UIOffsetMake(0.f, self.tabBar.intrinsicContentSize.height);
     return tabBarItem;
 }
 
