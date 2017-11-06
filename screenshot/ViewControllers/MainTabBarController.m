@@ -185,7 +185,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     
     UITabBarItem *tabBarItem = [[UITabBarItem alloc] initWithTitle:title image:image tag:tag];
     tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0.f, -offset, 0.f);
-    tabBarItem.titlePositionAdjustment = UIOffsetMake(0.f, self.tabBar.intrinsicContentSize.height);
+    tabBarItem.titlePositionAdjustment = UIOffsetMake(0.f, self.tabBar.intrinsicContentSize.height * 2.f);
     return tabBarItem;
 }
 
