@@ -9,34 +9,12 @@
 import UIKit
 
 public class HelperView : UIView {
-    public var titleLabel = UILabel()
-    public var subtitleLabel = UILabel()
-    public var contentView = UIView()
+    private(set) var titleLabel = UILabel()
+    private(set) var subtitleLabel = UILabel()
+    private(set) var contentView = UIView()
+    private(set) var controlView = NotifySizeChangeView()
 
     private var imageView: UIImageView?
-    
-    // Setting this will center an imageView in the contentView
-    public var contentImage: UIImage? {
-        didSet {
-            if imageView == nil && contentImage != nil {
-                let imageView = UIImageView()
-                imageView.translatesAutoresizingMaskIntoConstraints = false
-                imageView.contentMode = .scaleAspectFit
-                contentView.addSubview(imageView)
-                imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Geometry.extendedPadding).isActive = true
-                imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor).isActive = true
-                imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-                
-                self.imageView = imageView
-                
-            } else if contentImage == nil {
-                imageView?.removeFromSuperview()
-                imageView = nil
-            }
-            
-            imageView?.image = contentImage
-        }
-    }
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -68,6 +46,7 @@ public class HelperView : UIView {
         subtitleLabel.textColor = .gray3
         subtitleLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         subtitleLabel.numberOfLines = 0
+        subtitleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.extendedPadding, right: 0)
         addSubview(subtitleLabel)
         subtitleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
         subtitleLabel.topAnchor.constraint(equalTo: titleLabel.layoutMarginsGuide.bottomAnchor).isActive = true
@@ -75,10 +54,48 @@ public class HelperView : UIView {
         subtitleLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.layoutMargins = .zero
         addSubview(contentView)
         contentView.topAnchor.constraint(equalTo: subtitleLabel.layoutMarginsGuide.bottomAnchor).isActive = true
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        controlView.translatesAutoresizingMaskIntoConstraints = false
+        controlView.layoutMargins = .zero
+        controlView.notification = { size in
+            var contentViewLayoutMargins = self.contentView.layoutMargins
+            contentViewLayoutMargins.bottom = size.height > 0 ? -Geometry.extendedPadding : 0
+            self.contentView.layoutMargins = contentViewLayoutMargins
+        }
+        addSubview(controlView)
+        controlView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        controlView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        controlView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        controlView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+    }
+    
+    // Setting this will center an imageView in the contentView
+    public var contentImage: UIImage? {
+        didSet {
+            if imageView == nil && contentImage != nil {
+                let imageView = UIImageView()
+                imageView.translatesAutoresizingMaskIntoConstraints = false
+                imageView.contentMode = .scaleAspectFit
+                contentView.addSubview(imageView)
+                imageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+                imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+                imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+                imageView.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+                imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+                imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+                self.imageView = imageView
+                
+            } else if contentImage == nil {
+                imageView?.removeFromSuperview()
+                imageView = nil
+            }
+            
+            imageView?.image = contentImage
+        }
     }
 }

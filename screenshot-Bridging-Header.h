@@ -12,5 +12,6 @@
 #import "MainTabBarController.h"
 #import "WebViewController.h"
 #import "TappableTextView.h"
+#import "NotifySizeChangeView.h"
 
 #endif /* screenshot_Bridging_Header_h */

@@ -23,8 +23,9 @@ class TutorialWelcomeSlideView : HelperView {
         button.setTitle("Get Started", for: .normal)
         button.backgroundColor = .crazeGreen
         button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
-        contentView.addSubview(button)
-        button.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -Geometry.extendedPadding).isActive = true
+        controlView.addSubview(button)
+        button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
+        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor, constant: -Geometry.extendedPadding).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
     }
     
