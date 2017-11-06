@@ -2,16 +2,16 @@
 //  HelperView.swift
 //  screenshot
 //
-//  Created by Jacob Relkin on 10/22/17.
+//  Created by Corey Werner on 10/22/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
 
 public class HelperView : UIView {
-    public var titleLabel: UILabel!
-    public var subtitleLabel: UILabel!
-    public var contentView: UIView!
+    public var titleLabel = UILabel()
+    public var subtitleLabel = UILabel()
+    public var contentView = UIView()
 
     private var imageView: UIImageView?
     
@@ -23,12 +23,9 @@ public class HelperView : UIView {
                 imageView.translatesAutoresizingMaskIntoConstraints = false
                 imageView.contentMode = .scaleAspectFit
                 contentView.addSubview(imageView)
-                
-                NSLayoutConstraint.activate([
-                    imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Geometry.extendedPadding),
-                    imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
-                    imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
-                ])
+                imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Geometry.extendedPadding).isActive = true
+                imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor).isActive = true
+                imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
                 
                 self.imageView = imageView
                 
@@ -48,64 +45,40 @@ public class HelperView : UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        titleLabel = { _ -> UILabel in
-            let label = UILabel()
-
-            let font = UIFont.preferredFont(forTextStyle: .title1)
-            guard let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) else {
-                return label
-            }
-            
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.textAlignment = .center
-            label.textColor = .gray3
-            label.font = UIFont(descriptor: descriptor, size: 0)
-            label.numberOfLines = 0
-            label.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.padding, right: 0)
-            addSubview(label)
-            label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
-                label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
-                label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
-            ])
-            
-            return label
-        }()
+        var font = UIFont.preferredFont(forTextStyle: .title1)
         
-        subtitleLabel = { _ -> UILabel in
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.textAlignment = .center
-            label.textColor = .gray3
-            label.font = UIFont.preferredFont(forTextStyle: .title3)
-            label.numberOfLines = 0
-            addSubview(label)
-            label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: titleLabel.layoutMarginsGuide.bottomAnchor),
-                label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
-                label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
-            ])
-            
-            return label
-        }()
+        if let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) {
+            font = UIFont(descriptor: descriptor, size: 0)
+        }
         
-        contentView = { _ -> UIView in
-            let view = UIView()
-            view.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(view)
-            
-            NSLayoutConstraint.activate([
-                view.topAnchor.constraint(equalTo: subtitleLabel.layoutMarginsGuide.bottomAnchor),
-                view.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
-                view.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-                view.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
-            ])
-            
-            return view
-        }()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.textAlignment = .center
+        titleLabel.textColor = .gray3
+        titleLabel.font = font
+        titleLabel.numberOfLines = 0
+        titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.padding, right: 0)
+        addSubview(titleLabel)
+        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        titleLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        subtitleLabel.textAlignment = .center
+        subtitleLabel.textColor = .gray3
+        subtitleLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+        subtitleLabel.numberOfLines = 0
+        addSubview(subtitleLabel)
+        subtitleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        subtitleLabel.topAnchor.constraint(equalTo: titleLabel.layoutMarginsGuide.bottomAnchor).isActive = true
+        subtitleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        subtitleLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: subtitleLabel.layoutMarginsGuide.bottomAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        contentView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
     }
 }
