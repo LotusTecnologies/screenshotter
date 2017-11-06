@@ -185,7 +185,7 @@
         toolbar.hidden = !self.toolbarEnabled;
         [self.view addSubview:toolbar];
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+        [toolbar.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor].active = YES;
         [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         _toolbar = toolbar;
         
