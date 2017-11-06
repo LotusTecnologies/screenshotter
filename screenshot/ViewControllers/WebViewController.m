@@ -110,6 +110,12 @@
     [self hideLoadingView];
 }
 
+- (void)viewSafeAreaInsetsDidChange {
+    [super viewSafeAreaInsetsDidChange];
+    
+    [self updateLoadingCoverLayoutMargins];
+}
+
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
     if (self.view.window) {
         [self.loader stopAnimation];
@@ -306,10 +312,12 @@
             [self.view addSubview:view];
             [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
             [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-            [view.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
+            [view.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
             [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
             view;
         });
+        
+        [self updateLoadingCoverLayoutMargins];
         
         _loader = ({
             Loader *loader = [[Loader alloc] init];
@@ -339,7 +347,7 @@
         [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
         [self.loadingCoverView addSubview:button];
-        [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
+        [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.layoutMarginsGuide.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
         [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
     }
 }
@@ -358,6 +366,12 @@
     }
 }
 
+- (void)updateLoadingCoverLayoutMargins {
+    if (@available(iOS 11.0, *)) {
+        self.loadingCoverView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, self.view.window.safeAreaInsets.bottom, 0.f);
+    }
+}
+
 
 #pragma mark - Game
 
@@ -370,7 +384,7 @@
     [self.loadingCoverView addSubview:gameView];
     [gameView.topAnchor constraintEqualToAnchor:self.loadingCoverView.topAnchor].active = YES;
     [gameView.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor].active = YES;
-    [gameView.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.bottomAnchor].active = YES;
+    [gameView.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.layoutMarginsGuide.bottomAnchor].active = YES;
     [gameView.trailingAnchor constraintEqualToAnchor:self.loadingCoverView.trailingAnchor].active = YES;
     
     GameScene *scene = (GameScene *)[GameScene unarchiveFromFile:@"GameScene"];
