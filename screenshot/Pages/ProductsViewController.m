@@ -532,8 +532,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     retryButton.backgroundColor = [UIColor crazeGreen];
     [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
     [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
-    [helperView.contentView addSubview:retryButton];
-    [retryButton.bottomAnchor constraintEqualToAnchor:helperView.contentView.bottomAnchor].active = YES;
+    [helperView.controlView addSubview:retryButton];
+    [retryButton.topAnchor constraintEqualToAnchor:helperView.controlView.topAnchor].active = YES;
+    [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
     [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
     
     [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
