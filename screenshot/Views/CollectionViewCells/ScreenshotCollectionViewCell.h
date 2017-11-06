@@ -27,4 +27,6 @@
 
 @property (nonatomic) BOOL badgeEnabled;
 
++ (UIEdgeInsets)shadowInsets;
+
 @end

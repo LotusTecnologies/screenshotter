@@ -95,6 +95,7 @@ class AssetSyncModel: NSObject {
             }.then (on: processingQ) { isFashion, imageData -> Void in
                 if isFashion {
                     if ApplicationStateModel.sharedInstance.isBackground() {
+                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
                         self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
                     } else {
                         DispatchQueue.main.async {
@@ -650,7 +651,6 @@ class AssetSyncModel: NSObject {
             }
             if toUpload.count > 0 {
                 track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
-                AccumulatorModel.sharedInstance.addToNewScreenshots(count: toUpload.count)
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1

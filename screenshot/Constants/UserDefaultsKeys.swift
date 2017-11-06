@@ -29,7 +29,7 @@ class UserDefaultsKeys : NSObject {
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedProductHelper = "OnboardingPresentedProductHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
-    static let onboardingPresentedBackgroundScreenshotHelper = "OnboardingPresentedBackgroundScreenshotHelper"
+    static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     
     // Device / Version
     static let dateInstalled = "DateInstalled"

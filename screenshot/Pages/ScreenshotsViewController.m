@@ -57,18 +57,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
     CGFloat p = [Geometry padding];
+    CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
     
     _collectionView = ({
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumInteritemSpacing = p;
-        layout.minimumLineSpacing = p;
+        layout.minimumInteritemSpacing = minimumSpacing.x;
+        layout.minimumLineSpacing = minimumSpacing.y;
         
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(p, p, p, p);
+        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
@@ -121,10 +123,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
-    if (self.collectionView.backgroundView) {
-        [self.collectionView.backgroundView removeFromSuperview];
-        self.collectionView.backgroundView = nil;
-    }
+    [self removeScreenshotHelperView];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -135,10 +134,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification {
     if (self.view.window) {
-        if (self.collectionView.backgroundView) {
-            [self.collectionView.backgroundView removeFromSuperview];
-            self.collectionView.backgroundView = nil;
-        }
+        [self removeScreenshotHelperView];
     }
 }
 
@@ -216,6 +212,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
+- (void)removeScreenshotHelperView {
+    if (self.collectionView.backgroundView) {
+        [self.collectionView.backgroundView removeFromSuperview];
+        self.collectionView.backgroundView = nil;
+    }
+}
+
 
 #pragma mark - Collection View
 
@@ -241,8 +244,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     if (indexPath.section == ScreenshotsSectionImages) {
         NSInteger columns = [self numberOfCollectionViewColumns];
+        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+        CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
         
-        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns);
+        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
         size.height = ceil(size.width * [self screenshotRatio]);
     }
     
@@ -255,7 +260,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
         cell.delegate = self;
-        cell.backgroundColor = [UIColor lightGrayColor];
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.screenshot = screenshot;
         cell.badgeEnabled = screenshot.isNew;
         return cell;
@@ -334,6 +339,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
         [[self screenshotAtIndex:indexPath.item] setHide];
+        
+        [self removeScreenshotHelperView];
         
         [AnalyticsTrackers.standard track:@"Removed screenshot"];
     }]];

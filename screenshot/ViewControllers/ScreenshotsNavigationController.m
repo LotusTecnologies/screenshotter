@@ -15,14 +15,13 @@
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) WebViewController *webViewController;
+@property (nonatomic, strong) ClipView *clipView;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
 
 @end
 
 @implementation ScreenshotsNavigationController
-@dynamic delegate;
-
 
 #pragma mark - Life Cycle
 
@@ -63,15 +62,18 @@
         self.previousDidAppearViewControllerClass == [ProductsViewController class])
     {
         if ([self needsToPresentPickerViewController]) {
-            [self presentPickerViewController];
-            
+            // Allow the view controller transition view to cleanup
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self presentPickerClipView];
+            });
+
             // Go back into Products before presenting the next view
             self.previousDidAppearViewControllerClass = nil;
-            
-        } else if ([self needsToPresentBackgroundScreenshotViewController] &&
+
+        } else if ([self needsToPresentPushAlert] &&
                    [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
         {
-            [self presentBackgroundScreenshotViewController];
+            [self presentPushAlert];
         }
     }
     
@@ -96,7 +98,9 @@
 }
 
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController {
-    [self presentPickerViewController];
+    if ([self needsToPresentPickerViewController]) {
+        [self presentPickerClipView];
+    }
 }
 
 
@@ -117,6 +121,8 @@
 }
 
 - (void)presentPickerViewController {
+    [self dismissPickerClipView];
+    
     ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
     picker.cancelButton.target = self;
     picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
@@ -124,9 +130,10 @@
     picker.doneButton.action = @selector(pickerViewControllerDidFinish);
     self.pickerNavigationController = picker;
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
-    }];
+    [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+    
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     [AnalyticsTrackers.standard track:@"Opened Picker"];
 }
@@ -143,18 +150,30 @@
 }
 
 
-#pragma mark - Background Screenshot
+#pragma mark - Push Permission
 
-- (BOOL)needsToPresentBackgroundScreenshotViewController {
-    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
+- (BOOL)needsToPresentPushAlert {
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert];
 }
 
-- (void)presentBackgroundScreenshotViewController {
-    UIViewController *controller = [[BackgroundScreenshotsExplanationViewController alloc] init];
+- (void)presentPushAlert {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Start Screenshotting" message:@"Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!" preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
+            if (granted) {
+                [self.screenshotsNavigationControllerDelegate screenshotsNavigationControllerDidGrantPushPermissions:self];
+                
+                [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
+                
+            } else {
+                [AnalyticsTrackers.standard track:@"Denied Push Permissions"];
+            }
+        }];
+    }]];
+    [self presentViewController:alertController animated:YES completion:nil];
     
-    [self presentViewController:controller animated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedBackgroundScreenshotHelper];
-    }];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 
@@ -191,6 +210,47 @@
     
     if (self.screenshotsViewController.navigationItem.leftBarButtonItem.tag == 0) {
         self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    }
+}
+
+
+#pragma mark - Clip View
+
+- (void)presentPickerClipView {
+    if (!self.clipView) {
+        UIView *rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem.targetView;
+        CGRect rect = [rightBarButtonView.superview convertRect:rightBarButtonView.frame toView:self.view];
+        CGFloat radius = MIN(rect.size.height / 2.f, rect.size.width / 2.f);
+        UIBezierPath *croppedPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:radius];
+        
+        UIView *tabBarView = self.tabBarController.view;
+        
+        ClipView *clipView = [[ClipView alloc] init];
+        clipView.translatesAutoresizingMaskIntoConstraints = NO;
+        clipView.clippings = @[croppedPath];
+        clipView.alpha = 0.f;
+        [tabBarView addSubview:clipView];
+        [clipView.topAnchor constraintEqualToAnchor:tabBarView.topAnchor].active = YES;
+        [clipView.leadingAnchor constraintEqualToAnchor:tabBarView.leadingAnchor].active = YES;
+        [clipView.bottomAnchor constraintEqualToAnchor:tabBarView.bottomAnchor].active = YES;
+        [clipView.trailingAnchor constraintEqualToAnchor:tabBarView.trailingAnchor].active = YES;
+        self.clipView = clipView;
+        
+        [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
+            self.clipView.alpha = 1.f;
+        }];
+    }
+}
+
+- (void)dismissPickerClipView {
+    if (self.clipView) {
+        [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
+            self.clipView.alpha = 0.f;
+            
+        } completion:^(BOOL finished) {
+            [self.clipView removeFromSuperview];
+            self.clipView = nil;
+        }];
     }
 }
 
