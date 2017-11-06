@@ -512,18 +512,20 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 #pragma mark - Helper View
 
 - (void)showNoItemsHelperView {
-    CGFloat p2 = [Geometry extendedPadding];
+    CGFloat verPadding = [Geometry extendedPadding];
+    CGFloat horPadding = [Geometry padding];
     
     HelperView *helperView = [[HelperView alloc] init];
     helperView.translatesAutoresizingMaskIntoConstraints = NO;
+    helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
     helperView.backgroundColor = self.view.backgroundColor;
     helperView.titleLabel.text = @"No Items Found";
     helperView.subtitleLabel.text = @"No visually similar products were detected";
     helperView.contentImage = [UIImage imageNamed:@"ProductsEmptyListGraphic"];
     [self.view addSubview:helperView];
-    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:p2].active = YES;
+    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
     [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-p2].active = YES;
+    [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
     

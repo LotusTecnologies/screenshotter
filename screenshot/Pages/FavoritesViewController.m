@@ -78,18 +78,20 @@
     });
     
     self.helperView = ({
-        CGFloat p2 = [Geometry extendedPadding];
+        CGFloat verPadding = [Geometry extendedPadding];
+        CGFloat horPadding = [Geometry padding];
         
         HelperView *helperView = [[HelperView alloc] init];
         helperView.translatesAutoresizingMaskIntoConstraints = NO;
         helperView.userInteractionEnabled = NO;
+        helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
         helperView.titleLabel.text = @"No Favorites";
         helperView.subtitleLabel.text = @"Tap the heart icon on products to add them to your favorites";
         helperView.contentImage = [UIImage imageNamed:@"FavoriteEmptyListGraphic"];
         [self.view addSubview:helperView];
-        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:p2].active = YES;
+        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
         [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-p2].active = YES;
+        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
         [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;        
         helperView;
     });

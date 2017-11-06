@@ -99,11 +99,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     });
     
     _helperView = ({
-        CGFloat p2 = [Geometry extendedPadding];
+        CGFloat verPadding = [Geometry extendedPadding];
+        CGFloat horPadding = [Geometry padding];
         
         ScreenshotsHelperView *helperView = [[ScreenshotsHelperView alloc] init];
         helperView.translatesAutoresizingMaskIntoConstraints = NO;
-        helperView.layoutMargins = UIEdgeInsetsMake(p2, p, p2, p);
+        helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
         [helperView.button addTarget:self action:@selector(helperViewAllowAccessAction) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:helperView];
         [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
