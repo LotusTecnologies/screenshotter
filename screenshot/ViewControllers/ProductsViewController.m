@@ -12,7 +12,6 @@
 #import "ScreenshotDisplayNavigationController.h"
 #import "TutorialProductsPageViewController.h"
 #import "TransitioningController.h"
-#import "Loader.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
@@ -181,7 +180,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [self.shoppablesToolbar selectFirstShoppable];
     
     if (![self hasShoppables] && !self.noItemsHelperView) {
-        [self.loader startAnimation:LoaderAnimationSpin];
+        [self.loader startAnimation];
     }
 }
 
@@ -550,7 +549,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)noItemsRetryAction {
     [self.shoppablesController refetchShoppables];
     [self hideNoItemsHelperView];
-    [self.loader startAnimation:LoaderAnimationSpin];
+    [self.loader startAnimation];
 }
 
 @end

@@ -7,7 +7,6 @@
 //
 
 #import "WebViewController.h"
-#import "Loader.h"
 
 #import "NetworkingModel.h"
 #import "screenshot-Swift.h"
@@ -88,7 +87,7 @@
     _didViewAppear = YES;
     
     if (!self.didLoadInitialPage) {
-        [self.loader startAnimation:LoaderAnimationPoseThenSpin];
+        [self.loader startAnimation];
     }
     
     [Appsee startScreen:@"WebView"];
@@ -128,7 +127,7 @@
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
-        [self.loader startAnimation:LoaderAnimationSpin];
+        [self.loader startAnimation];
         
         if (_isShowingGame) {
             [AnalyticsTrackers.standard track:@"Game Resumed" properties:@{@"From": @"App Backgrounding"}];
@@ -287,7 +286,7 @@
         [self showLoadingView];
         
         if (_didViewAppear) {
-            [self.loader startAnimation:LoaderAnimationPoseThenSpin];
+            [self.loader startAnimation];
         }
     }
 }

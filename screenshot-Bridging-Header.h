@@ -5,7 +5,6 @@
 #ifndef screenshot_Bridging_Header_h
 #define screenshot_Bridging_Header_h
 
-#import "LoadingViewController.h"
 #import "UIApplication+Version.h"
 #import "PermissionsManager.h"
 #import "NetworkingModel.h"
