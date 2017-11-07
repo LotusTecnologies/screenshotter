@@ -14,7 +14,7 @@
 #import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
-    ScreenshotsSectionNotification,
+//    ScreenshotsSectionNotification,
     ScreenshotsSectionImage
 };
 
@@ -229,14 +229,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 2;
+    return 1;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (section == ScreenshotsSectionNotification) {
-        return 1;
-        
-    } else if (section == ScreenshotsSectionImage) {
+//    if (section == ScreenshotsSectionNotification) {
+//        return 1;
+//
+//    } else
+        if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjects.count;
         
     } else {
@@ -247,11 +248,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = CGSizeZero;
     
-    if (indexPath.section == ScreenshotsSectionNotification) {
-        size.width = 300;
-        size.height = 100;
-        
-    } else if (indexPath.section == ScreenshotsSectionImage) {
+//    if (indexPath.section == ScreenshotsSectionNotification) {
+//        size.width = 300;
+//        size.height = 100;
+//        
+//    } else
+        if (indexPath.section == ScreenshotsSectionImage) {
         NSInteger columns = [self numberOfCollectionViewImageColumns];
         UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
         CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
@@ -264,12 +266,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionNotification) {
-        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
-        cell.mainView.backgroundColor = [UIColor greenColor];
-        return cell;
-        
-    } else if (indexPath.section == ScreenshotsSectionImage) {
+//    if (indexPath.section == ScreenshotsSectionNotification) {
+//        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
+////        cell.contentView.backgroundColor = collectionView.backgroundColor;
+//        cell.mainView.backgroundColor = [UIColor greenColor];
+//        return cell;
+//
+//    } else
+        if (indexPath.section == ScreenshotsSectionImage) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
@@ -347,7 +351,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [AnalyticsTrackers.standard track:@"Shared screenshot"];
 }
 
-- (void)screenshotCollectionViewCellDidTapTrash:(ScreenshotCollectionViewCell *)cell {
+- (void)screenshotCollectionViewCellDidTapDelete:(ScreenshotCollectionViewCell *)cell {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Delete Screenshot?" message:nil preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {

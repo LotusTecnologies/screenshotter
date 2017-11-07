@@ -21,9 +21,6 @@ class ShadowCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         shadowView.translatesAutoresizingMaskIntoConstraints = false
-        shadowView.layer.shadowColor = Shadow.basic.color.cgColor;
-        shadowView.layer.shadowOffset = type(of: self).shadowOffset
-        shadowView.layer.shadowRadius = type(of: self).shadowRadius
         shadowView.layoutMargins = {
             var margins = type(of: self).shadowInsets
             margins.top = -margins.top
@@ -31,6 +28,15 @@ class ShadowCollectionViewCell: UICollectionViewCell {
             margins.bottom = -margins.bottom
             margins.right = -margins.right
             return margins
+        }()
+        shadowView.layer.shadowColor = Shadow.basic.color.cgColor;
+        shadowView.layer.shadowOffset = type(of: self).shadowOffset
+        shadowView.layer.shadowRadius = type(of: self).shadowRadius
+        shadowView.layer.shadowOpacity = 1
+        shadowView.layer.shadowPath = {
+            var rect = UIEdgeInsetsInsetRect(bounds, type(of: self).shadowInsets)
+            rect.origin = .zero
+            return UIBezierPath(roundedRect: rect, cornerRadius: type(of: self).cornerRadius).cgPath
         }()
         contentView.addSubview(shadowView)
         shadowView.layoutMarginsGuide.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
@@ -51,17 +57,10 @@ class ShadowCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        var canAddShadow = false
-        
-        if shadowView.layer.shadowPath == nil {
-            canAddShadow = true
-            
-        } else if let shadowPath = shadowView.layer.shadowPath, !shadowPath.boundingBox.size.equalTo(shadowView.bounds.size) {
-            canAddShadow = true
-        }
-        
-        if canAddShadow {
-            shadowView.layer.shadowOpacity = 1
+        if !shadowView.bounds.equalTo(.zero),
+            let shadowPath = shadowView.layer.shadowPath,
+            !shadowPath.boundingBox.size.equalTo(shadowView.bounds.size)
+        {
             shadowView.layer.shadowPath = UIBezierPath(roundedRect: shadowView.bounds, cornerRadius: type(of: self).cornerRadius).cgPath
         }
     }
