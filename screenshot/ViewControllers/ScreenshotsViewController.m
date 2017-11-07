@@ -9,13 +9,13 @@
 #import <CoreData/CoreData.h>
 
 #import "ScreenshotsViewController.h"
-#import "ScreenshotCollectionViewCell.h"
 #import "screenshot-Swift.h"
 
 #import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
-    ScreenshotsSectionImages
+    ScreenshotsSectionNotification,
+    ScreenshotsSectionImage
 };
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
@@ -75,6 +75,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
         
+        [collectionView registerClass:[ShadowCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view addSubview:collectionView];
@@ -164,7 +165,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)insertScreenshotHelperView {
     BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
     
-    if (!hasPresented && [self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] == 1) {
+    if (!hasPresented && [self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 1) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
@@ -223,16 +224,19 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Collection View
 
-- (NSInteger)numberOfCollectionViewColumns {
+- (NSInteger)numberOfCollectionViewImageColumns {
     return 2;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 1;
+    return 2;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (section == ScreenshotsSectionImages) {
+    if (section == ScreenshotsSectionNotification) {
+        return 1;
+        
+    } else if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjects.count;
         
     } else {
@@ -243,8 +247,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = CGSizeZero;
     
-    if (indexPath.section == ScreenshotsSectionImages) {
-        NSInteger columns = [self numberOfCollectionViewColumns];
+    if (indexPath.section == ScreenshotsSectionNotification) {
+        size.width = 300;
+        size.height = 100;
+        
+    } else if (indexPath.section == ScreenshotsSectionImage) {
+        NSInteger columns = [self numberOfCollectionViewImageColumns];
         UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
         CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
         
@@ -256,14 +264,19 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImages) {
+    if (indexPath.section == ScreenshotsSectionNotification) {
+        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
+        cell.mainView.backgroundColor = [UIColor greenColor];
+        return cell;
+        
+    } else if (indexPath.section == ScreenshotsSectionImage) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
         cell.delegate = self;
         cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.screenshot = screenshot;
-        cell.badgeEnabled = screenshot.isNew;
+        cell.isBadgeEnabled = screenshot.isNew;
         return cell;
         
     } else {
@@ -272,13 +285,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImages && indexPath.item == 0) {
+    if (indexPath.section == ScreenshotsSectionImage && indexPath.item == 0) {
         [self insertScreenshotHelperView];
     }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImages) {
+    if (indexPath.section == ScreenshotsSectionImage) {
         [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
         
         [AnalyticsTrackers.standard track:@"Tapped on screenshot"];
@@ -290,7 +303,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)scrollTopTop {
-    if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages]) {
+    if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
     }
 }
@@ -374,7 +387,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
         [self syncHelperViewVisibility];
         
-        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] == 0) {
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
             [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
         }
     }
@@ -398,7 +411,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (NSIndexPath *)screenshotFrcToCollectionViewIndexPath:(NSInteger)index {
-    return [NSIndexPath indexPathForItem:index inSection:ScreenshotsSectionImages];
+    return [NSIndexPath indexPathForItem:index inSection:ScreenshotsSectionImage];
 }
 
 - (void)helperViewAllowAccessAction {
@@ -420,7 +433,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         }
     }
     
-    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImages] > 0);
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
 }
 
