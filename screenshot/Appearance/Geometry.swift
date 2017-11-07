@@ -9,15 +9,10 @@
 import Foundation
 
 public class Geometry : NSObject {
-    class var padding: CGFloat {
-        return 16
-    }
+    static let padding = CGFloat(16)
+    static let extendedPadding = CGFloat(40)
     
-    class var extendedPadding: CGFloat {
-        return 40
-    }
+    static let halfPoint = CGFloat(UIScreen.main.scale > 1 ? 0.5 : 1)
     
-    class var halfPoint: CGFloat {
-        return UIScreen.main.scale > 1 ? 0.5 : 1
-    }
+    static let defaultCornerRadius = CGFloat(6)
 }

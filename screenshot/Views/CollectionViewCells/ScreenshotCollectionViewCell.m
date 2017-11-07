@@ -28,7 +28,7 @@
         _shadowView = ({
             UIView *view = [[UIView alloc] init];
             view.translatesAutoresizingMaskIntoConstraints = NO;
-            view.layer.shadowColor = [UIColor blackColor].CGColor;
+            view.layer.shadowColor = [_Shadow color].CGColor;
             view.layer.shadowOffset = [[self class] shadowOffset];
             view.layer.shadowRadius = [[self class] shadowRadius];
             view.layoutMargins = ({
@@ -140,7 +140,7 @@
     [super layoutSubviews];
     
     if (!self.shadowView.layer.shadowPath || !CGSizeEqualToSize(CGPathGetBoundingBox(self.shadowView.layer.shadowPath).size, self.shadowView.bounds.size)) {
-        self.shadowView.layer.shadowOpacity = .2f;
+        self.shadowView.layer.shadowOpacity = 1.f;
         self.shadowView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.shadowView.bounds cornerRadius:[[self class] cornerRadius]].CGPath;
     }
 }
@@ -149,15 +149,15 @@
 #pragma mark - Border / Shadow
 
 + (CGFloat)cornerRadius {
-    return 6.f;
+    return [Geometry defaultCornerRadius];
 }
 
 + (CGSize)shadowOffset {
-    return CGSizeMake(0.f, 1.f);
+    return _Shadow.offset;
 }
 
 + (CGFloat)shadowRadius {
-    return 2.f;
+    return _Shadow.radius;
 }
 
 + (UIEdgeInsets)shadowInsets {

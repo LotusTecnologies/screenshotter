@@ -82,11 +82,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
         tableHeaderContentView.translatesAutoresizingMaskIntoConstraints = NO;
         tableHeaderContentView.backgroundColor = [UIColor whiteColor];
         tableHeaderContentView.layoutMargins = UIEdgeInsetsMake(p, p, p, p);
-        tableHeaderContentView.layer.cornerRadius = 10.f;
-        tableHeaderContentView.layer.shadowColor = [UIColor blackColor].CGColor;
-        tableHeaderContentView.layer.shadowOffset = CGSizeMake(0.f, 1.f);
-        tableHeaderContentView.layer.shadowRadius = 1.f;
-        tableHeaderContentView.layer.shadowOpacity = .3f;
+        tableHeaderContentView.layer.cornerRadius = [Geometry defaultCornerRadius];
+        tableHeaderContentView.layer.shadowColor = _Shadow.color.CGColor;
+        tableHeaderContentView.layer.shadowOffset = _Shadow.offset;
+        tableHeaderContentView.layer.shadowRadius = _Shadow.radius;
+        tableHeaderContentView.layer.shadowOpacity = 1.f;
         [view addSubview:tableHeaderContentView];
         [tableHeaderContentView.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor].active = YES;
         [tableHeaderContentView.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor].active = YES;
@@ -95,7 +95,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [tableHeaderContentView.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor].active = YES;
         _tableHeaderContentView = tableHeaderContentView;
         
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SettingsScreenshot"]];
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SettingsAddPhotos"]];
         imageView.translatesAutoresizingMaskIntoConstraints = NO;
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         imageView.layoutMargins = UIEdgeInsetsMake(0.f, 0.f, 0.f, -p);
