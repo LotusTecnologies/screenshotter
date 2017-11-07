@@ -121,9 +121,9 @@ PODS:
     - PromiseKit/CorePromise
   - Protobuf (3.4.0)
   - RateView (1.2)
-  - SDWebImage (4.2.1):
-    - SDWebImage/Core (= 4.2.1)
-  - SDWebImage/Core (4.2.1)
+  - SDWebImage (4.2.2):
+    - SDWebImage/Core (= 4.2.2)
+  - SDWebImage/Core (4.2.2)
 
 DEPENDENCIES:
   - AFNetworking
@@ -180,7 +180,7 @@ SPEC CHECKSUMS:
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   Protobuf: 03eef2ee0b674770735cf79d9c4d3659cf6908e8
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 1fa4c9edf525b744f002db89f3f5a38b3cd4c541
+  SDWebImage: 89a9d32cd520bbb46eb14e541d5109b3564af198
 
 PODFILE CHECKSUM: d51264679cbe2b5cad115cc6226ef01968ec92c1
 
