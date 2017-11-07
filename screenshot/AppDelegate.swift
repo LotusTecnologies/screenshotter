@@ -202,7 +202,7 @@ extension AppDelegate {
             return UIFont(name: "Futura-Medium", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
         }
         
-        UINavigationBar.appearance().tintColor = UIColor.gray6
+        UINavigationBar.appearance().tintColor = .gray3
         UINavigationBar.appearance().titleTextAttributes = [
             NSFontAttributeName: futuraMediumFont(20),
             NSForegroundColorAttributeName: UIColor.gray3
@@ -213,17 +213,19 @@ extension AppDelegate {
         
         UIToolbar.appearance().tintColor = crazeRedColor
         
-        var barButtonItemTitleTextAttributes = [NSFontAttributeName: futuraFont(16)]
-        var barButtonItemAppearance = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
-        barButtonItemAppearance.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
-        barButtonItemAppearance.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
-        barButtonItemAppearance.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
+        var barButtonItemTitleTextAttributes: [String:Any] = [NSFontAttributeName: futuraFont(16)]
+        let navigationBarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
+        navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
+        navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
+        
+        barButtonItemTitleTextAttributes[NSForegroundColorAttributeName] = UIColor.gray7
+        navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         barButtonItemTitleTextAttributes = [NSFontAttributeName: futuraFont(12)]
-        barButtonItemAppearance = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
-        barButtonItemAppearance.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
-        barButtonItemAppearance.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
-        barButtonItemAppearance.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
+        let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
+        toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
+        toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
+        toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [UIToolbar.self]).color = crazeRedColor
     }
