@@ -45,6 +45,7 @@ class ShadowCollectionViewCell: UICollectionViewCell {
         shadowView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         mainView.translatesAutoresizingMaskIntoConstraints = false
+        mainView.backgroundColor = .white
         mainView.layer.cornerRadius = type(of: self).cornerRadius
         mainView.layer.masksToBounds = true
         contentView.addSubview(mainView)

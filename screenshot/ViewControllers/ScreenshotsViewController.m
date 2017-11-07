@@ -14,7 +14,7 @@
 #import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
-//    ScreenshotsSectionNotification,
+    ScreenshotsSectionNotification,
     ScreenshotsSectionImage
 };
 
@@ -229,15 +229,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 1;
+    return 2;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-//    if (section == ScreenshotsSectionNotification) {
-//        return 1;
-//
-//    } else
-        if (section == ScreenshotsSectionImage) {
+    if (section == ScreenshotsSectionNotification) {
+        return 1;
+
+    } else if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjects.count;
         
     } else {
@@ -245,20 +244,30 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
+    if (section == ScreenshotsSectionNotification) {
+        CGFloat y = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+        
+        return CGSizeMake(0.f, y);
+        
+    } else {
+        return CGSizeZero;
+    }
+}
+
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = CGSizeZero;
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
-//    if (indexPath.section == ScreenshotsSectionNotification) {
-//        size.width = 300;
-//        size.height = 100;
-//        
-//    } else
-        if (indexPath.section == ScreenshotsSectionImage) {
-        NSInteger columns = [self numberOfCollectionViewImageColumns];
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+    if (indexPath.section == ScreenshotsSectionNotification) {
+        size.width = floor(collectionView.bounds.size.width - (padding * 2));
+        size.height = 100;
         
-        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
+    } else if (indexPath.section == ScreenshotsSectionImage) {
+        NSInteger columns = [self numberOfCollectionViewImageColumns];
+        
+        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
         size.height = ceil(size.width * [self screenshotRatio]);
     }
     
@@ -266,14 +275,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-//    if (indexPath.section == ScreenshotsSectionNotification) {
-//        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
-////        cell.contentView.backgroundColor = collectionView.backgroundColor;
-//        cell.mainView.backgroundColor = [UIColor greenColor];
-//        return cell;
-//
-//    } else
-        if (indexPath.section == ScreenshotsSectionImage) {
+    if (indexPath.section == ScreenshotsSectionNotification) {
+        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
+        return cell;
+
+    } else if (indexPath.section == ScreenshotsSectionImage) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
