@@ -58,7 +58,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         tempContentViewToIconConstraint = tempContentView.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: mainView.layoutMargins.left)
     }
     
-    private static let mainViewLayoutMargins = UIEdgeInsets(top: Geometry.padding, left: Geometry.padding, bottom: Geometry.padding, right: Geometry.padding)
+    fileprivate static let mainViewLayoutMargins = UIEdgeInsets(top: Geometry.padding, left: Geometry.padding, bottom: Geometry.padding, right: Geometry.padding)
     
     // MARK: Content Type
     
@@ -134,7 +134,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         confirmButton.heightAnchor.constraint(equalToConstant: type(of: self).buttonHeight).isActive = true
     }
     
-    private static let buttonHeight = UIButton().intrinsicContentSize.height
+    fileprivate static let buttonHeight = UIButton().intrinsicContentSize.height
     
     @objc private func rejectButtonAction() {
         delegate?.screenshotNotificationCollectionViewCellDidTapReject?(self)
@@ -164,7 +164,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
-    private static let iconWidth = CGFloat(30)
+    fileprivate static let iconWidth = CGFloat(30)
     
     // MARK: Label / Text
     
@@ -175,7 +175,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
     }
     
     private var _tempContentLabel: UILabel?
-    private var tempContentLabel: UILabel? {
+    fileprivate var tempContentLabel: UILabel? {
         set {
             _tempContentLabel = newValue
         }
@@ -192,10 +192,12 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
-    private static let labelFont = UIFont.preferredFont(forTextStyle: .body)
-    
-    // MARK: Size
-    
+    fileprivate static let labelFont = UIFont.preferredFont(forTextStyle: .body)
+}
+
+// MARK: - Size
+
+extension ScreenshotNotificationCollectionViewCell {
     static func height(withCellWidth width: CGFloat, text: String, contentType: ScreenshotNotificationCollectionViewCellContentType) -> CGFloat {
         guard width > 0, text.count > 0 else {
             return CGFloat(0)

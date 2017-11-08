@@ -261,7 +261,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
     if (indexPath.section == ScreenshotsSectionNotification) {
-        NSString *text = @"Import your latest screenshot? And here is some more text!";
+        NSString *text = @"Import your latest screenshot?";
         
         size.width = floor(collectionView.bounds.size.width - (padding * 2));
         size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width text:text contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
@@ -282,7 +282,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         cell.delegate = self;
         cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.iconImage = [UIImage imageNamed:@"NotificationSnapshot"];
-        cell.text = @"Import your latest screenshot? And here is some more text!";
+        cell.text = @"Import your latest screenshot?";
         [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         return cell;
 
