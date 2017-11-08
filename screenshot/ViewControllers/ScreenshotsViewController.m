@@ -18,7 +18,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionImage
 };
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
@@ -75,7 +75,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
         
-        [collectionView registerClass:[ShadowCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
+        [collectionView registerClass:[ScreenshotNotificationCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view addSubview:collectionView];
@@ -257,12 +257,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = CGSizeZero;
-    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    UIEdgeInsets shadowInsets = [ScreenshotNotificationCollectionViewCell shadowInsets];
     CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
     if (indexPath.section == ScreenshotsSectionNotification) {
+        NSString *text = @"Import your latest screenshot? And here is some more text!";
+        
         size.width = floor(collectionView.bounds.size.width - (padding * 2));
-        size.height = 100;
+        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width text:text contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         
     } else if (indexPath.section == ScreenshotsSectionImage) {
         NSInteger columns = [self numberOfCollectionViewImageColumns];
@@ -276,8 +278,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionNotification) {
-        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
+        ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
+        cell.delegate = self;
         cell.contentView.backgroundColor = collectionView.backgroundColor;
+        cell.iconImage = [UIImage imageNamed:@"NotificationSnapshot"];
+        cell.text = @"Import your latest screenshot? And here is some more text!";
+        [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         return cell;
 
     } else if (indexPath.section == ScreenshotsSectionImage) {
@@ -317,6 +323,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
     }
+}
+
+
+#pragma mark - Notification Cell
+
+- (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
+    
+}
+
+- (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
+    
 }
 
 
