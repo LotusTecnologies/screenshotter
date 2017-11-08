@@ -32,7 +32,11 @@ public class TutorialEmailSlideView : HelperView {
         titleLabel.text = "Sign Up"
         subtitleLabel.text = "Fill out your info below"
         
-        let p = Geometry.padding
+        // TODO: better small screen layout
+        let is480h = UIDevice.is480h
+        
+        let p = is480h ? Geometry.padding / 2 : Geometry.padding
+        let p2 = is480h ? Geometry.extendedPadding / 2 : Geometry.extendedPadding
         
         let nameLabel = { _ -> UILabel in
             let label = UILabel()
@@ -42,9 +46,10 @@ public class TutorialEmailSlideView : HelperView {
             
             contentView.addSubview(label)
             label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+            label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
             
             NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
+                label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: is480h ? 0 : 30),
                 label.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
                 label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
                 label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -79,7 +84,7 @@ public class TutorialEmailSlideView : HelperView {
                 textField.topAnchor.constraint(equalTo: nameLabel.layoutMarginsGuide.bottomAnchor),
                 textField.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
                 textField.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-                textField.heightAnchor.constraint(equalToConstant: 50)
+                textField.heightAnchor.constraint(equalToConstant: is480h ? 30 : 50)
             ])
         })()
         
@@ -125,15 +130,13 @@ public class TutorialEmailSlideView : HelperView {
         })()
 
         ({ _ in
-            let p2 = Geometry.extendedPadding
-
             button.translatesAutoresizingMaskIntoConstraints = false
             button.setTitle("Submit", for: .normal)
             button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
         
             contentView.addSubview(button)
             button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+            button.setContentCompressionResistancePriority(UILayoutPriorityDefaultHigh, for: .vertical)
             
             NSLayoutConstraint.activate([
                 button.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: p2),

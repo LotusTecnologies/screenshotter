@@ -11,12 +11,19 @@ import Foundation
 class TutorialWelcomeSlideView : HelperView {
     var getStartedButtonTapped: (() -> Void)?
     
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         titleLabel.attributedText = titleLabelAttributedText
         subtitleLabel.text = "Any fashion picture you screenshot becomes shoppable in the app"
         contentImage = UIImage(named: "TutorialWelcomeScreenshopIcon")
+        
+        // TODO: better small screen layout
+        let is480h = UIDevice.is480h
         
         let button = MainButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -25,12 +32,8 @@ class TutorialWelcomeSlideView : HelperView {
         button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
-        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor, constant: -Geometry.extendedPadding).isActive = true
+        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor, constant: is480h ? 0 : -Geometry.extendedPadding).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Actions

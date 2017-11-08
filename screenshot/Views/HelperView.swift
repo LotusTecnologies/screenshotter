@@ -36,6 +36,7 @@ public class HelperView : UIView {
         titleLabel.numberOfLines = 0
         titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.padding, right: 0)
         addSubview(titleLabel)
+        titleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
         titleLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -48,6 +49,7 @@ public class HelperView : UIView {
         subtitleLabel.numberOfLines = 0
         subtitleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.extendedPadding, right: 0)
         addSubview(subtitleLabel)
+        subtitleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         subtitleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
         subtitleLabel.topAnchor.constraint(equalTo: titleLabel.layoutMarginsGuide.bottomAnchor).isActive = true
         subtitleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -82,6 +84,7 @@ public class HelperView : UIView {
                 imageView.translatesAutoresizingMaskIntoConstraints = false
                 imageView.contentMode = .scaleAspectFit
                 contentView.addSubview(imageView)
+                imageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .vertical)
                 imageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
                 imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
                 imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
