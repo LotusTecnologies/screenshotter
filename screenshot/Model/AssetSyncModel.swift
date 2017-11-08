@@ -40,10 +40,11 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
-    public weak var foregroundScreenshotDelegate: ForegroundScreenshotProtocol?
+    public weak var screenshotDetectionDelegate: ScreenshotDetectionProtocol?
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
     var selectedScreenshotAssets = Set<PHAsset>()
     var foregroundScreenshotAssetIds = Set<String>()
+    var backgroundScreenshotAssetIds = Set<String>()
     var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
@@ -108,16 +109,22 @@ class AssetSyncModel: NSObject {
                     self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
                 }
                 if isFashion {
-                    if ApplicationStateModel.sharedInstance.isBackground() {
-                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
-                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
-                    } else {
-                        DispatchQueue.main.async {
-                            self.foregroundScreenshotDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                    if isForeground { // Screenshot taken while app in foregorund
+                        if ApplicationStateModel.sharedInstance.isActive() { // App currently in foreground
+                            DispatchQueue.main.async {
+                                self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                            }
+                        } else {  // App currently in background
+                            self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
                         }
-                    }
-                    if isForeground {
                         self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: asset.localIdentifier)
+                    } else { // Screenshot taken while app in background (or killed)
+                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
+                        if ApplicationStateModel.sharedInstance.isActive() { // App currently in foreground
+                            self.backgroundScreenshotAssetIds.insert(asset.localIdentifier)
+                        } else { // App currently in background
+                            self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                        }
                     }
                 }
             }.always(on: self.serialQ) {
@@ -226,8 +233,13 @@ class AssetSyncModel: NSObject {
     func decrementScreenshots() {
         self.screenshotsToProcess -= 1
         if self.screenshotsToProcess == 0 {
+            let backgroundScreenshotIds = Set<String>(backgroundScreenshotAssetIds)
+            backgroundScreenshotAssetIds.removeAll()
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Screenshot)
+                if backgroundScreenshotIds.count > 0 {
+                    self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
+                }
             }
             self.endSync()
         } else if self.screenshotsToProcess < 0 {

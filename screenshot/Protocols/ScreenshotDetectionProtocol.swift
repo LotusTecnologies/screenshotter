@@ -1,5 +1,5 @@
 //
-//  ForegroundScreenshotProtocol.swift
+//  ScreenshotDetectionProtocol.swift
 //  screenshot
 //
 //  Created by Gershon Kagan on 10/31/17.
@@ -8,6 +8,7 @@
 
 import Foundation
 
-@objc protocol ForegroundScreenshotProtocol: NSObjectProtocol {
+@objc protocol ScreenshotDetectionProtocol: NSObjectProtocol {
     @objc func foregroundScreenshotTaken(assetId: String)
+    @objc func backgroundScreenshotsWereTaken(assetIds: Set<String>)
 }
