@@ -28,11 +28,11 @@ PODS:
   - Clarifai-Apple-SDK (3.0.0-beta11)
   - EggRating (0.1.2):
     - RateView
-  - FBSDKCoreKit (4.27.1):
+  - FBSDKCoreKit (4.28.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.27.1):
+  - FBSDKLoginKit (4.28.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.27.1):
+  - FBSDKShareKit (4.28.0):
     - FBSDKCoreKit
   - Firebase/Auth (4.5.0):
     - Firebase/Core
@@ -121,9 +121,9 @@ PODS:
     - PromiseKit/CorePromise
   - Protobuf (3.4.0)
   - RateView (1.2)
-  - SDWebImage (4.2.1):
-    - SDWebImage/Core (= 4.2.1)
-  - SDWebImage/Core (4.2.1)
+  - SDWebImage (4.2.2):
+    - SDWebImage/Core (= 4.2.2)
+  - SDWebImage/Core (4.2.2)
 
 DEPENDENCIES:
   - AFNetworking
@@ -160,9 +160,9 @@ SPEC CHECKSUMS:
   Branch: 307446a687231526f60eef0f12407ca4ed177c32
   Clarifai-Apple-SDK: 4904e1088248191a483f9cdb54b0db4c73ceacc7
   EggRating: ac37ed4dad156c9912a384464a25f554bd4198c8
-  FBSDKCoreKit: 03365dad5d790249196ffad8be4f6d8a2d98f932
-  FBSDKLoginKit: 66ff53b73cffd967ab773e32fac39e90a60e6d46
-  FBSDKShareKit: 6a6a0ef9e850c741e4e1d7a7d21335205e997ec1
+  FBSDKCoreKit: ca961e279113f691fd83dc634c0bbad9d4e3f370
+  FBSDKLoginKit: b077381c27d800f21661757e8140cf2c80a91e4a
+  FBSDKShareKit: 4f525556e0df4cf0f574cb3f01c675434f29d477
   Firebase: d83d287bdb6b1c78320561482706d1fcfc8ddfc1
   FirebaseAnalytics: 722b53c7b32bfc7806b06e0093a2f5180d4f2c5a
   FirebaseAuth: e7c2b1359c2df4af23a568100a8eace0b8c507e4
@@ -180,7 +180,7 @@ SPEC CHECKSUMS:
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   Protobuf: 03eef2ee0b674770735cf79d9c4d3659cf6908e8
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 1fa4c9edf525b744f002db89f3f5a38b3cd4c541
+  SDWebImage: 89a9d32cd520bbb46eb14e541d5109b3564af198
 
 PODFILE CHECKSUM: d51264679cbe2b5cad115cc6226ef01968ec92c1
 
