@@ -232,6 +232,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     return [self newScreenshotsCount] > 0;
 }
 
+- (ScreenshotNotificationCollectionViewCellContentText)notificationContentText {
+    NSUInteger count = [self newScreenshotsCount];
+    
+    if (count == 1) {
+        return ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot;
+        
+    } else if (count > 1) {
+        return ScreenshotNotificationCollectionViewCellContentTextImportMultipleScreenshots;
+        
+    } else {
+        return ScreenshotNotificationCollectionViewCellContentTextNone;
+    }
+}
+
 
 #pragma mark - Collection View
 
@@ -272,7 +286,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     if (indexPath.section == ScreenshotsSectionNotification) {
         size.width = floor(collectionView.bounds.size.width - (padding * 2));
-        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         
     } else if (indexPath.section == ScreenshotsSectionImage) {
         NSInteger columns = [self numberOfCollectionViewImageColumns];
@@ -290,7 +304,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         cell.delegate = self;
         cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.iconImage = [UIImage imageNamed:@"NotificationSnapshot"];
-        cell.contentText = ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot;
+        cell.contentText = [self notificationContentText];
         [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         return cell;
 
