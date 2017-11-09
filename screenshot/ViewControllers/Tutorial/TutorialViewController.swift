@@ -62,15 +62,15 @@ class TutorialViewController : UIViewController {
     
     // MARK: - Initialization
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         slides = buildSlides()
         updatePromptHandler = UpdatePromptHandler(containerViewController: self)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - UIViewController
@@ -103,8 +103,11 @@ class TutorialViewController : UIViewController {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
         
+        // TODO: better small screen layout
+        let is480h = UIDevice.is480h
+        
         NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
+            contentView.topAnchor.constraint(equalTo: is480h ? topLayoutGuide.topAnchor : topLayoutGuide.bottomAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),

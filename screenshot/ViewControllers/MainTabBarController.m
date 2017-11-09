@@ -12,7 +12,7 @@
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ForegroundScreenshotProtocol> {
+@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -93,7 +93,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
         
-        [AssetSyncModel sharedInstance].foregroundScreenshotDelegate = self;
+        [AssetSyncModel sharedInstance].screenshotDetectionDelegate = self;
     }
     return self;
 }
@@ -111,11 +111,11 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [self refreshTabBarSettingsBadge];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    [self attemptPresentNotification];
-}
+//- (void)viewDidAppear:(BOOL)animated {
+//    [super viewDidAppear:animated];
+//
+//    [self attemptPresentNotification];
+//}
 
 - (void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
@@ -130,7 +130,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
-        [self attemptPresentNotification];
+//        [self attemptPresentNotification];
     }
 }
 
@@ -172,7 +172,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)dealloc {
     [self dismissTabBarSettingsBadge];
     
-    [AssetSyncModel sharedInstance].foregroundScreenshotDelegate = nil;
+    [AssetSyncModel sharedInstance].screenshotDetectionDelegate = nil;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -287,7 +287,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 }
 
 - (void)backgroundScreenshotsWereTakenWithAssetIds:(NSSet<NSString *> *)assetIds {
-    
+    [self.screenshotsNavigationController.screenshotsViewController presentNotificationCell];
 }
 
 @end

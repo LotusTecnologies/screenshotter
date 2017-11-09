@@ -38,6 +38,9 @@ class UserDefaultsKeys : NSObject {
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
     
+    // Clarifai
+    static let isModelDownloaded = "IsModelDownloaded"
+    
     // Game
     static let gameScore = "GameScore"
 }

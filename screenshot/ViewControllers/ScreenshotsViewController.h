@@ -28,4 +28,7 @@
 
 - (void)scrollTopTop;
 
+- (void)presentNotificationCell;
+- (void)dismissNotificationCell;
+
 @end

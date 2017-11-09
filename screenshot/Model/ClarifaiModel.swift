@@ -18,14 +18,18 @@ class ClarifaiModel: NSObject {
         let _ = ClarifaiModel.sharedInstance
     }
 
+    var isModelDownloaded = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isModelDownloaded)
+
+    
     override init() {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadStarted), name: Notification.Name.CAIWillFetchModel, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidFetchModel, object: nil)
         Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
-        if UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) == nil {
-            if let image = UIImage.init(named: "ControlX") {
-                let _ = localClarifaiOutputs(image: image)
+        if !isModelDownloaded,
+          let image = UIImage.init(named: "ControlX") {
+            localPredict(image: image) { (outputs: [Output]?, error: Error?) in
+                // Don't care about the results, just kick off prepping the model.
             }
         }
     }
@@ -41,16 +45,26 @@ class ClarifaiModel: NSObject {
     
     func modelDownloadFinished() {
         NSLog("modelDownloadFinished")
+        isModelDownloaded = true
+        UserDefaults.standard.set(isModelDownloaded, forKey: UserDefaultsKeys.isModelDownloaded)
         track("finished downloading Clarifai model")
     }
     
-    func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
+    func localPredict(image: UIImage, completionHandler: @escaping ([Output]?, Error?) -> Void) {
         let localImage = Image(image: image)
         let dataAsset = DataAsset(image: localImage)
         let input = Input(dataAsset: dataAsset)
         let generalModel = Clarifai.sharedInstance().generalModel
+        generalModel.predict([input], completionHandler: completionHandler)
+    }
+    
+    func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
+        guard isModelDownloaded else {
+            let error = NSError(domain: "Craze", code: 19, userInfo: [NSLocalizedDescriptionKey : "Clarifai model unavailable"])
+            return Promise(error: error)
+        }
         return Promise { fulfill, reject in
-            generalModel.predict([input]) { (outputs: [Output]?, error: Error?) in
+            localPredict(image: image) { (outputs: [Output]?, error: Error?) in
                 if let error = error {
                     reject(error)
                 } else if let outputs = outputs {

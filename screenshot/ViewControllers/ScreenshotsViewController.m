@@ -29,8 +29,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 @property (nonatomic) BOOL shouldDisplayInfoCell;
 
-@property (nonatomic) NSUInteger i;
-
 @end
 
 @implementation ScreenshotsViewController
@@ -52,8 +50,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [DataModel sharedInstance].screenshotFrcDelegate = self;
         self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
-        
-        self.i = 0;
     }
     return self;
 }
@@ -124,16 +120,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        
-        [self presentNotificationCell];
-        
-    });
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -239,7 +225,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 #pragma mark - Collection View Sections
 
 - (NSUInteger)newScreenshotsCount {
-    return self.i;//[[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+    return [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
 }
 
 - (BOOL)hasNewScreenshot {
@@ -369,13 +355,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)presentNotificationCell {
-    self.i = 1;
-    [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+    if ([self newScreenshotsCount] > 0 && [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] == 0) {
+        [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+    }
 }
 
 - (void)dismissNotificationCell {
-    self.i = 0;
-    [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+    if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
+        [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+    }
 }
 
 

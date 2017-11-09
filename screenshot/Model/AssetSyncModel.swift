@@ -40,16 +40,18 @@ class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
-    public weak var foregroundScreenshotDelegate: ForegroundScreenshotProtocol?
+    public weak var screenshotDetectionDelegate: ScreenshotDetectionProtocol?
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
     var selectedScreenshotAssets = Set<PHAsset>()
-//    var changedAssetIds: [String] = []
+    var foregroundScreenshotAssetIds = Set<String>()
+    var backgroundScreenshotAssetIds = Set<String>()
     var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
     var isRegistered = false
     var isSyncing = false
     var shouldSyncAgain = false
+    var isNextScreenshotForeground = false
     var screenshotsToProcess: Int = 0
     var shoppablesToProcess: Int = 0
     
@@ -58,6 +60,11 @@ class AssetSyncModel: NSObject {
     override init() {
         super.init()
         registerForPhotoChanges()
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func registerForPhotoChanges() {
@@ -69,8 +76,13 @@ class AssetSyncModel: NSObject {
         isRegistered = true
     }
     
+    @objc func applicationUserDidTakeScreenshot() {
+        print("AssetSyncModel applicationUserDidTakeScreenshot")
+        isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
+    }
+    
     func uploadScreenshotWithClarifai(asset: PHAsset) {
-        let isBackground = ApplicationStateModel.sharedInstance.isBackground()
+        let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
@@ -87,23 +99,32 @@ class AssetSyncModel: NSObject {
                                                          createdAt: asset.creationDate,
                                                          isFashion: isFashion,
                                                          isFromShare: false,
-                                                         isHidden: !isFashion || isBackground,
+                                                         isHidden: !isFashion || !isForeground,
                                                          imageData: imageData)
                         fulfill((isFashion, imageData))
                     }
                 }
             }.then (on: processingQ) { isFashion, imageData -> Void in
+                if isForeground {
+                    self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
+                }
                 if isFashion {
-                    if ApplicationStateModel.sharedInstance.isBackground() {
-                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
-                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
-                    } else {
-                        DispatchQueue.main.async {
-                            self.foregroundScreenshotDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                    if isForeground { // Screenshot taken while app in foregorund
+                        if ApplicationStateModel.sharedInstance.isActive() { // App currently in foreground
+                            DispatchQueue.main.async {
+                                self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                            }
+                        } else {  // App currently in background
+                            self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
                         }
-                    }
-                    if !isBackground {
                         self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: asset.localIdentifier)
+                    } else { // Screenshot taken while app in background (or killed)
+                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
+                        if ApplicationStateModel.sharedInstance.isActive() { // App currently in foreground
+                            self.backgroundScreenshotAssetIds.insert(asset.localIdentifier)
+                        } else { // App currently in background
+                            self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                        }
                     }
                 }
             }.always(on: self.serialQ) {
@@ -212,8 +233,13 @@ class AssetSyncModel: NSObject {
     func decrementScreenshots() {
         self.screenshotsToProcess -= 1
         if self.screenshotsToProcess == 0 {
+            let backgroundScreenshotIds = Set<String>(backgroundScreenshotAssetIds)
+            backgroundScreenshotAssetIds.removeAll()
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Screenshot)
+                if backgroundScreenshotIds.count > 0 {
+                    self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
+                }
             }
             self.endSync()
         } else if self.screenshotsToProcess < 0 {
@@ -563,7 +589,6 @@ class AssetSyncModel: NSObject {
     
     func beginSync() {
         isSyncing = true
-//print("beginSync isSyncing now true")
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
@@ -577,7 +602,6 @@ class AssetSyncModel: NSObject {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
         }
         isSyncing = false
-//print("endSync isSyncing now false")
         if shouldSyncAgain {
             shouldSyncAgain = false
             syncPhotos()
@@ -590,11 +614,9 @@ class AssetSyncModel: NSObject {
     
     func isSyncReady() -> Bool {
         if isSyncing {
-//print("isSyncReady isSyncing found true. notReady")
             shouldSyncAgain = true
             return false
         }
-//print("isSyncReady isSyncing found false. ready")
         return true
     }
     
@@ -624,19 +646,12 @@ class AssetSyncModel: NSObject {
             var dbSet = Set<String>()
             managedObjectContext.performAndWait {
                 dbSet = dataModel.retrieveAllAssetIds(managedObjectContext: managedObjectContext)
-//                let toDeleteFromDB = dbSet.subtracting(photosSet)//.union(changedAssetIds)
-//                self.countAndPrint(name: "toDeleteFromDB", set: toDeleteFromDB)
-//                if toDeleteFromDB.count > 0 {
-//                    dataModel.deleteScreenshots(managedObjectContext: managedObjectContext, assetIds: toDeleteFromDB)
-//                }
             }
             let toRetry = selectedSet.intersection(dbSet)
             let toBypassClarifai = selectedSet.subtracting(dbSet)
             let toUpload = futureSet.subtracting(selectedSet).subtracting(dbSet)//.union(changedAssetIds)
             let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
             self.incomingDynamicLinks.removeAll()
-            // TODO: Remove changedAssetIds as each screenshot is successfully saved.
-            //changedAssetIds = []
             self.countAndPrint(name: "selectedSet", set: selectedSet)
             self.countAndPrint(name: "futureSet", set: futureSet)
             self.countAndPrint(name: "dbSet", set: dbSet)
@@ -802,14 +817,12 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             return
         }
         if let changes = changeInstance.changeDetails(for: allScreenshotAssets),
-            changes.hasIncrementalChanges {
-            //                let changedAssets = changes.changedObjects
-            //                if changedAssets.count > 0 {
-            //                    for changedAsset in changedAssets {
-            //                        changedAssetIds.append(changedAsset.localIdentifier)
-            //                    }
-            //                }
-            //                print("photoLibraryDidChange changedAssets count:\(changedAssets.count)")
+          changes.hasIncrementalChanges {
+            if let foregroundScreenshotAssetId = changes.insertedObjects.first?.localIdentifier,
+                isNextScreenshotForeground {
+                self.foregroundScreenshotAssetIds.insert(foregroundScreenshotAssetId)
+                isNextScreenshotForeground = false
+            }
             syncPhotos()
         }
     }

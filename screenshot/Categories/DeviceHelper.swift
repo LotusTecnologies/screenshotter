@@ -17,5 +17,6 @@ extension UIDevice {
 // MARK: Size
 
 extension UIDevice {
+    static let is480h = UIScreen.main.bounds.size.height == 480
     static let is568h = UIScreen.main.bounds.size.height == 568
 }
