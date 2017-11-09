@@ -25,12 +25,10 @@ class ClarifaiModel: NSObject {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadStarted), name: Notification.Name.CAIWillFetchModel, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidFetchModel, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(modelAvailable), name: Notification.Name.CAIModelDidBecomeAvailable, object: nil)
         Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
-        if !isModelDownloaded,
-          let image = UIImage.init(named: "ControlX") {
-            localPredict(image: image) { (outputs: [Output]?, error: Error?) in
-                // Don't care about the results, just kick off prepping the model.
-            }
+        if !isModelDownloaded {
+            kickoffModelDownload()
         }
     }
     
@@ -48,6 +46,20 @@ class ClarifaiModel: NSObject {
         isModelDownloaded = true
         UserDefaults.standard.set(isModelDownloaded, forKey: UserDefaultsKeys.isModelDownloaded)
         track("finished downloading Clarifai model")
+    }
+    
+    func modelAvailable() {
+        NSLog("modelAvailable")
+        isModelDownloaded = true
+        UserDefaults.standard.set(isModelDownloaded, forKey: UserDefaultsKeys.isModelDownloaded)
+    }
+    
+    func kickoffModelDownload() {
+        if let image = UIImage.init(named: "ControlX") {
+            localPredict(image: image) { (outputs: [Output]?, error: Error?) in
+                // Don't care about the results, just kick off prepping the model.
+            }
+        }
     }
     
     func localPredict(image: UIImage, completionHandler: @escaping ([Output]?, Error?) -> Void) {
