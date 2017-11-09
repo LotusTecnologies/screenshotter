@@ -103,6 +103,10 @@
     }
 }
 
+- (void)screenshotsViewControllerWantsToPresentPicker:(ScreenshotsViewController *)viewController {
+    [self presentPickerViewController];
+}
+
 
 #pragma mark - Products View Controller
 

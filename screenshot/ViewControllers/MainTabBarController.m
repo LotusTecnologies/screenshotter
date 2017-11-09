@@ -286,4 +286,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     }
 }
 
+- (void)backgroundScreenshotsWereTakenWithAssetIds:(NSSet<NSString *> *)assetIds {
+    
+}
+
 @end

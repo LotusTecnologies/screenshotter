@@ -12,6 +12,12 @@ import Foundation
     case labelWithButtons
 }
 
+@objc enum ScreenshotNotificationCollectionViewCellContentText: UInt {
+    case none
+    case importSingleScreenshot
+    case importMultipleScreenshots
+}
+
 @objc protocol ScreenshotNotificationCollectionViewCellDelegate: NSObjectProtocol {
     @objc optional func screenshotNotificationCollectionViewCellDidTapReject(_ cell: ScreenshotNotificationCollectionViewCell)
     @objc optional func screenshotNotificationCollectionViewCellDidTapConfirm(_ cell: ScreenshotNotificationCollectionViewCell)
@@ -84,7 +90,6 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         }
         
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = text
         tempContentView.addSubview(label)
         label.topAnchor.constraint(equalTo: tempContentView.topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: tempContentView.leadingAnchor).isActive = true
@@ -168,12 +173,6 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
     
     // MARK: Label / Text
     
-    var text: String? {
-        didSet {
-            tempContentLabel?.text = text
-        }
-    }
-    
     private var _tempContentLabel: UILabel?
     fileprivate var tempContentLabel: UILabel? {
         set {
@@ -192,21 +191,45 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
+    var contentText = ScreenshotNotificationCollectionViewCellContentText.none {
+        didSet {
+            tempContentLabel?.text = type(of: self).text(forContentText: contentText)
+        }
+    }
+    
+    fileprivate static func text(forContentText contentText: ScreenshotNotificationCollectionViewCellContentText) -> String? {
+        let text: String?
+        
+        switch contentText {
+        case .none:
+            text = nil
+            break
+        case .importSingleScreenshot:
+            text = "Import your latest screenshot?"
+            break
+        case .importMultipleScreenshots:
+            text = "You have \(AccumulatorModel.sharedInstance.getNewScreenshotsCount()) new screenshots, do you want to import them?"
+            break
+        }
+        
+        return text
+    }
+    
     fileprivate static let labelFont = UIFont.preferredFont(forTextStyle: .body)
 }
 
 // MARK: - Size
 
 extension ScreenshotNotificationCollectionViewCell {
-    static func height(withCellWidth width: CGFloat, text: String, contentType: ScreenshotNotificationCollectionViewCellContentType) -> CGFloat {
-        guard width > 0, text.count > 0 else {
+    static func height(withCellWidth width: CGFloat, contentText: ScreenshotNotificationCollectionViewCellContentText, contentType: ScreenshotNotificationCollectionViewCellContentType) -> CGFloat {
+        guard width > 0, let string = text(forContentText: contentText) else {
             return CGFloat(0)
         }
         
         let contentWidth = width - shadowInsets.left - mainViewLayoutMargins.left - iconWidth - mainViewLayoutMargins.left - mainViewLayoutMargins.right - shadowInsets.right
         let constraintRect = CGSize(width: CGFloat(contentWidth), height: .greatestFiniteMagnitude)
         
-        let boundingBox = text.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
+        let boundingBox = string.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
         
         return shadowInsets.top + mainViewLayoutMargins.top + ceil(boundingBox.height) + mainViewLayoutMargins.top + buttonHeight + mainViewLayoutMargins.bottom + shadowInsets.bottom
     }

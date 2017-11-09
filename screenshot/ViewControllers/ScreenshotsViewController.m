@@ -29,6 +29,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 @property (nonatomic) BOOL shouldDisplayInfoCell;
 
+@property (nonatomic) NSUInteger i;
+
 @end
 
 @implementation ScreenshotsViewController
@@ -50,6 +52,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [DataModel sharedInstance].screenshotFrcDelegate = self;
         self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+        
+        self.i = 0;
     }
     return self;
 }
@@ -120,6 +124,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [super viewWillAppear:animated];
     
     [self syncHelperViewVisibility];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+        [self presentNotificationCell];
+        
+    });
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -222,6 +236,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 
+#pragma mark - Collection View Sections
+
+- (NSUInteger)newScreenshotsCount {
+    return self.i;//[[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+}
+
+- (BOOL)hasNewScreenshot {
+    return [self newScreenshotsCount] > 0;
+}
+
+
 #pragma mark - Collection View
 
 - (NSInteger)numberOfCollectionViewImageColumns {
@@ -234,7 +259,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ScreenshotsSectionNotification) {
-        return 1;
+        return [self hasNewScreenshot];
 
     } else if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjects.count;
@@ -245,14 +270,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
-    if (section == ScreenshotsSectionNotification) {
-        CGFloat y = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
-        
-        return CGSizeMake(0.f, y);
-        
-    } else {
-        return CGSizeZero;
+    CGSize size = CGSizeZero;
+    
+    if (section == ScreenshotsSectionNotification && [self hasNewScreenshot]) {
+        size.height = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
     }
+    
+    return size;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -261,10 +285,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
     if (indexPath.section == ScreenshotsSectionNotification) {
-        NSString *text = @"Import your latest screenshot?";
-        
         size.width = floor(collectionView.bounds.size.width - (padding * 2));
-        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width text:text contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         
     } else if (indexPath.section == ScreenshotsSectionImage) {
         NSInteger columns = [self numberOfCollectionViewImageColumns];
@@ -282,7 +304,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         cell.delegate = self;
         cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.iconImage = [UIImage imageNamed:@"NotificationSnapshot"];
-        cell.text = @"Import your latest screenshot?";
+        cell.contentText = ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot;
         [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         return cell;
 
@@ -329,11 +351,31 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 #pragma mark - Notification Cell
 
 - (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
-    
+    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+    [self dismissNotificationCell];
 }
 
 - (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
+    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
     
+    if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot) {
+        [[AssetSyncModel sharedInstance] refetchLastScreenshot];
+        
+    } else if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportMultipleScreenshots) {
+        [self.delegate screenshotsViewControllerWantsToPresentPicker:self];
+    }
+    
+    [self dismissNotificationCell];
+}
+
+- (void)presentNotificationCell {
+    self.i = 1;
+    [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+}
+
+- (void)dismissNotificationCell {
+    self.i = 0;
+    [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
 }
 
 

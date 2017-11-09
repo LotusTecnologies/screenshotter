@@ -16,6 +16,7 @@
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)screenshotsViewControllerDeletedLastScreenshot:(ScreenshotsViewController *)viewController;
+- (void)screenshotsViewControllerWantsToPresentPicker:(ScreenshotsViewController *)viewController;
 
 @end
 
