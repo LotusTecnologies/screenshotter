@@ -70,9 +70,7 @@
             // Go back into Products before presenting the next view
             self.previousDidAppearViewControllerClass = nil;
 
-        } else if ([self needsToPresentPushAlert] &&
-                   [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
-        {
+        } else if ([self needsToPresentPushAlert]) {
             [self presentPushAlert];
         }
     }
@@ -139,7 +137,11 @@
 }
 
 - (void)pickerViewControllerDidCancel {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        if ([self needsToPresentPushAlert]) {
+            [self presentPushAlert];
+        }
+    }];
 }
 
 - (void)pickerViewControllerDidFinish {
@@ -153,7 +155,7 @@
 #pragma mark - Push Permission
 
 - (BOOL)needsToPresentPushAlert {
-    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert];
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] && [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto];
 }
 
 - (void)presentPushAlert {
