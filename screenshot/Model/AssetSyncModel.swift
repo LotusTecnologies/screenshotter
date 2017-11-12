@@ -233,13 +233,8 @@ class AssetSyncModel: NSObject {
     func decrementScreenshots() {
         self.screenshotsToProcess -= 1
         if self.screenshotsToProcess == 0 {
-            let backgroundScreenshotIds = Set<String>(backgroundScreenshotAssetIds)
-            backgroundScreenshotAssetIds.removeAll()
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Screenshot)
-                if backgroundScreenshotIds.count > 0 {
-                    self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
-                }
             }
             self.endSync()
         } else if self.screenshotsToProcess < 0 {
@@ -598,8 +593,13 @@ class AssetSyncModel: NSObject {
     }
     
     func endSync() {
+        let backgroundScreenshotIds = Set<String>(backgroundScreenshotAssetIds)
+        backgroundScreenshotAssetIds.removeAll()
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            if ApplicationStateModel.sharedInstance.isActive() && (backgroundScreenshotIds.count > 0 || AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) {
+                self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
+            }
         }
         isSyncing = false
         if shouldSyncAgain {
