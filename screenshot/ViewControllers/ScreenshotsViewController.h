@@ -28,7 +28,7 @@
 
 - (void)scrollTopTop;
 
-- (void)presentNotificationCell;
+- (void)presentNotificationCellWithAssetId:(NSString *)assetId;
 - (void)dismissNotificationCell;
 
 @end

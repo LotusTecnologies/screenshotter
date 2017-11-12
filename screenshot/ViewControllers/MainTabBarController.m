@@ -253,7 +253,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 }
 
 - (void)backgroundScreenshotsWereTakenWithAssetIds:(NSSet<NSString *> *)assetIds {
-    [self.screenshotsNavigationController.screenshotsViewController presentNotificationCell];
+    // ???: Gershon why is this called multiple times?
+    [self.screenshotsNavigationController.screenshotsViewController presentNotificationCellWithAssetId:[assetIds anyObject]];
 }
 
 @end

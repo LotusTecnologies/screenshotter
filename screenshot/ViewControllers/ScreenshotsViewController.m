@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
 @property (nonatomic, strong) NSDate *lastVisited;
 
-@property (nonatomic) BOOL shouldDisplayInfoCell;
+@property (nonatomic, copy) NSString *notificationCellAssetId;
 
 @end
 
@@ -303,9 +303,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
         cell.delegate = self;
         cell.contentView.backgroundColor = collectionView.backgroundColor;
-        cell.iconImage = [UIImage imageNamed:@"NotificationSnapshot"];
         cell.contentText = [self notificationContentText];
         [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+        cell.iconImage = nil;
+        
+        [[AssetSyncModel sharedInstance] imageWithAssetId:self.notificationCellAssetId callback:^(UIImage *image, NSDictionary *info) {
+//            if (!cell.iconImage) {
+                cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
+//            }
+        }];
+        
         return cell;
 
     } else if (indexPath.section == ScreenshotsSectionImage) {
@@ -368,9 +375,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [self dismissNotificationCell];
 }
 
-- (void)presentNotificationCell {
-    if ([self newScreenshotsCount] > 0 && [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] == 0) {
-        [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+- (void)presentNotificationCellWithAssetId:(NSString *)assetId {
+    if ([self newScreenshotsCount] > 0) {
+        self.notificationCellAssetId = assetId;
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification];
+        
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] == 0) {
+            [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+            
+        } else {
+            [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+        }
     }
 }
 
