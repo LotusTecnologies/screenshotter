@@ -22,9 +22,9 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
-  - Branch (0.20.2):
-    - Branch/Core (= 0.20.2)
-  - Branch/Core (0.20.2)
+  - Branch (0.20.3):
+    - Branch/Core (= 0.20.3)
+  - Branch/Core (0.20.3)
   - Clarifai-Apple-SDK (3.0.0-beta11)
   - EggRating (0.1.2):
     - RateView
@@ -157,7 +157,7 @@ SPEC CHECKSUMS:
   Analytics: 2c09a50e3478a3a7ced08a22d00c43ba6f7011e6
   Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Branch: 307446a687231526f60eef0f12407ca4ed177c32
+  Branch: eec127cb61e0f7f1aa9c351adcad22fa980e001d
   Clarifai-Apple-SDK: 4904e1088248191a483f9cdb54b0db4c73ceacc7
   EggRating: ac37ed4dad156c9912a384464a25f554bd4198c8
   FBSDKCoreKit: ca961e279113f691fd83dc634c0bbad9d4e3f370
