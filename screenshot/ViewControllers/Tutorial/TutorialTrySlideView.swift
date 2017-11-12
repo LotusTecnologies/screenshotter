@@ -19,8 +19,15 @@ public class TutorialTrySlideView : HelperView {
         super.init(frame: frame)
         
         titleLabel.text = "Try It Out"
-        subtitleLabel.text = "Press the home & power buttons to take a screenshot of this page"
-        contentImage = UIImage(named: "TutorialTryGraphic")
+        
+        if UIDevice.isHomeButtonless {
+            subtitleLabel.text = "Press the volume up & power buttons to take a screenshot of this page"
+            contentImage = UIImage(named: "TutorialTryGraphicX")
+            
+        } else {
+            subtitleLabel.text = "Press the home & power buttons to take a screenshot of this page"
+            contentImage = UIImage(named: "TutorialTryGraphic")
+        }
         
         if UIDevice.isSimulator {
             addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(applicationUserDidTakeScreenshot)))
@@ -72,5 +79,4 @@ extension TutorialTrySlideView : TutorialSlideView {
     public func willLeaveSlide() {
         NotificationCenter.default.removeObserver(self)
     }
-        
 }

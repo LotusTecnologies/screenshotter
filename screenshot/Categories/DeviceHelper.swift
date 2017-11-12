@@ -11,7 +11,15 @@ import Foundation
 // MARK: Type
 
 extension UIDevice {
-    static let isSimulator: Bool = ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
+    static let isSimulator = ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
+    
+    static var isHomeButtonless: Bool {
+        guard #available(iOS 11, *), let window = UIApplication.shared.windows.first else {
+            return false
+        }
+        
+        return window.safeAreaInsets.bottom > 0
+    }
 }
 
 // MARK: Size
