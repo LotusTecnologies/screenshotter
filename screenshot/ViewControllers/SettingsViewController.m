@@ -9,7 +9,6 @@
 #import "SettingsViewController.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
-#import "WebViewController.h"
 #import "screenshot-Swift.h"
 
 @import MessageUI;

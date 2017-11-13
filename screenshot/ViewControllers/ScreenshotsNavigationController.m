@@ -105,10 +105,12 @@
 #pragma mark - Products View Controller
 
 - (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = [viewController productAtIndex:indexPath.item];
-    
-    self.webViewController.url = [NSURL URLWithString:product.offer];
-    [self pushViewController:self.webViewController animated:YES];
+    if (![self.topViewController isKindOfClass:[WebViewController class]]) {
+        Product *product = [viewController productAtIndex:indexPath.item];
+        
+        self.webViewController.url = [NSURL URLWithString:product.offer];
+        [self pushViewController:self.webViewController animated:YES];
+    }
 }
 
 
