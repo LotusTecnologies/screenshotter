@@ -44,3 +44,18 @@ class UserDefaultsKeys : NSObject {
     // Game
     static let gameScore = "GameScore"
 }
+
+extension UIApplication {
+    static func migrateUserDefaultsKeys() {
+        // Version 1.3 keys
+        if UserDefaults.standard.bool(forKey: "TutorialCompleted") {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
+        }
+        if UserDefaults.standard.bool(forKey: "TutorialPresentedScreenshotHelper") {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
+        }
+        if UserDefaults.standard.bool(forKey: "TutorialPresentedProductHelper") {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedProductHelper)
+        }
+    }
+}

@@ -32,7 +32,7 @@ class TutorialWelcomeSlideView : HelperView {
         button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
-        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor, constant: is480h ? 0 : -Geometry.extendedPadding).isActive = true
+        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor, constant: is480h ? 0 : -.extendedPadding).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
     }
     

@@ -258,7 +258,7 @@ private class NotificationView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let padding = Geometry.padding
+        let padding = CGFloat.padding
         
         let backgroundView = UIView()
         backgroundView.translatesAutoresizingMaskIntoConstraints = false

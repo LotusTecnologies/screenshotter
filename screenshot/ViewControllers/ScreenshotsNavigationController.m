@@ -70,9 +70,7 @@
             // Go back into Products before presenting the next view
             self.previousDidAppearViewControllerClass = nil;
 
-        } else if ([self needsToPresentPushAlert] &&
-                   [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto])
-        {
+        } else if ([self needsToPresentPushAlert]) {
             [self presentPushAlert];
         }
     }
@@ -111,10 +109,12 @@
 #pragma mark - Products View Controller
 
 - (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = [viewController productAtIndex:indexPath.item];
-    
-    self.webViewController.url = [NSURL URLWithString:product.offer];
-    [self pushViewController:self.webViewController animated:YES];
+    if (![self.topViewController isKindOfClass:[WebViewController class]]) {
+        Product *product = [viewController productAtIndex:indexPath.item];
+        
+        self.webViewController.url = [NSURL URLWithString:product.offer];
+        [self pushViewController:self.webViewController animated:YES];
+    }
 }
 
 
@@ -143,7 +143,11 @@
 }
 
 - (void)pickerViewControllerDidCancel {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        if ([self needsToPresentPushAlert]) {
+            [self presentPushAlert];
+        }
+    }];
 }
 
 - (void)pickerViewControllerDidFinish {
@@ -157,7 +161,7 @@
 #pragma mark - Push Permission
 
 - (BOOL)needsToPresentPushAlert {
-    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert];
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] && [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto];
 }
 
 - (void)presentPushAlert {

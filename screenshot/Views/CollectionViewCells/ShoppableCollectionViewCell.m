@@ -22,7 +22,9 @@
     if (self) {
         self.contentView.backgroundColor = [UIColor whiteColor];
         self.layer.borderColor = [self borderColor].CGColor;
-        self.layer.borderWidth = 1.f;
+        self.layer.borderWidth = 1.5f;
+        self.layer.cornerRadius = [Geometry defaultCornerRadius];
+        self.layer.masksToBounds = YES;
         
         _imageView = ({
             UIImageView *imageView = [[UIImageView alloc] init];
@@ -46,7 +48,7 @@
 }
 
 - (UIColor *)borderColor {
-    return [UIColor colorWithWhite:193.f/255.f alpha:1.f];
+    return [UIColor gray8];
 }
 
 - (void)setImage:(UIImage *)image {

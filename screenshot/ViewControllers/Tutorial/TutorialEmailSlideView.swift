@@ -35,8 +35,8 @@ public class TutorialEmailSlideView : HelperView {
         // TODO: better small screen layout
         let is480h = UIDevice.is480h
         
-        let p = is480h ? Geometry.padding / 2 : Geometry.padding
-        let p2 = is480h ? Geometry.extendedPadding / 2 : Geometry.extendedPadding
+        let p = is480h ? CGFloat.padding / 2 : CGFloat.padding
+        let p2 = is480h ? CGFloat.extendedPadding / 2 : CGFloat.extendedPadding
         
         let nameLabel = { _ -> UILabel in
             let label = UILabel()

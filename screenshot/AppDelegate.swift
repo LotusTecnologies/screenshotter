@@ -32,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
         
+        UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
         prepareDataStackCompletionIfNeeded()

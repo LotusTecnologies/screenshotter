@@ -13,6 +13,7 @@
 
 @interface ProductCollectionViewCell ()
 
+@property (nonatomic, strong) UIView *shadowView;
 @property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *priceLabel;
@@ -25,17 +26,37 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        _shadowView = ({
+            CGRect pathRect = CGRectMake(0.f, 0.f, self.bounds.size.width, self.bounds.size.width);
+            
+            UIView *view = [[UIView alloc] init];
+            view.translatesAutoresizingMaskIntoConstraints = NO;
+            view.layoutMargins = [_Shadow layoutMargins];
+            view.layer.shadowColor = [_Shadow color].CGColor;
+            view.layer.shadowOffset = [_Shadow offset];
+            view.layer.shadowRadius = [_Shadow radius];
+            view.layer.shadowOpacity = 1.f;
+            view.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:[_Shadow pathRect:pathRect] cornerRadius:[Geometry defaultCornerRadius]].CGPath;
+            [self.contentView addSubview:view];
+            [view.layoutMarginsGuide.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
+            [view.layoutMarginsGuide.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+            [view.layoutMarginsGuide.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            [view.heightAnchor constraintEqualToAnchor:view.widthAnchor].active = YES;
+            view;
+        });
+        
         _imageView = ({
             UIImageView *imageView = [[UIImageView alloc] init];
             imageView.translatesAutoresizingMaskIntoConstraints = NO;
             imageView.backgroundColor = [UIColor whiteColor];
             imageView.contentMode = UIViewContentModeScaleAspectFit;
             imageView.clipsToBounds = YES;
-            [self.contentView addSubview:imageView];
-            [imageView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
-            [imageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [imageView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-            [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor].active = YES;
+            imageView.layer.cornerRadius = [Geometry defaultCornerRadius];
+            [self.shadowView addSubview:imageView];
+            [imageView.topAnchor constraintEqualToAnchor:self.shadowView.topAnchor].active = YES;
+            [imageView.leadingAnchor constraintEqualToAnchor:self.shadowView.leadingAnchor].active = YES;
+            [imageView.bottomAnchor constraintEqualToAnchor:self.shadowView.bottomAnchor].active = YES;
+            [imageView.trailingAnchor constraintEqualToAnchor:self.shadowView.trailingAnchor].active = YES;
             imageView;
         });
         
@@ -52,8 +73,8 @@
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] titleLableHeight]].active = YES;
             
             [label.topAnchor constraintEqualToAnchor:self.imageView.bottomAnchor].active = YES;
-            [label.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [label.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            [label.leadingAnchor constraintEqualToAnchor:self.imageView.leadingAnchor].active = YES;
+            [label.trailingAnchor constraintEqualToAnchor:self.imageView.trailingAnchor].active = YES;
             label;
         });
         
@@ -68,8 +89,8 @@
             [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;
             
             [label.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor].active = YES;
-            [label.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [label.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+            [label.leadingAnchor constraintEqualToAnchor:self.titleLabel.leadingAnchor].active = YES;
+            [label.trailingAnchor constraintEqualToAnchor:self.titleLabel.trailingAnchor].active = YES;
             [label.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
             label;
         });
@@ -85,6 +106,16 @@
         });
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    if (!CGRectIsEmpty(self.shadowView.bounds) &&
+        !CGSizeEqualToSize(CGPathGetBoundingBox(self.shadowView.layer.shadowPath).size, self.shadowView.bounds.size))
+    {
+        self.shadowView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.shadowView.bounds cornerRadius:[Geometry defaultCornerRadius]].CGPath;
+    }
 }
 
 

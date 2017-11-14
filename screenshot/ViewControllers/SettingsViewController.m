@@ -9,7 +9,6 @@
 #import "SettingsViewController.h"
 #import "PermissionsManager.h"
 #import "UIApplication+Version.h"
-#import "WebViewController.h"
 #import "screenshot-Swift.h"
 
 @import MessageUI;
@@ -131,10 +130,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView.editable = NO;
         textView.scrollsToTop = NO;
         textView.scrollEnabled = NO;
-        textView.dataDetectorTypes = UIDataDetectorTypePhoneNumber | UIDataDetectorTypeLink;
+        textView.dataDetectorTypes = UIDataDetectorTypeLink;
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
-        textView.text = @"Questions? Get in touch: (212) 202-0991\nOr info@crazeapp.com";
+        textView.text = @"Questions? Get in touch: info@crazeapp.com";
         textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                         NSUnderlineColorAttributeName: [UIColor gray7]
                                         };

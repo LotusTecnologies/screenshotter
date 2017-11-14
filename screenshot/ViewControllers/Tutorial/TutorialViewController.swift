@@ -154,14 +154,13 @@ class TutorialViewController : UIViewController {
     }
     
     private func prepareSlideViews() {
-        let padding = Geometry.padding
         let top = contentView.layoutMargins.top
         
         slides.enumerated().forEach { i, slide in
             slide.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview(slide)
             
-            slide.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+            slide.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
             
             NSLayoutConstraint.activate([
                 slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor),

@@ -30,6 +30,32 @@ struct Shadow {
     private(set) var offset: CGSize;
     private(set) var color: UIColor;
     
+    var insets: UIEdgeInsets {
+        let inset = radius * 2
+        
+        var insets = UIEdgeInsets.zero
+        insets.top = inset - offset.height
+        insets.left = inset
+        insets.bottom = inset + offset.height
+        insets.right = inset
+        return insets
+    }
+    
+    var layoutMargins: UIEdgeInsets {
+        var margins = insets
+        margins.top = -margins.top
+        margins.left = -margins.left
+        margins.bottom = -margins.bottom
+        margins.right = -margins.right
+        return margins
+    }
+    
+    func pathRect(_ bounds: CGRect) -> CGRect {
+        var rect = UIEdgeInsetsInsetRect(bounds, insets)
+        rect.origin = .zero
+        return rect
+    }
+    
     static let basic = Shadow(radius: 1, offset: CGSize(width: 0, height: 1), color: UIColor.black.withAlphaComponent(0.3))
 }
 
@@ -38,6 +64,11 @@ class _Shadow: NSObject {
     static let radius = Shadow.basic.radius
     static let offset = Shadow.basic.offset
     static let color = Shadow.basic.color
+    static let insets = Shadow.basic.insets
+    static let layoutMargins = Shadow.basic.layoutMargins
+    static func pathRect(_ bounds: CGRect) -> CGRect {
+        return Shadow.basic.pathRect(bounds)
+    }
 }
 
 extension UIApplication {

@@ -171,19 +171,21 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
-    
-    WebViewController *webViewController = [[WebViewController alloc] init];
-    [webViewController addNavigationItemLogo];
-    webViewController.hidesBottomBarWhenPushed = YES;
-    webViewController.url = [NSURL URLWithString:product.offer];
-    
-    [self.navigationController pushViewController:webViewController animated:YES];
-    
-    [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Favorites"}];
-    [AnalyticsTrackers.branch track:@"Tapped on product"];
-    
-    [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
+        Product *product = [self.favoriteFrc objectAtIndexPath:indexPath];
+        
+        WebViewController *webViewController = [[WebViewController alloc] init];
+        [webViewController addNavigationItemLogo];
+        webViewController.hidesBottomBarWhenPushed = YES;
+        webViewController.url = [NSURL URLWithString:product.offer];
+        
+        [self.navigationController pushViewController:webViewController animated:YES];
+        
+        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Favorites"}];
+        [AnalyticsTrackers.branch track:@"Tapped on product"];
+        
+        [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    }
 }
 
 
