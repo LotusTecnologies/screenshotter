@@ -59,6 +59,13 @@ class DiscoverWebViewController : WebViewController {
         
         navigationItem.rightBarButtonItems = rightBarButtonItems()
     }
+    
+    // MARK: Bar Button Item Actions
+    
+    func refreshAction() {
+        url = url
+        AnalyticsTrackers.standard.track("Refreshed Discover webpage")
+    }
 }
 
 extension DiscoverWebViewController: UIScrollViewDelegate {
