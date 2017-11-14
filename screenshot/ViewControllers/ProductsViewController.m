@@ -33,9 +33,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 @end
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate> {
-    BOOL _didViewDidAppear;
-}
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
@@ -146,17 +144,19 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     });
     
     self.collectionView = ({
+        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
         CGFloat p = [Geometry padding];
+        CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
         
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumInteritemSpacing = p;
-        layout.minimumLineSpacing = p;
+        layout.minimumInteritemSpacing = minimumSpacing.x;
+        layout.minimumLineSpacing = minimumSpacing.y;
         
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(p + self.shoppablesToolbar.bounds.size.height, p, p, p);
+        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
@@ -188,12 +188,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [super viewDidAppear:animated];
     
     self.shoppablesToolbar.didViewControllerAppear = YES;
-    
-    if (_didViewDidAppear) {
-        [self.collectionView reloadItemsAtIndexPaths:[self.collectionView indexPathsForVisibleItems]];
-    }
-    
-    _didViewDidAppear = YES;
     
     [self presentTutorialHelperIfNeeded];
 }
@@ -300,9 +294,11 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger columns = [self numberOfCollectionViewColumns];
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
     CGSize size = CGSizeZero;
-    size.width = (collectionView.bounds.size.width - ((columns + 1) * [Geometry padding])) / columns;
+    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
     size.height = size.width + [ProductCollectionViewCell labelsHeight];
     return size;
 }
@@ -312,6 +308,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
+    cell.contentView.backgroundColor = collectionView.backgroundColor;
     cell.title = product.displayTitle;
     cell.price = product.price;
     cell.imageUrl = product.imageURL;
