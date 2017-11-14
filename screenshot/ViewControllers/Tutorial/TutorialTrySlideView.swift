@@ -80,3 +80,9 @@ extension TutorialTrySlideView : TutorialSlideView {
         NotificationCenter.default.removeObserver(self)
     }
 }
+
+// MARK: - Parse Image Helper
+
+extension TutorialTrySlideView {
+    static let rawGraphic = UIImage(named: "TutorialTryRawGraphic")
+}
