@@ -34,7 +34,7 @@ public class HelperView : UIView {
         titleLabel.textColor = .gray3
         titleLabel.font = font
         titleLabel.numberOfLines = 0
-        titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.padding, right: 0)
+        titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -.padding, right: 0)
         addSubview(titleLabel)
         titleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
@@ -47,7 +47,7 @@ public class HelperView : UIView {
         subtitleLabel.textColor = .gray3
         subtitleLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         subtitleLabel.numberOfLines = 0
-        subtitleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -Geometry.extendedPadding, right: 0)
+        subtitleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -.extendedPadding, right: 0)
         addSubview(subtitleLabel)
         subtitleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         subtitleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
@@ -66,7 +66,7 @@ public class HelperView : UIView {
         controlView.layoutMargins = .zero
         controlView.notification = { size in
             var contentViewLayoutMargins = self.contentView.layoutMargins
-            contentViewLayoutMargins.bottom = size.height > 0 ? -Geometry.extendedPadding : 0
+            contentViewLayoutMargins.bottom = size.height > 0 ? -.extendedPadding : 0
             self.contentView.layoutMargins = contentViewLayoutMargins
         }
         addSubview(controlView)

@@ -14,11 +14,11 @@
 #import "PermissionsManager.h"
 
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
-//    ScreenshotsSectionNotification,
+    ScreenshotsSectionNotification,
     ScreenshotsSectionImage
 };
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
 @property (nonatomic, strong) NSDate *lastVisited;
 
-@property (nonatomic) BOOL shouldDisplayInfoCell;
+@property (nonatomic, copy) NSString *notificationCellAssetId;
 
 @end
 
@@ -75,7 +75,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
         
-        [collectionView registerClass:[ShadowCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
+        [collectionView registerClass:[ScreenshotNotificationCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view addSubview:collectionView];
@@ -222,6 +222,31 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 
+#pragma mark - Collection View Sections
+
+- (NSUInteger)newScreenshotsCount {
+    return [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
+}
+
+- (BOOL)hasNewScreenshot {
+    return [self newScreenshotsCount] > 0;
+}
+
+- (ScreenshotNotificationCollectionViewCellContentText)notificationContentText {
+    NSUInteger count = [self newScreenshotsCount];
+    
+    if (count == 1) {
+        return ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot;
+        
+    } else if (count > 1) {
+        return ScreenshotNotificationCollectionViewCellContentTextImportMultipleScreenshots;
+        
+    } else {
+        return ScreenshotNotificationCollectionViewCellContentTextNone;
+    }
+}
+
+
 #pragma mark - Collection View
 
 - (NSInteger)numberOfCollectionViewImageColumns {
@@ -229,15 +254,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 1;
+    return 2;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-//    if (section == ScreenshotsSectionNotification) {
-//        return 1;
-//
-//    } else
-        if (section == ScreenshotsSectionImage) {
+    if (section == ScreenshotsSectionNotification) {
+        return [self hasNewScreenshot];
+
+    } else if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjects.count;
         
     } else {
@@ -245,20 +269,29 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
     CGSize size = CGSizeZero;
     
-//    if (indexPath.section == ScreenshotsSectionNotification) {
-//        size.width = 300;
-//        size.height = 100;
-//        
-//    } else
-        if (indexPath.section == ScreenshotsSectionImage) {
-        NSInteger columns = [self numberOfCollectionViewImageColumns];
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+    if (section == ScreenshotsSectionNotification && [self hasNewScreenshot]) {
+        size.height = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+    }
+    
+    return size;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    CGSize size = CGSizeZero;
+    UIEdgeInsets shadowInsets = [ScreenshotNotificationCollectionViewCell shadowInsets];
+    CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+    
+    if (indexPath.section == ScreenshotsSectionNotification) {
+        size.width = floor(collectionView.bounds.size.width - (padding * 2));
+        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         
-        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
+    } else if (indexPath.section == ScreenshotsSectionImage) {
+        NSInteger columns = [self numberOfCollectionViewImageColumns];
+        
+        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
         size.height = ceil(size.width * [self screenshotRatio]);
     }
     
@@ -266,14 +299,23 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-//    if (indexPath.section == ScreenshotsSectionNotification) {
-//        ShadowCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
-////        cell.contentView.backgroundColor = collectionView.backgroundColor;
-//        cell.mainView.backgroundColor = [UIColor greenColor];
-//        return cell;
-//
-//    } else
-        if (indexPath.section == ScreenshotsSectionImage) {
+    if (indexPath.section == ScreenshotsSectionNotification) {
+        ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
+        cell.delegate = self;
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
+        cell.contentText = [self notificationContentText];
+        [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+        cell.iconImage = nil;
+        
+        [[AssetSyncModel sharedInstance] imageWithAssetId:self.notificationCellAssetId callback:^(UIImage *image, NSDictionary *info) {
+//            if (!cell.iconImage) {
+                cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
+//            }
+        }];
+        
+        return cell;
+
+    } else if (indexPath.section == ScreenshotsSectionImage) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
@@ -309,6 +351,47 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)scrollTopTop {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+    }
+}
+
+
+#pragma mark - Notification Cell
+
+- (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
+    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+    [self dismissNotificationCell];
+}
+
+- (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
+    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+    
+    if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot) {
+        [[AssetSyncModel sharedInstance] refetchLastScreenshot];
+        
+    } else if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportMultipleScreenshots) {
+        [self.delegate screenshotsViewControllerWantsToPresentPicker:self];
+    }
+    
+    [self dismissNotificationCell];
+}
+
+- (void)presentNotificationCellWithAssetId:(NSString *)assetId {
+    if ([self newScreenshotsCount] > 0) {
+        self.notificationCellAssetId = assetId;
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification];
+        
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] == 0) {
+            [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+            
+        } else {
+            [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+        }
+    }
+}
+
+- (void)dismissNotificationCell {
+    if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
+        [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
     }
 }
 

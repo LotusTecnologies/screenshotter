@@ -30,8 +30,8 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let padding = Geometry.padding
-        let extendedPadding = Geometry.extendedPadding
+        let padding = CGFloat.padding
+        let extendedPadding = CGFloat.extendedPadding
         
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false

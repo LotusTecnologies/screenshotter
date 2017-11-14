@@ -40,6 +40,21 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         let deleteButtonItem = UIBarButtonItem(title: "DELETE", style: .plain, target: self, action: #selector(deleteAction))
         let flexilbeItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
+        // Even though this is set globally, it is possible to hit a race condition
+        // where the first cell has the wrong font. This will force the font.
+        let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
+        let titleTextAttributesNormal = toolbarButtonItem.titleTextAttributes(for: .normal)
+        let titleTextAttributesHighlighted = toolbarButtonItem.titleTextAttributes(for: .highlighted)
+        let titleTextAttributesDisabled = toolbarButtonItem.titleTextAttributes(for: .disabled)
+        
+        shareButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
+        shareButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
+        shareButtonItem.setTitleTextAttributes(titleTextAttributesDisabled, for: .disabled)
+        
+        deleteButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
+        deleteButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
+        deleteButtonItem.setTitleTextAttributes(titleTextAttributesDisabled, for: .disabled)
+        
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         toolbar.backgroundColor = UIColor(white: 1, alpha: 0.9)
         toolbar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
