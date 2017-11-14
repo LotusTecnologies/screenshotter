@@ -67,7 +67,7 @@ class ShadowCollectionViewCell: UICollectionViewCell {
     
     // MARK: Layout
     
-    private static let cornerRadius = Geometry.defaultCornerRadius
+    private static let cornerRadius = CGFloat.defaultCornerRadius
     
     private static let shadowOffset = Shadow.basic.offset
     
