@@ -25,17 +25,9 @@ struct UpdatePromptState {
 }
 
 class UpdatePromptHandler : NSObject {
-    private var currentAppVersion: String {
-        return Bundle.main.shortVersion!
-    }
-    
-    private var appStoreURL: URL {
-        return URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
-    }
-    
-    private var appDisplayName: String {
-        return Bundle.main.displayName!
-    }
+    private let currentAppVersion = UIApplication.version()
+    private var appDisplayName = UIApplication.displayName()
+    private var appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     
     private var containerViewController: UIViewController
     private var didBecomeActiveObserver: Any?
@@ -45,8 +37,6 @@ class UpdatePromptHandler : NSObject {
         super.init()
     }
     
-    // MARK: Public methods
-    
     deinit {
         guard let observer = didBecomeActiveObserver else {
             return
@@ -54,6 +44,8 @@ class UpdatePromptHandler : NSObject {
         
         NotificationCenter.default.removeObserver(observer)
     }
+    
+    // MARK: Public methods
     
     func start() {
         print("Starting update handler")
@@ -92,6 +84,8 @@ class UpdatePromptHandler : NSObject {
             return
         }
         
+        // TODO: move this code out of this class
+        
         let randomIndex = Int(arc4random_uniform(UInt32(discoverURLs.count)))
         let randomURL = discoverURLs[randomIndex]
         UserDefaults.standard.set(randomURL, forKey: UserDefaultsKeys.discoverUrl)
@@ -129,7 +123,7 @@ class UpdatePromptHandler : NSObject {
     }
 
     private func presentUpdateAlert() {
-        let controller = UIAlertController(title: "New Version Available", message: "Update now for the best \(appDisplayName) experience!", preferredStyle: .alert)
+        let controller = UIAlertController(title: "New Version Available", message: "Update now for the best \(String(describing: appDisplayName)) experience!", preferredStyle: .alert)
         let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
         
         controller.addAction(UIAlertAction(title: "Later", style: .cancel, handler: nil))

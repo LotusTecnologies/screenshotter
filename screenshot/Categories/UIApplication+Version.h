@@ -10,8 +10,9 @@
 
 @interface UIApplication (Version)
 
-+ (NSString *)version;
-+ (NSString *)build;
-+ (NSString *)versionBuild;
++ (nonnull NSString *)displayName;
++ (nonnull NSString *)version;
++ (nonnull NSString *)build;
++ (nonnull NSString *)versionBuild;
 
 @end
