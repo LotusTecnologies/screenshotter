@@ -489,7 +489,7 @@ class AssetSyncModel: NSObject {
         imageRequestOptions.version = .current
         imageRequestOptions.deliveryMode = .opportunistic
         imageRequestOptions.resizeMode = .none
-        imageRequestOptions.isNetworkAccessAllowed = false
+        imageRequestOptions.isNetworkAccessAllowed = true
         let targetSize = self.targetSize()
         PHImageManager.default().requestImage(for: asset,
                                               targetSize: targetSize,
