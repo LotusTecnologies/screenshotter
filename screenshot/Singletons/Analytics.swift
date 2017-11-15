@@ -189,9 +189,9 @@ public class AnalyticsTrackers : NSObject {
 
 extension AnalyticsTracker {
     fileprivate func log(name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
-        #if DEV
+        if UIApplication.isDev() {
             print("[\(type(of: self))] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
-        #endif
+        }
         
         closure()
     }

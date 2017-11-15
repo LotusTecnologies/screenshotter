@@ -40,32 +40,17 @@ class UpdatePromptHandler : NSObject {
         }
     }
     
-    // MARK: Discover URL handling
-    
-    private func processDiscoverURLs(_ dictionary: [String : Any]) {
-        guard let discoverURLs = dictionary["DiscoverURLs"] as? [String] else {
-            return
-        }
-        
-        // TODO: move this code out of this class
-        
-        let randomIndex = Int(arc4random_uniform(UInt32(discoverURLs.count)))
-        let randomURL = discoverURLs[randomIndex]
-        UserDefaults.standard.set(randomURL, forKey: UserDefaultsKeys.discoverUrl)
-    }
-    
     // MARK: Alert presentation
     
     func presentUpdatePromptIfNeeded() {
-        guard let appSettings = appSettings else {
+        guard !UIApplication.isDev(), let appSettings = appSettings else {
             return
         }
         
         let forcedVersionIsGreater = appSettings.forceVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
         let suggestedVersionIsGreater = appSettings.suggestedVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
         
-        // !!!: DEBUG
-        if forcedVersionIsGreater || true {
+        if forcedVersionIsGreater {
             presentForceUpdateAlert()
             
         } else if suggestedVersionIsGreater {

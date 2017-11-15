@@ -16,3 +16,9 @@
 + (nonnull NSString *)versionBuild;
 
 @end
+
+@interface UIApplication (Environment)
+
++ (BOOL)isDev;
+
+@end

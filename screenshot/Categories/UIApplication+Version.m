@@ -29,3 +29,16 @@
 }
 
 @end
+
+@implementation UIApplication (Environment)
+
++ (BOOL)isDev {
+#if DEV
+    return YES;
+#else
+    return NO;
+#endif
+}
+
+@end
+

@@ -155,9 +155,10 @@ extension AppDelegate {
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version" : UIApplication.versionBuild()])
         
-#if DEV
-        Branch.setUseTestBranchKey(true)
-#endif
+        if UIApplication.isDev() {
+            Branch.setUseTestBranchKey(true)
+        }
+        
         let branch = Branch.getInstance()
         branch?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
