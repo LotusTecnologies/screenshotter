@@ -11,5 +11,6 @@
 #import "WebViewController.h"
 #import "TappableTextView.h"
 #import "NotifySizeChangeView.h"
+#import "InsetPresentationController.h"
 
 #endif /* screenshot_Bridging_Header_h */
