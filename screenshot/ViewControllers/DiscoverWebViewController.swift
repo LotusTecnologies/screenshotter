@@ -76,7 +76,7 @@ class DiscoverWebViewController : WebViewController {
     // MARK: Bar Button Item Actions
     
     func refreshAction() {
-        url = url
+        url = randomUrl()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
     }
 }
