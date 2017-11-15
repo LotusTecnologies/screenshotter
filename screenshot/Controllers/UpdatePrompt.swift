@@ -7,24 +7,21 @@
 //
 
 import Foundation
-import PromiseKit
-
-struct UpdatePromptState {
-    let suggestedVersion: String?
-    let forceVersion: String?
-    
-    enum JSONKeys : String {
-        case Suggested = "SuggestedUpdateVersion"
-        case Force = "ForceUpdateVersion"
-    }
-    
-    init(dictionaryRepresentation representation: [AnyHashable : Any]) {
-        suggestedVersion = representation[JSONKeys.Suggested.rawValue] as? String
-        forceVersion = representation[JSONKeys.Force.rawValue] as? String
-    }
-}
 
 class UpdatePromptHandler : NSObject {
+    var appSettings: AppSettings?
+    var _appSettings: _AppSettings? {
+        // TODO: can be removed once files converted to swift
+        didSet {
+            if let settings = _appSettings {
+                appSettings = AppSettings(settings)
+                
+            } else {
+                appSettings = nil
+            }
+        }
+    }
+    
     private let currentAppVersion = UIApplication.version()
     private let appDisplayName = UIApplication.displayName()
     private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
@@ -40,35 +37,6 @@ class UpdatePromptHandler : NSObject {
     deinit {
         if let observer = applicationWillEnterForegroundObserver {
             NotificationCenter.default.removeObserver(observer)
-        }
-    }
-    
-    // MARK: Public methods
-    
-    func start() {
-        startUpdateFlow()
-    }
-    
-    // MARK: Fetching update payload
-    
-    private func startUpdateFlow() {
-        fetchSettingsPayload() { updateState in
-//            #if DEV
-//                // Dont update on dev
-//            #else
-                self.presentAppropriatePromptIfNecessary(withUpdateState: updateState)
-//            #endif
-        }
-    }
-    
-    private func fetchSettingsPayload(withCompletion completion: ((UpdatePromptState) -> Void)? = nil) {
-        let _ = NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { dictionary -> Promise<UpdatePromptState> in
-            self.processDiscoverURLs(dictionary)
-            
-            return Promise(value: UpdatePromptState(dictionaryRepresentation: dictionary))
-            
-        }.then(on: .main) { updateState in
-            completion?(updateState)
         }
     }
     
@@ -88,9 +56,13 @@ class UpdatePromptHandler : NSObject {
     
     // MARK: Alert presentation
     
-    private func presentAppropriatePromptIfNecessary(withUpdateState state: UpdatePromptState) {
-        let forcedVersionIsGreater = state.forceVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
-        let suggestedVersionIsGreater = state.suggestedVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
+    func presentUpdatePromptIfNeeded() {
+        guard let appSettings = appSettings else {
+            return
+        }
+        
+        let forcedVersionIsGreater = appSettings.forceVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
+        let suggestedVersionIsGreater = appSettings.suggestedVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
         
         // !!!: DEBUG
         if forcedVersionIsGreater || true {
@@ -99,13 +71,13 @@ class UpdatePromptHandler : NSObject {
         } else if suggestedVersionIsGreater {
             // Ignore if we've already asked to update to this version.
             if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String,
-                lastVersionAskedToUpdate == state.suggestedVersion
+                lastVersionAskedToUpdate == appSettings.suggestedVersion
             {
                 return
             }
             
             presentUpdateAlert()
-            UserDefaults.standard.set(state.suggestedVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
+            UserDefaults.standard.set(appSettings.suggestedVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
         }
     }
 
@@ -136,11 +108,11 @@ class UpdatePromptHandler : NSObject {
         applicationWillEnterForegroundObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { notification in
             if let presentedViewController = self.rootViewController?.presentedViewController {
                 if !presentedViewController.isKind(of: UIAlertController.self) {
-                    self.rootViewController?.dismiss(animated: true, completion: self.startUpdateFlow)
+                    self.rootViewController?.dismiss(animated: true, completion: self.presentUpdatePromptIfNeeded)
                 }
                 
             } else {
-                self.startUpdateFlow()
+                self.presentUpdatePromptIfNeeded()
             }
         }
     }

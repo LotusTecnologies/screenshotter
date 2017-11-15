@@ -18,6 +18,12 @@ struct AppSettings {
         forceVersion = settings["ForceUpdateVersion"] as? String
         suggestedVersion = settings["SuggestedUpdateVersion"] as? String
     }
+    
+    init(_ _appSettings: _AppSettings) {
+        discoverUrls = _appSettings.discoverUrls
+        forceVersion = _appSettings.forceVersion
+        suggestedVersion = _appSettings.suggestedVersion
+    }
 }
 
 // TODO: remove once classes converted to swift

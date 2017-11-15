@@ -269,7 +269,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         
         if (settings != nil) {
             self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
-            [self.updatePromptHandler start];
+            self.updatePromptHandler._appSettings = settings;
+            [self.updatePromptHandler presentUpdatePromptIfNeeded];
         }
     }
 }
