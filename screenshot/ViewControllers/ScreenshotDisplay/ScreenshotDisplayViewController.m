@@ -10,11 +10,15 @@
 
 #import "screenshot-Swift.h"
 
+// Uncomment to calculate b0,b1 for a new tutorial screenshot.
+//define STORE_NEW_TUTORIAL_SCREENSHOT 1
+
 @interface ScreenshotDisplayViewController () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIImageView *screenshotImageView;
 @property (nonatomic, strong) UIView *screenshotImageFrameView;
+@property (nonatomic, assign) CGPoint b0;
 
 @end
 
@@ -64,14 +68,22 @@
     [screenshotImageView.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor].active = YES;
     [screenshotImageView.widthAnchor constraintEqualToAnchor:self.scrollView.widthAnchor constant:-horizontal].active = YES;
     [screenshotImageView.heightAnchor constraintEqualToAnchor:self.scrollView.heightAnchor constant:-vertical].active = YES;
+    
+#ifdef STORE_NEW_TUTORIAL_SCREENSHOT
+    screenshotImageView.userInteractionEnabled = YES;
+    UILongPressGestureRecognizer *longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
+    [screenshotImageView addGestureRecognizer:longPressGestureRecognizer];
+#endif
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
+#ifndef STORE_NEW_TUTORIAL_SCREENSHOT
     if (!CGRectIsEmpty(self.screenshotImageView.bounds)) {
         [self insertShoppableFrames];
     }
+#endif
 }
 
 
@@ -136,5 +148,37 @@
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     return self.screenshotImageView;
 }
+
+#pragma mark - Gesture Recognizer
+
+- (void)handleLongPressGesture:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    CGPoint longPressPoint = [gestureRecognizer locationInView:self.screenshotImageView];
+    CGFloat normalizedX = longPressPoint.x / self.screenshotImageView.bounds.size.width;
+    CGFloat normalizedY = longPressPoint.y / self.screenshotImageView.bounds.size.height;
+    if (normalizedX < 0) normalizedX = 0;
+    if (normalizedY < 0) normalizedY = 0;
+    if (normalizedX > 1) normalizedX = 1;
+    if (normalizedY > 1) normalizedY = 1;
+    CGPoint normalizedPressPoint = CGPointMake(normalizedX, normalizedY);
+    if (CGPointEqualToPoint(self.b0, CGPointZero)) {
+        self.b0 = normalizedPressPoint;
+        NSLog(@"b0:%@  longPressPoint:%@  in size:%@", NSStringFromCGPoint(self.b0), NSStringFromCGPoint(longPressPoint), NSStringFromCGSize(self.screenshotImageView.bounds.size));
+    } else {
+        CGPoint b1 = normalizedPressPoint;
+        NSLog(@"b1:%@  longPressPoint:%@  in size:%@", NSStringFromCGPoint(b1), NSStringFromCGPoint(longPressPoint), NSStringFromCGSize(self.screenshotImageView.bounds.size));
+        CGFloat viewWidth = self.screenshotImageView.bounds.size.width;
+        CGFloat viewHeight = self.screenshotImageView.bounds.size.height;
+        CGRect frame = CGRectMake(self.b0.x * viewWidth, self.b0.y * viewHeight, (b1.x - self.b0.x) * viewWidth, (b1.y - self.b0.y) * viewHeight);
+        UIView *frameView = [[UIView alloc] initWithFrame:frame];
+        frameView.layer.borderColor = [[UIColor greenColor] colorWithAlphaComponent:.7f].CGColor;
+        frameView.layer.borderWidth = 2.f;
+        [self.screenshotImageView addSubview:frameView];
+        self.b0 = CGPointZero;
+    }
+}
+
 
 @end

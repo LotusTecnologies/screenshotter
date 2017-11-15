@@ -210,6 +210,9 @@ class AssetSyncModel: NSObject {
                 return NetworkingPromise.uploadToSyte(imageData: imageData)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     track("received response from Syte", properties: ["segmentCount" : segments.count])
+#if STORE_NEW_TUTORIAL_SCREENSHOT
+                    print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
+#endif
                     self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments)
                 }.always {
                     self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Product)
@@ -298,53 +301,85 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func tupleForRatio17750() -> (String, [[String : Any]]) {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/1nfaMAuRYUUcVz1SZJmN6"
+    func tupleForRawGraphic() -> (String, [[String : Any]]) {
+        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/aKeeu5_UE5rQj09XPjla5"
         let segments = [
-            ["label":"Bags","gender":"female","b0":[0.3559979498386383,0.5867233872413635],"b1":[0.4344922006130219,0.6679672598838806],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC42Njg5ODI4MDgyOTE5MTIsInkiOjAuNTg1NzA3ODM4ODMzMzMyMSwieDIiOjAuNDM1NDczMzc4NzQ3NzAxNjQsIngiOjAuMzU1MDE2NzcxNzAzOTU4NX0%3D&cats=WyJIYW5kYmFncyJd&prob=0.4663&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Jackets","gender":"female","b0":[0.3828337788581848,0.4187996685504913],"b1":[0.6517795920372009,0.5956178903579712],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC41OTc4MjgxMTgxMzA1NjQ3LCJ5IjowLjQxNjU4OTQ0MDc3Nzg5NzgzLCJ4MiI6MC42NTUxNDE0MTQ3MDE5Mzg3LCJ4IjowLjM3OTQ3MTk1NjE5MzQ0NzE1fQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.6450&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shirts","gender":"female","b0":[0.4629025161266327,0.4479158520698547],"b1":[0.5702998638153076,0.5158113837242126],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC41MTY2NjAwNzc4Njk4OTIxLCJ5IjowLjQ0NzA2NzE1NzkyNDE3NTMsIngyIjowLjU3MTY0MjMzMDY2MTQxNiwieCI6MC40NjE1NjAwNDkyODA1MjQyNH0%3D&cats=WyJQdWxsb3ZlckFuZFNoaXJ0cyJd&prob=0.5469&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Skirts","gender":"female","b0":[0.3978304862976074,0.5245752334594727],"b1":[0.6558108329772949,0.7177786827087402],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC43MjAxOTM3MjU4MjQzNTYsInkiOjAuNTIyMTYwMTkwMzQzODU2OSwieDIiOjAuNjU5MDM1NTg3MzEwNzkxLCJ4IjowLjM5NDYwNTczMTk2NDExMTM2fQ%3D%3D&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.7699&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-           ["label":"Shoes","gender":"female","b0":[0.5260283350944519,0.7322256565093994],"b1":[0.5960294604301453,0.782284140586853],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC43ODI5MDk4NzE2Mzc4MjEyLCJ5IjowLjczMTU5OTkyNTQ1ODQzMTIsIngyIjowLjU5NjkwNDQ3NDQ5Njg0MTUsIngiOjAuNTI1MTUzMzIxMDI3NzU1N30%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5192&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.420631468296051,0.7285764217376709],"b1":[0.4867706298828125,0.7937597036361694],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLzFuZmFNQXVSWVVVY1Z6MVNaSm1ONg%3D%3D&crop=eyJ5MiI6MC43OTQ1NzQ0OTQ2NTk5MDA3LCJ5IjowLjcyNzc2MTYzMDcxMzkzOTYsIngyIjowLjQ4NzU5NzM2OTQwMjY0NzAzLCJ4IjowLjQxOTgwNDcyODc3NjIxNjV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6263&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
+            ["label":"Skirts","gender":"female",
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC44MzQ1MjQ1NjQwNzI0ODk4LCJ5IjowLjMxNTc4MTgwOTc2MjEyMDMsIngyIjowLjczMTM4OTQ1Mjg4OTU2MTYsIngiOjAuMzYwNzQwNTgyMjcyNDEwNH0%3D&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.7441&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Jackets","gender":"female",
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC41MjEzNTk2OTk1OTE5OTQyLCJ5IjowLjE2OTM2NDQ2NDY1NTUxODU1LCJ4MiI6MC42NTIxMDM5NjIwMDQxODQ3LCJ4IjowLjM0NDgwMjA4MDA5NDgxNDMzfQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.8739&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+           ["label":"Bags","gender":"female",
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC43MTI0MzIyNzEyNDIxNDE3LCJ5IjowLjU0MDc4NDgyOTg1NDk2NTIsIngyIjowLjM5ODcwODUxMzM3OTA5Njk2LCJ4IjowLjMwMzUyMzYwOTA0MjE2Nzd9&cats=WyJIYW5kYmFncyJd&prob=0.7504&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Shoes","gender":"female", // Heeled shoe
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC45NjI4MjczMDk5NjYwODczLCJ5IjowLjgzMDg1NDA3MzE2Njg0NzIsIngyIjowLjQ2NDg3NDE5MjMyNzI2MDk2LCJ4IjowLjM4MzQxNDE2NDkzMDU4MjA2fQ%3D%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.7713&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Shoes","gender":"female", // Invisible heel
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC45MzAzMjQ1NjkzNDQ1MjA2LCJ5IjowLjgwODgzNzYzNzMwNTI1OTcsIngyIjowLjU5ODI1MTQ0MTEyMTEwMTQsIngiOjAuNTEzMjgyNTU4MzIxOTUyOH0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.8184&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
         ]
         return (imageURL, segments)
+    }
+    
+    func tupleForRatio17750() -> (String, [[String : Any]]) {
+        let rawGraphicTuple = self.tupleForRawGraphic()
+        var segments = rawGraphicTuple.1
+        segments[0]["b0"] = [0.44328701, 0.55790961] // skirt
+        segments[0]["b1"] = [0.58159721, 0.67620057]
+        segments[1]["b0"] = [0.4380787, 0.51624292]  // jacket
+        segments[1]["b1"] = [0.55497682, 0.58615816]
+        segments[2]["b0"] = [0.41782409, 0.61087573] // bag
+        segments[2]["b1"] = [0.46122682, 0.64724576]
+        segments[3]["b0"] = [0.45023149, 0.67372882] // heeled shoe
+        segments[3]["b1"] = [0.4832176, 0.71080506]
+        segments[4]["b0"] = [0.50752318, 0.67302257] // flat shoe
+        segments[4]["b1"] = [0.53703707, 0.70303673]
+        return (rawGraphicTuple.0, segments)
     }
     
     func tupleForRatio17777() -> (String, [[String : Any]]) {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/WB42KwmBD9R5PBlwBJcc4"
-        let segments = [
-            ["label":"Dresses","gender":"female","b0":[0.3939443826675415,0.4749177694320679],"b1":[0.6968114376068115,0.7054287195205688],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC43MDgzMTAxMDYzOTY2NzUxLCJ5IjowLjQ3MjAzNjM4MjU1NTk2MTY0LCJ4MiI6MC43MDA1OTcyNzU3OTM1NTI0LCJ4IjowLjM5MDE1ODU0NDQ4MDgwMDZ9&cats=WyJEcmVzc2VzIiwiTmlnaHRNb3JuaW5nRHJlc3NlcyJd&prob=0.4820&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Jackets","gender":"female","b0":[0.3839874267578125,0.4090573787689209],"b1":[0.6477440595626831,0.5754011273384094],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC41Nzc0ODA0MjQxOTU1MjgsInkiOjAuNDA2OTc4MDgxOTExODAyMywieDIiOjAuNjUxMDQxMDE3NDcyNzQ0LCJ4IjowLjM4MDY5MDQ2ODg0Nzc1MTY1fQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.4667&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.5229871273040771,0.7103928923606873],"b1":[0.5969663858413696,0.7615106701850891],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC43NjIxNDk2NDI0MDc4OTQyLCJ5IjowLjcwOTc1MzkyMDEzNzg4MjIsIngyIjowLjU5Nzg5MTEyNjU3MzA4NTcsIngiOjAuNTIyMDYyMzg2NTcyMzYxfQ%3D%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5856&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.4234914183616638,0.712901771068573],"b1":[0.4835497140884399,0.7732203602790833],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL1dCNDJLd21CRDlSNVBCbHdCSmNjNA%3D%3D&crop=eyJ5MiI6MC43NzM5NzQzNDI2NDQyMTQ2LCJ5IjowLjcxMjE0Nzc4ODcwMzQ0MTYsIngyIjowLjQ4NDMwMDQ0Mjc4NTAyNDY1LCJ4IjowLjQyMjc0MDY4OTY2NTA3OTF9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6671&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
-        ]
-        return (imageURL, segments)
+        let rawGraphicTuple = self.tupleForRawGraphic()
+        var segments = rawGraphicTuple.1
+        segments[0]["b0"] = [0.45157109968941067, 0.5366802879937731]  // skirt
+        segments[0]["b1"] = [0.58665370415977025, 0.6534345203346954]
+        segments[1]["b0"] = [0.44677137870855144, 0.49513888623979357] // jacket
+        segments[1]["b1"] = [0.55206514528284523, 0.56215277777777772]
+        segments[2]["b0"] = [0.42815589571914536, 0.58124999470180927] // bag
+        segments[2]["b1"] = [0.46364164768505262, 0.61493055290646015]
+        segments[3]["b0"] = [0.45753344524177159, 0.64548611111111109] // heeled shoe
+        segments[3]["b1"] = [0.4837114557129758, 0.67291666136847605]
+        segments[4]["b0"] = [0.50756252748179809, 0.64201388623979361] // flat shoe
+        segments[4]["b1"] = [0.53548573865108251, 0.66944444444444451]
+        return (rawGraphicTuple.0, segments)
     }
     
     func tupleForRatio17786() -> (String, [[String : Any]]) {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/Lb7vNFNqo_YLrpG4SZjHW"
-        let segments = [
-            ["label":"Dresses","gender":"female","b0":[0.3925015330314636,0.4712252020835876],"b1":[0.6986575722694397,0.7028000950813293],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0xiN3ZORk5xb19ZTHJwRzRTWmpIVw%3D%3D&crop=eyJ5MiI6MC43MDU2OTQ3ODEyNDM4MDExLCJ5IjowLjQ2ODMzMDUxNTkyMTExNTksIngyIjowLjcwMjQ4NDUyMjc1OTkxNDQsIngiOjAuMzg4Njc0NTgyNTQwOTg4OX0%3D&cats=WyJEcmVzc2VzIiwiTmlnaHRNb3JuaW5nRHJlc3NlcyJd&prob=0.5303&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Jackets","gender":"female","b0":[0.3785334825515747,0.4049455225467682],"b1":[0.6530630588531494,0.5816818475723267],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0xiN3ZORk5xb19ZTHJwRzRTWmpIVw%3D%3D&crop=eyJ5MiI6MC41ODM4OTEwNTE2MzUxNDYxLCJ5IjowLjQwMjczNjMxODQ4Mzk0ODcsIngyIjowLjY1NjQ5NDY3ODU1NjkxOTEsIngiOjAuMzc1MTAxODYyODQ3ODA1MDZ9&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.5320&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.5189570784568787,0.7087295651435852], "b1":[0.5980026125907898,0.7619832158088684],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0xiN3ZORk5xb19ZTHJwRzRTWmpIVw%3D%3D&crop=eyJ5MiI6MC43NjI2NDg4ODY0NDIxODQ0LCJ5IjowLjcwODA2Mzg5NDUxMDI2OTIsIngyIjowLjU5ODk5MDY4MTc2NzQ2MzcsIngiOjAuNTE3OTY5MDA5MjgwMjA0N30%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.5862&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.4238345623016357,0.7074891328811646],"b1":[0.4840186834335327,0.7699545621871948],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL0xiN3ZORk5xb19ZTHJwRzRTWmpIVw%3D%3D&crop=eyJ5MiI6MC43NzA3MzUzODAwNTM1MjAyLCJ5IjowLjcwNjcwODMxNTAxNDgzOTIsIngyIjowLjQ4NDc3MDk4NDk0NzY4MTQ1LCJ4IjowLjQyMzA4MjI2MDc4NzQ4N30%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6999&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
-        ]
-        return (imageURL, segments)
+        let rawGraphicTuple = self.tupleForRawGraphic()
+        var segments = rawGraphicTuple.1
+        segments[0]["b0"] = [0.44412050534499509, 0.53736135434909515] // skirt
+        segments[0]["b1"] = [0.58551992225461613, 0.65148861646234679]
+        segments[1]["b0"] = [0.43828960155490765, 0.49357851722124924] // jacket
+        segments[1]["b1"] = [0.55733722060252666, 0.5642148277875072]
+        segments[2]["b0"] = [0.4139941690962099, 0.58990075890251015]  // bag
+        segments[2]["b1"] = [0.46064139941690962, 0.62930531231757147]
+        segments[3]["b0"] = [0.44946550048590861, 0.66053706946876822] // heeled shoe
+        segments[3]["b1"] = [0.48250728862973763, 0.69118505545826026]
+        segments[4]["b0"] = [0.50874635568513116, 0.65703444249854048] // flat shoe
+        segments[4]["b1"] = [0.53838678328474243, 0.68563922942206657]
+        return (rawGraphicTuple.0, segments)
+    }
+    
+    func tupleForRatio21653() -> (String, [[String : Any]]) {
+        let rawGraphicTuple = self.tupleForRawGraphic()
+        var segments = rawGraphicTuple.1
+        segments[0]["b0"] = [0.44962746014979649, 0.53225261735900031] // skirt
+        segments[0]["b1"] = [0.58956915111189556, 0.63492062976737951]
+        segments[1]["b0"] = [0.43861353571143857, 0.49240121322884345] // jacket
+        segments[1]["b1"] = [0.56073858114674435, 0.55673758607585455]
+        segments[2]["b0"] = [0.41690962099125367, 0.57598783936866105] // bag
+        segments[2]["b1"] = [0.46161321671525746, 0.60840931859865088]
+        segments[3]["b0"] = [0.45124716058996139, 0.6377912841508292]  // heeled shoe
+        segments[3]["b1"] = [0.48720440062883408, 0.6656534928641018]
+        segments[4]["b0"] = [0.51182376724406276, 0.63542721538034808] // flat shoe
+        segments[4]["b1"] = [0.54065435203796919, 0.66024991041580916]
+        return (rawGraphicTuple.0, segments)
     }
     
     func tupleByAspectRatio() -> (String, [[String : Any]]) {
@@ -359,6 +394,8 @@ class AssetSyncModel: NSObject {
             return self.tupleForRatio17777()
         case 17786: // iPhone 6,6S,7,8
             return self.tupleForRatio17786()
+        case 21653: // iPhone X
+            return self.tupleForRatio21653()
         default:
             return self.tupleForRatio17750()
         }
@@ -536,7 +573,7 @@ class AssetSyncModel: NSObject {
     
     func data(for image: UIImage) -> Data? {
         let actualToTargetRatio = image.size.width / targetSize().width
-        let compressionQuality: CGFloat
+        var compressionQuality: CGFloat
         switch actualToTargetRatio {
         case 0..<0.8:
             compressionQuality = 0.99
@@ -547,6 +584,9 @@ class AssetSyncModel: NSObject {
         default:
             compressionQuality = 0.75
         }
+#if STORE_NEW_TUTORIAL_SCREENSHOT
+        compressionQuality = 0.99
+#endif
         let data = UIImageJPEGRepresentation(image, compressionQuality)
         print("image.size:\(image.size)  targetSize:\(targetSize())  actualToTargetRatio:\(actualToTargetRatio)  compressionQuality:\(compressionQuality)  data.count:\(data?.count ?? 0)")
         return data
@@ -727,7 +767,12 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let imageData = self.data(for: image)
+            let imageData: Data?
+#if STORE_NEW_TUTORIAL_SCREENSHOT
+            imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+#else
+            imageData = self.data(for: image)
+#endif
             dataModel.performBackgroundTask { (managedObjectContext) in
                 let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                  assetId: Constants.tutorialScreenshotAssetId,
@@ -737,8 +782,13 @@ class AssetSyncModel: NSObject {
                                                  isHidden: false,
                                                  imageData: imageData)
             }
+#if STORE_NEW_TUTORIAL_SCREENSHOT
+            let _ = self.tupleByAspectRatio() // Just want print of aspectRatio.
+            self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
+#else
             let tuple = self.tupleByAspectRatio()
             self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
+#endif
             self.endSync()
         }
     }
