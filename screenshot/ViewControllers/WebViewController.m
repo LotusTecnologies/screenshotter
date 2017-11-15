@@ -21,7 +21,7 @@
     BOOL _isShowingGame;
 }
 
-@property (nonatomic, strong) UIView *loadingCoverView;
+@property (nonatomic, strong) UIImageView *loadingCoverView;
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) UIToolbar *toolbar;
 
@@ -305,9 +305,10 @@
 - (void)showLoadingView {
     if (!self.loadingCoverView) {
         _loadingCoverView = ({
-            UIView *view = [[UIView alloc] init];
+            UIImageView *view = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"LoaderBackground"]];
             view.translatesAutoresizingMaskIntoConstraints = NO;
-            view.backgroundColor = [UIColor whiteColor];
+            view.userInteractionEnabled = YES;
+            view.contentMode = UIViewContentModeScaleAspectFill;
             [self.view addSubview:view];
             [view.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
             [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -321,6 +322,7 @@
         _loader = ({
             Loader *loader = [[Loader alloc] init];
             loader.translatesAutoresizingMaskIntoConstraints = NO;
+            loader.color = [UIColor crazeRed];
             [self.loadingCoverView addSubview:loader];
             [loader.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
             [NSLayoutConstraint constraintWithItem:loader attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.loadingCoverView attribute:NSLayoutAttributeCenterY multiplier:0.8f constant:0.f].active = YES;
@@ -332,7 +334,7 @@
         UILabel *loaderLabel = [[UILabel alloc] init];
         loaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
         loaderLabel.text = self.loaderLabelText;
-        loaderLabel.textColor = [UIColor gray6];
+        loaderLabel.textColor = [UIColor gray3];
         loaderLabel.textAlignment = NSTextAlignmentCenter;
         loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
         [self.loadingCoverView addSubview:loaderLabel];
