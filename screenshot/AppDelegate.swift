@@ -153,9 +153,9 @@ extension AppDelegate {
         SEGAnalytics.setup(with: configuration)
         
         Appsee.start(Constants.appSeeApiKey)
-        Appsee.addEvent("App Launched", withProperties: ["version" : UIApplication.versionBuild()])
+        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
         
-        if UIApplication.isDev() {
+        if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
         }
         

@@ -22,8 +22,8 @@ class UpdatePromptHandler : NSObject {
         }
     }
     
-    private let currentAppVersion = UIApplication.version()
-    private let appDisplayName = UIApplication.displayName()
+    private let currentAppVersion = Bundle.displayVersion
+    private let appDisplayName = Bundle.displayName
     private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     
     private var rootViewController: UIViewController? {
@@ -43,7 +43,7 @@ class UpdatePromptHandler : NSObject {
     // MARK: Alert presentation
     
     func presentUpdatePromptIfNeeded() {
-        guard !UIApplication.isDev(), let appSettings = appSettings else {
+        guard !UIApplication.isDev, let appSettings = appSettings else {
             return
         }
         

@@ -8,7 +8,6 @@
 
 #import "SettingsViewController.h"
 #import "PermissionsManager.h"
-#import "UIApplication+Version.h"
 #import "screenshot-Swift.h"
 
 @import MessageUI;
@@ -472,7 +471,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
-            return [NSString stringWithFormat:@"%@%@", [UIApplication versionBuild], Constants.buildEnvironmentSuffix];
+            return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], Constants.buildEnvironmentSuffix];
             break;
         case RowTypeName:
             return @"Enter Your Name";
@@ -712,7 +711,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         NSArray *message = @[@"\n\n\n",
                              @"-----------------",
                              @"Don't edit below.\n",
-                             [NSString stringWithFormat:@"version: %@", [UIApplication versionBuild]]
+                             [NSString stringWithFormat:@"version: %@", [NSBundle displayVersionBuild]]
                              ];
         
         MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
