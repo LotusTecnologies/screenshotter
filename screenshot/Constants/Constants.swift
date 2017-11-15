@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class Constants: NSObject {
 

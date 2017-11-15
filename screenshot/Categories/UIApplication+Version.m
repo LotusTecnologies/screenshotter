@@ -8,18 +8,37 @@
 
 #import "UIApplication+Version.h"
 
+// TODO: make as an extension on NSBundle
+
 @implementation UIApplication (Version)
 
-+ (NSString *)version {
-    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
++ (nonnull NSString *)displayName {
+    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] ?: @"";
 }
 
-+ (NSString *)build {
-    return [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
++ (nonnull NSString *)version {
+    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] ?: @"";
 }
 
-+ (NSString *)versionBuild {
++ (nonnull NSString *)build {
+    return [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey] ?: @"";
+}
+
++ (nonnull NSString *)versionBuild {
     return [NSString stringWithFormat:@"%@.%@", [self version], [self build]];
 }
 
 @end
+
+@implementation UIApplication (Environment)
+
++ (BOOL)isDev {
+#if DEV
+    return YES;
+#else
+    return NO;
+#endif
+}
+
+@end
+

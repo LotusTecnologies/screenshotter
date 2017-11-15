@@ -16,7 +16,6 @@ class TutorialViewController : UIViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
     var video = TutorialVideo.Standard
-    var updatePromptHandler: UpdatePromptHandler!
     let scrollView = UIScrollView()
     let contentView = UIView()
     
@@ -70,7 +69,6 @@ class TutorialViewController : UIViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         slides = buildSlides()
-        updatePromptHandler = UpdatePromptHandler(containerViewController: self)
     }
     
     // MARK: - UIViewController
@@ -79,8 +77,6 @@ class TutorialViewController : UIViewController {
         super.viewDidLoad()
         
         track("Started Tutorial")
-        
-        updatePromptHandler.start()
         
         view.backgroundColor = .white
         

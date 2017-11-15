@@ -40,8 +40,21 @@ class DiscoverWebViewController : WebViewController {
         webView.scrollView.delegate = self
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
         
-        url = URL(string: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverUrl) ?? "https://screenshopit.tumblr.com")
+        url = randomUrl()
         track("Loaded Discover Web Page", properties: ["url" : url])
+    }
+    
+    // MARK: Random Url
+    
+    func randomUrl() -> URL? {
+        var randomUrl = "https://screenshopit.tumblr.com"
+        
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings?.discoverUrls {
+            let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
+            randomUrl = urls[randomIndex]
+        }
+        
+        return URL(string: randomUrl)
     }
     
     // MARK: Bar Button Item
