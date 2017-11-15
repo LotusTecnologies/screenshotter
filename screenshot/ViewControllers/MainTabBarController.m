@@ -91,23 +91,18 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUserDidTakeScreenshot:) name:UIApplicationUserDidTakeScreenshotNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationFetchedAppSettings:) name:[NotificationCenterKeys fetchedAppSettings] object:nil];
         
         [AssetSyncModel sharedInstance].screenshotDetectionDelegate = self;
     }
     return self;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
-    [self.updatePromptHandler start];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self refreshTabBarSettingsBadge];
+    [self presentUpdatePromptIfNeeded];
 }
 
 - (void)viewSafeAreaInsetsDidChange {
@@ -140,6 +135,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         
         NSString *eventName = foundIntercomWindow ? @"Took Screenshot While Showing Intercom Window" : @"Took Screenshot";
         [AnalyticsTrackers.standard track:eventName properties:nil];
+    }
+}
+
+- (void)applicationFetchedAppSettings:(NSNotification *)notification {
+    if ([self isViewLoaded] && self.view.window) {
+        [self presentUpdatePromptIfNeeded];
     }
 }
 
@@ -255,6 +256,22 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)backgroundScreenshotsWereTakenWithAssetIds:(NSSet<NSString *> *)assetIds {
     // ???: Gershon why is this called multiple times?
     [self.screenshotsNavigationController.screenshotsViewController presentNotificationCellWithAssetId:[assetIds anyObject]];
+}
+
+
+#pragma mark - Update Prompt
+
+- (void)presentUpdatePromptIfNeeded {
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    
+    if ([appDelegate isKindOfClass:[AppDelegate class]] && !self.updatePromptHandler) {
+        _AppSettings *settings = [appDelegate getAppSettings];
+        
+        if (settings != nil) {
+            self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
+            [self.updatePromptHandler start];
+        }
+    }
 }
 
 @end
