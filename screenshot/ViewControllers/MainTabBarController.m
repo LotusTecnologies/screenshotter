@@ -100,7 +100,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.updatePromptHandler = [[UpdatePromptHandler alloc] initWithContainerViewController:self];
+    self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
     [self.updatePromptHandler start];
 }
 

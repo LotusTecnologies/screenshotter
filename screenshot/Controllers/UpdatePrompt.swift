@@ -26,54 +26,49 @@ struct UpdatePromptState {
 
 class UpdatePromptHandler : NSObject {
     private let currentAppVersion = UIApplication.version()
-    private var appDisplayName = UIApplication.displayName()
-    private var appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
+    private let appDisplayName = UIApplication.displayName()
+    private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     
-    private var containerViewController: UIViewController
-    private var didBecomeActiveObserver: Any?
-    
-    init(containerViewController controller: UIViewController) {
-        containerViewController = controller
-        super.init()
+    private var rootViewController: UIViewController? {
+        return UIApplication.shared.keyWindow?.rootViewController
     }
     
+    private var applicationWillEnterForegroundObserver: Any?
+    
+    // MARK: Life Cycle
+    
     deinit {
-        guard let observer = didBecomeActiveObserver else {
-            return
+        if let observer = applicationWillEnterForegroundObserver {
+            NotificationCenter.default.removeObserver(observer)
         }
-        
-        NotificationCenter.default.removeObserver(observer)
     }
     
     // MARK: Public methods
     
     func start() {
-        print("Starting update handler")
-
         startUpdateFlow()
     }
     
     // MARK: Fetching update payload
     
     private func startUpdateFlow() {
-        fetchSettingsPayload() { state in
-            #if DEV
-                print("Not running update flow because we are in development")
-            #else
-                self.presentAppropriatePromptIfNecessary(withUpdateState: state)
-            #endif
+        fetchSettingsPayload() { updateState in
+//            #if DEV
+//                // Dont update on dev
+//            #else
+                self.presentAppropriatePromptIfNecessary(withUpdateState: updateState)
+//            #endif
         }
     }
     
     private func fetchSettingsPayload(withCompletion completion: ((UpdatePromptState) -> Void)? = nil) {
         let _ = NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { dictionary -> Promise<UpdatePromptState> in
-            print("Received settings payload from server")
-            
             self.processDiscoverURLs(dictionary)
             
             return Promise(value: UpdatePromptState(dictionaryRepresentation: dictionary))
-        }.then(on: .main) { state in
-            completion?(state)
+            
+        }.then(on: .main) { updateState in
+            completion?(updateState)
         }
     }
     
@@ -94,73 +89,65 @@ class UpdatePromptHandler : NSObject {
     // MARK: Alert presentation
     
     private func presentAppropriatePromptIfNecessary(withUpdateState state: UpdatePromptState) {
-        print("Determining appropriate prompt action (if any)...")
-        
         let forcedVersionIsGreater = state.forceVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
         let suggestedVersionIsGreater = state.suggestedVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
- 
-        if forcedVersionIsGreater {
-            print("forced version is greater")
-            
-            // Force update.
+        
+        // !!!: DEBUG
+        if forcedVersionIsGreater || true {
             presentForceUpdateAlert()
+            
         } else if suggestedVersionIsGreater {
-            print("suggested version is greater")
-            
-            // Suggested update.
-            
             // Ignore if we've already asked to update to this version.
             if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String,
-                lastVersionAskedToUpdate == state.suggestedVersion {
+                lastVersionAskedToUpdate == state.suggestedVersion
+            {
                 return
             }
             
             presentUpdateAlert()
             UserDefaults.standard.set(state.suggestedVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
-        } else {
-            print("No prompt action deemed necessary")
         }
     }
 
     private func presentUpdateAlert() {
         let controller = UIAlertController(title: "New Version Available", message: "Update now for the best \(String(describing: appDisplayName)) experience!", preferredStyle: .alert)
-        let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
-        
         controller.addAction(UIAlertAction(title: "Later", style: .cancel, handler: nil))
+        
+        let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
-        containerViewController.present(controller, animated: true, completion: nil)
+        rootViewController?.present(controller, animated: true, completion: nil)
     }
     
     private func presentForceUpdateAlert() {
-        containerViewController.view.isUserInteractionEnabled = false
-        
-        // Restart the flow if users try to re-enter the app.
-        didBecomeActiveObserver = didBecomeActiveObserver ?? NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationDidBecomeActive, object: nil, queue: nil) { note in
-            self.containerViewController.dismiss(animated: false, completion: nil)
-            self.startUpdateFlow()
-        }
-        
         let controller = UIAlertController(title: "Update Required", message: "You need to update to the latest version to keep using \(appDisplayName).", preferredStyle: .alert)
-        let updateAction = UIAlertAction(title: "Update", style: .cancel, handler: navigateToAppStore)
+        
+        let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
-        containerViewController.present(controller, animated: true) { [weak containerViewController] in
-            containerViewController?.view.isUserInteractionEnabled = true
+        rootViewController?.present(controller, animated: true, completion: nil)
+        
+        guard applicationWillEnterForegroundObserver == nil else {
+            return
+        }
+        
+        applicationWillEnterForegroundObserver = NotificationCenter.default.addObserver(forName: .UIApplicationWillEnterForeground, object: nil, queue: nil) { notification in
+            if let presentedViewController = self.rootViewController?.presentedViewController {
+                if !presentedViewController.isKind(of: UIAlertController.self) {
+                    self.rootViewController?.dismiss(animated: true, completion: self.startUpdateFlow)
+                }
+                
+            } else {
+                self.startUpdateFlow()
+            }
         }
     }
 
     private func navigateToAppStore(action: UIAlertAction) {
-        guard UIApplication.shared.canOpenURL(appStoreURL) else {
-            return
-        }
-        
-        if #available(iOS 10.0, *) {
+        if UIApplication.shared.canOpenURL(appStoreURL) {
             UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
-        } else {
-            UIApplication.shared.openURL(appStoreURL)
         }
     }
 }
