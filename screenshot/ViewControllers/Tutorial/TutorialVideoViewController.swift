@@ -57,6 +57,10 @@ class TutorialVideoViewController : BaseViewController {
     
     // MARK: - Initialization
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     init(video vid: TutorialVideo) {
         let playerItem = AVPlayerItem(url: vid.url)
         
@@ -72,14 +76,6 @@ class TutorialVideoViewController : BaseViewController {
         video = vid
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    convenience override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        self.init(video: .Standard)
-    }
-    
     deinit {
         endObserving()
     }
@@ -93,21 +89,20 @@ class TutorialVideoViewController : BaseViewController {
         
         view.layer.addSublayer(playerLayer)
         
+        if let item = player.currentItem {
+            beginObserving(playerItem: item)
+        }
+        
+        overlayView.volumeToggleButton.isSelected = true
+        overlayView.volumeToggleButton.addTarget(self, action: #selector(volumeToggleButtonTapped), for: .touchUpInside)
+        overlayView.replayPauseButton.addTarget(self, action: #selector(replayPauseButtonTapped), for: .touchUpInside)
+        overlayView.doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         overlayView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(overlayView)
         overlayView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
-        if let item = player.currentItem {
-            beginObserving(playerItem: item)
-        }
-
-        overlayView.volumeToggleButton.isSelected = true
-        overlayView.volumeToggleButton.addTarget(self, action: #selector(volumeToggleButtonTapped), for: .touchUpInside)
-        overlayView.replayPauseButton.addTarget(self, action: #selector(replayPauseButtonTapped), for: .touchUpInside)
-        overlayView.doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         
         observers.append(AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.new]) { session, change in
             let shouldMute = (change.newValue ?? 1) == 0
@@ -276,11 +271,7 @@ extension AVPlayer {
     }
     
     func togglePlayback() -> PlaybackState {
-        if rate == 0 {
-            play()
-        } else {
-            pause()
-        }
+        rate == 0 ? play() : pause()
         
         return playbackState
     }

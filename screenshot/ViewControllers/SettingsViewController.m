@@ -176,12 +176,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    // TODO: why is the page scrolling after poping another vc (after commenting the below code)
     CGFloat offsetY = -self.tableView.contentInset.top;
-    
+
     if (@available(iOS 11.0, *)) {
         offsetY = -self.tableView.adjustedContentInset.top;
     }
-    
+
     self.tableView.contentOffset = CGPointMake(0.f, offsetY);
     
     [self updateScreenshotsCount];
