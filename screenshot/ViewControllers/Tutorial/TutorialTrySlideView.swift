@@ -26,7 +26,13 @@ public class TutorialTrySlideView : HelperView {
             
         } else {
             subtitleLabel.text = "Press the home & power buttons to take a screenshot of this page"
-            contentImage = UIImage(named: "TutorialTryGraphic")
+            
+            if UIDevice.is568h || UIDevice.is480h {
+                contentImage = UIImage(named: "TutorialTryGraphicSE")
+                
+            } else {
+                contentImage = UIImage(named: "TutorialTryGraphic")
+            }
         }
         
         if UIDevice.isSimulator {

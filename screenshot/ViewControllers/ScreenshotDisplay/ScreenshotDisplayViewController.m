@@ -11,7 +11,7 @@
 #import "screenshot-Swift.h"
 
 // Uncomment to calculate b0,b1 for a new tutorial screenshot.
-//define STORE_NEW_TUTORIAL_SCREENSHOT 1
+#define STORE_NEW_TUTORIAL_SCREENSHOT 1
 
 @interface ScreenshotDisplayViewController () <UIScrollViewDelegate>
 
@@ -158,6 +158,8 @@
     CGPoint longPressPoint = [gestureRecognizer locationInView:self.screenshotImageView];
     CGFloat normalizedX = longPressPoint.x / self.screenshotImageView.bounds.size.width;
     CGFloat normalizedY = longPressPoint.y / self.screenshotImageView.bounds.size.height;
+    
+//    MAX(0, normalizedX)
     if (normalizedX < 0) normalizedX = 0;
     if (normalizedY < 0) normalizedY = 0;
     if (normalizedX > 1) normalizedX = 1;
