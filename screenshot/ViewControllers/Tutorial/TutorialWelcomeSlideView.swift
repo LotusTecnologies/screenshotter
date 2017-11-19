@@ -22,6 +22,7 @@ class TutorialWelcomeSlideView : HelperView {
         subtitleLabel.text = "Any fashion picture you screenshot becomes shoppable in the app"
         contentImage = UIImage(named: "TutorialWelcomeScreenshopIcon")
         
+        
         // TODO: better small screen layout
         let is480h = UIDevice.is480h
         

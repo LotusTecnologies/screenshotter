@@ -20,6 +20,7 @@ class ScreenshotsHelperView: HelperView {
         }
     }
     private(set) var button = MainButton()
+    private var buttonHeightConstraint: NSLayoutConstraint!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -34,6 +35,7 @@ class ScreenshotsHelperView: HelperView {
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        buttonHeightConstraint = button.heightAnchor.constraint(equalToConstant: 0)
         
         syncType()
     }
@@ -44,12 +46,14 @@ class ScreenshotsHelperView: HelperView {
             subtitleLabel.text = "Allow CRAZE to access your screenshots to start shopping!"
             contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
             button.isHidden = false
+            buttonHeightConstraint.isActive = false
             
         } else if (type == .screenshot) {
             titleLabel.text = "No Screenshots Yet"
             subtitleLabel.text = "Add screenshots you want to shop by pressing the power & home buttons at the same time"
             contentImage = UIImage(named: "ScreenshotsEmptyListGraphic")
             button.isHidden = true
+            buttonHeightConstraint.isActive = true
         }
     }
 }

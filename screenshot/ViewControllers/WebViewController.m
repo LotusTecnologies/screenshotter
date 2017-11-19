@@ -348,7 +348,8 @@
         [button setTitle:@"Get More Coins" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(showLoadingGame) forControlEvents:UIControlEventTouchUpInside];
         [self.loadingCoverView addSubview:button];
-        [button.bottomAnchor constraintEqualToAnchor:self.loadingCoverView.layoutMarginsGuide.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
+        [button.bottomAnchor constraintLessThanOrEqualToAnchor:self.loadingCoverView.layoutMarginsGuide.bottomAnchor constant:-[Geometry extendedPadding]].active = YES;
+        [button.bottomAnchor constraintLessThanOrEqualToAnchor:self.bottomLayoutGuide.topAnchor constant:-[Geometry extendedPadding]].active = YES;
         [button.centerXAnchor constraintEqualToAnchor:self.loadingCoverView.centerXAnchor].active = YES;
     }
 }
