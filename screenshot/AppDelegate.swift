@@ -14,11 +14,13 @@ import FBSDKLoginKit
 import Branch
 import Firebase
 import GoogleSignIn
+import PromiseKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    var settings: AppSettings?
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
@@ -36,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.appearanceSetup()
         
         prepareDataStackCompletionIfNeeded()
+        fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
@@ -64,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
         track("sessionStarted")
-        AssetSyncModel.sharedInstance.syncPhotos()
+        AssetSyncModel.sharedInstance.syncPhotosUponForeground()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -150,11 +153,12 @@ extension AppDelegate {
         SEGAnalytics.setup(with: configuration)
         
         Appsee.start(Constants.appSeeApiKey)
-        Appsee.addEvent("App Launched", withProperties: ["version" : UIApplication.versionBuild()])
+        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
         
-#if DEV
-        Branch.setUseTestBranchKey(true)
-#endif
+        if UIApplication.isDev {
+            Branch.setUseTestBranchKey(true)
+        }
+        
         let branch = Branch.getInstance()
         branch?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
@@ -220,10 +224,10 @@ extension AppDelegate {
     func prepareDataStackCompletionIfNeeded() {
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                AssetSyncModel.sharedInstance.syncPhotos()
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    AssetSyncModel.sharedInstance.syncPhotos()
+                    AssetSyncModel.sharedInstance.syncPhotosUponForeground()
                     self.transitionTo(self.nextViewController())
                 }
                 
@@ -277,6 +281,31 @@ extension AppDelegate {
     }
 }
 
+// MARK: - Settings
+
+extension AppDelegate {
+    fileprivate func fetchAppSettings() {
+        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<AppSettings> in
+            return Promise(value: AppSettings(data))
+            
+        }.then(on: .main) { appSettings -> Void in
+            self.settings = appSettings
+            
+            let name = Notification.Name(NotificationCenterKeys.fetchedAppSettings)
+            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": appSettings])
+        }
+    }
+    
+    func getAppSettings() -> _AppSettings? {
+        if let settings = settings {
+            return _AppSettings(settings)
+            
+        } else {
+            return nil
+        }
+    }
+}
+
 extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : String],
@@ -291,5 +320,4 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         track("app opened from local notification")
     }
-    
 }

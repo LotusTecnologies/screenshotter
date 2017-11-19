@@ -47,8 +47,8 @@ class TutorialVideoOverlayView : UIView {
         doneButton.layer.cornerRadius = 5
         doneButton.insertSubview(blurView, at: 0)
         addSubview(doneButton)
-        doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        doneButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
+        doneButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -.padding).isActive = true
         
         volumeToggleButton.translatesAutoresizingMaskIntoConstraints = false
         volumeToggleButton.adjustsImageWhenHighlighted = true
@@ -58,7 +58,7 @@ class TutorialVideoOverlayView : UIView {
         volumeToggleButton.setImage(UIImage(named: "PlayerMute"), for: .selected)
         volumeToggleButton.setImage(UIImage(named: "PlayerMute"), for: [.highlighted, .selected])
         addSubview(volumeToggleButton)
-        volumeToggleButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        volumeToggleButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .padding).isActive = true
         volumeToggleButton.centerYAnchor.constraint(equalTo: doneButton.centerYAnchor).isActive = true
     }
     

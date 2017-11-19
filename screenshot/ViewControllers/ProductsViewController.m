@@ -11,7 +11,6 @@
 #import "ShoppablesToolbar.h"
 #import "ScreenshotDisplayNavigationController.h"
 #import "TutorialProductsPageViewController.h"
-#import "TransitioningController.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
@@ -311,7 +310,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     cell.contentView.backgroundColor = collectionView.backgroundColor;
     cell.title = product.displayTitle;
     cell.price = product.price;
+    cell.originalPrice = product.originalPrice;
     cell.imageUrl = product.imageURL;
+    cell.isSale = product.floatOriginalPrice > product.floatPrice;
     cell.favoriteButton.selected = product.isFavorite;
     return cell;
 }

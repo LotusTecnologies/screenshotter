@@ -5,12 +5,12 @@
 #ifndef screenshot_Bridging_Header_h
 #define screenshot_Bridging_Header_h
 
-#import "UIApplication+Version.h"
 #import "PermissionsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 #import "WebViewController.h"
 #import "TappableTextView.h"
 #import "NotifySizeChangeView.h"
+#import "InsetPresentationController.h"
 
 #endif /* screenshot_Bridging_Header_h */

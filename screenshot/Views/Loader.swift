@@ -9,7 +9,9 @@
 import Foundation
 
 class Loader: UIView {
-    let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    private let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    
+    private let activityTransform = CGAffineTransform(scaleX: 1.5, y: 1.5)
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -21,15 +23,27 @@ class Loader: UIView {
         activityView.translatesAutoresizingMaskIntoConstraints = false
         activityView.hidesWhenStopped = false
         activityView.color = .gray6
+        activityView.transform = activityTransform
         addSubview(activityView)
         activityView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         activityView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         activityView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         activityView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        activityView.widthAnchor.constraint(equalToConstant: intrinsicContentSize.width).isActive = true
+        activityView.heightAnchor.constraint(equalToConstant: intrinsicContentSize.height).isActive = true
     }
     
     override var intrinsicContentSize: CGSize {
-        return activityView.intrinsicContentSize
+        return activityView.intrinsicContentSize.applying(activityTransform)
+    }
+    
+    var color: UIColor? {
+        set {
+            activityView.color = newValue
+        }
+        get {
+            return activityView.color
+        }
     }
     
     func startAnimation() {

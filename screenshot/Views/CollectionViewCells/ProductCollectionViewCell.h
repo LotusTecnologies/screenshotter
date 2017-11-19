@@ -23,9 +23,13 @@
 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *price;
+@property (nonatomic, copy) NSString *originalPrice;
 @property (nonatomic, copy) NSString *imageUrl;
 
+@property (nonatomic) BOOL isSale;
+
 @property (nonatomic, strong, readonly) UIButton *favoriteButton;
+
 
 + (CGFloat)labelsHeight;
 
