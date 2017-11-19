@@ -109,15 +109,16 @@ class NetworkingPromise: NSObject {
         return NetworkingPromise.shareWorkhorse(parameterData: parameterData, url: url)
     }
     
-    static func reshare(userName: String?, screenshotId: String?) -> Promise<(String, String)> {
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "shares") else {
+    static func reshare(userName: String?, shareId: String?) -> Promise<(String, String)> {
+        guard let encoded = shareId?.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+          let url = URL(string: Constants.screenShotLambdaDomain + "shares?reshare=" + encoded) else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
             print(error)
             return Promise(error: error)
         }
-        let parameterDict = ["share" : ["userName" : userName!, "screenshot" : ["id" : screenshotId]]]
-        guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
-            let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")  screenshotId:\(screenshotId ?? "-")"])
+        guard let userNameUnwrapped = userName,
+          let parameterData = try? JSONSerialization.data(withJSONObject: ["share" : ["userName" : userNameUnwrapped]], options: []) else {
+            let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize userName:\(userName ?? "-")"])
             print(error)
             return Promise(error: error)
         }
@@ -139,9 +140,9 @@ class NetworkingPromise: NSObject {
                 } else if let data = data,
                   let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any],
                   let share = json["share"] as? [String : Any],
-                  let id = share["id"] as? String,
+                  let shareId = share["id"] as? String,
                   let shareLink = share["link"] as? String {
-                    fulfill((id, shareLink))
+                    fulfill((shareId, shareLink))
                 } else {
                     let error = NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "share unknown error"])
                     reject(error)
