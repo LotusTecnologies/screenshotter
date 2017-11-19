@@ -313,6 +313,22 @@ class AssetSyncModel: NSObject {
         return (imageURL, segments)
     }
     
+    func tupleForRatio15000() -> (String, [[String : Any]]) {
+        let rawGraphicTuple = self.tupleForRawGraphic()
+        var segments = rawGraphicTuple.1
+        segments[0]["b0"] = [0.44328701, 0.55790961]                   // skirt
+        segments[0]["b1"] = [0.58159721, 0.67620057]
+        segments[1]["b0"] = [0.45023148148148145, 0.54166666666666663] // jacket
+        segments[1]["b1"] = [0.54861111111111116, 0.61979166666666663]
+        segments[2]["b0"] = [0.43981481481481477, 0.61545138888888884] // bag
+        segments[2]["b1"] = [0.48495370370370366, 0.65364583333333337]
+        segments[3]["b0"] = [0.46296296296296291, 0.67664930555555547] // heeled shoe
+        segments[3]["b1"] = [0.49537037037037035, 0.70616319444444431]
+        segments[4]["b0"] = [0.50231481481481477, 0.67230902777777768] // flat shoe
+        segments[4]["b1"] = [0.53356481481481477, 0.70182291666666663]
+        return (rawGraphicTuple.0, segments)
+    }
+    
     func tupleForRatio17750() -> (String, [[String : Any]]) {
         let rawGraphicTuple = self.tupleForRawGraphic()
         var segments = rawGraphicTuple.1
@@ -383,11 +399,13 @@ class AssetSyncModel: NSObject {
         let aspectRatio5Digit = Int(deviceAspectRatio * 10000)
         print("nativeSize:\(nativeSize)  aspectRatio5Digit:\(aspectRatio5Digit)  deviceAspectRatio:\(deviceAspectRatio)")
         switch aspectRatio5Digit {
+        case 15000: // iPad, iPad Air, iPad Pro 9.7", iPad Pro 10.5"
+            return self.tupleForRatio15000()
         case 17750: // iPhone 5C,5,5S
             return self.tupleForRatio17750()
         case 17777: // iPhone 6+,6S+,7+
             return self.tupleForRatio17777()
-        case 17786: // iPhone 6,6S,7,8
+        case 17786: // iPhone 6,6S,7,8; iPad Pro 12.9"
             return self.tupleForRatio17786()
         case 21653: // iPhone X
             return self.tupleForRatio21653()
