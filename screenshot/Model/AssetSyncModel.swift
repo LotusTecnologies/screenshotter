@@ -52,6 +52,7 @@ class AssetSyncModel: NSObject {
     var isSyncing = false
     var shouldSyncAgain = false
     var isNextScreenshotForeground = false
+    var isRecentlyForeground = false
     var screenshotsToProcess: Int = 0
     var shoppablesToProcess: Int = 0
     
@@ -589,9 +590,11 @@ class AssetSyncModel: NSObject {
     func endSync() {
         let backgroundScreenshotIds = Set<String>(backgroundScreenshotAssetIds)
         backgroundScreenshotAssetIds.removeAll()
+        let wasRecentlyForeground = isRecentlyForeground
+        isRecentlyForeground = false
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            if ApplicationStateModel.sharedInstance.isActive() && (backgroundScreenshotIds.count > 0 || AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) {
+            if ApplicationStateModel.sharedInstance.isActive() && (backgroundScreenshotIds.count > 0 || (wasRecentlyForeground && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0)) {
                 self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
             }
         }
@@ -708,6 +711,11 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    @objc public func syncPhotosUponForeground() {
+        isRecentlyForeground = true
+        syncPhotos()
+    }
+
     @objc public func syncSelectedPhotos(assets: [PHAsset]) {
         self.selectedScreenshotAssets.formUnion(assets)
         syncPhotos()

@@ -67,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
         track("sessionStarted")
-        AssetSyncModel.sharedInstance.syncPhotos()
+        AssetSyncModel.sharedInstance.syncPhotosUponForeground()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -224,10 +224,10 @@ extension AppDelegate {
     func prepareDataStackCompletionIfNeeded() {
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                AssetSyncModel.sharedInstance.syncPhotos()
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    AssetSyncModel.sharedInstance.syncPhotos()
+                    AssetSyncModel.sharedInstance.syncPhotosUponForeground()
                     self.transitionTo(self.nextViewController())
                 }
                 
