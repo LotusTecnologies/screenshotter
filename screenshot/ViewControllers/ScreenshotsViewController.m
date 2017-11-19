@@ -350,7 +350,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)scrollTopTop {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+        [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
     }
 }
 
