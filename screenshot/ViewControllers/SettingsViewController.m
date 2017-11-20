@@ -34,10 +34,33 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeCoins
 };
 
+
+@interface ATextView : UITextView
+
+@property (nonatomic, copy) void (^notification)(void);
+
+@end
+@implementation ATextView
+
+- (void)setContentSize:(CGSize)contentSize {
+    [super setContentSize:contentSize];
+    
+    if (self.notification) {
+        self.notification();
+    }
+}
+
+
+
+@end
+
+
+
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
+@property (nonatomic, strong) ATextView *tableFooterTextView;
 @property (nonatomic, strong) UIView *tableViewFollowSectionFooter;
 @property (nonatomic, strong) UILabel *screenshotsCountLabel;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
@@ -61,6 +84,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     if (self) {
         // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
         [self addNavigationItemLogo];
     }
@@ -106,7 +131,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
         label.textAlignment = NSTextAlignmentCenter;
-        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        label.font = [UIFont systemFontOfSize:20 weight:UIFontWeightSemibold];
         label.adjustsFontSizeToFitWidth = YES;
         label.minimumScaleFactor = .7f;
         [tableHeaderContentView addSubview:label];
@@ -123,27 +148,48 @@ typedef NS_ENUM(NSUInteger, RowType) {
         view;
     });
     
-    UITextView *tableFooterTextView = ({
-        UITextView *textView = [[UITextView alloc] init];
-        textView.backgroundColor = [UIColor clearColor];
+    _tableFooterTextView = ({
+        ATextView *textView = [[ATextView alloc] init];
+        textView.backgroundColor = [UIColor greenColor];// [UIColor clearColor];
         textView.editable = NO;
         textView.scrollsToTop = NO;
         textView.scrollEnabled = NO;
         textView.dataDetectorTypes = UIDataDetectorTypeLink;
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+        textView.adjustsFontForContentSizeCategory = YES;
         textView.text = @"Questions? Get in touch: info@crazeapp.com";
         textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                         NSUnderlineColorAttributeName: [UIColor gray7]
                                         };
-        [textView sizeToFit];
+        
+        textView.notification = ^{
+//            CGSize size = CGSizeMake(self.view.bounds.size.width, CGFLOAT_MAX);
+//            
+//            CGRect rect = [self.tableFooterTextView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
+//            rect.size.width = size.width;
+//            rect.size.height = ceil(rect.size.height);
+//            self.tableFooterTextView.frame = rect;
+//            
+//            NSLog(@"||| size = %@", NSStringFromCGRect(rect));
+//            
+//            self.tableView.tableFooterView = self.tableFooterTextView;
+        };
+        
         textView.frame = ({
-            CGRect rect = textView.frame;
-            rect.size.height += [Geometry padding];
+            CGSize size = CGSizeMake(self.view.bounds.size.width, CGFLOAT_MAX);
+            
+            CGRect rect = [textView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
+            rect.size.width = size.width;
+            rect.size.height = ceil(rect.size.height);
             rect;
         });
         textView;
     });
+    
+    NotifySizeChangeView *nv = [[NotifySizeChangeView alloc] init];
+    nv.translatesAutoresizingMaskIntoConstraints = NO;
+    // TODO: add the textview into the notify view and add that to the table footer view. listen to the change on height. the text view should be applied with constraints.
     
     _tableView = ({
         UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
@@ -153,9 +199,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         tableView.backgroundView = nil;
         tableView.backgroundColor = [UIColor clearColor];
         tableView.tableHeaderView = tableHeaderView;
-        tableView.tableFooterView = tableFooterTextView;
+        tableView.tableFooterView = self.tableFooterTextView;
         tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
-        tableView.rowHeight = 44.f;
         [self.view addSubview:tableView];
         [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -199,6 +244,23 @@ typedef NS_ENUM(NSUInteger, RowType) {
     if (self.view.window) {
         [self updateScreenshotsCount];
         [self reloadPermissionIndexPaths];
+    }
+}
+
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    if (self.view.window) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            CGSize size = CGSizeMake(self.view.bounds.size.width, CGFLOAT_MAX);
+//
+//            CGRect rect = [self.tableFooterTextView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
+//            rect.size.width = size.width;
+//            rect.size.height = ceil(rect.size.height);
+//            self.tableFooterTextView.frame = rect;
+//
+//            NSLog(@"||| size = %@", NSStringFromCGRect(rect));
+//
+//            self.tableView.tableFooterView = self.tableFooterTextView;
+//        });
     }
 }
 
@@ -274,6 +336,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         // this section is causing the first sections title to animate down
         // scroll to bottom, tap on another tab, tap back to settings
         return self.tableViewFollowSectionFooter.bounds.size.height;
+        
+//    } else if (section == SectionTypeAbout) {
+//        return self.tableFooterTextView.bounds.size.height + [Geometry padding];
         
     } else {
         return tableView.sectionFooterHeight;

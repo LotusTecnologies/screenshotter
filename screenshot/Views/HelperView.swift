@@ -102,13 +102,27 @@ public class HelperView : UIView {
         contentView.leadingAnchor.constraint(equalTo: scrollContentView.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: scrollContentView.trailingAnchor).isActive = true
         
+        let controlViewNotificationBlock = {
+            var controlViewLayoutMargins = self.controlView.layoutMargins
+            
+            if self.controlView.subviews.count > 0 && self.controlView.bounds.size.height > 0 {
+                controlViewLayoutMargins.top = -.extendedPadding
+                
+            } else {
+                controlViewLayoutMargins.top = 0
+            }
+            
+            self.controlView.layoutMargins = controlViewLayoutMargins
+        }
+        
         controlView.translatesAutoresizingMaskIntoConstraints = false
         controlView.layoutMargins = .zero
 //        controlView.backgroundColor = .green
         controlView.subviewNotification = { count in
-            var controlViewLayoutMargins = self.controlView.layoutMargins
-            controlViewLayoutMargins.top = count > 0 ? -.extendedPadding : 0
-            self.controlView.layoutMargins = controlViewLayoutMargins
+            controlViewNotificationBlock()
+        }
+        controlView.notification = { size in
+            controlViewNotificationBlock()
         }
         scrollContentView.addSubview(controlView)
         controlView.layoutMarginsGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true

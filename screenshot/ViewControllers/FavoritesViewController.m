@@ -83,7 +83,6 @@
         
         HelperView *helperView = [[HelperView alloc] init];
         helperView.translatesAutoresizingMaskIntoConstraints = NO;
-        helperView.userInteractionEnabled = NO;
         helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
         helperView.titleLabel.text = @"No Favorites";
         helperView.subtitleLabel.text = @"Tap the heart icon on products to add them to your favorites";
