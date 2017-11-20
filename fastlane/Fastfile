@@ -19,7 +19,8 @@ platform :ios do
 
     gym(scheme: "prdScreenshot") # Build your app - more options available
     testflight(skip_waiting_for_build_processing: true) # to only upload the build
-    add_git_tag
+    version = get_version_number
+    add_git_tag(tag: "#{version}/#{lane_context[SharedValues::BUILD_NUMBER]}")
     push_to_git_remote
   end
 
@@ -30,7 +31,8 @@ platform :ios do
 
     gym(scheme: "devScreenshot") # Build your app - more options available
     testflight(skip_waiting_for_build_processing: true, app_identifier: "io.crazeapp.screenshot.dev") # to only upload the build
-    add_git_tag
+    version = get_version_number
+    add_git_tag(tag: "#{version}/#{lane_context[SharedValues::BUILD_NUMBER]}")
     push_to_git_remote
   end
 
