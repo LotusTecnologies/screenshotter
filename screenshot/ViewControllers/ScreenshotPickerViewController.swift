@@ -114,14 +114,14 @@ class ScreenshotPickerViewController: BaseViewController {
         
         let verPadding = CGFloat.extendedPadding
         let horPadding = CGFloat.padding
-        let imageAdjustment = CGFloat(view.bounds.size.height * 0.2)
         
         helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
-        helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding + imageAdjustment, horPadding)
+        helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding)
         helperView.titleLabel.text = "No Photos!"
         helperView.subtitleLabel.text = "Start taking screenshots of fashion items to fill up your gallery!"
         helperView.contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
+        helperView.isScrollable = false
         view.addSubview(helperView)
         helperView.topAnchor.constraint(equalTo: toolbar.bottomAnchor).isActive = true
         helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true

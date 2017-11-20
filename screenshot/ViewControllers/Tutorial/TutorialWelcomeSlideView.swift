@@ -2,7 +2,7 @@
 //  TutorialWelcomeSlideView.swift
 //  screenshot
 //
-//  Created by Jacob Relkin on 10/17/17.
+//  Created by Corey Werner on 10/17/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
@@ -22,10 +22,6 @@ class TutorialWelcomeSlideView : HelperView {
         subtitleLabel.text = "Any fashion picture you screenshot becomes shoppable in the app"
         contentImage = UIImage(named: "TutorialWelcomeScreenshopIcon")
         
-        
-        // TODO: better small screen layout
-        let is480h = UIDevice.is480h
-        
         let button = MainButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Get Started", for: .normal)
@@ -33,7 +29,7 @@ class TutorialWelcomeSlideView : HelperView {
         button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
-        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor, constant: is480h ? 0 : -.extendedPadding).isActive = true
+        button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
     }
     

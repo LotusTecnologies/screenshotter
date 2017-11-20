@@ -2,7 +2,7 @@
 //  TutorialViewController.swift
 //  screenshot
 //
-//  Created by Jacob Relkin on 10/14/17.
+//  Created by Corey Werner on 10/14/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
@@ -18,14 +18,6 @@ class TutorialViewController : UIViewController {
     var video = TutorialVideo.Standard
     let scrollView = UIScrollView()
     let contentView = UIView()
-    
-    var contentLayoutMargins: UIEdgeInsets {
-        get {
-            return contentView.layoutMargins
-        } set {
-            contentView.layoutMargins = newValue
-        }
-    }
     
     private var didPresentDeterminePushAlertController = false
     fileprivate var scrollViewIsScrollingAnimation = false
@@ -80,36 +72,25 @@ class TutorialViewController : UIViewController {
         
         view.backgroundColor = .white
         
-        // Setup scroll view
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.delegate = self
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.isPagingEnabled = true
         scrollView.isScrollEnabled = false
         view.addSubview(scrollView)
+        scrollView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-        
-        // Setup content view
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
-        
-        // TODO: better small screen layout
-        let is480h = UIDevice.is480h
-        
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: is480h ? topLayoutGuide.topAnchor : topLayoutGuide.bottomAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CGFloat(slides.count)),
-            contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
-        ])
+        contentView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CGFloat(slides.count)).isActive = true
+        contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
         
         prepareSlideViews()
     }
@@ -150,19 +131,13 @@ class TutorialViewController : UIViewController {
     }
     
     private func prepareSlideViews() {
-        let top = contentView.layoutMargins.top
-        
         slides.enumerated().forEach { i, slide in
             slide.translatesAutoresizingMaskIntoConstraints = false
-            contentView.addSubview(slide)
-            
             slide.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-            
-            NSLayoutConstraint.activate([
-                slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-                slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor, constant: -top),
-                slide.topAnchor.constraint(equalTo: contentView.topAnchor, constant: top)
-                ])
+            contentView.addSubview(slide)
+            slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+            slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
+            slide.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
             
             if i == 0 {
                 slide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
@@ -206,7 +181,8 @@ extension TutorialViewController : TutorialEmailSlideViewDelegate {
     }
     
     func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {            present(vc, animated: true, completion: nil)
+        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(vc, animated: true, completion: nil)
         }
     }
     

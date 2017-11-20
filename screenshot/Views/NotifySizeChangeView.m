@@ -11,6 +11,7 @@
 @interface NotifySizeChangeView ()
 
 @property (nonatomic) CGSize previousSize;
+@property (nonatomic) NSUInteger previousSubviewCount;
 
 @end
 
@@ -36,6 +37,29 @@
         self.previousSize = self.bounds.size;
         self.notification(self.bounds.size);
     }
+}
+
+
+#pragma mark - Subview
+
+- (void)notifySubviewChange {
+    if (self.subviewNotification && self.previousSubviewCount != self.subviews.count) {
+        self.previousSubviewCount = self.subviews.count;
+        self.subviewNotification(self.subviews.count);
+    }
+}
+
+- (void)didAddSubview:(UIView *)subview {
+    [super didAddSubview:subview];
+    
+    [self notifySubviewChange];
+}
+
+- (void)willRemoveSubview:(UIView *)subview {
+    [super willRemoveSubview:subview];
+    
+    // ???: should this be in a dispatch async to wait until the view is removed before rechecking the count
+    [self notifySubviewChange];
 }
 
 @end

@@ -337,6 +337,8 @@
         loaderLabel.textColor = [UIColor gray3];
         loaderLabel.textAlignment = NSTextAlignmentCenter;
         loaderLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+        loaderLabel.numberOfLines = 0;
+        loaderLabel.adjustsFontForContentSizeCategory = YES;
         [self.loadingCoverView addSubview:loaderLabel];
         [loaderLabel.topAnchor constraintEqualToAnchor:self.loader.bottomAnchor constant:padding].active = YES;
         [loaderLabel.leadingAnchor constraintEqualToAnchor:self.loadingCoverView.leadingAnchor constant:padding].active = YES;
