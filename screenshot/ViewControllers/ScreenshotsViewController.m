@@ -269,14 +269,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
-    CGSize size = CGSizeZero;
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
     
     if (section == ScreenshotsSectionNotification && [self hasNewScreenshot]) {
-        size.height = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+        insets.bottom = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
     }
     
-    return size;
+    return insets;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
