@@ -23,7 +23,7 @@ class Constants: NSObject {
     // Keys
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
-    static let screenShotLambdaDomain = "https://euqm1pl241.execute-api.us-east-1.amazonaws.com/dev/"
+    static let screenShotLambdaDomain = "https://c3fkst0oq3.execute-api.us-east-1.amazonaws.com/dev/"
     static let intercomAPIKey = "ios_sdk-97795b9b5fdcdb25e81866ff066ffa4869376161"
     static let intercomAppID = "z57orduu"
     static let segmentWriteKey = "54lr3LDCEhRCTa13eEt2xaDTqnaQxbsC"

@@ -33,7 +33,7 @@
 			<string>Bundle ID</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>io.crazeapp.screenshot</string>
+				<string>io.crazeapp.screenshot.dev</string>
 			</array>
 		</dict>
 		<dict>
@@ -65,7 +65,7 @@
 		<string>google</string>
 		<string>snapchat</string>
 		<string>fb</string>
-        <string>fbauth2</string>
+		<string>fbauth2</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
