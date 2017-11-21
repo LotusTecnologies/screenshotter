@@ -41,17 +41,36 @@ class TutorialWelcomeSlideView : HelperView {
     
     // MARK: - Private
     
+    // https://useyourloaf.com/blog/using-a-custom-font-with-dynamic-type/
+    // TODO: create custom font class
+//    func font(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
+//        guard let fontDescription = styleDictionary?[textStyle.rawValue],
+//            let font = UIFont(name: fontDescription.fontName, size: fontDescription.fontSize) else {
+//                return UIFont.preferredFont(forTextStyle: textStyle)
+//        }
+//
+//        let fontMetrics = UIFontMetrics(forTextStyle: textStyle)
+//        return fontMetrics.scaledFont(for: font)
+//    }
+    
     private var titleLabelAttributedText: NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = UIImage(named: "Logo20h")?.withRenderingMode(.alwaysTemplate)
+        
+//        let font = UIFont(name: "DINCondensed-Bold", size: 28) ?? UIFont.systemFont(ofSize: 28)
+        
         
         let prefix = "Welcome to "
         let attachmentString = NSAttributedString(attachment: attachment)
         let attachmentRange = NSMakeRange(prefix.count - 1, attachmentString.length)
         let mutableString = NSMutableAttributedString(string: prefix)
+//        , attributes: [
+//            NSFontAttributeName: font,
+//            NSKernAttributeName: 2.6
+//            ])
         
         mutableString.append(attachmentString)
-        mutableString.addAttributes([ NSForegroundColorAttributeName : UIColor.crazeRed ], range: attachmentRange)
+        mutableString.addAttributes([NSForegroundColorAttributeName: UIColor.crazeRed], range: attachmentRange)
         
         return mutableString
     }
