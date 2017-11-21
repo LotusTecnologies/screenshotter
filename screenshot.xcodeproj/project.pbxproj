@@ -37,7 +37,6 @@
 		C53B46391FB1A54000A8C886 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46321FB1A54000A8C886 /* TutorialVideoViewController.swift */; };
 		C53B463E1FB1A55500A8C886 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463C1FB1A55500A8C886 /* SettingsViewController.m */; };
 		C53B463F1FB1A55500A8C886 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */; };
-		C53B46421FB1A57700A8C886 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B46411FB1A57700A8C886 /* ProductsViewController.m */; };
 		C53B46451FB1A58800A8C886 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B46431FB1A58700A8C886 /* FavoritesViewController.m */; };
 		C53B46471FB1A8A500A8C886 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46461FB1A8A500A8C886 /* Loader.swift */; };
 		C53B46491FB1ABFC00A8C886 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */; };
@@ -69,6 +68,8 @@
 		C5AA81A71F97228100421909 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */; };
 		C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5C8465F1F9740D400BCCB3E /* GameScene.sks */; };
 		C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C846601F9740D400BCCB3E /* GameScene.swift */; };
+		C5C9A2C11FC42E4300958453 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5C9A2BF1FC42E4200958453 /* ProductsViewController.m */; };
+		C5C9A2C31FC4315200958453 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C9A2C21FC4315200958453 /* ProductsOptions.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
@@ -132,8 +133,6 @@
 		C53B463B1FB1A55500A8C886 /* ScreenshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsViewController.h; sourceTree = "<group>"; };
 		C53B463C1FB1A55500A8C886 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
-		C53B46401FB1A57700A8C886 /* ProductsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductsViewController.h; sourceTree = "<group>"; };
-		C53B46411FB1A57700A8C886 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
 		C53B46431FB1A58700A8C886 /* FavoritesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoritesViewController.m; sourceTree = "<group>"; };
 		C53B46441FB1A58700A8C886 /* FavoritesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoritesViewController.h; sourceTree = "<group>"; };
 		C53B46461FB1A8A500A8C886 /* Loader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
@@ -170,6 +169,9 @@
 		C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductCollectionViewCell.m; sourceTree = "<group>"; };
 		C5C8465F1F9740D400BCCB3E /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C5C846601F9740D400BCCB3E /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		C5C9A2BF1FC42E4200958453 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
+		C5C9A2C01FC42E4200958453 /* ProductsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductsViewController.h; sourceTree = "<group>"; };
+		C5C9A2C21FC4315200958453 /* ProductsOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsOptions.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
@@ -285,8 +287,7 @@
 				C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */,
 				C5278FDD1F3C38510090E422 /* MainTabBarController.h */,
 				C5278FDE1F3C38510090E422 /* MainTabBarController.m */,
-				C53B46401FB1A57700A8C886 /* ProductsViewController.h */,
-				C53B46411FB1A57700A8C886 /* ProductsViewController.m */,
+				C5C9A2BE1FC42E4200958453 /* Products */,
 				C55184C31F4C0DAA00EE7855 /* ScreenshotDisplay */,
 				C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */,
 				C5278FE01F3C38510090E422 /* ScreenshotsNavigationController.h */,
@@ -412,6 +413,16 @@
 				C5C846601F9740D400BCCB3E /* GameScene.swift */,
 			);
 			path = Game;
+			sourceTree = "<group>";
+		};
+		C5C9A2BE1FC42E4200958453 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C5C9A2BF1FC42E4200958453 /* ProductsViewController.m */,
+				C5C9A2C01FC42E4200958453 /* ProductsViewController.h */,
+				C5C9A2C21FC4315200958453 /* ProductsOptions.swift */,
+			);
+			path = Products;
 			sourceTree = "<group>";
 		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
@@ -717,10 +728,12 @@
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				C53B46491FB1ABFC00A8C886 /* LoadingViewController.swift in Sources */,
 				C5EE6EF61FAA01FE008CBC3A /* BarButtonItemExt.swift in Sources */,
+				C5C9A2C11FC42E4300958453 /* ProductsViewController.m in Sources */,
 				C5F8D64C1FA74DE30067C26A /* InviteViewController.swift in Sources */,
 				C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */,
 				C53B46471FB1A8A500A8C886 /* Loader.swift in Sources */,
 				C5EE6EF81FAA0817008CBC3A /* ClipView.swift in Sources */,
+				C5C9A2C31FC4315200958453 /* ProductsOptions.swift in Sources */,
 				C53B464D1FB1C2ED00A8C886 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C53B464B1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift in Sources */,
 				C53B464F1FB1E8C700A8C886 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,
@@ -776,7 +789,6 @@
 				C53B46331FB1A54000A8C886 /* TutorialWelcomeSlideView.swift in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */,
-				C53B46421FB1A57700A8C886 /* ProductsViewController.m in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
