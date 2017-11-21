@@ -34,33 +34,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeCoins
 };
 
-
-@interface ATextView : UITextView
-
-@property (nonatomic, copy) void (^notification)(void);
-
-@end
-@implementation ATextView
-
-- (void)setContentSize:(CGSize)contentSize {
-    [super setContentSize:contentSize];
-    
-    if (self.notification) {
-        self.notification();
-    }
-}
-
-
-
-@end
-
-
-
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
-@property (nonatomic, strong) ATextView *tableFooterTextView;
+@property (nonatomic, strong) UITextView *tableFooterTextView;
 @property (nonatomic, strong) UIView *tableViewFollowSectionFooter;
 @property (nonatomic, strong) UILabel *screenshotsCountLabel;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
@@ -84,8 +62,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
     if (self) {
         // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
         [self addNavigationItemLogo];
     }
@@ -149,8 +125,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     });
     
     _tableFooterTextView = ({
-        ATextView *textView = [[ATextView alloc] init];
-        textView.backgroundColor = [UIColor greenColor];// [UIColor clearColor];
+        UITextView *textView = [[UITextView alloc] init];
+        textView.backgroundColor = [UIColor clearColor];
         textView.editable = NO;
         textView.scrollsToTop = NO;
         textView.scrollEnabled = NO;
@@ -162,34 +138,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                         NSUnderlineColorAttributeName: [UIColor gray7]
                                         };
-        
-        textView.notification = ^{
-//            CGSize size = CGSizeMake(self.view.bounds.size.width, CGFLOAT_MAX);
-//            
-//            CGRect rect = [self.tableFooterTextView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
-//            rect.size.width = size.width;
-//            rect.size.height = ceil(rect.size.height);
-//            self.tableFooterTextView.frame = rect;
-//            
-//            NSLog(@"||| size = %@", NSStringFromCGRect(rect));
-//            
-//            self.tableView.tableFooterView = self.tableFooterTextView;
-        };
-        
-        textView.frame = ({
-            CGSize size = CGSizeMake(self.view.bounds.size.width, CGFLOAT_MAX);
-            
-            CGRect rect = [textView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
-            rect.size.width = size.width;
-            rect.size.height = ceil(rect.size.height);
-            rect;
-        });
         textView;
     });
     
-    NotifySizeChangeView *nv = [[NotifySizeChangeView alloc] init];
-    nv.translatesAutoresizingMaskIntoConstraints = NO;
-    // TODO: add the textview into the notify view and add that to the table footer view. listen to the change on height. the text view should be applied with constraints.
+    self.tableFooterTextView.frame = [self rectForTableFooterTextView];
     
     _tableView = ({
         UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
@@ -216,6 +168,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
     UIEdgeInsets insets = self.tableViewFollowSectionFooter.layoutMargins;
     insets.left = [self.tableView headerViewForSection:SectionTypeFollow].layoutMargins.left;
     self.tableViewFollowSectionFooter.layoutMargins = insets;
+    
+    
+    CGRect tableFooterTextViewRect = [self rectForTableFooterTextView];
+    
+    if (self.tableView.tableFooterView.bounds.size.height != tableFooterTextViewRect.size.height) {
+        self.tableFooterTextView.frame = tableFooterTextViewRect;
+        self.tableView.tableFooterView = self.tableFooterTextView;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -244,23 +204,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
     if (self.view.window) {
         [self updateScreenshotsCount];
         [self reloadPermissionIndexPaths];
-    }
-}
-
-- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
-    if (self.view.window) {
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            CGSize size = CGSizeMake(self.view.bounds.size.width, CGFLOAT_MAX);
-//
-//            CGRect rect = [self.tableFooterTextView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
-//            rect.size.width = size.width;
-//            rect.size.height = ceil(rect.size.height);
-//            self.tableFooterTextView.frame = rect;
-//
-//            NSLog(@"||| size = %@", NSStringFromCGRect(rect));
-//
-//            self.tableView.tableFooterView = self.tableFooterTextView;
-//        });
     }
 }
 
@@ -337,9 +280,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
         // scroll to bottom, tap on another tab, tap back to settings
         return self.tableViewFollowSectionFooter.bounds.size.height;
         
-//    } else if (section == SectionTypeAbout) {
-//        return self.tableFooterTextView.bounds.size.height + [Geometry padding];
-        
     } else {
         return tableView.sectionFooterHeight;
     }
@@ -373,11 +313,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textField.delegate = self;
         textField.tag = 1;
         textField.returnKeyType = UIReturnKeyDone;
+        textField.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        textField.adjustsFontForContentSizeCategory = YES;
         [cell.contentView addSubview:textField];
-        [textField.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor].active = YES;
         [textField.leadingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
-        [textField.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor].active = YES;
         [textField.trailingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
+        [textField.centerYAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.centerYAnchor].active = YES;
         
     } else {
         textField = [cell.contentView viewWithTag:1];
@@ -394,6 +335,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     textField.text = [self textForRowType:rowType];
     textField.placeholder = [self detailTextForRowType:rowType];
+    
+    cell.textLabel.text = @" "; // Needed for adjusting the cell height correctly with dynamic type
     return cell;
 }
 
@@ -605,6 +548,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
     }
     
     [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];
+}
+
+- (CGRect)rectForTableFooterTextView {
+    CGFloat maxWidth = self.view.bounds.size.width - self.tableFooterTextView.textContainerInset.left - self.tableFooterTextView.textContainerInset.right;
+    CGSize size = CGSizeMake(maxWidth, CGFLOAT_MAX);
+    
+    CGRect rect = [self.tableFooterTextView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
+    rect.size.width = ceil(rect.size.width) + self.tableFooterTextView.textContainerInset.left + self.tableFooterTextView.textContainerInset.right;
+    rect.size.height = ceil(rect.size.height) + self.tableFooterTextView.textContainerInset.top + self.tableFooterTextView.textContainerInset.bottom + [Geometry padding];
+    return rect;
 }
 
 
