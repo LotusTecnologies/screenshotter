@@ -166,7 +166,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"rate"];
+        [collectionView registerClass:[ProductsRateCollectionViewCell class] forCellWithReuseIdentifier:@"rate"];
         
         [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
@@ -322,18 +322,18 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = CGSizeZero;
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
     if (indexPath.section == ProductsSectionProduct) {
         NSInteger columns = [self numberOfCollectionViewProductColumns];
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
         
-        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
+        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
         size.height = size.width + [ProductCollectionViewCell labelsHeight];
         
     } else if (indexPath.section == ProductsSectionRate) {
-        size.width = collectionView.bounds.size.width;
-        size.height = 44.f;
+        size.width = floor(collectionView.bounds.size.width - (padding * 2));
+        size.height = 50.f;
     }
     
     return size;
@@ -355,8 +355,9 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         return cell;
         
     } else if (indexPath.section == ProductsSectionRate) {
-        UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
-        cell.contentView.backgroundColor = [UIColor redColor];
+        ProductsRateCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
+        [cell.voteUpButton addTarget:self action:@selector(productsRateVoteUpAction) forControlEvents:UIControlEventTouchUpInside];
+        [cell.voteDownButton addTarget:self action:@selector(productsRateVoteDownAction) forControlEvents:UIControlEventTouchUpInside];
         return cell;
         
     } else {
@@ -364,8 +365,15 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     }
 }
 
+- (void)productsRateVoteUpAction {
+    
+}
+
+- (void)productsRateVoteDownAction {
+    
+}
+
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
-    // ???: is this needed?
     return indexPath.section == ProductsSectionRate ? NO : YES;
 }
 

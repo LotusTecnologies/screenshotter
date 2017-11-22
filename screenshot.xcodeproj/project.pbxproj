@@ -56,6 +56,7 @@
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F2C5B1F9E35AD00488C0D /* WebView.swift */; };
+		C5709E471FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
@@ -156,6 +157,7 @@
 		C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayNavigationController.m; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C56F2C5B1F9E35AD00488C0D /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
+		C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsRateCollectionViewCell.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
@@ -397,6 +399,7 @@
 				C5AA81991F97227E00421909 /* PickerCollectionViewCell.swift */,
 				C5AA819A1F97227E00421909 /* ProductCollectionViewCell.h */,
 				C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */,
+				C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */,
 				C53B464C1FB1C2ED00A8C886 /* ScreenshotCollectionViewCell.swift */,
 				C53B464E1FB1E8C700A8C886 /* ScreenshotNotificationCollectionViewCell.swift */,
 				C53B464A1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift */,
@@ -751,6 +754,7 @@
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
+				C5709E471FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift in Sources */,
 				C53B46341FB1A54000A8C886 /* TutorialEmailSlideView.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */,

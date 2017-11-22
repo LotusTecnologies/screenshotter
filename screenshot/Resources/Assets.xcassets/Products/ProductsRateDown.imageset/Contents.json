@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "ProductsRateDown.png",
+      "filename" : "ProductsRateUp.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "ProductsRateDown@2x.png",
+      "filename" : "ProductsRateUp@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "ProductsRateDown@3x.png",
+      "filename" : "ProductsRateUp@3x.png",
       "scale" : "3x"
     }
   ],
