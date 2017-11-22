@@ -360,6 +360,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
     [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
     [self dismissNotificationCell];
+    [self syncHelperViewVisibility];
 }
 
 - (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
@@ -373,6 +374,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
     
     [self dismissNotificationCell];
+    [self syncHelperViewVisibility];
 }
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId {
@@ -386,6 +388,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         } else {
             [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
         }
+        
+        [self syncHelperViewVisibility];
     }
 }
 
@@ -520,7 +524,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         }
     }
     
-    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0);
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0 || [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
 }
 
