@@ -170,21 +170,21 @@ class ProductsOptionsView : UIView {
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        sizeControl.translatesAutoresizingMaskIntoConstraints = false
-        sizeControl.tintColor = .crazeGreen
-        addSubview(sizeControl)
-        sizeControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        sizeControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
-        sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+//        sizeControl.translatesAutoresizingMaskIntoConstraints = false
+//        sizeControl.tintColor = .crazeGreen
+//        addSubview(sizeControl)
+//        sizeControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+//        sizeControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+//        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
+//        sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+//        sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.tintColor = .crazeGreen
         addSubview(saleControl)
         saleControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         saleControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        saleControl.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
+        saleControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
         saleControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         saleControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -206,7 +206,7 @@ class ProductsOptionsView : UIView {
         sortPickerView.topAnchor.constraint(equalTo: sortLabel.bottomAnchor).isActive = true
         sortPickerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         sortPickerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        sortPickerView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        sortPickerView.heightAnchor.constraint(equalToConstant: 130).isActive = true
         
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.backgroundColor = .gray3
