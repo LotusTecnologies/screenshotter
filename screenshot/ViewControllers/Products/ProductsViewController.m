@@ -216,7 +216,11 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
             break;
     }
     
-    return [shoppable.products sortedArrayUsingDescriptors:descriptors];
+    NSSet<Product *> *filtered = shoppable.products;
+    if ([self.productsOptions _currentSale] == 0) { // 0 => .sale
+        filtered = [filtered filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
+    }
+    return [filtered sortedArrayUsingDescriptors:descriptors];
 }
 
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
