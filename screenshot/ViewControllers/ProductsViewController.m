@@ -14,6 +14,11 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
+typedef NS_ENUM(NSUInteger, ProductsSection) {
+    ProductsSectionProduct,
+    ProductsSectionRate
+};
+
 typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeSimilar,
     ShoppableSortTypePriceAsc,
@@ -161,6 +166,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"rate"];
         
         [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
@@ -278,54 +284,102 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [self.collectionView reloadData];
         
         if (self.products.count) {
+            // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
     }
 }
 
-- (NSInteger)numberOfCollectionViewColumns {
+- (NSInteger)numberOfCollectionViewProductColumns {
+    return 2;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 2;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.products.count;
+    if (section == ProductsSectionProduct) {
+        return self.products.count;
+        
+    } else if (section == ProductsSectionRate) {
+        return 1;
+        
+    } else {
+        return 0;
+    }
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    
+    if (section == ProductsSectionRate) {
+        insets.top = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+    }
+    
+    return insets;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
-    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-    CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
-    
     CGSize size = CGSizeZero;
-    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
-    size.height = size.width + [ProductCollectionViewCell labelsHeight];
+    
+    if (indexPath.section == ProductsSectionProduct) {
+        NSInteger columns = [self numberOfCollectionViewProductColumns];
+        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+        CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+        
+        size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
+        size.height = size.width + [ProductCollectionViewCell labelsHeight];
+        
+    } else if (indexPath.section == ProductsSectionRate) {
+        size.width = collectionView.bounds.size.width;
+        size.height = 44.f;
+    }
+    
     return size;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = [self productAtIndex:indexPath.item];
-    
-    ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.delegate = self;
-    cell.contentView.backgroundColor = collectionView.backgroundColor;
-    cell.title = product.displayTitle;
-    cell.price = product.price;
-    cell.originalPrice = product.originalPrice;
-    cell.imageUrl = product.imageURL;
-    cell.isSale = product.floatOriginalPrice > product.floatPrice;
-    cell.favoriteButton.selected = product.isFavorite;
-    return cell;
+    if (indexPath.section == ProductsSectionProduct) {
+        Product *product = [self productAtIndex:indexPath.item];
+        
+        ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+        cell.delegate = self;
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
+        cell.title = product.displayTitle;
+        cell.price = product.price;
+        cell.originalPrice = product.originalPrice;
+        cell.imageUrl = product.imageURL;
+        cell.isSale = product.floatOriginalPrice > product.floatPrice;
+        cell.favoriteButton.selected = product.isFavorite;
+        return cell;
+        
+    } else if (indexPath.section == ProductsSectionRate) {
+        UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
+        cell.contentView.backgroundColor = [UIColor redColor];
+        return cell;
+        
+    } else {
+        return nil;
+    }
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    // ???: is this needed?
+    return indexPath.section == ProductsSectionRate ? NO : YES;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
-    
-    Product *product = [self productAtIndex:indexPath.item];
-    
-    [AnalyticsTrackers.branch track:@"Tapped on product"];
-    [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
-    
-    [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    if (indexPath.section == ProductsSectionProduct) {
+        [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
+        
+        Product *product = [self productAtIndex:indexPath.item];
+        
+        [AnalyticsTrackers.branch track:@"Tapped on product"];
+        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
+        
+        [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    }
 }
 
 
