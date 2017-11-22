@@ -314,7 +314,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     UIEdgeInsets insets = UIEdgeInsetsZero;
     
     if (section == ProductsSectionRate) {
-        insets.top = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+        insets.top = [Geometry extendedPadding];
     }
     
     return insets;
