@@ -22,6 +22,9 @@ class UserDefaultsKeys : NSObject {
     static let newScreenshotsCount = "NewScreenshotsCount"
     
     // Product
+    static let productGender = "ProductGender"
+    static let productSize = "ProductSize"
+    static let productSale = "ProductSale"
     static let productSort = "ProductSort"
     
     // Onboarding
