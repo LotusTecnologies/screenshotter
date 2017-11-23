@@ -18,11 +18,13 @@ public class HelperView : UIView {
     private var scrollContentViewMaxHeightConstraint: NSLayoutConstraint!
     private var imageView: UIImageView?
     
-    public var isScrollable = true {
+    private var isScrollable = false {
         didSet {
             scrollContentViewMaxHeightConstraint.isActive = !isScrollable
         }
     }
+    
+    // MARK: Life Cycle
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -31,8 +33,9 @@ public class HelperView : UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
+        
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-//        scrollView.backgroundColor = .red
         addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
@@ -48,6 +51,7 @@ public class HelperView : UIView {
         scrollContentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         scrollContentView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor).isActive = true
         scrollContentViewMaxHeightConstraint = scrollContentView.heightAnchor.constraint(equalTo: layoutMarginsGuide.heightAnchor)
+        scrollContentViewMaxHeightConstraint.isActive = true
         
         var font = UIFont.preferredFont(forTextStyle: .title1)
         
@@ -58,7 +62,6 @@ public class HelperView : UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
         titleLabel.textColor = .gray3
-//        titleLabel.backgroundColor = .cyan
         titleLabel.font = font
         titleLabel.numberOfLines = 0
         titleLabel.adjustsFontForContentSizeCategory = true
@@ -75,7 +78,6 @@ public class HelperView : UIView {
         subtitleLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         subtitleLabel.numberOfLines = 0
         subtitleLabel.adjustsFontForContentSizeCategory = true
-//        subtitleLabel.backgroundColor = .yellow
         subtitleLabel.layoutMargins = UIEdgeInsets(top: -.padding, left: 0, bottom: 0, right: 0)
         scrollContentView.addSubview(subtitleLabel)
         subtitleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
@@ -86,7 +88,6 @@ public class HelperView : UIView {
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.layoutMargins = .zero
-//        contentView.backgroundColor = .cyan
         contentView.subviewNotification = { count in
             var contentViewLayoutMargins = self.contentView.layoutMargins
             contentViewLayoutMargins.top = count > 0 ? -.extendedPadding : 0
@@ -117,7 +118,6 @@ public class HelperView : UIView {
         
         controlView.translatesAutoresizingMaskIntoConstraints = false
         controlView.layoutMargins = .zero
-//        controlView.backgroundColor = .green
         controlView.subviewNotification = { count in
             controlViewNotificationBlock()
         }
@@ -130,6 +130,40 @@ public class HelperView : UIView {
         controlView.bottomAnchor.constraint(equalTo: scrollContentView.bottomAnchor).isActive = true
         controlView.trailingAnchor.constraint(equalTo: scrollContentView.trailingAnchor).isActive = true
     }
+    
+    public override var layoutMargins: UIEdgeInsets {
+        didSet {
+            scrollView.contentInset = layoutMargins
+        }
+    }
+    
+    func contentSizeCategoryDidChange(_ notification: Notification) {
+        guard window != nil else {
+            return
+        }
+        
+        if let userInfo = notification.userInfo, let contentSizeCategoryString = userInfo[UIContentSizeCategoryNewValueKey] as? String {
+            let contentSizeCategory = UIContentSizeCategory(rawValue: contentSizeCategoryString)
+            
+            switch contentSizeCategory {
+            case .accessibilityMedium,
+                 .accessibilityLarge,
+                 .accessibilityExtraLarge,
+                 .accessibilityExtraExtraLarge,
+                 .accessibilityExtraExtraExtraLarge:
+                isScrollable = true
+                break
+            default:
+                isScrollable = false
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: Content
     
     // Setting this will center an imageView in the contentView
     public var contentImage: UIImage? {
@@ -156,12 +190,6 @@ public class HelperView : UIView {
                 imageView?.removeFromSuperview()
                 imageView = nil
             }
-        }
-    }
-    
-    public override var layoutMargins: UIEdgeInsets {
-        didSet {
-            scrollView.contentInset = layoutMargins
         }
     }
 }

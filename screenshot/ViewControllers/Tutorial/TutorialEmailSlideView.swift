@@ -36,12 +36,20 @@ public class TutorialEmailSlideView : HelperView {
         titleLabel.text = "Sign Up"
         subtitleLabel.text = "Fill out your info below"
         
+        let paddingView1 = UIView()
+        paddingView1.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(paddingView1)
+        paddingView1.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        let paddingView1HeightConstraint = paddingView1.heightAnchor.constraint(equalToConstant: .extendedPadding)
+        paddingView1HeightConstraint.priority = UILayoutPriorityDefaultLow
+        paddingView1HeightConstraint.isActive = true
+        
         setupTextField(nameTextField)
         nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
         nameTextField.placeholder = "Name"
         nameTextField.returnKeyType = .next
         contentView.addSubview(nameTextField)
-        nameTextField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .extendedPadding).isActive = true
+        nameTextField.topAnchor.constraint(equalTo: paddingView1.bottomAnchor).isActive = true
         nameTextField.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor).isActive = true
         nameTextField.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
         nameTextField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
@@ -58,13 +66,21 @@ public class TutorialEmailSlideView : HelperView {
         emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor).isActive = true
         emailTextField.widthAnchor.constraint(equalTo: nameTextField.widthAnchor).isActive = true
         
+        let paddingView2 = UIView()
+        paddingView2.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(paddingView2)
+        paddingView2.topAnchor.constraint(equalTo: emailTextField.bottomAnchor).isActive = true
+        let paddingView2HeightConstraint = paddingView2.heightAnchor.constraint(equalToConstant: .extendedPadding)
+        paddingView2HeightConstraint.priority = UILayoutPriorityDefaultLow
+        paddingView2HeightConstraint.isActive = true
+        
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Submit", for: .normal)
         button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
         contentView.addSubview(button)
         button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        button.setContentCompressionResistancePriority(UILayoutPriorityDefaultHigh, for: .vertical)
-        button.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: .extendedPadding * 2).isActive = true
+        button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        button.topAnchor.constraint(equalTo: paddingView2.bottomAnchor, constant: .extendedPadding).isActive = true
         button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor).isActive = true
         button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
@@ -135,6 +151,7 @@ public class TutorialEmailSlideView : HelperView {
         textField.spellCheckingType = .no
         textField.autocorrectionType = .no
         textField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
+        textField.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false
