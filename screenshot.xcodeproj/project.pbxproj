@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
+		524DB53A1FC6F69800BD408F /* UsageStreakHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524DB5391FC6F69800BD408F /* UsageStreakHelper.swift */; };
+		524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */; };
 		525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCF91F9CBA6800330C95 /* HelperView.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
 		527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 527F17491FA21CA6008082BC /* Craze_Video.mp4 */; };
@@ -94,6 +96,8 @@
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
+		524DB5391FC6F69800BD408F /* UsageStreakHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStreakHelper.swift; sourceTree = "<group>"; };
+		524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDeepLinkHandler.swift; sourceTree = "<group>"; };
 		525BBCF91F9CBA6800330C95 /* HelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		527F17491FA21CA6008082BC /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
@@ -344,6 +348,8 @@
 				C59A30471F655F1C00463338 /* ShoppablesController.swift */,
 				C53B46611FBC7CBD00A8C886 /* TransitioningController.swift */,
 				52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */,
+				524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */,
+				524DB5391FC6F69800BD408F /* UsageStreakHelper.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -791,6 +797,7 @@
 				C53B46421FB1A57700A8C886 /* ProductsViewController.m in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
 				C5278FFA1F3C38510090E422 /* PermissionsManager.m in Sources */,
+				524DB53A1FC6F69800BD408F /* UsageStreakHelper.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,

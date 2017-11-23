@@ -14,6 +14,8 @@ class UserDefaultsKeys : NSObject {
     static let name = "Name"
     static let userID = "UserID"
     static let ambasssadorUsername = "AmbasssadorUsername"
+    static let dailyStreak = "dailyStreak"
+    static let lastAppSessionDate = "lastAppSessionDate"
     
     // Discover
     static let discoverUrl = "DiscoverUrl"

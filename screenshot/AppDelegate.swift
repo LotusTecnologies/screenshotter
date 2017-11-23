@@ -40,6 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         prepareDataStackCompletionIfNeeded()
         fetchAppSettings()
         
+        UsageStreakHelper.updateStreak()
+        
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
@@ -52,9 +54,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 //    }
     
+    func applicationWillTerminate(_ application: UIApplication) {
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.discoverUrl)
+        UsageStreakHelper.updateLastSessionDate()
+    }
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        UsageStreakHelper.updateLastSessionDate()
         ApplicationStateModel.sharedInstance.applicationState = .background
         track("sessionEnded")
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
@@ -68,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = .active
         track("sessionStarted")
         AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+        UsageStreakHelper.updateStreak()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -75,10 +85,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = .active
         FBSDKAppEvents.activateApp()
     }
-    
-//    func applicationWillTerminate(_ application: UIApplication) {
-//        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-//    }
     
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         completionHandler(.noData)

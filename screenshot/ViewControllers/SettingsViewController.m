@@ -28,6 +28,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeName,
     RowTypeTutorialVideo,
     RowTypeTellFriend,
+    RowTypeUsageStreak,
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion,
@@ -192,6 +193,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     [self updateScreenshotsCount];
     [self reloadPermissionIndexPaths];
+    
+    NSInteger row = [self.data[@(SectionTypeAbout)] indexOfObject:@(RowTypeUsageStreak)];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:SectionTypeAbout];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -226,10 +231,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
                   @(SectionTypeInfo): @[@(RowTypeName),
                                         @(RowTypeEmail)
                                         ],
-                  @(SectionTypeAbout): @[@(RowTypeTellFriend),
+                  @(SectionTypeAbout): @[
+                                         @(RowTypeTellFriend),
                                          @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
+                                         @(RowTypeUsageStreak),
                                          @(RowTypeCoins),
                                          @(RowTypeVersion)
                                          ],
@@ -436,6 +443,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (NSString *)textForRowType:(RowType)rowType {
     switch (rowType) {
+        case RowTypeUsageStreak:
+            return @"Daily Streak";
+            break;
         case RowTypeBug:
             return @"Submit a Bug";
             break;
@@ -479,6 +489,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypePushPermission:
             return [self enabledTextForRowType:rowType];
             break;
+        case RowTypeUsageStreak: {
+            NSInteger streak = [NSUserDefaults.standardUserDefaults integerForKey:[UserDefaultsKeys dailyStreak]];
+            NSString *suffix = (streak == 0 || streak > 1) ? @"s" : @"";
+            return [NSString stringWithFormat:@"%ld day%@", streak, suffix];
+            break;
+        }
         case RowTypeVersion:
             return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], Constants.buildEnvironmentSuffix];
             break;
