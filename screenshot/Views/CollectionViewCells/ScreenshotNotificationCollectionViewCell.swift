@@ -104,6 +104,8 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         borderView.widthAnchor.constraint(equalToConstant: 1).isActive = true
         borderView.centerXAnchor.constraint(equalTo: tempContentView.centerXAnchor).isActive = true
         
+        // TODO: test dynamic type support!
+        
         var buttonFont = UIFont.preferredFont(forTextStyle: .body)
         
         if let descriptor = buttonFont.fontDescriptor.withSymbolicTraits(.traitBold) {

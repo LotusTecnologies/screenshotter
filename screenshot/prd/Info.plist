@@ -109,5 +109,9 @@
 		<key>test</key>
 		<string>key_test_nhuLfd9jmgzQdyMXBQwnzfinzyh6aPfx</string>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Hind 700.ttf</string>
+	</array>
 </dict>
 </plist>

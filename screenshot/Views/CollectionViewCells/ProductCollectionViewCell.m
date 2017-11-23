@@ -194,7 +194,7 @@
 #pragma mark - Layout
 
 + (UIFont *)labelFont {
-    return [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    return [UIFont systemFontOfSize:17.f];
 }
 
 + (CGFloat)labelVerticalPadding {
