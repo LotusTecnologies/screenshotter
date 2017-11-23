@@ -57,8 +57,7 @@ class DiscoverWebViewController : WebViewController {
             return deepLinkURL
         }
         
-        let persistedDiscoverURL = UserDefaults.standard.url(forKey: UserDefaultsKeys.discoverUrl)
-        return persistedDiscoverURL ?? randomUrl()
+        return randomUrl()
     }
     
     // MARK: Random

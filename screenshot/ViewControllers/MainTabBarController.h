@@ -16,6 +16,6 @@
 @property (nonatomic, strong, readonly) UINavigationController *settingsNavigationController;
 @property (nonatomic, strong, readonly) UINavigationController *discoverNavigationController;
 
-- (void)setNeedsDiscoverNavigation;
+- (void)setNeedsDiscoverNavigationToURL:(NSURL *)URL;
 
 @end
