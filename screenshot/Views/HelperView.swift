@@ -175,20 +175,6 @@ public class HelperView : UIView {
     // MARK: Scrolling
     
     func isScrollable(contentSizeCategory: UIContentSizeCategory = UIApplication.shared.preferredContentSizeCategory) -> Bool {
-        var isScrollable: Bool
-        
-        switch contentSizeCategory {
-        case .accessibilityMedium,
-             .accessibilityLarge,
-             .accessibilityExtraLarge,
-             .accessibilityExtraExtraLarge,
-             .accessibilityExtraExtraExtraLarge:
-            isScrollable = true
-            break
-        default:
-            isScrollable = false
-        }
-        
-        return isScrollable
+        return contentSizeCategory.isAccessibilityCategory
     }
 }

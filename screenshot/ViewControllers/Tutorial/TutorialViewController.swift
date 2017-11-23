@@ -31,6 +31,8 @@ class TutorialViewController : UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
+        
         slides = buildSlides()
     }
     
@@ -73,6 +75,16 @@ class TutorialViewController : UIViewController {
             offset.x = size.width * CGFloat(currentSlideIdx)
             self.scrollView.contentOffset = offset
         }, completion: nil)
+    }
+    
+    func contentSizeCategoryDidChange(_ notification: Notification) {
+        slides.forEach { slide in
+            slide.layoutMargins = slideLayoutMargins
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Slides
@@ -120,7 +132,7 @@ class TutorialViewController : UIViewController {
     private func prepareSlideViews() {
         slides.enumerated().forEach { i, slide in
             slide.translatesAutoresizingMaskIntoConstraints = false
-            slide.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+            slide.layoutMargins = slideLayoutMargins
             contentView.addSubview(slide)
             slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
             slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
@@ -139,6 +151,24 @@ class TutorialViewController : UIViewController {
                 slide.leadingAnchor.constraint(equalTo: previousSlide.trailingAnchor).isActive = true
             }
         }
+    }
+    
+    private var slideLayoutMargins: UIEdgeInsets {
+        var extraTop = CGFloat(0)
+        var extraBottom = CGFloat(0)
+        
+        if !UIApplication.shared.preferredContentSizeCategory.isAccessibilityCategory {
+            if UIDevice.is812h || UIDevice.is736h {
+                extraTop = .extendedPadding
+                extraBottom = .extendedPadding
+                
+            } else if UIDevice.is667h {
+                extraTop = .padding
+                extraBottom = .padding
+            }
+        }
+        
+        return UIEdgeInsets(top: .padding + extraTop, left: .padding, bottom: .padding + extraBottom, right: .padding)
     }
     
     // MARK: - Video
