@@ -38,6 +38,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
+@property (nonatomic, strong) UITextView *tableFooterTextView;
 @property (nonatomic, strong) UIView *tableViewFollowSectionFooter;
 @property (nonatomic, strong) UILabel *screenshotsCountLabel;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
@@ -106,7 +107,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         UILabel *label = [[UILabel alloc] init];
         label.translatesAutoresizingMaskIntoConstraints = NO;
         label.textAlignment = NSTextAlignmentCenter;
-        label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        label.font = [UIFont systemFontOfSize:20 weight:UIFontWeightSemibold];
         label.adjustsFontSizeToFitWidth = YES;
         label.minimumScaleFactor = .7f;
         [tableHeaderContentView addSubview:label];
@@ -123,7 +124,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         view;
     });
     
-    UITextView *tableFooterTextView = ({
+    _tableFooterTextView = ({
         UITextView *textView = [[UITextView alloc] init];
         textView.backgroundColor = [UIColor clearColor];
         textView.editable = NO;
@@ -132,18 +133,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView.dataDetectorTypes = UIDataDetectorTypeLink;
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+        textView.adjustsFontForContentSizeCategory = YES;
         textView.text = @"Questions? Get in touch: info@crazeapp.com";
         textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                         NSUnderlineColorAttributeName: [UIColor gray7]
                                         };
-        [textView sizeToFit];
-        textView.frame = ({
-            CGRect rect = textView.frame;
-            rect.size.height += [Geometry padding];
-            rect;
-        });
         textView;
     });
+    
+    self.tableFooterTextView.frame = [self rectForTableFooterTextView];
     
     _tableView = ({
         UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
@@ -153,9 +151,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         tableView.backgroundView = nil;
         tableView.backgroundColor = [UIColor clearColor];
         tableView.tableHeaderView = tableHeaderView;
-        tableView.tableFooterView = tableFooterTextView;
+        tableView.tableFooterView = self.tableFooterTextView;
         tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
-        tableView.rowHeight = 44.f;
         [self.view addSubview:tableView];
         [tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         [tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
@@ -171,6 +168,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
     UIEdgeInsets insets = self.tableViewFollowSectionFooter.layoutMargins;
     insets.left = [self.tableView headerViewForSection:SectionTypeFollow].layoutMargins.left;
     self.tableViewFollowSectionFooter.layoutMargins = insets;
+    
+    
+    CGRect tableFooterTextViewRect = [self rectForTableFooterTextView];
+    
+    if (self.tableView.tableFooterView.bounds.size.height != tableFooterTextViewRect.size.height) {
+        self.tableFooterTextView.frame = tableFooterTextViewRect;
+        self.tableView.tableFooterView = self.tableFooterTextView;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -308,11 +313,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textField.delegate = self;
         textField.tag = 1;
         textField.returnKeyType = UIReturnKeyDone;
+        textField.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        textField.adjustsFontForContentSizeCategory = YES;
         [cell.contentView addSubview:textField];
-        [textField.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor].active = YES;
         [textField.leadingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
-        [textField.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor].active = YES;
         [textField.trailingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
+        [textField.centerYAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.centerYAnchor].active = YES;
         
     } else {
         textField = [cell.contentView viewWithTag:1];
@@ -329,6 +335,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     textField.text = [self textForRowType:rowType];
     textField.placeholder = [self detailTextForRowType:rowType];
+    
+    cell.textLabel.text = @" "; // Needed for adjusting the cell height correctly with dynamic type
     return cell;
 }
 
@@ -540,6 +548,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
     }
     
     [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];
+}
+
+- (CGRect)rectForTableFooterTextView {
+    CGFloat maxWidth = self.view.bounds.size.width - self.tableFooterTextView.textContainerInset.left - self.tableFooterTextView.textContainerInset.right;
+    CGSize size = CGSizeMake(maxWidth, CGFLOAT_MAX);
+    
+    CGRect rect = [self.tableFooterTextView.attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:NULL];
+    rect.size.width = ceil(rect.size.width) + self.tableFooterTextView.textContainerInset.left + self.tableFooterTextView.textContainerInset.right;
+    rect.size.height = ceil(rect.size.height) + self.tableFooterTextView.textContainerInset.top + self.tableFooterTextView.textContainerInset.bottom + [Geometry padding];
+    return rect;
 }
 
 

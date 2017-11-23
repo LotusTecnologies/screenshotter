@@ -872,6 +872,8 @@ extension AssetSyncModel {
         UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
             if let error = error {
                 print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
+            } else {
+                track("app sent local push notification")
             }
         })
     }

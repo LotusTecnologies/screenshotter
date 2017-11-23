@@ -2,7 +2,7 @@
 //  TutorialEmailSlideView.swift
 //  screenshot
 //
-//  Created by Jacob Relkin on 10/22/17.
+//  Created by Corey Werner on 10/22/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
@@ -17,14 +17,18 @@ protocol TutorialEmailSlideViewDelegate : class {
 public class TutorialEmailSlideView : HelperView {
     weak var delegate: TutorialEmailSlideViewDelegate?
     
-    let nameTextField = UITextField()
-    let emailTextField = UITextField()
-    let textView = TappableTextView()
-    let button = MainButton()
-    var expandableViewHeightConstraint: NSLayoutConstraint!
+    fileprivate let nameTextField = TutorialEmailSlideTextField()
+    fileprivate let emailTextField = TutorialEmailSlideTextField()
+    fileprivate let textView = TappableTextView()
+    fileprivate let button = MainButton()
+    fileprivate var expandableViewHeightConstraint: NSLayoutConstraint!
     
-    var keyboardFrame: CGRect = .zero
-    var readyToSubmit: Bool = false
+    fileprivate var keyboardFrame = CGRect.zero
+    private var readyToSubmit = false
+    
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,144 +36,75 @@ public class TutorialEmailSlideView : HelperView {
         titleLabel.text = "Sign Up"
         subtitleLabel.text = "Fill out your info below"
         
-        // TODO: better small screen layout
-        let is480h = UIDevice.is480h
+        let paddingView1 = UIView()
+        paddingView1.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(paddingView1)
+        paddingView1.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        let paddingView1HeightConstraint = paddingView1.heightAnchor.constraint(equalToConstant: .extendedPadding)
+        paddingView1HeightConstraint.priority = UILayoutPriorityDefaultLow
+        paddingView1HeightConstraint.isActive = true
         
-        let p = is480h ? CGFloat.padding / 2 : CGFloat.padding
-        let p2 = is480h ? CGFloat.extendedPadding / 2 : CGFloat.extendedPadding
+        setupTextField(nameTextField)
+        nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
+        nameTextField.placeholder = "Name"
+        nameTextField.returnKeyType = .next
+        contentView.addSubview(nameTextField)
+        nameTextField.topAnchor.constraint(equalTo: paddingView1.bottomAnchor).isActive = true
+        nameTextField.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor).isActive = true
+        nameTextField.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
+        nameTextField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        nameTextField.widthAnchor.constraint(greaterThanOrEqualToConstant: 236).isActive = true
         
-        let nameLabel = { _ -> UILabel in
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.text = "Your name:"
-            label.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -5, right: 0)
-            
-            contentView.addSubview(label)
-            label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: is480h ? 0 : 30),
-                label.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
-                label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
-                label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-                
-                { _ -> NSLayoutConstraint in
-                    let width = NSLayoutConstraint(item: label, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 400)
-                    width.priority = UILayoutPriorityDefaultHigh
-                    return width
-                }()
-            ])
-            
-            return label
-        }()
+        setupTextField(emailTextField)
+        emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
+        emailTextField.placeholder = "Email"
+        emailTextField.keyboardType = .emailAddress
+        emailTextField.autocapitalizationType = .none
+        contentView.addSubview(emailTextField)
+        emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: .extendedPadding).isActive = true
+        emailTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor).isActive = true
+        emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor).isActive = true
+        emailTextField.widthAnchor.constraint(equalTo: nameTextField.widthAnchor).isActive = true
         
-        ({ _ -> Void in
-            let textField = nameTextField
-            textField.translatesAutoresizingMaskIntoConstraints = false
-            textField.delegate = self
-            textField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
-            textField.placeholder = "Enter your name"
-            textField.backgroundColor = .white
-            textField.borderStyle = .roundedRect
-            textField.returnKeyType = .next
-            textField.spellCheckingType = .no
-            textField.autocorrectionType = .no
-            textField.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -p, right: 0)
-            contentView.addSubview(textField)
-            
-            textField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                textField.topAnchor.constraint(equalTo: nameLabel.layoutMarginsGuide.bottomAnchor),
-                textField.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-                textField.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-                textField.heightAnchor.constraint(equalToConstant: is480h ? 30 : 50)
-            ])
-        })()
+        let paddingView2 = UIView()
+        paddingView2.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(paddingView2)
+        paddingView2.topAnchor.constraint(equalTo: emailTextField.bottomAnchor).isActive = true
+        let paddingView2HeightConstraint = paddingView2.heightAnchor.constraint(equalToConstant: .extendedPadding)
+        paddingView2HeightConstraint.priority = UILayoutPriorityDefaultLow
+        paddingView2HeightConstraint.isActive = true
         
-        let emailLabel = { _ -> UILabel in
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.text = "Your email:"
-            label.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -5, right: 0)
-            
-            contentView.addSubview(label)
-            label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: nameTextField.layoutMarginsGuide.bottomAnchor, constant: 20),
-                label.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
-                label.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor)
-            ])
-            
-            return label
-        }()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Submit", for: .normal)
+        button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
+        contentView.addSubview(button)
+        button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        button.topAnchor.constraint(equalTo: paddingView2.bottomAnchor, constant: .extendedPadding).isActive = true
+        button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor).isActive = true
+        button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
+        button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         
-        ({ _ in
-            emailTextField.translatesAutoresizingMaskIntoConstraints = false
-            emailTextField.delegate = self
-            emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-            emailTextField.placeholder = "yourname@website.com"
-            emailTextField.keyboardType = .emailAddress
-            emailTextField.backgroundColor = .white
-            emailTextField.borderStyle = .roundedRect
-            emailTextField.spellCheckingType = .no
-            emailTextField.autocorrectionType = .no
-            emailTextField.autocapitalizationType = .none
-            
-            contentView.addSubview(emailTextField)
-            emailTextField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                emailTextField.topAnchor.constraint(equalTo: emailLabel.layoutMarginsGuide.bottomAnchor),
-                emailTextField.leadingAnchor.constraint(equalTo: emailLabel.leadingAnchor),
-                emailTextField.trailingAnchor.constraint(equalTo: emailLabel.trailingAnchor),
-                emailTextField.heightAnchor.constraint(equalTo: nameTextField.heightAnchor)
-            ])
-        })()
-
-        ({ _ in
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.setTitle("Submit", for: .normal)
-            button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
-        
-            contentView.addSubview(button)
-            button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-            button.setContentCompressionResistancePriority(UILayoutPriorityDefaultHigh, for: .vertical)
-            
-            NSLayoutConstraint.activate([
-                button.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: p2),
-                button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
-                button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
-                button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
-            ])
-        })()
-        
-        ({
+        {
             textView.delegate = self
             textView.translatesAutoresizingMaskIntoConstraints = false
             textView.backgroundColor = .clear
             textView.textColor = .gray6
             textView.textAlignment = .center
             textView.font = UIFont.preferredFont(forTextStyle: .footnote)
+            textView.adjustsFontForContentSizeCategory = true
             textView.isEditable = false
             textView.isScrollEnabled = false
             textView.scrollsToTop = false
-            
             contentView.addSubview(textView)
-            
             textView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+            textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor, constant: .extendedPadding).isActive = true
+            textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+            textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+            textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             
-            NSLayoutConstraint.activate([
-                textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor, constant: p),
-                textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-                textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
-            ])
-            
-            let tappableText:[[String: NSNumber]] = [
-                ["By tapping \"Submit\" above, you agree to our\n": NSNumber(value:false)],
+            let tappableText: [[String: NSNumber]] = [
+                ["By tapping \"Submit\" above, you agree to our ": NSNumber(value:false)],
                 ["Terms of Service": NSNumber(value:true)],
                 [" and ": NSNumber(value:false)],
                 ["Privacy Policy": NSNumber(value:true)],
@@ -179,32 +114,53 @@ public class TutorialEmailSlideView : HelperView {
             let paragraph = NSMutableParagraphStyle()
             paragraph.alignment = textView.textAlignment
             
-            let attributes = [ NSFontAttributeName : textView.font!,
-                               NSParagraphStyleAttributeName : paragraph ] as [String : Any]
-            textView.applyTappableText(tappableText, withAttributes: attributes)
-        })()
-
-        ({ _ in
-            let expandableView = UIView()
-            expandableView.translatesAutoresizingMaskIntoConstraints = false
-            contentView.addSubview(expandableView)
+            let attributes: [String : Any] = [
+                NSFontAttributeName : textView.font!,
+                NSParagraphStyleAttributeName : paragraph
+            ]
             
-            expandableView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-            expandableViewHeightConstraint = NSLayoutConstraint(item: expandableView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0)
-            expandableViewHeightConstraint.isActive = true
-        })()
+            textView.applyTappableText(tappableText, withAttributes: attributes)
+        }()
+        
+        let expandableView = UIView()
+        expandableView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(expandableView)
+        expandableView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        expandableViewHeightConstraint = NSLayoutConstraint(item: expandableView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0)
+        expandableViewHeightConstraint.isActive = true
         
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
         
         textView.delegate = nil
+    }
+    
+    // MARK: Layout
+    
+    func setupTextField(_ textField: UITextField) {
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.delegate = self
+        textField.textAlignment = .center
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.adjustsFontForContentSizeCategory = true
+        textField.backgroundColor = .white
+        textField.borderStyle = .none
+        textField.spellCheckingType = .no
+        textField.autocorrectionType = .no
+        textField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
+        textField.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        
+        let borderView = UIView()
+        borderView.translatesAutoresizingMaskIntoConstraints = false
+        borderView.backgroundColor = .gray3
+        textField.addSubview(borderView)
+        borderView.leadingAnchor.constraint(equalTo: textField.leadingAnchor).isActive = true
+        borderView.bottomAnchor.constraint(equalTo: textField.bottomAnchor).isActive = true
+        borderView.trailingAnchor.constraint(equalTo: textField.trailingAnchor).isActive = true
+        borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
     }
     
     // MARK: Actions
@@ -222,12 +178,17 @@ public class TutorialEmailSlideView : HelperView {
         _ = identify(trimmedName, email: trimmedEmail, tracker: AnalyticsTrackers.branch)
         
         if trimmedEmail.count > 0 {
-            track("Submitted email", properties: ["id" : user.identifier,
-                                                  "name" : trimmedName,
-                                                  "email": trimmedEmail])
+            track("Submitted email", properties: [
+                "id": user.identifier,
+                "name": trimmedName,
+                "email": trimmedEmail
+                ])
+            
         } else {
-            track("Submitted blank email", properties: [ "id" : user.identifier,
-                                                         "name" : trimmedName])
+            track("Submitted blank email", properties: [
+                "id": user.identifier,
+                "name": trimmedName
+                ])
         }
 
         if let ambassadorUsername = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername) {
@@ -373,5 +334,13 @@ extension TutorialEmailSlideView : TutorialSlideView {
     
     public func willLeaveSlide() {
         NotificationCenter.default.removeObserver(self)
+    }
+}
+
+private class TutorialEmailSlideTextField : UITextField {
+    override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height *= 1.5
+        return size
     }
 }

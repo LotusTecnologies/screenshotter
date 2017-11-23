@@ -185,9 +185,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         UILabel *titleLabel = [[UILabel alloc] init];
         titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
         titleLabel.text = @"Ready To Shop";
-        titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-        titleLabel.minimumScaleFactor = .7f;
-        titleLabel.adjustsFontSizeToFitWidth = YES;
+        titleLabel.font = [UIFont systemFontOfSize:22.f weight:UIFontWeightSemibold];
+        titleLabel.numberOfLines = 0;
         [contentView addSubview:titleLabel];
         [titleLabel.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
         [titleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
@@ -196,7 +195,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         UILabel *descriptionLabel = [[UILabel alloc] init];
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
         descriptionLabel.text = @"Here’s your screenshot!\nTap on it to see the products in the photo.";
-        descriptionLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        descriptionLabel.font = [UIFont systemFontOfSize:22.f weight:UIFontWeightLight];
         descriptionLabel.numberOfLines = 0;
         [contentView addSubview:descriptionLabel];
         [descriptionLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:[Geometry padding]].active = YES;
@@ -360,6 +359,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
     [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
     [self dismissNotificationCell];
+    [self syncHelperViewVisibility];
 }
 
 - (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
@@ -373,6 +373,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
     
     [self dismissNotificationCell];
+    [self syncHelperViewVisibility];
 }
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId {
@@ -386,6 +387,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         } else {
             [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
         }
+        
+        [self syncHelperViewVisibility];
     }
 }
 
@@ -520,7 +523,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         }
     }
     
-    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0);
+    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0 || [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
 }
 

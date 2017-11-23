@@ -25,6 +25,9 @@ extension UIDevice {
 // MARK: Size
 
 extension UIDevice {
-    static let is480h = UIScreen.main.bounds.size.height == 480
-    static let is568h = UIScreen.main.bounds.size.height == 568
+    static let is480h = UIScreen.main.bounds.size.height == 480 // 4
+    static let is568h = UIScreen.main.bounds.size.height == 568 // 5
+    static let is667h = UIScreen.main.bounds.size.height == 667 // 6, 7, 8
+    static let is736h = UIScreen.main.bounds.size.height == 736 // 6+, 7+, 8+
+    static let is812h = UIScreen.main.bounds.size.height == 812 // X
 }

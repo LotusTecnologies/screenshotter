@@ -39,7 +39,6 @@ class TutorialVideoOverlayView : UIView {
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.alpha = 0
         doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 12, 8, 12)
-        doneButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         doneButton.setTitle("Done", for: .normal)
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 1

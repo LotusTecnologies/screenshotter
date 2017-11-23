@@ -96,7 +96,7 @@
         shoppableLabel.textAlignment = NSTextAlignmentCenter;
         shoppableLabel.minimumScaleFactor = .7f;
         shoppableLabel.adjustsFontSizeToFitWidth = YES;
-        shoppableLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        shoppableLabel.font = [UIFont boldSystemFontOfSize:20.f];
         [topContentView addSubview:shoppableLabel];
         [shoppableLabel.topAnchor constraintEqualToAnchor:shoppableContentView.bottomAnchor constant:p].active = YES;
         [shoppableLabel.leadingAnchor constraintEqualToAnchor:topContentView.leadingAnchor].active = YES;
@@ -140,7 +140,7 @@
             label.textAlignment = NSTextAlignmentCenter;
             label.minimumScaleFactor = .7f;
             label.adjustsFontSizeToFitWidth = YES;
-            label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+            label.font = [UIFont systemFontOfSize:13.f];
             [bottomContentView addSubview:label];
             [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
             [label.topAnchor constraintEqualToAnchor:self.productImageView.bottomAnchor constant:2.f].active = YES;
@@ -154,7 +154,7 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             label.textAlignment = NSTextAlignmentCenter;
             label.textColor = [UIColor gray6];
-            label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
+            label.font = [UIFont systemFontOfSize:13.f];
             [bottomContentView addSubview:label];
             [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
             [label.topAnchor constraintEqualToAnchor:self.productBrandLabel.bottomAnchor constant:2.f].active = YES;
@@ -173,7 +173,9 @@
         UILabel *favoriteLabel = [[UILabel alloc] init];
         favoriteLabel.translatesAutoresizingMaskIntoConstraints = NO;
         favoriteLabel.text = @"Favorite";
-        favoriteLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        favoriteLabel.font = [UIFont boldSystemFontOfSize:18.f];
+        favoriteLabel.adjustsFontSizeToFitWidth = YES;
+        favoriteLabel.minimumScaleFactor = .7f;
         [bottomContentView addSubview:favoriteLabel];
         [favoriteLabel.leadingAnchor constraintEqualToAnchor:self.productImageView.trailingAnchor constant:25.f].active = YES;
         [favoriteLabel.trailingAnchor constraintEqualToAnchor:bottomContentView.trailingAnchor].active = YES;
@@ -189,7 +191,9 @@
         UILabel *purchaseLabel = [[UILabel alloc] init];
         purchaseLabel.translatesAutoresizingMaskIntoConstraints = NO;
         purchaseLabel.text = @"Tap to purchase";
-        purchaseLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        purchaseLabel.font = [UIFont boldSystemFontOfSize:18.f];
+        purchaseLabel.adjustsFontSizeToFitWidth = YES;
+        purchaseLabel.minimumScaleFactor = .7f;
         [bottomContentView addSubview:purchaseLabel];
         [purchaseLabel.leadingAnchor constraintEqualToAnchor:favoriteLabel.leadingAnchor].active = YES;
         [purchaseLabel.trailingAnchor constraintEqualToAnchor:bottomContentView.trailingAnchor].active = YES;
