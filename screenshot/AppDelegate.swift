@@ -19,7 +19,7 @@ import DeepLinkKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    var router = DPLDeepLinkRouter()
+    var router:DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var settings: AppSettings?
@@ -32,7 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        setupRouter()
         PermissionsManager.shared().fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
@@ -88,11 +87,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        var handled = router.handle(url) { (handled, error) in
+        var handled = router?.handle(url) { (handled, error) in
             if let error = error {
                 print(error)
             }
-        }
+        } ?? false
         
         if !handled {
             handled = Branch.getInstance().application(app, open: url, options:options)
@@ -137,11 +136,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         // pass the url to the handle deep link call
         if Branch.getInstance().continue(userActivity) == false {
-            return router.handle(userActivity) { (handled, error) in
+            return router?.handle(userActivity) { (handled, error) in
                 if let error = error {
                     print(error)
                 }
-            }
+            } ?? false
         }
         
         return true
@@ -163,6 +162,8 @@ extension AppDelegate {
     // MARK: - Third Party
 
     func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
+        setupRouter()
+        
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
         configuration.recordScreenViews = true
@@ -276,7 +277,8 @@ extension AppDelegate {
 
 extension AppDelegate {
     func setupRouter() {
-        router.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
+        router = DPLDeepLinkRouter()
+        router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 
