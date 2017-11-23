@@ -92,16 +92,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        var handled = router.handle(url) { (handled, error) in
+            if let error = error {
+                print(error)
+            }
+        }
         
-        var handled = Branch.getInstance().application(app, open: url, options:options)
+        if !handled {
+            handled = Branch.getInstance().application(app, open: url, options:options)
+        }
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
         if !handled {
+            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+            let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+            
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
@@ -125,14 +133,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //
 //                return true
 //            }
-        }
-        
-        if !handled {
-            handled = router.handle(url) { (handled, error) in
-                if let error = error {
-                    print(error)
-                }
-            }
         }
         
         return handled
