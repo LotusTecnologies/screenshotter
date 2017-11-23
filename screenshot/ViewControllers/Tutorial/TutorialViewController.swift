@@ -22,36 +22,7 @@ class TutorialViewController : UIViewController {
     private var didPresentDeterminePushAlertController = false
     fileprivate var scrollViewIsScrollingAnimation = false
     
-    // MARK: Slides
-    
-    var slides = [UIView]()
-    
-    private func buildSlides() -> [UIView] {
-        let welcomeSlide = TutorialWelcomeSlideView()
-        welcomeSlide.getStartedButtonTapped = presentVideo
-        
-        let emailSlide = TutorialEmailSlideView()
-        emailSlide.delegate = self
-        
-        let trySlide = TutorialTrySlideView()
-        trySlide.delegate = self
-        
-        return [welcomeSlide, emailSlide, trySlide]
-    }
-    
-    fileprivate var currentSlideIndex: Int {
-        guard scrollView.bounds != .zero else {
-            return 0
-        }
-        
-        return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
-    }
-    
-    fileprivate var currentSlide: UIView {
-        return slides[currentSlideIndex]
-    }
-    
-    // MARK: - Initialization
+    // MARK: - Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -62,8 +33,6 @@ class TutorialViewController : UIViewController {
         
         slides = buildSlides()
     }
-    
-    // MARK: - UIViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,16 +75,34 @@ class TutorialViewController : UIViewController {
         }, completion: nil)
     }
     
-    // MARK: - Public
+    // MARK: - Slides
     
-    func presentVideo() {
-        let vc = TutorialVideoViewController(video: video)
-        vc.modalTransitionStyle = .crossDissolve
-        vc.delegate = self
-        present(vc, animated: true, completion: nil)
+    var slides = [UIView]()
+    
+    private func buildSlides() -> [UIView] {
+        let welcomeSlide = TutorialWelcomeSlideView()
+        welcomeSlide.getStartedButtonTapped = presentVideo
+        
+        let emailSlide = TutorialEmailSlideView()
+        emailSlide.delegate = self
+        
+        let trySlide = TutorialTrySlideView()
+        trySlide.delegate = self
+        
+        return [welcomeSlide, emailSlide, trySlide]
     }
     
-    // MARK: - Private
+    fileprivate var currentSlideIndex: Int {
+        guard scrollView.bounds != .zero else {
+            return 0
+        }
+        
+        return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
+    }
+    
+    fileprivate var currentSlide: UIView {
+        return slides[currentSlideIndex]
+    }
     
     fileprivate func scrollToNextSlide(animated: Bool = true) {
         guard scrollViewIsScrollingAnimation == false else {
@@ -152,6 +139,15 @@ class TutorialViewController : UIViewController {
                 slide.leadingAnchor.constraint(equalTo: previousSlide.trailingAnchor).isActive = true
             }
         }
+    }
+    
+    // MARK: - Video
+    
+    private func presentVideo() {
+        let viewController = TutorialVideoViewController(video: video)
+        viewController.modalTransitionStyle = .crossDissolve
+        viewController.delegate = self
+        present(viewController, animated: true, completion: nil)
     }
     
     @objc fileprivate func dismissViewController() {
