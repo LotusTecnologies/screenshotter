@@ -18,12 +18,6 @@ public class HelperView : UIView {
     private var scrollContentViewMaxHeightConstraint: NSLayoutConstraint!
     private var imageView: UIImageView?
     
-    private var isScrollable = false {
-        didSet {
-            scrollContentViewMaxHeightConstraint.isActive = !isScrollable
-        }
-    }
-    
     // MARK: Life Cycle
     
     public required init?(coder aDecoder: NSCoder) {
@@ -51,7 +45,7 @@ public class HelperView : UIView {
         scrollContentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         scrollContentView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor).isActive = true
         scrollContentViewMaxHeightConstraint = scrollContentView.heightAnchor.constraint(equalTo: layoutMarginsGuide.heightAnchor)
-        scrollContentViewMaxHeightConstraint.isActive = true
+        scrollContentViewMaxHeightConstraint.isActive = !isScrollable()
         
         var font = UIFont.preferredFont(forTextStyle: .title1)
         
@@ -138,24 +132,9 @@ public class HelperView : UIView {
     }
     
     func contentSizeCategoryDidChange(_ notification: Notification) {
-        guard window != nil else {
-            return
-        }
-        
         if let userInfo = notification.userInfo, let contentSizeCategoryString = userInfo[UIContentSizeCategoryNewValueKey] as? String {
             let contentSizeCategory = UIContentSizeCategory(rawValue: contentSizeCategoryString)
-            
-            switch contentSizeCategory {
-            case .accessibilityMedium,
-                 .accessibilityLarge,
-                 .accessibilityExtraLarge,
-                 .accessibilityExtraExtraLarge,
-                 .accessibilityExtraExtraExtraLarge:
-                isScrollable = true
-                break
-            default:
-                isScrollable = false
-            }
+            scrollContentViewMaxHeightConstraint.isActive = !isScrollable(contentSizeCategory: contentSizeCategory)
         }
     }
     
@@ -191,5 +170,25 @@ public class HelperView : UIView {
                 imageView = nil
             }
         }
+    }
+    
+    // MARK: Scrolling
+    
+    func isScrollable(contentSizeCategory: UIContentSizeCategory = UIApplication.shared.preferredContentSizeCategory) -> Bool {
+        var isScrollable: Bool
+        
+        switch contentSizeCategory {
+        case .accessibilityMedium,
+             .accessibilityLarge,
+             .accessibilityExtraLarge,
+             .accessibilityExtraExtraLarge,
+             .accessibilityExtraExtraExtraLarge:
+            isScrollable = true
+            break
+        default:
+            isScrollable = false
+        }
+        
+        return isScrollable
     }
 }

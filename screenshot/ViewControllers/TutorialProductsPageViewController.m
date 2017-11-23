@@ -173,7 +173,9 @@
         UILabel *favoriteLabel = [[UILabel alloc] init];
         favoriteLabel.translatesAutoresizingMaskIntoConstraints = NO;
         favoriteLabel.text = @"Favorite";
-        favoriteLabel.font = [UIFont boldSystemFontOfSize:20.f];
+        favoriteLabel.font = [UIFont boldSystemFontOfSize:18.f];
+        favoriteLabel.adjustsFontSizeToFitWidth = YES;
+        favoriteLabel.minimumScaleFactor = .7f;
         [bottomContentView addSubview:favoriteLabel];
         [favoriteLabel.leadingAnchor constraintEqualToAnchor:self.productImageView.trailingAnchor constant:25.f].active = YES;
         [favoriteLabel.trailingAnchor constraintEqualToAnchor:bottomContentView.trailingAnchor].active = YES;
@@ -189,7 +191,9 @@
         UILabel *purchaseLabel = [[UILabel alloc] init];
         purchaseLabel.translatesAutoresizingMaskIntoConstraints = NO;
         purchaseLabel.text = @"Tap to purchase";
-        purchaseLabel.font = [UIFont boldSystemFontOfSize:20.f];
+        purchaseLabel.font = [UIFont boldSystemFontOfSize:18.f];
+        purchaseLabel.adjustsFontSizeToFitWidth = YES;
+        purchaseLabel.minimumScaleFactor = .7f;
         [bottomContentView addSubview:purchaseLabel];
         [purchaseLabel.leadingAnchor constraintEqualToAnchor:favoriteLabel.leadingAnchor].active = YES;
         [purchaseLabel.trailingAnchor constraintEqualToAnchor:bottomContentView.trailingAnchor].active = YES;
