@@ -25,6 +25,26 @@ extension UIColor {
     static let gray9 = UIColor(white: 0.9, alpha: 1.0) // 229.5
 }
 
+extension UIContentSizeCategory {
+    var isAccessibilityCategory: Bool {
+        var isAccessibility: Bool
+        
+        switch self {
+        case .accessibilityMedium,
+             .accessibilityLarge,
+             .accessibilityExtraLarge,
+             .accessibilityExtraExtraLarge,
+             .accessibilityExtraExtraExtraLarge:
+            isAccessibility = true
+            break
+        default:
+            isAccessibility = false
+        }
+        
+        return isAccessibility
+    }
+}
+
 struct Shadow {
     private(set) var radius: CGFloat;
     private(set) var offset: CGSize;
