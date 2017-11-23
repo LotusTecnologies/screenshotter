@@ -14,13 +14,6 @@
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
-typedef NS_ENUM(NSUInteger, ShoppableSortType) {
-    ShoppableSortTypeSimilar,
-    ShoppableSortTypePriceAsc,
-    ShoppableSortTypePriceDes,
-    ShoppableSortTypeBrands
-};
-
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate>
 
 @property (nonatomic, strong) Loader *loader;
@@ -198,29 +191,31 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     NSArray<NSSortDescriptor *> *descriptors;
     
     switch ([self.productsOptions _currentSort]) {
-        case ShoppableSortTypeSimilar:
+        case 0: // == .similar
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
             
-        case ShoppableSortTypePriceAsc:
+        case 1: // == .priceAsc
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
             break;
             
-        case ShoppableSortTypePriceDes:
+        case 2: // == .priceDes
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:NO]];
             break;
             
-        case ShoppableSortTypeBrands:
+        case 3: // == .brands
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"displayTitle" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)],
                             [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
     }
     
-    NSSet<Product *> *filtered = shoppable.products;
-    if ([self.productsOptions _currentSale] == 0) { // 0 => .sale
-        filtered = [filtered filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
+    NSSet<Product *> *products = shoppable.products;
+    
+    if ([self.productsOptions _currentSale] == 0) { // == .sale
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
-    return [filtered sortedArrayUsingDescriptors:descriptors];
+    
+    return [products sortedArrayUsingDescriptors:descriptors];
 }
 
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
