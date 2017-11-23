@@ -15,9 +15,11 @@ import Branch
 import Firebase
 import GoogleSignIn
 import PromiseKit
+import DeepLinkKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    var router = DPLDeepLinkRouter()
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var settings: AppSettings?
@@ -30,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        setupRouter()
         PermissionsManager.shared().fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
@@ -51,6 +54,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 //        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 //    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.discoverUrl)
+    }
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
@@ -120,12 +127,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            }
         }
         
+        if !handled {
+            handled = router.handle(url) { (handled, error) in
+                if let error = error {
+                    print(error)
+                }
+            }
+        }
+        
         return handled
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         // pass the url to the handle deep link call
-        Branch.getInstance().continue(userActivity)
+        if Branch.getInstance().continue(userActivity) == false {
+            return router.handle(userActivity) { (handled, error) in
+                if let error = error {
+                    print(error)
+                }
+            }
+        }
+        
         return true
     }
 }
@@ -183,6 +205,15 @@ extension AppDelegate {
                 
                 if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
                     tutorialVC.video = .Ambassador(username: channel)
+                }
+            }
+            
+            // "discoverURL" will be the discover URL that should be used during this session.
+            if let discoverURLString = params["discoverURL"] as? String, let discoverURL = URL(string: discoverURLString) {
+                UserDefaults.standard.set(discoverURL, forKey: UserDefaultsKeys.discoverUrl)
+                
+                if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                    mainTabBarController.setNeedsDiscoverNavigation()
                 }
             }
         }
@@ -244,6 +275,14 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
+    }
+}
+
+// MARK: - Deep Link Router
+
+extension AppDelegate {
+    func setupRouter() {
+        router.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 

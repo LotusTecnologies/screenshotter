@@ -5,6 +5,8 @@
 #ifndef screenshot_Bridging_Header_h
 #define screenshot_Bridging_Header_h
 
+#import <DeepLinkKit/DeepLinkKit.h>
+
 #import "PermissionsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"

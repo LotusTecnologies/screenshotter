@@ -14,6 +14,7 @@
 
 @interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
     BOOL _isObservingSettingsBadgeFont;
+    BOOL _needsDiscoverNavigation;
 }
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
@@ -103,6 +104,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     
     [self refreshTabBarSettingsBadge];
     [self presentUpdatePromptIfNeeded];
+    
+    if (_needsDiscoverNavigation) {
+        [self navigateToDiscover];
+        
+        _needsDiscoverNavigation = NO;
+    }
 }
 
 - (void)viewSafeAreaInsetsDidChange {
@@ -115,6 +122,18 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         }
     }
 }
+
+#pragma mark - Discover Navigation
+
+- (void)setNeedsDiscoverNavigation {
+    if ([self isViewLoaded]) {
+        [self navigateToDiscover];
+    } else {
+        _needsDiscoverNavigation = YES;
+    }
+}
+
+#pragma mark -
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
@@ -273,6 +292,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             [self.updatePromptHandler presentUpdatePromptIfNeeded];
         }
     }
+}
+
+#pragma mark - Private
+
+- (void)navigateToDiscover {
+    self.selectedViewController = self.discoverNavigationController;
 }
 
 @end

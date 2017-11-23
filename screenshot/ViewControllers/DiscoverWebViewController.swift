@@ -1,4 +1,3 @@
-
 //
 //  DiscoverWebViewController.swift
 //  screenshot
@@ -8,8 +7,11 @@
 //
 
 import WebKit.WKWebView
+import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
+    var deepLinkURL: URL?
+    
     override var title: String? {
         set {}
         get {
@@ -40,11 +42,26 @@ class DiscoverWebViewController : WebViewController {
         webView.scrollView.delegate = self
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
         
-        url = randomUrl()
+        reloadURL()
         track("Loaded Discover Web Page", properties: ["url" : url])
     }
     
-    // MARK: Random Url
+    // MARK: - URLs
+
+    func reloadURL() {
+        url = discoverURL()
+    }
+    
+    func discoverURL() -> URL? {
+        guard deepLinkURL == nil else {
+            return deepLinkURL
+        }
+        
+        let persistedDiscoverURL = UserDefaults.standard.url(forKey: UserDefaultsKeys.discoverUrl)
+        return persistedDiscoverURL ?? randomUrl()
+    }
+    
+    // MARK: Random
     
     func randomUrl() -> URL? {
         var randomUrl = "https://screenshopit.tumblr.com"
@@ -76,7 +93,7 @@ class DiscoverWebViewController : WebViewController {
     // MARK: Bar Button Item Actions
     
     func refreshAction() {
-        url = randomUrl()
+        reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
     }
 }
@@ -84,5 +101,14 @@ class DiscoverWebViewController : WebViewController {
 extension DiscoverWebViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return nil
+    }
+}
+
+extension DiscoverWebViewController : DPLTargetViewController {
+    func configure(with deepLink: DPLDeepLink!) {
+        if let url = deepLink.discoverURL {
+            deepLinkURL = url
+            reloadURL()
+        }
     }
 }
