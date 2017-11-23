@@ -53,11 +53,7 @@ class DiscoverWebViewController : WebViewController {
     }
     
     func discoverURL() -> URL? {
-        guard deepLinkURL == nil else {
-            return deepLinkURL
-        }
-        
-        return randomUrl()
+        return deepLinkURL ?? randomUrl()
     }
     
     // MARK: Random
