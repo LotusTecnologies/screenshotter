@@ -10,7 +10,7 @@ import Foundation
 import QuartzCore
 
 class ShadowCollectionViewCell: UICollectionViewCell {
-    private let shadowView = UIView()
+    private let shadowView = NotifySizeChangeView()
     private(set) var mainView = UIView()
     
     required init?(coder aDecoder: NSCoder) {
@@ -22,6 +22,9 @@ class ShadowCollectionViewCell: UICollectionViewCell {
         
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         shadowView.layoutMargins = Shadow.basic.layoutMargins
+        shadowView.notification = { size in
+            self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: self.shadowView.bounds, cornerRadius: type(of: self).cornerRadius).cgPath
+        }
         shadowView.layer.shadowColor = Shadow.basic.color.cgColor;
         shadowView.layer.shadowOffset = type(of: self).shadowOffset
         shadowView.layer.shadowRadius = type(of: self).shadowRadius
@@ -42,17 +45,6 @@ class ShadowCollectionViewCell: UICollectionViewCell {
         mainView.leadingAnchor.constraint(equalTo: shadowView.leadingAnchor).isActive = true
         mainView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
         mainView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        if !shadowView.bounds.equalTo(.zero),
-            let shadowPath = shadowView.layer.shadowPath,
-            !shadowPath.boundingBox.size.equalTo(shadowView.bounds.size)
-        {
-            shadowView.layer.shadowPath = UIBezierPath(roundedRect: shadowView.bounds, cornerRadius: type(of: self).cornerRadius).cgPath
-        }
     }
     
     // MARK: Layout

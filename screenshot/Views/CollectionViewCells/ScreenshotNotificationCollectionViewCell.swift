@@ -104,8 +104,6 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         borderView.widthAnchor.constraint(equalToConstant: 1).isActive = true
         borderView.centerXAnchor.constraint(equalTo: tempContentView.centerXAnchor).isActive = true
         
-        // TODO: test dynamic type support!
-        
         var buttonFont = UIFont.preferredFont(forTextStyle: .body)
         
         if let descriptor = buttonFont.fontDescriptor.withSymbolicTraits(.traitBold) {
@@ -118,6 +116,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         rejectButton.setTitleColor(.gray3, for: .normal)
         rejectButton.setTitleColor(.gray7, for: .highlighted)
         rejectButton.titleLabel?.font = buttonFont
+        rejectButton.titleLabel?.adjustsFontForContentSizeCategory = true
         rejectButton.addTarget(self, action: #selector(rejectButtonAction), for: .touchUpInside)
         tempContentView.addSubview(rejectButton)
         rejectButton.topAnchor.constraint(equalTo: borderView.topAnchor).isActive = true
@@ -132,6 +131,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         confirmButton.setTitleColor(.gray3, for: .normal)
         confirmButton.setTitleColor(.gray7, for: .highlighted)
         confirmButton.titleLabel?.font = buttonFont
+        rejectButton.titleLabel?.adjustsFontForContentSizeCategory = true
         confirmButton.addTarget(self, action: #selector(confirmButtonAction), for: .touchUpInside)
         tempContentView.addSubview(confirmButton)
         confirmButton.topAnchor.constraint(equalTo: borderView.topAnchor).isActive = true
@@ -186,6 +186,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
                 label.textColor = .gray3
                 label.numberOfLines = 0
                 label.font = type(of: self).labelFont
+                label.adjustsFontForContentSizeCategory = true
                 label.textAlignment = .center
                 _tempContentLabel = label
             }
@@ -217,7 +218,9 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         return text
     }
     
-    fileprivate static let labelFont = UIFont.preferredFont(forTextStyle: .body)
+    fileprivate static var labelFont: UIFont {
+        return UIFont.preferredFont(forTextStyle: .body)
+    }
 }
 
 // MARK: - Size

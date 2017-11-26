@@ -134,7 +134,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
         textView.adjustsFontForContentSizeCategory = YES;
-        textView.text = @"Questions? Get in touch: info@crazeapp.com";
+        textView.text = @"Questions? Get in touch: info@screenshopit.com";
         textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                         NSUnderlineColorAttributeName: [UIColor gray7]
                                         };
@@ -737,7 +737,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         mail.mailComposeDelegate = self;
         [mail setSubject:@"Bug Report"];
         [mail setMessageBody:[message componentsJoinedByString:@"\n"] isHTML:NO];
-        [mail setToRecipients:@[@"support@crazeapp.com"]];
+        [mail setToRecipients:@[@"support@screenshopit.com"]];
         
         [self presentViewController:mail animated:YES completion:nil];
         
