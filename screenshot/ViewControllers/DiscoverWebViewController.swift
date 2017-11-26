@@ -10,7 +10,11 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
-    var deepLinkURL: URL?
+    var deepLinkURL: URL? {
+        didSet {
+            reloadURL()
+        }
+    }
     
     override var title: String? {
         set {}
@@ -103,7 +107,6 @@ extension DiscoverWebViewController : DPLTargetViewController {
     func configure(with deepLink: DPLDeepLink!) {
         if let url = deepLink.discoverURL {
             deepLinkURL = url
-            reloadURL()
         }
     }
 }

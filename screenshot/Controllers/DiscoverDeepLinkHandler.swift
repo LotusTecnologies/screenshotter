@@ -14,20 +14,16 @@ class DiscoverDeepLinkHandler : DPLRouteHandler {
         return (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController as? MainTabBarController
     }
     
-    var discoverURL: URL?
-    
     override func shouldHandle(_ deepLink: DPLDeepLink!) -> Bool {
-        discoverURL = deepLink.discoverURL
-        
-        return discoverURL != nil
+        return deepLink.discoverURL != nil
     }
     
     override func targetViewController() -> UIViewController! {
-        return mainTabBarController?.discoverNavigationController.topViewController!
+        return mainTabBarController!.discoverNavigationController.viewControllers.first(where: { $0 is DPLTargetViewController })!
     }
     
     override func presentTargetViewController(_ targetViewController: UIViewController!, in presentingViewController: UIViewController!) {
-        mainTabBarController?.setNeedsDiscoverNavigationTo(discoverURL)
+        mainTabBarController?.selectedViewController = mainTabBarController?.discoverNavigationController
     }
 }
 

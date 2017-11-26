@@ -206,10 +206,10 @@ extension AppDelegate {
             }
             
             // "discoverURL" will be the discover URL that should be used during this session.
-            if let discoverURLString = params["discoverURL"] as? String, let discoverURL = URL(string: discoverURLString) {
-                if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
-                    mainTabBarController.setNeedsDiscoverNavigationTo(discoverURL)
-                }
+            if let discoverURLString = params["discoverURL"] as? String, let discoverURL = URL(string: discoverURLString),
+                let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                let discoverWebVC = mainTabBarController.discoverNavigationController.viewControllers.first(where: { $0 is DiscoverWebViewController }) as? DiscoverWebViewController {
+                discoverWebVC.deepLinkURL = discoverURL
             }
         }
         

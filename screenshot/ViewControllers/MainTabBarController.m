@@ -14,7 +14,6 @@
 
 @interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
     BOOL _isObservingSettingsBadgeFont;
-    NSURL *_discoverURL;
 }
 
 @property (nonatomic, strong) UINavigationController *favoritesNavigationController;
@@ -104,10 +103,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     
     [self refreshTabBarSettingsBadge];
     [self presentUpdatePromptIfNeeded];
-    
-    if (_discoverURL != nil) {
-        [self navigateToDiscover];
-    }
 }
 
 - (void)viewSafeAreaInsetsDidChange {
@@ -118,16 +113,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             CGFloat offset = 16.f;
             viewController.tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0.f, -offset, 0.f);
         }
-    }
-}
-
-#pragma mark - Discover Navigation
-
-- (void)setNeedsDiscoverNavigationToURL:(NSURL *)URL {
-    _discoverURL = URL;
-    
-    if ([self isViewLoaded]) {
-        [self navigateToDiscover];
     }
 }
 
@@ -290,20 +275,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             [self.updatePromptHandler presentUpdatePromptIfNeeded];
         }
     }
-}
-
-#pragma mark - Private
-
-- (void)navigateToDiscover {
-    DiscoverWebViewController *discoverWebVC = (DiscoverWebViewController *)self.discoverNavigationController.topViewController;
-    
-    if (![discoverWebVC isKindOfClass:[DiscoverWebViewController class]]) {
-        // Shouldn't happen, but we should still check nevertheless.
-        return;
-    }
-    
-    discoverWebVC.deepLinkURL = _discoverURL;
-    self.selectedViewController = self.discoverNavigationController;
 }
 
 @end
