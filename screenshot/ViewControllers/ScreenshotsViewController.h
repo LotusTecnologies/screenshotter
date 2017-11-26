@@ -26,7 +26,7 @@
 
 - (Screenshot *)screenshotAtIndex:(NSInteger)index;
 
-- (void)scrollTopTop;
+- (void)scrollToTop;
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId;
 - (void)dismissNotificationCell;
