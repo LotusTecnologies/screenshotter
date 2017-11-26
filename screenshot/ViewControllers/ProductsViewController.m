@@ -371,11 +371,15 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)productsRateVoteUpAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:YES];
+    
+    [AnalyticsTrackers.standard track:@"Shoppable rating positive"];
 }
 
 - (void)productsRateVoteDownAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:NO];
+    
+    [AnalyticsTrackers.standard track:@"Shoppable rating negative"];
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {

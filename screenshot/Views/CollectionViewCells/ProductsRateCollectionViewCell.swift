@@ -15,8 +15,7 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
     private let label = UILabel()
     private var labelTrailingConstraint: NSLayoutConstraint!
     
-    var rating = -1 {
-        // TODO: after converting ProductsVC to swift this can be checked against nil
+    var rating: UInt = 0 {
         didSet {
             voteUpButton.isHidden = hasRating
             voteDownButton.isHidden = hasRating
@@ -26,7 +25,7 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
         }
     }
     var hasRating: Bool {
-        return rating > -1
+        return rating > 0
     }
     
     // MARK: Life Cycle
@@ -64,6 +63,13 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
         labelToVoteTrailingConstraint.isActive = true
         
         labelTrailingConstraint = label.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -.padding)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        voteUpButton.isSelected = false
+        voteDownButton.isSelected = false
     }
     
     func syncBackgroundColor() {
@@ -108,11 +114,11 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
         
         if button == voteUpButton {
             voteDownButton.isSelected = false
-            rating = 1
+            rating = 5
             
         } else {
             voteUpButton.isSelected = false
-            rating = 0
+            rating = 1
         }
     }
 }
