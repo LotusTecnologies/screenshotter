@@ -16,6 +16,7 @@ typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
     SectionTypeInfo,
     SectionTypePermissions,
+    SectionTypeProducts,
     SectionTypeFollow,
     SectionTypeAbout
 };
@@ -31,7 +32,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion,
-    RowTypeCoins
+    RowTypeCoins,
+    RowTypeProductGender,
+    RowTypeProductSize
 };
 
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
@@ -234,6 +237,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                          @(RowTypeVersion)
                                          ],
                   @(SectionTypeFollow): @[],
+                  @(SectionTypeProducts): @[@(RowTypeProductGender),
+//                                            @(RowTypeProductSize)
+                                            ]
                   };
     }
     return _data;
@@ -359,6 +365,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeVersion:
         case RowTypeEmail:
         case RowTypeCoins:
+        case RowTypeProductGender:
+        case RowTypeProductSize:
             return NO;
             break;
         case RowTypeLocationPermission:
@@ -411,6 +419,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeEmail:
         case RowTypeVersion:
         case RowTypeCoins:
+        case RowTypeProductGender:
+        case RowTypeProductSize:
             break;
     }
     
@@ -430,6 +440,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case SectionTypeFollow:
             return @"Follow Us";
+            break;
+        case SectionTypeProducts:
+            return @"Product Options";
             break;
     }
 }
@@ -468,6 +481,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeCoins:
             return @"Coins Collected";
+            break;
+        case RowTypeProductGender:
+            return @"Gender";
+            break;
+        case RowTypeProductSize:
+            return @"Size";
             break;
     }
 }
@@ -513,25 +532,36 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (UIView *)accessoryViewForRowType:(RowType)rowType {
-    UILabel *label;
-    
-    if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]]) {
-        CGFloat size = 18.f;
-        
-        label = [[UILabel alloc] initWithFrame:CGRectMake(0.f, 0.f, size, size)];
-        label.backgroundColor = [UIColor crazeRed];
-        label.text = @"!";
-        label.textAlignment = NSTextAlignmentCenter;
-        label.font = [UIFont fontWithName:@"Optima-ExtraBlack" size:14.f];
-        label.textColor = [UIColor whiteColor];
-        label.layer.cornerRadius = size / 2.f;
-        label.layer.masksToBounds = YES;
-    }
-    
     switch (rowType) {
         case RowTypePhotoPermission:
-        case RowTypePushPermission:
+        case RowTypePushPermission: {
+            UILabel *label;
+            
+            if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]]) {
+                CGFloat size = 18.f;
+                
+                label = [[UILabel alloc] initWithFrame:CGRectMake(0.f, 0.f, size, size)];
+                label.backgroundColor = [UIColor crazeRed];
+                label.text = @"!";
+                label.textAlignment = NSTextAlignmentCenter;
+                label.font = [UIFont fontWithName:@"Optima-ExtraBlack" size:14.f];
+                label.textColor = [UIColor whiteColor];
+                label.layer.cornerRadius = size / 2.f;
+                label.layer.masksToBounds = YES;
+            }
+            
             return label;
+        }
+            break;
+        case RowTypeProductGender: {
+            // TODO: use ProductsOptions after swift converstion
+            
+            UISegmentedControl *control = [[UISegmentedControl alloc] initWithItems:@[@"Female", @"Male", @"All"]];
+            control.tintColor = [UIColor crazeGreen];
+            control.selectedSegmentIndex = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productGender]];
+            [control addTarget:self action:@selector(genderControlAction:) forControlEvents:UIControlEventValueChanged];
+            return control;
+        }
             break;
         default:
             return nil;
@@ -695,6 +725,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)instagramButtonAction {
     NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/screenshopit/"];
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+}
+
+
+#pragma mark - Product Options
+
+- (void)genderControlAction:(UISegmentedControl *)control {
+    [[NSUserDefaults standardUserDefaults] setInteger:control.selectedSegmentIndex forKey:[UserDefaultsKeys productGender]];
 }
 
 
