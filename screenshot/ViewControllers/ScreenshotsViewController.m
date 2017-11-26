@@ -307,9 +307,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         cell.iconImage = nil;
         
         [[AssetSyncModel sharedInstance] imageWithAssetId:self.notificationCellAssetId callback:^(UIImage *image, NSDictionary *info) {
-//            if (!cell.iconImage) {
-                cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
-//            }
+            cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
         }];
         
         return cell;
