@@ -702,10 +702,11 @@ extension Shoppable {
             
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
-                let ratingValue: Int16 = positive ? 1 : 0
-                let ratingNumber = NSNumber(value: ratingValue)
+                let positiveRating: Int16 = 5
+                let negativeRating: Int16 = 1
+                let ratingValue: Int16 = positive ? positiveRating : negativeRating
                 for shoppable in results {
-                    shoppable.rating = ratingNumber
+                    shoppable.rating = ratingValue
                 }
                 try managedObjectContext.save()
             } catch {

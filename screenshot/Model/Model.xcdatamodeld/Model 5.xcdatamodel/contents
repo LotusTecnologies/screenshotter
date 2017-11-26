@@ -41,7 +41,7 @@
         <attribute name="offersURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="rating" optional="YES" attributeType="Integer 16" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="products" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="shoppable" inverseEntity="Product" syncable="YES"/>
         <relationship name="screenshot" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="shoppables" inverseEntity="Screenshot" syncable="YES"/>
     </entity>
