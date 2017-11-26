@@ -355,7 +355,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         return cell;
         
     } else if (indexPath.section == ProductsSectionRate) {
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+        
         ProductsRateCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
+        cell.rating = shoppable.rating;
         [cell.voteUpButton addTarget:self action:@selector(productsRateVoteUpAction) forControlEvents:UIControlEventTouchUpInside];
         [cell.voteDownButton addTarget:self action:@selector(productsRateVoteDownAction) forControlEvents:UIControlEventTouchUpInside];
         return cell;
@@ -366,11 +369,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 }
 
 - (void)productsRateVoteUpAction {
-    
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:YES];
 }
 
 - (void)productsRateVoteDownAction {
-    
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:NO];
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
