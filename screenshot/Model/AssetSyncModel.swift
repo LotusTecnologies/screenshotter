@@ -417,7 +417,7 @@ class AssetSyncModel: NSObject {
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
-                let url = URL(string: offersURL.hasPrefix("//") ? "https:" + offersURL : offersURL),
+                let url = URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + "&force_currency=JPY"),
                 let b0 = segment["b0"] as? [Any],
                 b0.count >= 2,
                 let b1 = segment["b1"] as? [Any],
