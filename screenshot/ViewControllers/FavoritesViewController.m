@@ -162,6 +162,7 @@
     
     ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     cell.delegate = self;
+    cell.contentView.backgroundColor = collectionView.backgroundColor;
     cell.title = product.productDescription;
     cell.price = product.price;
     cell.imageUrl = product.imageURL;
