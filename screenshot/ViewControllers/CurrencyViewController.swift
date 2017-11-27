@@ -56,7 +56,10 @@ extension CurrencyViewController : UITableViewDataSource {
     func createTableViewCell() -> UITableViewCell {
         let cell = UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.textLabel?.highlightedTextColor = .white
+        
         cell.detailTextLabel?.highlightedTextColor = .white
+        cell.detailTextLabel?.minimumScaleFactor = 0.7
+        cell.detailTextLabel?.adjustsFontSizeToFitWidth = true
         
         let selectedBackgroundView = UIView()
         selectedBackgroundView.backgroundColor = .crazeGreen
