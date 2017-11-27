@@ -221,22 +221,22 @@ extension AppDelegate {
     }
     
     func prepareDataStackCompletionIfNeeded() {
-        func syncPhotosAndTransition() {
+        func syncPhotos() {
             if ApplicationStateModel.sharedInstance.isBackground() {
                 AssetSyncModel.sharedInstance.syncPhotos()
             } else {
                 AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             }
-            
-            self.transitionTo(self.nextViewController())
         }
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                syncPhotosAndTransition()
+                syncPhotos()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    syncPhotosAndTransition()
+                    syncPhotos()
+                    
+                    self.transitionTo(self.nextViewController())
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {
@@ -284,15 +284,21 @@ extension AppDelegate {
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+
+        // Only spin up a background task if:
+        // a) We are already in the background, and
+        // b) We don't currently have a background task
+        if application.applicationState == .background && self.bgTask == UIBackgroundTaskInvalid {
+            self.bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+                application.endBackgroundTask(self.bgTask)
+                self.bgTask = UIBackgroundTaskInvalid
+                
+                // TODO: Call the completion handler when the sync is done.
+                // TODO: Provide the correct background fetch result to the completionHandler.
+                completionHandler(.newData)
+            })
+        }
         
-        self.bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
-            application.endBackgroundTask(self.bgTask)
-            self.bgTask = UIBackgroundTaskInvalid
-            
-            completionHandler(.newData)
-        })
-        
-        prepareDataStackCompletionIfNeeded()
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
         Branch.getInstance().handlePushNotification(userInfo)
     }
