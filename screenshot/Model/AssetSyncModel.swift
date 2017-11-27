@@ -296,6 +296,14 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    func currencyParam() -> String {
+        guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
+          !productCurrency.isEmpty else {
+            return ""
+        }
+        return "&force_currency=\(productCurrency)"
+    }
+    
     func tupleForRawGraphic() -> (String, [[String : Any]]) {
         let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/aKeeu5_UE5rQj09XPjla5"
         let segments = [
@@ -417,7 +425,7 @@ class AssetSyncModel: NSObject {
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
-                let url = URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + "&force_currency=JPY"),
+                let url = URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam()),
                 let b0 = segment["b0"] as? [Any],
                 b0.count >= 2,
                 let b1 = segment["b1"] as? [Any],
