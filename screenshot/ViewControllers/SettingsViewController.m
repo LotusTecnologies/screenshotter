@@ -31,7 +31,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion,
-    RowTypeCoins
+    RowTypeCoins,
+    RowTypeCurrency
 };
 
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
@@ -224,7 +225,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 //                                               @(RowTypeLocationService)
                                                ],
                   @(SectionTypeInfo): @[@(RowTypeName),
-                                        @(RowTypeEmail)
+                                        @(RowTypeEmail),
+                                        @(RowTypeCurrency)
                                         ],
                   @(SectionTypeAbout): @[@(RowTypeTellFriend),
                                          @(RowTypeTutorialVideo),
@@ -407,10 +409,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
             }];
         }
             break;
-        case RowTypeName:
-        case RowTypeEmail:
-        case RowTypeVersion:
-        case RowTypeCoins:
+        case RowTypeCurrency: {
+            CurrencyViewController *viewController = [[CurrencyViewController alloc] init];
+            viewController.title = [self textForRowType:rowType];
+            viewController.hidesBottomBarWhenPushed = YES;
+            viewController.selectedCurrencyCode = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
+            break;
+        default:
             break;
     }
     
@@ -469,6 +476,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeCoins:
             return @"Coins Collected";
             break;
+        case RowTypeCurrency:
+            return @"Currency";
+            break;
     }
 }
 
@@ -491,6 +501,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeCoins:
             return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:UserDefaultsKeys.gameScore]];
             break;
+        case RowTypeCurrency:
+            return @""; // TODO:
+            break;
         default:
             return nil;
             break;
@@ -504,6 +517,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
         case RowTypeTellFriend:
+        case RowTypeCurrency:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
         default:
