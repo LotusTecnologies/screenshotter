@@ -30,6 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+
+        prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared().fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
@@ -37,7 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        prepareDataStackCompletionIfNeeded()
         fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
@@ -218,13 +221,22 @@ extension AppDelegate {
     }
     
     func prepareDataStackCompletionIfNeeded() {
+        func syncPhotosAndTransition() {
+            if ApplicationStateModel.sharedInstance.isBackground() {
+                AssetSyncModel.sharedInstance.syncPhotos()
+            } else {
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+            }
+            
+            self.transitionTo(self.nextViewController())
+        }
+        
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                syncPhotosAndTransition()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    AssetSyncModel.sharedInstance.syncPhotosUponForeground()
-                    self.transitionTo(self.nextViewController())
+                    syncPhotosAndTransition()
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {
@@ -271,9 +283,18 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        
+        self.bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+            application.endBackgroundTask(self.bgTask)
+            self.bgTask = UIBackgroundTaskInvalid
+            
+            completionHandler(.newData)
+        })
+        
+        prepareDataStackCompletionIfNeeded()
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
         Branch.getInstance().handlePushNotification(userInfo)
-        completionHandler(.noData)
     }
 }
 
