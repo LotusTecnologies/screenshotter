@@ -185,6 +185,7 @@
                                                                             @"brand": product.brand,
                                                                             @"url": product.offer,
                                                                             @"imageUrl": product.imageURL,
+                                                                            @"sale": @([product isSale]),
                                                                             @"page": @"Favorites"
                                                                             }];
         [AnalyticsTrackers.branch track:@"Tapped on product"];

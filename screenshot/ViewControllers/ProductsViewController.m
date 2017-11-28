@@ -354,7 +354,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         cell.price = product.price;
         cell.originalPrice = product.originalPrice;
         cell.imageUrl = product.imageURL;
-        cell.isSale = product.floatOriginalPrice > product.floatPrice;
+        cell.isSale = [product isSale];
         cell.favoriteButton.selected = product.isFavorite;
         return cell;
         
@@ -400,6 +400,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                                                             @"brand": product.brand,
                                                                             @"url": product.offer,
                                                                             @"imageUrl": product.imageURL,
+                                                                            @"sale": @([product isSale]),
                                                                             @"page": @"Products"
                                                                             }];
         
