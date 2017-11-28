@@ -116,8 +116,6 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     }
 }
 
-#pragma mark -
-
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
         [self refreshTabBarSettingsBadge];

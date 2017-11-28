@@ -60,7 +60,7 @@ class DiscoverWebViewController : WebViewController {
         track("Loaded Discover Web Page", properties: ["url" : url])
     }
     
-    // MARK: - URLs
+    // MARK: URLs
 
     func reloadURL() {
         url = discoverURL()
@@ -69,8 +69,6 @@ class DiscoverWebViewController : WebViewController {
     func discoverURL() -> URL? {
         return deepLinkURL ?? (appDelegate?.discoverURL ?? randomUrl())
     }
-    
-    // MARK: Random
     
     func randomUrl() -> URL? {
         var randomUrl = "https://screenshopit.tumblr.com"
