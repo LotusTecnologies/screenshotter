@@ -10,6 +10,10 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
+    private var appDelegate: AppDelegate? {
+        return UIApplication.shared.delegate as? AppDelegate
+    }
+    
     var deepLinkURL: URL? {
         didSet {
             reloadURL()
@@ -40,8 +44,14 @@ class DiscoverWebViewController : WebViewController {
         addNavigationItemLogo()
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(discoverURLUpdated), name: Notification.Name(NotificationCenterKeys.updatedDiscoverURL), object: nil)
         
         webView.scrollView.delegate = self
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
@@ -57,7 +67,7 @@ class DiscoverWebViewController : WebViewController {
     }
     
     func discoverURL() -> URL? {
-        return deepLinkURL ?? randomUrl()
+        return deepLinkURL ?? (appDelegate?.discoverURL ?? randomUrl())
     }
     
     // MARK: Random
@@ -94,6 +104,12 @@ class DiscoverWebViewController : WebViewController {
     func refreshAction() {
         reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
+    }
+    
+    // MARK: Notification Observers
+    
+    func discoverURLUpdated() {
+        reloadURL()
     }
 }
 
