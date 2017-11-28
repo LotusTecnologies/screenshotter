@@ -49,6 +49,7 @@ class SilentPushSubscriptionManager : NSObject {
         super.init()
         
         updateSubscriptionsIfNeeded()
+        beginObservingForSignificantTimeChange()
     }
     
     deinit {
@@ -67,7 +68,6 @@ class SilentPushSubscriptionManager : NSObject {
         if hasDeviceToken && [hasARN, enabledSilentPush].contains(false) {
             updateSubscriptions().then { _ -> Void in
                 UserDefaults.standard.set(true, forKey: UserDefaultsKeys.enabledSilentPush)
-                self.beginObservingForSignificantTimeChange()
             }
         }
     }
