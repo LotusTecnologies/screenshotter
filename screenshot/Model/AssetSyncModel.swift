@@ -296,6 +296,14 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    func currencyParam() -> String {
+        guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
+          !productCurrency.isEmpty else {
+            return ""
+        }
+        return "&force_currency=\(productCurrency)"
+    }
+    
     func tupleForRawGraphic() -> (String, [[String : Any]]) {
         let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/aKeeu5_UE5rQj09XPjla5"
         let segments = [
@@ -417,7 +425,7 @@ class AssetSyncModel: NSObject {
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
-                let url = URL(string: offersURL.hasPrefix("//") ? "https:" + offersURL : offersURL),
+                let url = URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam()),
                 let b0 = segment["b0"] as? [Any],
                 b0.count >= 2,
                 let b1 = segment["b1"] as? [Any],
@@ -527,6 +535,7 @@ class AssetSyncModel: NSObject {
         
         guard let asset = assets.firstObject else {
             print("No asset for assetId:\(assetId)")
+            track("err img hang", properties: ["reason" : "No asset for assetId:\(assetId)"])
             callback(nil, nil)
             return
         }
@@ -554,11 +563,13 @@ class AssetSyncModel: NSObject {
         return Promise { fulfill, reject in
             image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
                 if let imageError = info?[PHImageErrorKey] as? NSError {
+                    track("err img hang", properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
                     reject(imageError)
                     return
                 }
                 if let isCancelled = info?[PHImageCancelledKey] as? Bool,
                     isCancelled == true {
+                    track("err img hang", properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
                     let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
                     reject(cancelledError)
                     return
@@ -571,6 +582,7 @@ class AssetSyncModel: NSObject {
                 if let image = image {
                     fulfill(image)
                 } else {
+                    track("err img hang", properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
                     let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
                     reject(emptyError)
                 }

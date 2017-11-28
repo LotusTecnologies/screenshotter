@@ -34,7 +34,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeVersion,
     RowTypeCoins,
     RowTypeProductGender,
-    RowTypeProductSize
+    RowTypeProductSize,
+    RowTypeCurrency
 };
 
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
@@ -227,7 +228,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 //                                               @(RowTypeLocationService)
                                                ],
                   @(SectionTypeInfo): @[@(RowTypeName),
-                                        @(RowTypeEmail)
+                                        @(RowTypeEmail),
+                                        @(RowTypeCurrency)
                                         ],
                   @(SectionTypeAbout): @[@(RowTypeTellFriend),
                                          @(RowTypeTutorialVideo),
@@ -295,7 +297,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowType rowType = [self rowTypeForIndexPath:indexPath];
     UITableViewCell *cell;
     
-    if (indexPath.section == SectionTypeInfo) {
+    if (indexPath.section == SectionTypeInfo && (rowType == RowTypeName || rowType == RowTypeEmail)) {
         cell = [self tableView:tableView inputCellAtIndexPath:indexPath rowType:rowType];
         
     } else {
@@ -415,12 +417,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
             }];
         }
             break;
-        case RowTypeName:
-        case RowTypeEmail:
-        case RowTypeVersion:
-        case RowTypeCoins:
-        case RowTypeProductGender:
-        case RowTypeProductSize:
+        case RowTypeCurrency: {
+            CurrencyViewController *viewController = [[CurrencyViewController alloc] init];
+            viewController.title = [self textForRowType:rowType];
+            viewController.hidesBottomBarWhenPushed = YES;
+            viewController.selectedCurrencyCode = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
+            break;
+        default:
             break;
     }
     
@@ -488,6 +493,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeProductSize:
             return @"Size";
             break;
+        case RowTypeCurrency:
+            return @"Currency";
+            break;
     }
 }
 
@@ -499,7 +507,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return [self enabledTextForRowType:rowType];
             break;
         case RowTypeVersion:
-            return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], Constants.buildEnvironmentSuffix];
+            return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], [Constants buildEnvironmentSuffix]];
             break;
         case RowTypeName:
             return @"Enter Your Name";
@@ -509,6 +517,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeCoins:
             return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:UserDefaultsKeys.gameScore]];
+            break;
+        case RowTypeCurrency:
+            return [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
             break;
         default:
             return nil;
@@ -523,6 +534,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
         case RowTypeTellFriend:
+        case RowTypeCurrency:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
         default:
