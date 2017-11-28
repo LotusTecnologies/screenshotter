@@ -449,10 +449,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Replay Tutorial";
             break;
         case RowTypeName:
-            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
+            return [[NSUserDefaults standardUserDefaults] stringForKey:UserDefaultsKeys.name];
             break;
         case RowTypeEmail:
-            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
+            return [[NSUserDefaults standardUserDefaults] stringForKey:UserDefaultsKeys.email];
             break;
         case RowTypeLocationPermission:
             return @"Location Services";

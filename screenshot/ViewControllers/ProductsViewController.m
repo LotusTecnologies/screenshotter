@@ -402,6 +402,22 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                                                             @"imageUrl": product.imageURL,
                                                                             @"page": @"Products"
                                                                             }];
+        
+        NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
+        
+        if (email.length) {
+            [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
+                                                                                @"merchant": product.merchant,
+                                                                                @"brand": product.brand,
+                                                                                @"title": product.displayTitle,
+                                                                                @"url": product.offer,
+                                                                                @"imageUrl": product.imageURL,
+                                                                                @"price": product.price,
+                                                                                @"date": [NSDate date],
+                                                                                @"email": email
+                                                                                }];
+        }
+        
         [AnalyticsTrackers.branch track:@"Tapped on product"];
         
         [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
