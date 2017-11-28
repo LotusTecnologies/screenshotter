@@ -41,6 +41,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
