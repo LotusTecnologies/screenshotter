@@ -392,8 +392,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         
         Product *product = [self productAtIndex:indexPath.item];
         
+        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
+                                                                            @"brand": product.brand,
+                                                                            @"url": product.offer,
+                                                                            @"imageUrl": product.imageURL,
+                                                                            @"page": @"Products"
+                                                                            }];
         [AnalyticsTrackers.branch track:@"Tapped on product"];
-        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
         
         [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
     }
@@ -410,7 +415,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [AnalyticsTrackers.standard track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    
+    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": product.merchant,
+                                                                  @"brand": product.brand,
+                                                                  @"url": product.offer,
+                                                                  @"imageUrl": product.imageURL,
+                                                                  @"page": @"Products"
+                                                                  }];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
