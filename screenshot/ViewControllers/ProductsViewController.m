@@ -272,6 +272,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     return self.products[index];
 }
 
+- (NSInteger)indexForProduct:(Product *)product {
+    return [self.products indexOfObject:product];
+}
+
 
 #pragma mark - Collection View
 
@@ -425,6 +429,13 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
+
+- (void)reloadProductCellAtIndex:(NSInteger)index {
+    if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > index) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
+        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    }
 }
 
 

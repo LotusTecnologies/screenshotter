@@ -11,10 +11,14 @@
 #import "WebViewController.h"
 #import "screenshot-Swift.h"
 
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+
 @interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) WebViewController *webViewController;
+@property (nonatomic, strong) FavoriteButton *webViewFavoriteButton;
+@property (nonatomic, strong) Product *webViewProduct;
 @property (nonatomic, strong) ClipView *clipView;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
@@ -78,8 +82,22 @@
     self.previousDidAppearViewControllerClass = [viewController class];
 }
 
+- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
+    if (viewController == self.webViewController && [self.topViewController isKindOfClass:[ProductsViewController class]]) {
+        ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
+        NSInteger index = [productsViewController indexForProduct:self.webViewProduct];
+        [productsViewController reloadProductCellAtIndex:index];
+    }
+}
 
-#pragma mark - Screenshots View Controller
+- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
+    if (viewController == self.webViewController && ![self.viewControllers containsObject:viewController]) {
+        self.webViewProduct = nil;
+    }
+}
+
+
+#pragma mark - Screenshots
 
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
@@ -106,19 +124,39 @@
 }
 
 
-#pragma mark - Products View Controller
+#pragma mark - Products
 
 - (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (![self.topViewController isKindOfClass:[WebViewController class]]) {
-        Product *product = [viewController productAtIndex:indexPath.item];
+        self.webViewProduct = [viewController productAtIndex:indexPath.item];
         
-        self.webViewController.url = [NSURL URLWithString:product.offer];
+        self.webViewFavoriteButton.selected = self.webViewProduct.isFavorite;
+        
+        self.webViewController.url = [NSURL URLWithString:self.webViewProduct.offer];
         [self pushViewController:self.webViewController animated:YES];
     }
 }
 
+- (void)productWebViewFavoriteAction:(UIButton *)button {
+    BOOL isFavorited = [button isSelected];
+    
+    [self.webViewProduct setFavoritedToFavorited:isFavorited];
+    
+    NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
+    
+    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": self.webViewProduct.merchant,
+                                                                  @"brand": self.webViewProduct.brand,
+                                                                  @"url": self.webViewProduct.offer,
+                                                                  @"imageUrl": self.webViewProduct.imageURL,
+                                                                  @"page": @"Product Web View"
+                                                                  }];
+    
+    NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
+    [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
 
-#pragma mark - Screenshots Picker
+
+#pragma mark - Screenshot Picker
 
 - (BOOL)needsToPresentPickerViewController {
     return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
@@ -190,12 +228,24 @@
 - (WebViewController *)webViewController {
     if (!_webViewController) {
         WebViewController *webViewController = [[WebViewController alloc] init];
+        webViewController.lifeCycleDelegate = self;
         [webViewController addNavigationItemLogo];
         webViewController.hidesBottomBarWhenPushed = YES;
         webViewController.loaderLabelText = @"Loading your store...";
+        webViewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.webViewFavoriteButton];
         _webViewController = webViewController;
     }
     return _webViewController;
+}
+
+- (FavoriteButton *)webViewFavoriteButton {
+    if (!_webViewFavoriteButton) {
+        FavoriteButton *button = [[FavoriteButton alloc] init];
+        [button addTarget:self action:@selector(productWebViewFavoriteAction:) forControlEvents:UIControlEventTouchUpInside];
+        [button sizeToFit];
+        _webViewFavoriteButton = button;
+    }
+    return _webViewFavoriteButton;
 }
 
 
