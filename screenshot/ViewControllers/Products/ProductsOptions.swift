@@ -8,6 +8,35 @@
 
 import Foundation
 
+struct ProductsOptionsMask : OptionSet {
+    let rawValue: Int
+    
+    static let genderUnknown = ProductsOptionsMask(rawValue: 0 << 0)
+    static let genderMale    = ProductsOptionsMask(rawValue: 1 << 0)
+    static let genderFemale  = ProductsOptionsMask(rawValue: 2 << 0)
+    
+    static let sizeUnknown   = ProductsOptionsMask(rawValue: 0 << 2)
+    static let sizeChild     = ProductsOptionsMask(rawValue: 1 << 2)
+    static let sizeAdult     = ProductsOptionsMask(rawValue: 2 << 2)
+    static let sizePlus      = ProductsOptionsMask(rawValue: 3 << 2)
+    
+    init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+    
+    func gender() -> ProductsOptionsGender {
+        switch rawValue & 3 {
+        case ProductsOptionsMask.genderMale.rawValue:
+            return ProductsOptionsGender.male
+        case ProductsOptionsMask.genderFemale.rawValue:
+            return ProductsOptionsGender.female
+        default:
+            return ProductsOptionsGender.all
+        }
+    }
+    
+}
+
 @objc protocol ProductsOptionsDelegate : NSObjectProtocol {
     func productsOptionsDidChange(_ productsOptions: ProductsOptions)
 }

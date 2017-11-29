@@ -296,14 +296,6 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func currencyParam() -> String {
-        guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
-          !productCurrency.isEmpty else {
-            return ""
-        }
-        return "&force_currency=\(productCurrency)"
-    }
-    
     func tupleForRawGraphic() -> (String, [[String : Any]]) {
         let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/aKeeu5_UE5rQj09XPjla5"
         let segments = [
@@ -422,10 +414,31 @@ class AssetSyncModel: NSObject {
         }
     }
     
+    func currencyParam() -> String {
+        guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
+            !productCurrency.isEmpty else {
+                return ""
+        }
+        return "&force_currency=\(productCurrency)"
+    }
+    
+    func augmentedUrl(offersURL: String, gender: ProductsOptionsGender) -> URL? {
+        let genderParamString: String
+        switch gender {
+        case .male:
+            genderParamString = "&force_gender=male"
+        case .female:
+            genderParamString = "&force_gender=female"
+        default:
+            genderParamString = ""
+        }
+        return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + genderParamString)
+    }
+    
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
-                let url = URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam()),
+                let url = augmentedUrl(offersURL: offersURL, gender: ProductsOptions().currentGender),
                 let b0 = segment["b0"] as? [Any],
                 b0.count >= 2,
                 let b1 = segment["b1"] as? [Any],
@@ -441,6 +454,7 @@ class AssetSyncModel: NSObject {
             self.extractProducts(assetId: assetId,
                                  uploadedURLString: uploadedURLString,
                                  segments: segments,
+                                 offersURL: offersURL,
                                  url: url,
                                  label: label,
                                  b0x: b0x,
@@ -453,6 +467,7 @@ class AssetSyncModel: NSObject {
     func extractProducts(assetId: String,
                          uploadedURLString: String,
                          segments: [[String : Any]],
+                         offersURL: String,
                          url: URL,
                          label: String?,
                          b0x: Double,
@@ -469,7 +484,7 @@ class AssetSyncModel: NSObject {
                             let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
                                                                     screenshot: screenshot,
                                                                     label: label,
-                                                                    offersURL: url.absoluteString,
+                                                                    offersURL: offersURL,
                                                                     b0x: b0x,
                                                                     b0y: b0y,
                                                                     b1x: b1x,
@@ -520,6 +535,66 @@ class AssetSyncModel: NSObject {
                     }
                 } else {
                     print("AssetSyncModel extractProducts no products in ads. productsDict:\(productsDict)")
+                }
+            }.catch { error in
+                print("AssetSyncModel extractProducts error parsing product:\(error)")
+        }
+    }
+    
+    func reExtractProducts(shoppableId: NSManagedObjectID,
+                           optionsMask: ProductsOptionsMask,
+                           offersURL: String) {
+            guard let url = augmentedUrl(offersURL: offersURL, gender: optionsMask.gender()) else {
+//                let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey : "No url from offersURL:\(offersURL)"])
+//                return Promise(error: error)
+                print("AssetSyncModel reExtractProducts no url from offersURL:\(offersURL)")
+                return
+            }
+            NetworkingPromise.downloadInfo(url: url)
+                .then(on: self.processingQ) { productsDict -> Void in
+                guard let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 else {
+                    print("AssetSyncModel reExtractProducts no products in ads. productsDict:\(productsDict)")
+                    return
+                }
+                let dataModel = DataModel.sharedInstance
+                dataModel.performBackgroundTask { (managedObjectContext) in
+                    guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableId) else {
+                        print("AssetSyncModel reExtractProducts error retreiving shoppable:\(shoppableId) to which to add products")
+                        return
+                    }
+                    var productOrder: Int16 = shoppable.productCount
+                    for prod in productsArray {
+                        var floatPrice: Float = 0 // -1 ?
+                        if let extractedFloatPrice = prod["floatPrice"] as? Float {
+                            floatPrice = extractedFloatPrice
+                        }
+                        var floatOriginalPrice: Float = 0 // -1 ?
+                        if let extractedOriginalFloatPrice = prod["floatOriginalPrice"] as? Float {
+                            floatOriginalPrice = extractedOriginalFloatPrice
+                        }
+                        var categories: String?
+                        if let extractedCategories = prod["categories"] as? [String] {
+                            categories = extractedCategories.first
+                        }
+                        let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
+                                                      shoppable: shoppable,
+                                                      order: productOrder,
+                                                      productDescription: prod["description"] as? String,
+                                                      price: prod["price"] as? String,
+                                                      originalPrice: prod["originalPrice"] as? String,
+                                                      floatPrice: floatPrice,
+                                                      floatOriginalPrice: floatOriginalPrice,
+                                                      categories: categories,
+                                                      brand: prod["brand"] as? String,
+                                                      offer: prod["offer"] as? String,
+                                                      imageURL: prod["imageUrl"] as? String,
+                                                      merchant: prod["merchant"] as? String)
+                        productOrder += 1
+                    }
+                    if shoppable.productCount != productOrder {
+                        shoppable.productCount = productOrder
+                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    }
                 }
             }.catch { error in
                 print("AssetSyncModel extractProducts error parsing product:\(error)")

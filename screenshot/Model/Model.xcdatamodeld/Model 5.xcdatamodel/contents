@@ -41,6 +41,7 @@
         <attribute name="offersURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="productsOptions" attributeType="String" defaultValueString="0" syncable="YES"/>
         <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="products" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="shoppable" inverseEntity="Product" syncable="YES"/>
         <relationship name="screenshot" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="shoppables" inverseEntity="Screenshot" syncable="YES"/>
@@ -48,6 +49,6 @@
     <elements>
         <element name="Product" positionX="124" positionY="189" width="128" height="270"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="240"/>
-        <element name="Shoppable" positionX="-38" positionY="18" width="128" height="210"/>
+        <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
     </elements>
 </model>
