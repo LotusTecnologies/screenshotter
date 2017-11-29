@@ -14,5 +14,6 @@
 @property (nonatomic, strong, readonly) UINavigationController *favoritesNavigationController;
 @property (nonatomic, strong, readonly) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong, readonly) UINavigationController *settingsNavigationController;
+@property (nonatomic, strong, readonly) UINavigationController *discoverNavigationController;
 
 @end

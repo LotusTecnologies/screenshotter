@@ -80,6 +80,7 @@ class IntercomHelper : NSObject {
         Intercom.registerUser(withUserId: id)
         
         performUserUpdate { attrs in
+            attrs.userId = id
             attrs.email = email
             attrs.name = name
         }
@@ -104,7 +105,7 @@ class IntercomHelper : NSObject {
     func recordPushNotificationStatus(_ enabled:Bool) {
         let name = "APN \(enabled ? "En" : "Dis")abled"
         track(name)
-        Intercom.logEvent(withName: name)
+        record(event: name)
     }
     
     func record(event: String, properties: [AnyHashable : Any]? = nil) {

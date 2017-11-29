@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
+		524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */; };
 		525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCF91F9CBA6800330C95 /* HelperView.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
 		527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 527F17491FA21CA6008082BC /* Craze_Video.mp4 */; };
+		529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		52FCF2311F9639AE007A6442 /* DiscoverWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
@@ -39,6 +41,7 @@
 		C53B463E1FB1A55500A8C886 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463C1FB1A55500A8C886 /* SettingsViewController.m */; };
 		C53B463F1FB1A55500A8C886 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */; };
 		C53B46451FB1A58800A8C886 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B46431FB1A58700A8C886 /* FavoritesViewController.m */; };
+		C53B46421FB1A57700A8C886 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B46411FB1A57700A8C886 /* ProductsViewController.m */; };
 		C53B46471FB1A8A500A8C886 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46461FB1A8A500A8C886 /* Loader.swift */; };
 		C53B46491FB1ABFC00A8C886 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */; };
 		C53B464B1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B464A1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift */; };
@@ -76,6 +79,7 @@
 		C5CAF2781FCBF89A006F37DC /* CurrencyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF2771FCBF89A006F37DC /* CurrencyViewController.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
+		C5CAF2801FCEDFA8006F37DC /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27F1FCEDFA8006F37DC /* FavoritesViewController.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
@@ -100,10 +104,12 @@
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
+		524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDeepLinkHandler.swift; sourceTree = "<group>"; };
 		525BBCF91F9CBA6800330C95 /* HelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		527F17491FA21CA6008082BC /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
+		529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilentPushSubscriptionManager.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverWebViewController.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
@@ -142,6 +148,8 @@
 		C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
 		C53B46431FB1A58700A8C886 /* FavoritesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoritesViewController.m; sourceTree = "<group>"; };
 		C53B46441FB1A58700A8C886 /* FavoritesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoritesViewController.h; sourceTree = "<group>"; };
+		C53B46401FB1A57700A8C886 /* ProductsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductsViewController.h; sourceTree = "<group>"; };
+		C53B46411FB1A57700A8C886 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
 		C53B46461FB1A8A500A8C886 /* Loader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		C53B464A1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -184,6 +192,7 @@
 		C5CAF2771FCBF89A006F37DC /* CurrencyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyViewController.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
+		C5CAF27F1FCEDFA8006F37DC /* FavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
@@ -294,6 +303,7 @@
 				C5F8D63C1FA05AE40067C26A /* Notification.swift */,
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
+				529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";
@@ -305,8 +315,7 @@
 				C5278FDC1F3C38510090E422 /* BaseViewController.m */,
 				C5CAF2771FCBF89A006F37DC /* CurrencyViewController.swift */,
 				52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */,
-				C53B46441FB1A58700A8C886 /* FavoritesViewController.h */,
-				C53B46431FB1A58700A8C886 /* FavoritesViewController.m */,
+				C5CAF27F1FCEDFA8006F37DC /* FavoritesViewController.swift */,
 				C528DC101F57EDD100F4E723 /* InsetPresentationController.h */,
 				C528DC111F57EDD100F4E723 /* InsetPresentationController.m */,
 				C5F8D64B1FA74DE30067C26A /* InviteViewController.swift */,
@@ -360,6 +369,7 @@
 				C59A30471F655F1C00463338 /* ShoppablesController.swift */,
 				C53B46611FBC7CBD00A8C886 /* TransitioningController.swift */,
 				52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */,
+				524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -650,6 +660,7 @@
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/Branch/Branch.framework",
 				"${PODS_ROOT}/Clarifai-Apple-SDK/Clarifai_Apple_SDK.framework",
+				"${BUILT_PRODUCTS_DIR}/DeepLinkKit/DeepLinkKit.framework",
 				"${BUILT_PRODUCTS_DIR}/EggRating/EggRating.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -671,6 +682,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Branch.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Clarifai_Apple_SDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DeepLinkKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EggRating.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -789,7 +801,7 @@
 				C53B46351FB1A54000A8C886 /* TutorialSlideView.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
-				C53B46451FB1A58800A8C886 /* FavoritesViewController.m in Sources */,
+				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */,
@@ -805,9 +817,11 @@
 				525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */,
 				C53B46601FBC792F00A8C886 /* ShoppableCollectionViewCell.swift in Sources */,
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
+				C5CAF2801FCEDFA8006F37DC /* FavoritesViewController.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */,
+				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
 				C53B46391FB1A54000A8C886 /* TutorialVideoViewController.swift in Sources */,
 				C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */,

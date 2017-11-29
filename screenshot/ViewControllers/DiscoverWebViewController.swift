@@ -1,4 +1,3 @@
-
 //
 //  DiscoverWebViewController.swift
 //  screenshot
@@ -8,8 +7,19 @@
 //
 
 import WebKit.WKWebView
+import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
+    private var appDelegate: AppDelegate? {
+        return UIApplication.shared.delegate as? AppDelegate
+    }
+    
+    var deepLinkURL: URL? {
+        didSet {
+            reloadURL()
+        }
+    }
+    
     override var title: String? {
         set {}
         get {
@@ -34,16 +44,32 @@ class DiscoverWebViewController : WebViewController {
         addNavigationItemLogo()
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        NotificationCenter.default.addObserver(self, selector: #selector(discoverURLUpdated), name: Notification.Name(NotificationCenterKeys.updatedDiscoverURL), object: nil)
+        
         webView.scrollView.delegate = self
         
-        url = randomUrl()
-        track("Loaded Discover Web Page", properties: ["url" : url])
+        reloadURL()
+        
+        // !!!: the properties value is creating a crash when building the app and immediatly going to the discover page
+        track("Loaded Discover Web Page", properties: ["url": url])
     }
     
-    // MARK: Random Url
+    // MARK: URLs
+
+    func reloadURL() {
+        url = discoverURL()
+    }
+    
+    func discoverURL() -> URL? {
+        return deepLinkURL ?? (appDelegate?.settings.forcedDiscoverURL ?? randomUrl())
+    }
     
     func randomUrl() -> URL? {
         var url = URL(string: "https://screenshopit.tumblr.com")
@@ -75,13 +101,27 @@ class DiscoverWebViewController : WebViewController {
     // MARK: Bar Button Item Actions
     
     func refreshAction() {
-        url = randomUrl()
+        reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
+    }
+    
+    // MARK: Notification Observers
+    
+    func discoverURLUpdated() {
+        reloadURL()
     }
 }
 
 extension DiscoverWebViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return nil
+    }
+}
+
+extension DiscoverWebViewController : DPLTargetViewController {
+    func configure(with deepLink: DPLDeepLink!) {
+        if let url = deepLink.discoverURL {
+            deepLinkURL = url
+        }
     }
 }

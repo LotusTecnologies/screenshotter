@@ -19,6 +19,7 @@ def shared_pods
     pod 'Firebase/Invites'
     pod 'Firebase/Auth'
     pod 'GoogleSignIn'
+    pod 'DeepLinkKit'
 end
 
 target 'screenshot' do

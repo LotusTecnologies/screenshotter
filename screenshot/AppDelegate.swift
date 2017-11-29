@@ -15,9 +15,11 @@ import Branch
 import Firebase
 import GoogleSignIn
 import PromiseKit
+import DeepLinkKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
@@ -37,6 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+
+        prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared().fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
@@ -44,12 +50,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        prepareDataStackCompletionIfNeeded()
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
+        
+        if application.applicationState == .background,
+            let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
+            let aps = remoteNotification["aps"] as? [String : AnyObject],
+            let contentAvailable = aps["content-available"] as? NSNumber,
+            contentAvailable.intValue == 1 {
+            AnalyticsTrackers.segment.track("Woke From Silent Push")
+        }
         
         return true
     }
@@ -58,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 //        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 //    }
-    
+        
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -92,16 +107,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        var handled = router?.handle(url) { (handled, error) in
+            if let error = error {
+                AnalyticsTrackers.segment.error(error)
+            }
+        } ?? false
         
-        var handled = Branch.getInstance().application(app, open: url, options:options)
+        if !handled {
+            handled = Branch.getInstance().application(app, open: url, options:options)
+        }
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
         if !handled {
+            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+            let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+            
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
@@ -132,7 +155,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         // pass the url to the handle deep link call
-        Branch.getInstance().continue(userActivity)
+        if Branch.getInstance().continue(userActivity) == false {
+            return router?.handle(userActivity) { (handled, error) in
+                if let error = error {
+                    print(error)
+                }
+            } ?? false
+        }
+        
         return true
     }
 }
@@ -152,6 +182,8 @@ extension AppDelegate {
     // MARK: - Third Party
 
     func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
+        setupRouter()
+        
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
         configuration.recordScreenViews = true
@@ -192,6 +224,11 @@ extension AppDelegate {
                     tutorialVC.video = .Ambassador(username: channel)
                 }
             }
+            
+            // "discoverURL" will be the discover URL that should be used during this session.
+            if let discoverURLString = params["discoverURL"] as? String {
+                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
+            }
         }
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -225,12 +262,21 @@ extension AppDelegate {
     }
     
     func prepareDataStackCompletionIfNeeded() {
+        func syncPhotos() {
+            if ApplicationStateModel.sharedInstance.isBackground() {
+                AssetSyncModel.sharedInstance.syncPhotos()
+            } else {
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+            }
+        }
+        
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                syncPhotos()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                    syncPhotos()
+                    
                     self.transitionTo(self.nextViewController())
                 }
                 
@@ -247,6 +293,15 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
+    }
+}
+
+// MARK: - Deep Link Router
+
+extension AppDelegate {
+    func setupRouter() {
+        router = DPLDeepLinkRouter()
+        router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 
@@ -278,9 +333,28 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+
+        // Only spin up a background task if we are already in the background
+        if application.applicationState == .background {
+            if bgTask != UIBackgroundTaskInvalid {
+                application.endBackgroundTask(self.bgTask)
+            }
+            
+            bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+                // TODO: Call the completion handler when the sync is done.
+                // TODO: Provide the correct background fetch result to the completionHandler.
+                completionHandler(.newData)
+
+                application.endBackgroundTask(self.bgTask)
+                self.bgTask = UIBackgroundTaskInvalid
+            })
+        } else {
+            completionHandler(.noData)
+        }
+        
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
         Branch.getInstance().handlePushNotification(userInfo)
-        completionHandler(.noData)
     }
 }
 
