@@ -1,0 +1,954 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>code</key>
+		<string>AED</string>
+		<key>title</key>
+		<string>United Arab Emirates Dirham</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>AFN</string>
+		<key>title</key>
+		<string>Afghan Afghani</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ALL</string>
+		<key>title</key>
+		<string>Albanian Lek</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>AMD</string>
+		<key>title</key>
+		<string>Armenian Dram</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ANG</string>
+		<key>title</key>
+		<string>Netherlands Antillian Guilder</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>AOA</string>
+		<key>title</key>
+		<string>Angolan Kwanza</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ARS</string>
+		<key>title</key>
+		<string>Argentine Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>AUD</string>
+		<key>title</key>
+		<string>Australian Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>AWG</string>
+		<key>title</key>
+		<string>Aruban Guilder</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>AZN</string>
+		<key>title</key>
+		<string>Azerbaijanian Manat</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BAM</string>
+		<key>title</key>
+		<string>Convertible Marks</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BBD</string>
+		<key>title</key>
+		<string>Barbados Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BDT</string>
+		<key>title</key>
+		<string>Bangladeshi Taka</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BGN</string>
+		<key>title</key>
+		<string>Bulgarian Lev</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BHD</string>
+		<key>title</key>
+		<string>Bahraini Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BIF</string>
+		<key>title</key>
+		<string>Burundian Franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BMD</string>
+		<key>title</key>
+		<string>Bermudian Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BND</string>
+		<key>title</key>
+		<string>Brunei Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BOB</string>
+		<key>title</key>
+		<string>Boliviano</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BRL</string>
+		<key>title</key>
+		<string>Brazilian Real</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BSD</string>
+		<key>title</key>
+		<string>Bahamian Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BTN</string>
+		<key>title</key>
+		<string>Bhutanese Ngultrum</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BWP</string>
+		<key>title</key>
+		<string>Botswana Pula</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BYR</string>
+		<key>title</key>
+		<string>Belarussian Ruble</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>BZD</string>
+		<key>title</key>
+		<string>Belize Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CAD</string>
+		<key>title</key>
+		<string>Canadian Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CDF</string>
+		<key>title</key>
+		<string>Franc Congolais</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CHF</string>
+		<key>title</key>
+		<string>Swiss Franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CLP</string>
+		<key>title</key>
+		<string>Chilean Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CNY</string>
+		<key>title</key>
+		<string>Yuan Renminbi</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>COP</string>
+		<key>title</key>
+		<string>Colombian Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CRC</string>
+		<key>title</key>
+		<string>Costa Rican Colon</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CUP</string>
+		<key>title</key>
+		<string>Cuban Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CVE</string>
+		<key>title</key>
+		<string>Cape Verde Escudo</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CYP</string>
+		<key>title</key>
+		<string>Cyprus Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>CZK</string>
+		<key>title</key>
+		<string>Czech Koruna</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>DJF</string>
+		<key>title</key>
+		<string>Djibouti Franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>DKK</string>
+		<key>title</key>
+		<string>Danish Krone</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>DOP</string>
+		<key>title</key>
+		<string>Dominican Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>DZD</string>
+		<key>title</key>
+		<string>Algerian Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>EGP</string>
+		<key>title</key>
+		<string>Egyptian Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ERN</string>
+		<key>title</key>
+		<string>Eritrean Nakfa</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ETB</string>
+		<key>title</key>
+		<string>Ethiopian Birr</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>EUR</string>
+		<key>title</key>
+		<string>Euro</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>FJD</string>
+		<key>title</key>
+		<string>Fiji Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>FKP</string>
+		<key>title</key>
+		<string>Falkland Islands Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GBP</string>
+		<key>title</key>
+		<string>Pound Sterling</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GEL</string>
+		<key>title</key>
+		<string>Georgian Lari</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GHS</string>
+		<key>title</key>
+		<string>Ghanaian Cedi</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GIP</string>
+		<key>title</key>
+		<string>Gibraltar Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GMD</string>
+		<key>title</key>
+		<string>Gambian Dalasi</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GNF</string>
+		<key>title</key>
+		<string>Guinea Franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GTQ</string>
+		<key>title</key>
+		<string>Guatemalan Quetzal</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>GYD</string>
+		<key>title</key>
+		<string>Guyana Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>HKD</string>
+		<key>title</key>
+		<string>Hong Kong Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>HNL</string>
+		<key>title</key>
+		<string>Honduran Lempira</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>HRK</string>
+		<key>title</key>
+		<string>Croatian Kuna</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>HTG</string>
+		<key>title</key>
+		<string>Haiti Gourde</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>HUF</string>
+		<key>title</key>
+		<string>Hungarian Forint</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>IDR</string>
+		<key>title</key>
+		<string>Indonesian Rupiah</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ILS</string>
+		<key>title</key>
+		<string>New Israeli Shekel</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>INR</string>
+		<key>title</key>
+		<string>Indian Rupee</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>IQD</string>
+		<key>title</key>
+		<string>Iraqi Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>IRR</string>
+		<key>title</key>
+		<string>Iranian Rial</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ISK</string>
+		<key>title</key>
+		<string>Iceland Krona</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>JMD</string>
+		<key>title</key>
+		<string>Jamaican Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>JOD</string>
+		<key>title</key>
+		<string>Jordanian Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>JPY</string>
+		<key>title</key>
+		<string>Japanese Yen</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KES</string>
+		<key>title</key>
+		<string>Kenyan Shilling</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KGS</string>
+		<key>title</key>
+		<string>Kyrgyzstani Som</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KHR</string>
+		<key>title</key>
+		<string>Cambodian Riel</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KMF</string>
+		<key>title</key>
+		<string>Comoro Franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KPW</string>
+		<key>title</key>
+		<string>North Korean Won</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KRW</string>
+		<key>title</key>
+		<string>South Korean Won</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KWD</string>
+		<key>title</key>
+		<string>Kuwaiti Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KYD</string>
+		<key>title</key>
+		<string>Cayman Islands Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>KZT</string>
+		<key>title</key>
+		<string>Kazakhstani Tenge</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LAK</string>
+		<key>title</key>
+		<string>Lao Kip</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LBP</string>
+		<key>title</key>
+		<string>Lebanese Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LKR</string>
+		<key>title</key>
+		<string>Sri Lanka Rupee</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LRD</string>
+		<key>title</key>
+		<string>Liberian Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LSL</string>
+		<key>title</key>
+		<string>Lesotho Loti</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LTL</string>
+		<key>title</key>
+		<string>Lithuanian Litas</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LVL</string>
+		<key>title</key>
+		<string>Latvian Lats</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>LYD</string>
+		<key>title</key>
+		<string>Libyan Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MAD</string>
+		<key>title</key>
+		<string>Moroccan Dirham</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MDL</string>
+		<key>title</key>
+		<string>Moldovan Leu</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MGA</string>
+		<key>title</key>
+		<string>Malagasy Ariary</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MKD</string>
+		<key>title</key>
+		<string>Macedonian Denar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MMK</string>
+		<key>title</key>
+		<string>Myanmar Kyat</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MNT</string>
+		<key>title</key>
+		<string>Mongolian Tugrik</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MOP</string>
+		<key>title</key>
+		<string>Macanese Pataca</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MRO</string>
+		<key>title</key>
+		<string>Mauritanian Ouguiya</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MTL</string>
+		<key>title</key>
+		<string>Maltese Lira</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MUR</string>
+		<key>title</key>
+		<string>Mauritius Rupee</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MWK</string>
+		<key>title</key>
+		<string>Malawian Kwacha</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MXN</string>
+		<key>title</key>
+		<string>Mexican Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MYR</string>
+		<key>title</key>
+		<string>Malaysian Ringgit</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>MZN</string>
+		<key>title</key>
+		<string>Mozambican Metical</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>NAD</string>
+		<key>title</key>
+		<string>Namibian Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>NGN</string>
+		<key>title</key>
+		<string>Nigerian Naira</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>NIO</string>
+		<key>title</key>
+		<string>Cordoba Oro</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>NOK</string>
+		<key>title</key>
+		<string>Norwegian Krone</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>NPR</string>
+		<key>title</key>
+		<string>Nepalese Rupee</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>NZD</string>
+		<key>title</key>
+		<string>New Zealand Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>OMR</string>
+		<key>title</key>
+		<string>Rial Omani</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PAB</string>
+		<key>title</key>
+		<string>Panamanian Balboa</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PEN</string>
+		<key>title</key>
+		<string>Nuevo Sol</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PGK</string>
+		<key>title</key>
+		<string>Papua New Guinean Kina</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PHP</string>
+		<key>title</key>
+		<string>Philippine Peso</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PKR</string>
+		<key>title</key>
+		<string>Pakistan Rupee</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PLN</string>
+		<key>title</key>
+		<string>Polish Zloty</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>PYG</string>
+		<key>title</key>
+		<string>Paraguayan Guarani</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>QAR</string>
+		<key>title</key>
+		<string>Qatari Rial</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>RON</string>
+		<key>title</key>
+		<string>Romanian New Leu</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>RSD</string>
+		<key>title</key>
+		<string>Serbian Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>RUB</string>
+		<key>title</key>
+		<string>Russian Ruble</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>RWF</string>
+		<key>title</key>
+		<string>Rwanda Franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SAR</string>
+		<key>title</key>
+		<string>Saudi Riyal</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SBD</string>
+		<key>title</key>
+		<string>Solomon Islands Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SCR</string>
+		<key>title</key>
+		<string>Seychelles Rupee</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SDG</string>
+		<key>title</key>
+		<string>Sudanese Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SEK</string>
+		<key>title</key>
+		<string>Swedish Krona</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SGD</string>
+		<key>title</key>
+		<string>Singapore Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SHP</string>
+		<key>title</key>
+		<string>Saint Helena Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SKK</string>
+		<key>title</key>
+		<string>Slovak Koruna</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SLL</string>
+		<key>title</key>
+		<string>Sierra Leonean Leone</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SOS</string>
+		<key>title</key>
+		<string>Somali Shilling</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SRD</string>
+		<key>title</key>
+		<string>Surinam Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>STD</string>
+		<key>title</key>
+		<string>Saão Tomé and Príncipe Dobra</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SYP</string>
+		<key>title</key>
+		<string>Syrian Pound</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>SZL</string>
+		<key>title</key>
+		<string>Swazi Lilangeni</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>THB</string>
+		<key>title</key>
+		<string>Thai Baht</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TJS</string>
+		<key>title</key>
+		<string>Tajikistani Somoni</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TMM</string>
+		<key>title</key>
+		<string>Turkmenistan Manat</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TND</string>
+		<key>title</key>
+		<string>Tunisian Dinar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TOP</string>
+		<key>title</key>
+		<string>Tongan Pa'anga</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TRY</string>
+		<key>title</key>
+		<string>New Turkish Lira</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TTD</string>
+		<key>title</key>
+		<string>Trinidad and Tobago Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TWD</string>
+		<key>title</key>
+		<string>New Taiwan Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>TZS</string>
+		<key>title</key>
+		<string>Tanzanian Shilling</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>UAH</string>
+		<key>title</key>
+		<string>Ukrainian Hryvnia</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>UGX</string>
+		<key>title</key>
+		<string>Uganda Shilling</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>USD</string>
+		<key>title</key>
+		<string>United States Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>UYU</string>
+		<key>title</key>
+		<string>Peso Uruguayo</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>UZS</string>
+		<key>title</key>
+		<string>Uzbekistan Som</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>VEB</string>
+		<key>title</key>
+		<string>Venezuelan Bolívar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>VND</string>
+		<key>title</key>
+		<string>Vietnamese đồng</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>VUV</string>
+		<key>title</key>
+		<string>Vanuatu Vatu</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>WST</string>
+		<key>title</key>
+		<string>Samoan Tala</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>XAF</string>
+		<key>title</key>
+		<string>CFA Franc BEAC</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>XCD</string>
+		<key>title</key>
+		<string>East Caribbean Dollar</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>XOF</string>
+		<key>title</key>
+		<string>CFA Franc BCEAO</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>XPF</string>
+		<key>title</key>
+		<string>CFP franc</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>YER</string>
+		<key>title</key>
+		<string>Yemeni Rial</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ZAR</string>
+		<key>title</key>
+		<string>South African Rand</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ZMK</string>
+		<key>title</key>
+		<string>Zambian Kwacha</string>
+	</dict>
+	<dict>
+		<key>code</key>
+		<string>ZWD</string>
+		<key>title</key>
+		<string>Zimbabwe Dollar</string>
+	</dict>
+</array>
+</plist>

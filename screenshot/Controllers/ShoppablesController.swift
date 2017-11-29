@@ -13,6 +13,10 @@ import CoreData
     func shoppablesControllerIsEmpty(_ controller: ShoppablesController)
 }
 
+@objc protocol ShoppablesControllerProtocol {
+    var shoppablesController: ShoppablesController! { get set }
+}
+
 class ShoppablesController: NSObject, FrcDelegateProtocol {
     fileprivate var shoppablesFrc: ShoppableFrc!
     fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>!
@@ -90,8 +94,4 @@ extension ShoppablesController {
             collectionView?.reloadData()
         }
     }
-}
-
-@objc protocol ShoppablesControllerProtocol {
-    var shoppablesController: ShoppablesController! { get set }
 }
