@@ -337,7 +337,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionImage) {
         [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
         
-        [AnalyticsTrackers.standard track:@"Tapped on screenshot"];
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
     }
 }
 

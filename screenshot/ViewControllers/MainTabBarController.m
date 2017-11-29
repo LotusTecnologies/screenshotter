@@ -262,16 +262,9 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 #pragma mark - Update Prompt
 
 - (void)presentUpdatePromptIfNeeded {
-    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    
-    if ([appDelegate isKindOfClass:[AppDelegate class]] && !self.updatePromptHandler) {
-        _AppSettings *settings = [appDelegate getAppSettings];
-        
-        if (settings != nil) {
-            self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
-            self.updatePromptHandler._appSettings = settings;
-            [self.updatePromptHandler presentUpdatePromptIfNeeded];
-        }
+    if (!self.updatePromptHandler) {
+        self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
+        [self.updatePromptHandler presentUpdatePromptIfNeeded];
     }
 }
 
