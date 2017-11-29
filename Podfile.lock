@@ -14,7 +14,7 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
-  - Analytics (3.6.7)
+  - Analytics (3.6.8)
   - Appsee (2.3.6)
   - Bolts (1.8.4):
     - Bolts/AppLinks (= 1.8.4)
@@ -110,7 +110,7 @@ PODS:
   - GTMSessionFetcher/Core (1.1.12)
   - GTMSessionFetcher/Full (1.1.12):
     - GTMSessionFetcher/Core (= 1.1.12)
-  - Intercom (4.1.3)
+  - Intercom (4.1.4)
   - nanopb (0.3.8):
     - nanopb/decode (= 0.3.8)
     - nanopb/encode (= 0.3.8)
@@ -155,7 +155,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
-  Analytics: 2c09a50e3478a3a7ced08a22d00c43ba6f7011e6
+  Analytics: 6f00cff963ca3b9a4ffdfe3b6dc5564405431f60
   Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
   Branch: f7dda659d380d6c16b47adaefda8f9361718fa6c
@@ -177,7 +177,7 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: 2501e2ad72a52eb3dfe7bd9aee7dad11b858bd20
   GTMOAuth2: be83fd28d63ae3087e7d351b1f39c1a7e24ab6e7
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
-  Intercom: 72319a42bcec50f5e377c160f10363de925ef23c
+  Intercom: 720d61fb4b57b8ed6d0eba311bdc5602cbd025cd
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
