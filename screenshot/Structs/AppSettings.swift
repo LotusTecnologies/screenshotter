@@ -8,33 +8,69 @@
 
 import Foundation
 
-struct AppSettings {
-    let discoverUrls: [String]?
-    let forceVersion: String?
-    let suggestedVersion: String?
+final class AppSettings : NSObject {
+    fileprivate(set) var discoverURLs: [URL?]?
+    fileprivate(set) var forcedDiscoverURL: URL?
+    fileprivate(set) var updateVersion: String?
+    fileprivate(set) var forcedUpdateVersion: String?
     
-    init(_ settings: [AnyHashable : Any]) {
-        discoverUrls = settings["DiscoverURLs"] as? [String]
-        forceVersion = settings["ForceUpdateVersion"] as? String
-        suggestedVersion = settings["SuggestedUpdateVersion"] as? String
+    private var setter: AppSettingsSetter
+    
+    init(withSetter setter: AppSettingsSetter) {
+        self.setter = setter
+        super.init()
+        setter.settings = self
     }
     
-    init(_ _appSettings: _AppSettings) {
-        discoverUrls = _appSettings.discoverUrls
-        forceVersion = _appSettings.forceVersion
-        suggestedVersion = _appSettings.suggestedVersion
+    private let currentVersion = Bundle.displayVersion
+    
+    var shouldUpdate: Bool {
+        return updateVersion?.compare(currentVersion, options: .numeric) == .orderedDescending
+    }
+    
+    var shouldForceUpdate: Bool {
+        return forcedUpdateVersion?.compare(currentVersion, options: .numeric) == .orderedDescending
     }
 }
 
-// TODO: remove once classes converted to swift
-class _AppSettings : NSObject {
-    let discoverUrls: [String]?
-    let forceVersion: String?
-    let suggestedVersion: String?
+final class AppSettingsSetter : NSObject {
+    fileprivate var settings: AppSettings!
     
-    init(_ appSettings: AppSettings?) {
-        discoverUrls = appSettings?.discoverUrls
-        forceVersion = appSettings?.forceVersion
-        suggestedVersion = appSettings?.suggestedVersion
+    func setDiscoverURLs(withURLPaths urlPaths: [String]?) {
+        guard let urlPaths = urlPaths else {
+            return
+        }
+        
+        settings.discoverURLs = urlPaths.map { urlPath in
+            return URL(string: urlPath)
+        }
+    }
+    
+    func setForcedDiscoverURL(withURLPath urlPath: String?) {
+        guard let urlPath = urlPath else {
+            return
+        }
+        
+        settings.forcedDiscoverURL = URL(string: urlPath)
+    }
+    
+    func setUpdateVersion(_ version: String?) {
+        settings.updateVersion = version
+    }
+    
+    func setForcedUpdateVersion(_ version: String?) {
+        settings.forcedUpdateVersion = version
+    }
+}
+
+struct FetchedAppSettings {
+    let discoverURLPaths: [String]?
+    let updateVersion: String?
+    let forcedUpdateVersion: String?
+    
+    init(_ settings: [AnyHashable : Any]) {
+        discoverURLPaths = settings["DiscoverURLs"] as? [String]
+        updateVersion = settings["SuggestedUpdateVersion"] as? String
+        forcedUpdateVersion = settings["ForceUpdateVersion"] as? String
     }
 }

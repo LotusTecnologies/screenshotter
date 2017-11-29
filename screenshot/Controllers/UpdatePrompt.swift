@@ -9,20 +9,6 @@
 import Foundation
 
 class UpdatePromptHandler : NSObject {
-    var appSettings: AppSettings?
-    var _appSettings: _AppSettings? {
-        // TODO: can be removed once files converted to swift
-        didSet {
-            if let settings = _appSettings {
-                appSettings = AppSettings(settings)
-                
-            } else {
-                appSettings = nil
-            }
-        }
-    }
-    
-    private let currentAppVersion = Bundle.displayVersion
     private let appDisplayName = Bundle.displayName
     private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     
@@ -43,26 +29,25 @@ class UpdatePromptHandler : NSObject {
     // MARK: Alert presentation
     
     func presentUpdatePromptIfNeeded() {
-        guard !UIApplication.isDev, let appSettings = appSettings else {
+        guard !UIApplication.isDev, let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
         
-        let forcedVersionIsGreater = appSettings.forceVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
-        let suggestedVersionIsGreater = appSettings.suggestedVersion?.compare(currentAppVersion, options: .numeric) == .orderedDescending
+        let appSettings = appDelegate.settings
         
-        if forcedVersionIsGreater {
+        if appSettings.shouldForceUpdate {
             presentForceUpdateAlert()
             
-        } else if suggestedVersionIsGreater {
+        } else if appSettings.shouldUpdate {
             // Ignore if we've already asked to update to this version.
             if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String,
-                lastVersionAskedToUpdate == appSettings.suggestedVersion
+                lastVersionAskedToUpdate == appSettings.updateVersion
             {
                 return
             }
             
             presentUpdateAlert()
-            UserDefaults.standard.set(appSettings.suggestedVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
+            UserDefaults.standard.set(appSettings.updateVersion, forKey: UserDefaultsKeys.versionLastAskedToUpdate)
         }
     }
 

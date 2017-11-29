@@ -46,14 +46,14 @@ class DiscoverWebViewController : WebViewController {
     // MARK: Random Url
     
     func randomUrl() -> URL? {
-        var randomUrl = "https://screenshopit.tumblr.com"
+        var url = URL(string: "https://screenshopit.tumblr.com")
         
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings?.discoverUrls {
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            randomUrl = urls[randomIndex]
+            url = urls[randomIndex]
         }
         
-        return URL(string: randomUrl)
+        return url
     }
     
     // MARK: Bar Button Item

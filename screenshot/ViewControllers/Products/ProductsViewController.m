@@ -235,6 +235,10 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     return self.products[index];
 }
 
+- (NSInteger)indexForProduct:(Product *)product {
+    return [self.products indexOfObject:product];
+}
+
 
 #pragma mark - Collection View
 
@@ -266,7 +270,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         return self.products.count;
         
     } else if (section == ProductsSectionRate) {
-        return 1;
+        return [self.shoppablesController shoppableCount] > 0 ? 1 : 0;
         
     } else {
         return 0;
@@ -313,7 +317,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         cell.price = product.price;
         cell.originalPrice = product.originalPrice;
         cell.imageUrl = product.imageURL;
-        cell.isSale = product.floatOriginalPrice > product.floatPrice;
+        cell.isSale = [product isSale];
         cell.favoriteButton.selected = product.isFavorite;
         return cell;
         
@@ -355,8 +359,30 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         
         Product *product = [self productAtIndex:indexPath.item];
         
+        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
+                                                                            @"brand": product.brand,
+                                                                            @"url": product.offer,
+                                                                            @"imageUrl": product.imageURL,
+                                                                            @"sale": @([product isSale]),
+                                                                            @"page": @"Products"
+                                                                            }];
+        
+        NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
+        
+        if (email.length) {
+            [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
+                                                                                @"merchant": product.merchant,
+                                                                                @"brand": product.brand,
+                                                                                @"title": product.displayTitle,
+                                                                                @"url": product.offer,
+                                                                                @"imageUrl": product.imageURL,
+                                                                                @"price": product.price,
+                                                                                @"date": [NSDate date],
+                                                                                @"email": email
+                                                                                }];
+        }
+        
         [AnalyticsTrackers.branch track:@"Tapped on product"];
-        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
         
         [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
     }
@@ -373,10 +399,23 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [AnalyticsTrackers.standard track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    
+    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": product.merchant,
+                                                                  @"brand": product.brand,
+                                                                  @"url": product.offer,
+                                                                  @"imageUrl": product.imageURL,
+                                                                  @"page": @"Products"
+                                                                  }];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
+
+- (void)reloadProductCellAtIndex:(NSInteger)index {
+    if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > index) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
+        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    }
 }
 
 
