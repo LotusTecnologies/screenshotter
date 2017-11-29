@@ -12,5 +12,6 @@
 #import "TappableTextView.h"
 #import "NotifySizeChangeView.h"
 #import "InsetPresentationController.h"
+#import "ProductCollectionViewCell.h"
 
 #endif /* screenshot_Bridging_Header_h */
