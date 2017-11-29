@@ -9,5 +9,6 @@
 import Foundation
 
 class NotificationCenterKeys : NSObject {
+    static let updatedDiscoverURL = "UpdatedDiscoverURL"
     static let fetchedAppSettings = "FetchedAppSettings"
 }

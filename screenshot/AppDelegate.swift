@@ -15,9 +15,11 @@ import Branch
 import Firebase
 import GoogleSignIn
 import PromiseKit
+import DeepLinkKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     
@@ -58,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 //        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 //    }
-    
+        
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -92,16 +94,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        var handled = router?.handle(url) { (handled, error) in
+            if let error = error {
+                AnalyticsTrackers.segment.error(error)
+            }
+        } ?? false
         
-        var handled = Branch.getInstance().application(app, open: url, options:options)
+        if !handled {
+            handled = Branch.getInstance().application(app, open: url, options:options)
+        }
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
         if !handled {
+            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+            let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+            
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
@@ -132,7 +142,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         // pass the url to the handle deep link call
-        Branch.getInstance().continue(userActivity)
+        if Branch.getInstance().continue(userActivity) == false {
+            return router?.handle(userActivity) { (handled, error) in
+                if let error = error {
+                    print(error)
+                }
+            } ?? false
+        }
+        
         return true
     }
 }
@@ -152,6 +169,8 @@ extension AppDelegate {
     // MARK: - Third Party
 
     func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
+        setupRouter()
+        
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
         configuration.recordScreenViews = true
@@ -191,6 +210,11 @@ extension AppDelegate {
                 if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
                     tutorialVC.video = .Ambassador(username: channel)
                 }
+            }
+            
+            // "discoverURL" will be the discover URL that should be used during this session.
+            if let discoverURLString = params["discoverURL"] as? String {
+                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
             }
         }
         
@@ -247,6 +271,15 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
+    }
+}
+
+// MARK: - Deep Link Router
+
+extension AppDelegate {
+    func setupRouter() {
+        router = DPLDeepLinkRouter()
+        router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 
