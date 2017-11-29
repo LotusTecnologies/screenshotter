@@ -301,12 +301,12 @@ extension AppDelegate {
             }
             
             bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
-                application.endBackgroundTask(self.bgTask)
-                self.bgTask = UIBackgroundTaskInvalid
-                
                 // TODO: Call the completion handler when the sync is done.
                 // TODO: Provide the correct background fetch result to the completionHandler.
                 completionHandler(.newData)
+
+                application.endBackgroundTask(self.bgTask)
+                self.bgTask = UIBackgroundTaskInvalid
             })
         } else {
             completionHandler(.noData)
