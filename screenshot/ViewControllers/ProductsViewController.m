@@ -376,14 +376,14 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:YES];
     
-    [AnalyticsTrackers.standard track:@"Shoppable rating positive"];
+    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
 }
 
 - (void)productsRateVoteDownAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:NO];
     
-    [AnalyticsTrackers.standard track:@"Shoppable rating negative"];
+    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -396,6 +396,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         
         Product *product = [self productAtIndex:indexPath.item];
         
+        // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
         [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
                                                                             @"brand": product.brand,
                                                                             @"url": product.offer,
@@ -419,7 +420,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                                                                 }];
         }
         
-        [AnalyticsTrackers.branch track:@"Tapped on product"];
+        [AnalyticsTrackers.branch track:@"Tapped on product" properties:nil];
         
         [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
     }
@@ -567,7 +568,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
     [self reloadCollectionViewForIndex:index];
     
-    [AnalyticsTrackers.standard track:@"Tapped on shoppable"];
+    [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];
 }
 
 - (BOOL)shouldHideToolbar {
@@ -646,7 +647,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
     [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
     
-    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
+    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
 }
 
 - (void)hideNoItemsHelperView {

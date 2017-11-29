@@ -7,7 +7,6 @@
 //
 
 #import "MainTabBarController.h"
-#import "FavoritesViewController.h"
 #import "ScreenshotsViewController.h"
 #import "SettingsViewController.h"
 #import "screenshot-Swift.h"

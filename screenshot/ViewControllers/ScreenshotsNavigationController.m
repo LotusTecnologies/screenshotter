@@ -177,7 +177,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [AnalyticsTrackers.standard track:@"Opened Picker"];
+    [AnalyticsTrackers.standard track:@"Opened Picker" properties:nil];
 }
 
 - (void)pickerViewControllerDidCancel {
@@ -209,10 +209,10 @@
             if (granted) {
                 [self.screenshotsNavigationControllerDelegate screenshotsNavigationControllerDidGrantPushPermissions:self];
                 
-                [AnalyticsTrackers.standard track:@"Accepted Push Permissions"];
+                [AnalyticsTrackers.standard track:@"Accepted Push Permissions" properties:nil];
                 
             } else {
-                [AnalyticsTrackers.standard track:@"Denied Push Permissions"];
+                [AnalyticsTrackers.standard track:@"Denied Push Permissions" properties:nil];
             }
         }];
     }]];
