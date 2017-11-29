@@ -96,8 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         var handled = router?.handle(url) { (handled, error) in
             if let error = error {
-                // TODO: Log this error to Segment
-                print(error)
+                AnalyticsTrackers.segment.error(error)
             }
         } ?? false
         
