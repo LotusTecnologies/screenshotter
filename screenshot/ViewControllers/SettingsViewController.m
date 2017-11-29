@@ -790,7 +790,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
-    [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video"];
+    [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video" properties:nil];
     
     // TODO: look into why this is here - corey
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -40,7 +40,6 @@ public class AnalyticsUser : NSObject {
 }
 
 @objc public protocol AnalyticsTracker {
-    func track(_ event: String)
     func track(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
 }
@@ -70,10 +69,6 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     
     // MARK: - AnalyticsTracker
     
-    public func track(_ event: String) {
-        trackers.values.forEach { $0.track(event) }
-    }
-
     public func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         trackers.values.forEach { $0.track(event, properties: properties) }
     }
@@ -84,10 +79,6 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-    
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
     }
@@ -102,10 +93,6 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         // Appsee properties can't exceed 300 bytes.
         // https://www.appsee.com/docs/ios/api?section=events
@@ -137,11 +124,7 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-
-    func track(_ event: String, properties: [AnyHashable : Any]?) {
+    func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         IntercomHelper.sharedInstance.record(event: event, properties: properties)
     }
     
@@ -151,10 +134,6 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
     }

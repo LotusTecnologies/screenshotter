@@ -40,7 +40,9 @@ class DiscoverWebViewController : WebViewController {
         webView.scrollView.delegate = self
         
         url = randomUrl()
-        track("Loaded Discover Web Page", properties: ["url" : url])
+        
+        // !!!: the properties value is creating a crash when building the app and immediatly going to the discover page
+        AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url])
     }
     
     // MARK: Random Url
