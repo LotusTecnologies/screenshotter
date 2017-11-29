@@ -414,7 +414,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
                                                                                 @"url": product.offer,
                                                                                 @"imageUrl": product.imageURL,
                                                                                 @"price": product.price,
-                                                                                @"date": [NSDate date],
                                                                                 @"email": email
                                                                                 }];
         }
