@@ -294,11 +294,13 @@ extension AppDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
 
-        // Only spin up a background task if:
-        // a) We are already in the background, and
-        // b) We don't currently have a background task
-        if application.applicationState == .background && self.bgTask == UIBackgroundTaskInvalid {
-            self.bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+        // Only spin up a background task if we are already in the background
+        if application.applicationState == .background {
+            if bgTask != UIBackgroundTaskInvalid {
+                application.endBackgroundTask(self.bgTask)
+            }
+            
+            bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
                 application.endBackgroundTask(self.bgTask)
                 self.bgTask = UIBackgroundTaskInvalid
                 
@@ -306,6 +308,8 @@ extension AppDelegate {
                 // TODO: Provide the correct background fetch result to the completionHandler.
                 completionHandler(.newData)
             })
+        } else {
+            completionHandler(.noData)
         }
         
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
