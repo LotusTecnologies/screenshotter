@@ -22,12 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-    var settings: AppSettings?
-    var discoverURL: URL? {
-        didSet {
-            let notification = Notification(name: Notification.Name(NotificationCenterKeys.updatedDiscoverURL))
-            NotificationCenter.default.post(notification)
-        }
+    
+    let settings: AppSettings
+    fileprivate let settingsSetter = AppSettingsSetter()
+    
+    override init() {
+        settings = AppSettings(withSetter: self.settingsSetter)
+        super.init()
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
@@ -321,23 +322,16 @@ extension AppDelegate {
 
 extension AppDelegate {
     fileprivate func fetchAppSettings() {
-        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<AppSettings> in
-            return Promise(value: AppSettings(data))
+        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<FetchedAppSettings> in
+            return Promise(value: FetchedAppSettings(data))
             
-        }.then(on: .main) { appSettings -> Void in
-            self.settings = appSettings
+        }.then(on: .main) { fetchedAppSettings -> Void in
+            self.settingsSetter.setDiscoverURLs(withURLPaths: fetchedAppSettings.discoverURLPaths)
+            self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
+            self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
             
             let name = Notification.Name(NotificationCenterKeys.fetchedAppSettings)
-            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": appSettings])
-        }
-    }
-    
-    func getAppSettings() -> _AppSettings? {
-        if let settings = settings {
-            return _AppSettings(settings)
-            
-        } else {
-            return nil
+            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
         }
     }
 }

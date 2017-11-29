@@ -337,7 +337,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionImage) {
         [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
         
-        [AnalyticsTrackers.standard track:@"Tapped on screenshot"];
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        
+        if (screenshot.uploadedImageURL) {
+            [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
+        }
     }
 }
 
@@ -430,17 +434,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
-            [AnalyticsTrackers.standard track:@"Share completed"];
-            [AnalyticsTrackers.branch track:@"Share completed"];
+            [AnalyticsTrackers.standard track:@"Share completed" properties:nil];
+            [AnalyticsTrackers.branch track:@"Share completed" properties:nil];
             
         } else {
-            [AnalyticsTrackers.standard track:@"Share incomplete"];
+            [AnalyticsTrackers.standard track:@"Share incomplete" properties:nil];
         }
     };
     activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
     [self presentViewController:activityViewController animated:YES completion:nil];
     
-    [AnalyticsTrackers.standard track:@"Shared screenshot"];
+    [AnalyticsTrackers.standard track:@"Shared screenshot" properties:nil];
 }
 
 - (void)screenshotCollectionViewCellDidTapDelete:(ScreenshotCollectionViewCell *)cell {
@@ -452,7 +456,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [self removeScreenshotHelperView];
         
-        [AnalyticsTrackers.standard track:@"Removed screenshot"];
+        [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }

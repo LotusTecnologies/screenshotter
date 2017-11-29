@@ -693,6 +693,28 @@ extension Shoppable {
         return croppedImage
     }
     
+    @objc public func setRating(positive: Bool) {
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                let positiveRating: Int16 = 5
+                let negativeRating: Int16 = 1
+                let ratingValue: Int16 = positive ? positiveRating : negativeRating
+                for shoppable in results {
+                    shoppable.rating = ratingValue
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("setRating objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
 }
 
 extension Product {
@@ -725,6 +747,13 @@ extension Product {
         } else {
             displayTitle = merchant
         }
+    }
+    
+    @objc public func isSale() -> Bool {
+        guard let price = price, let originalPrice = originalPrice else {
+            return false
+        }
+        return price < originalPrice
     }
     
 }

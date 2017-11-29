@@ -54,10 +54,11 @@ class DiscoverWebViewController : WebViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(discoverURLUpdated), name: Notification.Name(NotificationCenterKeys.updatedDiscoverURL), object: nil)
         
         webView.scrollView.delegate = self
-        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
         
         reloadURL()
-        track("Loaded Discover Web Page", properties: ["url" : url])
+        
+        // !!!: the properties value is creating a crash when building the app and immediatly going to the discover page
+        track("Loaded Discover Web Page", properties: ["url": url])
     }
     
     // MARK: URLs
@@ -71,14 +72,14 @@ class DiscoverWebViewController : WebViewController {
     }
     
     func randomUrl() -> URL? {
-        var randomUrl = "https://screenshopit.tumblr.com"
+        var url = URL(string: "https://screenshopit.tumblr.com")
         
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings?.discoverUrls {
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            randomUrl = urls[randomIndex]
+            url = urls[randomIndex]
         }
         
-        return URL(string: randomUrl)
+        return url
     }
     
     // MARK: Bar Button Item

@@ -13,6 +13,10 @@ import CoreData
     func shoppablesControllerIsEmpty(_ controller: ShoppablesController)
 }
 
+@objc protocol ShoppablesControllerProtocol {
+    var shoppablesController: ShoppablesController! { get set }
+}
+
 class ShoppablesController: NSObject, FrcDelegateProtocol {
     fileprivate var shoppablesFrc: ShoppableFrc!
     fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>!
@@ -67,7 +71,14 @@ extension ShoppablesController {
     
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
         if frc == shoppablesFrc {
+            let shoppablesCount = collectionView?.numberOfItems(inSection: 0)
+            let selectedIndexPath = collectionView?.indexPathsForSelectedItems?.first
+            
             collectionView?.reloadItems(at: [indexPath])
+            
+            if collectionView?.numberOfItems(inSection: 0) == shoppablesCount {
+                collectionView?.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .centeredHorizontally)
+            }
             
         } else if frc == hasShoppablesFrc {
             let screenshot = hasShoppablesFrc.object(at: indexPath)
@@ -83,8 +94,4 @@ extension ShoppablesController {
             collectionView?.reloadData()
         }
     }
-}
-
-@objc protocol ShoppablesControllerProtocol {
-    var shoppablesController: ShoppablesController! { get set }
 }

@@ -14,6 +14,11 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
+typedef NS_ENUM(NSUInteger, ProductsSection) {
+    ProductsSectionProduct,
+    ProductsSectionRate
+};
+
 typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     ShoppableSortTypeSimilar,
     ShoppableSortTypePriceAsc,
@@ -161,6 +166,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        [collectionView registerClass:[ProductsRateCollectionViewCell class] forCellWithReuseIdentifier:@"rate"];
         
         [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
@@ -266,6 +272,10 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     return self.products[index];
 }
 
+- (NSInteger)indexForProduct:(Product *)product {
+    return [self.products indexOfObject:product];
+}
+
 
 #pragma mark - Collection View
 
@@ -278,54 +288,142 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [self.collectionView reloadData];
         
         if (self.products.count) {
+            // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
     }
 }
 
-- (NSInteger)numberOfCollectionViewColumns {
+- (NSInteger)numberOfCollectionViewProductColumns {
+    return 2;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 2;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.products.count;
+    if (section == ProductsSectionProduct) {
+        return self.products.count;
+        
+    } else if (section == ProductsSectionRate) {
+        return [self.shoppablesController shoppableCount] > 0 ? 1 : 0;
+        
+    } else {
+        return 0;
+    }
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    
+    if (section == ProductsSectionRate) {
+        insets.top = [Geometry extendedPadding];
+    }
+    
+    return insets;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
+    CGSize size = CGSizeZero;
     UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
     CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
-    CGSize size = CGSizeZero;
-    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
-    size.height = size.width + [ProductCollectionViewCell labelsHeight];
+    if (indexPath.section == ProductsSectionProduct) {
+        NSInteger columns = [self numberOfCollectionViewProductColumns];
+        
+        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
+        size.height = size.width + [ProductCollectionViewCell labelsHeight];
+        
+    } else if (indexPath.section == ProductsSectionRate) {
+        size.width = floor(collectionView.bounds.size.width - (padding * 2));
+        size.height = 50.f;
+    }
+    
     return size;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = [self productAtIndex:indexPath.item];
+    if (indexPath.section == ProductsSectionProduct) {
+        Product *product = [self productAtIndex:indexPath.item];
+        
+        ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+        cell.delegate = self;
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
+        cell.title = product.displayTitle;
+        cell.price = product.price;
+        cell.originalPrice = product.originalPrice;
+        cell.imageUrl = product.imageURL;
+        cell.isSale = [product isSale];
+        cell.favoriteButton.selected = product.isFavorite;
+        return cell;
+        
+    } else if (indexPath.section == ProductsSectionRate) {
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+        
+        ProductsRateCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
+        cell.rating = shoppable.rating;
+        [cell.voteUpButton addTarget:self action:@selector(productsRateVoteUpAction) forControlEvents:UIControlEventTouchUpInside];
+        [cell.voteDownButton addTarget:self action:@selector(productsRateVoteDownAction) forControlEvents:UIControlEventTouchUpInside];
+        return cell;
+        
+    } else {
+        return nil;
+    }
+}
+
+- (void)productsRateVoteUpAction {
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:YES];
     
-    ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.delegate = self;
-    cell.contentView.backgroundColor = collectionView.backgroundColor;
-    cell.title = product.displayTitle;
-    cell.price = product.price;
-    cell.originalPrice = product.originalPrice;
-    cell.imageUrl = product.imageURL;
-    cell.isSale = product.floatOriginalPrice > product.floatPrice;
-    cell.favoriteButton.selected = product.isFavorite;
-    return cell;
+    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
+}
+
+- (void)productsRateVoteDownAction {
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:NO];
+    
+    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    return indexPath.section == ProductsSectionRate ? NO : YES;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
-    
-    Product *product = [self productAtIndex:indexPath.item];
-    
-    [AnalyticsTrackers.branch track:@"Tapped on product"];
-    [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
-    
-    [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    if (indexPath.section == ProductsSectionProduct) {
+        [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
+        
+        Product *product = [self productAtIndex:indexPath.item];
+        
+        // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
+        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
+                                                                            @"brand": product.brand,
+                                                                            @"url": product.offer,
+                                                                            @"imageUrl": product.imageURL,
+                                                                            @"sale": @([product isSale]),
+                                                                            @"page": @"Products"
+                                                                            }];
+        
+        NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
+        
+        if (email.length) {
+            [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
+                                                                                @"merchant": product.merchant,
+                                                                                @"brand": product.brand,
+                                                                                @"title": product.displayTitle,
+                                                                                @"url": product.offer,
+                                                                                @"imageUrl": product.imageURL,
+                                                                                @"price": product.price,
+                                                                                @"date": [NSDate date],
+                                                                                @"email": email
+                                                                                }];
+        }
+        
+        [AnalyticsTrackers.branch track:@"Tapped on product" properties:nil];
+        
+        [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    }
 }
 
 
@@ -339,10 +437,23 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [AnalyticsTrackers.standard track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    
+    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": product.merchant,
+                                                                  @"brand": product.brand,
+                                                                  @"url": product.offer,
+                                                                  @"imageUrl": product.imageURL,
+                                                                  @"page": @"Products"
+                                                                  }];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
+
+- (void)reloadProductCellAtIndex:(NSInteger)index {
+    if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > index) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
+        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    }
 }
 
 
@@ -457,7 +568,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
     [self reloadCollectionViewForIndex:index];
     
-    [AnalyticsTrackers.standard track:@"Tapped on shoppable"];
+    [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];
 }
 
 - (BOOL)shouldHideToolbar {
@@ -536,7 +647,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
     [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
     
-    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
+    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
 }
 
 - (void)hideNoItemsHelperView {
