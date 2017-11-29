@@ -474,6 +474,7 @@ class AssetSyncModel: NSObject {
                          b0y: Double,
                          b1x: Double,
                          b1y: Double) {
+        let isMale = false
         firstly {
             NetworkingPromise.downloadInfo(url: url)
             }.then(on: self.processingQ) { productsDict -> Void in
@@ -515,7 +516,8 @@ class AssetSyncModel: NSObject {
                                                               brand: prod["brand"] as? String,
                                                               offer: prod["offer"] as? String,
                                                               imageURL: prod["imageUrl"] as? String,
-                                                              merchant: prod["merchant"] as? String)
+                                                              merchant: prod["merchant"] as? String,
+                                                              isMale: isMale)
                                 productOrder += 1
                             }
                             shoppable.productCount = productOrder
@@ -544,14 +546,14 @@ class AssetSyncModel: NSObject {
     func reExtractProducts(shoppableId: NSManagedObjectID,
                            optionsMask: ProductsOptionsMask,
                            offersURL: String) {
-            guard let url = augmentedUrl(offersURL: offersURL, gender: optionsMask.gender()) else {
-//                let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey : "No url from offersURL:\(offersURL)"])
-//                return Promise(error: error)
-                print("AssetSyncModel reExtractProducts no url from offersURL:\(offersURL)")
-                return
-            }
-            NetworkingPromise.downloadInfo(url: url)
-                .then(on: self.processingQ) { productsDict -> Void in
+        let isMale = optionsMask.gender() == ProductsOptionsGender.male
+        guard let url = augmentedUrl(offersURL: offersURL, gender: optionsMask.gender()) else {
+            print("AssetSyncModel reExtractProducts no url from offersURL:\(offersURL)")
+            return
+        }
+        print("reExtractProducts url:\(url)")
+        NetworkingPromise.downloadInfo(url: url)
+            .then(on: self.processingQ) { productsDict -> Void in
                 guard let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 else {
                     print("AssetSyncModel reExtractProducts no products in ads. productsDict:\(productsDict)")
                     return
@@ -588,7 +590,8 @@ class AssetSyncModel: NSObject {
                                                       brand: prod["brand"] as? String,
                                                       offer: prod["offer"] as? String,
                                                       imageURL: prod["imageUrl"] as? String,
-                                                      merchant: prod["merchant"] as? String)
+                                                      merchant: prod["merchant"] as? String,
+                                                      isMale: isMale)
                         productOrder += 1
                     }
                     if shoppable.productCount != productOrder {

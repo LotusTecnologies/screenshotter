@@ -220,6 +220,11 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if ([self.productsOptions _currentSale] == 0) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
+    if ([self.productsOptions _currentGender] == 0) { // == .female
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == FALSE"]];
+    } else if([self.productsOptions _currentGender] == 1) { // == .male
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == TRUE"]];
+    }
     
     return [products sortedArrayUsingDescriptors:descriptors];
 }
@@ -481,6 +486,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 #pragma mark - Product Options
 
 - (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
+//    DataModel.sharedInstance.
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setWithProductsOptions:productsOptions];
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     [self dismissOptions];
 }

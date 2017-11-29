@@ -503,7 +503,8 @@ extension DataModel {
                      brand: String?,
                      offer: String?,
                      imageURL: String?,
-                     merchant: String?) -> Product {
+                     merchant: String?,
+                     isMale: Bool) -> Product {
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
@@ -517,6 +518,7 @@ extension DataModel {
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
+        productToSave.isMale = isMale
         return productToSave
     }
     
@@ -715,7 +717,16 @@ extension Shoppable {
         return productsOptionsStrings.contains(toFind)
     }
     
-    func set(optionsMask: ProductsOptionsMask) {
+    @objc func set(productsOptions: ProductsOptions) {
+        let optionsMask: ProductsOptionsMask
+        switch productsOptions.currentGender {
+        case .male:
+            optionsMask = ProductsOptionsMask.genderMale
+        case .female:
+            optionsMask = ProductsOptionsMask.genderFemale
+        default:
+            optionsMask = ProductsOptionsMask.genderUnknown
+        }
         guard let screenshot = self.screenshot,
           !productsOptionsContains(optionsMask: optionsMask) else {
             return
