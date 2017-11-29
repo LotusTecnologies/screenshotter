@@ -44,6 +44,11 @@ class UserDefaultsKeys : NSObject {
     
     // Game
     static let gameScore = "GameScore"
+    
+    // Silent Push
+    static let lastTimeZone = "LastTimeZone"
+    static let subscriptionARN = "SubscriptionARN"
+    static let enabledSilentPush = "EnabledSilentPush"
 }
 
 extension UIApplication {

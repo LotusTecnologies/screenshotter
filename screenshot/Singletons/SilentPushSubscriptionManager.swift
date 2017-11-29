@@ -9,12 +9,6 @@
 import Foundation
 import PromiseKit
 
-extension UserDefaultsKeys {
-    static let lastTimeZone = "lastTimeZone"
-    static let subscriptionARN = "subscriptionARN"
-    static let enabledSilentPush = "enabledSilentPush"
-}
-
 class SilentPushSubscriptionManager : NSObject {
     static let sharedInstance = SilentPushSubscriptionManager()
     
