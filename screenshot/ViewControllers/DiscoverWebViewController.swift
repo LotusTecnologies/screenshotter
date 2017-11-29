@@ -68,7 +68,7 @@ class DiscoverWebViewController : WebViewController {
     }
     
     func discoverURL() -> URL? {
-        return deepLinkURL ?? (appDelegate?.discoverURL ?? randomUrl())
+        return deepLinkURL ?? (appDelegate?.settings.forcedDiscoverURL ?? randomUrl())
     }
     
     func randomUrl() -> URL? {

@@ -214,8 +214,8 @@ extension AppDelegate {
             }
             
             // "discoverURL" will be the discover URL that should be used during this session.
-            if let discoverURLString = params["discoverURL"] as? String, let URL = URL(string: discoverURLString) {
-                self.discoverURL = URL
+            if let discoverURLString = params["discoverURL"] as? String {
+                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
             }
         }
         
