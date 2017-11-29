@@ -39,6 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+
+        prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared().fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
@@ -46,12 +50,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        prepareDataStackCompletionIfNeeded()
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
+        
+        if application.applicationState == .background,
+            let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
+            let aps = remoteNotification["aps"] as? [String : AnyObject],
+            let contentAvailable = aps["content-available"] as? NSNumber,
+            contentAvailable.intValue == 1 {
+            AnalyticsTrackers.segment.track("Woke From Silent Push")
+        }
         
         return true
     }
@@ -249,12 +262,21 @@ extension AppDelegate {
     }
     
     func prepareDataStackCompletionIfNeeded() {
+        func syncPhotos() {
+            if ApplicationStateModel.sharedInstance.isBackground() {
+                AssetSyncModel.sharedInstance.syncPhotos()
+            } else {
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+            }
+        }
+        
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                syncPhotos()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                    syncPhotos()
+                    
                     self.transitionTo(self.nextViewController())
                 }
                 
@@ -311,9 +333,28 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+
+        // Only spin up a background task if we are already in the background
+        if application.applicationState == .background {
+            if bgTask != UIBackgroundTaskInvalid {
+                application.endBackgroundTask(self.bgTask)
+            }
+            
+            bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+                // TODO: Call the completion handler when the sync is done.
+                // TODO: Provide the correct background fetch result to the completionHandler.
+                completionHandler(.newData)
+
+                application.endBackgroundTask(self.bgTask)
+                self.bgTask = UIBackgroundTaskInvalid
+            })
+        } else {
+            completionHandler(.noData)
+        }
+        
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
         Branch.getInstance().handlePushNotification(userInfo)
-        completionHandler(.noData)
     }
 }
 
