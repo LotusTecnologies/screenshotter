@@ -37,6 +37,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        if application.applicationState == .background,
+            let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
+            let aps = remoteNotification["aps"] as? [String : AnyObject],
+            let contentAvailable = aps["content-available"] as? NSNumber,
+            contentAvailable.intValue == 1 {
+            AnalyticsTrackers.segment.track("Woke From Silent Push")
+        }
+        
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
 
