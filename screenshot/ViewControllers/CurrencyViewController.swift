@@ -8,7 +8,7 @@
 
 import Foundation
 
-class CurrencyViewController : UIViewController {
+class CurrencyViewController : BaseViewController {
     var selectedCurrencyCode: String?
     
     fileprivate let currencyMap = CurrencyMap()

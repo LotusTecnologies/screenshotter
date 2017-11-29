@@ -307,7 +307,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         return self.products.count;
         
     } else if (section == ProductsSectionRate) {
-        return 1;
+        return [self.shoppablesController shoppableCount] > 0 ? 1 : 0;
         
     } else {
         return 0;

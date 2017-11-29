@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeCurrency
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate, ViewControllerLifeCycle>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
@@ -201,6 +201,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self dismissKeyboard];
 }
 
+- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
+    if ([viewController isKindOfClass:[CurrencyViewController class]]) {
+        NSIndexPath *indexPath = [self indexPathForRowType:RowTypeCurrency inSectionType:SectionTypeInfo];
+        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
         [self updateScreenshotsCount];
@@ -246,8 +253,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (NSIndexPath *)indexPathForRowType:(RowType)rowType inSectionType:(SectionType)sectionType {
-    NSInteger row = self.data[@(sectionType)][rowType].integerValue;
-    
+    NSInteger row = [self.data[@(sectionType)] indexOfObject:@(rowType)];
     return [NSIndexPath indexPathForRow:row inSection:sectionType];
 }
 
@@ -411,6 +417,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeCurrency: {
             CurrencyViewController *viewController = [[CurrencyViewController alloc] init];
+            viewController.lifeCycleDelegate = self;
             viewController.title = [self textForRowType:rowType];
             viewController.hidesBottomBarWhenPushed = YES;
             viewController.selectedCurrencyCode = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
