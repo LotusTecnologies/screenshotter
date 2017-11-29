@@ -183,16 +183,8 @@ extension FavoritesViewController : UICollectionViewDelegate {
         webViewController.url = URL(string: offer)
 
         navigationController?.pushViewController(webViewController, animated: true)
-
-        AnalyticsTrackers.standard.track("Tapped on product", properties: [
-            "merchant": product.merchant ?? "",
-            "brand": product.brand ?? "",
-            "url": offer,
-            "imageUrl": product.imageURL ?? "",
-            "sale": product.isSale(),
-            "page": "Favorites"
-            ])
         
+        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Favorites")
         AnalyticsTrackers.branch.track("Tapped on product")
         
         FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])

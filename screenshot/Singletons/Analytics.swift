@@ -101,7 +101,7 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 }
 
-class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
+class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
     func track(_ event: String) {
         track(event, properties: nil)
     }
@@ -167,7 +167,7 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 public class AnalyticsTrackers : NSObject {
-    static let appsee = AppSeeAnalyticsTracker()
+    static let appsee = AppseeAnalyticsTracker()
     static let segment = SegmentAnalyticsTracker()
     static let intercom = IntercomAnalyticsTracker()
     static let branch = BranchAnalyticsTracker()
@@ -183,4 +183,17 @@ public func identify(_ name: String? = nil, email: String? = nil, tracker: Analy
     let user = AnalyticsUser(name: name, email: email)
     tracker.identify(user)
     return user
+}
+
+extension AnalyticsTracker {
+    func trackTappedOnProduct(_ product: Product, onPage page: String) {
+        track("Tapped on product", properties: [
+            "merchant": product.merchant ?? "",
+            "brand": product.brand ?? "",
+            "url": product.offer ?? "",
+            "imageUrl": product.imageURL ?? "",
+            "sale": product.isSale(),
+            "page": page
+            ])
+    }
 }

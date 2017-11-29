@@ -396,6 +396,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         
         Product *product = [self productAtIndex:indexPath.item];
         
+        // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
         [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
                                                                             @"brand": product.brand,
                                                                             @"url": product.offer,
