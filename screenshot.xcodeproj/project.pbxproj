@@ -40,8 +40,6 @@
 		C53B46391FB1A54000A8C886 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46321FB1A54000A8C886 /* TutorialVideoViewController.swift */; };
 		C53B463E1FB1A55500A8C886 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463C1FB1A55500A8C886 /* SettingsViewController.m */; };
 		C53B463F1FB1A55500A8C886 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */; };
-		C53B46451FB1A58800A8C886 /* FavoritesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B46431FB1A58700A8C886 /* FavoritesViewController.m */; };
-		C53B46421FB1A57700A8C886 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B46411FB1A57700A8C886 /* ProductsViewController.m */; };
 		C53B46471FB1A8A500A8C886 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46461FB1A8A500A8C886 /* Loader.swift */; };
 		C53B46491FB1ABFC00A8C886 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */; };
 		C53B464B1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B464A1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift */; };
@@ -54,7 +52,6 @@
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
 		C53B46601FBC792F00A8C886 /* ShoppableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465F1FBC792F00A8C886 /* ShoppableCollectionViewCell.swift */; };
 		C53B46621FBC7CBD00A8C886 /* TransitioningController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46611FBC7CBD00A8C886 /* TransitioningController.swift */; };
-		C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5448E841F66910700CD063B /* NotifySizeChangeView.m */; };
 		C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */; };
 		C55184C91F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55184C81F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.m */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
@@ -83,6 +80,7 @@
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CCBB3C1F405C0B00D6B392 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */; };
 		C5CCBB431F41C3E600D6B392 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5CCBB421F41C3E600D6B392 /* WebViewController.m */; };
+		C5E64F531FCFEBFB0073CAB5 /* NotifyChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E64F521FCFEBFB0073CAB5 /* NotifyChangeView.swift */; };
 		C5EE6EF61FAA01FE008CBC3A /* BarButtonItemExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE6EF51FAA01FE008CBC3A /* BarButtonItemExt.swift */; };
 		C5EE6EF81FAA0817008CBC3A /* ClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE6EF71FAA0817008CBC3A /* ClipView.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
@@ -146,10 +144,6 @@
 		C53B463B1FB1A55500A8C886 /* ScreenshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsViewController.h; sourceTree = "<group>"; };
 		C53B463C1FB1A55500A8C886 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
-		C53B46431FB1A58700A8C886 /* FavoritesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FavoritesViewController.m; sourceTree = "<group>"; };
-		C53B46441FB1A58700A8C886 /* FavoritesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FavoritesViewController.h; sourceTree = "<group>"; };
-		C53B46401FB1A57700A8C886 /* ProductsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductsViewController.h; sourceTree = "<group>"; };
-		C53B46411FB1A57700A8C886 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
 		C53B46461FB1A8A500A8C886 /* Loader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		C53B464A1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -162,8 +156,6 @@
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
 		C53B465F1FBC792F00A8C886 /* ShoppableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppableCollectionViewCell.swift; sourceTree = "<group>"; };
 		C53B46611FBC7CBD00A8C886 /* TransitioningController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitioningController.swift; sourceTree = "<group>"; };
-		C5448E831F66910700CD063B /* NotifySizeChangeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotifySizeChangeView.h; sourceTree = "<group>"; };
-		C5448E841F66910700CD063B /* NotifySizeChangeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotifySizeChangeView.m; sourceTree = "<group>"; };
 		C55184C41F4C0DAA00EE7855 /* ScreenshotDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayViewController.h; sourceTree = "<group>"; };
 		C55184C51F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayViewController.m; sourceTree = "<group>"; };
 		C55184C71F4C0DCB00EE7855 /* ScreenshotDisplayNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayNavigationController.h; sourceTree = "<group>"; };
@@ -198,6 +190,7 @@
 		C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
 		C5CCBB411F41C3E600D6B392 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		C5CCBB421F41C3E600D6B392 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
+		C5E64F521FCFEBFB0073CAB5 /* NotifyChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyChangeView.swift; sourceTree = "<group>"; };
 		C5EE6EF51FAA01FE008CBC3A /* BarButtonItemExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonItemExt.swift; sourceTree = "<group>"; };
 		C5EE6EF71FAA0817008CBC3A /* ClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipView.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
@@ -349,8 +342,7 @@
 				C5EE6EF71FAA0817008CBC3A /* ClipView.swift */,
 				525BBCF91F9CBA6800330C95 /* HelperView.swift */,
 				C53B46461FB1A8A500A8C886 /* Loader.swift */,
-				C5448E831F66910700CD063B /* NotifySizeChangeView.h */,
-				C5448E841F66910700CD063B /* NotifySizeChangeView.m */,
+				C5E64F521FCFEBFB0073CAB5 /* NotifyChangeView.swift */,
 				C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */,
 				C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */,
 				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
@@ -791,6 +783,7 @@
 				C53B46621FBC7CBD00A8C886 /* TransitioningController.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C5AA81A11F97228100421909 /* FavoriteButton.swift in Sources */,
+				C5E64F531FCFEBFB0073CAB5 /* NotifyChangeView.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				C55184C61F4C0DAA00EE7855 /* ScreenshotDisplayViewController.m in Sources */,
 				C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */,
@@ -841,7 +834,6 @@
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C5278FFB1F3C38510090E422 /* BaseViewController.m in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
-				C5448E851F66910700CD063B /* NotifySizeChangeView.m in Sources */,
 				C5AA81A21F97228100421909 /* FloatingActionButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

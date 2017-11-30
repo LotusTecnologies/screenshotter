@@ -10,7 +10,7 @@ import Foundation
 import QuartzCore
 
 class ShadowCollectionViewCell: UICollectionViewCell {
-    private let shadowView = NotifySizeChangeView()
+    private let shadowView = NotifyChangeView()
     private(set) var mainView = UIView()
     
     required init?(coder aDecoder: NSCoder) {
@@ -22,7 +22,7 @@ class ShadowCollectionViewCell: UICollectionViewCell {
         
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         shadowView.layoutMargins = Shadow.basic.layoutMargins
-        shadowView.notification = { size in
+        shadowView.notifySizeChange = { size in
             self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: self.shadowView.bounds, cornerRadius: type(of: self).cornerRadius).cgPath
         }
         shadowView.layer.shadowColor = Shadow.basic.color.cgColor;

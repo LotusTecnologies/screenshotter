@@ -12,7 +12,6 @@
 #import "MainTabBarController.h"
 #import "WebViewController.h"
 #import "TappableTextView.h"
-#import "NotifySizeChangeView.h"
 #import "InsetPresentationController.h"
 #import "ProductCollectionViewCell.h"
 
