@@ -529,7 +529,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeUsageStreak: {
             NSInteger streak = [NSUserDefaults.standardUserDefaults integerForKey:[UserDefaultsKeys dailyStreak]];
-            NSString *suffix = (streak == 0 || streak > 1) ? @"s" : @"";
+            NSString *suffix = (streak == 1) ? @"" : @"s";
             return [NSString stringWithFormat:@"%ld day%@", streak, suffix];
             break;
         }
