@@ -197,10 +197,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     
     [self updateScreenshotsCount];
     [self reloadPermissionIndexPaths];
-    
-    NSInteger row = [self.data[@(SectionTypeAbout)] indexOfObject:@(RowTypeUsageStreak)];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:SectionTypeAbout];
-    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    [self reloadDailyStreak];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -226,6 +223,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self updateScreenshotsCount];
+        [self reloadDailyStreak];
     }
 }
 
@@ -608,6 +606,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return nil;
             break;
     }
+}
+
+- (void)reloadDailyStreak {
+    [UsageStreakHelper updateStreak];
+    
+    NSIndexPath *indexPath = [self indexPathForRowType:RowTypeUsageStreak inSectionType:SectionTypeAbout];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 - (void)reloadPermissionIndexPaths {
