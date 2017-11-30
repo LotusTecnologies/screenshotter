@@ -14,15 +14,35 @@ extension UIColor {
     static let crazeRed = UIColor(red: 237.0/255.0, green: 20.0/255.0, blue: 90.0/255.0, alpha: 1)
     static let crazeGreen = UIColor(red: 32.0/255.0, green: 200.0/255.0, blue: 163.0/255.0, alpha: 1)
         
-    static let gray1 = UIColor(white: 0.1, alpha: 1.0) // 25.5
-    static let gray2 = UIColor(white: 0.2, alpha: 1.0) // 51
-    static let gray3 = UIColor(white: 0.3, alpha: 1.0) // 76.5
-    static let gray4 = UIColor(white: 0.4, alpha: 1.0) // 102
-    static let gray5 = UIColor(white: 0.5, alpha: 1.0) // 127.5
-    static let gray6 = UIColor(white: 0.6, alpha: 1.0) // 153
-    static let gray7 = UIColor(white: 0.7, alpha: 1.0) // 178.5
-    static let gray8 = UIColor(white: 0.8, alpha: 1.0) // 204
-    static let gray9 = UIColor(white: 0.9, alpha: 1.0) // 229.5
+    static let gray1 = UIColor(white: 0.1, alpha: 1) // 25.5
+    static let gray2 = UIColor(white: 0.2, alpha: 1) // 51
+    static let gray3 = UIColor(white: 0.3, alpha: 1) // 76.5
+    static let gray4 = UIColor(white: 0.4, alpha: 1) // 102
+    static let gray5 = UIColor(white: 0.5, alpha: 1) // 127.5
+    static let gray6 = UIColor(white: 0.6, alpha: 1) // 153
+    static let gray7 = UIColor(white: 0.7, alpha: 1) // 178.5
+    static let gray8 = UIColor(white: 0.8, alpha: 1) // 204
+    static let gray9 = UIColor(white: 0.9, alpha: 1) // 229.5
+    
+    func lighter(by percentage: CGFloat = 8) -> UIColor? {
+        return adjust(by: abs(percentage))
+    }
+    
+    func darker(by percentage: CGFloat = 8) -> UIColor? {
+        return adjust(by: -1 * abs(percentage))
+    }
+    
+    func adjust(by percentage: CGFloat = 8) -> UIColor? {
+        var r = CGFloat(), g = CGFloat(), b = CGFloat(), a = CGFloat()
+        
+        if getRed(&r, green: &g, blue: &b, alpha: &a) {
+            let p = percentage / 100
+            return UIColor(red: min(r + p, 1), green: min(g + p, 1), blue: min(b + p, 1), alpha: a)
+            
+        } else {
+            return nil
+        }
+    }
 }
 
 extension UIContentSizeCategory {
