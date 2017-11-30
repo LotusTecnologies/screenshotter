@@ -64,8 +64,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
         [self addNavigationItemLogo];
     }
@@ -213,8 +213,14 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
-        [self updateScreenshotsCount];
+        // Use did become active since this value can change through an alert view
         [self reloadPermissionIndexPaths];
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self updateScreenshotsCount];
     }
 }
 
