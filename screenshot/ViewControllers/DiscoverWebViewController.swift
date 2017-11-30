@@ -59,7 +59,7 @@ class DiscoverWebViewController : WebViewController {
         url = deepLinkURL ?? (AppDelegate.shared.settings.forcedDiscoverURL ?? randomUrl())
     }
     
-    func randomUrl() -> URL? {
+    private func randomUrl() -> URL? {
         var url = URL(string: "https://screenshopit.tumblr.com")
         
         if let urls = AppDelegate.shared.settings.discoverURLs {
