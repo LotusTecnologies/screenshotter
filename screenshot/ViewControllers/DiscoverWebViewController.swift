@@ -55,24 +55,43 @@ class DiscoverWebViewController : WebViewController {
     }
 
     func reloadURL() {
-        url = deepLinkURL ?? (AppDelegate.shared.settings.forcedDiscoverURL ?? randomUrl())
+        let potentialURLs = [
+            deepLinkURL,
+            AppDelegate.shared.settings.forcedDiscoverURL,
+            randomURL(),
+            URL(string: "https://screenshopit.tumblr.com")
+        ]
+        
+        for potentialURL in potentialURLs {
+            if let potentialURL = potentialURL, UIApplication.shared.canOpenURL(potentialURL) {
+                url = potentialURL
+                break
+            }
+        }
     }
 
-    private func randomUrl() -> URL? {
-        var url = URL(string: "https://screenshopit.tumblr.com")
+    private func randomURL() -> URL? {
+        var url: URL?
 
         if let urls = AppDelegate.shared.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            let randomUrl = urls[randomIndex]
+            let randomURL = urls[randomIndex]
             
             // Check the URL's validity
-            if let randomUrl = randomUrl, UIApplication.shared.canOpenURL(randomUrl) {
-                url = randomUrl
+            if let randomURL = randomURL {
+                if UIApplication.shared.canOpenURL(randomURL) {
+                    url = randomURL
+                    
+                } else {
+                    AnalyticsTrackers.segment.error(withDescription: "Invalid fetched URL \(randomURL.absoluteString)")
+                }
             }
         }
 
         return url
     }
+    
+//    private
     
     // MARK: Bar Button Item
     

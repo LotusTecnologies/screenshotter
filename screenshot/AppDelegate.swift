@@ -113,7 +113,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         var handled = router?.handle(url) { (handled, error) in
             if let error = error {
-                AnalyticsTrackers.segment.error(error)
+                AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
             }
         } ?? false
         
@@ -162,7 +162,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if Branch.getInstance().continue(userActivity) == false {
             return router?.handle(userActivity) { (handled, error) in
                 if let error = error {
-                    AnalyticsTrackers.segment.error(error)
+                    AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
                 }
             } ?? false
         }
@@ -207,7 +207,7 @@ extension AppDelegate {
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
             guard error == nil, let params = params as? [String : AnyObject] else {
-                AnalyticsTrackers.segment.error(error!)
+                AnalyticsTrackers.segment.error(withDescription: error!.localizedDescription)
                 return
             }
             

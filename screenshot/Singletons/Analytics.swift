@@ -87,8 +87,8 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
         SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
     }
     
-    func error(_ error: Error) {
-        SEGAnalytics.shared().track("Error", properties: ["Description" : error.localizedDescription])
+    func error(withDescription description: String) {
+        SEGAnalytics.shared().track("Error", properties: ["Description" : description])
     }
 }
 
