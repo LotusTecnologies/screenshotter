@@ -29,11 +29,11 @@ class UpdatePromptHandler : NSObject {
     // MARK: Alert presentation
     
     func presentUpdatePromptIfNeeded() {
-        guard !UIApplication.isDev, let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+        guard !UIApplication.isDev else {
             return
         }
         
-        let appSettings = appDelegate.settings
+        let appSettings = AppDelegate.shared.settings
         
         if appSettings.shouldForceUpdate {
             presentForceUpdateAlert()

@@ -11,7 +11,7 @@ import DeepLinkKit
 
 class DiscoverDeepLinkHandler : DPLRouteHandler {
     var mainTabBarController:MainTabBarController? {
-        return (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController as? MainTabBarController
+        return AppDelegate.shared.window?.rootViewController as? MainTabBarController
     }
     
     override func shouldHandle(_ deepLink: DPLDeepLink!) -> Bool {

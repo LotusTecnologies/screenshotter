@@ -10,22 +10,14 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
-    private var appDelegate: AppDelegate? {
-        return UIApplication.shared.delegate as? AppDelegate
-    }
-    
-    var deepLinkURL: URL? {
-        didSet {
-            reloadURL()
-        }
-    }
-    
     override var title: String? {
         set {}
         get {
             return "Discover"
         }
     }
+    
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -44,37 +36,33 @@ class DiscoverWebViewController : WebViewController {
         addNavigationItemLogo()
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(discoverURLUpdated), name: Notification.Name(NotificationCenterKeys.updatedDiscoverURL), object: nil)
         
         webView.scrollView.delegate = self
         
         reloadURL()
         
         // !!!: the properties value is creating a crash when building the app and immediatly going to the discover page
-        track("Loaded Discover Web Page", properties: ["url": url])
+        AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url])
     }
     
     // MARK: URLs
-
-    func reloadURL() {
-        url = discoverURL()
+    
+    var deepLinkURL: URL? {
+        didSet {
+            reloadURL()
+        }
     }
     
-    func discoverURL() -> URL? {
-        return deepLinkURL ?? (appDelegate?.settings.forcedDiscoverURL ?? randomUrl())
+    func reloadURL() {
+        url = deepLinkURL ?? (AppDelegate.shared.settings.forcedDiscoverURL ?? randomUrl())
     }
     
     func randomUrl() -> URL? {
         var url = URL(string: "https://screenshopit.tumblr.com")
         
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings.discoverURLs {
+        if let urls = AppDelegate.shared.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
             url = urls[randomIndex]
         }
@@ -103,12 +91,6 @@ class DiscoverWebViewController : WebViewController {
     func refreshAction() {
         reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
-    }
-    
-    // MARK: Notification Observers
-    
-    func discoverURLUpdated() {
-        reloadURL()
     }
 }
 

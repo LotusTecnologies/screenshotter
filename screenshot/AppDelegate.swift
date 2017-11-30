@@ -26,6 +26,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
+    static var shared: AppDelegate {
+        return UIApplication.shared.delegate as! AppDelegate
+    }
+    
     override init() {
         settings = AppSettings(withSetter: self.settingsSetter)
         super.init()
@@ -158,7 +162,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if Branch.getInstance().continue(userActivity) == false {
             return router?.handle(userActivity) { (handled, error) in
                 if let error = error {
-                    print(error)
+                    AnalyticsTrackers.segment.error(error)
                 }
             } ?? false
         }
@@ -202,15 +206,11 @@ extension AppDelegate {
         branch?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
-            guard error == nil else {
-                print("Branch initSession error:\(error!)")
+            guard error == nil, let params = params as? [String : AnyObject] else {
+                AnalyticsTrackers.segment.error(error!)
                 return
             }
-            guard let params = params as? [String : AnyObject] else {
-                print("Branch initSession no params")
-                return
-            }
-            print("Branch params:\(params)")
+            
             if let shareId = params["shareId"] as? String {
                 AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
                 self.showScreenshotListTop()
