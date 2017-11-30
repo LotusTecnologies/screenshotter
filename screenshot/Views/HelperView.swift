@@ -12,8 +12,8 @@ public class HelperView : UIView {
     private let scrollView = UIScrollView()
     private(set) var titleLabel = UILabel()
     private(set) var subtitleLabel = UILabel()
-    private(set) var contentView = NotifySizeChangeView()
-    private(set) var controlView = NotifySizeChangeView()
+    private(set) var contentView = NotifyChangeView()
+    private(set) var controlView = NotifyChangeView()
     
     private var scrollContentViewMaxHeightConstraint: NSLayoutConstraint!
     private var imageView: UIImageView?
@@ -82,12 +82,12 @@ public class HelperView : UIView {
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.layoutMargins = .zero
-        contentView.subviewNotification = { count in
+        contentView.notifySubviewChange = { count in
             var contentViewLayoutMargins = self.contentView.layoutMargins
             contentViewLayoutMargins.top = count > 0 ? -.extendedPadding : 0
             self.contentView.layoutMargins = contentViewLayoutMargins
         }
-        contentView.notification = { size in
+        contentView.notifySizeChange = { size in
             if let image = self.imageView?.image {
                 self.contentView.isHidden = image.size.height * 0.3 > self.contentView.bounds.size.height
             }
@@ -112,10 +112,10 @@ public class HelperView : UIView {
         
         controlView.translatesAutoresizingMaskIntoConstraints = false
         controlView.layoutMargins = .zero
-        controlView.subviewNotification = { count in
+        controlView.notifySubviewChange = { count in
             controlViewNotificationBlock()
         }
-        controlView.notification = { size in
+        controlView.notifySizeChange = { size in
             controlViewNotificationBlock()
         }
         scrollContentView.addSubview(controlView)

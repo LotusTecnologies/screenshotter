@@ -1,4 +1,3 @@
-
 //
 //  DiscoverWebViewController.swift
 //  screenshot
@@ -8,6 +7,7 @@
 //
 
 import WebKit.WKWebView
+import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
     override var title: String? {
@@ -16,6 +16,8 @@ class DiscoverWebViewController : WebViewController {
             return "Discover"
         }
     }
+    
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -38,45 +40,79 @@ class DiscoverWebViewController : WebViewController {
         super.viewDidLoad()
         
         webView.scrollView.delegate = self
-        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+
+        reloadURL()
         
-        url = randomUrl()
-        track("Loaded Discover Web Page", properties: ["url" : url])
+        AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url])
     }
     
-    // MARK: Random Url
+    // MARK: URLs
     
-    func randomUrl() -> URL? {
-        var randomUrl = "https://screenshopit.tumblr.com"
-        
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let urls = appDelegate.settings?.discoverUrls {
-            let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            randomUrl = urls[randomIndex]
+    var deepLinkURL: URL? {
+        didSet {
+            reloadURL()
         }
-        
-        return URL(string: randomUrl)
     }
+
+    func reloadURL() {
+        let potentialURLs = [
+            deepLinkURL,
+            AppDelegate.shared.settings.forcedDiscoverURL,
+            randomURL(),
+            URL(string: "https://screenshopit.tumblr.com")
+        ]
+        
+        for potentialURL in potentialURLs {
+            if let potentialURL = potentialURL, UIApplication.shared.canOpenURL(potentialURL) {
+                url = potentialURL
+                break
+            }
+        }
+    }
+
+    private func randomURL() -> URL? {
+        var url: URL?
+
+        if let urls = AppDelegate.shared.settings.discoverURLs {
+            let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
+            let randomURL = urls[randomIndex]
+            
+            // Check the URL's validity
+            if let randomURL = randomURL {
+                if UIApplication.shared.canOpenURL(randomURL) {
+                    url = randomURL
+                    
+                } else {
+                    AnalyticsTrackers.segment.error(withDescription: "Invalid fetched URL \(randomURL.absoluteString)")
+                }
+            }
+        }
+
+        return url
+    }
+    
+//    private
     
     // MARK: Bar Button Item
     
     func leftBarButtonItems() -> [UIBarButtonItem] {
         return [backItem!, forwardItem!]
     }
-    
+
     func rightBarButtonItems() -> [UIBarButtonItem] {
         return [shareItem!, refreshItem!]
     }
-    
+
     override func updateShareItem() {
         super.updateShareItem()
-        
+
         navigationItem.rightBarButtonItems = rightBarButtonItems()
     }
-    
+
     // MARK: Bar Button Item Actions
-    
+
     func refreshAction() {
-        url = randomUrl()
+        reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
     }
 }
@@ -84,5 +120,13 @@ class DiscoverWebViewController : WebViewController {
 extension DiscoverWebViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return nil
+    }
+}
+
+extension DiscoverWebViewController : DPLTargetViewController {
+    func configure(with deepLink: DPLDeepLink!) {
+        if let url = deepLink.discoverURL {
+            deepLinkURL = url
+        }
     }
 }

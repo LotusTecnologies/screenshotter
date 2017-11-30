@@ -15,12 +15,25 @@ import Branch
 import Firebase
 import GoogleSignIn
 import PromiseKit
+import DeepLinkKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-    var settings: AppSettings?
+    
+    let settings: AppSettings
+    fileprivate let settingsSetter = AppSettingsSetter()
+    
+    static var shared: AppDelegate {
+        return UIApplication.shared.delegate as! AppDelegate
+    }
+    
+    override init() {
+        settings = AppSettings(withSetter: self.settingsSetter)
+        super.init()
+    }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
@@ -30,6 +43,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+
+        prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared().fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
@@ -37,7 +54,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        prepareDataStackCompletionIfNeeded()
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         fetchAppSettings()
         
         UsageStreakHelper.updateStreak()
@@ -45,6 +63,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
+        
+        if application.applicationState == .background,
+            let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
+            let aps = remoteNotification["aps"] as? [String : AnyObject],
+            let contentAvailable = aps["content-available"] as? NSNumber,
+            contentAvailable.intValue == 1 {
+            AnalyticsTrackers.segment.track("Woke From Silent Push")
+        }
         
         return true
     }
@@ -55,7 +81,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //    }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.discoverUrl)
         UsageStreakHelper.updateLastSessionDate()
     }
     
@@ -91,16 +116,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        var handled = router?.handle(url) { (handled, error) in
+            if let error = error {
+                AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
+            }
+        } ?? false
         
-        var handled = Branch.getInstance().application(app, open: url, options:options)
+        if !handled {
+            handled = Branch.getInstance().application(app, open: url, options:options)
+        }
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
         if !handled {
+            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+            let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+            
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
@@ -131,7 +164,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         // pass the url to the handle deep link call
-        Branch.getInstance().continue(userActivity)
+        if Branch.getInstance().continue(userActivity) == false {
+            return router?.handle(userActivity) { (handled, error) in
+                if let error = error {
+                    AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
+                }
+            } ?? false
+        }
+        
         return true
     }
 }
@@ -143,7 +183,7 @@ extension AppDelegate {
     func showScreenshotListTop() {
         if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
             mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
-            mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollTopTop()
+            mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollToTop()
             mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController
         }
     }
@@ -151,6 +191,8 @@ extension AppDelegate {
     // MARK: - Third Party
 
     func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
+        setupRouter()
+        
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
         configuration.recordScreenViews = true
@@ -169,15 +211,11 @@ extension AppDelegate {
         branch?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
-            guard error == nil else {
-                print("Branch initSession error:\(error!)")
+            guard error == nil, let params = params as? [String : AnyObject] else {
+                AnalyticsTrackers.segment.error(withDescription: error!.localizedDescription)
                 return
             }
-            guard let params = params as? [String : AnyObject] else {
-                print("Branch initSession no params")
-                return
-            }
-            print("Branch params:\(params)")
+            
             if let shareId = params["shareId"] as? String {
                 AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
                 self.showScreenshotListTop()
@@ -190,6 +228,11 @@ extension AppDelegate {
                 if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
                     tutorialVC.video = .Ambassador(username: channel)
                 }
+            }
+            
+            // "discoverURL" will be the discover URL that should be used during this session.
+            if let discoverURLString = params["discoverURL"] as? String {
+                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
             }
         }
         
@@ -224,12 +267,21 @@ extension AppDelegate {
     }
     
     func prepareDataStackCompletionIfNeeded() {
+        func syncPhotos() {
+            if ApplicationStateModel.sharedInstance.isBackground() {
+                AssetSyncModel.sharedInstance.syncPhotos()
+            } else {
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+            }
+        }
+        
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                syncPhotos()
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+                    syncPhotos()
+                    
                     self.transitionTo(self.nextViewController())
                 }
                 
@@ -246,6 +298,15 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
+    }
+}
+
+// MARK: - Deep Link Router
+
+extension AppDelegate {
+    func setupRouter() {
+        router = DPLDeepLinkRouter()
+        router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 
@@ -277,9 +338,28 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+
+        // Only spin up a background task if we are already in the background
+        if application.applicationState == .background {
+            if bgTask != UIBackgroundTaskInvalid {
+                application.endBackgroundTask(self.bgTask)
+            }
+            
+            bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+                // TODO: Call the completion handler when the sync is done.
+                // TODO: Provide the correct background fetch result to the completionHandler.
+                application.endBackgroundTask(self.bgTask)
+                self.bgTask = UIBackgroundTaskInvalid
+            })
+            
+            completionHandler(.newData)
+        } else {
+            completionHandler(.noData)
+        }
+        
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
         Branch.getInstance().handlePushNotification(userInfo)
-        completionHandler(.noData)
     }
 }
 
@@ -287,23 +367,16 @@ extension AppDelegate {
 
 extension AppDelegate {
     fileprivate func fetchAppSettings() {
-        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<AppSettings> in
-            return Promise(value: AppSettings(data))
+        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<FetchedAppSettings> in
+            return Promise(value: FetchedAppSettings(data))
             
-        }.then(on: .main) { appSettings -> Void in
-            self.settings = appSettings
+        }.then(on: .main) { fetchedAppSettings -> Void in
+            self.settingsSetter.setDiscoverURLs(withURLPaths: fetchedAppSettings.discoverURLPaths)
+            self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
+            self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
             
             let name = Notification.Name(NotificationCenterKeys.fetchedAppSettings)
-            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": appSettings])
-        }
-    }
-    
-    func getAppSettings() -> _AppSettings? {
-        if let settings = settings {
-            return _AppSettings(settings)
-            
-        } else {
-            return nil
+            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
         }
     }
 }

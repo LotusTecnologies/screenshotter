@@ -16,6 +16,7 @@ typedef NS_ENUM(NSUInteger, SectionType) {
     // Order reflects in the TableView
     SectionTypeInfo,
     SectionTypePermissions,
+    SectionTypeProducts,
     SectionTypeFollow,
     SectionTypeAbout
 };
@@ -32,10 +33,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion,
-    RowTypeCoins
+    RowTypeCoins,
+    RowTypeProductGender,
+    RowTypeProductSize,
+    RowTypeCurrency
 };
 
-@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate>
+@interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate, ViewControllerLifeCycle>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
@@ -61,8 +65,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Use did become after to show the change once the user entered the app
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
         [self addNavigationItemLogo];
     }
@@ -135,7 +139,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         textView.textAlignment = NSTextAlignmentCenter;
         textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
         textView.adjustsFontForContentSizeCategory = YES;
-        textView.text = @"Questions? Get in touch: info@crazeapp.com";
+        textView.text = @"Questions? Get in touch: info@screenshopit.com";
         textView.linkTextAttributes = @{NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
                                         NSUnderlineColorAttributeName: [UIColor gray7]
                                         };
@@ -205,10 +209,23 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [self dismissKeyboard];
 }
 
+- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
+    if ([viewController isKindOfClass:[CurrencyViewController class]]) {
+        NSIndexPath *indexPath = [self indexPathForRowType:RowTypeCurrency inSectionType:SectionTypeInfo];
+        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
-        [self updateScreenshotsCount];
+        // Use did become active since this value can change through an alert view
         [self reloadPermissionIndexPaths];
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    if (self.view.window) {
+        [self updateScreenshotsCount];
     }
 }
 
@@ -229,7 +246,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 //                                               @(RowTypeLocationService)
                                                ],
                   @(SectionTypeInfo): @[@(RowTypeName),
-                                        @(RowTypeEmail)
+                                        @(RowTypeEmail),
+                                        @(RowTypeCurrency)
                                         ],
                   @(SectionTypeAbout): @[
                                          @(RowTypeTellFriend),
@@ -241,6 +259,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                          @(RowTypeVersion)
                                          ],
                   @(SectionTypeFollow): @[],
+                  @(SectionTypeProducts): @[@(RowTypeProductGender),
+//                                            @(RowTypeProductSize)
+                                            ]
                   };
     }
     return _data;
@@ -251,8 +272,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (NSIndexPath *)indexPathForRowType:(RowType)rowType inSectionType:(SectionType)sectionType {
-    NSInteger row = self.data[@(sectionType)][rowType].integerValue;
-    
+    NSInteger row = [self.data[@(sectionType)] indexOfObject:@(rowType)];
     return [NSIndexPath indexPathForRow:row inSection:sectionType];
 }
 
@@ -296,7 +316,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowType rowType = [self rowTypeForIndexPath:indexPath];
     UITableViewCell *cell;
     
-    if (indexPath.section == SectionTypeInfo) {
+    if (indexPath.section == SectionTypeInfo && (rowType == RowTypeName || rowType == RowTypeEmail)) {
         cell = [self tableView:tableView inputCellAtIndexPath:indexPath rowType:rowType];
         
     } else {
@@ -366,6 +386,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeVersion:
         case RowTypeEmail:
         case RowTypeCoins:
+        case RowTypeProductGender:
+        case RowTypeProductSize:
             return NO;
             break;
         case RowTypeLocationPermission:
@@ -414,10 +436,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
             }];
         }
             break;
-        case RowTypeName:
-        case RowTypeEmail:
-        case RowTypeVersion:
-        case RowTypeCoins:
+        case RowTypeCurrency: {
+            CurrencyViewController *viewController = [[CurrencyViewController alloc] init];
+            viewController.lifeCycleDelegate = self;
+            viewController.title = [self textForRowType:rowType];
+            viewController.hidesBottomBarWhenPushed = YES;
+            viewController.selectedCurrencyCode = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
+            break;
+        default:
             break;
     }
     
@@ -437,6 +465,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case SectionTypeFollow:
             return @"Follow Us";
+            break;
+        case SectionTypeProducts:
+            return @"Product Options";
             break;
     }
 }
@@ -459,10 +490,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Replay Tutorial";
             break;
         case RowTypeName:
-            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.name];
+            return [[NSUserDefaults standardUserDefaults] stringForKey:UserDefaultsKeys.name];
             break;
         case RowTypeEmail:
-            return [[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsKeys.email];
+            return [[NSUserDefaults standardUserDefaults] stringForKey:UserDefaultsKeys.email];
             break;
         case RowTypeLocationPermission:
             return @"Location Services";
@@ -478,6 +509,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeCoins:
             return @"Coins Collected";
+            break;
+        case RowTypeProductGender:
+            return @"Gender";
+            break;
+        case RowTypeProductSize:
+            return @"Size";
+            break;
+        case RowTypeCurrency:
+            return @"Currency";
             break;
     }
 }
@@ -496,7 +536,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         }
         case RowTypeVersion:
-            return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], Constants.buildEnvironmentSuffix];
+            return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], [Constants buildEnvironmentSuffix]];
             break;
         case RowTypeName:
             return @"Enter Your Name";
@@ -505,7 +545,10 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Enter Your Email";
             break;
         case RowTypeCoins:
-            return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:UserDefaultsKeys.gameScore]];
+            return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys gameScore]]];
+            break;
+        case RowTypeCurrency:
+            return [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
             break;
         default:
             return nil;
@@ -520,6 +563,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (UITableViewCellAccessoryType)accessoryTypeForRowType:(RowType)rowType {
     switch (rowType) {
         case RowTypeTellFriend:
+        case RowTypeCurrency:
             return UITableViewCellAccessoryDisclosureIndicator;
             break;
         default:
@@ -529,25 +573,36 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (UIView *)accessoryViewForRowType:(RowType)rowType {
-    UILabel *label;
-    
-    if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]]) {
-        CGFloat size = 18.f;
-        
-        label = [[UILabel alloc] initWithFrame:CGRectMake(0.f, 0.f, size, size)];
-        label.backgroundColor = [UIColor crazeRed];
-        label.text = @"!";
-        label.textAlignment = NSTextAlignmentCenter;
-        label.font = [UIFont fontWithName:@"Optima-ExtraBlack" size:14.f];
-        label.textColor = [UIColor whiteColor];
-        label.layer.cornerRadius = size / 2.f;
-        label.layer.masksToBounds = YES;
-    }
-    
     switch (rowType) {
         case RowTypePhotoPermission:
-        case RowTypePushPermission:
+        case RowTypePushPermission: {
+            UILabel *label;
+            
+            if (![[PermissionsManager sharedPermissionsManager] hasPermissionForType:[self permissionTypeForRowType:rowType]]) {
+                CGFloat size = 18.f;
+                
+                label = [[UILabel alloc] initWithFrame:CGRectMake(0.f, 0.f, size, size)];
+                label.backgroundColor = [UIColor crazeRed];
+                label.text = @"!";
+                label.textAlignment = NSTextAlignmentCenter;
+                label.font = [UIFont fontWithName:@"Optima-ExtraBlack" size:14.f];
+                label.textColor = [UIColor whiteColor];
+                label.layer.cornerRadius = size / 2.f;
+                label.layer.masksToBounds = YES;
+            }
+            
             return label;
+        }
+            break;
+        case RowTypeProductGender: {
+            // TODO: use ProductsOptions after swift converstion
+            
+            UISegmentedControl *control = [[UISegmentedControl alloc] initWithItems:@[@"Female", @"Male", @"All"]];
+            control.tintColor = [UIColor crazeGreen];
+            control.selectedSegmentIndex = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productGender]];
+            [control addTarget:self action:@selector(genderControlAction:) forControlEvents:UIControlEventValueChanged];
+            return control;
+        }
             break;
         default:
             return nil;
@@ -714,6 +769,13 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 
+#pragma mark - Product Options
+
+- (void)genderControlAction:(UISegmentedControl *)control {
+    [[NSUserDefaults standardUserDefaults] setInteger:control.selectedSegmentIndex forKey:[UserDefaultsKeys productGender]];
+}
+
+
 #pragma mark - Permissions
 
 - (PermissionType)permissionTypeForRowType:(RowType)rowType {
@@ -753,7 +815,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         mail.mailComposeDelegate = self;
         [mail setSubject:@"Bug Report"];
         [mail setMessageBody:[message componentsJoinedByString:@"\n"] isHTML:NO];
-        [mail setToRecipients:@[@"support@crazeapp.com"]];
+        [mail setToRecipients:@[@"support@screenshopit.com"]];
         
         [self presentViewController:mail animated:YES completion:nil];
         
@@ -785,7 +847,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (void)tutorialVideoViewControllerDidEnd:(TutorialVideoViewController *)viewController {
-    [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video"];
+    [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video" properties:nil];
     
     // TODO: look into why this is here - corey
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -17,14 +17,15 @@ class UserDefaultsKeys : NSObject {
     static let dailyStreak = "dailyStreak"
     static let lastAppSessionDate = "lastAppSessionDate"
     
-    // Discover
-    static let discoverUrl = "DiscoverUrl"
-    
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     
     // Product
+    static let productGender = "ProductGender"
+    static let productSize = "ProductSize"
+    static let productSale = "ProductSale"
     static let productSort = "ProductSort"
+    static let productCurrency = "ProductCurrency"
     
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
@@ -45,6 +46,11 @@ class UserDefaultsKeys : NSObject {
     
     // Game
     static let gameScore = "GameScore"
+    
+    // Silent Push
+    static let lastTimeZone = "LastTimeZone"
+    static let subscriptionARN = "SubscriptionARN"
+    static let enabledSilentPush = "EnabledSilentPush"
 }
 
 extension UIApplication {

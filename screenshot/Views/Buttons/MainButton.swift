@@ -9,8 +9,13 @@
 import UIKit
 
 class MainButton: UIButton {
-    var edgePadding = CGFloat(16)
-    var imagePadding = CGFloat(6)
+    private var edgePadding = CGFloat(16)
+    private var imagePadding = CGFloat(6)
+    
+    private var backgroundColorStates: [UInt : UIColor] = [:]
+    private var isSettingBackgroundColor = false
+    
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -20,9 +25,19 @@ class MainButton: UIButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsetsMake(edgePadding, edgePadding, edgePadding, edgePadding)
+        contentEdgeInsets = UIEdgeInsets(top: edgePadding, left: edgePadding, bottom: edgePadding, right: edgePadding)
         adjustsImageWhenHighlighted = false
         layer.cornerRadius = 9
+        layer.shadowColor = Shadow.basic.color.cgColor
+        layer.shadowOffset = Shadow.basic.offset
+        layer.shadowRadius = Shadow.basic.radius
+        layer.shadowOpacity = 1
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius).cgPath
     }
     
     override var intrinsicContentSize: CGSize {
@@ -31,11 +46,38 @@ class MainButton: UIButton {
         return size
     }
     
+    // MARK: Interaction
+    
+    override var isHighlighted: Bool {
+        didSet {
+            isSettingBackgroundColor = true
+            backgroundColor = backgroundColorStates[isHighlighted ? UIControlState.highlighted.rawValue : UIControlState.normal.rawValue]
+            isSettingBackgroundColor = false
+            
+            if isLoading {
+                activityIndicator?.backgroundColor = self.backgroundColor
+            }
+        }
+    }
+    
+    // MARK: Background Color
+    
+    override var backgroundColor: UIColor? {
+        didSet {
+            if !isSettingBackgroundColor {
+                backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
+                backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
+            }
+        }
+    }
+    
+    // MARK: Image
+    
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
         
-        imageEdgeInsets = UIEdgeInsetsMake(0, -imagePadding, 0, imagePadding / 2.0)
-        titleEdgeInsets = UIEdgeInsetsMake(0, imagePadding / 2.0, 0, -imagePadding)
+        imageEdgeInsets = UIEdgeInsets(top: 0, left: -imagePadding, bottom: 0, right: imagePadding / 2.0)
+        titleEdgeInsets = UIEdgeInsets(top: 0, left: imagePadding / 2.0, bottom: 0, right: -imagePadding)
         
         var contentInsets = contentEdgeInsets
         contentInsets.left += imageEdgeInsets.right

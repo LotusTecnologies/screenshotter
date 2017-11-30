@@ -12,36 +12,22 @@
 #import "ScreenshotDisplayNavigationController.h"
 #import "TutorialProductsPageViewController.h"
 
-#import <FBSDKCoreKit/FBSDKCoreKit.h>
+@import FBSDKCoreKit.FBSDKAppEvents;
 
-typedef NS_ENUM(NSUInteger, ShoppableSortType) {
-    ShoppableSortTypeSimilar,
-    ShoppableSortTypePriceAsc,
-    ShoppableSortTypePriceDes,
-    ShoppableSortTypeBrands
+typedef NS_ENUM(NSUInteger, ProductsSection) {
+    ProductsSectionProduct,
+    ProductsSectionRate
 };
 
-@interface ShoppableSortItem: NSObject
-
-+ (ShoppableSortItem *)title:(NSString *)title;
-+ (ShoppableSortItem *)title:(NSString *)title detail:(NSString *)detail;
-
-@property (nonatomic, copy) NSString *title;
-@property (nonatomic, copy) NSString *detail;
-@property (nonatomic, copy, readonly) NSString *detailedTitle;
-
-@end
-
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
+@property (nonatomic, strong) ProductsOptions *productsOptions;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
-@property (nonatomic, strong) NSDictionary<NSNumber *, ShoppableSortItem *> *shoppableSortTitles;
-@property (nonatomic) ShoppableSortType currentSortType;
 
 @property (nonatomic, copy) UIImage *image;
 
@@ -55,25 +41,6 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 
 @end
 
-@implementation ShoppableSortItem
-
-+ (ShoppableSortItem *)title:(NSString *)title {
-    return [self title:title detail:nil];
-}
-
-+ (ShoppableSortItem *)title:(NSString *)title detail:(NSString *)detail {
-    ShoppableSortItem *item = [[ShoppableSortItem alloc] init];
-    item.title = title;
-    item.detail = detail;
-    return item;
-}
-
-- (NSString *)detailedTitle {
-    return self.detail.length ? [NSString stringWithFormat:@"%@ %@", self.title, self.detail] : self.title;
-}
-
-@end
-
 @implementation ProductsViewController
 @synthesize shoppablesController = _shoppablesController;
 
@@ -83,13 +50,8 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _shoppableSortTitles = @{@(ShoppableSortTypeSimilar): [ShoppableSortItem title:@"Similar"],
-                                 @(ShoppableSortTypePriceAsc): [ShoppableSortItem title:@"Price" detail:@"(lowest first)"],
-                                 @(ShoppableSortTypePriceDes): [ShoppableSortItem title:@"Price" detail:@"(highest first)"],
-                                 @(ShoppableSortTypeBrands): [ShoppableSortItem title:@"Brands"]
-                                 };
-        
-        _currentSortType = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productSort]];
+        _productsOptions = [[ProductsOptions alloc] init];
+        self.productsOptions.delegate = self;
         
         self.title = @"Products";
     }
@@ -161,6 +123,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        [collectionView registerClass:[ProductsRateCollectionViewCell class] forCellWithReuseIdentifier:@"rate"];
         
         [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
@@ -194,7 +157,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    [self dismissSortPicker];
+    [self dismissOptions];
 }
 
 - (void)dealloc {
@@ -233,26 +196,37 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
     NSArray<NSSortDescriptor *> *descriptors;
     
-    switch (self.currentSortType) {
-        case ShoppableSortTypeSimilar:
+    switch ([self.productsOptions _currentSort]) {
+        case 0: // == .similar
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
             
-        case ShoppableSortTypePriceAsc:
+        case 1: // == .priceAsc
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
             break;
             
-        case ShoppableSortTypePriceDes:
+        case 2: // == .priceDes
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:NO]];
             break;
             
-        case ShoppableSortTypeBrands:
+        case 3: // == .brands
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"displayTitle" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)],
                             [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
     }
     
-    return [shoppable.products sortedArrayUsingDescriptors:descriptors];
+    NSSet<Product *> *products = shoppable.products;
+    
+    if ([self.productsOptions _currentSale] == 0) { // == .sale
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
+    }
+    if ([self.productsOptions _currentGender] == 0) { // == .female
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == FALSE"]];
+    } else if([self.productsOptions _currentGender] == 1) { // == .male
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == TRUE"]];
+    }
+    
+    return [products sortedArrayUsingDescriptors:descriptors];
 }
 
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
@@ -266,11 +240,15 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     return self.products[index];
 }
 
+- (NSInteger)indexForProduct:(Product *)product {
+    return [self.products indexOfObject:product];
+}
+
 
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
-    [self updateSortView];
+    [self updateOptionsView];
     
     if ([self hasShoppables]) {
         self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
@@ -278,54 +256,141 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
         [self.collectionView reloadData];
         
         if (self.products.count) {
+            // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
     }
 }
 
-- (NSInteger)numberOfCollectionViewColumns {
+- (NSInteger)numberOfCollectionViewProductColumns {
+    return 2;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 2;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.products.count;
+    if (section == ProductsSectionProduct) {
+        return self.products.count;
+        
+    } else if (section == ProductsSectionRate) {
+        return [self.shoppablesController shoppableCount] > 0 ? 1 : 0;
+        
+    } else {
+        return 0;
+    }
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    
+    if (section == ProductsSectionRate) {
+        insets.top = [Geometry extendedPadding];
+    }
+    
+    return insets;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger columns = [self numberOfCollectionViewColumns];
+    CGSize size = CGSizeZero;
     UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
     CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
-    CGSize size = CGSizeZero;
-    size.width = floor((collectionView.bounds.size.width - ((columns + 1) * padding)) / columns);
-    size.height = size.width + [ProductCollectionViewCell labelsHeight];
+    if (indexPath.section == ProductsSectionProduct) {
+        NSInteger columns = [self numberOfCollectionViewProductColumns];
+        
+        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
+        size.height = size.width + [ProductCollectionViewCell labelsHeight];
+        
+    } else if (indexPath.section == ProductsSectionRate) {
+        size.width = floor(collectionView.bounds.size.width - (padding * 2));
+        size.height = 50.f;
+    }
+    
     return size;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Product *product = [self productAtIndex:indexPath.item];
+    if (indexPath.section == ProductsSectionProduct) {
+        Product *product = [self productAtIndex:indexPath.item];
+        
+        ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+        cell.delegate = self;
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
+        cell.title = product.displayTitle;
+        cell.price = product.price;
+        cell.originalPrice = product.originalPrice;
+        cell.imageUrl = product.imageURL;
+        cell.isSale = [product isSale];
+        cell.favoriteButton.selected = product.isFavorite;
+        return cell;
+        
+    } else if (indexPath.section == ProductsSectionRate) {
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+        
+        ProductsRateCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
+        cell.rating = shoppable.rating;
+        [cell.voteUpButton addTarget:self action:@selector(productsRateVoteUpAction) forControlEvents:UIControlEventTouchUpInside];
+        [cell.voteDownButton addTarget:self action:@selector(productsRateVoteDownAction) forControlEvents:UIControlEventTouchUpInside];
+        return cell;
+        
+    } else {
+        return nil;
+    }
+}
+
+- (void)productsRateVoteUpAction {
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:YES];
     
-    ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    cell.delegate = self;
-    cell.contentView.backgroundColor = collectionView.backgroundColor;
-    cell.title = product.displayTitle;
-    cell.price = product.price;
-    cell.originalPrice = product.originalPrice;
-    cell.imageUrl = product.imageURL;
-    cell.isSale = product.floatOriginalPrice > product.floatPrice;
-    cell.favoriteButton.selected = product.isFavorite;
-    return cell;
+    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
+}
+
+- (void)productsRateVoteDownAction {
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:NO];
+    
+    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    return indexPath.section == ProductsSectionRate ? NO : YES;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
-    
-    Product *product = [self productAtIndex:indexPath.item];
-    
-    [AnalyticsTrackers.branch track:@"Tapped on product"];
-    [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant, @"brand": product.brand, @"page": @"Products"}];
-    
-    [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    if (indexPath.section == ProductsSectionProduct) {
+        [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
+        
+        Product *product = [self productAtIndex:indexPath.item];
+        
+        // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
+        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
+                                                                            @"brand": product.brand,
+                                                                            @"url": product.offer,
+                                                                            @"imageUrl": product.imageURL,
+                                                                            @"sale": @([product isSale]),
+                                                                            @"page": @"Products"
+                                                                            }];
+        
+        NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
+        
+        if (email.length) {
+            [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
+                                                                                @"merchant": product.merchant,
+                                                                                @"brand": product.brand,
+                                                                                @"title": product.displayTitle,
+                                                                                @"url": product.offer,
+                                                                                @"imageUrl": product.imageURL,
+                                                                                @"price": product.price,
+                                                                                @"email": email
+                                                                                }];
+        }
+        
+        [AnalyticsTrackers.branch track:@"Tapped on product" properties:nil];
+        
+        [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
+    }
 }
 
 
@@ -339,36 +404,44 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [product setFavoritedToFavorited:isFavorited];
     
     NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    [AnalyticsTrackers.standard track:favoriteString properties:@{@"url": product.offer, @"imageUrl": product.imageURL}];
+    
+    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": product.merchant,
+                                                                  @"brand": product.brand,
+                                                                  @"url": product.offer,
+                                                                  @"imageUrl": product.imageURL,
+                                                                  @"page": @"Products"
+                                                                  }];
     
     NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
     [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+}
+
+- (void)reloadProductCellAtIndex:(NSInteger)index {
+    if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > index) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
+        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+    }
 }
 
 
 #pragma mark - Scroll View
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [self dismissSortPicker];
+    [self dismissOptions];
 }
 
 
-#pragma mark - Sorting
+#pragma mark - Options
 
-- (UIView *)currentSortView {
+- (UIView *)currentOptionsView {
     UILabel *label = [[UILabel alloc] init];
     label.adjustsFontSizeToFitWidth = YES;
     label.minimumScaleFactor = .7f;
     
     NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithDictionary:[[UINavigationBar appearance] titleTextAttributes]];
-    
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Sort by: " attributes:attributes];
-    
     [attributes setObject:[UIColor crazeGreen] forKey:NSForegroundColorAttributeName];
     
-    ShoppableSortItem *sortItem = self.shoppableSortTitles[@(self.currentSortType)];
-    NSAttributedString *sortString = [[NSAttributedString alloc] initWithString:sortItem.title attributes:attributes];
-    [attributedString appendAttributedString:sortString];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:@"Sort & Filter" attributes:attributes];
     
     CGFloat offset = 3.f;
     
@@ -385,56 +458,39 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     label.frame = rect;
     
     ProductsViewControllerControl *container = [[ProductsViewControllerControl alloc] initWithFrame:label.bounds];
-    [container addTarget:self action:@selector(presentSortPicker:) forControlEvents:UIControlEventTouchUpInside];
+    [container addTarget:self action:@selector(presentOptions:) forControlEvents:UIControlEventTouchUpInside];
     [container addSubview:label];
     return container;
 }
 
-- (void)updateSortView {
-    self.navigationItem.titleView = [self hasShoppables] ? [self currentSortView] : nil;
+- (void)updateOptionsView {
+    self.navigationItem.titleView = [self hasShoppables] ? [self currentOptionsView] : nil;
 }
 
-- (void)presentSortPicker:(ProductsViewControllerControl *)control {
+- (void)presentOptions:(ProductsViewControllerControl *)control {
     if ([control isFirstResponder]) {
         [control resignFirstResponder];
         
     } else {
-        UIPickerView *picker = [[UIPickerView alloc] init];
-        picker.delegate = self;
-        picker.dataSource = self;
-        picker.backgroundColor = [UIColor whiteColor];
-        [picker selectRow:self.currentSortType inComponent:0 animated:NO];
-        
-        control.customInputView = picker;
+        [self.productsOptions syncOptions];
+        control.customInputView = self.productsOptions.view;
         [control becomeFirstResponder];
     }
 }
 
-- (void)dismissSortPicker {
+- (void)dismissOptions {
     [self.navigationItem.titleView endEditing:YES];
 }
 
 
-#pragma mark - Picker View
+#pragma mark - Product Options
 
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
-    return 1;
-}
-
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    return self.shoppableSortTitles.count;
-}
-
-- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return [self.shoppableSortTitles[@(row)] detailedTitle];
-}
-
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    self.currentSortType = row;
-    [[NSUserDefaults standardUserDefaults] setInteger:row forKey:[UserDefaultsKeys productSort]];
-    
+- (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
+//    DataModel.sharedInstance.
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setWithProductsOptions:productsOptions];
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
-    [self.navigationController.navigationBar endEditing:YES];
+    [self dismissOptions];
 }
 
 
@@ -457,7 +513,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
     [self reloadCollectionViewForIndex:index];
     
-    [AnalyticsTrackers.standard track:@"Tapped on shoppable"];
+    [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];
 }
 
 - (BOOL)shouldHideToolbar {
@@ -536,7 +592,7 @@ typedef NS_ENUM(NSUInteger, ShoppableSortType) {
     [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
     [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
     
-    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables"];
+    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
 }
 
 - (void)hideNoItemsHelperView {

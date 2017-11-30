@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13533" systemVersion="17B48" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Product" representedClassName="Product" syncable="YES" codeGenerationType="class">
+        <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="categories" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateFavorited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="displayTitle" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
+        <attribute name="floatOriginalPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="floatPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isMale" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="merchant" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="offer" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="originalPrice" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="shoppable" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="products" inverseEntity="Shoppable" syncable="YES"/>
+    </entity>
+    <entity name="Screenshot" representedClassName="Screenshot" syncable="YES" codeGenerationType="class">
+        <attribute name="assetId" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="isFashion" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isFromShare" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isNew" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="shareLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shoppablesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="syteJson" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uploadedImageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="shoppables" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Shoppable" inverseName="screenshot" inverseEntity="Shoppable" syncable="YES"/>
+    </entity>
+    <entity name="Shoppable" representedClassName="Shoppable" syncable="YES" codeGenerationType="class">
+        <attribute name="b0x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b0y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b1x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b1y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="offersURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="productCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="productsOptions" attributeType="String" defaultValueString="0" syncable="YES"/>
+        <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="products" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="shoppable" inverseEntity="Product" syncable="YES"/>
+        <relationship name="screenshot" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="shoppables" inverseEntity="Screenshot" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Product" positionX="124" positionY="189" width="128" height="285"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="240"/>
+        <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
+    </elements>
+</model>

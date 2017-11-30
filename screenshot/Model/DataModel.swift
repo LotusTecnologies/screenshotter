@@ -475,6 +475,21 @@ extension DataModel {
         return shoppableToSave
     }
     
+    func retrieveShoppable(managedObjectContext: NSManagedObjectContext, objectId: NSManagedObjectID) -> Shoppable? {
+        let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "SELF == %@", objectId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            print("retrieveShoppable objectId:\(objectId) results with error:\(error)")
+        }
+        return nil
+    }
+    
     // Save a new Product to Core Data.
     func saveProduct(managedObjectContext: NSManagedObjectContext,
                      shoppable: Shoppable,
@@ -488,7 +503,8 @@ extension DataModel {
                      brand: String?,
                      offer: String?,
                      imageURL: String?,
-                     merchant: String?) -> Product {
+                     merchant: String?,
+                     isMale: Bool) -> Product {
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
@@ -502,6 +518,7 @@ extension DataModel {
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
+        productToSave.isMale = isMale
         return productToSave
     }
     
@@ -692,6 +709,73 @@ extension Shoppable {
         let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
         return croppedImage
     }
+
+    private func productsOptionsContains(optionsMask: ProductsOptionsMask) -> Bool {
+        let toFind = String(optionsMask.rawValue)
+        let productsOptions = self.productsOptions ?? "0"
+        let productsOptionsStrings = productsOptions.components(separatedBy: ",")
+        return productsOptionsStrings.contains(toFind)
+    }
+    
+    @objc func set(productsOptions: ProductsOptions) {
+        let optionsMask: ProductsOptionsMask
+        switch productsOptions.currentGender {
+        case .male:
+            optionsMask = ProductsOptionsMask.genderMale
+        case .female:
+            optionsMask = ProductsOptionsMask.genderFemale
+        default:
+            optionsMask = ProductsOptionsMask.genderUnknown
+        }
+        guard let screenshot = self.screenshot,
+          !productsOptionsContains(optionsMask: optionsMask) else {
+            return
+        }
+        let optionsMaskString = String(optionsMask.rawValue)
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshot.objectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for shoppable in results {
+                    let productsOptions = shoppable.productsOptions ?? "0"
+                    guard let offersURL = shoppable.offersURL,
+                        !productsOptions.components(separatedBy: ",").contains(optionsMaskString) else {
+                        continue
+                    }
+                    shoppable.productsOptions = productsOptions + ",\(optionsMaskString)"
+                    AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("shoppable set optionsMask results with error:\(error)")
+            }
+        }
+    }
+    
+    @objc public func setRating(positive: Bool) {
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                let positiveRating: Int16 = 5
+                let negativeRating: Int16 = 1
+                let ratingValue: Int16 = positive ? positiveRating : negativeRating
+                for shoppable in results {
+                    shoppable.rating = ratingValue
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("setRating objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
     
 }
 
@@ -711,6 +795,9 @@ extension Product {
                     product.dateFavorited = toFavorited ? NSDate() : nil
                 }
                 try managedObjectContext.save()
+                
+                let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
+                UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
             } catch {
                 print("setFavorited objectID:\(managedObjectID) results with error:\(error)")
             }
@@ -725,6 +812,13 @@ extension Product {
         } else {
             displayTitle = merchant
         }
+    }
+    
+    @objc public func isSale() -> Bool {
+        guard let price = price, let originalPrice = originalPrice else {
+            return false
+        }
+        return price < originalPrice
     }
     
 }

@@ -94,6 +94,47 @@ class NetworkingPromise: NSObject {
         }
     }
     
+    // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
+    static func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "push-subscribe") else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            return Promise(error: error)
+        }
+        
+        var parameters = [ "token": token, "timezone": tzOffset ]
+
+        if let arn = arn {
+            parameters["arnToUnsubscribe"] = arn
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONEncoder().encode(parameters)
+        } catch {
+            return Promise(error: error)
+        }
+        
+        let promise:URLDataPromise = URLSession.shared.dataTask(with: request)
+        return promise.asDataAndResponse().then { data, response -> Promise<String> in
+            var dictionary:[String: String]!
+            do {
+                dictionary = try JSONDecoder().decode([String: String].self, from: data)
+            } catch {
+                return Promise(error: error)
+            }
+            
+            guard let subscriptionARN = dictionary["subscriptionArn"] else {
+                return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "No subscription ARN in the response payload!"]))
+            }
+            
+            return Promise(value: subscriptionARN)
+        }
+    }
+    
     static func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots?createShare=true") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])

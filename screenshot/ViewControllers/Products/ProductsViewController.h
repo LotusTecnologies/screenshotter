@@ -25,5 +25,8 @@
 @property (nonatomic, strong) Screenshot *screenshot;
 
 - (Product *)productAtIndex:(NSInteger)index;
+- (NSInteger)indexForProduct:(Product *)product;
+
+- (void)reloadProductCellAtIndex:(NSInteger)index;
 
 @end

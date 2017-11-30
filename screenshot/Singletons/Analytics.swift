@@ -13,13 +13,12 @@ import Branch
 
 public class AnalyticsUser : NSObject {
     let identifier: String
-    
     let name: String?
     let email: String?
     
-    init(name n: String?, email e:String?) {
-        name = n
-        email = (e?.count ?? 0 > 0) ? e : nil
+    init(name: String?, email: String?) {
+        self.name = name
+        self.email = (email?.count ?? 0 > 0) ? email : nil
         
         let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID)
         identifier = persistedID ?? UUID().uuidString
@@ -27,6 +26,7 @@ public class AnalyticsUser : NSObject {
     
     var analyticsProperties: [String : String] {
         var props = ["identifier" : identifier]
+        
         if let email = email {
             props["email"] = email
         }
@@ -40,7 +40,6 @@ public class AnalyticsUser : NSObject {
 }
 
 @objc public protocol AnalyticsTracker {
-    func track(_ event: String)
     func track(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
 }
@@ -56,6 +55,7 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func add(tracker: AnalyticsTracker) {
         let id = String(describing: type(of:tracker))
+        
         guard trackers[id] == nil else {
             return
         }
@@ -69,10 +69,6 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     
     // MARK: - AnalyticsTracker
     
-    public func track(_ event: String) {
-        trackers.values.forEach { $0.track(event) }
-    }
-
     public func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         trackers.values.forEach { $0.track(event, properties: properties) }
     }
@@ -83,28 +79,20 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-    
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        log(name: event, properties: properties) {
-            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
-        }
+        SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: user.analyticsProperties) {
-            SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
-        }
+        SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
+    }
+    
+    func error(withDescription description: String) {
+        SEGAnalytics.shared().track("Error", properties: ["Description" : description])
     }
 }
 
-class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-
+class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
         // Appsee properties can't exceed 300 bytes.
         // https://www.appsee.com/docs/ios/api?section=events
@@ -121,80 +109,49 @@ class AppSeeAnalyticsTracker : NSObject, AnalyticsTracker {
                 return copy
             }
             
-            log(name: event, properties: props) {
-                Appsee.addEvent(event, withProperties: props)
-            }
+            Appsee.addEvent(event, withProperties: props)
+            
         } else {
-            log(name: event) {
-                Appsee.addEvent(event)
-            }
+            Appsee.addEvent(event)
         }
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: user.analyticsProperties) {
-            Appsee.setUserID(user.email ?? user.identifier)
-            
-            track("User Properties", properties: user.analyticsProperties)
-        }
+        Appsee.setUserID(user.email ?? user.identifier)
+        
+        track("User Properties", properties: user.analyticsProperties)
     }
 }
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-
-    func track(_ event: String, properties: [AnyHashable : Any]?) {
-        log(name: event, properties: properties) {
-            IntercomHelper.sharedInstance.record(event: event, properties: properties)
-        }
+    func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+        IntercomHelper.sharedInstance.record(event: event, properties: properties)
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: user.analyticsProperties) {
-            IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name)
-        }
+        IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name)
     }
 }
 
 class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String) {
-        track(event, properties: nil)
-    }
-
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        log(name: event, properties: properties) {
-            Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
-        }
+        Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
     }
     
     func identify(_ user: AnalyticsUser) {
-        log(name: "identify", properties: user.analyticsProperties) {
-            if let isEmpty = user.email?.isEmpty, isEmpty == false {
-                Branch.getInstance().userCompletedAction("Submitted email")
-            }
+        if let isEmpty = user.email?.isEmpty, isEmpty == false {
+            Branch.getInstance().userCompletedAction("Submitted email")
         }
     }
 }
 
 public class AnalyticsTrackers : NSObject {
-    static let appsee = AppSeeAnalyticsTracker()
+    static let appsee = AppseeAnalyticsTracker()
     static let segment = SegmentAnalyticsTracker()
     static let intercom = IntercomAnalyticsTracker()
     static let branch = BranchAnalyticsTracker()
     
     static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom])
-}
-
-extension AnalyticsTracker {
-    fileprivate func log(name: String, properties: [AnyHashable : Any]? = nil, _ closure:() -> ()) {
-        if UIApplication.isDev {
-            print("[\(type(of: self))] \"\(name)\" tracked -- Properties: \((properties ?? [:]).debugDescription)")
-        }
-        
-        closure()
-    }
 }
 
 public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
@@ -207,3 +164,15 @@ public func identify(_ name: String? = nil, email: String? = nil, tracker: Analy
     return user
 }
 
+extension AnalyticsTracker {
+    func trackTappedOnProduct(_ product: Product, onPage page: String) {
+        track("Tapped on product", properties: [
+            "merchant": product.merchant ?? "",
+            "brand": product.brand ?? "",
+            "url": product.offer ?? "",
+            "imageUrl": product.imageURL ?? "",
+            "sale": product.isSale(),
+            "page": page
+            ])
+    }
+}

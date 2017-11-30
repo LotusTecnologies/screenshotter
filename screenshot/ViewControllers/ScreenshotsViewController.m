@@ -337,7 +337,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionImage) {
         [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
         
-        [AnalyticsTrackers.standard track:@"Tapped on screenshot"];
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        
+        if (screenshot.uploadedImageURL) {
+            [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
+        }
     }
 }
 
@@ -345,7 +349,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     return [self.screenshotFrc objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
 }
 
-- (void)scrollTopTop {
+- (void)scrollToTop {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
     }
@@ -355,12 +359,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 #pragma mark - Notification Cell
 
 - (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
+    NSUInteger screenshotsCount = [self newScreenshotsCount];
     [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
+    
     [self dismissNotificationCell];
     [self syncHelperViewVisibility];
+    
+    [AnalyticsTrackers.standard track:@"Screenshot notification cancelled" properties:@{@"Screenshot count": @(screenshotsCount)}];
 }
 
 - (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
+    NSUInteger screenshotsCount = [self newScreenshotsCount];
     [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
     
     if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot) {
@@ -372,6 +381,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     [self dismissNotificationCell];
     [self syncHelperViewVisibility];
+    
+    [AnalyticsTrackers.standard track:@"Screenshot notification accepted" properties:@{@"Screenshot count": @(screenshotsCount)}];
 }
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId {
@@ -423,16 +434,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
     activityViewController.completionWithItemsHandler = ^(UIActivityType  _Nullable activityType, BOOL completed, NSArray * _Nullable returnedItems, NSError * _Nullable activityError) {
         if (completed) {
-            [AnalyticsTrackers.standard track:@"share completed"];
-            [AnalyticsTrackers.branch track:@"share completed"];
+            [AnalyticsTrackers.standard track:@"Share completed" properties:nil];
+            [AnalyticsTrackers.branch track:@"Share completed" properties:nil];
+            
         } else {
-            [AnalyticsTrackers.standard track:@"share incomplete"];
+            [AnalyticsTrackers.standard track:@"Share incomplete" properties:nil];
         }
     };
     activityViewController.popoverPresentationController.sourceView = self.view; // so iPads don't crash
     [self presentViewController:activityViewController animated:YES completion:nil];
     
-    [AnalyticsTrackers.standard track:@"Shared screenshot"];
+    [AnalyticsTrackers.standard track:@"Shared screenshot" properties:nil];
 }
 
 - (void)screenshotCollectionViewCellDidTapDelete:(ScreenshotCollectionViewCell *)cell {
@@ -444,7 +456,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [self removeScreenshotHelperView];
         
-        [AnalyticsTrackers.standard track:@"Removed screenshot"];
+        [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
