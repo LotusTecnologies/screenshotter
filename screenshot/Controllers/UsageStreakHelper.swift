@@ -9,6 +9,8 @@
 import Foundation
 
 class UsageStreakHelper : NSObject {
+    private static var calendar = Calendar.autoupdatingCurrent
+    
     static func updateLastSessionDate() {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsKeys.lastAppSessionDate)
     }
@@ -27,7 +29,11 @@ class UsageStreakHelper : NSObject {
             UserDefaults.standard.set(0, forKey: UserDefaultsKeys.dailyStreak)
             return
         }
-    
+
+        guard calendar.isDate(currentDate, inSameDayAs: lastSessionDate) == false else {
+            return
+        }
+        
         let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
         UserDefaults.standard.set(streak + 1, forKey: UserDefaultsKeys.dailyStreak)
     }
