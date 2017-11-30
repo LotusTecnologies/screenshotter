@@ -40,10 +40,9 @@ class DiscoverWebViewController : WebViewController {
         super.viewDidLoad()
         
         webView.scrollView.delegate = self
-        
+
         reloadURL()
         
-        // !!!: the properties value is creating a crash when building the app and immediatly going to the discover page
         AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url])
     }
     
@@ -54,19 +53,24 @@ class DiscoverWebViewController : WebViewController {
             reloadURL()
         }
     }
-    
+
     func reloadURL() {
         url = deepLinkURL ?? (AppDelegate.shared.settings.forcedDiscoverURL ?? randomUrl())
     }
-    
+
     private func randomUrl() -> URL? {
         var url = URL(string: "https://screenshopit.tumblr.com")
-        
+
         if let urls = AppDelegate.shared.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            url = urls[randomIndex]
+            let randomUrl = urls[randomIndex]
+            
+            // Check the URL's validity
+            if let randomUrl = randomUrl, UIApplication.shared.canOpenURL(randomUrl) {
+                url = randomUrl
+            }
         }
-        
+
         return url
     }
     
@@ -75,19 +79,19 @@ class DiscoverWebViewController : WebViewController {
     func leftBarButtonItems() -> [UIBarButtonItem] {
         return [backItem!, forwardItem!]
     }
-    
+
     func rightBarButtonItems() -> [UIBarButtonItem] {
         return [shareItem!, refreshItem!]
     }
-    
+
     override func updateShareItem() {
         super.updateShareItem()
-        
+
         navigationItem.rightBarButtonItems = rightBarButtonItems()
     }
-    
+
     // MARK: Bar Button Item Actions
-    
+
     func refreshAction() {
         reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
