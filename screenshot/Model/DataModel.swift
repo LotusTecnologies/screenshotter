@@ -795,6 +795,9 @@ extension Product {
                     product.dateFavorited = toFavorited ? NSDate() : nil
                 }
                 try managedObjectContext.save()
+                
+                let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
+                UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
             } catch {
                 print("setFavorited objectID:\(managedObjectID) results with error:\(error)")
             }

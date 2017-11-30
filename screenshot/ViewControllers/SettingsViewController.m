@@ -523,7 +523,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return @"Enter Your Email";
             break;
         case RowTypeCoins:
-            return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:UserDefaultsKeys.gameScore]];
+            return [NSString stringWithFormat:@"%ld", (long)[[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys gameScore]]];
             break;
         case RowTypeCurrency:
             return [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys productCurrency]];
