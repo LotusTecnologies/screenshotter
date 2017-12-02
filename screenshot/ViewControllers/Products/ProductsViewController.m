@@ -221,11 +221,17 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
     if ([self.productsOptions _currentGender] == 0) { // == .female
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == FALSE"]];
-    } else if([self.productsOptions _currentGender] == 1) { // == .male
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == TRUE"]];
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 2]]; // 2 == .genderFemale
+    } else if ([self.productsOptions _currentGender] == 1) { // == .male
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 1]]; // 1 == .genderMale
     }
-    
+    if ([self.productsOptions _currentSize] == 0) { // == .child
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 4]]; // 4 == .sizeChild
+    } else if ([self.productsOptions _currentSize] == 1) { // == .adult
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == 0", 12]]; // size bits clear => .sizeAdult
+    } else if ([self.productsOptions _currentSize] == 2) { // == .plus
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 8]]; // 8 == .sizePlus
+    }
     return [products sortedArrayUsingDescriptors:descriptors];
 }
 

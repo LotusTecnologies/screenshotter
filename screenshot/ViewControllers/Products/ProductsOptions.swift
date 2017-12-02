@@ -15,24 +15,60 @@ struct ProductsOptionsMask : OptionSet {
     static let genderMale    = ProductsOptionsMask(rawValue: 1 << 0)
     static let genderFemale  = ProductsOptionsMask(rawValue: 2 << 0)
     
-    static let sizeUnknown   = ProductsOptionsMask(rawValue: 0 << 2)
+    static let sizeAdult     = ProductsOptionsMask(rawValue: 0 << 2)
     static let sizeChild     = ProductsOptionsMask(rawValue: 1 << 2)
-    static let sizeAdult     = ProductsOptionsMask(rawValue: 2 << 2)
-    static let sizePlus      = ProductsOptionsMask(rawValue: 3 << 2)
+    static let sizePlus      = ProductsOptionsMask(rawValue: 2 << 2)
     
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
     func gender() -> ProductsOptionsGender {
-        switch rawValue & 3 {
+        switch rawValue & 0x3 {
         case ProductsOptionsMask.genderMale.rawValue:
-            return ProductsOptionsGender.male
+            return .male
         case ProductsOptionsMask.genderFemale.rawValue:
-            return ProductsOptionsGender.female
+            return .female
         default:
-            return ProductsOptionsGender.all
+            return .all
         }
+    }
+    
+    func size() -> ProductsOptionsSize {
+        switch rawValue & 0x1C {
+        case ProductsOptionsMask.sizeChild.rawValue:
+            return .child
+        case ProductsOptionsMask.sizeAdult.rawValue:
+            return .adult
+        case ProductsOptionsMask.sizePlus.rawValue:
+            return .plus
+        default:
+            return .fallback
+        }
+    }
+    
+    static func current() -> ProductsOptionsMask {
+        var workingValue: Int
+        let productsOptions = ProductsOptions()
+        switch productsOptions.currentGender {
+        case .male:
+            workingValue = ProductsOptionsMask.genderMale.rawValue
+        case .female:
+            workingValue = ProductsOptionsMask.genderFemale.rawValue
+        default:
+            workingValue = ProductsOptionsMask.genderUnknown.rawValue
+        }
+        
+        switch productsOptions.currentSize {
+        case .child:
+            workingValue |= ProductsOptionsMask.sizeChild.rawValue
+        case .adult:
+            workingValue |= ProductsOptionsMask.sizeAdult.rawValue
+        case .plus:
+            workingValue |= ProductsOptionsMask.sizePlus.rawValue
+        }
+        
+        return ProductsOptionsMask(rawValue: workingValue)
     }
     
 }

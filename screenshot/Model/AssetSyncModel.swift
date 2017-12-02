@@ -422,9 +422,9 @@ class AssetSyncModel: NSObject {
         return "&force_currency=\(productCurrency)"
     }
     
-    func augmentedUrl(offersURL: String, gender: ProductsOptionsGender) -> URL? {
+    func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
         let genderParamString: String
-        switch gender {
+        switch optionsMask.gender() {
         case .male:
             genderParamString = "&force_gender=male"
         case .female:
@@ -436,9 +436,10 @@ class AssetSyncModel: NSObject {
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
+        let optionsMask = ProductsOptionsMask.current()
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
-                let url = augmentedUrl(offersURL: offersURL, gender: ProductsOptions().currentGender),
+                let url = augmentedUrl(offersURL: offersURL, optionsMask: optionsMask),
                 let b0 = segment["b0"] as? [Any],
                 b0.count >= 2,
                 let b1 = segment["b1"] as? [Any],
@@ -455,6 +456,7 @@ class AssetSyncModel: NSObject {
                                  uploadedURLString: uploadedURLString,
                                  segments: segments,
                                  offersURL: offersURL,
+                                 optionsMask: optionsMask,
                                  url: url,
                                  label: label,
                                  b0x: b0x,
@@ -468,13 +470,13 @@ class AssetSyncModel: NSObject {
                          uploadedURLString: String,
                          segments: [[String : Any]],
                          offersURL: String,
+                         optionsMask: ProductsOptionsMask,
                          url: URL,
                          label: String?,
                          b0x: Double,
                          b0y: Double,
                          b1x: Double,
                          b1y: Double) {
-        let isMale = false
         firstly {
             NetworkingPromise.downloadInfo(url: url)
             }.then(on: self.processingQ) { productsDict -> Void in
@@ -517,7 +519,7 @@ class AssetSyncModel: NSObject {
                                                               offer: prod["offer"] as? String,
                                                               imageURL: prod["imageUrl"] as? String,
                                                               merchant: prod["merchant"] as? String,
-                                                              isMale: isMale)
+                                                              optionsMask: Int32(optionsMask.rawValue))
                                 productOrder += 1
                             }
                             shoppable.productCount = productOrder
@@ -546,8 +548,7 @@ class AssetSyncModel: NSObject {
     func reExtractProducts(shoppableId: NSManagedObjectID,
                            optionsMask: ProductsOptionsMask,
                            offersURL: String) {
-        let isMale = optionsMask.gender() == ProductsOptionsGender.male
-        guard let url = augmentedUrl(offersURL: offersURL, gender: optionsMask.gender()) else {
+        guard let url = augmentedUrl(offersURL: offersURL, optionsMask: optionsMask) else {
             print("AssetSyncModel reExtractProducts no url from offersURL:\(offersURL)")
             return
         }
@@ -591,7 +592,7 @@ class AssetSyncModel: NSObject {
                                                       offer: prod["offer"] as? String,
                                                       imageURL: prod["imageUrl"] as? String,
                                                       merchant: prod["merchant"] as? String,
-                                                      isMale: isMale)
+                                                      optionsMask: Int32(optionsMask.rawValue))
                         productOrder += 1
                     }
                     if shoppable.productCount != productOrder {
