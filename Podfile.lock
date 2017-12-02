@@ -35,13 +35,13 @@ PODS:
     - FBSDKCoreKit
   - FBSDKShareKit (4.28.0):
     - FBSDKCoreKit
-  - Firebase/Auth (4.6.0):
+  - Firebase/Auth (4.7.0):
     - Firebase/Core
-    - FirebaseAuth (= 4.3.2)
-  - Firebase/Core (4.6.0):
+    - FirebaseAuth (= 4.4.0)
+  - Firebase/Core (4.7.0):
     - FirebaseAnalytics (= 4.0.5)
-    - FirebaseCore (= 4.0.11)
-  - Firebase/Invites (4.6.0):
+    - FirebaseCore (= 4.0.12)
+  - Firebase/Invites (4.7.0):
     - Firebase/Core
     - FirebaseInvites (= 2.0.2)
   - FirebaseAnalytics (4.0.5):
@@ -49,15 +49,15 @@ PODS:
     - FirebaseInstanceID (~> 2.0)
     - GoogleToolboxForMac/NSData+zlib (~> 2.1)
     - nanopb (~> 0.3)
-  - FirebaseAuth (4.3.2):
+  - FirebaseAuth (4.4.0):
     - FirebaseAnalytics (~> 4.0)
     - GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)
     - GTMSessionFetcher/Core (~> 1.1)
-  - FirebaseCore (4.0.11):
+  - FirebaseCore (4.0.12):
     - GoogleToolboxForMac/NSData+zlib (~> 2.1)
-  - FirebaseDynamicLinks (2.2.0):
+  - FirebaseDynamicLinks (2.3.0):
     - FirebaseAnalytics (~> 4.0)
-  - FirebaseInstanceID (2.0.6)
+  - FirebaseInstanceID (2.0.7)
   - FirebaseInvites (2.0.2):
     - FirebaseAnalytics (~> 4.0)
     - FirebaseDynamicLinks (~> 2.2)
@@ -165,12 +165,12 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: ca961e279113f691fd83dc634c0bbad9d4e3f370
   FBSDKLoginKit: b077381c27d800f21661757e8140cf2c80a91e4a
   FBSDKShareKit: 4f525556e0df4cf0f574cb3f01c675434f29d477
-  Firebase: 27321a925aa85520618255a7c630859e0502ccbd
+  Firebase: dbfb98ccec2dcfcd21ab9cc1b4981a3f3c8c5e26
   FirebaseAnalytics: 5b02a63ead2c3f0259cfc7f15e053e440587ecf8
-  FirebaseAuth: e58563adb207a43910a2ed87fecb9fa7d556df5a
-  FirebaseCore: 2a946ece8fbe3ce1fdeeb55324f273caade22df9
-  FirebaseDynamicLinks: 188c8d7b31a12a25165dc574c5249df97d8ab442
-  FirebaseInstanceID: 24958382a1011bba5aaff37e334e7a650b9118f5
+  FirebaseAuth: cdeee95b528958dbb7dcf220ad0fb804d3a284b0
+  FirebaseCore: 6cf108b63997bc08c04a1ffa55a3ac0d71a59ffc
+  FirebaseDynamicLinks: b75f5b4dcfc3c9b7889e1283632359e5431264e7
+  FirebaseInstanceID: 148c25c986c8699e67304b114e365713dce467f2
   FirebaseInvites: ae15e0636f9eb42bdf5c1ef4c8f7bd4a88f9878b
   GoogleAPIClientForREST: d18c6704317d6d5c56d70f724f8990eb125359a4
   GoogleSignIn: 3fdaa34a2ba04dbd7a25d7db39aecb0da98d5bdc
