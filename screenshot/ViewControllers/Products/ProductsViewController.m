@@ -220,18 +220,24 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if ([self.productsOptions _currentSale] == 0) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
+    
     if ([self.productsOptions _currentGender] == 0) { // == .female
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 2]]; // 2 == .genderFemale
+        
     } else if ([self.productsOptions _currentGender] == 1) { // == .male
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 1]]; // 1 == .genderMale
     }
+    
     if ([self.productsOptions _currentSize] == 0) { // == .child
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 4]]; // 4 == .sizeChild
+        
     } else if ([self.productsOptions _currentSize] == 1) { // == .adult
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == 0", 12]]; // size bits clear => .sizeAdult
+        
     } else if ([self.productsOptions _currentSize] == 2) { // == .plus
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 8]]; // 8 == .sizePlus
     }
+    
     return [products sortedArrayUsingDescriptors:descriptors];
 }
 
@@ -255,6 +261,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
     [self updateOptionsView];
+    
+    self.products = nil;
     
     if ([self hasShoppables]) {
         self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
@@ -492,7 +500,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 #pragma mark - Product Options
 
 - (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
-//    DataModel.sharedInstance.
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setWithProductsOptions:productsOptions];
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
