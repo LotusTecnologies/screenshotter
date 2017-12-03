@@ -14,8 +14,6 @@ class UserDefaultsKeys : NSObject {
     static let name = "Name"
     static let userID = "UserID"
     static let ambasssadorUsername = "AmbasssadorUsername"
-    static let dailyStreak = "dailyStreak"
-    static let lastAppSessionDate = "lastAppSessionDate"
     
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
@@ -37,9 +35,11 @@ class UserDefaultsKeys : NSObject {
     // Device / Version
     static let dateInstalled = "DateInstalled"
     static let dateLastSound = "DateLastSound"
+    static let dateLastAppSession = "lastAppSessionDate"
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
+    static let dailyStreak = "dailyStreak"
     
     // Clarifai
     static let isModelDownloaded = "IsModelDownloaded"
