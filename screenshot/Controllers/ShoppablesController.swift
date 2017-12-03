@@ -11,10 +11,11 @@ import CoreData
 
 @objc protocol ShoppablesControllerDelegate {
     func shoppablesControllerIsEmpty(_ controller: ShoppablesController)
+    func shoppablesControllerDidReload(_ controller: ShoppablesController)
 }
 
 @objc protocol ShoppablesControllerProtocol {
-    var shoppablesController: ShoppablesController! { get set }
+    var shoppablesController: ShoppablesController! { set get }
 }
 
 class ShoppablesController: NSObject, FrcDelegateProtocol {
@@ -71,14 +72,11 @@ extension ShoppablesController {
     
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
         if frc == shoppablesFrc {
-            let shoppablesCount = collectionView?.numberOfItems(inSection: 0)
-            let selectedIndexPath = collectionView?.indexPathsForSelectedItems?.first
-            
-            collectionView?.reloadItems(at: [indexPath])
-            
-            if collectionView?.numberOfItems(inSection: 0) == shoppablesCount {
-                collectionView?.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .centeredHorizontally)
+            preserveSelectedItem {
+                collectionView?.reloadItems(at: [indexPath])
             }
+            
+            delegate?.shoppablesControllerDidReload(self)
             
         } else if frc == hasShoppablesFrc {
             let screenshot = hasShoppablesFrc.object(at: indexPath)
@@ -91,7 +89,22 @@ extension ShoppablesController {
     
     func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>) {
         if frc == shoppablesFrc {
-            collectionView?.reloadData()
+            preserveSelectedItem {
+                collectionView?.reloadData()
+            }
+            
+            delegate?.shoppablesControllerDidReload(self)
+        }
+    }
+    
+    private func preserveSelectedItem(reload: () -> ()) {
+        let shoppablesCount = collectionView?.numberOfItems(inSection: 0)
+        let selectedIndexPath = collectionView?.indexPathsForSelectedItems?.first
+        
+        reload()
+        
+        if collectionView?.numberOfItems(inSection: 0) == shoppablesCount {
+            collectionView?.selectItem(at: selectedIndexPath, animated: false, scrollPosition: .centeredHorizontally)
         }
     }
 }

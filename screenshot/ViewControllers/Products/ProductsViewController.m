@@ -241,6 +241,14 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     return [products sortedArrayUsingDescriptors:descriptors];
 }
 
+- (Product *)productAtIndex:(NSInteger)index {
+    return self.products[index];
+}
+
+- (NSInteger)indexForProduct:(Product *)product {
+    return [self.products indexOfObject:product];
+}
+
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
     if (!self.noItemsHelperView) {
         [self stopAndRemoveLoader];
@@ -248,12 +256,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     }
 }
 
-- (Product *)productAtIndex:(NSInteger)index {
-    return self.products[index];
-}
-
-- (NSInteger)indexForProduct:(Product *)product {
-    return [self.products indexOfObject:product];
+- (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
+    [self.collectionView reloadData];
 }
 
 
