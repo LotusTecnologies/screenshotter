@@ -220,20 +220,25 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if ([self.productsOptions _currentSale] == 0) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
+    
     if ([self.productsOptions _currentGender] == 0) { // == .female
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == FALSE"]];
-    } else if([self.productsOptions _currentGender] == 1) { // == .male
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"isMale == TRUE"]];
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 2]]; // 2 == .genderFemale
+        
+    } else if ([self.productsOptions _currentGender] == 1) { // == .male
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 1]]; // 1 == .genderMale
+    }
+    
+    if ([self.productsOptions _currentSize] == 0) { // == .child
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 4]]; // 4 == .sizeChild
+        
+    } else if ([self.productsOptions _currentSize] == 1) { // == .adult
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == 0", 12]]; // size bits clear => .sizeAdult
+        
+    } else if ([self.productsOptions _currentSize] == 2) { // == .plus
+        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 8]]; // 8 == .sizePlus
     }
     
     return [products sortedArrayUsingDescriptors:descriptors];
-}
-
-- (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
-    if (!self.noItemsHelperView) {
-        [self stopAndRemoveLoader];
-        [self showNoItemsHelperView];
-    }
 }
 
 - (Product *)productAtIndex:(NSInteger)index {
@@ -244,11 +249,24 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     return [self.products indexOfObject:product];
 }
 
+- (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
+    if (!self.noItemsHelperView) {
+        [self stopAndRemoveLoader];
+        [self showNoItemsHelperView];
+    }
+}
+
+- (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
+    [self.collectionView reloadData];
+}
+
 
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
     [self updateOptionsView];
+    
+    self.products = nil;
     
     if ([self hasShoppables]) {
         self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
@@ -376,6 +394,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
         
         if (email.length) {
+            NSString *name = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys name]] ?: @"";
+            
             [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
                                                                                 @"merchant": product.merchant,
                                                                                 @"brand": product.brand,
@@ -383,7 +403,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
                                                                                 @"url": product.offer,
                                                                                 @"imageUrl": product.imageURL,
                                                                                 @"price": product.price,
-                                                                                @"email": email
+                                                                                @"email": email,
+                                                                                @"name": name
                                                                                 }];
         }
         
@@ -486,7 +507,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 #pragma mark - Product Options
 
 - (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
-//    DataModel.sharedInstance.
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setWithProductsOptions:productsOptions];
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];

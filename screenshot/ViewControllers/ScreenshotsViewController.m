@@ -416,6 +416,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     NSString *introductoryText = @"Check out this look on SCREENSHOP!";
     NSArray *items;
     
+    // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
+    NSString *space = @" ";
+    
     if (screenshot.shoppablesCount <= 0) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry" message:@"We could not find similar items to share." preferredStyle:UIAlertControllerStyleAlert];
         [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil]];
@@ -424,11 +427,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
         
     if (screenshot.shareLink) {
-        items = @[introductoryText, [NSURL URLWithString:screenshot.shareLink]];
+        items = @[introductoryText, space, [NSURL URLWithString:screenshot.shareLink]];
         
     } else {
         ScreenshotActivityItemProvider *screenshotActivityItemProvider = [[ScreenshotActivityItemProvider alloc] initWithScreenshot:screenshot placeholderURL:[NSURL URLWithString:@"https://getscreenshop.com/"]];
-        items = @[introductoryText, screenshotActivityItemProvider];
+        items = @[introductoryText, space, screenshotActivityItemProvider];
     }
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];

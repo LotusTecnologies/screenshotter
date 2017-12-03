@@ -504,7 +504,7 @@ extension DataModel {
                      offer: String?,
                      imageURL: String?,
                      merchant: String?,
-                     isMale: Bool) -> Product {
+                     optionsMask: Int32) -> Product {
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
@@ -518,7 +518,7 @@ extension DataModel {
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
-        productToSave.isMale = isMale
+        productToSave.optionsMask = optionsMask
         return productToSave
     }
     
@@ -717,16 +717,8 @@ extension Shoppable {
         return productsOptionsStrings.contains(toFind)
     }
     
-    @objc func set(productsOptions: ProductsOptions) {
-        let optionsMask: ProductsOptionsMask
-        switch productsOptions.currentGender {
-        case .male:
-            optionsMask = ProductsOptionsMask.genderMale
-        case .female:
-            optionsMask = ProductsOptionsMask.genderFemale
-        default:
-            optionsMask = ProductsOptionsMask.genderUnknown
-        }
+    @objc func set(productsOptions unused: ProductsOptions) {
+        let optionsMask = ProductsOptionsMask.current() // Refactor ProductsOptions to not always return current to init ProductsOptionsMask from ProductsOptions.
         guard let screenshot = self.screenshot,
           !productsOptionsContains(optionsMask: optionsMask) else {
             return
@@ -815,10 +807,7 @@ extension Product {
     }
     
     @objc public func isSale() -> Bool {
-        guard let price = price, let originalPrice = originalPrice else {
-            return false
-        }
-        return price < originalPrice
+        return floatPrice < floatOriginalPrice
     }
     
 }

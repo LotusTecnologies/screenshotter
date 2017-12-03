@@ -351,9 +351,9 @@ extension AppDelegate {
                 // TODO: Provide the correct background fetch result to the completionHandler.
                 application.endBackgroundTask(self.bgTask)
                 self.bgTask = UIBackgroundTaskInvalid
+                
+                completionHandler(.newData)
             })
-            
-            completionHandler(.newData)
         } else {
             completionHandler(.noData)
         }
