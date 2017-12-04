@@ -197,19 +197,19 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     NSArray<NSSortDescriptor *> *descriptors;
     
     switch ([self.productsOptions _sort]) {
-        case 0: // == .similar
+        case 1: // == .similar
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
             
-        case 1: // == .priceAsc
+        case 2: // == .priceAsc
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
             break;
             
-        case 2: // == .priceDes
+        case 3: // == .priceDes
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:NO]];
             break;
             
-        case 3: // == .brands
+        case 4: // == .brands
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"displayTitle" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)],
                             [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;

@@ -86,12 +86,7 @@ class ProductsOptions : NSObject {
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
     fileprivate(set) var sort = ProductsOptionsSort.globalValue
     
-    fileprivate let sortItems: [ProductsOptionsSort: ProductsOptionsSortItem] = [
-        .similar: ProductsOptionsSortItem(title: "Similar"),
-        .priceAsc: ProductsOptionsSortItem(title: "Price", detail: "(lowest first)"),
-        .priceDes: ProductsOptionsSortItem(title: "Price", detail: "(highest first)"),
-        .brands: ProductsOptionsSortItem(title: "Brands")
-    ]
+    fileprivate let sortItems: [ProductsOptionsSort] = [.similar, .priceAsc, .priceDes, .brands]
     
     private(set) lazy var view: ProductsOptionsView = {
         let view = ProductsOptionsView()
@@ -169,7 +164,7 @@ extension ProductsOptions : UIPickerViewDataSource {
 
 extension ProductsOptions : UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return sortItems[ProductsOptionsSort(intValue: row)]?.detailedTitle()
+        return sortItems[row].stringValue
     }
 }
 
@@ -413,29 +408,17 @@ enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     var offsetValue: Int {
         return self.rawValue - 1
     }
-}
-
-
-private struct ProductsOptionsSortItem {
-    // TODO: move this to the stringValue of the sort enum
-    let title: String
-    let detail: String?
     
-    init(title: String) {
-        self.init(title: title, detail: nil)
-    }
-    
-    init(title: String, detail: String?) {
-        self.title = title
-        self.detail = detail
-    }
-    
-    func detailedTitle() -> String {
-        if let detail = detail, !detail.isEmpty {
-            return "\(title) \(detail)"
-            
-        } else {
-            return title
+    var stringValue: String {
+        var string: String
+        
+        switch self {
+        case .similar: string = "Similar"
+        case .priceAsc: string = "Price (lowest first)"
+        case .priceDes: string = "Price (highest first)"
+        case .brands: string = "Brands"
         }
+        
+        return string
     }
 }
