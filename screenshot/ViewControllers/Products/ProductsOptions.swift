@@ -87,7 +87,7 @@ final class ProductsOptions : NSObject {
     fileprivate(set) var gender = ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
     fileprivate(set) var size = ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
     fileprivate(set) var sale = ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
-    fileprivate(set) var sort = ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
+    fileprivate(set) var sort = ProductsOptionsSort(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSort))
     
     fileprivate let sortItems: [ProductsOptionsSort: ProductsOptionsSortItem] = [
         .similar: ProductsOptionsSortItem(title: "Similar"),
@@ -116,7 +116,7 @@ final class ProductsOptions : NSObject {
     }
     
     private func syncOptions(withView view: ProductsOptionsView) {
-        view.sortPickerView.selectRow(sort.rawValue, inComponent: 0, animated: false)
+        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
         view.genderControl.selectedSegmentIndex = gender.offsetValue
         view.sizeControl.selectedSegmentIndex = size.offsetValue
         view.saleControl.selectedSegmentIndex = sale.offsetValue
@@ -126,7 +126,7 @@ final class ProductsOptions : NSObject {
         gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
-        sort = ProductsOptionsSort(intValue: view.sortPickerView.selectedRow(inComponent: 0))
+        sort = ProductsOptionsSort(offsetValue: view.sortPickerView.selectedRow(inComponent: 0))
         
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
@@ -153,6 +153,9 @@ extension ProductsOptions {
             
         case UserDefaultsKeys.productSale:
             return ProductsOptionsSale.default.rawValue
+            
+        case UserDefaultsKeys.productSort:
+            return ProductsOptionsSort.default.rawValue
             
         default:
             return 1
@@ -299,8 +302,8 @@ class ProductsOptionsView : UIView {
     }
 }
 
-enum ProductsOptionsSort : Int, EnumIntDefaultProtocol {
-    case similar
+enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case similar = 1
     case priceAsc
     case priceDes
     case brands
@@ -311,6 +314,14 @@ enum ProductsOptionsSort : Int, EnumIntDefaultProtocol {
     
     init(intValue: Int) {
         self = ProductsOptionsSort(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
     }
 }
 
