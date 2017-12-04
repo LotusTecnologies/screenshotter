@@ -83,7 +83,7 @@ class ProductsOptions : NSObject {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productGender)
         }
         get {
-            return ProductsOptionsGender(intValue: productOptionsValue(forKey: UserDefaultsKeys.productGender))
+            return ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
         }
     }
     
@@ -92,7 +92,7 @@ class ProductsOptions : NSObject {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSize)
         }
         get {
-            return ProductsOptionsSize(intValue: productOptionsValue(forKey: UserDefaultsKeys.productSize))
+            return ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
         }
     }
     
@@ -101,7 +101,7 @@ class ProductsOptions : NSObject {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSale)
         }
         get {
-            return ProductsOptionsSale(intValue: productOptionsValue(forKey: UserDefaultsKeys.productSale))
+            return ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
         }
     }
     
@@ -137,7 +137,7 @@ class ProductsOptions : NSObject {
 }
 
 extension ProductsOptions {
-    func productOptionsValue(forKey key: String) -> Int {
+    static func value(forProductsOptionsKey key: String) -> Int {
         let int = UserDefaults.standard.integer(forKey: key)
         
         guard int == 0 else {
@@ -157,6 +157,10 @@ extension ProductsOptions {
         default:
             return 1
         }
+    }
+    
+    static func offsetValue(forProductsOptionsKey key: String) -> Int {
+        return value(forProductsOptionsKey: key) - 1
     }
     
     // MARK: Objc
