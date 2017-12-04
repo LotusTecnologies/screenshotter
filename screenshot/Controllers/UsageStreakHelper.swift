@@ -8,39 +8,31 @@
 
 import Foundation
 
+fileprivate extension DateComponents {
+    func value(for component: Calendar.Component) -> Int? {
+        switch component {
+        case .day:
+            return self.day
+        default:
+            return nil
+        }
+    }
+}
+
 fileprivate struct StreakContext {
     let calendar: Calendar
     let previousStreakDate: Date?
     let previousStreakCount: Int
 }
 
-fileprivate enum StreakInterval {
-    case day
-    
-    var component: Calendar.Component {
-        switch self {
-        case .day:
-            return .day
-        }
-    }
-    
-    func value(for components:DateComponents) -> Int? {
-        switch self {
-        case .day:
-            return components.day
-        }
-    }
-}
-
-fileprivate func streak(for interval:StreakInterval, with context: StreakContext) -> Int? {
+fileprivate func streak(for component:Calendar.Component, with context: StreakContext) -> Int? {
     guard let streakDate = context.previousStreakDate else {
         return 1
     }
-    
-    let component = interval.component
+
     let diff = context.calendar.dateComponents(Set([component]), from: streakDate, to: Date())
     
-    switch interval.value(for: diff) {
+    switch diff.value(for: component) {
     case .none:
         return nil
     case .some(let value):
