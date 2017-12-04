@@ -35,7 +35,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeCoins,
     RowTypeProductGender,
     RowTypeProductSize,
-    RowTypeCurrency
+    RowTypeCurrency,
+    RowTypeFollowFacebook,
+    RowTypeFollowInstagram
 };
 
 @interface SettingsViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, MFMailComposeViewControllerDelegate, TutorialViewControllerDelegate, TutorialVideoViewControllerDelegate, ViewControllerLifeCycle>
@@ -43,7 +45,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *tableHeaderContentView;
 @property (nonatomic, strong) UITextView *tableFooterTextView;
-@property (nonatomic, strong) UIView *tableViewFollowSectionFooter;
 @property (nonatomic, strong) UILabel *screenshotsCountLabel;
 @property (nonatomic, strong) NSDictionary<NSNumber *, NSArray<NSNumber *> *> *data;
 
@@ -169,11 +170,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
-    UIEdgeInsets insets = self.tableViewFollowSectionFooter.layoutMargins;
-    insets.left = [self.tableView headerViewForSection:SectionTypeFollow].layoutMargins.left;
-    self.tableViewFollowSectionFooter.layoutMargins = insets;
-    
-    
     CGRect tableFooterTextViewRect = [self rectForTableFooterTextView];
     
     if (self.tableView.tableFooterView.bounds.size.height != tableFooterTextViewRect.size.height) {
@@ -184,15 +180,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    // TODO: why is the page scrolling after poping another vc (after commenting the below code)
-    CGFloat offsetY = -self.tableView.contentInset.top;
-
-    if (@available(iOS 11.0, *)) {
-        offsetY = -self.tableView.adjustedContentInset.top;
-    }
-
-    self.tableView.contentOffset = CGPointMake(0.f, offsetY);
     
     [self updateScreenshotsCount];
     [self reloadPermissionIndexPaths];
@@ -251,7 +238,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                          @(RowTypeCoins),
                                          @(RowTypeVersion)
                                          ],
-                  @(SectionTypeFollow): @[],
+                  @(SectionTypeFollow): @[@(RowTypeFollowInstagram),
+                                          @(RowTypeFollowFacebook)
+                                          ],
                   @(SectionTypeProducts): @[@(RowTypeProductGender),
 //                                            @(RowTypeProductSize)
                                             ]
@@ -282,27 +271,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return [self textForSectionType:section];
-}
-
-- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    if (section == SectionTypeFollow) {
-        return self.tableViewFollowSectionFooter;
-        
-    } else {
-        return nil;
-    }
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if (section == SectionTypeFollow) {
-        // FIXME: tableview first section title animation
-        // this section is causing the first sections title to animate down
-        // scroll to bottom, tap on another tab, tap back to settings
-        return self.tableViewFollowSectionFooter.bounds.size.height;
-        
-    } else {
-        return tableView.sectionFooterHeight;
-    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -367,6 +335,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
     }
     
+    cell.imageView.image = [self imageForRowType:rowType];
     cell.textLabel.text = [self textForRowType:rowType];
     cell.detailTextLabel.text = [self detailTextForRowType:rowType];
     return cell;
@@ -438,6 +407,16 @@ typedef NS_ENUM(NSUInteger, RowType) {
             [self.navigationController pushViewController:viewController animated:YES];
         }
             break;
+        case RowTypeFollowInstagram: {
+            NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/screenshopit/"];
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }
+            break;
+        case RowTypeFollowFacebook: {
+            NSURL *url = [NSURL URLWithString:@"https://www.facebook.com/screenshopit/"];
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }
+            break;
         default:
             break;
     }
@@ -461,6 +440,20 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case SectionTypeProducts:
             return @"Product Options";
+            break;
+    }
+}
+
+- (UIImage *)imageForRowType:(RowType)rowType {
+    switch (rowType) {
+        case RowTypeFollowInstagram:
+            return [UIImage imageNamed:@"SettingsInstagram"];
+            break;
+        case RowTypeFollowFacebook:
+            return [UIImage imageNamed:@"SettingsFacebook"];
+            break;
+        default:
+            return nil;
             break;
     }
 }
@@ -508,6 +501,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
             break;
         case RowTypeCurrency:
             return @"Currency";
+            break;
+        case RowTypeFollowInstagram:
+            return @"Instagram";
+            break;
+        case RowTypeFollowFacebook:
+            return @"Facebook";
             break;
     }
 }
@@ -705,54 +704,6 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 
-#pragma mark - Follow Buttons
-
-- (UIView *)tableViewFollowSectionFooter {
-    if (!_tableViewFollowSectionFooter) {
-        UIButton * (^createButton)(NSString *, SEL) = ^UIButton * (NSString *imageName, SEL action){
-            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-            button.translatesAutoresizingMaskIntoConstraints = NO;
-            button.imageView.contentMode = UIViewContentModeScaleAspectFit;
-            [button setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
-            [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-            button.adjustsImageWhenHighlighted = NO;
-            [button sizeToFit];
-            return button;
-        };
-        
-        UIButton *facebookButton = createButton(@"SettingsFacebook", @selector(facebookButtonAction));
-        UIButton *instagramButton = createButton(@"SettingsInstagram", @selector(instagramButtonAction));
-        
-        CGFloat tableSectionHeaderLabelOffsetY = 15.5f;
-        CGRect rect = CGRectZero;
-        rect.size.height = facebookButton.bounds.size.height + self.tableView.sectionFooterHeight + tableSectionHeaderLabelOffsetY;
-        UIView *view = [[UIView alloc] initWithFrame:rect];
-        
-        [view addSubview:instagramButton];
-        [instagramButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
-        [instagramButton.leadingAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leadingAnchor].active = YES;
-        
-        [view addSubview:facebookButton];
-        [facebookButton.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
-        [facebookButton.leadingAnchor constraintEqualToAnchor:instagramButton.trailingAnchor constant:20.0f].active = YES;
-        
-        [view layoutIfNeeded];
-        _tableViewFollowSectionFooter = view;
-    }
-    return _tableViewFollowSectionFooter;
-}
-
-- (void)facebookButtonAction {
-    NSURL *url = [NSURL URLWithString:@"https://www.facebook.com/screenshopit/"];
-    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-}
-
-- (void)instagramButtonAction {
-    NSURL *url = [NSURL URLWithString:@"https://www.instagram.com/screenshopit/"];
-    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-}
-
-
 #pragma mark - Product Options
 
 - (void)genderControlAction:(UISegmentedControl *)control {
@@ -840,4 +791,3 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 @end
-

@@ -842,10 +842,7 @@ extension Product {
     }
     
     @objc public func isSale() -> Bool {
-        guard let price = price, let originalPrice = originalPrice else {
-            return false
-        }
-        return price < originalPrice
+        return floatPrice < floatOriginalPrice
     }
     
 }

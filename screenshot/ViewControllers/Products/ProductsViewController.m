@@ -378,6 +378,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
         
         if (email.length) {
+            NSString *name = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys name]] ?: @"";
+            
             [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
                                                                                 @"merchant": product.merchant,
                                                                                 @"brand": product.brand,
@@ -385,7 +387,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
                                                                                 @"url": product.offer,
                                                                                 @"imageUrl": product.imageURL,
                                                                                 @"price": product.price,
-                                                                                @"email": email
+                                                                                @"email": email,
+                                                                                @"name": name
                                                                                 }];
         }
         

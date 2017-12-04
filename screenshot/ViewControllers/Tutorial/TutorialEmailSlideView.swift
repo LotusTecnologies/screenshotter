@@ -48,6 +48,7 @@ public class TutorialEmailSlideView : HelperView {
         nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
         nameTextField.placeholder = "Name"
         nameTextField.returnKeyType = .next
+        nameTextField.autocapitalizationType = .words
         contentView.addSubview(nameTextField)
         nameTextField.topAnchor.constraint(equalTo: paddingView1.bottomAnchor).isActive = true
         nameTextField.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor).isActive = true
