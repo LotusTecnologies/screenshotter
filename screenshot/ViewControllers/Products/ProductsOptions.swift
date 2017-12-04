@@ -26,7 +26,8 @@ class ProductsOptionsMask : NSObject {
     static func current() -> ProductsOptionsMask {
         var workingValue: Int
         let productsOptions = ProductsOptions.global
-        switch productsOptions.currentGender {
+        
+        switch productsOptions.gender {
         case .male:
             workingValue = ProductsOptionsMask.genderMale.rawValue
         case .female:
@@ -35,7 +36,7 @@ class ProductsOptionsMask : NSObject {
             workingValue = ProductsOptionsMask.genderUnisex.rawValue
         }
         
-        switch productsOptions.currentSize {
+        switch productsOptions.size {
         case .child:
             workingValue |= ProductsOptionsMask.sizeChild.rawValue
         case .adult:
@@ -45,6 +46,26 @@ class ProductsOptionsMask : NSObject {
         }
         
         return ProductsOptionsMask(rawValue: workingValue)
+    }
+    
+    var gender: ProductsOptionsGender {
+        if rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
+            return .male
+        } else if rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
+            return .female
+        } else {
+            return .unisex
+        }
+    }
+    
+    var size: ProductsOptionsSize {
+        if rawValue & ProductsOptionsMask.sizeChild.rawValue > 0 {
+            return .child
+        } else if rawValue & ProductsOptionsMask.sizePlus.rawValue > 0 {
+            return .plus
+        } else {
+            return .adult
+        }
     }
 }
 
@@ -58,13 +79,8 @@ class _ProductsOptionsMask : NSObject {
     func productsOptionsDidChange(_ productsOptions: ProductsOptions)
 }
 
-class ProductsOptions : NSObject {
+final class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
-    
-    fileprivate(set) var gender: ProductsOptionsGender?
-    fileprivate(set) var size: ProductsOptionsSize?
-    fileprivate(set) var sale: ProductsOptionsSale?
-    fileprivate(set) var sort: ProductsOptionsSort?
     
     static let global: ProductsOptions = {
         let options = ProductsOptions()
@@ -74,6 +90,11 @@ class ProductsOptions : NSObject {
         options.sort = ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
         return options
     }()
+    
+    fileprivate(set) var gender: ProductsOptionsGender = ProductsOptions.global.gender
+    fileprivate(set) var size: ProductsOptionsSize = ProductsOptions.global.size
+    fileprivate(set) var sale: ProductsOptionsSale = ProductsOptions.global.sale
+    fileprivate(set) var sort: ProductsOptionsSort = ProductsOptions.global.sort
     
     fileprivate let sortItems: [ProductsOptionsSort: ProductsOptionsSortItem] = [
         .similar: ProductsOptionsSortItem(title: "Similar"),
@@ -92,58 +113,30 @@ class ProductsOptions : NSObject {
         return view
     }()
     
-    fileprivate(set) var currentGender: ProductsOptionsGender {
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productGender)
-        }
-        get {
-            return ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
-        }
-    }
-    
-    fileprivate(set) var currentSize: ProductsOptionsSize {
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSize)
-        }
-        get {
-            return ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
-        }
-    }
-    
-    fileprivate(set) var currentSale: ProductsOptionsSale {
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSale)
-        }
-        get {
-            return ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
-        }
-    }
-    
-    fileprivate(set) var currentSort: ProductsOptionsSort {
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSort)
-        }
-        get {
-            return ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
-        }
-    }
-    
-    func syncOptions() {
+    func syncOptions(withMask mask: ProductsOptionsMask?) {
+        gender = mask?.gender ?? type(of: self).global.gender
+        size = mask?.size ?? type(of: self).global.size
+        sale = type(of: self).global.sale
+        sort = type(of: self).global.sort
+        
         syncOptions(withView: view)
     }
     
     private func syncOptions(withView view: ProductsOptionsView) {
-        view.sortPickerView.selectRow(self.currentSort.rawValue, inComponent: 0, animated: false)
-        view.genderControl.selectedSegmentIndex = self.currentGender.offsetValue
-        view.sizeControl.selectedSegmentIndex = self.currentSize.offsetValue
-        view.saleControl.selectedSegmentIndex = self.currentSale.offsetValue
+        view.sortPickerView.selectRow(sort.rawValue, inComponent: 0, animated: false)
+        view.genderControl.selectedSegmentIndex = gender.offsetValue
+        view.sizeControl.selectedSegmentIndex = size.offsetValue
+        view.saleControl.selectedSegmentIndex = sale.offsetValue
     }
     
     @objc private func doneButtonAction() {
-        currentGender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
-        currentSize = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
-        currentSale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
-        currentSort = ProductsOptionsSort(intValue: view.sortPickerView.selectedRow(inComponent: 0))
+        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
+        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
+        sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
+        sort = ProductsOptionsSort(intValue: view.sortPickerView.selectedRow(inComponent: 0))
+        
+        UserDefaults.standard.set(sale, forKey: UserDefaultsKeys.productSale)
+        UserDefaults.standard.set(sort, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
         delegate?.productsOptionsDidChange(self)
@@ -179,20 +172,20 @@ extension ProductsOptions {
     
     // MARK: Objc
     
-    func _currentGender() -> Int {
-        return currentGender.rawValue
+    func _gender() -> Int {
+        return gender.rawValue
     }
     
-    func _currentSize() -> Int {
-        return currentSize.rawValue
+    func _size() -> Int {
+        return size.rawValue
     }
     
-    func _currentSale() -> Int {
-        return currentSale.rawValue
+    func _sale() -> Int {
+        return sale.rawValue
     }
     
-    func _currentSort() -> Int {
-        return currentSort.rawValue
+    func _sort() -> Int {
+        return sort.rawValue
     }
 }
 

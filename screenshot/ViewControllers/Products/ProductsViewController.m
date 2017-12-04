@@ -196,7 +196,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 - (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
     NSArray<NSSortDescriptor *> *descriptors;
     
-    switch ([self.productsOptions _currentSort]) {
+    switch ([self.productsOptions _sort]) {
         case 0: // == .similar
             descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
@@ -214,11 +214,11 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
                             [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
     }
-        
+    
     NSInteger mask = [_ProductsOptionsMask current];
     NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
     
-    if ([self.productsOptions _currentSale] == 1) { // == .sale
+    if ([self.productsOptions _sale] == 1) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
     
@@ -436,7 +436,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 
-#pragma mark - Options
+#pragma mark - Products Options
 
 - (UIView *)currentOptionsView {
     UILabel *label = [[UILabel alloc] init];
@@ -477,7 +477,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         [control resignFirstResponder];
         
     } else {
-        [self.productsOptions syncOptions];
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+        [self.productsOptions syncOptionsWithMask:[shoppable getLast]];
+        
         control.customInputView = self.productsOptions.view;
         [control becomeFirstResponder];
     }
@@ -486,9 +488,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 - (void)dismissOptions {
     [self.navigationItem.titleView endEditing:YES];
 }
-
-
-#pragma mark - Product Options
 
 - (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
