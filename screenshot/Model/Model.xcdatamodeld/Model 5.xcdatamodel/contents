@@ -19,6 +19,7 @@
         <relationship name="shoppable" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="products" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
     <entity name="ProductFilter" representedClassName="ProductFilter" syncable="YES" codeGenerationType="class">
+        <attribute name="dateSet" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="optionsMask" attributeType="Integer 32" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="shoppable" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="productFilters" inverseEntity="Shoppable" syncable="YES"/>
@@ -53,8 +54,8 @@
     </entity>
     <elements>
         <element name="Product" positionX="358" positionY="189" width="128" height="283"/>
+        <element name="ProductFilter" positionX="124" positionY="72" width="128" height="103"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="240"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="208"/>
-        <element name="ProductFilter" positionX="124" positionY="72" width="128" height="88"/>
     </elements>
 </model>

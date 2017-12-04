@@ -733,20 +733,45 @@ extension Shoppable {
         return productFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask.rawValue) != nil
     }
     
-    fileprivate func addProductFilter(managedObjectContext: NSManagedObjectContext, optionsMask: ProductsOptionsMask) {
+    fileprivate func addProductFilter(managedObjectContext: NSManagedObjectContext, optionsMask: ProductsOptionsMask, rating: Int16 = 0) {
         let productFilterToSave = ProductFilter(context: managedObjectContext)
         productFilterToSave.optionsMask = Int32(optionsMask.rawValue)
-        productFilterToSave.rating = 0
+        productFilterToSave.rating = rating
+        productFilterToSave.dateSet = NSDate()
         productFilterToSave.shoppable = self
     }
     
-    // Updates all this screenshot's shoppables' productFilters' dateModified.
-    @objc func set(productsOptions unused: ProductsOptions) {
-        let optionsMask = ProductsOptionsMask.current() // Refactor ProductsOptions to not always return current to init ProductsOptionsMask from ProductsOptions.
-        let optionsMaskInt = optionsMask.rawValue
+    func getLastFilter() -> ProductFilter? {
+        let lastSetDescriptor = NSSortDescriptor(key: "dateSet", ascending: false)
+        if let lastSetFilter = productFilters?.sortedArray(using: [lastSetDescriptor]).first as? ProductFilter {
+            return lastSetFilter
+        }
+        return nil
+    }
+    
+    // Updates all this screenshot's shoppables' productFilters' dateSet.
+    @objc func set(productsOptions: ProductsOptions) {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
+       var optionsMaskInt: Int
+        switch productsOptions.gender! { // TODO: GMK remove "!" once productsOptions.gender not optional.
+        case .male:
+            optionsMaskInt = ProductsOptionsMask.genderMale.rawValue
+        case .female:
+            optionsMaskInt = ProductsOptionsMask.genderFemale.rawValue
+        case .unisex:
+            optionsMaskInt = ProductsOptionsMask.genderUnisex.rawValue
+        }
+        switch productsOptions.size! { // TODO: GMK remove "!" once productsOptions.size not optional.
+        case .adult:
+            optionsMaskInt |= ProductsOptionsMask.sizeAdult.rawValue
+        case .child:
+            optionsMaskInt |= ProductsOptionsMask.sizeChild.rawValue
+        case .plus:
+            optionsMaskInt |= ProductsOptionsMask.sizePlus.rawValue
+        }
+        let optionsMask = ProductsOptionsMask(rawValue: optionsMaskInt)
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshotId)
@@ -755,11 +780,14 @@ extension Shoppable {
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
-                    guard let offersURL = shoppable.offersURL,
-                      !shoppable.productFiltersContains(managedObjectContext: managedObjectContext, optionsMask: optionsMask) else {
+                    if let matchingFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMaskInt)).first as? ProductFilter {
+                        matchingFilter.dateSet = NSDate()
                         continue
                     }
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask)
+                    guard let offersURL = shoppable.offersURL else {
+                        continue
+                    }
                     if let existingProducts = shoppable.products as? Set<Product>,
                         existingProducts.contains(where: { $0.optionsMask == optionsMaskInt }) {
                         continue
@@ -773,39 +801,44 @@ extension Shoppable {
         }
     }
     
-    // Return the last set productFilter
-    @objc func getLast() -> ProductsOptionsMask {
-        return ProductsOptionsMask(rawValue: 9)
+    @objc func getLast() -> ProductsOptionsMask? {
+        if let lastSetFilter = getLastFilter() {
+            return ProductsOptionsMask(rawValue: Int(lastSetFilter.optionsMask))
+        }
+        return nil
     }
 
     @objc public func getRating() -> Int16 {
-        let optionsMask = ProductsOptionsMask.current().rawValue
-        let managedObjectContext = DataModel.sharedInstance.mainMoc()
-        if let productFilter = productFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask) {
-            return productFilter.rating
+        if let lastSetFilter = getLastFilter() {
+            return lastSetFilter.rating
         }
         return 0
     }
     
     @objc public func setRating(positive: Bool) {
         let shoppableID = self.objectID
-        let optionsMask = ProductsOptionsMask.current().rawValue
-        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "shoppable == %@ AND optionsMask == %d", shoppableID, optionsMask)
-            fetchRequest.sortDescriptors = nil
+            fetchRequest.predicate = NSPredicate(format: "shoppable == %@", shoppableID)
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateSet", ascending: false)]
             
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 let positiveRating: Int16 = 5
                 let negativeRating: Int16 = 1
                 let ratingValue: Int16 = positive ? positiveRating : negativeRating
-                for productFilter in results {
+                if let productFilter = results.first {
                     productFilter.rating = ratingValue
+                } else {
+                    guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableID) else {
+                        return
+                    }
+                    shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: ProductsOptionsMask(rawValue: 9), rating: ratingValue)
                 }
                 try managedObjectContext.save()
             } catch {
-                print("setRating optionsMask:\(optionsMask)  shoppableID:\(shoppableID) results with error:\(error)")
+                print("setRating shoppableID:\(shoppableID) results with error:\(error)")
             }
         }
     }
