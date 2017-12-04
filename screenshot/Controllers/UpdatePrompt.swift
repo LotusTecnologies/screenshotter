@@ -40,7 +40,7 @@ class UpdatePromptHandler : NSObject {
             
         } else if appSettings.shouldUpdate {
             // Ignore if we've already asked to update to this version.
-            if let lastVersionAskedToUpdate = UserDefaults.standard.object(forKey: UserDefaultsKeys.versionLastAskedToUpdate) as? String,
+            if let lastVersionAskedToUpdate = UserDefaults.standard.string(forKey: UserDefaultsKeys.versionLastAskedToUpdate),
                 lastVersionAskedToUpdate == appSettings.updateVersion
             {
                 return
