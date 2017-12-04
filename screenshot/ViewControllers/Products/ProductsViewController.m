@@ -218,7 +218,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     NSInteger mask = [_ProductsOptionsMask current];
     NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
     
-    if ([self.productsOptions _currentSale] == 0) { // == .sale
+    if ([self.productsOptions _currentSale] == 1) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
     }
     

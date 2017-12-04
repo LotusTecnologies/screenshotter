@@ -83,7 +83,7 @@ class ProductsOptions : NSObject {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productGender)
         }
         get {
-            return ProductsOptionsGender(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender))
+            return ProductsOptionsGender(intValue: productOptionsValue(forKey: UserDefaultsKeys.productGender))
         }
     }
     
@@ -92,7 +92,7 @@ class ProductsOptions : NSObject {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSize)
         }
         get {
-            return ProductsOptionsSize(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize))
+            return ProductsOptionsSize(intValue: productOptionsValue(forKey: UserDefaultsKeys.productSize))
         }
     }
     
@@ -101,7 +101,7 @@ class ProductsOptions : NSObject {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKeys.productSale)
         }
         get {
-            return ProductsOptionsSale(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSale))
+            return ProductsOptionsSale(intValue: productOptionsValue(forKey: UserDefaultsKeys.productSale))
         }
     }
     
@@ -120,19 +120,43 @@ class ProductsOptions : NSObject {
     
     private func syncOptions(withView view: ProductsOptionsView) {
         view.sortPickerView.selectRow(self.currentSort.rawValue, inComponent: 0, animated: false)
-        view.genderControl.selectedSegmentIndex = self.currentGender.rawValue
-        view.sizeControl.selectedSegmentIndex = self.currentSize.rawValue
-        view.saleControl.selectedSegmentIndex = self.currentSale.rawValue
+        view.genderControl.selectedSegmentIndex = self.currentGender.offsetValue
+        view.sizeControl.selectedSegmentIndex = self.currentSize.offsetValue
+        view.saleControl.selectedSegmentIndex = self.currentSale.offsetValue
     }
     
     @objc private func doneButtonAction() {
-        currentGender = ProductsOptionsGender(intValue: view.genderControl.selectedSegmentIndex)
-        currentSize = ProductsOptionsSize(intValue: view.sizeControl.selectedSegmentIndex)
-        currentSale = ProductsOptionsSale(intValue: view.saleControl.selectedSegmentIndex)
+        currentGender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
+        currentSize = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
+        currentSale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
         currentSort = ProductsOptionsSort(intValue: view.sortPickerView.selectedRow(inComponent: 0))
         UserDefaults.standard.synchronize()
         
         delegate?.productsOptionsDidChange(self)
+    }
+}
+
+extension ProductsOptions {
+    func productOptionsValue(forKey key: String) -> Int {
+        let int = UserDefaults.standard.integer(forKey: key)
+        
+        guard int == 0 else {
+            return int
+        }
+        
+        switch key {
+        case UserDefaultsKeys.productGender:
+            return ProductsOptionsGender.default.rawValue
+            
+        case UserDefaultsKeys.productSize:
+            return ProductsOptionsSize.default.rawValue
+            
+        case UserDefaultsKeys.productSale:
+            return ProductsOptionsSale.default.rawValue
+            
+        default:
+            return 1
+        }
     }
     
     // MARK: Objc
@@ -174,7 +198,7 @@ class ProductsOptionsView : UIView {
     let genderControl = UISegmentedControl(items: [
         ProductsOptionsGender.female.stringValue,
         ProductsOptionsGender.male.stringValue,
-        ProductsOptionsGender.all.stringValue
+        ProductsOptionsGender.unisex.stringValue
         ])
     let sizeControl = UISegmentedControl(items: [
         ProductsOptionsSize.child.stringValue,
@@ -271,32 +295,40 @@ class ProductsOptionsView : UIView {
     }
 }
 
-enum ProductsOptionsSort : Int, EnumIntFallbackProtocol {
+enum ProductsOptionsSort : Int, EnumIntDefaultProtocol {
     case similar
     case priceAsc
     case priceDes
     case brands
     
-    static var fallback: ProductsOptionsSort {
+    static var `default`: ProductsOptionsSort {
         return .similar
     }
     
     init(intValue: Int) {
-        self = ProductsOptionsSort(rawValue: intValue) ?? .fallback
+        self = ProductsOptionsSort(rawValue: intValue) ?? .default
     }
 }
 
-enum ProductsOptionsGender : Int, EnumIntFallbackProtocol {
-    case female
+enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case female = 1
     case male
-    case all
+    case unisex
     
-    static var fallback: ProductsOptionsGender {
+    static var `default`: ProductsOptionsGender {
         return .female
     }
     
     init(intValue: Int) {
-        self = ProductsOptionsGender(rawValue: intValue) ?? .fallback
+        self = ProductsOptionsGender(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
     }
     
     var stringValue: String {
@@ -305,24 +337,32 @@ enum ProductsOptionsGender : Int, EnumIntFallbackProtocol {
         switch self {
         case .female: string = "Female"
         case .male: string = "Male"
-        case .all: string = "All"
+        case .unisex: string = "All"
         }
         
         return string
     }
 }
 
-enum ProductsOptionsSize : Int, EnumIntFallbackProtocol {
-    case child
+enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case child = 1
     case adult
     case plus
     
-    static var fallback: ProductsOptionsSize {
+    static var `default`: ProductsOptionsSize {
         return .adult
     }
     
     init(intValue: Int) {
-        self = ProductsOptionsSize(rawValue: intValue) ?? .fallback
+        self = ProductsOptionsSize(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
     }
     
     var stringValue: String {
@@ -338,16 +378,24 @@ enum ProductsOptionsSize : Int, EnumIntFallbackProtocol {
     }
 }
 
-enum ProductsOptionsSale : Int, EnumIntFallbackProtocol {
-    case sale
+enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case sale = 1
     case all
     
-    static var fallback: ProductsOptionsSale {
+    static var `default`: ProductsOptionsSale {
         return .all
     }
     
     init(intValue: Int) {
-        self = ProductsOptionsSale(rawValue: intValue) ?? .fallback
+        self = ProductsOptionsSale(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
     }
     
     var stringValue: String {
