@@ -44,16 +44,14 @@ fileprivate func streak(for interval:StreakInterval, with context: StreakContext
     case .none:
         return nil
     case .some(let value):
-        return {
-            switch value {
-            case 1:
-                return context.previousStreakCount + 1
-            case 0:
-                return context.previousStreakCount
-            default:
-                return nil
-            }
-        }()
+        switch value {
+        case 1:
+            return context.previousStreakCount + 1
+        case 0:
+            return context.previousStreakCount
+        default:
+            return nil
+        }
     }
 }
 
