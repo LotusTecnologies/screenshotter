@@ -215,7 +215,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
             break;
     }
     
-    NSInteger mask = [_ProductsOptionsMask current];
+    NSInteger mask = [[shoppable getLast] rawValue];
     NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
     
     if ([self.productsOptions _sale] == 1) { // == .sale
@@ -491,8 +491,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setWithProductsOptions:productsOptions];
-    [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setWithProductsOptions:productsOptions callback:^{
+        [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+    }];
     [self dismissOptions];
 }
 

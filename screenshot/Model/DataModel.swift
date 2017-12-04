@@ -750,7 +750,7 @@ extension Shoppable {
     }
     
     // Updates all this screenshot's shoppables' productFilters' dateSet.
-    @objc func set(productsOptions: ProductsOptions) {
+    @objc func set(productsOptions: ProductsOptions, callback: @escaping () -> Void) {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
@@ -795,6 +795,7 @@ extension Shoppable {
                     AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
                 }
                 try managedObjectContext.save()
+                DispatchQueue.main.async(execute: callback)
             } catch {
                 print("shoppable set optionsMask results with error:\(error)")
             }
