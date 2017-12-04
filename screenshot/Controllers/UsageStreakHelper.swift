@@ -61,6 +61,8 @@ class UsageStreakHelper : NSObject {
         if lastStreak != dayStreak {
             UserDefaults.standard.set(dayStreak, forKey: UserDefaultsKeys.dailyStreak)
             UserDefaults.standard.set(Date(), forKey: UserDefaultsKeys.dateLastAppSession)
+            
+            AnalyticsTrackers.standard.track("Daily Streak", properties: ["current": dayStreak])
         }
     }
 }
