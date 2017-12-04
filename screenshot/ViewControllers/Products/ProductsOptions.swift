@@ -61,6 +61,20 @@ class _ProductsOptionsMask : NSObject {
 class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
+    fileprivate(set) var gender: ProductsOptionsGender?
+    fileprivate(set) var size: ProductsOptionsSize?
+    fileprivate(set) var sale: ProductsOptionsSale?
+    fileprivate(set) var sort: ProductsOptionsSort?
+    
+    static let global: ProductsOptions = {
+        let options = ProductsOptions()
+        options.gender = ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
+        options.size = ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
+        options.sale = ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
+        options.sort = ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
+        return options
+    }()
+    
     fileprivate let sortItems: [ProductsOptionsSort: ProductsOptionsSortItem] = [
         .similar: ProductsOptionsSortItem(title: "Similar"),
         .priceAsc: ProductsOptionsSortItem(title: "Price", detail: "(lowest first)"),
