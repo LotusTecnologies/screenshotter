@@ -14,7 +14,7 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
-  - Analytics (3.6.8)
+  - Analytics (3.6.9)
   - Appsee (2.3.6)
   - Bolts (1.8.4):
     - Bolts/AppLinks (= 1.8.4)
@@ -155,7 +155,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
-  Analytics: 6f00cff963ca3b9a4ffdfe3b6dc5564405431f60
+  Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
   Branch: e4a73742c7d77fae7e40c6b3184ddcb0103d71cd

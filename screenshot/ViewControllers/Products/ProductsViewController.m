@@ -214,28 +214,12 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
                             [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
             break;
     }
-    
-    NSSet<Product *> *products = shoppable.products;
+        
+    NSInteger mask = [_ProductsOptionsMask current];
+    NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
     
     if ([self.productsOptions _currentSale] == 0) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
-    }
-    
-    if ([self.productsOptions _currentGender] == 0) { // == .female
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 2]]; // 2 == .genderFemale
-        
-    } else if ([self.productsOptions _currentGender] == 1) { // == .male
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 1]]; // 1 == .genderMale
-    }
-    
-    if ([self.productsOptions _currentSize] == 0) { // == .child
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 4]]; // 4 == .sizeChild
-        
-    } else if ([self.productsOptions _currentSize] == 1) { // == .adult
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == 0", 12]]; // size bits clear => .sizeAdult
-        
-    } else if ([self.productsOptions _currentSize] == 2) { // == .plus
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) != 0", 8]]; // 8 == .sizePlus
     }
     
     return [products sortedArrayUsingDescriptors:descriptors];
@@ -348,7 +332,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         
         ProductsRateCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
-        cell.rating = shoppable.rating;
+        cell.rating = [shoppable getRating];
         [cell.voteUpButton addTarget:self action:@selector(productsRateVoteUpAction) forControlEvents:UIControlEventTouchUpInside];
         [cell.voteDownButton addTarget:self action:@selector(productsRateVoteDownAction) forControlEvents:UIControlEventTouchUpInside];
         return cell;
