@@ -80,21 +80,14 @@ class _ProductsOptionsMask : NSObject {
 }
 
 final class ProductsOptions : NSObject {
+    static let global = ProductsOptions()
+    
     weak var delegate: ProductsOptionsDelegate?
     
-    static let global: ProductsOptions = {
-        let options = ProductsOptions()
-        options.gender = ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
-        options.size = ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
-        options.sale = ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
-        options.sort = ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
-        return options
-    }()
-    
-    fileprivate(set) var gender: ProductsOptionsGender = ProductsOptions.global.gender
-    fileprivate(set) var size: ProductsOptionsSize = ProductsOptions.global.size
-    fileprivate(set) var sale: ProductsOptionsSale = ProductsOptions.global.sale
-    fileprivate(set) var sort: ProductsOptionsSort = ProductsOptions.global.sort
+    fileprivate(set) var gender = ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
+    fileprivate(set) var size = ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
+    fileprivate(set) var sale = ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
+    fileprivate(set) var sort = ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
     
     fileprivate let sortItems: [ProductsOptionsSort: ProductsOptionsSortItem] = [
         .similar: ProductsOptionsSortItem(title: "Similar"),
@@ -135,8 +128,8 @@ final class ProductsOptions : NSObject {
         sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
         sort = ProductsOptionsSort(intValue: view.sortPickerView.selectedRow(inComponent: 0))
         
-        UserDefaults.standard.set(sale, forKey: UserDefaultsKeys.productSale)
-        UserDefaults.standard.set(sort, forKey: UserDefaultsKeys.productSort)
+        UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
+        UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
         delegate?.productsOptionsDidChange(self)
