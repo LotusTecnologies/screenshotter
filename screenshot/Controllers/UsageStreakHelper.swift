@@ -8,13 +8,13 @@
 
 import Foundation
 
-struct StreakContext {
+fileprivate struct StreakContext {
     let calendar: Calendar
     let previousStreakDate: Date?
     let previousStreakCount: Int
 }
 
-enum StreakInterval {
+fileprivate enum StreakInterval {
     case day
     
     var component: Calendar.Component {
@@ -32,7 +32,7 @@ enum StreakInterval {
     }
 }
 
-func streak(for interval:StreakInterval, with context: StreakContext) -> Int? {
+fileprivate func streak(for interval:StreakInterval, with context: StreakContext) -> Int? {
     guard let streakDate = context.previousStreakDate else {
         return 1
     }
