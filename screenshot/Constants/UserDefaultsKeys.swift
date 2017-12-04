@@ -35,7 +35,7 @@ class UserDefaultsKeys : NSObject {
     // Device / Version
     static let dateInstalled = "DateInstalled"
     static let dateLastSound = "DateLastSound"
-    static let dateLastAppSession = "lastAppSessionDate"
+    static let dateLastAppSession = "DateLastAppSession"
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
