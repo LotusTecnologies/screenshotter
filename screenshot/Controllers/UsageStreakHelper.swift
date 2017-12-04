@@ -32,18 +32,17 @@ fileprivate func streak(for component:Calendar.Component, with context: StreakCo
 
     let diff = context.calendar.dateComponents(Set([component]), from: streakDate, to: Date())
     
-    switch diff.value(for: component) {
-    case .none:
+    guard let value = diff.value(for: component) else {
         return nil
-    case .some(let value):
-        switch value {
-        case 1:
-            return context.previousStreakCount + 1
-        case 0:
-            return context.previousStreakCount
-        default:
-            return nil
-        }
+    }
+    
+    switch value {
+    case 1:
+        return context.previousStreakCount + 1
+    case 0:
+        return context.previousStreakCount
+    default:
+        return nil
     }
 }
 
