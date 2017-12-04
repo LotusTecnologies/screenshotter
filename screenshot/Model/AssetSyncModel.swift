@@ -433,7 +433,7 @@ class AssetSyncModel: NSObject {
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
-        let optionsMask = ProductsOptionsMask.current()
+        let optionsMask = ProductsOptionsMask.global
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
                 let url = augmentedUrl(offersURL: offersURL, optionsMask: optionsMask),

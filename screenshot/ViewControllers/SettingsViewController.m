@@ -580,11 +580,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeProductGender: {
             // TODO: use ProductsOptions after swift converstion
             
-            // TODO: reload segment on view will appear
+            NSInteger integer = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productGender]];
             
             UISegmentedControl *control = [[UISegmentedControl alloc] initWithItems:@[@"Female", @"Male", @"All"]];
             control.tintColor = [UIColor crazeGreen];
-            control.selectedSegmentIndex = [ProductsOptions offsetValueForProductsOptionsKey:[UserDefaultsKeys productGender]];
+            control.selectedSegmentIndex = [_ProductsOptionsGender fromOffsetValue:integer];
             [control addTarget:self action:@selector(genderControlAction:) forControlEvents:UIControlEventValueChanged];
             return control;
         }
@@ -715,7 +715,8 @@ typedef NS_ENUM(NSUInteger, RowType) {
 #pragma mark - Product Options
 
 - (void)genderControlAction:(UISegmentedControl *)control {
-    [[NSUserDefaults standardUserDefaults] setInteger:control.selectedSegmentIndex forKey:[UserDefaultsKeys productGender]];
+    NSInteger integer = [_ProductsOptionsGender toOffsetValue:control.selectedSegmentIndex];
+    [[NSUserDefaults standardUserDefaults] setInteger:integer forKey:[UserDefaultsKeys productGender]];
 }
 
 

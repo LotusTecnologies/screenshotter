@@ -11,41 +11,40 @@ import Foundation
 class ProductsOptionsMask : NSObject {
     let rawValue: Int
     
-    static let genderUnisex  = ProductsOptionsMask(rawValue: 1 << 0) // 1
-    static let genderMale    = ProductsOptionsMask(rawValue: 1 << 1) // 2
-    static let genderFemale  = ProductsOptionsMask(rawValue: 1 << 2) // 4
+    static let genderUnisex = ProductsOptionsMask(rawValue: 1 << 0) // 1
+    static let genderMale   = ProductsOptionsMask(rawValue: 1 << 1) // 2
+    static let genderFemale = ProductsOptionsMask(rawValue: 1 << 2) // 4
     
-    static let sizeAdult     = ProductsOptionsMask(rawValue: 1 << 3) // 8
-    static let sizeChild     = ProductsOptionsMask(rawValue: 1 << 4) // 16
-    static let sizePlus      = ProductsOptionsMask(rawValue: 1 << 5) // 32
+    static let sizeAdult    = ProductsOptionsMask(rawValue: 1 << 3) // 8
+    static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
+    static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    static func current() -> ProductsOptionsMask {
-        var workingValue: Int
-        let productsOptions = ProductsOptions.global
+    static var global: ProductsOptionsMask {
+        var value: Int
         
-        switch productsOptions.gender {
+        switch ProductsOptionsGender.globalValue {
         case .male:
-            workingValue = ProductsOptionsMask.genderMale.rawValue
+            value = ProductsOptionsMask.genderMale.rawValue
         case .female:
-            workingValue = ProductsOptionsMask.genderFemale.rawValue
+            value = ProductsOptionsMask.genderFemale.rawValue
         default:
-            workingValue = ProductsOptionsMask.genderUnisex.rawValue
+            value = ProductsOptionsMask.genderUnisex.rawValue
         }
         
-        switch productsOptions.size {
+        switch ProductsOptionsSize.globalValue {
         case .child:
-            workingValue |= ProductsOptionsMask.sizeChild.rawValue
-        case .adult:
-            workingValue |= ProductsOptionsMask.sizeAdult.rawValue
+            value |= ProductsOptionsMask.sizeChild.rawValue
         case .plus:
-            workingValue |= ProductsOptionsMask.sizePlus.rawValue
+            value |= ProductsOptionsMask.sizePlus.rawValue
+        default:
+            value |= ProductsOptionsMask.sizeAdult.rawValue
         }
         
-        return ProductsOptionsMask(rawValue: workingValue)
+        return ProductsOptionsMask(rawValue: value)
     }
     
     var gender: ProductsOptionsGender {
@@ -71,7 +70,7 @@ class ProductsOptionsMask : NSObject {
 
 class _ProductsOptionsMask : NSObject {
     static func current() -> Int {
-        return ProductsOptionsMask.current().rawValue
+        return ProductsOptionsMask.global.rawValue
     }
 }
 
@@ -79,15 +78,13 @@ class _ProductsOptionsMask : NSObject {
     func productsOptionsDidChange(_ productsOptions: ProductsOptions)
 }
 
-final class ProductsOptions : NSObject {
-    static let global = ProductsOptions()
-    
+class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
-    fileprivate(set) var gender = ProductsOptionsGender(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productGender))
-    fileprivate(set) var size = ProductsOptionsSize(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSize))
-    fileprivate(set) var sale = ProductsOptionsSale(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSale))
-    fileprivate(set) var sort = ProductsOptionsSort(intValue: ProductsOptions.value(forProductsOptionsKey: UserDefaultsKeys.productSort))
+    fileprivate(set) var gender = ProductsOptionsGender.globalValue
+    fileprivate(set) var size = ProductsOptionsSize.globalValue
+    fileprivate(set) var sale = ProductsOptionsSale.globalValue
+    fileprivate(set) var sort = ProductsOptionsSort.globalValue
     
     fileprivate let sortItems: [ProductsOptionsSort: ProductsOptionsSortItem] = [
         .similar: ProductsOptionsSortItem(title: "Similar"),
@@ -107,10 +104,13 @@ final class ProductsOptions : NSObject {
     }()
     
     func syncOptions(withMask mask: ProductsOptionsMask?) {
-        gender = mask?.gender ?? type(of: self).global.gender
-        size = mask?.size ?? type(of: self).global.size
-        sale = type(of: self).global.sale
-        sort = type(of: self).global.sort
+        let globalMask = ProductsOptionsMask.global
+        
+        gender = mask?.gender ?? globalMask.gender
+        size = mask?.size ?? globalMask.size
+        // TODO: use the globalMask
+        sale = ProductsOptionsSale.globalValue // globalMask.sale
+        sort = ProductsOptionsSort.globalValue // globalMask.sort
         
         syncOptions(withView: view)
     }
@@ -137,34 +137,6 @@ final class ProductsOptions : NSObject {
 }
 
 extension ProductsOptions {
-    static func value(forProductsOptionsKey key: String) -> Int {
-        let int = UserDefaults.standard.integer(forKey: key)
-        
-        guard int == 0 else {
-            return int
-        }
-        
-        switch key {
-        case UserDefaultsKeys.productGender:
-            return ProductsOptionsGender.default.rawValue
-            
-        case UserDefaultsKeys.productSize:
-            return ProductsOptionsSize.default.rawValue
-            
-        case UserDefaultsKeys.productSale:
-            return ProductsOptionsSale.default.rawValue
-            
-        case UserDefaultsKeys.productSort:
-            return ProductsOptionsSort.default.rawValue
-            
-        default:
-            return 1
-        }
-    }
-    
-    static func offsetValue(forProductsOptionsKey key: String) -> Int {
-        return value(forProductsOptionsKey: key) - 1
-    }
     
     // MARK: Objc
     
@@ -302,36 +274,15 @@ class ProductsOptionsView : UIView {
     }
 }
 
-enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
-    case similar = 1
-    case priceAsc
-    case priceDes
-    case brands
-    
-    static var `default`: ProductsOptionsSort {
-        return .similar
-    }
-    
-    init(intValue: Int) {
-        self = ProductsOptionsSort(rawValue: intValue) ?? .default
-    }
-    
-    init(offsetValue: Int) {
-        self.init(intValue: offsetValue + 1)
-    }
-    
-    var offsetValue: Int {
-        return self.rawValue - 1
-    }
-}
-
 enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case female = 1
     case male
     case unisex
     
-    static var `default`: ProductsOptionsGender {
-        return .female
+    static let `default` = ProductsOptionsGender.female
+    
+    static var globalValue: ProductsOptionsGender {
+        return ProductsOptionsGender(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender))
     }
     
     init(intValue: Int) {
@@ -359,13 +310,25 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
     }
 }
 
+class _ProductsOptionsGender : NSObject {
+    static func toOffsetValue(_ value: Int) -> Int {
+        return ProductsOptionsGender(offsetValue: value).rawValue
+    }
+    
+    static func fromOffsetValue(_ value: Int) -> Int {
+        return ProductsOptionsGender(intValue: value).offsetValue
+    }
+}
+
 enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case child = 1
     case adult
     case plus
     
-    static var `default`: ProductsOptionsSize {
-        return .adult
+    static var `default` = ProductsOptionsSize.adult
+    
+    static var globalValue: ProductsOptionsSize {
+        return ProductsOptionsSize(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize))
     }
     
     init(intValue: Int) {
@@ -397,8 +360,10 @@ enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case sale = 1
     case all
     
-    static var `default`: ProductsOptionsSale {
-        return .all
+    static var `default` = ProductsOptionsSale.all
+    
+    static var globalValue: ProductsOptionsSale {
+        return ProductsOptionsSale(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSale))
     }
     
     init(intValue: Int) {
@@ -425,7 +390,34 @@ enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     }
 }
 
+enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case similar = 1
+    case priceAsc
+    case priceDes
+    case brands
+    
+    static let `default` = ProductsOptionsSort.similar
+    
+    static var globalValue: ProductsOptionsSort {
+        return ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
+    }
+    
+    init(intValue: Int) {
+        self = ProductsOptionsSort(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
+    }
+}
+
+
 private struct ProductsOptionsSortItem {
+    // TODO: move this to the stringValue of the sort enum
     let title: String
     let detail: String?
     
