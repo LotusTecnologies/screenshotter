@@ -11,40 +11,16 @@ import Foundation
 struct ProductsOptionsMask : OptionSet {
     let rawValue: Int
     
-    static let genderUnknown = ProductsOptionsMask(rawValue: 0 << 0)
-    static let genderMale    = ProductsOptionsMask(rawValue: 1 << 0)
-    static let genderFemale  = ProductsOptionsMask(rawValue: 2 << 0)
+    static let genderUnisex  = ProductsOptionsMask(rawValue: 1 << 0) // 1
+    static let genderMale    = ProductsOptionsMask(rawValue: 1 << 1) // 2
+    static let genderFemale  = ProductsOptionsMask(rawValue: 1 << 2) // 4
     
-    static let sizeAdult     = ProductsOptionsMask(rawValue: 0 << 2)
-    static let sizeChild     = ProductsOptionsMask(rawValue: 1 << 2)
-    static let sizePlus      = ProductsOptionsMask(rawValue: 2 << 2)
+    static let sizeAdult     = ProductsOptionsMask(rawValue: 1 << 3) // 8
+    static let sizeChild     = ProductsOptionsMask(rawValue: 1 << 4) // 16
+    static let sizePlus      = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
     init(rawValue: Int) {
         self.rawValue = rawValue
-    }
-    
-    func gender() -> ProductsOptionsGender {
-        switch rawValue & 0x3 {
-        case ProductsOptionsMask.genderMale.rawValue:
-            return .male
-        case ProductsOptionsMask.genderFemale.rawValue:
-            return .female
-        default:
-            return .all
-        }
-    }
-    
-    func size() -> ProductsOptionsSize {
-        switch rawValue & 0x1C {
-        case ProductsOptionsMask.sizeChild.rawValue:
-            return .child
-        case ProductsOptionsMask.sizeAdult.rawValue:
-            return .adult
-        case ProductsOptionsMask.sizePlus.rawValue:
-            return .plus
-        default:
-            return .fallback
-        }
     }
     
     static func current() -> ProductsOptionsMask {
@@ -56,7 +32,7 @@ struct ProductsOptionsMask : OptionSet {
         case .female:
             workingValue = ProductsOptionsMask.genderFemale.rawValue
         default:
-            workingValue = ProductsOptionsMask.genderUnknown.rawValue
+            workingValue = ProductsOptionsMask.genderUnisex.rawValue
         }
         
         switch productsOptions.currentSize {
@@ -70,7 +46,12 @@ struct ProductsOptionsMask : OptionSet {
         
         return ProductsOptionsMask(rawValue: workingValue)
     }
-    
+}
+
+class _ProductsOptionsMask : NSObject {
+    static func current() -> Int {
+        return ProductsOptionsMask.current().rawValue
+    }
 }
 
 @objc protocol ProductsOptionsDelegate : NSObjectProtocol {

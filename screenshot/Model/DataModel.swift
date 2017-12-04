@@ -430,7 +430,8 @@ extension DataModel {
                        b0x: Double,
                        b0y: Double,
                        b1x: Double,
-                       b1y: Double) -> Shoppable {
+                       b1y: Double,
+                       optionsMask: ProductsOptionsMask) -> Shoppable {
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
         let spellingMap = ["Bodypart" : "Body Part",
@@ -472,6 +473,7 @@ extension DataModel {
         shoppableToSave.b0y = b0y
         shoppableToSave.b1x = b1x
         shoppableToSave.b1y = b1y
+        shoppableToSave.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask)
         return shoppableToSave
     }
     
@@ -710,34 +712,57 @@ extension Shoppable {
         return croppedImage
     }
 
-    private func productsOptionsContains(optionsMask: ProductsOptionsMask) -> Bool {
-        let toFind = String(optionsMask.rawValue)
-        let productsOptions = self.productsOptions ?? "0"
-        let productsOptionsStrings = productsOptions.components(separatedBy: ",")
-        return productsOptionsStrings.contains(toFind)
+    private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {
+        let shoppableID = self.objectID
+        let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "shoppable == %@ AND optionsMask == %d", shoppableID, optionsMask)
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let productFilter = results.first {
+                return productFilter
+            }
+        } catch {
+            print("productFilter optionsMask:\(optionsMask)  shoppableID:\(shoppableID) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    private func productFiltersContains(managedObjectContext: NSManagedObjectContext, optionsMask: ProductsOptionsMask) -> Bool {
+        return productFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask.rawValue) != nil
+    }
+    
+    fileprivate func addProductFilter(managedObjectContext: NSManagedObjectContext, optionsMask: ProductsOptionsMask) {
+        let productFilterToSave = ProductFilter(context: managedObjectContext)
+        productFilterToSave.optionsMask = Int32(optionsMask.rawValue)
+        productFilterToSave.rating = 0
+        productFilterToSave.shoppable = self
     }
     
     @objc func set(productsOptions unused: ProductsOptions) {
         let optionsMask = ProductsOptionsMask.current() // Refactor ProductsOptions to not always return current to init ProductsOptionsMask from ProductsOptions.
-        guard let screenshot = self.screenshot,
-          !productsOptionsContains(optionsMask: optionsMask) else {
+        let optionsMaskInt = optionsMask.rawValue
+        guard let screenshotId = self.screenshot?.objectID else {
             return
         }
-        let optionsMaskString = String(optionsMask.rawValue)
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshot.objectID)
+            fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshotId)
             fetchRequest.sortDescriptors = nil
             
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
-                    let productsOptions = shoppable.productsOptions ?? "0"
                     guard let offersURL = shoppable.offersURL,
-                        !productsOptions.components(separatedBy: ",").contains(optionsMaskString) else {
+                      !shoppable.productFiltersContains(managedObjectContext: managedObjectContext, optionsMask: optionsMask) else {
                         continue
                     }
-                    shoppable.productsOptions = productsOptions + ",\(optionsMaskString)"
+                    shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask)
+                    if let existingProducts = shoppable.products as? Set<Product>,
+                        existingProducts.contains(where: { $0.optionsMask == optionsMaskInt }) {
+                        continue
+                    }
                     AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
                 }
                 try managedObjectContext.save()
@@ -747,11 +772,21 @@ extension Shoppable {
         }
     }
     
+    @objc public func getRating() -> Int16 {
+        let optionsMask = ProductsOptionsMask.current().rawValue
+        let managedObjectContext = DataModel.sharedInstance.mainMoc()
+        if let productFilter = productFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask) {
+            return productFilter.rating
+        }
+        return 0
+    }
+    
     @objc public func setRating(positive: Bool) {
-        let managedObjectID = self.objectID
+        let shoppableID = self.objectID
+        let optionsMask = ProductsOptionsMask.current().rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "shoppable == %@ AND optionsMask == %d", shoppableID, optionsMask)
             fetchRequest.sortDescriptors = nil
             
             do {
@@ -759,12 +794,12 @@ extension Shoppable {
                 let positiveRating: Int16 = 5
                 let negativeRating: Int16 = 1
                 let ratingValue: Int16 = positive ? positiveRating : negativeRating
-                for shoppable in results {
-                    shoppable.rating = ratingValue
+                for productFilter in results {
+                    productFilter.rating = ratingValue
                 }
                 try managedObjectContext.save()
             } catch {
-                print("setRating objectID:\(managedObjectID) results with error:\(error)")
+                print("setRating optionsMask:\(optionsMask)  shoppableID:\(shoppableID) results with error:\(error)")
             }
         }
     }

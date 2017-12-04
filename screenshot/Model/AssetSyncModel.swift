@@ -423,14 +423,11 @@ class AssetSyncModel: NSObject {
     }
     
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
-        let genderParamString: String
-        switch optionsMask.gender() {
-        case .male:
+        var genderParamString = ""
+        if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
             genderParamString = "&force_gender=male"
-        case .female:
+        } else if optionsMask.rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
             genderParamString = "&force_gender=female"
-        default:
-            genderParamString = ""
         }
         return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + genderParamString)
     }
@@ -491,7 +488,8 @@ class AssetSyncModel: NSObject {
                                                                     b0x: b0x,
                                                                     b0y: b0y,
                                                                     b1x: b1x,
-                                                                    b1y: b1y)
+                                                                    b1y: b1y,
+                                                                    optionsMask: optionsMask)
                             var productOrder: Int16 = 0
                             for prod in productsArray {
                                 var floatPrice: Float = 0 // -1 ?
@@ -566,7 +564,13 @@ class AssetSyncModel: NSObject {
                         return
                     }
                     var productOrder: Int16 = shoppable.productCount
+                    let existingProducts = shoppable.products as? Set<Product>
                     for prod in productsArray {
+                        let offer = prod["offer"] as? String
+                        if let identicalProduct = existingProducts?.filter({ $0.offer == offer }).first {
+                            identicalProduct.optionsMask |= Int32(optionsMask.rawValue)
+                            continue
+                        }
                         var floatPrice: Float = 0 // -1 ?
                         if let extractedFloatPrice = prod["floatPrice"] as? Float {
                             floatPrice = extractedFloatPrice
@@ -589,16 +593,13 @@ class AssetSyncModel: NSObject {
                                                       floatOriginalPrice: floatOriginalPrice,
                                                       categories: categories,
                                                       brand: prod["brand"] as? String,
-                                                      offer: prod["offer"] as? String,
+                                                      offer: offer,
                                                       imageURL: prod["imageUrl"] as? String,
                                                       merchant: prod["merchant"] as? String,
                                                       optionsMask: Int32(optionsMask.rawValue))
                         productOrder += 1
                     }
-                    if shoppable.productCount != productOrder {
-                        shoppable.productCount = productOrder
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                    }
+                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
                 }
             }.catch { error in
                 print("AssetSyncModel extractProducts error parsing product:\(error)")
