@@ -8,8 +8,14 @@
 
 import Foundation
 
-protocol EnumIntFallbackProtocol {
-    static var fallback: Self { get }
+protocol EnumIntDefaultProtocol {
+    static var `default`: Self { get }
     
     init(intValue: Int)
+}
+
+protocol EnumIntOffsetProtocol {
+    init(offsetValue: Int)
+    
+    var offsetValue: Int { get }
 }

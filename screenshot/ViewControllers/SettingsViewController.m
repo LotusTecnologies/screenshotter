@@ -183,8 +183,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     [super viewWillAppear:animated];
     
     [self updateScreenshotsCount];
-    [self reloadPermissionIndexPaths];
-    [self reloadDailyStreak];
+    [self reloadChangeableIndexPaths];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -202,15 +201,15 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     if (self.view.window) {
-        // Use did become active since this value can change through an alert view
-        [self reloadPermissionIndexPaths];
+        // Use did become active since the permissions values can change through an alert view
+        [self reloadChangeableIndexPaths];
     }
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self updateScreenshotsCount];
-        [self reloadDailyStreak];
+        [self reloadChangeableIndexPaths];
     }
 }
 
@@ -594,9 +593,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypeProductGender: {
             // TODO: use ProductsOptions after swift converstion
             
+            // TODO: reload segment on view will appear
+            
             UISegmentedControl *control = [[UISegmentedControl alloc] initWithItems:@[@"Female", @"Male", @"All"]];
             control.tintColor = [UIColor crazeGreen];
-            control.selectedSegmentIndex = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productGender]];
+            control.selectedSegmentIndex = [ProductsOptions offsetValueForProductsOptionsKey:[UserDefaultsKeys productGender]];
             [control addTarget:self action:@selector(genderControlAction:) forControlEvents:UIControlEventValueChanged];
             return control;
         }
@@ -607,22 +608,25 @@ typedef NS_ENUM(NSUInteger, RowType) {
     }
 }
 
-- (void)reloadDailyStreak {
-    [UsageStreakHelper updateStreak];
+- (void)reloadChangeableIndexPaths {
+    NSMutableArray *indexPaths = [NSMutableArray array];
+    NSInteger permissionSection = SectionTypePermissions;
     
-    NSIndexPath *indexPath = [self indexPathForRowType:RowTypeUsageStreak inSectionType:SectionTypeAbout];
-    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-}
-
-- (void)reloadPermissionIndexPaths {
-    NSMutableArray *permissionIndexPaths = [NSMutableArray array];
-    NSInteger section = SectionTypePermissions;
-    
-    for (NSNumber *permissionNumber in [self data][@(section)]) {
-        [permissionIndexPaths addObject:[NSIndexPath indexPathForRow:[permissionNumber integerValue] inSection:section]];
+    for (NSNumber *permissionNumber in [self data][@(permissionSection)]) {
+        [indexPaths addObject:[self indexPathForRowType:[permissionNumber integerValue] inSectionType:permissionSection]];
     }
     
-    [self.tableView reloadRowsAtIndexPaths:permissionIndexPaths withRowAnimation:UITableViewRowAnimationFade];
+    NSInteger productsSection = SectionTypeProducts;
+    
+    for (NSNumber *productsNumber in [self data][@(productsSection)]) {
+        [indexPaths addObject:[self indexPathForRowType:[productsNumber integerValue] inSectionType:productsSection]];
+    }
+    
+    NSIndexPath *dailyStreakIndexPath = [self indexPathForRowType:RowTypeUsageStreak inSectionType:SectionTypeAbout];
+    [indexPaths addObject:dailyStreakIndexPath];
+    
+    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    
 }
 
 - (CGRect)rectForTableFooterTextView {
