@@ -21,8 +21,8 @@ import CoreData
 class ShoppablesController: NSObject, FrcDelegateProtocol {
     fileprivate var shoppablesFrc: ShoppableFrc!
     fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>!
-    public var collectionView: UICollectionView?
-    public var delegate: ShoppablesControllerDelegate?
+    var collectionView: UICollectionView?
+    var delegate: ShoppablesControllerDelegate?
     private var screenshot: Screenshot!
     
     init(screenshot: Screenshot) {
@@ -40,19 +40,19 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
         DataModel.sharedInstance.clearShoppableFrc();
     }
     
-    public func refetchShoppables() {
+    func refetchShoppables() {
         AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot)
     }
     
-    public func shoppableCount() -> Int {
+    func shoppableCount() -> Int {
         return shoppablesFrc.fetchedObjects!.count
     }
     
-    public func shoppables() -> [Shoppable] {
+    func shoppables() -> [Shoppable] {
         return shoppablesFrc.fetchedObjects!
     }
     
-    public func shoppable(at index: Int) -> Shoppable {
+    func shoppable(at index: Int) -> Shoppable {
         return shoppablesFrc.object(at: IndexPath.init(row: index, section: 0))
     }
 }
