@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ProductsOptionsMask : OptionSet {
+class ProductsOptionsMask : NSObject {
     let rawValue: Int
     
     static let genderUnisex  = ProductsOptionsMask(rawValue: 1 << 0) // 1
@@ -25,7 +25,7 @@ struct ProductsOptionsMask : OptionSet {
     
     static func current() -> ProductsOptionsMask {
         var workingValue: Int
-        let productsOptions = ProductsOptions()
+        let productsOptions = ProductsOptions.global
         switch productsOptions.currentGender {
         case .male:
             workingValue = ProductsOptionsMask.genderMale.rawValue

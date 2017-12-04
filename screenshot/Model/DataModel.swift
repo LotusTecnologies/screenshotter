@@ -740,6 +740,7 @@ extension Shoppable {
         productFilterToSave.shoppable = self
     }
     
+    // Updates all this screenshot's shoppables' productFilters' dateModified.
     @objc func set(productsOptions unused: ProductsOptions) {
         let optionsMask = ProductsOptionsMask.current() // Refactor ProductsOptions to not always return current to init ProductsOptionsMask from ProductsOptions.
         let optionsMaskInt = optionsMask.rawValue
@@ -772,6 +773,11 @@ extension Shoppable {
         }
     }
     
+    // Return the last set productFilter
+    @objc func getLast() -> ProductsOptionsMask {
+        return ProductsOptionsMask(rawValue: 9)
+    }
+
     @objc public func getRating() -> Int16 {
         let optionsMask = ProductsOptionsMask.current().rawValue
         let managedObjectContext = DataModel.sharedInstance.mainMoc()
