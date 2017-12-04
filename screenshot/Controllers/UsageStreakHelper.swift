@@ -15,24 +15,24 @@ struct StreakContext {
 }
 
 enum StreakInterval {
-    case Day
+    case day
     
     var component: Calendar.Component {
         switch self {
-        case .Day:
+        case .day:
             return .day
         }
     }
     
-    func value(`for` components:DateComponents) -> Int? {
+    func value(for components:DateComponents) -> Int? {
         switch self {
-        case .Day:
+        case .day:
             return components.day
         }
     }
 }
 
-func streak(`for` interval:StreakInterval, with context: StreakContext) -> Int? {
+func streak(for interval:StreakInterval, with context: StreakContext) -> Int? {
     guard let streakDate = context.previousStreakDate else {
         return 1
     }
@@ -62,7 +62,7 @@ class UsageStreakHelper : NSObject {
         let lastSessionDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastAppSession) as? Date
         let lastStreak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
         let context = StreakContext(calendar: Calendar.current, previousStreakDate: lastSessionDate, previousStreakCount: lastStreak)
-        guard let dayStreak = streak(for: .Day, with: context) else {
+        guard let dayStreak = streak(for: .day, with: context) else {
             UserDefaults.standard.set(1, forKey: UserDefaultsKeys.dailyStreak)
             UserDefaults.standard.set(Date(), forKey: UserDefaultsKeys.dateLastAppSession)
             return
