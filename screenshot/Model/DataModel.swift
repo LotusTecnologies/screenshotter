@@ -755,7 +755,7 @@ extension Shoppable {
             return
         }
        var optionsMaskInt: Int
-        switch productsOptions.gender! { // TODO: GMK remove "!" once productsOptions.gender not optional.
+        switch productsOptions.gender {
         case .male:
             optionsMaskInt = ProductsOptionsMask.genderMale.rawValue
         case .female:
@@ -763,7 +763,7 @@ extension Shoppable {
         case .unisex:
             optionsMaskInt = ProductsOptionsMask.genderUnisex.rawValue
         }
-        switch productsOptions.size! { // TODO: GMK remove "!" once productsOptions.size not optional.
+        switch productsOptions.size {
         case .adult:
             optionsMaskInt |= ProductsOptionsMask.sizeAdult.rawValue
         case .child:
