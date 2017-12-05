@@ -97,6 +97,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         toolbar.screenshotImage = self.image;
         toolbar.shoppablesController = self.shoppablesController;
         toolbar.delegate = self;
+        toolbar.barTintColor = [UIColor whiteColor];
         toolbar.hidden = [self shouldHideToolbar];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;

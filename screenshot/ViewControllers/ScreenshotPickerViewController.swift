@@ -74,6 +74,7 @@ class ScreenshotPickerViewController: BaseViewController {
         let toolbar = UIToolbar()
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         toolbar.delegate = self
+        toolbar.barTintColor = .white
         view.addSubview(toolbar)
         toolbar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
         toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -81,7 +82,7 @@ class ScreenshotPickerViewController: BaseViewController {
         
         segments = UISegmentedControl(items: ["Screenshots", "Gallery"])
         segments.translatesAutoresizingMaskIntoConstraints = false
-        segments.tintColor = UIColor.crazeGreen
+        segments.tintColor = .crazeGreen
         segments.selectedSegmentIndex = 0
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem(customView: segments)]
@@ -130,7 +131,7 @@ class ScreenshotPickerViewController: BaseViewController {
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false
             fab.setImage(UIImage(named: "FABCamera"), for: .normal)
-            fab.backgroundColor = UIColor.crazeRed
+            fab.backgroundColor = .crazeRed
             fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
             fab.adjustsImageWhenHighlighted = false
             fab.addTarget(self, action: #selector(cameraButtonAction), for: .touchUpInside)
