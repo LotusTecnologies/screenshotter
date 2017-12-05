@@ -71,6 +71,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         button.imageView.contentMode = UIViewContentModeScaleAspectFill;
         [button setImage:self.image forState:UIControlStateNormal];
         [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
+        button.layer.borderColor = [UIColor crazeGreen].CGColor;
+        button.layer.borderWidth = 1.f;
         
         UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
         
