@@ -19,10 +19,11 @@ import CoreData
 }
 
 class ShoppablesController: NSObject, FrcDelegateProtocol {
+    var collectionView: UICollectionView?
+    weak var delegate: ShoppablesControllerDelegate?
+    
     fileprivate var shoppablesFrc: ShoppableFrc!
     fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>!
-    var collectionView: UICollectionView?
-    var delegate: ShoppablesControllerDelegate?
     private var screenshot: Screenshot!
     
     init(screenshot: Screenshot) {

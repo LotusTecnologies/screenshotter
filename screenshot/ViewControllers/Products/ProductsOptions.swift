@@ -187,7 +187,7 @@ class ProductsOptionsView : UIView {
     let sizeControl = UISegmentedControl(items: [
         ProductsOptionsSize.child.stringValue,
         ProductsOptionsSize.adult.stringValue,
-        ProductsOptionsSize.plus.stringValue
+//        ProductsOptionsSize.plus.stringValue
         ])
     let saleControl = UISegmentedControl(items: [
         ProductsOptionsSale.sale.stringValue,
