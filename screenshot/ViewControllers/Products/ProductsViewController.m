@@ -369,8 +369,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
         [AnalyticsTrackerObjCBridge trackTappedOnProductWithTracker:AnalyticsTrackers.standard
                                                             product:product
-                                                             onPage:@"Products"
-                                            trackingMarketingBrands:YES];
+                                                             onPage:@"Products"];
         
         NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
         
