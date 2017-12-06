@@ -181,7 +181,7 @@ fileprivate let marketingBrands = [
 ]
 
 extension AnalyticsTracker {
-    func trackTappedOnProduct(_ product: Product, onPage page: String, trackingMarketingBrands: Bool = true) {
+    func trackTappedOnProduct(_ product: Product, onPage page: String) {
         track("Tapped on product", properties: [
             "merchant": product.merchant ?? "",
             "brand": product.brand ?? "",
@@ -195,18 +195,16 @@ extension AnalyticsTracker {
             return marketingBrands.contains(brand.lowercased())
         }
         
-        guard trackingMarketingBrands,
-            let brand = product.brand,
-            isMarketingBrand(brand) else {
+        guard let brand = product.brand, isMarketingBrand(brand) else {
             return
         }
         
-        track("Tapped on \(brand.capitalized) product", properties: [:])
+        track("Tapped on \(brand) product")
     }
 }
 
 class AnalyticsTrackerObjCBridge : NSObject {
-    static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String, trackingMarketingBrands trackMarketingBrands: Bool = true) {
-        tracker.trackTappedOnProduct(product, onPage: page, trackingMarketingBrands: trackMarketingBrands)
+    static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String) {
+        tracker.trackTappedOnProduct(product, onPage: page)
     }
 }
