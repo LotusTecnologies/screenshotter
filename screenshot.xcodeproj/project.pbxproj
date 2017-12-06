@@ -19,6 +19,7 @@
 		52FCF2311F9639AE007A6442 /* DiscoverWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
 		C50EE2761FC40DCD002B4259 /* Hind 700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C50EE2751FC40DCC002B4259 /* Hind 700.ttf */; };
+		C5206CF91FD824B100C4C484 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5206CF81FD824B100C4C484 /* TextFieldTableViewCell.swift */; };
 		C5233F021F6E92F300F25C7C /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
@@ -114,6 +115,7 @@
 		52FCF2301F9639AE007A6442 /* DiscoverWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverWebViewController.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
 		C50EE2751FC40DCC002B4259 /* Hind 700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind 700.ttf"; sourceTree = "<group>"; };
+		C5206CF81FD824B100C4C484 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
 		C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
 		C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPickerViewController.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
@@ -263,6 +265,14 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		C5206CF71FD8247A00C4C484 /* TableViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				C5206CF81FD824B100C4C484 /* TextFieldTableViewCell.swift */,
+			);
+			path = TableViewCells;
+			sourceTree = "<group>";
+		};
 		C5233F091F6FEFEB00F25C7C /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,15 +349,16 @@
 			isa = PBXGroup;
 			children = (
 				C5AA81931F97227E00421909 /* Buttons */,
+				C5EE6EF71FAA0817008CBC3A /* ClipView.swift */,
 				C5AA81971F97227E00421909 /* CollectionViewCells */,
 				C5EE6EF41FAA01D9008CBC3A /* Extensions */,
-				C5EE6EF71FAA0817008CBC3A /* ClipView.swift */,
 				525BBCF91F9CBA6800330C95 /* HelperView.swift */,
 				C53B46461FB1A8A500A8C886 /* Loader.swift */,
 				C5E64F521FCFEBFB0073CAB5 /* NotifyChangeView.swift */,
 				C5233F011F6E92F300F25C7C /* ScreenshotsHelperView.swift */,
 				C5CCBB3A1F405C0B00D6B392 /* ShoppablesToolbar.h */,
 				C5CCBB3B1F405C0B00D6B392 /* ShoppablesToolbar.m */,
+				C5206CF71FD8247A00C4C484 /* TableViewCells */,
 				C5921E951F433D4100DF4888 /* TappableTextView.h */,
 				C5921E961F433D4100DF4888 /* TappableTextView.m */,
 				C56F2C5B1F9E35AD00488C0D /* WebView.swift */,
@@ -767,6 +778,7 @@
 				C5EE6EF61FAA01FE008CBC3A /* BarButtonItemExt.swift in Sources */,
 				C5C9A2C11FC42E4300958453 /* ProductsViewController.m in Sources */,
 				C5F8D64C1FA74DE30067C26A /* InviteViewController.swift in Sources */,
+				C5206CF91FD824B100C4C484 /* TextFieldTableViewCell.swift in Sources */,
 				C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */,
 				C53B46471FB1A8A500A8C886 /* Loader.swift in Sources */,
 				C5EE6EF81FAA0817008CBC3A /* ClipView.swift in Sources */,

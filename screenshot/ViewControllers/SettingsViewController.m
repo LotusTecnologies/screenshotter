@@ -294,41 +294,24 @@ typedef NS_ENUM(NSUInteger, RowType) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView inputCellAtIndexPath:(NSIndexPath *)indexPath rowType:(RowType)rowType {
-    UITextField *textField;
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"input"];
+    TextFieldTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"input"];
     
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"input"];
+        cell = [[TextFieldTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"input"];
+        cell.textField.delegate = self;
         
-        textField = [[UITextField alloc] init];
-        textField.translatesAutoresizingMaskIntoConstraints = NO;
-        textField.delegate = self;
-        textField.tag = 1;
-        textField.returnKeyType = UIReturnKeyDone;
-        textField.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        textField.adjustsFontForContentSizeCategory = YES;
-        [cell.contentView addSubview:textField];
-        [textField.leadingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
-        [textField.trailingAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
-        [textField.centerYAnchor constraintEqualToAnchor:cell.contentView.layoutMarginsGuide.centerYAnchor].active = YES;
-        
-    } else {
-        textField = [cell.contentView viewWithTag:1];
+        if (rowType == RowTypeEmail) {
+            self.emailTextField = cell.textField;
+            cell.textField.keyboardType = UIKeyboardTypeEmailAddress;
+            
+        } else if (rowType == RowTypeName) {
+            self.nameTextField = cell.textField;
+            cell.textField.keyboardType = UIKeyboardTypeDefault;
+        }
     }
     
-    if (rowType == RowTypeEmail) {
-        self.emailTextField = textField;
-        textField.keyboardType = UIKeyboardTypeEmailAddress;
-        
-    } else if (rowType == RowTypeName) {
-        self.nameTextField = textField;
-        textField.keyboardType = UIKeyboardTypeDefault;
-    }
-    
-    textField.text = [self textForRowType:rowType];
-    textField.placeholder = [self detailTextForRowType:rowType];
-    
-    cell.textLabel.text = @" "; // Needed for adjusting the cell height correctly with dynamic type
+    cell.textField.text = [self textForRowType:rowType];
+    cell.textField.placeholder = [self detailTextForRowType:rowType];
     return cell;
 }
 
