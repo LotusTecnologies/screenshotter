@@ -191,15 +191,12 @@ extension AnalyticsTracker {
             "page": page
         ])
         
-        func isMarketingBrand(_ brand: String) -> Bool {
-            return marketingBrands.contains(brand.lowercased())
-        }
-        
-        guard let brand = product.brand, isMarketingBrand(brand) else {
+        guard let brand = product.brand?.lowercased(), marketingBrands.contains(brand) else {
             return
         }
         
-        track("Tapped on \(brand) product")
+        // Need to use properties: [:] to clarify which track function we want to call
+        track("Tapped on \(brand) product", properties: [:])
     }
 }
 
