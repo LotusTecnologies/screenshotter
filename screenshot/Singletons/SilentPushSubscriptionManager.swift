@@ -42,7 +42,6 @@ class SilentPushSubscriptionManager : NSObject {
         
         super.init()
         
-        updateSubscriptionsIfNeeded()
         beginObservingForSignificantTimeChange()
     }
     
