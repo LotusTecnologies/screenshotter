@@ -164,6 +164,22 @@ public func identify(_ name: String? = nil, email: String? = nil, tracker: Analy
     return user
 }
 
+fileprivate let marketingBrands = [
+    "boohoo",
+    "missguided",
+    "forever 21",
+    "asos",
+    "free people",
+    "urban outfitters",
+    "river island",
+    "bdg",
+    "tommy hilfiger",
+    "nbd",
+    "yoox.com",
+    "revolve",
+    "nordstrom"
+]
+
 extension AnalyticsTracker {
     func trackTappedOnProduct(_ product: Product, onPage page: String) {
         track("Tapped on product", properties: [
@@ -173,6 +189,19 @@ extension AnalyticsTracker {
             "imageUrl": product.imageURL ?? "",
             "sale": product.isSale(),
             "page": page
-            ])
+        ])
+        
+        guard let brand = product.brand?.lowercased(), marketingBrands.contains(brand) else {
+            return
+        }
+        
+        // Need to use properties: [:] to clarify which track function we want to call
+        track("Tapped on \(brand) product", properties: [:])
+    }
+}
+
+class AnalyticsTrackerObjCBridge : NSObject {
+    static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String) {
+        tracker.trackTappedOnProduct(product, onPage: page)
     }
 }
