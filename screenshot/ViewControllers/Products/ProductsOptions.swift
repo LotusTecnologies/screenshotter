@@ -19,14 +19,18 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
+    static var global: ProductsOptionsMask {
+        return ProductsOptionsMask(ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
+    }
+    
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    static var global: ProductsOptionsMask {
+    convenience init(_ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
         var value: Int
         
-        switch ProductsOptionsGender.globalValue {
+        switch gender {
         case .male:
             value = ProductsOptionsMask.genderMale.rawValue
         case .female:
@@ -35,7 +39,7 @@ class ProductsOptionsMask : NSObject {
             value = ProductsOptionsMask.genderUnisex.rawValue
         }
         
-        switch ProductsOptionsSize.globalValue {
+        switch size {
         case .child:
             value |= ProductsOptionsMask.sizeChild.rawValue
         case .plus:
@@ -44,7 +48,7 @@ class ProductsOptionsMask : NSObject {
             value |= ProductsOptionsMask.sizeAdult.rawValue
         }
         
-        return ProductsOptionsMask(rawValue: value)
+        self.init(rawValue: value)
     }
     
     var gender: ProductsOptionsGender {
@@ -75,7 +79,7 @@ class _ProductsOptionsMask : NSObject {
 }
 
 @objc protocol ProductsOptionsDelegate : NSObjectProtocol {
-    func productsOptionsDidChange(_ productsOptions: ProductsOptions)
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool)
 }
 
 class ProductsOptions : NSObject {
@@ -98,14 +102,11 @@ class ProductsOptions : NSObject {
         return view
     }()
     
-    func syncOptions(withMask mask: ProductsOptionsMask?) {
-        let globalMask = ProductsOptionsMask.global
-        
-        gender = mask?.gender ?? globalMask.gender
-        size = mask?.size ?? globalMask.size
-        // TODO: use the globalMask
-        sale = ProductsOptionsSale.globalValue // globalMask.sale
-        sort = ProductsOptionsSort.globalValue // globalMask.sort
+    func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
+        gender = mask?.gender ?? ProductsOptionsGender.globalValue
+        size = mask?.size ?? ProductsOptionsSize.globalValue
+        sale = ProductsOptionsSale.globalValue
+        sort = ProductsOptionsSort.globalValue
         
         syncOptions(withView: view)
     }
@@ -118,6 +119,10 @@ class ProductsOptions : NSObject {
     }
     
     @objc private func doneButtonAction() {
+        let previousMask = ProductsOptionsMask(gender, size)
+        let previousSale = sale
+        let previousSort = sort
+        
         gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
@@ -127,7 +132,12 @@ class ProductsOptions : NSObject {
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
-        delegate?.productsOptionsDidChange(self)
+        let maskChanged = previousMask.rawValue != ProductsOptionsMask(gender, size).rawValue
+        let saleChanged = previousSale.rawValue != sale.rawValue
+        let sortChanged = previousSort.rawValue != sort.rawValue
+        let changed = maskChanged || saleChanged || sortChanged
+            
+        delegate?.productsOptionsDidComplete(self, withChange: changed)
     }
 }
 

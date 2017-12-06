@@ -492,11 +492,14 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     [self.navigationItem.titleView endEditing:YES];
 }
 
-- (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
-    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setWithProductsOptions:productsOptions callback:^{
-        [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
-    }];
+- (void)productsOptionsDidComplete:(ProductsOptions *)productsOptions withChange:(BOOL)changed {
+    if (changed) {
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+        [shoppable setWithProductsOptions:productsOptions callback:^{
+            [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+        }];
+    }
+    
     [self dismissOptions];
 }
 
