@@ -136,6 +136,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         collectionView;
     });
     
+    [self updateOptionsView];
     [self reloadCollectionViewForIndex:0];
 }
 
@@ -244,9 +245,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 - (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
-//    [self.collectionView reloadData];
-    
-    // TODO: only needed to be called after shoppable setWithProductsOptions completion. only called for new database entries
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
     
     NSLog(@"||| shoppablesControllerDidReload");
@@ -256,19 +254,25 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 #pragma mark - Collection View
 
 - (void)reloadCollectionViewForIndex:(NSInteger)index {
-    [self updateOptionsView];
-    
-    self.products = nil;
-    
     if ([self hasShoppables]) {
+        BOOL hadProducts = self.products.count > 0;
         self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
         
-        [self.collectionView reloadData];
+        (self.products.count == 0) ? [self.loader startAnimation] : [self stopAndRemoveLoader];
+        
+        NSLog(@"||| should hide collection view = %d", self.products.count == 0);
+        
+        if (hadProducts || self.products.count) {
+            [self.collectionView reloadData];
+        }
         
         if (self.products.count) {
             // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
+        
+    } else {
+        self.products = @[];
     }
 }
 
@@ -285,7 +289,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         return self.products.count;
         
     } else if (section == ProductsSectionRate) {
-        return [self.shoppablesController shoppableCount] > 0 ? 1 : 0;
+        return self.products.count > 0 ? 1 : 0;
         
     } else {
         return 0;
@@ -477,7 +481,13 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 - (void)updateOptionsView {
-    self.navigationItem.titleView = [self hasShoppables] ? [self currentOptionsView] : nil;
+    if ([self hasShoppables]) {
+        if (!self.navigationItem.titleView) {
+            self.navigationItem.titleView = [self currentOptionsView];
+        }
+    } else {
+        self.navigationItem.titleView = nil;
+    }
 }
 
 - (void)presentOptions:(ProductsViewControllerControl *)control {
@@ -501,7 +511,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if (changed) {
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         [shoppable setWithProductsOptions:productsOptions callback:^{
-            // TODO: only needed to be called when products already exist in database
             [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
             
             NSLog(@"||| setWithProductsOptions");
@@ -519,11 +528,12 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
-    if (!self.products && [self isViewLoaded]) {
+    if (self.products.count == 0 && [self isViewLoaded]) {
         [self stopAndRemoveLoader];
         
         toolbar.hidden = [self shouldHideToolbar];
         
+        [self updateOptionsView];
         [self reloadCollectionViewForIndex:0];
     }
 }
