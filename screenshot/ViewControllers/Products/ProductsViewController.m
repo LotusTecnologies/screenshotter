@@ -246,8 +246,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
     [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
-    
-    NSLog(@"||| shoppablesControllerDidReload");
 }
 
 
@@ -259,8 +257,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
         
         (self.products.count == 0) ? [self.loader startAnimation] : [self stopAndRemoveLoader];
-        
-        NSLog(@"||| should hide collection view = %d", self.products.count == 0);
         
         if (hadProducts || self.products.count) {
             [self.collectionView reloadData];
@@ -508,8 +504,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         [shoppable setWithProductsOptions:productsOptions callback:^{
             [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
-            
-            NSLog(@"||| setWithProductsOptions");
         }];
     }
     
