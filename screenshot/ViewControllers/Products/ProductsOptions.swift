@@ -204,7 +204,6 @@ class ProductsOptionsView : UIView {
         super.init(frame: frame)
         
         backgroundColor = .white
-        layoutMargins = UIEdgeInsetsMake(.padding, .extendedPadding, .padding, .extendedPadding)
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false
@@ -272,6 +271,13 @@ class ProductsOptionsView : UIView {
         doneButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
         doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // Needed in iOS 10
+        layoutMargins = UIEdgeInsets(top: .padding, left: .extendedPadding, bottom: .padding, right: .extendedPadding)
     }
     
     override var intrinsicContentSize: CGSize {
