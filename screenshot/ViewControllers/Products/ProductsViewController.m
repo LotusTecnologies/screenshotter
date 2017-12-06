@@ -71,6 +71,8 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         button.imageView.contentMode = UIViewContentModeScaleAspectFill;
         [button setImage:self.image forState:UIControlStateNormal];
         [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
+        button.layer.borderColor = [UIColor crazeGreen].CGColor;
+        button.layer.borderWidth = 1.f;
         
         UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
         
@@ -95,6 +97,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         toolbar.screenshotImage = self.image;
         toolbar.shoppablesController = self.shoppablesController;
         toolbar.delegate = self;
+        toolbar.barTintColor = [UIColor whiteColor];
         toolbar.hidden = [self shouldHideToolbar];
         [self.view addSubview:toolbar];
         [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
@@ -241,7 +244,12 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 - (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
-    [self.collectionView reloadData];
+//    [self.collectionView reloadData];
+    
+    // TODO: only needed to be called after shoppable setWithProductsOptions completion. only called for new database entries
+    [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+    
+    NSLog(@"||| shoppablesControllerDidReload");
 }
 
 
@@ -367,13 +375,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         Product *product = [self productAtIndex:indexPath.item];
         
         // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
-        [AnalyticsTrackers.standard track:@"Tapped on product" properties:@{@"merchant": product.merchant,
-                                                                            @"brand": product.brand,
-                                                                            @"url": product.offer,
-                                                                            @"imageUrl": product.imageURL,
-                                                                            @"sale": @([product isSale]),
-                                                                            @"page": @"Products"
-                                                                            }];
+        [AnalyticsTrackerObjCBridge trackTappedOnProductWithTracker:AnalyticsTrackers.standard
+                                                            product:product
+                                                             onPage:@"Products"];
         
         NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
         
@@ -489,11 +493,17 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     [self.navigationItem.titleView endEditing:YES];
 }
 
-- (void)productsOptionsDidChange:(ProductsOptions *)productsOptions {
-    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setWithProductsOptions:productsOptions callback:^{
-        [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
-    }];
+- (void)productsOptionsDidComplete:(ProductsOptions *)productsOptions withChange:(BOOL)changed {
+    if (changed) {
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+        [shoppable setWithProductsOptions:productsOptions callback:^{
+            // TODO: only needed to be called when products already exist in database
+            [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+            
+            NSLog(@"||| setWithProductsOptions");
+        }];
+    }
+    
     [self dismissOptions];
 }
 

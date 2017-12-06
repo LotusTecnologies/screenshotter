@@ -19,6 +19,9 @@ import DeepLinkKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    // We are purposely iniitalizing this immediately since it observes for app launch notifications.
+    private let usageStreakManager = UsageStreakManager()
+    
     var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
@@ -81,6 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
         ApplicationStateModel.sharedInstance.applicationState = .background
         track("sessionEnded")
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
@@ -325,6 +329,7 @@ extension AppDelegate: TutorialViewControllerDelegate {
 extension AppDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         IntercomHelper.sharedInstance.deviceToken = deviceToken
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

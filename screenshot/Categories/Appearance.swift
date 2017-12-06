@@ -122,12 +122,14 @@ extension UIApplication {
             return UIFont(name: "Futura-Medium", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
         }
         
+        UINavigationBar.appearance().barTintColor = .white
         UINavigationBar.appearance().tintColor = .gray3
         UINavigationBar.appearance().titleTextAttributes = [
             NSFontAttributeName: futuraMediumFont(20),
             NSForegroundColorAttributeName: UIColor.gray3
         ]
         
+        UITabBar.appearance().barTintColor = .white
         UITabBar.appearance().tintColor = crazeRedColor
         UITabBar.appearance().unselectedItemTintColor = .gray3
         

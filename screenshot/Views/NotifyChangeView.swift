@@ -42,27 +42,31 @@ class NotifyChangeView : UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if let notifySizeChange = notifySizeChange, !previousSize.equalTo(bounds.size) {
-            previousSize = bounds.size
-            notifySizeChange(bounds.size)
-        }
+        sizeChanged()
     }
     
     // MARK: Setters
     
     override var frame: CGRect {
         didSet {
-            previousSize = frame.size
+            sizeChanged()
         }
     }
     
     override var bounds: CGRect {
         didSet {
-            previousSize = bounds.size
+            sizeChanged()
         }
     }
     
-    // MARK:
+    // MARK: Changes
+    
+    private func sizeChanged() {
+        if let notifySizeChange = notifySizeChange, !previousSize.equalTo(bounds.size) {
+            previousSize = bounds.size
+            notifySizeChange(bounds.size)
+        }
+    }
     
     private func subviewChanged() {
         if let notifySubviewChange = notifySubviewChange, previousSubviewCount != subviews.count {

@@ -29,6 +29,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
     RowTypeName,
     RowTypeTutorialVideo,
     RowTypeTellFriend,
+    RowTypeUsageStreak,
     RowTypeContactUs,
     RowTypeBug,
     RowTypeVersion,
@@ -208,6 +209,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self updateScreenshotsCount];
+        [self reloadChangeableIndexPaths];
     }
 }
 
@@ -231,10 +233,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                         @(RowTypeEmail),
                                         @(RowTypeCurrency)
                                         ],
-                  @(SectionTypeAbout): @[@(RowTypeTellFriend),
+                  @(SectionTypeAbout): @[
+                                         @(RowTypeTellFriend),
                                          @(RowTypeTutorialVideo),
                                          @(RowTypeContactUs),
                                          @(RowTypeBug),
+                                         @(RowTypeUsageStreak),
                                          @(RowTypeCoins),
                                          @(RowTypeVersion)
                                          ],
@@ -460,6 +464,9 @@ typedef NS_ENUM(NSUInteger, RowType) {
 
 - (NSString *)textForRowType:(RowType)rowType {
     switch (rowType) {
+        case RowTypeUsageStreak:
+            return @"Daily Streak";
+            break;
         case RowTypeBug:
             return @"Submit a Bug";
             break;
@@ -518,6 +525,12 @@ typedef NS_ENUM(NSUInteger, RowType) {
         case RowTypePushPermission:
             return [self enabledTextForRowType:rowType];
             break;
+        case RowTypeUsageStreak: {
+            NSInteger streak = [NSUserDefaults.standardUserDefaults integerForKey:[UserDefaultsKeys dailyStreak]];
+            NSString *suffix = (streak == 1) ? @"" : @"s";
+            return [NSString stringWithFormat:@"%@ day%@", @(streak), suffix];
+            break;
+        }
         case RowTypeVersion:
             return [NSString stringWithFormat:@"%@%@", [NSBundle displayVersionBuild], [Constants buildEnvironmentSuffix]];
             break;
@@ -609,7 +622,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
         [indexPaths addObject:[self indexPathForRowType:[productsNumber integerValue] inSectionType:productsSection]];
     }
     
+    NSIndexPath *dailyStreakIndexPath = [self indexPathForRowType:RowTypeUsageStreak inSectionType:SectionTypeAbout];
+    [indexPaths addObject:dailyStreakIndexPath];
+    
     [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+    
 }
 
 - (CGRect)rectForTableFooterTextView {

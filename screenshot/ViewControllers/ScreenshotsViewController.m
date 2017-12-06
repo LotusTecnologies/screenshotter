@@ -392,6 +392,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] == 0) {
             [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
+            [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
             
         } else {
             [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];

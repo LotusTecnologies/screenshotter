@@ -101,7 +101,7 @@ class NetworkingPromise: NSObject {
             return Promise(error: error)
         }
         
-        var parameters = [ "token": token, "timezone": tzOffset ]
+        var parameters = [ "token": token, "timezone": tzOffset, "email": UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""]
 
         if let arn = arn {
             parameters["arnToUnsubscribe"] = arn
@@ -120,6 +120,10 @@ class NetworkingPromise: NSObject {
         
         let promise:URLDataPromise = URLSession.shared.dataTask(with: request)
         return promise.asDataAndResponse().then { data, response -> Promise<String> in
+            guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
+                return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid status code received from AWS lambda"]))
+            }
+            
             var dictionary:[String: String]!
             do {
                 dictionary = try JSONDecoder().decode([String: String].self, from: data)
