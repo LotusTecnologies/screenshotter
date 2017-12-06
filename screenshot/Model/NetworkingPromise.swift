@@ -101,7 +101,7 @@ class NetworkingPromise: NSObject {
             return Promise(error: error)
         }
         
-        var parameters = [ "token": token, "timezone": tzOffset ]
+        var parameters = [ "token": token, "timezone": tzOffset, "email": UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""]
 
         if let arn = arn {
             parameters["arnToUnsubscribe"] = arn
