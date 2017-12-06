@@ -223,21 +223,21 @@ class ProductsOptionsView : UIView {
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-//        sizeControl.translatesAutoresizingMaskIntoConstraints = false
-//        sizeControl.tintColor = .crazeGreen
-//        addSubview(sizeControl)
-//        sizeControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-//        sizeControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-//        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
-//        sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-//        sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        sizeControl.translatesAutoresizingMaskIntoConstraints = false
+        sizeControl.tintColor = .crazeGreen
+        addSubview(sizeControl)
+        sizeControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        sizeControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
+        sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.tintColor = .crazeGreen
         addSubview(saleControl)
         saleControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         saleControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        saleControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
+        saleControl.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
         saleControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         saleControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         

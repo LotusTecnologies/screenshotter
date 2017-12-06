@@ -244,7 +244,12 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 - (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
-    [self.collectionView reloadData];
+//    [self.collectionView reloadData];
+    
+    // TODO: only needed to be called after shoppable setWithProductsOptions completion. only called for new database entries
+    [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+    
+    NSLog(@"||| shoppablesControllerDidReload");
 }
 
 
@@ -496,7 +501,10 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if (changed) {
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         [shoppable setWithProductsOptions:productsOptions callback:^{
+            // TODO: only needed to be called when products already exist in database
             [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+            
+            NSLog(@"||| setWithProductsOptions");
         }];
     }
     
