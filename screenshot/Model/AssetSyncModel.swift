@@ -423,13 +423,15 @@ class AssetSyncModel: NSObject {
     }
     
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
+        let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
+        let sizeParamString = isChild ? "&feed=kids_craze" : ""
         var genderParamString = ""
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
-            genderParamString = "&force_gender=male"
+            genderParamString = isChild ? "&force_gender=boy" : "&force_gender=male"
         } else if optionsMask.rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
-            genderParamString = "&force_gender=female"
+            genderParamString = isChild ? "&force_gender=girl" : "&force_gender=female"
         }
-        return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + genderParamString)
+        return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + sizeParamString + genderParamString)
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
