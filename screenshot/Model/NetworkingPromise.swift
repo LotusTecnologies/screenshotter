@@ -120,7 +120,7 @@ class NetworkingPromise: NSObject {
         
         let promise:URLDataPromise = URLSession.shared.dataTask(with: request)
         return promise.asDataAndResponse().then { data, response -> Promise<String> in
-            if let response = response as? HTTPURLResponse, response.statusCode != 200 {
+            guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
                 return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid status code received from AWS lambda"]))
             }
             
