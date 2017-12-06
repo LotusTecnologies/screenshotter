@@ -100,16 +100,17 @@ class SilentPushSubscriptionManager : NSObject {
 
 extension TimeZone {
     var serverFormattedOffset: String {
-        let seconds = secondsFromGMT()
+        let isNegative = secondsFromGMT() < 0
+        let seconds = abs(secondsFromGMT())
         let minutes = Double(seconds) / 60
         var hours = Int(round(minutes / 60.0)) // Rounding because we don't want half timzeones like +3.5
-
+        
         if hours < -12 || hours > 11 {
             hours = -12
         }
         
-        let prefix = hours > 0 ? "+" : "-"
+        let prefix = isNegative == false ? "+" : "-"
         let zeropad = hours < 10 && hours > -10 ? "0" : ""
-        return "\(prefix)\(zeropad)\(hours)"
+        return "\(prefix)\(zeropad)\(abs(hours))"
     }
 }
