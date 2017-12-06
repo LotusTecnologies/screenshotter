@@ -329,6 +329,7 @@ extension AppDelegate: TutorialViewControllerDelegate {
 extension AppDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         IntercomHelper.sharedInstance.deviceToken = deviceToken
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
