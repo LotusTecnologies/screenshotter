@@ -62,6 +62,7 @@
 		C5709E471FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
+		C5911A3A1FD923330036883D /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5911A391FD923330036883D /* SettingsViewController.swift */; };
 		C5921E971F433D4100DF4888 /* TappableTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5921E961F433D4100DF4888 /* TappableTextView.m */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
 		C5A8DB441F8225200065DCEA /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F031F6FA0AF00F25C7C /* ScreenshotPickerViewController.swift */; };
@@ -170,6 +171,7 @@
 		C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsRateCollectionViewCell.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
+		C5911A391FD923330036883D /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C5921E951F433D4100DF4888 /* TappableTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TappableTextView.h; sourceTree = "<group>"; };
 		C5921E961F433D4100DF4888 /* TappableTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TappableTextView.m; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */,
 				C5CCBB411F41C3E600D6B392 /* WebViewController.h */,
 				C5CCBB421F41C3E600D6B392 /* WebViewController.m */,
+				C5911A391FD923330036883D /* SettingsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -825,6 +828,7 @@
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */,
 				C53B46601FBC792F00A8C886 /* ShoppableCollectionViewCell.swift in Sources */,
+				C5911A3A1FD923330036883D /* SettingsViewController.swift in Sources */,
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
 				C5CAF2801FCEDFA8006F37DC /* FavoritesViewController.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,

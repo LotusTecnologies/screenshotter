@@ -8,10 +8,9 @@
 
 #import "MainTabBarController.h"
 #import "ScreenshotsViewController.h"
-#import "SettingsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
+@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, _SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -70,7 +69,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         _settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
-            SettingsViewController *viewController = [[SettingsViewController alloc] init];
+            _SettingsViewController *viewController = [[_SettingsViewController alloc] init];
             viewController.delegate = self;
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
@@ -237,7 +236,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 #pragma mark - Settings View Controller
 
-- (void)settingsViewControllerDidGrantPermission:(SettingsViewController *)viewController {
+- (void)settingsViewControllerDidGrantPermission:(_SettingsViewController *)viewController {
     [self refreshTabBarSettingsBadge];
 }
 
