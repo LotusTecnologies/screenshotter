@@ -760,8 +760,8 @@ extension Shoppable {
             optionsMaskInt = ProductsOptionsMask.genderMale.rawValue
         case .female:
             optionsMaskInt = ProductsOptionsMask.genderFemale.rawValue
-        case .unisex:
-            optionsMaskInt = ProductsOptionsMask.genderUnisex.rawValue
+        case .auto:
+            optionsMaskInt = ProductsOptionsMask.genderAuto.rawValue
         }
         switch productsOptions.size {
         case .adult:

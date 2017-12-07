@@ -11,7 +11,7 @@ import Foundation
 class ProductsOptionsMask : NSObject {
     let rawValue: Int
     
-    static let genderUnisex = ProductsOptionsMask(rawValue: 1 << 0) // 1
+    static let genderAuto   = ProductsOptionsMask(rawValue: 1 << 0) // 1
     static let genderMale   = ProductsOptionsMask(rawValue: 1 << 1) // 2
     static let genderFemale = ProductsOptionsMask(rawValue: 1 << 2) // 4
     
@@ -36,7 +36,7 @@ class ProductsOptionsMask : NSObject {
         case .female:
             value = ProductsOptionsMask.genderFemale.rawValue
         default:
-            value = ProductsOptionsMask.genderUnisex.rawValue
+            value = ProductsOptionsMask.genderAuto.rawValue
         }
         
         switch size {
@@ -57,7 +57,7 @@ class ProductsOptionsMask : NSObject {
         } else if rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
             return .female
         } else {
-            return .unisex
+            return .auto
         }
     }
     
@@ -182,7 +182,7 @@ class ProductsOptionsView : UIView {
     let genderControl = UISegmentedControl(items: [
         ProductsOptionsGender.female.stringValue,
         ProductsOptionsGender.male.stringValue,
-        ProductsOptionsGender.unisex.stringValue
+        ProductsOptionsGender.auto.stringValue
         ])
     let sizeControl = UISegmentedControl(items: [
         ProductsOptionsSize.child.stringValue,
@@ -288,7 +288,7 @@ class ProductsOptionsView : UIView {
 enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case female = 1
     case male
-    case unisex
+    case auto
     
     static let `default` = ProductsOptionsGender.female
     
@@ -314,7 +314,7 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         switch self {
         case .female: string = "Female"
         case .male: string = "Male"
-        case .unisex: string = "All"
+        case .auto: string = "All"
         }
         
         return string
