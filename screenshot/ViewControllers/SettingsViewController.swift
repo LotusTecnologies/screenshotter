@@ -526,7 +526,7 @@ fileprivate extension _SettingsViewController {
         case .coins:
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
-            return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCurrency))"
+            return UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
         default:
             return nil
         }
@@ -706,35 +706,33 @@ extension _SettingsViewController : TutorialVideoViewControllerDelegate {
 
 extension _SettingsViewController : MFMailComposeViewControllerDelegate {
     func presentMailComposer() {
-//        if ([MFMailComposeViewController canSendMail]) {
-//            NSArray *message = @[@"\n\n\n",
-//            @"-----------------",
-//            @"Don't edit below.\n",
-//            [NSString stringWithFormat:@"version: %@", [NSBundle displayVersionBuild]]
-//            ];
-//
-//            MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
-//            mail.mailComposeDelegate = self;
-//            [mail setSubject:@"Bug Report"];
-//            [mail setMessageBody:[message componentsJoinedByString:@"\n"] isHTML:NO];
-//            [mail setToRecipients:@[@"support@screenshopit.com"]];
-//
-//            [self presentViewController:mail animated:YES completion:nil];
-//
-//        } else {
-//            NSURL* mailURL = [NSURL URLWithString:@"message://"];
-//
-//            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Setup Email" message:@"You need to setup an email on your device in order to send a bug report." preferredStyle:UIAlertControllerStyleAlert];
-//            [alertController addAction:[UIAlertAction actionWithTitle:@"Later" style:UIAlertActionStyleCancel handler:nil]];
-//
-//            if ([[UIApplication sharedApplication] canOpenURL:mailURL]) {
-//                [alertController addAction:[UIAlertAction actionWithTitle:@"Setup" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//                    [[UIApplication sharedApplication] openURL:mailURL options:@{} completionHandler:nil];
-//                    }]];
-//            }
-//
-//            [self presentViewController:alertController animated:YES completion:nil];
-//        }
+        if MFMailComposeViewController.canSendMail() {
+            let message = [
+                "\n\n\n",
+                "-----------------",
+                "Don't edit below.\n",
+                "version: \(Bundle.displayVersionBuild)"
+            ]
+
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setSubject("Bug Report")
+            mail.setMessageBody(message.joined(separator: "\n"), isHTML: false)
+            mail.setToRecipients(["support@screenshopit.com"])
+            present(mail, animated: true, completion: nil)
+
+        } else {
+            let alertController = UIAlertController(title: "Setup Email", message: "You need to setup an email on your device in order to send a bug report.", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Later", style: .cancel, handler: nil))
+            
+            if let mailURL = URL(string: "message://"), UIApplication.shared.canOpenURL(mailURL) {
+                alertController.addAction(UIAlertAction(title: "Setup", style: .default, handler: { action in
+                    UIApplication.shared.open(mailURL, options: [:], completionHandler: nil)
+                }))
+            }
+            
+            present(alertController, animated: true, completion: nil)
+        }
     }
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
@@ -758,38 +756,3 @@ fileprivate extension SettingsRow {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
