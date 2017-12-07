@@ -290,7 +290,7 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
     case male
     case auto
     
-    static let `default` = ProductsOptionsGender.female
+    static let `default` = ProductsOptionsGender.auto
     
     static var globalValue: ProductsOptionsGender {
         return ProductsOptionsGender(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender))
