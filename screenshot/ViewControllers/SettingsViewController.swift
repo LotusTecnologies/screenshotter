@@ -21,7 +21,7 @@ fileprivate enum SettingsSection : Int {
 fileprivate enum SettingsRow : Int {
     case photoPermission
     case pushPermission
-    case locationPermission // ???:
+    case locationPermission // ???: should this be removed
     case email
     case name
     case tutorialVideo
@@ -100,8 +100,8 @@ class _SettingsViewController : BaseViewController {
             tableHeaderContentView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
             tableHeaderContentView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
             tableHeaderContentView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            tableHeaderContentView.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor).isActive = true
-            tableHeaderContentView.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
+            tableHeaderContentView.leftAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leftAnchor).isActive = true
+            tableHeaderContentView.rightAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.rightAnchor).isActive = true
 
             let imageView = UIImageView(image: UIImage(named: "SettingsAddPhotos"))
             imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -131,7 +131,7 @@ class _SettingsViewController : BaseViewController {
 
             return view
         }()
-        
+
         tableFooterTextView.backgroundColor = .clear
         tableFooterTextView.isEditable = false
         tableFooterTextView.scrollsToTop = false
@@ -142,31 +142,32 @@ class _SettingsViewController : BaseViewController {
         tableFooterTextView.adjustsFontForContentSizeCategory = true
         tableFooterTextView.text = "Questions? Get in touch: info@screenshopit.com"
         tableFooterTextView.linkTextAttributes = [
-            NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle,
+            NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
             NSUnderlineColorAttributeName: UIColor.gray7
         ]
         tableFooterTextView.frame = rectForTableFooterTextView()
-        
+
+        tableView.frame = view.bounds
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundView = nil
         tableView.backgroundColor = .clear
-//        tableView.tableHeaderView = tableHeaderView
-//        tableView.tableFooterView = tableFooterTextView
+        tableView.tableHeaderView = tableHeaderView
+        tableView.tableFooterView = tableFooterTextView
         tableView.keyboardDismissMode = .onDrag
         view.addSubview(tableView)
-        tableView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        tableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         let tableFooterTextViewRect = rectForTableFooterTextView()
-        
+
         if tableView.tableFooterView?.bounds.size.height != tableFooterTextViewRect.size.height {
             tableFooterTextView.frame = tableFooterTextViewRect
             tableView.tableFooterView = tableFooterTextView
@@ -692,12 +693,12 @@ extension _SettingsViewController : TutorialVideoViewControllerDelegate {
     }
     
     func tutorialVideoViewControllerDidEnd(_ viewController: TutorialVideoViewController) {
-//        [AnalyticsTrackers.standard track:@"Automatically Exited Tutorial Video" properties:nil];
-//
-//        // TODO: look into why this is here - corey
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            [self dismissViewControllerAnimated:YES completion:nil];
-//            });
+        AnalyticsTrackers.standard.track("Automatically Exited Tutorial Video")
+
+        // TODO: look into why the dispatch is here - corey
+        DispatchQueue.main.async {
+            self.dismiss(animated: true, completion: nil)
+        }
     }
 }
 
