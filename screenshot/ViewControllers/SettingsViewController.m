@@ -246,7 +246,7 @@ typedef NS_ENUM(NSUInteger, RowType) {
                                           @(RowTypeFollowFacebook)
                                           ],
                   @(SectionTypeProducts): @[@(RowTypeProductGender),
-//                                            @(RowTypeProductSize)
+                                            @(RowTypeProductSize)
                                             ]
                   };
     }
@@ -585,6 +585,18 @@ typedef NS_ENUM(NSUInteger, RowType) {
             return control;
         }
             break;
+        case RowTypeProductSize: {
+            // TODO: use ProductsOptions after swift converstion
+            
+            NSInteger integer = [[NSUserDefaults standardUserDefaults] integerForKey:[UserDefaultsKeys productSize]];
+            
+            UISegmentedControl *control = [[UISegmentedControl alloc] initWithItems:@[@"Child", @"Adult"]];
+            control.tintColor = [UIColor crazeGreen];
+            control.selectedSegmentIndex = [_ProductsOptionsSize fromOffsetValue:integer];
+            [control addTarget:self action:@selector(sizeControlAction:) forControlEvents:UIControlEventValueChanged];
+            return control;
+        }
+            break;
         default:
             return nil;
             break;
@@ -717,6 +729,11 @@ typedef NS_ENUM(NSUInteger, RowType) {
 - (void)genderControlAction:(UISegmentedControl *)control {
     NSInteger integer = [_ProductsOptionsGender toOffsetValue:control.selectedSegmentIndex];
     [[NSUserDefaults standardUserDefaults] setInteger:integer forKey:[UserDefaultsKeys productGender]];
+}
+
+- (void)sizeControlAction:(UISegmentedControl *)control {
+    NSInteger integer = [_ProductsOptionsSize toOffsetValue:control.selectedSegmentIndex];
+    [[NSUserDefaults standardUserDefaults] setInteger:integer forKey:[UserDefaultsKeys productSize]];
 }
 
 
