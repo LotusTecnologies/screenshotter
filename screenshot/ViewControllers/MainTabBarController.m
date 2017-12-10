@@ -10,6 +10,8 @@
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
 
+#import <Lottie/Lottie.h>
+
 @interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
     BOOL _isObservingSettingsBadgeFont;
 }
@@ -94,6 +96,20 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         [AssetSyncModel sharedInstance].screenshotDetectionDelegate = self;
     }
     return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    LOTAnimatedSwitch *heartIcon = [LOTAnimatedSwitch switchNamed:@"TwitterHeart"];
+    heartIcon.backgroundColor = [UIColor whiteColor];
+    CGRect r = heartIcon.frame;
+    r.size.width = 300;
+    r.size.height = 300;
+    r.origin.x = 0;
+    r.origin.y = 200;
+    heartIcon.frame = r;
+    [self.view addSubview:heartIcon];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

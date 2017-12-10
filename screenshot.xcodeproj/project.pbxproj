@@ -32,6 +32,10 @@
 		C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */; };
 		C528DC0F1F57E9D700F4E723 /* TutorialProductsPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */; };
 		C528DC121F57EDD100F4E723 /* InsetPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C528DC111F57EDD100F4E723 /* InsetPresentationController.m */; };
+		C53B15B11FDD1EF400658A78 /* TwitterHeart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B01FDD1EF400658A78 /* TwitterHeart.json */; };
+		C53B15B31FDD224B00658A78 /* Heart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B21FDD224B00658A78 /* Heart.json */; };
+		C53B15B61FDD22B200658A78 /* fav-heart-01.png in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B41FDD22B100658A78 /* fav-heart-01.png */; };
+		C53B15B71FDD22B200658A78 /* fav-heart-02.png in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B51FDD22B200658A78 /* fav-heart-02.png */; };
 		C53B462A1FB1A50F00A8C886 /* Intercom.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46291FB1A50F00A8C886 /* Intercom.swift */; };
 		C53B46331FB1A54000A8C886 /* TutorialWelcomeSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B462C1FB1A54000A8C886 /* TutorialWelcomeSlideView.swift */; };
 		C53B46341FB1A54000A8C886 /* TutorialEmailSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B462D1FB1A54000A8C886 /* TutorialEmailSlideView.swift */; };
@@ -136,6 +140,10 @@
 		C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialProductsPageViewController.m; sourceTree = "<group>"; };
 		C528DC101F57EDD100F4E723 /* InsetPresentationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InsetPresentationController.h; sourceTree = "<group>"; };
 		C528DC111F57EDD100F4E723 /* InsetPresentationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InsetPresentationController.m; sourceTree = "<group>"; };
+		C53B15B01FDD1EF400658A78 /* TwitterHeart.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = TwitterHeart.json; sourceTree = "<group>"; };
+		C53B15B21FDD224B00658A78 /* Heart.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Heart.json; sourceTree = "<group>"; };
+		C53B15B41FDD22B100658A78 /* fav-heart-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fav-heart-01.png"; sourceTree = "<group>"; };
+		C53B15B51FDD22B200658A78 /* fav-heart-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fav-heart-02.png"; sourceTree = "<group>"; };
 		C53B46291FB1A50F00A8C886 /* Intercom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Intercom.swift; sourceTree = "<group>"; };
 		C53B462C1FB1A54000A8C886 /* TutorialWelcomeSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideView.swift; sourceTree = "<group>"; };
 		C53B462D1FB1A54000A8C886 /* TutorialEmailSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideView.swift; sourceTree = "<group>"; };
@@ -237,6 +245,10 @@
 		52807FFA1F9530E70075111D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C53B15B21FDD224B00658A78 /* Heart.json */,
+				C53B15B01FDD1EF400658A78 /* TwitterHeart.json */,
+				C53B15B41FDD22B100658A78 /* fav-heart-01.png */,
+				C53B15B51FDD22B200658A78 /* fav-heart-02.png */,
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				527F17491FA21CA6008082BC /* Craze_Video.mp4 */,
@@ -639,10 +651,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C53B15B11FDD1EF400658A78 /* TwitterHeart.json in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */,
+				C53B15B61FDD22B200658A78 /* fav-heart-01.png in Resources */,
+				C53B15B31FDD224B00658A78 /* Heart.json in Resources */,
+				C53B15B71FDD22B200658A78 /* fav-heart-02.png in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
 				C50EE2761FC40DCD002B4259 /* Hind 700.ttf in Resources */,
@@ -677,6 +693,7 @@
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/RateView/RateView.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -699,6 +716,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RateView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
