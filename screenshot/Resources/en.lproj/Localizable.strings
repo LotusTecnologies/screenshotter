@@ -11,9 +11,34 @@
 // https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
+"email.setup.title" = "Setup Email";
+"email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
+
+"generic.disabled" = "Disabled";
+"generic.enabled" = "Enabled";
+"generic.later" = "Later";
 "generic.ok" = "OK";
+"generic.setup" = "Setup";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
+"settings.row.bug.title" = "Submit a Bug";
+"settings.row.coins.title" = "Coins Collected";
+"settings.row.contact.title" = "Contact Us";
+"settings.row.currency.title" = "Currency";
+"settings.row.email.detail" = "Enter Your Email";
+"settings.row.facebook.title" = "Facebook";
+"settings.row.gender.title" = "Gender";
+"settings.row.instagram.title" = "Instagram";
+"settings.row.name.detail" = "Enter Your Name";
+"settings.row.photo_permission.title" = "Camera Roll";
+"settings.row.push_permission.title" = "Push Notifications";
+"settings.row.size.title" = "Size";
+"settings.row.tell_friend.title" = "Tell a Friend";
+"settings.row.tutorial.title" = "Replay Tutorial";
+"settings.row.usage_streak.title" = "Daily Streak";
+"settings.row.usage_streak.detail.single" = "%d day";
+"settings.row.usage_streak.detail.plural" = "%d days";
+"settings.row.version.title" = "App Version";
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
 "settings.section.about" = "About";
@@ -23,17 +48,14 @@
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
 
-"settings.row.bug.title" = "Submit a Bug";
-"settings.row.coins.title" = "Coins Collected";
-"settings.row.contact.title" = "Contact Us";
-"settings.row.currency.title" = "Currency";
-"settings.row.facebook.title" = "Facebook";
-"settings.row.gender.title" = "Gender";
-"settings.row.instagram.title" = "Instagram";
-"settings.row.photo-permission.title" = "Camera Roll";
-"settings.row.push-permission.title" = "Push Notifications";
-"settings.row.size.title" = "Size";
-"settings.row.tell-friend.title" = "Tell a Friend";
-"settings.row.tutorial.title" = "Replay Tutorial";
-"settings.row.usage-streak.title" = "Daily Streak";
-"settings.row.version.title" = "App Version";
+
+
+
+
+
+
+
+
+
+
+
