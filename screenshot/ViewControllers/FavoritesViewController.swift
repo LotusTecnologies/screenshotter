@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import FBSDKCoreKit
 
 class FavoritesViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -186,8 +185,6 @@ extension FavoritesViewController : UICollectionViewDelegate {
         
         AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Favorites")
         AnalyticsTrackers.branch.track("Tapped on product")
-        
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
     }
 }
 
@@ -220,18 +217,7 @@ extension FavoritesViewController : ProductCollectionViewCellDelegate {
             unfavoriteProducts.append(product)
         }
 
-        let favoriteEvent = isFavorited ? "Product favorited" : "Product unfavorited"
-
-        AnalyticsTrackers.standard.track(favoriteEvent, properties: [
-            "merchant": product.merchant ?? "",
-            "brand": product.brand ?? "",
-            "url": product.offer ?? "",
-            "imageUrl": product.imageURL ?? "",
-            "page": "Favorites"
-            ])
-        
-        let value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: value])
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
     }
 }
 

@@ -412,17 +412,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     Product *product = [self productAtIndex:indexPath.item];
     [product setFavoritedToFavorited:isFavorited];
     
-    NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    
-    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": product.merchant,
-                                                                  @"brand": product.brand,
-                                                                  @"url": product.offer,
-                                                                  @"imageUrl": product.imageURL,
-                                                                  @"page": @"Products"
-                                                                  }];
-    
-    NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
-    [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+    [AnalyticsTrackerObjCBridge trackFavoritedProductWithTracker:AnalyticsTrackers.standard favorited:isFavorited product:product onPage:@"Products"];
 }
 
 - (void)reloadProductCellAtIndex:(NSInteger)index {
