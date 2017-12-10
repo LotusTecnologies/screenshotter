@@ -111,21 +111,13 @@ class AssetSyncModel: NSObject {
                 }
                 if isFashion {
                     if isForeground { // Screenshot taken while app in foregorund
-                        if ApplicationStateModel.sharedInstance.isActive() { // App currently in foreground
-                            DispatchQueue.main.async {
-                                self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
-                            }
-                        } else {  // App currently in background
-                            self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
+                        DispatchQueue.main.async {
+                            self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
                         }
                         self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: asset.localIdentifier)
                     } else { // Screenshot taken while app in background (or killed)
                         AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
-                        if ApplicationStateModel.sharedInstance.isActive() { // App currently in foreground
-                            self.backgroundScreenshotAssetIds.insert(asset.localIdentifier)
-                        } else { // App currently in background
-                            self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier)
-                        }
+                        self.backgroundScreenshotAssetIds.insert(asset.localIdentifier)
                     }
                 }
             }.always(on: self.serialQ) {
@@ -746,9 +738,12 @@ class AssetSyncModel: NSObject {
         isRecentlyForeground = false
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            if ApplicationStateModel.sharedInstance.isActive() && (backgroundScreenshotIds.count > 0 || (wasRecentlyForeground && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0)) {
+            if backgroundScreenshotIds.count > 0 || (wasRecentlyForeground && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) {
                 self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
             }
+        }
+        if backgroundScreenshotIds.count > 0 && ApplicationStateModel.sharedInstance.isBackground() {
+            self.sendScreenshotAddedLocalNotification(assetIds: backgroundScreenshotIds)
         }
         isSyncing = false
         if shouldSyncAgain {
@@ -941,7 +936,7 @@ class AssetSyncModel: NSObject {
 
 extension AssetSyncModel {
     
-    func sendScreenshotAddedLocalNotification(assetId: String) {
+    func sendScreenshotAddedLocalNotification(assetIds: Set<String>) {
         guard PermissionsManager.shared().hasPermission(for: .push) else {
             print("sendScreenshotAddedLocalNotification refused by guard")
             return
@@ -956,10 +951,16 @@ extension AssetSyncModel {
             content.sound = UNNotificationSound.default()
         }
         UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
-        content.userInfo = [Constants.openingScreenKey : Constants.openingScreenValueScreenshot,
-                            Constants.openingAssetIdKey : assetId]
+        if assetIds.count == 1,
+          let onlyAssetId = assetIds.first {
+            content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
+                                Constants.openingAssetIdKey : onlyAssetId]
+        } else {
+            content.userInfo = [Constants.openingScreenKey : Constants.openingScreenValueScreenshot]
+        }
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        let identifier = "CrazeLocal" + assetId
+        let firstAssetId = assetIds.first ?? ""
+        let identifier = "CrazeLocal" + firstAssetId
         let request = UNNotificationRequest(identifier: identifier,
                                             content: content,
                                             trigger: trigger)
