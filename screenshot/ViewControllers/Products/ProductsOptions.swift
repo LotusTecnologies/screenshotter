@@ -367,6 +367,16 @@ enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     }
 }
 
+class _ProductsOptionsSize : NSObject {
+    static func toOffsetValue(_ value: Int) -> Int {
+        return ProductsOptionsSize(offsetValue: value).rawValue
+    }
+    
+    static func fromOffsetValue(_ value: Int) -> Int {
+        return ProductsOptionsSize(intValue: value).offsetValue
+    }
+}
+
 enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case sale = 1
     case all
