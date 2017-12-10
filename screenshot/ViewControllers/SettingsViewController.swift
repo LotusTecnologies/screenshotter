@@ -61,7 +61,7 @@ class SettingsViewController : BaseViewController {
     override var title: String? {
         set {}
         get {
-            return "Settings"
+            return NSLocalizedString("settings.title", comment: "Settings")
         }
     }
     
@@ -256,9 +256,13 @@ class SettingsViewController : BaseViewController {
     
     var screenshotsCountText: String {
         let screenshotCount = DataModel.sharedInstance.countTotalScreenshots()
-        let suffix = screenshotCount == 1 ? "" : "s"
         
-        return "\(screenshotCount) screenshot\(suffix)"
+        if screenshotCount == 1 {
+            return String(format: NSLocalizedString("settings.screenshot.single", comment: ""), arguments: [screenshotCount])
+            
+        } else {
+            return String(format: NSLocalizedString("settings.screenshot.plural", comment: ""), arguments: [screenshotCount])
+        }
     }
     
     private func layoutScreenshotsCountShadow() {
@@ -456,15 +460,15 @@ fileprivate extension SettingsViewController {
     func sectionText(for section: SettingsSection) -> String {
         switch section {
         case .permission:
-            return "Permissions"
+            return NSLocalizedString("settings.section.permission", comment: "Permissions")
         case .about:
-            return "About"
+            return NSLocalizedString("settings.section.about", comment: "About")
         case .info:
-            return "Your Info"
+            return NSLocalizedString("settings.section.info", comment: "Your Info")
         case .follow:
-            return "Follow Us"
+            return NSLocalizedString("settings.section.follow", comment: "Follow Us")
         case .product:
-            return "Product Options"
+            return NSLocalizedString("settings.section.product", comment: "Product Options")
         }
     }
     

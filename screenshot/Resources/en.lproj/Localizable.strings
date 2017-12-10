@@ -1,0 +1,23 @@
+/* 
+  Localizable.strings
+  screenshot
+
+  Created by Corey Werner on 12/10/17.
+  Copyright © 2017 crazeapp. All rights reserved.
+*/
+
+// Before moving forward with Localizable.strings as the correct approch, read these
+// https://blog.lokalise.co/getting-started-with-ios-localization/
+// https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
+// https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
+
+"generic.ok" = "OK";
+
+"settings.screenshot.single" = "%d screenshot";
+"settings.screenshot.plural" = "%d screenshots";
+"settings.section.about" = "About";
+"settings.section.follow" = "Follow Us";
+"settings.section.info" = "Your Info";
+"settings.section.permission" = "Permissions";
+"settings.section.product" = "Product Options";
+"settings.title" = "Settings";
