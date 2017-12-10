@@ -40,7 +40,6 @@
 		C53B46371FB1A54000A8C886 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46301FB1A54000A8C886 /* TutorialVideoOverlayView.swift */; };
 		C53B46381FB1A54000A8C886 /* TutorialTrySlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46311FB1A54000A8C886 /* TutorialTrySlideView.swift */; };
 		C53B46391FB1A54000A8C886 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46321FB1A54000A8C886 /* TutorialVideoViewController.swift */; };
-		C53B463E1FB1A55500A8C886 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463C1FB1A55500A8C886 /* SettingsViewController.m */; };
 		C53B463F1FB1A55500A8C886 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */; };
 		C53B46471FB1A8A500A8C886 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46461FB1A8A500A8C886 /* Loader.swift */; };
 		C53B46491FB1ABFC00A8C886 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */; };
@@ -145,9 +144,7 @@
 		C53B46301FB1A54000A8C886 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
 		C53B46311FB1A54000A8C886 /* TutorialTrySlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideView.swift; sourceTree = "<group>"; };
 		C53B46321FB1A54000A8C886 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
-		C53B463A1FB1A55500A8C886 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		C53B463B1FB1A55500A8C886 /* ScreenshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsViewController.h; sourceTree = "<group>"; };
-		C53B463C1FB1A55500A8C886 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
 		C53B46461FB1A8A500A8C886 /* Loader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C53B46481FB1ABFC00A8C886 /* LoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
@@ -336,14 +333,12 @@
 				C5278FE11F3C38510090E422 /* ScreenshotsNavigationController.m */,
 				C53B463B1FB1A55500A8C886 /* ScreenshotsViewController.h */,
 				C53B463D1FB1A55500A8C886 /* ScreenshotsViewController.m */,
-				C53B463A1FB1A55500A8C886 /* SettingsViewController.h */,
-				C53B463C1FB1A55500A8C886 /* SettingsViewController.m */,
+				C5911A391FD923330036883D /* SettingsViewController.swift */,
 				C53B462B1FB1A54000A8C886 /* Tutorial */,
 				C528DC0D1F57E9D700F4E723 /* TutorialProductsPageViewController.h */,
 				C528DC0E1F57E9D700F4E723 /* TutorialProductsPageViewController.m */,
 				C5CCBB411F41C3E600D6B392 /* WebViewController.h */,
 				C5CCBB421F41C3E600D6B392 /* WebViewController.m */,
-				C5911A391FD923330036883D /* SettingsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -789,7 +784,6 @@
 				C53B464D1FB1C2ED00A8C886 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C53B464B1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift in Sources */,
 				C53B464F1FB1E8C700A8C886 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,
-				C53B463E1FB1A55500A8C886 /* SettingsViewController.m in Sources */,
 				C5AA81A31F97228100421909 /* PickerCollectionViewCell.swift in Sources */,
 				C5AA81A71F97228100421909 /* ProductCollectionViewCell.m in Sources */,
 				C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */,

@@ -15,7 +15,7 @@ import UIKit
 class TutorialViewController : UIViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
-    var video = TutorialVideo.Standard
+    var video = TutorialVideo.standard
     let scrollView = UIScrollView()
     let contentView = UIView()
     

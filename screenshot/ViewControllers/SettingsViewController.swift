@@ -21,7 +21,6 @@ fileprivate enum SettingsSection : Int {
 fileprivate enum SettingsRow : Int {
     case photoPermission
     case pushPermission
-    case locationPermission // ???: should this be removed
     case email
     case name
     case tutorialVideo
@@ -38,12 +37,12 @@ fileprivate enum SettingsRow : Int {
     case followInstagram
 }
 
-@objc protocol _SettingsViewControllerDelegate : NSObjectProtocol {
-    func settingsViewControllerDidGrantPermission(_ viewController: _SettingsViewController)
+@objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
+    func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
 }
 
-class _SettingsViewController : BaseViewController {
-    weak var delegate: _SettingsViewControllerDelegate?
+class SettingsViewController : BaseViewController {
+    weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableHeaderContentView = UIView()
@@ -213,8 +212,7 @@ class _SettingsViewController : BaseViewController {
     fileprivate let data: [SettingsSection : [SettingsRow]] = [
         .permission: [
             .photoPermission,
-            .pushPermission,
-//            .locationPermission
+            .pushPermission
         ],
         .info: [
             .name,
@@ -276,13 +274,17 @@ class _SettingsViewController : BaseViewController {
     // MARK: Product Options
     
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
-        // TODO: use the swift version
-        let integer = _ProductsOptionsGender.toOffsetValue(control.selectedSegmentIndex)
+        let integer = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
+    }
+    
+    @objc fileprivate func sizeControlAction(_ control: UISegmentedControl) {
+        let integer = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
 
-extension _SettingsViewController : ViewControllerLifeCycle {
+extension SettingsViewController : ViewControllerLifeCycle {
     func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
         if viewController.isKind(of: CurrencyViewController.self), let indexPath = indexPath(for: .currency, in: .info) {
             tableView.reloadRows(at: [indexPath], with: .none)
@@ -292,7 +294,7 @@ extension _SettingsViewController : ViewControllerLifeCycle {
 
 // MARK: - Table View
 
-extension _SettingsViewController : UITableViewDataSource {
+extension SettingsViewController : UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return data.count
     }
@@ -362,16 +364,16 @@ extension _SettingsViewController : UITableViewDataSource {
     }
 }
 
-extension _SettingsViewController : UITableViewDelegate {
+extension SettingsViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
         guard let row = settingsRow(for: indexPath) else {
             return true
         }
         
         switch (row) {
-        case .version, .email, .coins, .productGender, .productSize:
+        case .version, .email, .coins, .productGender, .productSize, .usageStreak:
             return false
-        case .locationPermission, .pushPermission, .photoPermission:
+        case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared().hasPermission(for: permissionType) {
                 return true
             } else {
@@ -397,8 +399,15 @@ extension _SettingsViewController : UITableViewDelegate {
             navigationController?.pushViewController(viewController, animated: true)
         
         case .tutorialVideo:
-            // TODO: does the below function have a swift version?
-            let viewController = TutorialVideoViewControllerFactory.replayViewController
+            var viewController: TutorialVideoViewController
+            
+            if let username = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername) {
+                viewController = TutorialVideoViewController(video: .ambassador(username: username))
+                
+            } else {
+                viewController = TutorialVideoViewController(video: .standard)
+            }
+            
             viewController.showsReplayButtonUponFinishing = false
             viewController.delegate = self
             viewController.modalTransitionStyle = .crossDissolve
@@ -407,7 +416,7 @@ extension _SettingsViewController : UITableViewDelegate {
         case .contactUs:
             IntercomHelper.sharedInstance.presentMessagingUI()
             
-        case .locationPermission, .pushPermission, .photoPermission:
+        case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared().requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
                     if granted {
@@ -443,7 +452,7 @@ extension _SettingsViewController : UITableViewDelegate {
     }
 }
 
-fileprivate extension _SettingsViewController {
+fileprivate extension SettingsViewController {
     func sectionText(for section: SettingsSection) -> String {
         switch section {
         case .permission:
@@ -486,8 +495,6 @@ fileprivate extension _SettingsViewController {
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
         case .email:
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-        case .locationPermission:
-            return "Location Services"
         case .pushPermission:
             return "Push Notifications"
         case .photoPermission:
@@ -511,7 +518,7 @@ fileprivate extension _SettingsViewController {
     
     func cellDetailedText(for row: SettingsRow) -> String? {
         switch (row) {
-        case .photoPermission, .pushPermission, .locationPermission:
+        case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
@@ -569,13 +576,27 @@ fileprivate extension _SettingsViewController {
             }
             
         case .productGender:
-            // TODO: use swift version of getting gender string value
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-            
-            let control = UISegmentedControl(items: ["Female", "Male", "All"])
+            let control = UISegmentedControl(items: [
+                ProductsOptionsGender.female.stringValue,
+                ProductsOptionsGender.male.stringValue,
+                ProductsOptionsGender.auto.stringValue
+                ])
             control.tintColor = .crazeGreen
-            control.selectedSegmentIndex = _ProductsOptionsGender.fromOffsetValue(integer)
+            control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
             control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
+            return control
+            
+        case .productSize:
+            let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
+            let control = UISegmentedControl(items: [
+                ProductsOptionsSize.child.stringValue,
+                ProductsOptionsSize.adult.stringValue,
+//                ProductsOptionsSize.plus.stringValue
+                ])
+            control.tintColor = .crazeGreen
+            control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
+            control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
             return control
             
         default:
@@ -617,7 +638,7 @@ fileprivate extension _SettingsViewController {
 
 // MARK: - Text Field
 
-extension _SettingsViewController : UITextFieldDelegate {
+extension SettingsViewController : UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField.returnKeyType == .done {
             textField.resignFirstResponder()
@@ -627,8 +648,6 @@ extension _SettingsViewController : UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         if let key = userDefaultsKey(for: textField) {
-            // TODO: can trimWhitespace be removed?
-//            NSString *trimmedText = [textField.text trimWhitespace];
             let trimmedText = textField.text?.trimmingCharacters(in: .whitespaces)
             var canContinue = false
             
@@ -681,30 +700,21 @@ extension _SettingsViewController : UITextFieldDelegate {
 
 // MARK: - Tutorial
 
-extension _SettingsViewController : TutorialViewControllerDelegate {
-    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
-        navigationController?.popViewController(animated: true)
-    }
-}
-
-extension _SettingsViewController : TutorialVideoViewControllerDelegate {
+extension SettingsViewController : TutorialVideoViewControllerDelegate {
     func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
         dismiss(animated: true, completion: nil)
     }
     
     func tutorialVideoViewControllerDidEnd(_ viewController: TutorialVideoViewController) {
+        dismiss(animated: true, completion: nil)
+        
         AnalyticsTrackers.standard.track("Automatically Exited Tutorial Video")
-
-        // TODO: look into why the dispatch is here - corey
-        DispatchQueue.main.async {
-            self.dismiss(animated: true, completion: nil)
-        }
     }
 }
 
 // MARK: - Mail
 
-extension _SettingsViewController : MFMailComposeViewControllerDelegate {
+extension SettingsViewController : MFMailComposeViewControllerDelegate {
     func presentMailComposer() {
         if MFMailComposeViewController.canSendMail() {
             let message = [
@@ -747,8 +757,6 @@ fileprivate extension SettingsRow {
         switch self {
         case .photoPermission:
             return PermissionType.photo
-        case .locationPermission:
-            return PermissionType.location
         case .pushPermission:
             return PermissionType.push
         default:

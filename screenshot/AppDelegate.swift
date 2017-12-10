@@ -225,7 +225,7 @@ extension AppDelegate {
                 UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.ambasssadorUsername)
                 
                 if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
-                    tutorialVC.video = .Ambassador(username: channel)
+                    tutorialVC.video = .ambassador(username: channel)
                 }
             }
             

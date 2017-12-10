@@ -170,7 +170,7 @@ public class TutorialEmailSlideView : HelperView {
         readyToSubmit = true
         
         let trimmedName = nameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
-        let trimmedEmail = (emailTextField.text?.isValidEmail() ?? false) ? (emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? "") : ""
+        let trimmedEmail = (emailTextField.text?.isValidEmail ?? false) ? (emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? "") : ""
         
         UserDefaults.standard.set(trimmedName, forKey: UserDefaultsKeys.name)
         UserDefaults.standard.set(trimmedEmail, forKey: UserDefaultsKeys.email)

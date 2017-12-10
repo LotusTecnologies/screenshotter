@@ -10,14 +10,14 @@ import UIKit
 import AVFoundation
 
 enum TutorialVideo {
-    case Standard
-    case Ambassador(username: String)
+    case standard
+    case ambassador(username: String)
     
     var url: URL {
         switch self {
-        case .Ambassador(let username):
+        case .ambassador(let username):
             return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!
-        case .Standard:
+        case .standard:
             return Bundle.main.url(forResource: "Craze_Video", withExtension: "mp4")!
         }
     }
@@ -29,15 +29,6 @@ enum TutorialVideo {
     @objc optional func tutorialVideoViewControllerDidEnd(_ viewController:TutorialVideoViewController)
     
     func tutorialVideoViewControllerDoneButtonTapped(_ viewController:TutorialVideoViewController)
-}
-
-// This factory is necessary to hide the `TutorialVideo` Swift enum from ObjC
-class TutorialVideoViewControllerFactory : NSObject {
-    class var replayViewController: TutorialVideoViewController {
-        let username = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername)
-        let video: TutorialVideo = (username != nil) ? .Ambassador(username: username!) : .Standard
-        return TutorialVideoViewController(video: video)
-    }
 }
 
 class TutorialVideoViewController : BaseViewController {
@@ -160,7 +151,7 @@ class TutorialVideoViewController : BaseViewController {
                 return
             }
             
-            if case .Ambassador(_) = video,
+            if case .ambassador(_) = video,
                 playerItem.status == .failed {
                 guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
                     return
@@ -168,9 +159,9 @@ class TutorialVideoViewController : BaseViewController {
                 
                 // Ambassador video failed to download, use standard one
                 
-                self.video = .Standard
+                self.video = .standard
                 
-                let standardPlayerItem = AVPlayerItem(url: TutorialVideo.Standard.url)
+                let standardPlayerItem = AVPlayerItem(url: TutorialVideo.standard.url)
                 self.player.replaceCurrentItem(with: standardPlayerItem)
                 self.beginObserving(playerItem: standardPlayerItem)
                 self.player.play()
