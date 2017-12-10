@@ -13,6 +13,7 @@
 
 "generic.ok" = "OK";
 
+"settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
 "settings.section.about" = "About";
@@ -21,3 +22,18 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+"settings.row.bug.title" = "Submit a Bug";
+"settings.row.coins.title" = "Coins Collected";
+"settings.row.contact.title" = "Contact Us";
+"settings.row.currency.title" = "Currency";
+"settings.row.facebook.title" = "Facebook";
+"settings.row.gender.title" = "Gender";
+"settings.row.instagram.title" = "Instagram";
+"settings.row.photo-permission.title" = "Camera Roll";
+"settings.row.push-permission.title" = "Push Notifications";
+"settings.row.size.title" = "Size";
+"settings.row.tell-friend.title" = "Tell a Friend";
+"settings.row.tutorial.title" = "Replay Tutorial";
+"settings.row.usage-streak.title" = "Daily Streak";
+"settings.row.version.title" = "App Version";

@@ -139,7 +139,7 @@ class SettingsViewController : BaseViewController {
         tableFooterTextView.textAlignment = .center
         tableFooterTextView.font = UIFont.preferredFont(forTextStyle: .footnote)
         tableFooterTextView.adjustsFontForContentSizeCategory = true
-        tableFooterTextView.text = "Questions? Get in touch: info@screenshopit.com"
+        tableFooterTextView.text = NSLocalizedString("settings.contact", comment: "Questions? Get in touch: info@screenshopit.com")
         tableFooterTextView.linkTextAttributes = [
             NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
             NSUnderlineColorAttributeName: UIColor.gray7
