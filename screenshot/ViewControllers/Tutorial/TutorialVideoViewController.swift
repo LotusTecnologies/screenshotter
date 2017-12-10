@@ -46,7 +46,7 @@ class TutorialVideoViewController : BaseViewController {
     private var observers = [NSKeyValueObservation]()
     private var ended = false
     
-    // MARK: - Initialization
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -59,7 +59,7 @@ class TutorialVideoViewController : BaseViewController {
         player.allowsExternalPlayback = false
         player.actionAtItemEnd = .pause
         player.isMuted = true
-        
+
         playerLayer = AVPlayerLayer(player: player)
         
         super.init(nibName: nil, bundle: nil)

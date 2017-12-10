@@ -21,13 +21,11 @@ public class TutorialEmailSlideView : HelperView {
     fileprivate let emailTextField = TutorialEmailSlideTextField()
     fileprivate let textView = TappableTextView()
     fileprivate let button = MainButton()
-    fileprivate var expandableViewHeightConstraint: NSLayoutConstraint!
     
-    fileprivate var keyboardFrame = CGRect.zero
-    private var readyToSubmit = false
+    // MARK: Life Cycle
     
     public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: aDecoder)
     }
     
     override init(frame: CGRect) {
@@ -105,30 +103,23 @@ public class TutorialEmailSlideView : HelperView {
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             
             let tappableText: [[String: NSNumber]] = [
-                ["By tapping \"Submit\" above, you agree to our ": NSNumber(value:false)],
-                ["Terms of Service": NSNumber(value:true)],
-                [" and ": NSNumber(value:false)],
-                ["Privacy Policy": NSNumber(value:true)],
-                [" ": NSNumber(value:false)]
+                ["By tapping \"Submit\" above, you agree to our ": NSNumber(value: false)],
+                ["Terms of Service": NSNumber(value: true)],
+                [" and ": NSNumber(value: false)],
+                ["Privacy Policy": NSNumber(value: true)],
+                [" ": NSNumber(value: false)]
             ]
             
             let paragraph = NSMutableParagraphStyle()
             paragraph.alignment = textView.textAlignment
             
             let attributes: [String : Any] = [
-                NSFontAttributeName : textView.font!,
-                NSParagraphStyleAttributeName : paragraph
+                NSFontAttributeName: textView.font!,
+                NSParagraphStyleAttributeName: paragraph
             ]
             
             textView.applyTappableText(tappableText, withAttributes: attributes)
         }()
-        
-        let expandableView = UIView()
-        expandableView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(expandableView)
-        expandableView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        expandableViewHeightConstraint = NSLayoutConstraint(item: expandableView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0)
-        expandableViewHeightConstraint.isActive = true
         
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
     }
@@ -167,51 +158,46 @@ public class TutorialEmailSlideView : HelperView {
     // MARK: Actions
     
     @objc private func submitEmail() {
-        readyToSubmit = true
+        let name = nameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
+        let trimmedEmail = emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
+        let email = trimmedEmail.isValidEmail ? trimmedEmail : ""
         
-        let trimmedName = nameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
-        let trimmedEmail = (emailTextField.text?.isValidEmail ?? false) ? (emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? "") : ""
+        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
         
-        UserDefaults.standard.set(trimmedName, forKey: UserDefaultsKeys.name)
-        UserDefaults.standard.set(trimmedEmail, forKey: UserDefaultsKeys.email)
+        let user = AnalyticsUser(name: name, email: email)
+        AnalyticsTrackers.standard.identify(user)
+        AnalyticsTrackers.branch.identify(user)
         
-        let user = identify(trimmedName, email: trimmedEmail)
-        _ = identify(trimmedName, email: trimmedEmail, tracker: AnalyticsTrackers.branch)
-        
-        if trimmedEmail.count > 0 {
-            track("Submitted email", properties: [
+        if email.count > 0 {
+            AnalyticsTrackers.standard.track("Submitted email", properties: [
                 "id": user.identifier,
-                "name": trimmedName,
-                "email": trimmedEmail
+                "name": name,
+                "email": email
                 ])
             
         } else {
-            track("Submitted blank email", properties: [
+            AnalyticsTrackers.standard.track("Submitted blank email", properties: [
                 "id": user.identifier,
-                "name": trimmedName
+                "name": name
                 ])
         }
 
         if let ambassadorUsername = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername) {
-            track("Referring Ambassador", properties: ["username": ambassadorUsername])
+            AnalyticsTrackers.standard.track("Referring Ambassador", properties: [
+                "username": ambassadorUsername
+                ])
         }
         
         UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
         UserDefaults.standard.synchronize()
         
-        informDelegateOfSubmittedEmailIfPossible()
-        emailTextField.resignFirstResponder()
+        resignTextField()
+        delegate?.tutorialEmailSlideViewDidComplete(self)
     }
     
     @objc private func resignTextField() {
         endEditing(true)
-    }
-    
-    private func informDelegateOfSubmittedEmailIfPossible() {
-        if !emailTextField.isFirstResponder, readyToSubmit {
-            resignTextField()
-            delegate?.tutorialEmailSlideViewDidComplete(self)
-        }
     }
     
     // MARK: Legal
@@ -256,21 +242,27 @@ public class TutorialEmailSlideView : HelperView {
     
     // MARK: Keyboard
     
-    @objc func keyboardDidHide(_ note: NSNotification) {
-        guard let _ = window else {
+    @objc func keyboardWillShow(_ notification: NSNotification) {
+        guard window != nil, let value = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue else {
             return
         }
         
-        informDelegateOfSubmittedEmailIfPossible()
+        scrollInset = UIEdgeInsets(top: 0, left: 0, bottom: value.cgRectValue.size.height, right: 0)
     }
     
-    @objc func keyboardWillShow(_ note: NSNotification) {
-        guard let _ = window,
-        let value = note.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue else {
+    @objc func keyboardWillHide(_ notification: NSNotification) {
+        guard window != nil else {
             return
         }
         
-        keyboardFrame = value.cgRectValue
+        if let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber {
+            UIView.animate(withDuration: duration.doubleValue) {
+                self.scrollInset = .zero
+            }
+            
+        } else {
+            scrollInset = .zero
+        }
     }
 }
 
@@ -290,35 +282,10 @@ extension TutorialEmailSlideView : TappableTextViewDelegate {
 }
 
 extension TutorialEmailSlideView : UITextFieldDelegate {
-    public func textFieldDidBeginEditing(_ textField: UITextField) {
-        // Wait until keyboard frame has been set!
-        
-        DispatchQueue.main.async {
-            guard let window = self.window else {
-                return
-            }
-            
-            let toWindowRect = self.convert(self.frame, to: window)
-            let bottomOffset = window.bounds.size.height - toWindowRect.maxY + self.button.bounds.size.height
-            
-            self.expandableViewHeightConstraint.constant = max(self.keyboardFrame.size.height - bottomOffset, 0)
-            UIView.animate(withDuration: 0.25) {
-                self.contentView.layoutIfNeeded()
-            }
-        }
-    }
-    
-    public func textFieldDidEndEditing(_ textField: UITextField) {
-        expandableViewHeightConstraint.constant = 0
-        
-        UIView.animate(withDuration: 0.25) {
-            self.contentView.layoutIfNeeded()
-        }
-    }
-    
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == nameTextField {
             emailTextField.becomeFirstResponder()
+            
         } else {
             textField.resignFirstResponder()
         }
@@ -330,7 +297,7 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
 extension TutorialEmailSlideView : TutorialSlideView {
     public func didEnterSlide() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
     }
     
     public func willLeaveSlide() {

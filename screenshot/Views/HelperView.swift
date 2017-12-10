@@ -15,6 +15,8 @@ public class HelperView : UIView {
     private(set) var contentView = NotifyChangeView()
     private(set) var controlView = NotifyChangeView()
     
+    private var scrollContentViewTopConstraint: NSLayoutConstraint!
+    private var scrollContentViewBottomConstraint: NSLayoutConstraint!
     private var scrollContentViewMaxHeightConstraint: NSLayoutConstraint!
     private var imageView: UIImageView?
     
@@ -39,9 +41,11 @@ public class HelperView : UIView {
         let scrollContentView = UIView()
         scrollContentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(scrollContentView)
-        scrollContentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        scrollContentViewTopConstraint = scrollContentView.topAnchor.constraint(equalTo: scrollView.topAnchor)
+        scrollContentViewTopConstraint.isActive = true
         scrollContentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        scrollContentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        scrollContentViewBottomConstraint = scrollContentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
+        scrollContentViewBottomConstraint.isActive = true
         scrollContentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         scrollContentView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor).isActive = true
         scrollContentViewMaxHeightConstraint = scrollContentView.heightAnchor.constraint(equalTo: layoutMarginsGuide.heightAnchor)
@@ -127,7 +131,9 @@ public class HelperView : UIView {
     
     public override var layoutMargins: UIEdgeInsets {
         didSet {
-            scrollView.contentInset = layoutMargins
+            // Only vertical is needed, horizontal is managed by the constraint system
+            scrollContentViewTopConstraint.constant = layoutMargins.top
+            scrollContentViewBottomConstraint.constant = -layoutMargins.bottom
         }
     }
     
@@ -173,6 +179,13 @@ public class HelperView : UIView {
     }
     
     // MARK: Scrolling
+    
+    var scrollInset: UIEdgeInsets = .zero {
+        didSet {
+            scrollView.contentInset = scrollInset
+            scrollView.scrollIndicatorInsets = scrollView.contentInset
+        }
+    }
     
     func isScrollable(contentSizeCategory: UIContentSizeCategory = UIApplication.shared.preferredContentSizeCategory) -> Bool {
         return contentSizeCategory.isAccessibilityCategory
