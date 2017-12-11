@@ -26,6 +26,10 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 @property (nonatomic, strong) ProductsOptions *productsOptions;
+@property (nonatomic, strong) UIView *rateView;
+@property (nonatomic, strong) NSLayoutConstraint *rateViewTopConstraint;
+@property (nonatomic) CGFloat rateViewOffsetY;
+@property (nonatomic) CGFloat rateViewPreviousOffsetY;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
 
@@ -134,6 +138,19 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
+    });
+    
+    _rateView = ({
+        UIView *view = [[UIView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        view.backgroundColor = [UIColor redColor];
+        [self.view addSubview:view];
+        _rateViewTopConstraint = [view.topAnchor constraintEqualToAnchor:self.view.bottomAnchor];
+        self.rateViewTopConstraint.active = YES;
+        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        [view.heightAnchor constraintEqualToConstant:44.f].active = YES;
+        view;
     });
     
     [self updateOptionsView];
@@ -437,6 +454,76 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     [self dismissOptions];
+    [self resetRateViewOffsetY:scrollView];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    // TODO: test with iPhone X
+    
+    if ([scrollView isDragging]) {
+        CGFloat expectedContentOffsetY = [self scrollViewExpectedContentOffsetY:scrollView];
+        CGFloat expectedContentSizeHeight = [self scrollViewExpectedContentSizeHeight:scrollView];
+        
+        // Dont change the constraint when bouncing
+        if (expectedContentOffsetY > 0 && expectedContentSizeHeight < scrollView.contentSize.height) {
+            self.rateViewTopConstraint.constant = MIN(0.f, MAX(-self.rateView.bounds.size.height, self.rateViewOffsetY - scrollView.contentOffset.y));
+        }
+        
+        [self resetRateViewOffsetY:scrollView];
+        self.rateViewPreviousOffsetY = scrollView.contentOffset.y;
+    }
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (!decelerate) {
+        [self animateRateViewIfNeeded];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [self animateRateViewIfNeeded];
+}
+
+- (UIEdgeInsets)scrollViewAjustedContentInset:(UIScrollView *)scrollView {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    
+    if (@available(iOS 11.0, *)) {
+        insets.top = scrollView.adjustedContentInset.top;
+        insets.bottom = scrollView.adjustedContentInset.bottom;
+        
+    } else {
+        insets.top = CGRectGetMaxY(self.navigationController.navigationBar.frame) + scrollView.contentInset.top;
+        insets.bottom = scrollView.contentInset.bottom;
+    }
+    
+    return insets;
+}
+
+- (CGFloat)scrollViewExpectedContentOffsetY:(UIScrollView *)scrollView {
+    UIEdgeInsets ajustedContentInset = [self scrollViewAjustedContentInset:scrollView];
+    return scrollView.contentOffset.y + ajustedContentInset.top;
+}
+
+- (CGFloat)scrollViewExpectedContentSizeHeight:(UIScrollView *)scrollView {
+    UIEdgeInsets ajustedContentInset = [self scrollViewAjustedContentInset:scrollView];
+    return scrollView.contentOffset.y + scrollView.bounds.size.height - ajustedContentInset.bottom;
+}
+
+- (void)resetRateViewOffsetY:(UIScrollView *)scrollView {
+    self.rateViewOffsetY = scrollView.contentOffset.y + self.rateViewTopConstraint.constant;
+}
+
+- (void)animateRateViewIfNeeded {
+    CGFloat minHeight = -self.rateView.bounds.size.height;
+    CGFloat maxHeight = 0.f;
+    CGFloat offsetY = self.rateViewTopConstraint.constant;
+    
+    if (offsetY > minHeight && offsetY < maxHeight) {
+        [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
+            self.rateViewTopConstraint.constant = (offsetY * 2.f > minHeight) ? maxHeight : minHeight;
+            [self.view layoutIfNeeded];
+        }];
+    }
 }
 
 
