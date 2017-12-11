@@ -232,14 +232,6 @@ public class TutorialEmailSlideView : HelperView {
         return UINavigationController(rootViewController: webVC)
     }
     
-    // MARK: Alert
-    
-    func failedAlertController() -> UIAlertController {
-        let controller = UIAlertController(title: "Submission Failed", message: "Please enter a valid email.", preferredStyle: .alert)
-        controller.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
-        return controller
-    }
-    
     // MARK: Keyboard
     
     @objc func keyboardWillShow(_ notification: NSNotification) {
