@@ -102,6 +102,10 @@ class IntercomHelper : NSObject {
         Intercom.hideMessenger()
     }
     
+    func presentMessageComposer(withInitialMessage message: String = "") {
+        Intercom.presentMessageComposer(withInitialMessage: message)
+    }
+    
     func recordUnsatisfactoryRating() {
         Intercom.logEvent(withName: "Rated app less than 4 stars")
     }
