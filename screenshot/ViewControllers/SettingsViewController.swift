@@ -61,7 +61,7 @@ class SettingsViewController : BaseViewController {
     override var title: String? {
         set {}
         get {
-            return NSLocalizedString("settings.title", comment: "Settings")
+            return "settings.title".localized
         }
     }
     
@@ -139,7 +139,7 @@ class SettingsViewController : BaseViewController {
         tableFooterTextView.textAlignment = .center
         tableFooterTextView.font = UIFont.preferredFont(forTextStyle: .footnote)
         tableFooterTextView.adjustsFontForContentSizeCategory = true
-        tableFooterTextView.text = NSLocalizedString("settings.contact", comment: "Questions? Get in touch: info@screenshopit.com")
+        tableFooterTextView.text = "settings.contact".localized
         tableFooterTextView.linkTextAttributes = [
             NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
             NSUnderlineColorAttributeName: UIColor.gray7
@@ -258,10 +258,10 @@ class SettingsViewController : BaseViewController {
         let screenshotCount = DataModel.sharedInstance.countTotalScreenshots()
         
         if screenshotCount == 1 {
-            return String(format: NSLocalizedString("settings.screenshot.single", comment: ""), arguments: [screenshotCount])
+            return "settings.screenshot.single".localized(withFormat: screenshotCount)
             
         } else {
-            return String(format: NSLocalizedString("settings.screenshot.plural", comment: ""), arguments: [screenshotCount])
+            return "settings.screenshot.plural".localized(withFormat: screenshotCount)
         }
     }
     
@@ -460,15 +460,15 @@ fileprivate extension SettingsViewController {
     func sectionText(for section: SettingsSection) -> String {
         switch section {
         case .permission:
-            return NSLocalizedString("settings.section.permission", comment: "Permissions")
+            return "settings.section.permission".localized
         case .about:
-            return NSLocalizedString("settings.section.about", comment: "About")
+            return "settings.section.about".localized
         case .info:
-            return NSLocalizedString("settings.section.info", comment: "Your Info")
+            return "settings.section.info".localized
         case .follow:
-            return NSLocalizedString("settings.section.follow", comment: "Follow Us")
+            return "settings.section.follow".localized
         case .product:
-            return NSLocalizedString("settings.section.product", comment: "Product Options")
+            return "settings.section.product".localized
         }
     }
     
@@ -486,37 +486,37 @@ fileprivate extension SettingsViewController {
     func cellText(for row: SettingsRow) -> String {
         switch (row) {
         case .usageStreak:
-            return NSLocalizedString("settings.row.usage_streak.title", comment: "Daily Streak")
+            return "settings.row.usage_streak.title".localized
         case .bug:
-            return NSLocalizedString("settings.row.bug.title", comment: "Submit a Bug")
+            return "settings.row.bug.title".localized
         case .tellFriend:
-            return NSLocalizedString("settings.row.tell_friend.title", comment: "Tell a Friend")
+            return "settings.row.tell_friend.title".localized
         case .contactUs:
-            return NSLocalizedString("settings.row.contact.title", comment: "Contact Us")
+            return "settings.row.contact.title".localized
         case .tutorialVideo:
-            return NSLocalizedString("settings.row.tutorial.title", comment: "Replay Tutorial")
+            return "settings.row.tutorial.title".localized
         case .name:
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
         case .email:
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
         case .pushPermission:
-            return NSLocalizedString("settings.row.push_permission.title", comment: "Push Notifications")
+            return "settings.row.push_permission.title".localized
         case .photoPermission:
-            return NSLocalizedString("settings.row.push_permission.title", comment: "Camera Roll")
+            return "settings.row.push_permission.title".localized
         case .version:
-            return NSLocalizedString("settings.row.version.title", comment: "App Version")
+            return "settings.row.version.title".localized
         case .coins:
-            return NSLocalizedString("settings.row.coins.title", comment: "Coins Collected")
+            return "settings.row.coins.title".localized
         case .productGender:
-            return NSLocalizedString("settings.row.gender.title", comment: "Gender")
+            return "settings.row.gender.title".localized
         case .productSize:
-            return NSLocalizedString("settings.row.size.title", comment: "Size")
+            return "settings.row.size.title".localized
         case .currency:
-            return NSLocalizedString("settings.row.currency.title", comment: "Currency")
+            return "settings.row.currency.title".localized
         case .followInstagram:
-            return NSLocalizedString("settings.row.instagram.title", comment: "Instagram")
+            return "settings.row.instagram.title".localized
         case .followFacebook:
-            return NSLocalizedString("settings.row.facebook.title", comment: "Facebook")
+            return "settings.row.facebook.title".localized
         }
     }
     
@@ -527,16 +527,16 @@ fileprivate extension SettingsViewController {
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
-                return String(format: NSLocalizedString("settings.row.usage_streak.detail.single", comment: ""), arguments: [streak])
+                return "settings.row.usage_streak.detail.single".localized(withFormat: streak)
             } else {
-                return String(format: NSLocalizedString("settings.row.usage_streak.detail.plural", comment: ""), arguments: [streak])
+                return "settings.row.usage_streak.detail.plural".localized(withFormat: streak)
             }
         case .version:
             return "\(Bundle.displayVersionBuild)\(Constants.buildEnvironmentSuffix)"
         case .name:
-            return NSLocalizedString("settings.row.name.detail", comment: "Enter Your Name")
+            return "settings.row.name.detail".localized
         case .email:
-            return NSLocalizedString("settings.row.email.detail", comment: "Enter Your Email")
+            return "settings.row.email.detail".localized
         case .coins:
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
@@ -552,10 +552,10 @@ fileprivate extension SettingsViewController {
         }
         
         if PermissionsManager.shared().hasPermission(for: permissionType) {
-            return NSLocalizedString("generic.enabled", comment: "Enabled")
+            return "generic.enabled".localized
             
         } else {
-            return NSLocalizedString("generic.disabled", comment: "Disabled")
+            return "generic.disabled".localized
         }
     }
     
@@ -745,16 +745,11 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
             present(mail, animated: true, completion: nil)
 
         } else {
-            let title = NSLocalizedString("email.setup.title", comment: "Setup Email")
-            let message = NSLocalizedString("email.setup.message", comment: "You need to setup an email on your device in order to send a bug report.")
-            let later = NSLocalizedString("generic.later", comment: "Later")
-            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: later, style: .cancel, handler: nil))
+            let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
             
             if let mailURL = URL(string: "message://"), UIApplication.shared.canOpenURL(mailURL) {
-                let setup = NSLocalizedString("generic.setup", comment: "Setup")
-                
-                alertController.addAction(UIAlertAction(title: setup, style: .default, handler: { action in
+                alertController.addAction(UIAlertAction(title: "generic.setup".localized, style: .default, handler: { action in
                     UIApplication.shared.open(mailURL, options: [:], completionHandler: nil)
                 }))
             }
