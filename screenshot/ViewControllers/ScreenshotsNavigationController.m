@@ -141,18 +141,7 @@
     BOOL isFavorited = [button isSelected];
     
     [self.webViewProduct setFavoritedToFavorited:isFavorited];
-    
-    NSString *favoriteString = isFavorited ? @"Product favorited" : @"Product unfavorited";
-    
-    [AnalyticsTrackers.standard track:favoriteString properties:@{@"merchant": self.webViewProduct.merchant,
-                                                                  @"brand": self.webViewProduct.brand,
-                                                                  @"url": self.webViewProduct.offer,
-                                                                  @"imageUrl": self.webViewProduct.imageURL,
-                                                                  @"page": @"Product Web View"
-                                                                  }];
-    
-    NSString *value = isFavorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo;
-    [FBSDKAppEvents logEvent:FBSDKAppEventNameAddedToWishlist parameters:@{FBSDKAppEventParameterNameSuccess: value}];
+    [AnalyticsTrackerObjCBridge trackFavoritedProductWithTracker:AnalyticsTrackers.standard favorited:isFavorited product:self.webViewProduct onPage:@"Product Web View"];
 }
 
 
