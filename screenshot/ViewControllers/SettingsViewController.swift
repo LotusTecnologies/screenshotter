@@ -502,7 +502,7 @@ fileprivate extension SettingsViewController {
         case .pushPermission:
             return "settings.row.push_permission.title".localized
         case .photoPermission:
-            return "settings.row.push_permission.title".localized
+            return "settings.row.photo_permission.title".localized
         case .version:
             return "settings.row.version.title".localized
         case .coins:
