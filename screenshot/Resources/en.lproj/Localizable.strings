@@ -32,6 +32,7 @@
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
 "generic.setup" = "Setup";
+"generic.submit" = "Submit";
 "generic.update" = "Update";
 
 "invite.facebook" = "Facebook Invite";
@@ -40,6 +41,9 @@
 "invite.share.message" = "Download SCREENSHOP, the app that lets you shop any screenshot, for free!";
 "invite.share.title" = "Invites Your Friends";
 "invite.title" = "Tell a Friend";
+
+"legal.terms_of_service" = "Terms of Service";
+"legal.privacy_policy" = "Privacy Policy";
 
 "notification.screenshot.latest" = "Tap to import your latest screenshot";
 "notification.screenshot.recent" = "Tap to import your new screenshots";
@@ -96,6 +100,11 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+"tutorial.email.detail" = "Fill out your info below";
+"tutorial.email.email" = "Email";
+"tutorial.email.name" = "Name";
+"tutorial.email.title" = "Sign Up";
 
 "update.force.title" = "Update Required";
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";

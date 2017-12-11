@@ -31,8 +31,8 @@ public class TutorialEmailSlideView : HelperView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        titleLabel.text = "Sign Up"
-        subtitleLabel.text = "Fill out your info below"
+        titleLabel.text = "tutorial.email.title".localized
+        subtitleLabel.text = "tutorial.email.detail".localized
         
         let paddingView1 = UIView()
         paddingView1.translatesAutoresizingMaskIntoConstraints = false
@@ -44,7 +44,7 @@ public class TutorialEmailSlideView : HelperView {
         
         setupTextField(nameTextField)
         nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
-        nameTextField.placeholder = "Name"
+        nameTextField.placeholder = "tutorial.email.name".localized
         nameTextField.returnKeyType = .next
         nameTextField.autocapitalizationType = .words
         contentView.addSubview(nameTextField)
@@ -56,7 +56,7 @@ public class TutorialEmailSlideView : HelperView {
         
         setupTextField(emailTextField)
         emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-        emailTextField.placeholder = "Email"
+        emailTextField.placeholder = "tutorial.email.email".localized
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
         contentView.addSubview(emailTextField)
@@ -74,7 +74,7 @@ public class TutorialEmailSlideView : HelperView {
         paddingView2HeightConstraint.isActive = true
         
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Submit", for: .normal)
+        button.setTitle("generic.submit".localized, for: .normal)
         button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
         contentView.addSubview(button)
         button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
@@ -207,7 +207,7 @@ public class TutorialEmailSlideView : HelperView {
             return nil
         }
         
-        let title = "Terms of Service"
+        let title = "legal.terms_of_service".localized
         
         return webViewController(withTitle: title, url: url, doneTarget: target, action: action)
     }
@@ -217,7 +217,7 @@ public class TutorialEmailSlideView : HelperView {
             return nil
         }
         
-        let title = "Privacy Policy"
+        let title = "legal.privacy_policy".localized
         
         return webViewController(withTitle: title, url: url, doneTarget: target, action: action)
     }
@@ -236,7 +236,7 @@ public class TutorialEmailSlideView : HelperView {
     
     func failedAlertController() -> UIAlertController {
         let controller = UIAlertController(title: "Submission Failed", message: "Please enter a valid email.", preferredStyle: .alert)
-        controller.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        controller.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
         return controller
     }
     
