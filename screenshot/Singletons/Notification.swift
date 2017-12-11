@@ -110,7 +110,7 @@ final class NotificationManager: NSObject {
     public func presentScreenshot(withAction action: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
-        notificationView.label.text = "Tap to import your latest screenshot"
+        notificationView.label.text = "notification.screenshot.latest".localized
         present(notificationView: notificationView, action: action)
     }
     
@@ -121,7 +121,7 @@ final class NotificationManager: NSObject {
         } else if screenshotCount > 1 {
             let notificationView = createNotificationView()
             notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
-            notificationView.label.text = "Tap to import your new screenshots"
+            notificationView.label.text = "notification.screenshot.recent".localized
             present(notificationView: notificationView, action: action)
         }
     }
@@ -129,7 +129,7 @@ final class NotificationManager: NSObject {
     public func presentForegroundScreenshot(withAssetId assetId: String, action: (() -> Void)? = nil) {
         let notificationView = createNotificationView()
         notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
-        notificationView.label.text = "Your screenshot is shoppable in the screenshot tab"
+        notificationView.label.text = "notification.screenshot.shoppable".localized
         present(notificationView: notificationView, action: action)
         
         AssetSyncModel.sharedInstance.image(assetId: assetId) { (image, info) in

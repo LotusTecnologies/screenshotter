@@ -9,7 +9,6 @@
 import Foundation
 
 class UpdatePromptHandler : NSObject {
-    private let appDisplayName = Bundle.displayName
     private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     
     private var rootViewController: UIViewController? {
@@ -52,10 +51,10 @@ class UpdatePromptHandler : NSObject {
     }
 
     private func presentUpdateAlert() {
-        let controller = UIAlertController(title: "New Version Available", message: "Update now for the best \(String(describing: appDisplayName)) experience!", preferredStyle: .alert)
-        controller.addAction(UIAlertAction(title: "Later", style: .cancel, handler: nil))
+        let controller = UIAlertController(title: "update.request.title".localized, message: "update.request.message", preferredStyle: .alert)
+        controller.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
         
-        let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
+        let updateAction = UIAlertAction(title: "generic.update".localized, style: .default, handler: navigateToAppStore)
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         
@@ -63,9 +62,9 @@ class UpdatePromptHandler : NSObject {
     }
     
     private func presentForceUpdateAlert() {
-        let controller = UIAlertController(title: "Update Required", message: "You need to update to the latest version to keep using \(appDisplayName).", preferredStyle: .alert)
+        let controller = UIAlertController(title: "update.force.title".localized, message: "update.force.message", preferredStyle: .alert)
         
-        let updateAction = UIAlertAction(title: "Update", style: .default, handler: navigateToAppStore)
+        let updateAction = UIAlertAction(title: "generic.update".localized, style: .default, handler: navigateToAppStore)
         controller.addAction(updateAction)
         controller.preferredAction = updateAction
         

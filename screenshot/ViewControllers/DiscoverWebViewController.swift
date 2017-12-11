@@ -13,7 +13,7 @@ class DiscoverWebViewController : WebViewController {
     override var title: String? {
         set {}
         get {
-            return "Discover"
+            return "discover.title".localized
         }
     }
     
@@ -28,7 +28,7 @@ class DiscoverWebViewController : WebViewController {
         
         toolbarEnabled = false
         
-        loaderLabelText = "Loading Discover..."
+        loaderLabelText = "discover.load"
         
         navigationItem.leftBarButtonItems = leftBarButtonItems()
         navigationItem.rightBarButtonItems = rightBarButtonItems()

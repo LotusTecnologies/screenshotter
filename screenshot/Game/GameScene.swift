@@ -142,13 +142,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabelNode = SKLabelNode(fontNamed:"MarkerFelt-Wide")
         scoreLabelNode.position = CGPoint(x: self.frame.midX, y: ceiling.frame.midY - 10)
         scoreLabelNode.zPosition = 100
-        scoreLabelNode.text = "Tap to get more coins"
+        scoreLabelNode.text = "game.start".localized
         scoreLabelNode.fontColor = .black
         self.addChild(scoreLabelNode)
     }
     
     func scoreLabelText() -> String {
-        return "My coins: " + String(score)
+        return "game.score".localized(withFormat: score)
     }
     
     func spawnPipes() {
@@ -291,7 +291,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bird.physicsBody?.collisionBitMask = worldCategory
                 bird.run(SKAction.rotate(byAngle: CGFloat(Double.pi) * CGFloat(bird.position.y) * 0.01, duration:1), completion: {
                     self.bird.speed = 0
-                    self.scoreLabelNode.text = "Tap to play again"
+                    self.scoreLabelNode.text = "game.restart".localized
                     self.canRestart = true
                     self.gameDelegate?.gameSceneDidEndGame(self)
                 })

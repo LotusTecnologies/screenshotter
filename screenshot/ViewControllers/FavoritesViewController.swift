@@ -22,7 +22,7 @@ class FavoritesViewController : BaseViewController {
     override var title: String? {
         set {}
         get {
-            return "Favorites"
+            return "favorites.title".localized
         }
     }
     
@@ -63,8 +63,8 @@ class FavoritesViewController : BaseViewController {
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
-        helperView.titleLabel.text = "No Favorites"
-        helperView.subtitleLabel.text = "Tap the heart icon on products to add them to your favorites"
+        helperView.titleLabel.text = "favorites.empty.title".localized
+        helperView.subtitleLabel.text = "favorites.empty.detail".localized
         helperView.contentImage = UIImage(named: "FavoriteEmptyListGraphic")
         view.addSubview(helperView)
         helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true

@@ -29,7 +29,7 @@ class ScreenshotPickerNavigationController: UINavigationController {
         internalDoneButton.isEnabled = false
         
         screenshotPickerViewController = ScreenshotPickerViewController(nibName: nil, bundle: nil)
-        screenshotPickerViewController.title = "Add Photos"
+        screenshotPickerViewController.title = "picker.title".localized
         screenshotPickerViewController.navigationItem.leftBarButtonItem = cancelButton
         screenshotPickerViewController.navigationItem.rightBarButtonItem = internalDoneButton
         viewControllers = [screenshotPickerViewController]
@@ -80,7 +80,10 @@ class ScreenshotPickerViewController: BaseViewController {
         toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        segments = UISegmentedControl(items: ["Screenshots", "Gallery"])
+        segments = UISegmentedControl(items: [
+            "picker.list.screenshot".localized,
+            "picker.list.gallery".localized
+            ])
         segments.translatesAutoresizingMaskIntoConstraints = false
         segments.tintColor = .crazeGreen
         segments.selectedSegmentIndex = 0
@@ -116,8 +119,8 @@ class ScreenshotPickerViewController: BaseViewController {
         helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.layoutMargins = UIEdgeInsetsMake(.extendedPadding, .padding, .extendedPadding, .padding)
-        helperView.titleLabel.text = "No Photos!"
-        helperView.subtitleLabel.text = "Start taking screenshots of fashion items to fill up your gallery!"
+        helperView.titleLabel.text = "picker.empty.title".localized
+        helperView.subtitleLabel.text = "picker.empty.detail".localized
         helperView.contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
         view.addSubview(helperView)
         helperView.topAnchor.constraint(equalTo: toolbar.bottomAnchor).isActive = true
@@ -221,8 +224,8 @@ class ScreenshotPickerViewController: BaseViewController {
     // MARK: Photo
     
     private func presentPhotoPermissionsAlert() {
-        let alertController = UIAlertController(title: "Shop Your Photos", message: "Pick screenshots from your gallery to scan for items to shop!", preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "No Thanks", style: .cancel, handler: { (action) in
+        let alertController = UIAlertController(title: "picker.permission.title".localized, message: "picker.permission.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.no_thanks".localized, style: .cancel, handler: { (action) in
             if let cancelButton = self.navigationItem.leftBarButtonItem,
                 let cancelAction = cancelButton.action,
                 let cancelTarget = cancelButton.target
@@ -230,7 +233,7 @@ class ScreenshotPickerViewController: BaseViewController {
                 UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
             }
         }))
-        alertController.addAction(UIAlertAction(title: "Add Photos", style: .default, handler: { (action) in
+        alertController.addAction(UIAlertAction(title: "picker.permission.add".localized, style: .default, handler: { (action) in
             if let alertController = PermissionsManager.shared().deniedAlertController(for: .photo, opened: nil) {
                 self.present(alertController, animated: true, completion: nil)
             }
@@ -289,8 +292,8 @@ extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINav
         if let error = error {
             dismiss(animated: true, completion: nil)
             
-            let alertController = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "Ok", style: .default))
+            let alertController = UIAlertController(title: "picker.save.error".localized, message: error.localizedDescription, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default))
             present(alertController, animated: true)
             
         } else {
