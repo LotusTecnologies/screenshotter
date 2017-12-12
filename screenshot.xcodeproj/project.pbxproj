@@ -60,7 +60,6 @@
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C56F2C5C1F9E35AD00488C0D /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F2C5B1F9E35AD00488C0D /* WebView.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
-		C5709E471FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5911A3A1FD923330036883D /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5911A391FD923330036883D /* SettingsViewController.swift */; };
@@ -87,6 +86,7 @@
 		C5E64F531FCFEBFB0073CAB5 /* NotifyChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E64F521FCFEBFB0073CAB5 /* NotifyChangeView.swift */; };
 		C5EE6EF61FAA01FE008CBC3A /* BarButtonItemExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE6EF51FAA01FE008CBC3A /* BarButtonItemExt.swift */; };
 		C5EE6EF81FAA0817008CBC3A /* ClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE6EF71FAA0817008CBC3A /* ClipView.swift */; };
+		C5F73C9C1FDFCA2F00E49F2B /* ProductsRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9B1FDFCA2F00E49F2B /* ProductsRateView.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
 		C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */; };
 		C5F8D64C1FA74DE30067C26A /* InviteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D64B1FA74DE30067C26A /* InviteViewController.swift */; };
@@ -169,7 +169,6 @@
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C56F2C5B1F9E35AD00488C0D /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
-		C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsRateCollectionViewCell.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5911A391FD923330036883D /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -200,6 +199,7 @@
 		C5E64F521FCFEBFB0073CAB5 /* NotifyChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyChangeView.swift; sourceTree = "<group>"; };
 		C5EE6EF51FAA01FE008CBC3A /* BarButtonItemExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonItemExt.swift; sourceTree = "<group>"; };
 		C5EE6EF71FAA0817008CBC3A /* ClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipView.swift; sourceTree = "<group>"; };
+		C5F73C9B1FDFCA2F00E49F2B /* ProductsRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsRateView.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapticHelper.swift; sourceTree = "<group>"; };
 		C5F8D64B1FA74DE30067C26A /* InviteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InviteViewController.swift; sourceTree = "<group>"; };
@@ -443,7 +443,6 @@
 				C5AA81991F97227E00421909 /* PickerCollectionViewCell.swift */,
 				C5AA819A1F97227E00421909 /* ProductCollectionViewCell.h */,
 				C5AA819E1F97227E00421909 /* ProductCollectionViewCell.m */,
-				C5709E461FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift */,
 				C53B464C1FB1C2ED00A8C886 /* ScreenshotCollectionViewCell.swift */,
 				C53B464E1FB1E8C700A8C886 /* ScreenshotNotificationCollectionViewCell.swift */,
 				C53B464A1FB1B5E100A8C886 /* ShadowCollectionViewCell.swift */,
@@ -467,6 +466,7 @@
 				C5C9A2BF1FC42E4200958453 /* ProductsViewController.m */,
 				C5C9A2C01FC42E4200958453 /* ProductsViewController.h */,
 				C5C9A2C21FC4315200958453 /* ProductsOptions.swift */,
+				C5F73C9B1FDFCA2F00E49F2B /* ProductsRateView.swift */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -820,11 +820,11 @@
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
-				C5709E471FC5AFF000AB2D04 /* ProductsRateCollectionViewCell.swift in Sources */,
 				C53B46341FB1A54000A8C886 /* TutorialEmailSlideView.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5AA81A61F97228100421909 /* ImageCollectionViewCell.swift in Sources */,
 				C5AA81A01F97228100421909 /* MainButton.swift in Sources */,
+				C5F73C9C1FDFCA2F00E49F2B /* ProductsRateView.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
 				525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */,

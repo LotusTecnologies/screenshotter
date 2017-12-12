@@ -1,23 +1,26 @@
 //
-//  ProductsRateCollectionViewCell.swift
+//  ProductsRateView.swift
 //  screenshot
 //
-//  Created by Corey Werner on 11/22/17.
+//  Created by Corey Werner on 12/12/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
 
-class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
+class ProductsRateView : UIView {
+    fileprivate let contentView = UIView()
     let voteUpButton = UIButton()
     let voteDownButton = UIButton()
     
-    private let label = UILabel()
-    private var labelTrailingConstraint: NSLayoutConstraint!
+    fileprivate let label = UILabel()
+    fileprivate var labelTrailingConstraint: NSLayoutConstraint!
     
     var rating: UInt = 0 {
         didSet {
+            voteUpButton.isSelected = false
             voteUpButton.isHidden = hasRating
+            voteDownButton.isSelected = false
             voteDownButton.isHidden = hasRating
             labelTrailingConstraint.isActive = hasRating
             syncLabel()
@@ -37,14 +40,22 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.backgroundColor = .green
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        contentView.heightAnchor.constraint(equalToConstant: intrinsicContentSize.height).isActive = true
+        
         setupButton(voteDownButton, withImage: UIImage(named: "ProductsRateDown"))
-        voteDownButton.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
-        voteDownButton.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
-        voteDownButton.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
+        voteDownButton.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        voteDownButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        voteDownButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         setupButton(voteUpButton, withImage: UIImage(named: "ProductsRateUp"))
-        voteUpButton.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
-        voteUpButton.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        voteUpButton.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        voteUpButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         voteUpButton.trailingAnchor.constraint(equalTo: voteDownButton.leadingAnchor).isActive = true
         
         syncLabel()
@@ -52,36 +63,41 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.7
-        mainView.addSubview(label)
+        contentView.addSubview(label)
         label.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
-        label.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
-        label.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: .padding).isActive = true
-        label.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .padding).isActive = true
+        label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
         let labelToVoteTrailingConstraint = label.trailingAnchor.constraint(equalTo: voteUpButton.leadingAnchor)
         labelToVoteTrailingConstraint.priority = UILayoutPriorityDefaultHigh
         labelToVoteTrailingConstraint.isActive = true
         
-        labelTrailingConstraint = label.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -.padding)
+        labelTrailingConstraint = label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.padding)
+        
+        let borderView = UIView()
+        borderView.translatesAutoresizingMaskIntoConstraints = false
+        borderView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        addSubview(borderView)
+        borderView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        borderView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
     }
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        voteUpButton.isSelected = false
-        voteDownButton.isSelected = false
+    override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height = 54
+        return size
     }
+    
+    // MARK: Content
     
     func syncBackgroundColor() {
-        if hasRating {
-            mainView.backgroundColor = .crazeGreen
-            
-        } else {
-            mainView.backgroundColor = .white
-        }
+        contentView.backgroundColor = hasRating ? .crazeGreen : .white
     }
     
-    func syncLabel() {
+    private func syncLabel() {
         if hasRating {
             label.textColor = .white
             label.text = "Thanks for your feedback!"
@@ -94,7 +110,7 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
         }
     }
     
-    func setupButton(_ button: UIButton, withImage image: UIImage?) {
+    private func setupButton(_ button: UIButton, withImage image: UIImage?) {
         let tintImage = image?.withRenderingMode(.alwaysTemplate)
         
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -104,12 +120,11 @@ class ProductsRateCollectionViewCell : ShadowCollectionViewCell {
         button.tintColor = .crazeGreen
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         button.addTarget(self, action: #selector(selectButton(_:)), for: .touchUpInside)
-        mainView.addSubview(button)
+        contentView.addSubview(button)
         button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-        
     }
     
-    func selectButton(_ button: UIButton) {
+    @objc private func selectButton(_ button: UIButton) {
         button.isSelected = true
         
         if button == voteUpButton {
