@@ -52,11 +52,9 @@ class IntercomHelper : NSObject {
 
         // Register the user if we're already logged in.
         if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
-                Intercom.registerUser(withUserId: id, email: email)
-            } else {
-                Intercom.registerUser(withUserId: id)
-            }
+            registerUser(withID: id,
+                         email: UserDefaults.standard.string(forKey: UserDefaultsKeys.email),
+                         name: UserDefaults.standard.string(forKey: UserDefaultsKeys.name))
         } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             // Backwards compatible w/version < 1.2
             Intercom.registerUser(withEmail: email)
