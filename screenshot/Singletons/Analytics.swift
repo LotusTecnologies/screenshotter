@@ -10,6 +10,7 @@ import Foundation
 import Analytics
 import Appsee
 import Branch
+import FBSDKCoreKit
 
 public class AnalyticsUser : NSObject {
     let identifier: String
@@ -181,6 +182,22 @@ fileprivate let marketingBrands = [
 ]
 
 extension AnalyticsTracker {
+    func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
+        let favoriteEvent = favorited ? "Product favorited" : "Product unfavorited"
+        track(favoriteEvent, properties: [
+            "screenshot" : product.shoppable?.screenshot?.uploadedImageURL ?? "",
+            "merchant": product.merchant ?? "",
+            "brand": product.brand ?? "",
+            "url": product.offer ?? "",
+            "imageUrl": product.imageURL ?? "",
+            "price": product.price ?? "0",
+            "page": page
+        ])
+        
+        let value = favorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo
+        FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: value])
+    }
+    
     func trackTappedOnProduct(_ product: Product, onPage page: String) {
         track("Tapped on product", properties: [
             "merchant": product.merchant ?? "",
@@ -190,6 +207,8 @@ extension AnalyticsTracker {
             "sale": product.isSale(),
             "page": page
         ])
+        
+        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
         
         guard let brand = product.brand?.lowercased(), marketingBrands.contains(brand) else {
             return
@@ -201,6 +220,10 @@ extension AnalyticsTracker {
 }
 
 class AnalyticsTrackerObjCBridge : NSObject {
+    static func trackFavoritedProduct(tracker: AnalyticsTracker, favorited: Bool, product: Product, onPage page: String) {
+        tracker.trackFavorited(favorited, product: product, onPage: page)
+    }
+    
     static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String) {
         tracker.trackTappedOnProduct(product, onPage: page)
     }
