@@ -589,7 +589,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.uploadedImageURL ?: @"null"];
-        [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage: prefilledMessage];
+        [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
