@@ -714,7 +714,7 @@ extension SettingsViewController : UITextFieldDelegate {
 // MARK: - Tutorial
 
 extension SettingsViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
         dismiss(animated: true, completion: nil)
     }
     

@@ -189,6 +189,7 @@ extension TutorialViewController : UIScrollViewDelegate {
 extension TutorialViewController : TutorialVideoViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
     @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
         if UIDevice.isSimulator {
+            // Skip over the video in the simulator since it crashes
             scrollToNextSlide()
             
         } else {
@@ -199,7 +200,7 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         }
     }
     
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
         viewController.delegate = nil
         dismissViewController()
         scrollToNextSlide()
