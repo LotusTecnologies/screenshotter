@@ -288,7 +288,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         if (hadProducts || self.products.count) {
             [self.collectionView reloadData];
             
-            self.rateView.rating = [shoppable getRating];
+            [self.rateView setRating:[shoppable getRating] animated:NO];
         }
         
         if (self.products.count) {
