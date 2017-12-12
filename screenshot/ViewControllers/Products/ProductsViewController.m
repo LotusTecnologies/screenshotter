@@ -610,7 +610,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         NSString *trimmedText = [self.productsRateNegativeFeedbackTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         
         if (trimmedText.length > 0) {
-            // TODO: Send `trimmedText` to Craze
+            [AnalyticsTrackers.segment track:@"Shoppable Feedback Negative" properties:@{@"text": trimmedText}];
         }
     }];
     self.productsRateNegativeFeedbackSubmitAction.enabled = NO;
