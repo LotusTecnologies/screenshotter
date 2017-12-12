@@ -117,7 +117,7 @@ class IntercomHelper : NSObject {
     }
     
     func record(event: String, properties: [AnyHashable : Any]? = nil) {
-        if let properties = properties {
+        if let properties = properties, properties.count > 0 {
             Intercom.logEvent(withName: event, metaData: properties)
         } else {
             Intercom.logEvent(withName: event)
