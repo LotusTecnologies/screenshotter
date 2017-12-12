@@ -105,8 +105,12 @@ class IntercomHelper : NSObject {
     
     func recordPushNotificationStatus(_ enabled:Bool) {
         let name = "APN \(enabled ? "En" : "Dis")abled"
-        let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken)
-        let properties = enabled && token != nil ? ["token" : token] : [:]
+        var properties = [AnyHashable : Any]()
+        
+        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
+            properties["token"] = token.description
+        }
+        
         track(name)
         record(event: name, properties: properties)
     }
