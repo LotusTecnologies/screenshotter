@@ -188,16 +188,10 @@ extension TutorialViewController : UIScrollViewDelegate {
 
 extension TutorialViewController : TutorialVideoViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
     @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
-        if UIDevice.isSimulator {
-            // Skip over the video in the simulator since it crashes
-            scrollToNextSlide()
-            
-        } else {
-            let viewController = TutorialVideoViewController(video: video)
-            viewController.modalTransitionStyle = .crossDissolve
-            viewController.delegate = self
-            present(viewController, animated: true, completion: nil)
-        }
+        let viewController = TutorialVideoViewController(video: video)
+        viewController.modalTransitionStyle = .crossDissolve
+        viewController.delegate = self
+        present(viewController, animated: true, completion: nil)
     }
     
     func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
