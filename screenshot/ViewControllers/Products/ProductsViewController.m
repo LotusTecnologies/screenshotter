@@ -40,6 +40,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 @property (nonatomic, strong) UITextField *productsRateNegativeFeedbackTextField;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
+@property (nonatomic) NSUInteger productsUnfilteredCount;
 
 @property (nonatomic, copy) UIImage *image;
 
@@ -100,6 +101,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         // TODO: Refactor this so the below views are still created, just not shown
         // You shall not pass!
         self.state = ProductsViewControllerStateRetry;
+        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
         return;
     }
     
@@ -227,16 +229,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             break;
             
         case ProductsViewControllerStateRetry:
-            [self stopAndRemoveLoader];
-            self.rateView.hidden = YES;
-            [self showNoItemsHelperView];
-            break;
-            
         case ProductsViewControllerStateEmpty:
             [self stopAndRemoveLoader];
-            [self hideNoItemsHelperView];
             self.rateView.hidden = YES;
-            // TODO: need to show UI for this case
+            [self hideNoItemsHelperView];
+            [self showNoItemsHelperView];
             break;
     }
 }
@@ -304,6 +301,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     NSInteger mask = [[shoppable getLast] rawValue];
     NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
+    self.productsUnfilteredCount = products.count;
     
     if ([self.productsOptions _sale] == 1) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
@@ -328,7 +326,12 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         Shoppable *shoppable = [self.shoppablesController shoppableAt:index];
         self.products = [self productsForShoppable:shoppable];
         
-        self.state = (self.products.count == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateProducts;
+        if (self.products.count == 0) {
+            self.state = (self.productsUnfilteredCount == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateEmpty;
+            
+        } else {
+            self.state = ProductsViewControllerStateProducts;
+        }
         
         if (hadProducts || self.products.count) {
             [self.collectionView reloadData];
@@ -751,32 +754,32 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)showNoItemsHelperView {
     CGFloat verPadding = [Geometry extendedPadding];
     CGFloat horPadding = [Geometry padding];
+    CGFloat topOffset = [self.shoppablesToolbar isHidden] ? 0.f : self.shoppablesToolbar.bounds.size.height;
     
     HelperView *helperView = [[HelperView alloc] init];
     helperView.translatesAutoresizingMaskIntoConstraints = NO;
     helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
-    helperView.backgroundColor = self.view.backgroundColor;
     helperView.titleLabel.text = @"No Items Found";
     helperView.subtitleLabel.text = @"No visually similar products were detected";
     helperView.contentImage = [UIImage imageNamed:@"ProductsEmptyListGraphic"];
     [self.view addSubview:helperView];
-    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:topOffset].active = YES;
     [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
     
-    MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
-    retryButton.translatesAutoresizingMaskIntoConstraints = NO;
-    retryButton.backgroundColor = [UIColor crazeGreen];
-    [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
-    [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
-    [helperView.controlView addSubview:retryButton];
-    [retryButton.topAnchor constraintEqualToAnchor:helperView.controlView.topAnchor].active = YES;
-    [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
-    [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
-    
-    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+    if (self.state == ProductsViewControllerStateRetry) {
+        MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
+        retryButton.translatesAutoresizingMaskIntoConstraints = NO;
+        retryButton.backgroundColor = [UIColor crazeGreen];
+        [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
+        [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
+        [helperView.controlView addSubview:retryButton];
+        [retryButton.topAnchor constraintEqualToAnchor:helperView.controlView.topAnchor].active = YES;
+        [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
+        [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+    }
 }
 
 - (void)hideNoItemsHelperView {
