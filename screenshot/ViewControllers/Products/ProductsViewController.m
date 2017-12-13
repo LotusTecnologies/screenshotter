@@ -635,7 +635,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.uploadedImageURL ?: @"null"];
+        NSString *shortenedScreenshotURL = [self.screenshot.uploadedImageURL stringByReplacingOccurrencesOfString:@"https://s3.amazonaws.com/s3-file-store/generated" withString:@"https://img.screenshopit.com"];
+        NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", shortenedScreenshotURL ?: @"null"];
         [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
