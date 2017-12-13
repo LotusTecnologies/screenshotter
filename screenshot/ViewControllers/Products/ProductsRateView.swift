@@ -73,7 +73,7 @@ class ProductsRateView : UIView {
     
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
-        size.height = 54
+        size.height = 49 // Same height as tab bar
         return size
     }
     
