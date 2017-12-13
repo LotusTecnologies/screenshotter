@@ -61,7 +61,7 @@ class SettingsViewController : BaseViewController {
     override var title: String? {
         set {}
         get {
-            return "Settings"
+            return "settings.title".localized
         }
     }
     
@@ -139,7 +139,7 @@ class SettingsViewController : BaseViewController {
         tableFooterTextView.textAlignment = .center
         tableFooterTextView.font = UIFont.preferredFont(forTextStyle: .footnote)
         tableFooterTextView.adjustsFontForContentSizeCategory = true
-        tableFooterTextView.text = "Questions? Get in touch: info@screenshopit.com"
+        tableFooterTextView.text = "settings.contact".localized
         tableFooterTextView.linkTextAttributes = [
             NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
             NSUnderlineColorAttributeName: UIColor.gray7
@@ -256,9 +256,13 @@ class SettingsViewController : BaseViewController {
     
     var screenshotsCountText: String {
         let screenshotCount = DataModel.sharedInstance.countTotalScreenshots()
-        let suffix = screenshotCount == 1 ? "" : "s"
         
-        return "\(screenshotCount) screenshot\(suffix)"
+        if screenshotCount == 1 {
+            return "settings.screenshot.single".localized(withFormat: screenshotCount)
+            
+        } else {
+            return "settings.screenshot.plural".localized(withFormat: screenshotCount)
+        }
     }
     
     private func layoutScreenshotsCountShadow() {
@@ -456,15 +460,15 @@ fileprivate extension SettingsViewController {
     func sectionText(for section: SettingsSection) -> String {
         switch section {
         case .permission:
-            return "Permissions"
+            return "settings.section.permission".localized
         case .about:
-            return "About"
+            return "settings.section.about".localized
         case .info:
-            return "Your Info"
+            return "settings.section.info".localized
         case .follow:
-            return "Follow Us"
+            return "settings.section.follow".localized
         case .product:
-            return "Product Options"
+            return "settings.section.product".localized
         }
     }
     
@@ -482,37 +486,37 @@ fileprivate extension SettingsViewController {
     func cellText(for row: SettingsRow) -> String {
         switch (row) {
         case .usageStreak:
-            return "Daily Streak"
+            return "settings.row.usage_streak.title".localized
         case .bug:
-            return "Submit a Bug"
+            return "settings.row.bug.title".localized
         case .tellFriend:
-            return "Tell a Friend"
+            return "settings.row.tell_friend.title".localized
         case .contactUs:
-            return "Contact Us"
+            return "settings.row.contact.title".localized
         case .tutorialVideo:
-            return "Replay Tutorial"
+            return "settings.row.tutorial.title".localized
         case .name:
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
         case .email:
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
         case .pushPermission:
-            return "Push Notifications"
+            return "settings.row.push_permission.title".localized
         case .photoPermission:
-            return "Camera Roll"
+            return "settings.row.photo_permission.title".localized
         case .version:
-            return "App Version"
+            return "settings.row.version.title".localized
         case .coins:
-            return "Coins Collected"
+            return "settings.row.coins.title".localized
         case .productGender:
-            return "Gender"
+            return "settings.row.gender.title".localized
         case .productSize:
-            return "Size"
+            return "settings.row.size.title".localized
         case .currency:
-            return "Currency"
+            return "settings.row.currency.title".localized
         case .followInstagram:
-            return "Instagram"
+            return "settings.row.instagram.title".localized
         case .followFacebook:
-            return "Facebook"
+            return "settings.row.facebook.title".localized
         }
     }
     
@@ -522,14 +526,17 @@ fileprivate extension SettingsViewController {
             return cellEnabledText(for: row)
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
-            let suffix = streak == 1 ? "" : "s"
-            return "\(streak) day\(suffix)"
+            if streak == 1 {
+                return "settings.row.usage_streak.detail.single".localized(withFormat: streak)
+            } else {
+                return "settings.row.usage_streak.detail.plural".localized(withFormat: streak)
+            }
         case .version:
             return "\(Bundle.displayVersionBuild)\(Constants.buildEnvironmentSuffix)"
         case .name:
-            return "Enter Your Name"
+            return "settings.row.name.detail".localized
         case .email:
-            return "Enter Your Email"
+            return "settings.row.email.detail".localized
         case .coins:
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
@@ -543,7 +550,13 @@ fileprivate extension SettingsViewController {
         guard let permissionType = row.permissionType else {
             return nil
         }
-        return PermissionsManager.shared().hasPermission(for: permissionType) ? "Enabled" : "Disabled"
+        
+        if PermissionsManager.shared().hasPermission(for: permissionType) {
+            return "generic.enabled".localized
+            
+        } else {
+            return "generic.disabled".localized
+        }
     }
     
     func cellAccessoryType(for row: SettingsRow) -> UITableViewCellAccessoryType {
@@ -701,7 +714,7 @@ extension SettingsViewController : UITextFieldDelegate {
 // MARK: - Tutorial
 
 extension SettingsViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
         dismiss(animated: true, completion: nil)
     }
     
@@ -732,11 +745,11 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
             present(mail, animated: true, completion: nil)
 
         } else {
-            let alertController = UIAlertController(title: "Setup Email", message: "You need to setup an email on your device in order to send a bug report.", preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "Later", style: .cancel, handler: nil))
+            let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
             
             if let mailURL = URL(string: "message://"), UIApplication.shared.canOpenURL(mailURL) {
-                alertController.addAction(UIAlertAction(title: "Setup", style: .default, handler: { action in
+                alertController.addAction(UIAlertAction(title: "generic.setup".localized, style: .default, handler: { action in
                     UIApplication.shared.open(mailURL, options: [:], completionHandler: nil)
                 }))
             }

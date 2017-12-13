@@ -101,7 +101,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    LOTAnimatedSwitch *heartIcon = [LOTAnimatedSwitch switchNamed:@"TwitterHeart"];
+    LOTAnimatedSwitch *heartIcon = [LOTAnimatedSwitch switchNamed:@"Heart"];
     heartIcon.backgroundColor = [UIColor whiteColor];
     CGRect r = heartIcon.frame;
     r.size.width = 300;

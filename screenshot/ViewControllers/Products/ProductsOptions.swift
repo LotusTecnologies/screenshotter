@@ -243,7 +243,7 @@ class ProductsOptionsView : UIView {
         
         let sortLabel = UILabel()
         sortLabel.translatesAutoresizingMaskIntoConstraints = false
-        sortLabel.text = "Sort by"
+        sortLabel.text = "products.options.sort.title".localized
         sortLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         sortLabel.adjustsFontForContentSizeCategory = true
         addSubview(sortLabel)
@@ -263,7 +263,7 @@ class ProductsOptionsView : UIView {
         
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.backgroundColor = .gray3
-        doneButton.setTitle("Done", for: .normal)
+        doneButton.setTitle("generic.done".localized, for: .normal)
         addSubview(doneButton)
         doneButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         doneButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
@@ -312,9 +312,9 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         var string: String
         
         switch self {
-        case .female: string = "Female"
-        case .male: string = "Male"
-        case .auto: string = "All"
+        case .female: string = "products.options.gender.female".localized
+        case .male: string = "products.options.gender.male".localized
+        case .auto: string = "products.options.gender.auto".localized
         }
         
         return string
@@ -358,9 +358,9 @@ enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         var string: String
         
         switch self {
-        case .child: string = "Child"
-        case .adult: string = "Adult"
-        case .plus: string = "Plus"
+        case .child: string = "products.options.size.child".localized
+        case .adult: string = "products.options.size.adult".localized
+        case .plus: string = "products.options.size.plus".localized
         }
         
         return string
@@ -403,8 +403,8 @@ enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         var string: String
         
         switch self {
-        case .sale: string = "Sale"
-        case .all: string = "All"
+        case .sale: string = "products.options.sale.only".localized
+        case .all: string = "products.options.sale.all".localized
         }
         
         return string
@@ -439,10 +439,10 @@ enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         var string: String
         
         switch self {
-        case .similar: string = "Similar"
-        case .priceAsc: string = "Price (lowest first)"
-        case .priceDes: string = "Price (highest first)"
-        case .brands: string = "Brands"
+        case .similar: string = "products.options.sort.similar".localized
+        case .priceAsc: string = "products.options.sort.price_asc".localized
+        case .priceDes: string = "products.options.sort.price_des".localized
+        case .brands: string = "products.options.sort.brand".localized
         }
         
         return string

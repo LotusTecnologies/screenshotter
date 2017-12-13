@@ -1,0 +1,119 @@
+/* 
+  Localizable.strings
+  screenshot
+
+  Created by Corey Werner on 12/10/17.
+  Copyright © 2017 crazeapp. All rights reserved.
+*/
+
+// Before moving forward with Localizable.strings as the correct approch, read these
+// https://blog.lokalise.co/getting-started-with-ios-localization/
+// https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
+// https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
+
+"discover.load" = "Loading Discover...";
+"discover.title" = "Discover";
+
+"email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
+"email.setup.title" = "Setup Email";
+
+"favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
+"favorites.empty.title" = "No Favorites";
+"favorites.title" = "Favorites";
+
+"game.restart" = "Tap to play again";
+"game.score" = "My coins: %d";
+"game.start" = "Tap to get more coins";
+
+"generic.disabled" = "Disabled";
+"generic.done" = "Done";
+"generic.enabled" = "Enabled";
+"generic.later" = "Later";
+"generic.no_thanks" = "No Thanks";
+"generic.ok" = "OK";
+"generic.setup" = "Setup";
+"generic.submit" = "Submit";
+"generic.update" = "Update";
+
+"invite.facebook" = "Facebook Invite";
+"invite.google" = "Google Invite";
+"invite.other" = "Share To Other Apps";
+"invite.share.message" = "Download SCREENSHOP, the app that lets you shop any screenshot, for free!";
+"invite.share.title" = "Invites Your Friends";
+"invite.title" = "Tell a Friend";
+
+"legal.terms_of_service" = "Terms of Service";
+"legal.privacy_policy" = "Privacy Policy";
+
+"notification.screenshot.latest" = "Tap to import your latest screenshot";
+"notification.screenshot.recent" = "Tap to import your new screenshots";
+"notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
+
+"picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
+"picker.empty.title" = "No Photos!";
+"picker.list.gallery" = "Gallery";
+"picker.list.screenshot" = "Screenshots";
+"picker.title" = "Add Photos";
+"picker.permission.add" = "Add Photos";
+"picker.permission.message" = "Pick screenshots from your gallery to scan for items to shop!";
+"picker.permission.title" = "Shop Your Photos";
+"picker.save.error" = "Save Error";
+
+"products.options.gender.auto" = "All";
+"products.options.gender.female" = "Female";
+"products.options.gender.male" = "Male";
+"products.options.sale.all" = "All";
+"products.options.sale.only" = "Sale";
+"products.options.size.adult" = "Adult";
+"products.options.size.child" = "Child";
+"products.options.size.plus" = "Plus";
+"products.options.sort.brand" = "Brands";
+"products.options.sort.price_asc" = "Price (lowest first)";
+"products.options.sort.price_des" = "Price (highest first)";
+"products.options.sort.similar" = "Similar";
+"products.options.sort.title" = "Sort by";
+
+"settings.contact" = "Questions? Get in touch: info@screenshopit.com";
+"settings.row.bug.title" = "Submit a Bug";
+"settings.row.coins.title" = "Coins Collected";
+"settings.row.contact.title" = "Contact Us";
+"settings.row.currency.title" = "Currency";
+"settings.row.email.detail" = "Enter Your Email";
+"settings.row.facebook.title" = "Facebook";
+"settings.row.gender.title" = "Gender";
+"settings.row.instagram.title" = "Instagram";
+"settings.row.name.detail" = "Enter Your Name";
+"settings.row.photo_permission.title" = "Camera Roll";
+"settings.row.push_permission.title" = "Push Notifications";
+"settings.row.size.title" = "Size";
+"settings.row.tell_friend.title" = "Tell a Friend";
+"settings.row.tutorial.title" = "Replay Tutorial";
+"settings.row.usage_streak.title" = "Daily Streak";
+"settings.row.usage_streak.detail.single" = "%d day";
+"settings.row.usage_streak.detail.plural" = "%d days";
+"settings.row.version.title" = "App Version";
+"settings.screenshot.single" = "%d screenshot";
+"settings.screenshot.plural" = "%d screenshots";
+"settings.section.about" = "About";
+"settings.section.follow" = "Follow Us";
+"settings.section.info" = "Your Info";
+"settings.section.permission" = "Permissions";
+"settings.section.product" = "Product Options";
+"settings.title" = "Settings";
+
+"tutorial.email.detail" = "Fill out your info below";
+"tutorial.email.email" = "Email";
+"tutorial.email.name" = "Name";
+"tutorial.email.title" = "Sign Up";
+
+"update.force.title" = "Update Required";
+"update.force.message" = "You need to update to the latest version to keep using Screenshop.";
+"update.request.title" = "New Version Available";
+"update.request.message" = "Update now for the best Screenshop experience!";
+
+
+
+
+
+
+

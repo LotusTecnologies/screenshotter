@@ -12,19 +12,16 @@ import Firebase
 import FBSDKShareKit
 
 class InviteViewController: BaseViewController, GIDSignInUIDelegate {
-    let shareText = "Download SCREENSHOP, the app that lets you shop any screenshot, for free!"
-    
     fileprivate let googleButton = MainButton()
     fileprivate let facebookButton = MainButton()
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        title = "Tell a Friend"
-    }
+    // MARK: Life Cycle
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    override var title: String? {
+        set {}
+        get {
+            return "invite.title".localized
+        }
     }
     
     override func viewDidLoad() {
@@ -44,7 +41,7 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         
         facebookButton.translatesAutoresizingMaskIntoConstraints = false
         facebookButton.backgroundColor = UIColor(red: 60/255, green: 90/255, blue: 150/255, alpha: 1)
-        facebookButton.setTitle("Facebook Invite", for: .normal)
+        facebookButton.setTitle("invite.facebook".localized, for: .normal)
         facebookButton.setImage(UIImage(named: "InviteFacebookIcon"), for: .normal)
         facebookButton.addTarget(self, action: #selector(presentFacebookInvite), for: .touchUpInside)
         containerView.addSubview(facebookButton)
@@ -55,7 +52,7 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         googleButton.translatesAutoresizingMaskIntoConstraints = false
         googleButton.backgroundColor = .white
         googleButton.setTitleColor(.black, for: .normal)
-        googleButton.setTitle("Google Invite", for: .normal)
+        googleButton.setTitle("invite.google".localized, for: .normal)
         googleButton.setImage(UIImage(named: "InviteGoogleIcon"), for: .normal)
         googleButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
         containerView.addSubview(googleButton)
@@ -75,7 +72,7 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         
         let shareButton = MainButton()
         shareButton.translatesAutoresizingMaskIntoConstraints = false
-        shareButton.setTitle("Share To Other Apps", for: .normal)
+        shareButton.setTitle("invite.other".localized, for: .normal)
         shareButton.setImage(UIImage(named: "InviteShare"), for: .normal)
         shareButton .addTarget(self, action: #selector(presentActivityViewController), for: .touchUpInside)
         containerView.addSubview(shareButton)
@@ -115,8 +112,8 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     func presentGoogleInvite() {
         if let invite = Invites.inviteDialog(), let bundleIdentifier = Bundle.main.bundleIdentifier {
             invite.setInviteDelegate(self)
-            invite.setTitle("Invites Your Friends")
-            invite.setMessage(shareText)
+            invite.setTitle("invite.share.title".localized)
+            invite.setMessage("invite.share.message".localized)
             invite.setDeepLink(bundleIdentifier)
             invite.setCallToActionText("Install!")
             invite.setCustomImage("https://static.crazeapp.com/screenshop-icon-500.png")
@@ -139,7 +136,7 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     // MARK: Share
     
     func presentActivityViewController() {
-        let text = shareText + " https://screenshopit.com/"
+        let text = "invite.share.message".localized + " https://screenshopit.com/"
         let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = view
         present(activityViewController, animated: true, completion: nil)

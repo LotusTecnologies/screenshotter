@@ -52,11 +52,9 @@ class IntercomHelper : NSObject {
 
         // Register the user if we're already logged in.
         if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
-                Intercom.registerUser(withUserId: id, email: email)
-            } else {
-                Intercom.registerUser(withUserId: id)
-            }
+            registerUser(withID: id,
+                         email: UserDefaults.standard.string(forKey: UserDefaultsKeys.email),
+                         name: UserDefaults.standard.string(forKey: UserDefaultsKeys.name))
         } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             // Backwards compatible w/version < 1.2
             Intercom.registerUser(withEmail: email)
@@ -77,12 +75,7 @@ class IntercomHelper : NSObject {
     func registerUser(withID id:String, email: String? = nil, name: String? = nil) {
         updateIntercomDeviceToken()
         
-        if let email = email {
-            Intercom.registerUser(withEmail: email)
-        } else {
-            Intercom.registerUser(withUserId: id)
-        }
-        
+        Intercom.registerUser(withUserId: id)
         performUserUpdate { attrs in
             attrs.userId = id
             attrs.email = email
@@ -102,20 +95,28 @@ class IntercomHelper : NSObject {
         Intercom.hideMessenger()
     }
     
+    func presentMessageComposer(withInitialMessage message: String = "") {
+        Intercom.presentMessageComposer(withInitialMessage: message)
+    }
+    
     func recordUnsatisfactoryRating() {
         Intercom.logEvent(withName: "Rated app less than 4 stars")
     }
     
     func recordPushNotificationStatus(_ enabled:Bool) {
         let name = "APN \(enabled ? "En" : "Dis")abled"
-        let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken)
-        let properties = enabled && token != nil ? ["token" : token] : [:]
+        var properties = [AnyHashable : Any]()
+        
+        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
+            properties["token"] = token.description
+        }
+        
         track(name)
         record(event: name, properties: properties)
     }
     
     func record(event: String, properties: [AnyHashable : Any]? = nil) {
-        if let properties = properties {
+        if let properties = properties, properties.count > 0 {
             Intercom.logEvent(withName: event, metaData: properties)
         } else {
             Intercom.logEvent(withName: event)
