@@ -32,11 +32,21 @@ class CurrencyViewController : BaseViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        if tableView.indexPathForSelectedRow == nil,
-            let code = selectedCurrencyCode,
-            let index = currencyMap.index(forCode: code)
-        {
+        let code = selectedCurrencyCode ?? CurrencyMap.autoCode
+        
+        if tableView.indexPathForSelectedRow == nil, let index = currencyMap.index(forCode: code) {
             tableView.selectRow(at: IndexPath(row: index, section: 0), animated: false, scrollPosition: .middle)
+        }
+    }
+    
+    // MARK: Currency
+    
+    static var currentCurrency: String {
+        if let code = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency), code != CurrencyMap.autoCode {
+            return code
+            
+        } else {
+            return "currency.auto".localized
         }
     }
 }
@@ -48,12 +58,12 @@ extension CurrencyViewController : UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? createTableViewCell()
-        cell.textLabel?.text = currencyMap.items[indexPath.row].currency
-        cell.detailTextLabel?.text = currencyMap.items[indexPath.row].code
+        cell.textLabel?.text = cellText(indexPath)
+        cell.detailTextLabel?.text = cellDetailText(indexPath)
         return cell
     }
     
-    func createTableViewCell() -> UITableViewCell {
+    private func createTableViewCell() -> UITableViewCell {
         let cell = UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.textLabel?.highlightedTextColor = .white
         
@@ -66,6 +76,24 @@ extension CurrencyViewController : UITableViewDataSource {
         cell.selectedBackgroundView = selectedBackgroundView
         
         return cell
+    }
+    
+    private func cellText(_ indexPath: IndexPath) -> String {
+        if indexPath.row == 0 {
+            return "currency.auto".localized
+            
+        } else {
+            return currencyMap.items[indexPath.row].currency
+        }
+    }
+    
+    private func cellDetailText(_ indexPath: IndexPath) -> String {
+        if indexPath.row == 0 {
+            return ""
+            
+        } else {
+            return currencyMap.items[indexPath.row].code
+        }
     }
 }
 

@@ -540,7 +540,7 @@ fileprivate extension SettingsViewController {
         case .coins:
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
+            return CurrencyViewController.currentCurrency
         default:
             return nil
         }
