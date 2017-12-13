@@ -26,7 +26,6 @@ class ProductsRateView : UIView {
         super.init(frame: frame)
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.backgroundColor = .green
         addSubview(contentView)
         contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
@@ -81,7 +80,7 @@ class ProductsRateView : UIView {
     // MARK: Content
     
     func syncBackgroundColor() {
-        contentView.backgroundColor = hasRating ? .crazeGreen : .white
+        backgroundColor = hasRating ? .crazeGreen : .white
     }
     
     private func syncLabel() {

@@ -127,7 +127,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     _rateView = ({
         ProductsRateView *view = [[ProductsRateView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
-        view.backgroundColor = [UIColor redColor];
         [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
         [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:view];
