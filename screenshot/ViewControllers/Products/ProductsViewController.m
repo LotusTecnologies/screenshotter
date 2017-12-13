@@ -103,7 +103,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         return;
     }
     
-    self.shoppablesToolbar = ({
+    _shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
         
@@ -120,34 +120,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         [toolbar.heightAnchor constraintEqualToConstant:toolbar.bounds.size.height].active = YES;
         toolbar;
-    });
-    
-    self.collectionView = ({
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat p = [Geometry padding];
-        CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
-        
-        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumInteritemSpacing = minimumSpacing.x;
-        layout.minimumLineSpacing = minimumSpacing.y;
-        
-        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
-        collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-        collectionView.delegate = self;
-        collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
-        collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
-        collectionView.backgroundColor = self.view.backgroundColor;
-        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
-        
-        [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-        
-        [self.view insertSubview:collectionView atIndex:0];
-        [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        [collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
-        [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        collectionView;
     });
     
     _rateView = ({
@@ -170,6 +142,34 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         
         [view.heightAnchor constraintEqualToConstant:height].active = YES;
         view;
+    });
+    
+    _collectionView = ({
+        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+        CGFloat p = [Geometry padding];
+        CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+        
+        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+        layout.minimumInteritemSpacing = minimumSpacing.x;
+        layout.minimumLineSpacing = minimumSpacing.y;
+        
+        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
+        collectionView.translatesAutoresizingMaskIntoConstraints = NO;
+        collectionView.delegate = self;
+        collectionView.dataSource = self;
+        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y + self.rateView.intrinsicContentSize.height, minimumSpacing.x);
+        collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
+        collectionView.backgroundColor = self.view.backgroundColor;
+        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
+        
+        [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        
+        [self.view insertSubview:collectionView atIndex:0];
+        [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+        [collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+        [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
+        [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        collectionView;
     });
     
     [self updateOptionsView];
@@ -211,36 +211,34 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 #pragma mark - State
 
 - (void)setState:(ProductsViewControllerState)state {
-//    if (_state != state) {
-        _state = state;
+    _state = state;
     
-        switch (state) {
-            case ProductsViewControllerStateLoading:
-                [self hideNoItemsHelperView];
-                self.rateView.hidden = YES;
-                [self.loader startAnimation];
-                break;
-                
-            case ProductsViewControllerStateProducts:
-                [self stopAndRemoveLoader];
-                [self hideNoItemsHelperView];
-                self.rateView.hidden = NO;
-                break;
-                
-            case ProductsViewControllerStateRetry:
-                [self stopAndRemoveLoader];
-                self.rateView.hidden = YES;
-                [self showNoItemsHelperView];
-                break;
-                
-            case ProductsViewControllerStateEmpty:
-                [self stopAndRemoveLoader];
-                [self hideNoItemsHelperView];
-                self.rateView.hidden = YES;
-                // TODO: need to show UI for this case
-                break;
-        }
-//    }
+    switch (state) {
+        case ProductsViewControllerStateLoading:
+            [self hideNoItemsHelperView];
+            self.rateView.hidden = YES;
+            [self.loader startAnimation];
+            break;
+            
+        case ProductsViewControllerStateProducts:
+            [self stopAndRemoveLoader];
+            [self hideNoItemsHelperView];
+            self.rateView.hidden = NO;
+            break;
+            
+        case ProductsViewControllerStateRetry:
+            [self stopAndRemoveLoader];
+            self.rateView.hidden = YES;
+            [self showNoItemsHelperView];
+            break;
+            
+        case ProductsViewControllerStateEmpty:
+            [self stopAndRemoveLoader];
+            [self hideNoItemsHelperView];
+            self.rateView.hidden = YES;
+            // TODO: need to show UI for this case
+            break;
+    }
 }
 
 
