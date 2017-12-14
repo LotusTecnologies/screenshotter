@@ -87,6 +87,7 @@
 		C5EE6EF61FAA01FE008CBC3A /* BarButtonItemExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE6EF51FAA01FE008CBC3A /* BarButtonItemExt.swift */; };
 		C5EE6EF81FAA0817008CBC3A /* ClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5EE6EF71FAA0817008CBC3A /* ClipView.swift */; };
 		C5F73C9C1FDFCA2F00E49F2B /* ProductsRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9B1FDFCA2F00E49F2B /* ProductsRateView.swift */; };
+		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
 		C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */; };
 		C5F8D64C1FA74DE30067C26A /* InviteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D64B1FA74DE30067C26A /* InviteViewController.swift */; };
@@ -200,6 +201,7 @@
 		C5EE6EF51FAA01FE008CBC3A /* BarButtonItemExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonItemExt.swift; sourceTree = "<group>"; };
 		C5EE6EF71FAA0817008CBC3A /* ClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipView.swift; sourceTree = "<group>"; };
 		C5F73C9B1FDFCA2F00E49F2B /* ProductsRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsRateView.swift; sourceTree = "<group>"; };
+		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapticHelper.swift; sourceTree = "<group>"; };
 		C5F8D64B1FA74DE30067C26A /* InviteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InviteViewController.swift; sourceTree = "<group>"; };
@@ -313,6 +315,7 @@
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
 				529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */,
+				C5F73C9D1FE244C800E49F2B /* Permissions.swift */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";
@@ -801,6 +804,7 @@
 				C53B46381FB1A54000A8C886 /* TutorialTrySlideView.swift in Sources */,
 				C53B46621FBC7CBD00A8C886 /* TransitioningController.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
+				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				C5AA81A11F97228100421909 /* FavoriteButton.swift in Sources */,
 				C5E64F531FCFEBFB0073CAB5 /* NotifyChangeView.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
