@@ -15,7 +15,7 @@
 @import Photos;
 @import UserNotifications;
 
-@interface PermissionsManager () <CLLocationManagerDelegate>
+@interface __PermissionsManager () <CLLocationManagerDelegate>
 
 @property (nonatomic) PermissionStatus pushStatus;
 
@@ -24,7 +24,7 @@
 
 @end
 
-@implementation PermissionsManager 
+@implementation __PermissionsManager 
 
 + (PermissionsManager *)sharedPermissionsManager {
     static dispatch_once_t pred;

@@ -69,7 +69,7 @@ class AssetSyncModel: NSObject {
     }
     
     func registerForPhotoChanges() {
-        guard PermissionsManager.shared().hasPermission(for: .photo) else {
+        guard PermissionsManager.shared.hasPermission(for: .photo) else {
             print("registerForPhotoChanges refused by guard")
             return
         }
@@ -778,7 +778,7 @@ class AssetSyncModel: NSObject {
     @objc public func syncPhotos() {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
-            guard PermissionsManager.shared().hasPermission(for: .photo),
+            guard PermissionsManager.shared.hasPermission(for: .photo),
                 dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
                     return
@@ -937,7 +937,7 @@ class AssetSyncModel: NSObject {
 extension AssetSyncModel {
     
     func sendScreenshotAddedLocalNotification(assetIds: Set<String>) {
-        guard PermissionsManager.shared().hasPermission(for: .push) else {
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
             print("sendScreenshotAddedLocalNotification refused by guard")
             return
         }

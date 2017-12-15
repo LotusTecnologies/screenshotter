@@ -149,7 +149,7 @@ class ScreenshotPickerViewController: BaseViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if !PermissionsManager.shared().hasPermission(for: .photo) {
+        if !PermissionsManager.shared.hasPermission(for: .photo) {
             presentPhotoPermissionsAlert()
         }
     }
@@ -234,7 +234,7 @@ class ScreenshotPickerViewController: BaseViewController {
             }
         }))
         alertController.addAction(UIAlertAction(title: "picker.permission.add".localized, style: .default, handler: { (action) in
-            if let alertController = PermissionsManager.shared().deniedAlertController(for: .photo, opened: nil) {
+            if let alertController = PermissionsManager.shared.deniedAlertController(for: .photo) {
                 self.present(alertController, animated: true, completion: nil)
             }
         }))
@@ -244,14 +244,14 @@ class ScreenshotPickerViewController: BaseViewController {
     // MARK: Camera
     
     @objc private func cameraButtonAction() {
-        if PermissionsManager.shared().hasPermission(for: .camera) {
+        if PermissionsManager.shared.hasPermission(for: .camera) {
             presentCameraViewController()
             
-        } else if !PermissionsManager.shared().hasPermission(for: .photo) {
+        } else if !PermissionsManager.shared.hasPermission(for: .photo) {
             presentPhotoPermissionsAlert()
             
         } else {
-            PermissionsManager.shared().requestPermission(for: .camera, openSettingsIfNeeded: true, response: { (granted) in
+            PermissionsManager.shared.requestPermission(for: .camera, openSettingsIfNeeded: true, response: { (granted) in
                 if granted {
                     self.presentCameraViewController()
                 }

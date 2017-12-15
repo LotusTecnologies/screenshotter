@@ -312,10 +312,10 @@
 				5273E3801F7ACE0300C832F8 /* Analytics.swift */,
 				C53B46291FB1A50F00A8C886 /* Intercom.swift */,
 				C5F8D63C1FA05AE40067C26A /* Notification.swift */,
+				C5F73C9D1FE244C800E49F2B /* Permissions.swift */,
 				C5278FD81F3C38510090E422 /* PermissionsManager.h */,
 				C5278FD91F3C38510090E422 /* PermissionsManager.m */,
 				529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */,
-				C5F73C9D1FE244C800E49F2B /* Permissions.swift */,
 			);
 			path = Singletons;
 			sourceTree = "<group>";

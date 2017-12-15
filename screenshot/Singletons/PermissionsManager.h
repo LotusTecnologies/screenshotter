@@ -24,9 +24,9 @@ typedef NS_ENUM(NSUInteger, PermissionStatus) {
 
 typedef void (^PermissionBlock)(BOOL granted);
 
-@interface PermissionsManager : NSObject
+@interface __PermissionsManager : NSObject
 
-+ (PermissionsManager *)sharedPermissionsManager;
++ (__PermissionsManager *)sharedPermissionsManager;
 
 - (PermissionStatus)permissionStatusForType:(PermissionType)type;
 - (BOOL)hasPermissionForType:(PermissionType)type;

@@ -28,8 +28,8 @@ enum PermissionStatus {
 
 typealias PermissionBlock = (_ granted: Bool) -> ()
 
-final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
-    static let shared = _PermissionsManager()
+final class PermissionsManager : NSObject, CLLocationManagerDelegate {
+    static let shared = PermissionsManager()
     
     // MARK: Status
     
@@ -40,7 +40,7 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
         }
     }
     
-    fileprivate func permissionStatus(forType type: PermissionType) -> PermissionStatus {
+    fileprivate func permissionStatus(for type: PermissionType) -> PermissionStatus {
         switch type {
         case .camera:
             return permissionStatus(forCamera: AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo))
@@ -80,6 +80,7 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     fileprivate func permissionStatus(forPush status: UNAuthorizationStatus) -> PermissionStatus {
+        // Fetch to try and keep the status always synced.
         fetchPushPermissionStatus()
         
         switch status {
@@ -105,30 +106,54 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
         }
     }
     
-    func hasPermission(forType type: PermissionType) -> Bool {
-        return permissionStatus(forType: type) == .authorized
+    func hasPermission(for type: PermissionType) -> Bool {
+        return permissionStatus(for: type) == .authorized
+    }
+    
+    func _hasPhotoPermission() -> Bool {
+        return hasPermission(for: .photo)
+    }
+    
+    func _hasPushPermission() -> Bool {
+        return hasPermission(for: .push)
     }
     
     // MARK: Request
     
-    func requestPermission(forType type: PermissionType, response: @escaping PermissionBlock) {
-        func requestResponse() {
+    func requestPermission(for type: PermissionType, response: PermissionBlock? = nil) {
+        func requestResponse(_ granted: Bool) {
+            guard let response = response else {
+                return
+            }
+            
             if Thread.isMainThread {
-//                response()
-            } else {
+                response(granted)
                 
+            } else {
+                DispatchQueue.main.async {
+                    response(granted)
+                }
             }
         }
         
-        
+        switch type {
+        case .camera:
+            requestCameraPermission(with: requestResponse)
+        case .photo:
+            requestPhotoPermission(with: requestResponse)
+        case .push:
+            requestPushPermission(with: requestResponse)
+        case .location:
+            requestLocationPermission(with: requestResponse)
+        }
     }
     
-    func requestPermission(forType type: PermissionType, openSettingsIfNeeded open: Bool, response: @escaping PermissionBlock) {
+    func requestPermission(for type: PermissionType, openSettingsIfNeeded open: Bool, response: PermissionBlock? = nil) {
         if open {
-            let status = permissionStatus(forType: type)
+            let status = permissionStatus(for: type)
             
             if status == .undetermined {
-                requestPermission(forType: type, response: response)
+                requestPermission(for: type, response: response)
                 
             } else {
                 if let url = URL(string: UIApplicationOpenSettingsURLString) {
@@ -137,35 +162,49 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
             }
             
         } else {
-            requestPermission(forType: type, response: response)
+            requestPermission(for: type, response: response)
         }
     }
     
-    fileprivate func requestCameraPermission(with response: @escaping PermissionBlock) {
+    func _requestPhotoPermission(openSettingsIfNeeded open: Bool, response: PermissionBlock?) {
+        requestPermission(for: .photo, openSettingsIfNeeded: open, response: response)
+    }
+    
+    func _requestPushPermission(response: PermissionBlock?) {
+        requestPermission(for: .push, response: response)
+    }
+    
+    fileprivate func requestCameraPermission(with response: PermissionBlock?) {
         let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
         
         if status == .notDetermined {
             AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: response)
             
         } else {
-            response(status == .authorized)
+            if let response = response {
+                response(status == .authorized)
+            }
         }
     }
     
-    fileprivate func requestPhotoPermission(with response: @escaping PermissionBlock) {
+    fileprivate func requestPhotoPermission(with response: PermissionBlock?) {
         let status = PHPhotoLibrary.authorizationStatus()
         
         if status == .notDetermined {
             PHPhotoLibrary.requestAuthorization { requestedStatus in
-                response(requestedStatus == .authorized)
+                if let response = response {
+                    response(requestedStatus == .authorized)
+                }
             }
             
         } else {
-            response(status == .authorized)
+            if let response = response {
+                response(status == .authorized)
+            }
         }
     }
     
-    fileprivate func requestPushPermission(with response: @escaping PermissionBlock) {
+    fileprivate func requestPushPermission(with response: PermissionBlock?) {
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
         
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
@@ -177,11 +216,13 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
                 }
             }
             
-            response(granted)
+            if let response = response {
+                response(granted)
+            }
         }
     }
     
-    fileprivate func requestLocationPermission(with response: @escaping PermissionBlock) {
+    fileprivate func requestLocationPermission(with response: PermissionBlock?) {
         let status = CLLocationManager.authorizationStatus()
         
         if status == .notDetermined {
@@ -197,17 +238,21 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
                 locationManager?.requestAlwaysAuthorization()
                 
             } else {
-                response(false)
+                if let response = response {
+                    response(false)
+                }
             }
             
         } else {
-            response(permissionStatus(forLocation: status) == .authorized)
+            if let response = response {
+                response(permissionStatus(forLocation: status) == .authorized)
+            }
         }
     }
     
     // MARK: Push
     
-    fileprivate func fetchPushPermissionStatus() {
+    func fetchPushPermissionStatus() {
         // The push status returns async, to maintain sync we need to manage the value.
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -232,4 +277,18 @@ final class _PermissionsManager : NSObject, CLLocationManagerDelegate {
     
     // MARK: Alert
     
+    func deniedAlertController(for type: PermissionType, opened: PermissionBlock? = nil) -> UIAlertController? {
+        if type == .photo {
+            let alertController = UIAlertController(title: "permission.photo.denied.title".localized, message: "permission.photo.denied.message".localized, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: { action in
+                if let url = URL(string: UIApplicationOpenSettingsURLString) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: opened)
+                }
+            }))
+            return alertController
+            
+        } else {
+            return nil
+        }
+    }
 }
