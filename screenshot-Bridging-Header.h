@@ -7,7 +7,6 @@
 
 #import <DeepLinkKit/DeepLinkKit.h>
 
-#import "PermissionsManager.h"
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
 #import "WebViewController.h"

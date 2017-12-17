@@ -21,6 +21,7 @@ def shared_pods
     pod 'Firebase/Auth'
     pod 'GoogleSignIn'
     pod 'DeepLinkKit'
+    pod 'lottie-ios'
 end
 
 target 'screenshot' do

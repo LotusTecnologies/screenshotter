@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.applicationIconBadgeNumber = 0
 
         prepareDataStackCompletionIfNeeded()
-        PermissionsManager.shared().fetchPushPermissionStatus()
+        PermissionsManager.shared.fetchPushPermissionStatus()
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
         

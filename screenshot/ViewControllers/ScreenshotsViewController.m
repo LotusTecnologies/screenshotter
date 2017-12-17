@@ -11,8 +11,6 @@
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
 
-#import "PermissionsManager.h"
-
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionNotification,
     ScreenshotsSectionImage
@@ -522,14 +520,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)helperViewAllowAccessAction {
-    [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePhoto openSettingsIfNeeded:YES response:nil];
+    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:nil];
 }
 
 
 #pragma mark - Helper View
 
 - (void)syncHelperViewVisibility {
-    if ([[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto]) {
+    if ([[PermissionsManager shared] _hasPhotoPermission]) {
         if (self.helperView.type != ScreenshotsHelperViewTypeScreenshot) {
             self.helperView.type = ScreenshotsHelperViewTypeScreenshot;
         }

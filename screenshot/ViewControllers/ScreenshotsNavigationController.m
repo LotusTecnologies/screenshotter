@@ -188,13 +188,13 @@
 #pragma mark - Push Permission
 
 - (BOOL)needsToPresentPushAlert {
-    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] && [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto];
+    return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedPushAlert] && [[PermissionsManager shared] _hasPhotoPermission];
 }
 
 - (void)presentPushAlert {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Start Screenshotting" message:@"Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [[PermissionsManager sharedPermissionsManager] requestPermissionForType:PermissionTypePush response:^(BOOL granted) {
+        [[PermissionsManager shared] _requestPushPermissionWithResponse:^(BOOL granted) {
             if (granted) {
                 [self.screenshotsNavigationControllerDelegate screenshotsNavigationControllerDidGrantPushPermissions:self];
                 
