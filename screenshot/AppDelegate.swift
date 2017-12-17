@@ -65,6 +65,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            if let rvc = self.window?.rootViewController, UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+                ChangelogAlert.presentIfNeeded(inViewController: rvc)
+            }
+        }
+        
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
             let aps = remoteNotification["aps"] as? [String : AnyObject],

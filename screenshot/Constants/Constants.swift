@@ -29,6 +29,7 @@ class Constants: NSObject {
     static let segmentWriteKey = "54lr3LDCEhRCTa13eEt2xaDTqnaQxbsC"
     static let buildEnvironmentSuffix = "d"
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
+    static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
@@ -37,6 +38,7 @@ class Constants: NSObject {
     static let segmentWriteKey = "RWoeJieRzzEBZ4GYG3bflJdTMyXHs5Fn"
     static let buildEnvironmentSuffix = ""
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
+    static let whatsNewDomain = "https://api.craze-api.com/static/whatsnew"
 #endif
 
 }

@@ -12,6 +12,7 @@
 		524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */; };
 		525691881FD5DD51008D728D /* UsageStreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524DB5391FC6F69800BD408F /* UsageStreak.swift */; };
 		525BBCFA1F9CBA6800330C95 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525BBCF91F9CBA6800330C95 /* HelperView.swift */; };
+		5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
 		527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 527F17491FA21CA6008082BC /* Craze_Video.mp4 */; };
 		529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */; };
@@ -110,6 +111,7 @@
 		524DB5391FC6F69800BD408F /* UsageStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStreak.swift; sourceTree = "<group>"; };
 		524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDeepLinkHandler.swift; sourceTree = "<group>"; };
 		525BBCF91F9CBA6800330C95 /* HelperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
+		5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangelogAlert.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		527F17491FA21CA6008082BC /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
@@ -379,6 +381,7 @@
 				52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */,
 				524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */,
 				524DB5391FC6F69800BD408F /* UsageStreak.swift */,
+				5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -797,6 +800,7 @@
 				C5278FFE1F3C38510090E422 /* ScreenshotsNavigationController.m in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
+				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
 				C53B462A1FB1A50F00A8C886 /* Intercom.swift in Sources */,
 				C5CAF2781FCBF89A006F37DC /* CurrencyViewController.swift in Sources */,
 				C53B46511FBC396900A8C886 /* Appearance.swift in Sources */,

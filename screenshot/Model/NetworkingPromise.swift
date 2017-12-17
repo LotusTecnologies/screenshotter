@@ -224,4 +224,25 @@ class NetworkingPromise: NSObject {
             task.resume()
         }
     }
+    
+    static func changelog(forAppVersion appVersion: String, localeIdentifier: String) -> Promise<String> {
+        let urlString = [Constants.whatsNewDomain, appVersion, "\(localeIdentifier).json"].joined(separator: "/")
+        guard let URL = URL(string: urlString) else {
+            return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Unable to construct changelog URL"]))
+        }
+        
+        let promise:URLDataPromise = URLSession.shared.dataTask(with: URLRequest(url: URL))
+        return promise.asDataAndResponse().then { data, response -> Promise<String> in
+            guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
+                return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid status code received from AWS lambda"]))
+            }
+        
+            let dictionary = try JSONDecoder().decode([String: String].self, from: data)
+            guard let body = dictionary["body"] else {
+                return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid data received from AWS lambda"]))
+            }
+            
+            return Promise(value: body)
+        }
+    }
 }
