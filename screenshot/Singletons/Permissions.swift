@@ -87,9 +87,6 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     fileprivate func permissionStatus(forPush status: UNAuthorizationStatus) -> PermissionStatus {
-        // Fetch to try and keep the status always synced.
-        fetchPushPermissionStatus()
-        
         switch status {
         case .denied:
             return .denied
