@@ -327,8 +327,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             self.state = ProductsViewControllerStateRetry;
             
         } else if (shoppable.productFilterCount == 0) {
-            self.state = ProductsViewControllerStateLoading;
+            self.products = [self productsForShoppable:shoppable];
             
+            self.state = (self.products.count == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateProducts;            
         } else {
             self.products = [self productsForShoppable:shoppable];
             
