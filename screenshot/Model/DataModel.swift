@@ -118,7 +118,7 @@ class DataModel: NSObject {
         
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "b0x", ascending: true), NSSortDescriptor(key: "b0y", ascending: true), NSSortDescriptor(key: "b1x", ascending: true), NSSortDescriptor(key: "b1y", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
-        request.predicate = NSPredicate(format: "screenshot == %@ AND productCount > 0", screenshot)
+        request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
         let fetchedResultsController = ShoppableFrc(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil, hasShoppablesFrc: hasShoppablesFrc!)
         shoppableFrc = fetchedResultsController as NSFetchedResultsController<Shoppable>
         shoppableFrc?.delegate = self
