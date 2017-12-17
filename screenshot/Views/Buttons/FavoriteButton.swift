@@ -59,5 +59,7 @@ class FavoriteButton: UIButton {
         animate = true
         isSelected = !isSelected
         animate = false
+        
+        TapticHelper.peek()
     }
 }
