@@ -28,6 +28,10 @@ class CurrencyMap : NSObject {
             return item.code == code
         }
     }
+    
+    static var autoCode: String {
+        return "XXX"
+    }
 }
 
 struct CurrencyItem {

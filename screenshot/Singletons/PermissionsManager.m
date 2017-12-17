@@ -44,7 +44,16 @@
         _pushStatus = pushStatus;
         
         BOOL enabled = _pushStatus == PermissionStatusAuthorized;
-        [IntercomHelper.sharedInstance recordPushNotificationStatus:enabled];
+        
+        NSString *name = [NSString stringWithFormat:@"APN %@abled", enabled ? @"En" : @"Dis"];
+        NSDictionary<NSString *, NSString *> *properties = nil;
+
+        NSData *token = [NSUserDefaults.standardUserDefaults objectForKey:[UserDefaultsKeys deviceToken]];
+        if (token != nil) {
+            properties = @{ @"token" : token.description };
+        }
+        
+        [AnalyticsTrackers.standard track:name properties:properties];
     }
 }
 

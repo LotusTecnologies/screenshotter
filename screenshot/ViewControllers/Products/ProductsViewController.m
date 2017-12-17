@@ -15,23 +15,38 @@
 @import FBSDKCoreKit.FBSDKAppEvents;
 
 typedef NS_ENUM(NSUInteger, ProductsSection) {
-    ProductsSectionProduct,
-    ProductsSectionRate
+    ProductsSectionProduct
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate>
+typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
+    ProductsViewControllerStateLoading,
+    ProductsViewControllerStateProducts,
+    ProductsViewControllerStateRetry,
+    ProductsViewControllerStateEmpty
+};
+
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 @property (nonatomic, strong) ProductsOptions *productsOptions;
+@property (nonatomic, strong) ProductsRateView *rateView;
+@property (nonatomic, strong) NSLayoutConstraint *rateViewTopConstraint;
+@property (nonatomic) CGFloat rateViewOffsetY;
+@property (nonatomic) CGFloat rateViewPreviousOffsetY;
+@property (nonatomic, strong) UIAlertAction *productsRateNegativeFeedbackSubmitAction;
+@property (nonatomic, strong) UITextField *productsRateNegativeFeedbackTextField;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
+@property (nonatomic) NSUInteger productsUnfilteredCount;
 
 @property (nonatomic, copy) UIImage *image;
 
 @property (nonatomic, strong) TransitioningController *transitioningController;
+
+@property (nonatomic) ProductsViewControllerState state;
 
 @end
 
@@ -83,12 +98,14 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     });
     
     if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
+        // TODO: Refactor this so the below views are still created, just not shown
         // You shall not pass!
-        [self showNoItemsHelperView];
+        self.state = ProductsViewControllerStateRetry;
+        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
         return;
     }
     
-    self.shoppablesToolbar = ({
+    _shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
         
@@ -107,7 +124,28 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         toolbar;
     });
     
-    self.collectionView = ({
+    _rateView = ({
+        ProductsRateView *view = [[ProductsRateView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
+        [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:view];
+        _rateViewTopConstraint = [view.topAnchor constraintEqualToAnchor:self.view.bottomAnchor];
+        self.rateViewTopConstraint.active = YES;
+        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        
+        CGFloat height = view.intrinsicContentSize.height;
+        
+        if (@available(iOS 11.0, *)) {
+            height += [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
+        }
+        
+        [view.heightAnchor constraintEqualToConstant:height].active = YES;
+        view;
+    });
+    
+    _collectionView = ({
         UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
         CGFloat p = [Geometry padding];
         CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
@@ -120,13 +158,12 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
+        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y + self.rateView.intrinsicContentSize.height, minimumSpacing.x);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-        [collectionView registerClass:[ProductsRateCollectionViewCell class] forCellWithReuseIdentifier:@"rate"];
         
         [self.view insertSubview:collectionView atIndex:0];
         [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
@@ -137,7 +174,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     });
     
     [self updateOptionsView];
-    [self reloadCollectionViewForIndex:0];
+    [self reloadProductsForShoppableAtIndex:0];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -146,7 +183,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     [self.shoppablesToolbar selectFirstShoppable];
     
     if (![self hasShoppables] && !self.noItemsHelperView) {
-        [self.loader startAnimation];
+        self.state = ProductsViewControllerStateLoading;
     }
 }
 
@@ -172,6 +209,35 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 
+#pragma mark - State
+
+- (void)setState:(ProductsViewControllerState)state {
+    _state = state;
+    
+    switch (state) {
+        case ProductsViewControllerStateLoading:
+            [self hideNoItemsHelperView];
+            self.rateView.hidden = YES;
+            [self.loader startAnimation];
+            break;
+            
+        case ProductsViewControllerStateProducts:
+            [self stopAndRemoveLoader];
+            [self hideNoItemsHelperView];
+            self.rateView.hidden = NO;
+            break;
+            
+        case ProductsViewControllerStateRetry:
+        case ProductsViewControllerStateEmpty:
+            [self stopAndRemoveLoader];
+            self.rateView.hidden = YES;
+            [self hideNoItemsHelperView];
+            [self showNoItemsHelperView];
+            break;
+    }
+}
+
+
 #pragma mark - Screenshot
 
 - (void)setScreenshot:(Screenshot *)screenshot {
@@ -191,11 +257,24 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 }
 
 
-#pragma mark - Shoppable / Products
+#pragma mark - Shoppables
 
 - (BOOL)hasShoppables {
     return [self.shoppablesController shoppableCount];
 }
+
+- (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
+    if (!self.noItemsHelperView) {
+        self.state = ProductsViewControllerStateRetry;
+    }
+}
+
+- (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
+    [self reloadProductsForShoppableAtIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+}
+
+
+#pragma mark - Products
 
 - (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
     NSArray<NSSortDescriptor *> *descriptors;
@@ -221,6 +300,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     
     NSInteger mask = [[shoppable getLast] rawValue];
     NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
+    self.productsUnfilteredCount = products.count;
     
     if ([self.productsOptions _sale] == 1) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
@@ -237,29 +317,25 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     return [self.products indexOfObject:product];
 }
 
-- (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
-    if (!self.noItemsHelperView) {
-        [self stopAndRemoveLoader];
-        [self showNoItemsHelperView];
-    }
-}
-
-- (void)shoppablesControllerDidReload:(ShoppablesController *)controller {
-    [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
-}
-
-
-#pragma mark - Collection View
-
-- (void)reloadCollectionViewForIndex:(NSInteger)index {
+- (void)reloadProductsForShoppableAtIndex:(NSInteger)index {
     if ([self hasShoppables]) {
-        BOOL hadProducts = self.products.count > 0;
-        self.products = [self productsForShoppable:[self.shoppablesController shoppableAt:index]];
+        [self repositionRateView];
         
-        (self.products.count == 0) ? [self.loader startAnimation] : [self stopAndRemoveLoader];
+        BOOL hadProducts = self.products.count > 0;
+        Shoppable *shoppable = [self.shoppablesController shoppableAt:index];
+        self.products = [self productsForShoppable:shoppable];
+        
+        if (self.products.count == 0) {
+            self.state = (self.productsUnfilteredCount == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateEmpty;
+            
+        } else {
+            self.state = ProductsViewControllerStateProducts;
+        }
         
         if (hadProducts || self.products.count) {
             [self.collectionView reloadData];
+            
+            [self.rateView setRating:[shoppable getRating] animated:NO];
         }
         
         if (self.products.count) {
@@ -271,6 +347,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         self.products = @[];
     }
 }
+
+
+#pragma mark - Collection View
 
 - (NSInteger)numberOfCollectionViewProductColumns {
     return 2;
@@ -284,22 +363,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if (section == ProductsSectionProduct) {
         return self.products.count;
         
-    } else if (section == ProductsSectionRate) {
-        return self.products.count > 0 ? 1 : 0;
-        
     } else {
         return 0;
     }
-}
-
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    
-    if (section == ProductsSectionRate) {
-        insets.top = [Geometry extendedPadding];
-    }
-    
-    return insets;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -312,10 +378,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         
         size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
         size.height = size.width + [ProductCollectionViewCell labelsHeight];
-        
-    } else if (indexPath.section == ProductsSectionRate) {
-        size.width = floor(collectionView.bounds.size.width - (padding * 2));
-        size.height = 50.f;
     }
     
     return size;
@@ -336,36 +398,9 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         cell.favoriteButton.selected = product.isFavorite;
         return cell;
         
-    } else if (indexPath.section == ProductsSectionRate) {
-        Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-        
-        ProductsRateCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rate" forIndexPath:indexPath];
-        cell.rating = [shoppable getRating];
-        [cell.voteUpButton addTarget:self action:@selector(productsRateVoteUpAction) forControlEvents:UIControlEventTouchUpInside];
-        [cell.voteDownButton addTarget:self action:@selector(productsRateVoteDownAction) forControlEvents:UIControlEventTouchUpInside];
-        return cell;
-        
     } else {
         return nil;
     }
-}
-
-- (void)productsRateVoteUpAction {
-    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setRatingWithPositive:YES];
-    
-    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
-}
-
-- (void)productsRateVoteDownAction {
-    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setRatingWithPositive:NO];
-    
-    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
-}
-
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
-    return indexPath.section == ProductsSectionRate ? NO : YES;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -374,7 +409,6 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
         
         Product *product = [self productAtIndex:indexPath.item];
         
-        // TODO: update to AnalyticsTrackers.standard.trackTappedOnProduct after swift conversion
         [AnalyticsTrackerObjCBridge trackTappedOnProductWithTracker:AnalyticsTrackers.standard
                                                             product:product
                                                              onPage:@"Products"];
@@ -427,6 +461,48 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     [self dismissOptions];
+    [self resetRateViewOffsetY:scrollView];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if ([scrollView isDragging]) {
+        [self adjustRateViewOffsetWithScrollView:scrollView];
+    }
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (!decelerate) {
+        [self animateRateViewIfNeeded];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [self animateRateViewIfNeeded];
+}
+
+- (UIEdgeInsets)scrollViewAjustedContentInset:(UIScrollView *)scrollView {
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    
+    if (@available(iOS 11.0, *)) {
+        insets.top = scrollView.adjustedContentInset.top;
+        insets.bottom = scrollView.adjustedContentInset.bottom;
+        
+    } else {
+        insets.top = CGRectGetMaxY(self.navigationController.navigationBar.frame) + scrollView.contentInset.top;
+        insets.bottom = scrollView.contentInset.bottom;
+    }
+    
+    return insets;
+}
+
+- (CGFloat)scrollViewExpectedContentOffsetY:(UIScrollView *)scrollView {
+    UIEdgeInsets ajustedContentInset = [self scrollViewAjustedContentInset:scrollView];
+    return scrollView.contentOffset.y + ajustedContentInset.top;
+}
+
+- (CGFloat)scrollViewExpectedContentSizeHeight:(UIScrollView *)scrollView {
+    UIEdgeInsets ajustedContentInset = [self scrollViewAjustedContentInset:scrollView];
+    return scrollView.contentOffset.y + scrollView.bounds.size.height - ajustedContentInset.bottom;
 }
 
 
@@ -493,11 +569,115 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
     if (changed) {
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         [shoppable setWithProductsOptions:productsOptions callback:^{
-            [self reloadCollectionViewForIndex:[self.shoppablesToolbar selectedShoppableIndex]];
+            [self reloadProductsForShoppableAtIndex:[self.shoppablesToolbar selectedShoppableIndex]];
         }];
     }
     
     [self dismissOptions];
+}
+
+
+#pragma mark - Rate View
+
+- (void)adjustRateViewOffsetWithScrollView:(UIScrollView *)scrollView {
+    CGFloat expectedContentOffsetY = [self scrollViewExpectedContentOffsetY:scrollView];
+    CGFloat expectedContentSizeHeight = [self scrollViewExpectedContentSizeHeight:scrollView];
+    
+    // Dont change the constraint when bouncing
+    if (expectedContentOffsetY > 0 && expectedContentSizeHeight < scrollView.contentSize.height) {
+        self.rateViewTopConstraint.constant = MIN(0.f, MAX(-self.rateView.bounds.size.height, self.rateViewOffsetY - scrollView.contentOffset.y));
+    }
+    
+    [self resetRateViewOffsetY:scrollView];
+    self.rateViewPreviousOffsetY = scrollView.contentOffset.y;
+}
+
+- (void)resetRateViewOffsetY:(UIScrollView *)scrollView {
+    self.rateViewOffsetY = scrollView.contentOffset.y + self.rateViewTopConstraint.constant;
+}
+
+- (void)animateRateViewIfNeeded {
+    CGFloat minHeight = -self.rateView.bounds.size.height;
+    CGFloat maxHeight = 0.f;
+    CGFloat offsetY = self.rateViewTopConstraint.constant;
+    
+    if (offsetY > minHeight && offsetY < maxHeight) {
+        [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
+            self.rateViewTopConstraint.constant = (offsetY * 2.f > minHeight) ? maxHeight : minHeight;
+            [self.view layoutIfNeeded];
+        }];
+    }
+}
+
+- (void)repositionRateView {
+    self.rateViewTopConstraint.constant = 0.f;
+}
+
+- (void)productsRatePositiveAction {
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:YES];
+    
+    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
+}
+
+- (void)productsRateNegativeAction {
+    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
+    [shoppable setRatingWithPositive:NO];
+    
+    [self presentProductsRateNegativeAlert];
+    
+    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
+}
+
+- (void)presentProductsRateNegativeAlert {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry To Hear That!" message:@"We hear you loud and clear and we’re going to look into this. How else can we help?" preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self presentProductsRateNegativeFeedbackAlert];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
+        [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)presentProductsRateNegativeFeedbackAlert {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"What’s Wrong Here?" message:@"What were you expecting to see and what did you see instead?" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.delegate = self;
+        textField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+        textField.enablesReturnKeyAutomatically = YES;
+        self.productsRateNegativeFeedbackTextField = textField;
+    }];
+    
+    self.productsRateNegativeFeedbackSubmitAction = [UIAlertAction actionWithTitle:@"Submit" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        // Even though we're using `enablesReturnKeyAutomatically` custom keyboards might not support this.
+        NSString *trimmedText = [self.productsRateNegativeFeedbackTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        
+        if (trimmedText.length > 0) {
+            [AnalyticsTrackers.segment track:@"Shoppable Feedback Negative" properties:@{@"text": trimmedText}];
+        }
+    }];
+    self.productsRateNegativeFeedbackSubmitAction.enabled = NO;
+    [alertController addAction:self.productsRateNegativeFeedbackSubmitAction];
+    alertController.preferredAction = self.productsRateNegativeFeedbackSubmitAction;
+    
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+
+#pragma mark - Text Field
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    NSString *text = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    NSString *trimmedText = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    
+    self.productsRateNegativeFeedbackSubmitAction.enabled = (trimmedText.length > 0);
+    
+    return YES;
 }
 
 
@@ -509,17 +689,15 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
     if (self.products.count == 0 && [self isViewLoaded]) {
-        [self stopAndRemoveLoader];
-        
         toolbar.hidden = [self shouldHideToolbar];
         
         [self updateOptionsView];
-        [self reloadCollectionViewForIndex:0];
+        [self reloadProductsForShoppableAtIndex:0];
     }
 }
 
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
-    [self reloadCollectionViewForIndex:index];
+    [self reloadProductsForShoppableAtIndex:index];
     
     [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];
 }
@@ -575,32 +753,32 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 - (void)showNoItemsHelperView {
     CGFloat verPadding = [Geometry extendedPadding];
     CGFloat horPadding = [Geometry padding];
+    CGFloat topOffset = [self.shoppablesToolbar isHidden] ? 0.f : self.shoppablesToolbar.bounds.size.height;
     
     HelperView *helperView = [[HelperView alloc] init];
     helperView.translatesAutoresizingMaskIntoConstraints = NO;
     helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
-    helperView.backgroundColor = self.view.backgroundColor;
     helperView.titleLabel.text = @"No Items Found";
     helperView.subtitleLabel.text = @"No visually similar products were detected";
     helperView.contentImage = [UIImage imageNamed:@"ProductsEmptyListGraphic"];
     [self.view addSubview:helperView];
-    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:topOffset].active = YES;
     [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
     [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     self.noItemsHelperView = helperView;
     
-    MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
-    retryButton.translatesAutoresizingMaskIntoConstraints = NO;
-    retryButton.backgroundColor = [UIColor crazeGreen];
-    [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
-    [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
-    [helperView.controlView addSubview:retryButton];
-    [retryButton.topAnchor constraintEqualToAnchor:helperView.controlView.topAnchor].active = YES;
-    [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
-    [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
-    
-    [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+    if (self.state == ProductsViewControllerStateRetry) {
+        MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
+        retryButton.translatesAutoresizingMaskIntoConstraints = NO;
+        retryButton.backgroundColor = [UIColor crazeGreen];
+        [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
+        [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
+        [helperView.controlView addSubview:retryButton];
+        [retryButton.topAnchor constraintEqualToAnchor:helperView.controlView.topAnchor].active = YES;
+        [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
+        [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
+    }
 }
 
 - (void)hideNoItemsHelperView {
@@ -610,8 +788,7 @@ typedef NS_ENUM(NSUInteger, ProductsSection) {
 
 - (void)noItemsRetryAction {
     [self.shoppablesController refetchShoppables];
-    [self hideNoItemsHelperView];
-    [self.loader startAnimation];
+    self.state = ProductsViewControllerStateLoading;
 }
 
 @end

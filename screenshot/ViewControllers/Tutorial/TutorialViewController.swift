@@ -93,7 +93,7 @@ class TutorialViewController : UIViewController {
     
     private func buildSlides() -> [UIView] {
         let welcomeSlide = TutorialWelcomeSlideView()
-        welcomeSlide.getStartedButtonTapped = presentVideo
+        welcomeSlide.button.addTarget(self, action: #selector(tutorialWelcomeSlideViewDidComplete), for: .touchUpInside)
         
         let emailSlide = TutorialEmailSlideView()
         emailSlide.delegate = self
@@ -173,13 +173,6 @@ class TutorialViewController : UIViewController {
     
     // MARK: - Video
     
-    private func presentVideo() {
-        let viewController = TutorialVideoViewController(video: video)
-        viewController.modalTransitionStyle = .crossDissolve
-        viewController.delegate = self
-        present(viewController, animated: true, completion: nil)
-    }
-    
     @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
@@ -193,14 +186,20 @@ extension TutorialViewController : UIScrollViewDelegate {
     }
 }
 
-extension TutorialViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+extension TutorialViewController : TutorialVideoViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
+    @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
+        let viewController = TutorialVideoViewController(video: video)
+        viewController.modalTransitionStyle = .crossDissolve
+        viewController.delegate = self
+        present(viewController, animated: true, completion: nil)
+    }
+    
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
+        viewController.delegate = nil
         dismissViewController()
         scrollToNextSlide()
     }
-}
-
-extension TutorialViewController : TutorialEmailSlideViewDelegate {
+    
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView) {
         slideView.delegate = nil
         scrollToNextSlide()
@@ -217,9 +216,7 @@ extension TutorialViewController : TutorialEmailSlideViewDelegate {
             present(vc, animated: true, completion: nil)
         }
     }
-}
-
-extension TutorialViewController : TutorialTrySlideViewDelegate {
+    
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {
         slideView.delegate = nil
         

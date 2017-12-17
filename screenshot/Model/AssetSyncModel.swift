@@ -408,7 +408,7 @@ class AssetSyncModel: NSObject {
     
     func currencyParam() -> String {
         guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
-            !productCurrency.isEmpty else {
+            (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) else {
                 return ""
         }
         return "&force_currency=\(productCurrency)"

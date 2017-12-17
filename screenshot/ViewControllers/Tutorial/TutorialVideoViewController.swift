@@ -28,7 +28,7 @@ enum TutorialVideo {
     @objc optional func tutorialVideoViewControllerDidPlay(_ viewController:TutorialVideoViewController)
     @objc optional func tutorialVideoViewControllerDidEnd(_ viewController:TutorialVideoViewController)
     
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController:TutorialVideoViewController)
+    func tutorialVideoViewControllerDidTapDone(_ viewController:TutorialVideoViewController)
 }
 
 class TutorialVideoViewController : BaseViewController {
@@ -201,7 +201,7 @@ class TutorialVideoViewController : BaseViewController {
     @objc private func doneButtonTapped() {
         track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
         
-        delegate?.tutorialVideoViewControllerDoneButtonTapped(self)
+        delegate?.tutorialVideoViewControllerDidTapDone(self)
     }
     
     @objc private func volumeToggleButtonTapped() {

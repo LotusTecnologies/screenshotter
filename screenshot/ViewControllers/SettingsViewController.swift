@@ -278,12 +278,12 @@ class SettingsViewController : BaseViewController {
     // MARK: Product Options
     
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
-        let integer = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
+        let integer = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex).rawValue
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
     @objc fileprivate func sizeControlAction(_ control: UISegmentedControl) {
-        let integer = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        let integer = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex).rawValue
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -540,7 +540,7 @@ fileprivate extension SettingsViewController {
         case .coins:
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
+            return CurrencyViewController.currentCurrency
         default:
             return nil
         }
@@ -714,7 +714,7 @@ extension SettingsViewController : UITextFieldDelegate {
 // MARK: - Tutorial
 
 extension SettingsViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDoneButtonTapped(_ viewController: TutorialVideoViewController) {
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
         dismiss(animated: true, completion: nil)
     }
     

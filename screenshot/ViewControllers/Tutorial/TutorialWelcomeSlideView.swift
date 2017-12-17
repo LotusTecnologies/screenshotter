@@ -9,7 +9,7 @@
 import Foundation
 
 class TutorialWelcomeSlideView : HelperView {
-    var getStartedButtonTapped: (() -> Void)?
+    private(set) var button = MainButton()
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -22,21 +22,13 @@ class TutorialWelcomeSlideView : HelperView {
         subtitleLabel.text = "Any fashion picture you screenshot becomes shoppable in the app"
         contentImage = UIImage(named: "TutorialWelcomeScreenshopIcon")
         
-        let button = MainButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Get Started", for: .normal)
         button.backgroundColor = .crazeGreen
-        button.addTarget(self, action: #selector(getStartedButtonWasTapped), for: .touchUpInside)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-    }
-    
-    // MARK: - Actions
-    
-    @objc private func getStartedButtonWasTapped() {
-        getStartedButtonTapped?()
     }
     
     // MARK: - Private

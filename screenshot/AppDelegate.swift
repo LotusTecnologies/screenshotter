@@ -333,8 +333,7 @@ extension AppDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("[ERROR] FAILED TO REGISTER FOR REMOTE NOTIFICATIONS!")
-        print("\(error)")
+        AnalyticsTrackers.segment.error(withDescription: "Failed to register for remote notifications! (\(error))")
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
