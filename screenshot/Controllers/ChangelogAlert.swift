@@ -36,10 +36,14 @@ struct ChangelogAlert {
             
             // If the request for the changelog of this locale fails, send another request for the default changelog in en_US
             NetworkingPromise.changelog(forAppVersion: version, localeIdentifier: localeIdentifier)
-            .recover { (error) -> Promise<String> in
+            .recover { (error) -> Promise<ChangelogResponse> in
                 return NetworkingPromise.changelog(forAppVersion: version, localeIdentifier: "en_US")
-            }.then(on: .main) { body in
-                let controller = UIAlertController(title: "What's New", message: body, preferredStyle: .alert)
+            }
+            .catch { error in
+                print(error)
+            }
+            .then(on: .main) { response in
+                let controller = UIAlertController(title: response.title, message: response.body, preferredStyle: .alert)
                 controller.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 viewController.present(controller, animated: true, completion: nil)
                 
