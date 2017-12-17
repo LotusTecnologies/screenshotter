@@ -10,15 +10,15 @@ import Foundation
 import AudioToolbox
 
 class TapticHelper: NSObject {
-    static public func peek() {
+    static func peek() {
         AudioServicesPlaySystemSound(1519) // weak boom
     }
     
-    static public func pop() {
+    static func pop() {
         AudioServicesPlaySystemSound(1520) // strong boom
     }
     
-    static public func nope() {
+    static func nope() {
         AudioServicesPlaySystemSound(1521) // series of three weak booms
     }
 }
