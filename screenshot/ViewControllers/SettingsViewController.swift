@@ -278,12 +278,12 @@ class SettingsViewController : BaseViewController {
     // MARK: Product Options
     
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
-        let integer = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
+        let integer = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex).rawValue
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
     @objc fileprivate func sizeControlAction(_ control: UISegmentedControl) {
-        let integer = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        let integer = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex).rawValue
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -378,7 +378,7 @@ extension SettingsViewController : UITableViewDelegate {
         case .version, .email, .coins, .productGender, .productSize, .usageStreak:
             return false
         case .pushPermission, .photoPermission:
-            if let permissionType = row.permissionType, !PermissionsManager.shared().hasPermission(for: permissionType) {
+            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 return true
             } else {
                 return false
@@ -422,7 +422,7 @@ extension SettingsViewController : UITableViewDelegate {
             
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
-                PermissionsManager.shared().requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
+                PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
                     if granted {
                         tableView.reloadRows(at: [indexPath], with: .fade)
                         self.delegate?.settingsViewControllerDidGrantPermission(self)
@@ -540,7 +540,7 @@ fileprivate extension SettingsViewController {
         case .coins:
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
+            return CurrencyViewController.currentCurrency
         default:
             return nil
         }
@@ -551,7 +551,7 @@ fileprivate extension SettingsViewController {
             return nil
         }
         
-        if PermissionsManager.shared().hasPermission(for: permissionType) {
+        if PermissionsManager.shared.hasPermission(for: permissionType) {
             return "generic.enabled".localized
             
         } else {
@@ -571,7 +571,7 @@ fileprivate extension SettingsViewController {
     func cellAccessoryView(for row: SettingsRow) -> UIView? {
         switch (row) {
         case .photoPermission, .pushPermission:
-            if let permissionType = row.permissionType, !PermissionsManager.shared().hasPermission(for: permissionType) {
+            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 let size = CGFloat(18)
                 
                 let label = UILabel(frame: CGRect(x: 0, y: 0, width: size, height: size))

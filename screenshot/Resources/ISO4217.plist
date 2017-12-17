@@ -4,6 +4,12 @@
 <array>
 	<dict>
 		<key>code</key>
+		<string>XXX</string>
+		<key>title</key>
+		<string>Automatic</string>
+	</dict>
+	<dict>
+		<key>code</key>
 		<string>AED</string>
 		<key>title</key>
 		<string>United Arab Emirates Dirham</string>
@@ -822,7 +828,7 @@
 		<key>code</key>
 		<string>TOP</string>
 		<key>title</key>
-		<string>Tongan Pa'anga</string>
+		<string>Tongan Pa&apos;anga</string>
 	</dict>
 	<dict>
 		<key>code</key>

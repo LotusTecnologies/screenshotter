@@ -102,19 +102,7 @@ class IntercomHelper : NSObject {
     func recordUnsatisfactoryRating() {
         Intercom.logEvent(withName: "Rated app less than 4 stars")
     }
-    
-    func recordPushNotificationStatus(_ enabled:Bool) {
-        let name = "APN \(enabled ? "En" : "Dis")abled"
-        var properties = [AnyHashable : Any]()
         
-        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
-            properties["token"] = token.description
-        }
-        
-        track(name)
-        record(event: name, properties: properties)
-    }
-    
     func record(event: String, properties: [AnyHashable : Any]? = nil) {
         if let properties = properties, properties.count > 0 {
             Intercom.logEvent(withName: event, metaData: properties)

@@ -231,8 +231,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 }
 
 - (void)refreshTabBarSettingsBadge {
-    BOOL hasPhotoPermissions = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePhoto];
-    BOOL hasPushPermissions = [[PermissionsManager sharedPermissionsManager] hasPermissionForType:PermissionTypePush];
+    BOOL hasPhotoPermissions = [[PermissionsManager shared] _hasPhotoPermission];
+    BOOL hasPushPermissions = [[PermissionsManager shared] _hasPushPermission];
     
     if (!hasPhotoPermissions || !hasPushPermissions) {
         [self presentTabBarSettingsBadge];

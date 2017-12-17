@@ -70,7 +70,7 @@ public class TutorialTrySlideView : HelperView {
             return
         }
     
-        PermissionsManager.shared().requestPermission(for: .photo) { granted in
+        PermissionsManager.shared.requestPermission(for: .photo) { granted in
             AssetSyncModel.sharedInstance.syncTutorialPhoto(image: image)
             self.delegate?.tutorialTrySlideViewDidComplete(self)
         }
