@@ -36,7 +36,14 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     private var pushStatus: PermissionStatus = .undetermined {
         didSet {
             let enabled = pushStatus == .authorized
-            IntercomHelper.sharedInstance.recordPushNotificationStatus(enabled)
+            let name = enabled ? "APN Enabled" : "APN Disabled"
+            var properties: [String : String]?
+            
+            if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data {
+                properties = ["token": token.description]
+            }
+            
+            AnalyticsTrackers.standard.track(name, properties: properties)
         }
     }
     

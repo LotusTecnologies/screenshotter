@@ -11,8 +11,6 @@
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
 
-#import "PermissionsManager.h"
-
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionNotification,
     ScreenshotsSectionImage
