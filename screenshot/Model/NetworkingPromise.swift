@@ -57,6 +57,33 @@ class NetworkingPromise: NSObject {
         return segments
     }
     
+    static func downloadJsonArray(url: URL) -> Promise<NSArray> {
+        let request = URLRequest(url: url)
+        let session = URLSession.shared
+        let dataPromise: URLDataPromise = session.dataTask(with: request)
+        return dataPromise.asArray()
+    }
+    
+    // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
+    static func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
+        NSLog("GMK outer attempt")
+        var attempts = 0
+        func attempt() -> Promise<T> {
+            attempts += 1
+            NSLog("GMK inner attempt:\(attempts)")
+            return body().recover { error -> Promise<T> in
+                NSLog("GMK attempt:\(attempts) failed, " + (attempts < maxRepeat ? "retrying after \(interdelay)" : "not retrying"))
+                guard attempts < maxRepeat else { throw error }
+                
+                return after(interval: interdelay).then {
+                    return attempt()
+                }
+            }
+        }
+        
+        return attempt()
+    }
+    
     static func downloadInfo(url: URL) -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
             let request = URLRequest(url: url)
@@ -74,6 +101,29 @@ class NetworkingPromise: NSObject {
             }
             dataTask.resume()
         }
+    }
+    
+    static func downloadProducts(url: URL) -> Promise<[String : Any]> {
+        NSLog("GMK downloadProducts starting url:\(url)")
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
+            if let productsDict = nsDict as? [String : Any] {
+                if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    NSLog("GMK downloadProducts success \(productsArray.count) products url:\(url)")
+                    return Promise(value: productsDict)
+                } else {
+                    NSLog("GMK downloadProducts no products url:\(url)")
+                    let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
+                    return Promise(error: error)
+                }
+            }
+            NSLog("GMK downloadProducts unknown error url:\(url)")
+            let error = NSError(domain: "Craze", code: 5, userInfo: [NSLocalizedDescriptionKey: "downloadProducts unknown error"])
+            return Promise(error: error)
+        }
+    }
+    
+    static func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
+        return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {downloadProducts(url: url)})
     }
     
     static func downloadImage(url: URL, screenshotDict: [String : Any]) -> Promise<(Data, [String : Any])> {

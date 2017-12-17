@@ -737,6 +737,7 @@ extension Shoppable {
         let productFilterToSave = ProductFilter(context: managedObjectContext)
         productFilterToSave.optionsMask = Int32(optionsMask.rawValue)
         productFilterToSave.rating = rating
+        productFilterToSave.productCount = 0
         productFilterToSave.dateSet = NSDate()
         productFilterToSave.shoppable = self
     }
@@ -782,14 +783,20 @@ extension Shoppable {
                 for shoppable in results {
                     if let matchingFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMaskInt)).first as? ProductFilter {
                         matchingFilter.dateSet = NSDate()
+                        if matchingFilter.productCount == 0,
+                          let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count {
+                            matchingFilter.productCount = Int16(actualFilteredProductCount)
+                        }
+                        shoppable.productFilterCount = matchingFilter.productCount
                         continue
                     }
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask)
+                    shoppable.productFilterCount = 0
                     guard let offersURL = shoppable.offersURL else {
                         continue
                     }
-                    if let existingProducts = shoppable.products as? Set<Product>,
-                        existingProducts.contains(where: { $0.optionsMask == optionsMaskInt }) {
+                    if let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count,
+                      actualFilteredProductCount > 0 {
                         continue
                     }
                     AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
