@@ -30,11 +30,12 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layoutMargins = .zero
         mainView.addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
-        imageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
+        imageView.layoutMarginsGuide.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
+        imageView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
+        imageView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        imageView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
         
         let shareButtonItem = UIBarButtonItem(title: "SHARE", style: .plain, target: self, action: #selector(shareAction))
         let deleteButtonItem = UIBarButtonItem(title: "DELETE", style: .plain, target: self, action: #selector(deleteAction))
@@ -88,6 +89,20 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     var screenshot: Screenshot? {
         didSet {
             if let screenshot = screenshot, let data = screenshot.imageData as Data? {
+                let size = bounds.size
+                let rect = screenshot.shoppablesBoundingFrame(in: size)
+                
+                if rect.isNull {
+                    // When there's no shoppables, scale the image by 120%
+                    let scaleSize = CGSize(width: size.width * 0.2, height: size.height * 0.2)
+                    
+                    imageView.layoutMargins = UIEdgeInsets(top: scaleSize.height, left: scaleSize.width, bottom: scaleSize.height, right: scaleSize.width)
+                    
+                } else {
+                    // Use the shoppables to display the outer bounding rect
+                    imageView.layoutMargins = UIEdgeInsets(top: rect.origin.y, left: rect.origin.x, bottom: size.height - rect.maxY, right: size.width - rect.maxX)
+                }
+                
                 imageView.image = UIImage(data: data)
                 
             } else {
