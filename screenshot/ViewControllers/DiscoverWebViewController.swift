@@ -10,6 +10,8 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
+    fileprivate let searchBar = UISearchBar()
+    
     override var title: String? {
         set {}
         get {
@@ -40,6 +42,17 @@ class DiscoverWebViewController : WebViewController {
         super.viewDidLoad()
         
         webView.scrollView.delegate = self
+        
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.delegate = self
+        searchBar.barTintColor = .white
+        
+        searchBar.setImage(UIImage(named: "Safari"), for: .search, state: .normal)
+        
+        view.addSubview(searchBar)
+        searchBar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 
         reloadURL()
         
@@ -117,7 +130,13 @@ class DiscoverWebViewController : WebViewController {
     }
 }
 
-extension DiscoverWebViewController: UIScrollViewDelegate {
+extension DiscoverWebViewController : UISearchBarDelegate {
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .topAttached
+    }
+}
+
+extension DiscoverWebViewController : UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return nil
     }
