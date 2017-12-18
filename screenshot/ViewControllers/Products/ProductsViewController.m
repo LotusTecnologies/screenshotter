@@ -318,33 +318,35 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (void)reloadProductsForShoppableAtIndex:(NSInteger)index {
+    self.products = @[];
+    self.productsUnfilteredCount = 0;
+    
     if ([self hasShoppables]) {
         [self repositionRateView];
         
-        BOOL hadProducts = self.products.count > 0;
         Shoppable *shoppable = [self.shoppablesController shoppableAt:index];
-        self.products = [self productsForShoppable:shoppable];
         
-        if (self.products.count == 0) {
-            self.state = (self.productsUnfilteredCount == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateEmpty;
+        if (shoppable.productFilterCount == -1) {
+            self.state = ProductsViewControllerStateRetry;
             
         } else {
-            self.state = ProductsViewControllerStateProducts;
+            self.products = [self productsForShoppable:shoppable];
+            
+            if (shoppable.productFilterCount == 0 && self.productsUnfilteredCount == 0) {
+                self.state = ProductsViewControllerStateLoading;
+                
+            } else {
+                self.state = (self.products.count == 0) ? ProductsViewControllerStateEmpty : ProductsViewControllerStateProducts;
+            }
         }
         
-        if (hadProducts || self.products.count) {
-            [self.collectionView reloadData];
-            
-            [self.rateView setRating:[shoppable getRating] animated:NO];
-        }
+        [self.collectionView reloadData];
+        [self.rateView setRating:[shoppable getRating] animated:NO];
         
         if (self.products.count) {
             // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
-        
-    } else {
-        self.products = @[];
     }
 }
 
