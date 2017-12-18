@@ -40,6 +40,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 @property (nonatomic, strong) UITextField *productsRateNegativeFeedbackTextField;
 
 @property (nonatomic, strong) NSArray<Product *> *products;
+@property (nonatomic) NSUInteger productsUnfilteredCount;
 
 @property (nonatomic, copy) UIImage *image;
 
@@ -299,6 +300,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     NSInteger mask = [[shoppable getLast] rawValue];
     NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
+    self.productsUnfilteredCount = products.count;
     
     if ([self.productsOptions _sale] == 1) { // == .sale
         products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
@@ -317,6 +319,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)reloadProductsForShoppableAtIndex:(NSInteger)index {
     self.products = @[];
+    self.productsUnfilteredCount = 0;
     
     if ([self hasShoppables]) {
         [self repositionRateView];
@@ -326,14 +329,15 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         if (shoppable.productFilterCount == -1) {
             self.state = ProductsViewControllerStateRetry;
             
-        } else if (shoppable.productFilterCount == 0) {
-            self.products = [self productsForShoppable:shoppable];
-            
-            self.state = (self.products.count == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateProducts;            
         } else {
             self.products = [self productsForShoppable:shoppable];
             
-            self.state = (self.products.count == 0) ? ProductsViewControllerStateEmpty : ProductsViewControllerStateProducts;
+            if (shoppable.productFilterCount == 0 && self.productsUnfilteredCount == 0) {
+                self.state = ProductsViewControllerStateLoading;
+                
+            } else {
+                self.state = (self.products.count == 0) ? ProductsViewControllerStateEmpty : ProductsViewControllerStateProducts;
+            }
         }
         
         [self.collectionView reloadData];
