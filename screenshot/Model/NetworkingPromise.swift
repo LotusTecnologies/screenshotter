@@ -57,6 +57,30 @@ class NetworkingPromise: NSObject {
         return segments
     }
     
+    static func downloadJsonArray(url: URL) -> Promise<NSArray> {
+        let request = URLRequest(url: url)
+        let session = URLSession.shared
+        let dataPromise: URLDataPromise = session.dataTask(with: request)
+        return dataPromise.asArray()
+    }
+    
+    // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
+    static func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
+        var attempts = 0
+        
+        func attempt() -> Promise<T> {
+            attempts += 1
+            return body().recover { error -> Promise<T> in
+                guard attempts < maxRepeat else { throw error }
+                return after(interval: interdelay).then {
+                    return attempt()
+                }
+            }
+        }
+        
+        return attempt()
+    }
+    
     static func downloadInfo(url: URL) -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
             let request = URLRequest(url: url)
@@ -74,6 +98,25 @@ class NetworkingPromise: NSObject {
             }
             dataTask.resume()
         }
+    }
+    
+    static func downloadProducts(url: URL) -> Promise<[String : Any]> {
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
+            if let productsDict = nsDict as? [String : Any] {
+                if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    return Promise(value: productsDict)
+                } else {
+                    let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
+                    return Promise(error: error)
+                }
+            }
+            let error = NSError(domain: "Craze", code: 5, userInfo: [NSLocalizedDescriptionKey: "downloadProducts unknown error"])
+            return Promise(error: error)
+        }
+    }
+    
+    static func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
+        return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {downloadProducts(url: url)})
     }
     
     static func downloadImage(url: URL, screenshotDict: [String : Any]) -> Promise<(Data, [String : Any])> {
