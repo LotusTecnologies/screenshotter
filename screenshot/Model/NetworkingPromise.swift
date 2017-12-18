@@ -66,15 +66,12 @@ class NetworkingPromise: NSObject {
     
     // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
     static func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
-        NSLog("GMK outer attempt")
         var attempts = 0
+        
         func attempt() -> Promise<T> {
             attempts += 1
-            NSLog("GMK inner attempt:\(attempts)")
             return body().recover { error -> Promise<T> in
-                NSLog("GMK attempt:\(attempts) failed, " + (attempts < maxRepeat ? "retrying after \(interdelay)" : "not retrying"))
                 guard attempts < maxRepeat else { throw error }
-                
                 return after(interval: interdelay).then {
                     return attempt()
                 }
@@ -104,19 +101,15 @@ class NetworkingPromise: NSObject {
     }
     
     static func downloadProducts(url: URL) -> Promise<[String : Any]> {
-        NSLog("GMK downloadProducts starting url:\(url)")
         return URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
-                    NSLog("GMK downloadProducts success \(productsArray.count) products url:\(url)")
                     return Promise(value: productsDict)
                 } else {
-                    NSLog("GMK downloadProducts no products url:\(url)")
                     let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
                     return Promise(error: error)
                 }
             }
-            NSLog("GMK downloadProducts unknown error url:\(url)")
             let error = NSError(domain: "Craze", code: 5, userInfo: [NSLocalizedDescriptionKey: "downloadProducts unknown error"])
             return Promise(error: error)
         }

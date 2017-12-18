@@ -520,7 +520,6 @@ class AssetSyncModel: NSObject {
                 shoppable.productCount = productOrder
                 if productOrder == 0 {
                     productOrder = -1
-                    print("AssetSyncModel extractProducts no products. offersUrl:\(url)")
                 }
                 shoppable.productFilterCount = productOrder
                 if let productFilter = shoppable.productFilters?.anyObject() as? ProductFilter {
@@ -582,7 +581,6 @@ class AssetSyncModel: NSObject {
             var changedProductCount = addedProductCount + existingProductCount
             if changedProductCount == 0 {
                 changedProductCount = -1
-                print("AssetSyncModel reExtractProducts no products. offersUrl:\(shoppable.offersURL ?? "-")")
             }
             shoppable.productFilterCount = changedProductCount
             if let productFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMask32)).first as? ProductFilter {
@@ -603,7 +601,6 @@ class AssetSyncModel: NSObject {
             updateShoppableWithProducts(shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
             return
         }
-        print("reExtractProducts url:\(url)")
         NetworkingPromise.downloadProductsWithRetry(url: url)
             .then(on: self.processingQ) { productsDict -> Void in
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
