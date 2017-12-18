@@ -100,6 +100,11 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [super viewWillAppear:animated];
     
     [self refreshTabBarSettingsBadge];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     [self presentUpdatePromptIfNeeded];
     [self presentChangelogAlertIfNeeded];
 }
