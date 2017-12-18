@@ -9,7 +9,7 @@
 import UIKit
 import PromiseKit
 
-struct ChangelogResponse : Decodable {
+fileprivate struct ChangelogResponse : Decodable {
     enum CodingKeys : String, CodingKey {
         case title = "title"
         case body = "body"
@@ -30,7 +30,7 @@ struct ChangelogResponse : Decodable {
 }
 
 
-extension NetworkingPromise {
+fileprivate extension NetworkingPromise {
     static func changelog(forAppVersion appVersion: String, localeIdentifier: String) -> Promise<ChangelogResponse> {
         let urlString = [Constants.whatsNewDomain, appVersion, "\(localeIdentifier).json"].joined(separator: "/")
         guard let URL = URL(string: urlString) else {
@@ -49,7 +49,7 @@ extension NetworkingPromise {
     }
 }
 
-struct ChangelogAlert {
+public class ChangelogAlertController : NSObject {
     static var lastVersion: String? {
         get {
              return UserDefaults.standard.string(forKey: UserDefaultsKeys.previousAppVersion)
