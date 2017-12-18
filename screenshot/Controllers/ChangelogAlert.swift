@@ -51,7 +51,7 @@ fileprivate extension NetworkingPromise {
 
 public class ChangelogAlertController : NSObject {
     static var lastVersion: String? {
-        return AppDelegate.shared.settings.persistedPreviousVersion
+        return AppDelegate.shared.settings.previousAppVersion
     }
     
     static func presentIfNeeded(inViewController viewController: UIViewController) {

@@ -13,12 +13,12 @@ final class AppSettings : NSObject {
     fileprivate(set) var forcedDiscoverURL: URL?
     fileprivate(set) var updateVersion: String?
     fileprivate(set) var forcedUpdateVersion: String?
-    fileprivate(set) var persistedPreviousVersion: String?
+    fileprivate(set) var previousAppVersion: String?
     
     private var setter: AppSettingsSetter
     
     init(withSetter setter: AppSettingsSetter) {
-        persistedPreviousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.previousAppVersion)
+        previousAppVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.previousAppVersion)
         UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.previousAppVersion)
         
         self.setter = setter
