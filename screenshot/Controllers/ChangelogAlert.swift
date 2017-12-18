@@ -51,33 +51,23 @@ fileprivate extension NetworkingPromise {
 
 public class ChangelogAlertController : NSObject {
     static var lastVersion: String? {
-        get {
-             return UserDefaults.standard.string(forKey: UserDefaultsKeys.previousAppVersion)
-        }
-        set {
-             UserDefaults.standard.set(newValue, forKey: UserDefaultsKeys.previousAppVersion)
-        }
+        return AppDelegate.shared.settings.persistedPreviousVersion
     }
-    
-    private static let currentVersion = Bundle.displayVersion
     
     static func presentIfNeeded(inViewController viewController: UIViewController) {
         guard let last = lastVersion else {
-            lastVersion = currentVersion
             return
         }
         
+        let currentVersion = Bundle.displayVersion
         if last.compare(currentVersion, options: .numeric) == .orderedAscending {
-            lastVersion = currentVersion
-
             // Last version was less than this one. Present alert
             let localeIdentifier = Locale.current.identifier
-            let version = currentVersion
             
             // If the request for the changelog of this locale fails, send another request for the default changelog in en_US
-            NetworkingPromise.changelog(forAppVersion: version, localeIdentifier: localeIdentifier)
+            NetworkingPromise.changelog(forAppVersion: currentVersion, localeIdentifier: localeIdentifier)
             .recover { (error) -> Promise<ChangelogResponse> in
-                return NetworkingPromise.changelog(forAppVersion: version, localeIdentifier: "en_US")
+                return NetworkingPromise.changelog(forAppVersion: currentVersion, localeIdentifier: "en_US")
             }
             .catch { error in
                 print(error)
