@@ -691,6 +691,20 @@ extension Screenshot {
             }
         }
     }
+    
+    @objc func shoppablesBoundingFrame(in size: CGSize) -> CGRect {
+        var frame: CGRect = .null
+        
+        if let shoppables = shoppables {
+            for shoppable in shoppables {
+                if let shoppable = shoppable as? Shoppable {
+                    frame = frame.union(shoppable.frame(size: size))
+                }
+            }
+        }
+        
+        return frame
+    }
 
 }
 
