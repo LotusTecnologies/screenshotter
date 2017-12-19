@@ -29,7 +29,6 @@ fileprivate struct ChangelogResponse : Decodable {
     }
 }
 
-
 fileprivate extension NetworkingPromise {
     static func changelog(forAppVersion appVersion: String, localeIdentifier: String) -> Promise<ChangelogResponse> {
         let urlString = [Constants.whatsNewDomain, appVersion, "\(localeIdentifier).json"].joined(separator: "/")
@@ -50,18 +49,12 @@ fileprivate extension NetworkingPromise {
 }
 
 public class ChangelogAlertController : NSObject {
-    static var lastVersion: String? {
-        return AppDelegate.shared.settings.previousAppVersion
-    }
-    
     static func presentIfNeeded(inViewController viewController: UIViewController) {
-        guard let last = lastVersion else {
-            return
-        }
+        let appSettings = AppDelegate.shared.settings
         
-        let currentVersion = Bundle.displayVersion
-        if last.compare(currentVersion, options: .numeric) == .orderedAscending {
+        if appSettings.isCurrentVersion(greaterThan: appSettings.previousVersion) {
             // Last version was less than this one. Present alert
+            let currentVersion = Bundle.displayVersion
             let localeIdentifier = Locale.current.identifier
             
             // If the request for the changelog of this locale fails, send another request for the default changelog in en_US
@@ -73,7 +66,7 @@ public class ChangelogAlertController : NSObject {
                 print(error)
             }
             .then(on: .main) { response in
-                let title = response.title ?? "changelog.alert.title.default".localized
+                let title = response.title ?? "changelog.title".localized
                 let controller = UIAlertController(title: title, message: response.body, preferredStyle: .alert)
                 controller.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
                 viewController.present(controller, animated: true, completion: nil)
@@ -83,4 +76,3 @@ public class ChangelogAlertController : NSObject {
         }
     }
 }
-

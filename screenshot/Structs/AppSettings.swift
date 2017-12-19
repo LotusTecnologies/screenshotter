@@ -13,27 +13,37 @@ final class AppSettings : NSObject {
     fileprivate(set) var forcedDiscoverURL: URL?
     fileprivate(set) var updateVersion: String?
     fileprivate(set) var forcedUpdateVersion: String?
-    fileprivate(set) var previousAppVersion: String?
+    fileprivate(set) var previousVersion: String?
     
     private var setter: AppSettingsSetter
     
     init(withSetter setter: AppSettingsSetter) {
-        previousAppVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.previousAppVersion)
-        UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.previousAppVersion)
+        previousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
+        UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.persistentVersion)
         
         self.setter = setter
         super.init()
         setter.settings = self
     }
     
+    // MARK: Version
+    
     private let currentVersion = Bundle.displayVersion
     
+    func isCurrentVersion(lessThan version: String?) -> Bool {
+        return version?.compare(currentVersion, options: .numeric) == .orderedDescending
+    }
+    
+    func isCurrentVersion(greaterThan version: String?) -> Bool {
+        return version?.compare(currentVersion, options: .numeric) == .orderedAscending
+    }
+    
     var shouldUpdate: Bool {
-        return updateVersion?.compare(currentVersion, options: .numeric) == .orderedDescending
+        return isCurrentVersion(lessThan: updateVersion)
     }
     
     var shouldForceUpdate: Bool {
-        return forcedUpdateVersion?.compare(currentVersion, options: .numeric) == .orderedDescending
+        return isCurrentVersion(lessThan: forcedUpdateVersion)
     }
 }
 

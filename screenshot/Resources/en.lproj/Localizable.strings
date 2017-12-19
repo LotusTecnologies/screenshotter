@@ -11,7 +11,7 @@
 // https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
-"changelog.alert.title.default" = "What's New";
+"changelog.title" = "What's New";
 
 "currency.auto" = "Automatic";
 
@@ -117,7 +117,3 @@
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
 "update.request.title" = "New Version Available";
 "update.request.message" = "Update now for the best Screenshop experience!";
-
-
-
-
