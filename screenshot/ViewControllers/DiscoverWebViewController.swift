@@ -42,12 +42,14 @@ class DiscoverWebViewController : WebViewController {
         super.viewDidLoad()
         
         webView.scrollView.delegate = self
+        webView.scrollView.keyboardDismissMode = .onDrag
         
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
         searchBar.barTintColor = .white
         
-        searchBar.setImage(UIImage(named: "Safari"), for: .search, state: .normal)
+        searchBar.setImage(UIImage(named: "InviteGoogleIcon"), for: .search, state: .normal)
+        
         
         view.addSubview(searchBar)
         searchBar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
@@ -133,6 +135,18 @@ class DiscoverWebViewController : WebViewController {
 extension DiscoverWebViewController : UISearchBarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         return .topAttached
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if let text = searchBar.text, !text.isEmpty {
+            url = googleSearchURL(text)
+            
+            searchBar.resignFirstResponder()
+        }
+    }
+    
+    private func googleSearchURL(_ query: String) -> URL? {
+        return URL(string: "https://google.com/search?q=\(query)")
     }
 }
 
