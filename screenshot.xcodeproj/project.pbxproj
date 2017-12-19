@@ -36,7 +36,6 @@
 		C53B46621FBC7CBD00A8C886 /* TransitioningController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46611FBC7CBD00A8C886 /* TransitioningController.swift */; };
 		C540880D1FE90C8E00198955 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C21FE90C8D00198955 /* Loader.swift */; };
 		C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C31FE90C8D00198955 /* LoadingViewController.swift */; };
-		C540880F1FE90C8E00198955 /* BarButtonItemExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C51FE90C8D00198955 /* BarButtonItemExt.swift */; };
 		C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C71FE90C8D00198955 /* SettingsViewController.swift */; };
 		C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */; };
 		C54088121FE90C8E00198955 /* TutorialEmailSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */; };
@@ -81,6 +80,9 @@
 		C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884F1FE90E2200198955 /* FloatingActionButton.swift */; };
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
+		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
+		C56F889F1FE949330006914C /* BarButtonItemExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889E1FE949320006914C /* BarButtonItemExt.swift */; };
+		C56F88A21FE949720006914C /* TappableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F88A11FE949720006914C /* TappableText.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
@@ -138,7 +140,6 @@
 		C53B46611FBC7CBD00A8C886 /* TransitioningController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitioningController.swift; sourceTree = "<group>"; };
 		C54087C21FE90C8D00198955 /* Loader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C54087C31FE90C8D00198955 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
-		C54087C51FE90C8D00198955 /* BarButtonItemExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarButtonItemExt.swift; sourceTree = "<group>"; };
 		C54087C71FE90C8D00198955 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideView.swift; sourceTree = "<group>"; };
 		C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideView.swift; sourceTree = "<group>"; };
@@ -196,6 +197,9 @@
 		C540884F1FE90E2200198955 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
+		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
+		C56F889E1FE949320006914C /* BarButtonItemExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarButtonItemExt.swift; sourceTree = "<group>"; };
+		C56F88A11FE949720006914C /* TappableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableText.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
@@ -343,7 +347,6 @@
 			children = (
 				C54087DA1FE90C8D00198955 /* Currency */,
 				C54087F61FE90C8E00198955 /* Discover */,
-				C54087C41FE90C8D00198955 /* Extension */,
 				C54087F31FE90C8E00198955 /* Favorite */,
 				C54087F81FE90C8E00198955 /* Generic */,
 				C54087DC1FE90C8D00198955 /* Invite */,
@@ -368,14 +371,6 @@
 				C54087C31FE90C8D00198955 /* LoadingViewController.swift */,
 			);
 			path = Loading;
-			sourceTree = "<group>";
-		};
-		C54087C41FE90C8D00198955 /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				C54087C51FE90C8D00198955 /* BarButtonItemExt.swift */,
-			);
-			path = Extension;
 			sourceTree = "<group>";
 		};
 		C54087C61FE90C8D00198955 /* Settings */ = {
@@ -505,9 +500,11 @@
 				C540884D1FE90E2200198955 /* Button */,
 				C54088461FE90E2200198955 /* ClipView.swift */,
 				C54088471FE90E2200198955 /* CollectionViewCell */,
+				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
 				C54088411FE90E2200198955 /* PresentationController */,
+				C56F88A01FE949560006914C /* Protocol */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C540884A1FE90E2200198955 /* TextView */,
 			);
@@ -559,6 +556,7 @@
 			children = (
 				C540884B1FE90E2200198955 /* TappableTextView.h */,
 				C540884C1FE90E2200198955 /* TappableTextView.m */,
+				C56F889B1FE9478D0006914C /* TappableTextView.swift */,
 			);
 			path = TextView;
 			sourceTree = "<group>";
@@ -580,6 +578,22 @@
 				528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */,
 			);
 			path = Constants;
+			sourceTree = "<group>";
+		};
+		C56F889D1FE949320006914C /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				C56F889E1FE949320006914C /* BarButtonItemExt.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		C56F88A01FE949560006914C /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				C56F88A11FE949720006914C /* TappableText.swift */,
+			);
+			path = Protocol;
 			sourceTree = "<group>";
 		};
 		C5C8465E1F9740D400BCCB3E /* Game */ = {
@@ -908,6 +922,7 @@
 				C54088551FE90E2200198955 /* ClipView.swift in Sources */,
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
+				C56F88A21FE949720006914C /* TappableText.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
@@ -916,7 +931,6 @@
 				C540882B1FE90C8E00198955 /* DiscoverWebViewController.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C54088581FE90E2200198955 /* TappableTextView.m in Sources */,
-				C540880F1FE90C8E00198955 /* BarButtonItemExt.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
 				C54088191FE90C8E00198955 /* WebViewController.m in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
@@ -925,6 +939,7 @@
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54088211FE90C8E00198955 /* MainTabBarController.m in Sources */,
 				C540881E1FE90C8E00198955 /* InviteViewController.swift in Sources */,
+				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
@@ -933,6 +948,7 @@
 				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C54088131FE90C8E00198955 /* TutorialSlideView.swift in Sources */,
+				C56F889F1FE949330006914C /* BarButtonItemExt.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
