@@ -93,8 +93,9 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
                 let rect = screenshot.shoppablesBoundingFrame(in: size)
                 
                 if rect.isNull {
-                    // When there's no shoppables, scale the image by 120%
-                    let scaleSize = CGSize(width: size.width * 0.2, height: size.height * 0.2)
+                    // When there's no shoppables, scale the image by 110%
+                    let scaleRatio = CGFloat(0.1)
+                    let scaleSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
                     
                     imageView.layoutMargins = UIEdgeInsets(top: scaleSize.height, left: scaleSize.width, bottom: scaleSize.height, right: scaleSize.width)
                     
