@@ -161,7 +161,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y + self.rateView.intrinsicContentSize.height, minimumSpacing.x);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
-        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
+        // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
+        // Then test why the control view jumps before being dragged away.
+        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
