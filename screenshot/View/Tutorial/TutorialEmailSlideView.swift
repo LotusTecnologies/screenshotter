@@ -85,7 +85,7 @@ public class TutorialEmailSlideView : HelperView {
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         
         {
-            textView.delegate = self
+            textView.tappableTextDelegate = self
             textView.translatesAutoresizingMaskIntoConstraints = false
             textView.backgroundColor = .clear
             textView.textColor = .gray6
@@ -102,23 +102,23 @@ public class TutorialEmailSlideView : HelperView {
             textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             
-            let tappableText: [[String: NSNumber]] = [
-                ["By tapping \"Submit\" above, you agree to our ": NSNumber(value: false)],
-                ["Terms of Service": NSNumber(value: true)],
-                [" and ": NSNumber(value: false)],
-                ["Privacy Policy": NSNumber(value: true)],
-                [" ": NSNumber(value: false)]
+            let tappableText: [[String : Bool]] = [
+                ["By tapping \"Submit\" above, you agree to our ": false],
+                ["Terms of Service": true],
+                [" and ": false],
+                ["Privacy Policy": true],
+                [" ": false]
             ]
             
             let paragraph = NSMutableParagraphStyle()
             paragraph.alignment = textView.textAlignment
             
-            let attributes: [String : Any] = [
+            let attributes: [String : AnyObject] = [
                 NSFontAttributeName: textView.font!,
                 NSParagraphStyleAttributeName: paragraph
             ]
             
-            textView.applyTappableText(tappableText, withAttributes: attributes)
+            textView.applyTappableText(tappableText, with: attributes)
         }()
         
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
@@ -258,8 +258,8 @@ public class TutorialEmailSlideView : HelperView {
     }
 }
 
-extension TutorialEmailSlideView : TappableTextViewDelegate {
-    public func tappableTextView(_ textView: TappableTextView!, tappedTextAt index: UInt) {
+extension TutorialEmailSlideView : TappableTextDelegate {
+    func tappableText(view: TappableTextProtocol, tappedTextAt index: UInt) {
         switch index {
         case 3:
             delegate?.tutorialEmailSlideViewDidTapPrivacyPolicy(self)

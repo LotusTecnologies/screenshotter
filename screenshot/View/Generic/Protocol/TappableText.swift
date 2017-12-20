@@ -16,7 +16,7 @@ protocol TappableTextProtocol : NSObjectProtocol {
     // @YES then the text fragment becomes tappable. Note that for
     // the best tapping results, a space key ' ', should always be
     // inserted before and after tappable text fragments.
-    func applyTappableText(_ texts: [[String : UInt]], with attributes: [String : AnyObject]?)
+    func applyTappableText(_ texts: [[String : Bool]], with attributes: [String : AnyObject]?)
 }
 
 protocol TappableTextDelegate : NSObjectProtocol {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-class _TappableTextView : UITextView, TappableTextProtocol {
+class TappableTextView : UITextView, TappableTextProtocol {
     weak var tappableTextDelegate: TappableTextDelegate?
     private var tappableIndexes: [UInt]?
     
@@ -43,31 +43,26 @@ class _TappableTextView : UITextView, TappableTextProtocol {
         }
     }
     
-    func applyTappableText(_ texts: [[String : UInt]], with attributes: [String : AnyObject]? = nil) {
+    func applyTappableText(_ texts: [[String : Bool]], with attributes: [String : AnyObject]? = nil) {
         var tappableIndexes: [UInt] = []
         let attributedString = NSMutableAttributedString()
         
-        for i in 0 ..< texts.count {
-            let dictionary = texts[i]
-            
-            guard let text = dictionary.keys.first else {
-                continue
+        texts.enumerated().forEach { (index: Int, dictionary: [String : Bool]) in
+            if let text = dictionary.keys.first, let isTappable = dictionary.values.first {
+                var fragmentAttributes: [String : Any]?
+                
+                if isTappable {
+                    tappableIndexes.append(UInt(index))
+                    fragmentAttributes = [
+                        "\(index)": isTappable,
+                        NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
+                        NSUnderlineColorAttributeName: UIColor.gray7
+                    ]
+                }
+                
+                let fragmentAttributedString = NSAttributedString(string: text, attributes: fragmentAttributes)
+                attributedString.append(fragmentAttributedString)
             }
-            
-            let isTappable = dictionary.values.first ?? 0 > 0
-            var fragmentAttributes: [String : Any]?
-            
-            if isTappable {
-                tappableIndexes.append(UInt(i))
-                fragmentAttributes = [
-                    "\(i)": isTappable,
-                    NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-                    NSUnderlineColorAttributeName: UIColor.gray7
-                ]
-            }
-            
-            let fragmentAttributedString = NSAttributedString(string: text, attributes: fragmentAttributes)
-            attributedString.append(fragmentAttributedString)
         }
         
         if let attributes = attributes {
