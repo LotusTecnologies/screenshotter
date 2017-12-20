@@ -86,6 +86,7 @@
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
+		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
 		C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5C8465F1F9740D400BCCB3E /* GameScene.sks */; };
 		C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C846601F9740D400BCCB3E /* GameScene.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
@@ -201,6 +202,7 @@
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
+		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		C5C8465F1F9740D400BCCB3E /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C5C846601F9740D400BCCB3E /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
@@ -397,9 +399,10 @@
 		C54087D21FE90C8D00198955 /* WebView */ = {
 			isa = PBXGroup;
 			children = (
-				C54087D31FE90C8D00198955 /* WebViewController.m */,
 				C54087D41FE90C8D00198955 /* WebView.swift */,
 				C54087D51FE90C8D00198955 /* WebViewController.h */,
+				C54087D31FE90C8D00198955 /* WebViewController.m */,
+				C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */,
 			);
 			path = WebView;
 			sourceTree = "<group>";
@@ -947,6 +950,7 @@
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				C54088141FE90C8E00198955 /* TutorialProductsPageViewController.m in Sources */,
+				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
