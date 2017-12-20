@@ -20,6 +20,11 @@ class Constants: NSObject {
     // Default UI / UX
     static let defaultAnimationDuration = 0.25
     
+    // Syte
+    static let syteAccountId = 6677
+    static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="
+    static let syteHardcodedAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTM3NjEzNzI1OTksInV1aWQiOiJjMTliZmVkNy05M2FmLTVkZjAtYTQ1ZS1kNWQ5ZGVmMjMzMjYifQ.6KtjqtvusixdqoaZjfp3au9b6SU5x-mdyq8WEJJx2U0"
+    
     // Keys
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"

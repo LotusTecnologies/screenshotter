@@ -839,6 +839,13 @@ extension Shoppable {
     
     @objc public func setRating(positive: Bool) {
         let shoppableID = self.objectID
+        let imageUrl = self.screenshot?.uploadedImageURL
+        let offersUrl = self.offersURL
+        let b0x = self.b0x
+        let b0y = self.b0y
+        let b1x = self.b1x
+        let b1y = self.b1y
+
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
@@ -850,14 +857,22 @@ extension Shoppable {
                 let positiveRating: Int16 = 5
                 let negativeRating: Int16 = 1
                 let ratingValue: Int16 = positive ? positiveRating : negativeRating
+                let optionsMask: ProductsOptionsMask
                 if let productFilter = results.first {
                     productFilter.rating = ratingValue
+                    optionsMask = ProductsOptionsMask(rawValue: Int(productFilter.optionsMask))
                 } else {
                     guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableID) else {
                         return
                     }
-                    shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: ProductsOptionsMask(rawValue: 9), rating: ratingValue)
+                    optionsMask = ProductsOptionsMask(rawValue: 9)
+                    shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask, rating: ratingValue)
                 }
+                var augmentedOffersUrl: String? = nil
+                if let offersUrl = offersUrl {
+                    augmentedOffersUrl = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersUrl, optionsMask: optionsMask)?.absoluteString
+                }
+                NetworkingPromise.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
                 try managedObjectContext.save()
             } catch {
                 print("setRating shoppableID:\(shoppableID) results with error:\(error)")
