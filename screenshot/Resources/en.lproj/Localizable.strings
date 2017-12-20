@@ -25,6 +25,7 @@
 "favorites.empty.title" = "No Favorites";
 "favorites.title" = "Favorites";
 
+"game.enter" = "Get More Coins";
 "game.restart" = "Tap to play again";
 "game.score" = "My coins: %d";
 "game.start" = "Tap to get more coins";
@@ -117,3 +118,5 @@
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
 "update.request.title" = "New Version Available";
 "update.request.message" = "Update now for the best Screenshop experience!";
+
+"webview.loading" = "Loading...";

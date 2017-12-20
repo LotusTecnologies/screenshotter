@@ -26,9 +26,9 @@ class DiscoverWebViewController : WebViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        toolbarEnabled = false
+        isToolbarEnabled = false
         
-        loaderLabelText = "discover.load"
+        loaderLabelText = "discover.load".localized
         
         navigationItem.leftBarButtonItems = leftBarButtonItems()
         navigationItem.rightBarButtonItems = rightBarButtonItems()
@@ -43,10 +43,10 @@ class DiscoverWebViewController : WebViewController {
 
         reloadURL()
         
-        AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url])
+        AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url ?? ""])
     }
     
-    // MARK: URLs
+    // MARK: URL
     
     var deepLinkURL: URL? {
         didSet {
@@ -91,8 +91,6 @@ class DiscoverWebViewController : WebViewController {
         return url
     }
     
-//    private
-    
     // MARK: Bar Button Item
     
     func leftBarButtonItems() -> [UIBarButtonItem] {
@@ -110,8 +108,8 @@ class DiscoverWebViewController : WebViewController {
     }
 
     // MARK: Bar Button Item Actions
-
-    func refreshAction() {
+    
+    @objc override func refreshAction() {
         reloadURL()
         AnalyticsTrackers.standard.track("Refreshed Discover webpage")
     }

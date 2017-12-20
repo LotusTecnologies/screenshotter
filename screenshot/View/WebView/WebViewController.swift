@@ -8,22 +8,16 @@
 
 import Foundation
 import WebKit
+import SpriteKit
 import Appsee
 
-class _WebViewController : BaseViewController {
-    var isToolbarEnabled = true
-    var loaderLabelText = "Loading..." // TODO: localize
-    
+class WebViewController : BaseViewController {
     let webView = WebView()
-    
-    fileprivate var loadingCoverView: UIImageView?
-    fileprivate var loader: Loader?
     
     // MARK: Life Cycle
     
-    private var didLoadInitialPage = false
-    private var didViewAppear = false
-    fileprivate var isShowingGame = false
+    fileprivate var didLoadInitialPage = false
+    fileprivate var didViewAppear = false
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -32,7 +26,7 @@ class _WebViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-//        setupBarButtonItems()
+        setupBarButtonItems()
         
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
@@ -51,7 +45,7 @@ class _WebViewController : BaseViewController {
         webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoBack), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoForward), options: .new, context: nil)
         
-//        setBarButtonItemsToToolbarIfPossible()
+        setBarButtonItemsToToolbarIfPossible()
         
         if let url = url {
             loadRequestURL(url)
@@ -132,7 +126,7 @@ class _WebViewController : BaseViewController {
             if keyPath == #keyPath(WebView.canGoBack) || keyPath == #keyPath(WebView.canGoForward) {
                 shouldCallSuper = false
                 
-//                syncToolbarNavigationItems()
+                syncToolbarNavigationItems()
             }
         }
         
@@ -152,6 +146,8 @@ class _WebViewController : BaseViewController {
     
     // MARK: URL
     
+    private var isShorteningURL = false
+    
     var url: URL? {
         didSet {
             if let url = url, isViewLoaded {
@@ -168,9 +164,159 @@ class _WebViewController : BaseViewController {
     
     // MARK: Toolbar
     
+    fileprivate lazy var toolbar: UIToolbar = {
+        let toolbar = UIToolbar()
+        toolbar.frame = CGRect(x: 0, y: 0, width: 0, height: toolbar.intrinsicContentSize.height)
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        toolbar.isHidden = !self.isToolbarEnabled
+        self.view.addSubview(toolbar)
+        toolbar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        toolbar.bottomAnchor.constraint(equalTo: self.view.layoutMarginsGuide.bottomAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        
+        var insets = self.webView.scrollView.contentInset
+        insets.bottom = toolbar.bounds.size.height
+        self.webView.scrollView.contentInset = insets
+        
+        insets = self.webView.scrollView.scrollIndicatorInsets
+        insets.bottom = toolbar.bounds.size.height
+        self.webView.scrollView.scrollIndicatorInsets = insets
+        
+        return toolbar
+    }()
     
+    var isToolbarEnabled = true {
+        didSet {
+            toolbar.isHidden = !isToolbarEnabled
+        }
+    }
+    
+    private(set) var backItem: UIBarButtonItem!
+    private(set) var forwardItem: UIBarButtonItem!
+    private(set) var refreshItem: UIBarButtonItem!
+    private(set) var shareItem: UIBarButtonItem!
+    private(set) var safariItem: UIBarButtonItem!
+    
+    fileprivate func setupBarButtonItems() {
+        backItem = UIBarButtonItem(image: UIImage(named: "Back"), style: .plain, target: self, action: #selector(backAction))
+        
+        forwardItem = UIBarButtonItem(image: UIImage(named: "Forward"), style: .plain, target: self, action: #selector(forwardAction))
+        
+        syncToolbarNavigationItems()
+        
+        refreshItem = UIBarButtonItem(image: UIImage(named: "Refresh"), style: .plain, target: self, action: #selector(refreshAction))
+        
+        shareItem = createShareItem()
+        
+        safariItem = UIBarButtonItem(image: UIImage(named: "Safari"), style: .plain, target: self, action: #selector(safariAction))
+        
+        backItem.tintColor = .crazeRed
+        forwardItem.tintColor = .crazeRed
+        refreshItem.tintColor = .crazeRed
+        safariItem.tintColor = .crazeRed
+    }
+    
+    private func createShareItem() -> UIBarButtonItem {
+        let item: UIBarButtonItem
+        
+        if isShorteningURL {
+            let activityView = UIActivityIndicatorView(activityIndicatorStyle: .white)
+            activityView.color = .crazeRed
+            activityView.startAnimating()
+            
+            // Resize the width to the share icon's size to prevent sibling views from jumping
+            var rect = activityView.frame
+            rect.size.width = 30
+            activityView.frame = rect
+            
+            item = UIBarButtonItem(customView: activityView)
+            
+        } else {
+            item = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareAction))
+        }
+        
+        item.tintColor = .crazeRed
+        return item
+    }
+    
+    private func setBarButtonItemsToToolbarIfPossible() {
+        if isToolbarEnabled {
+            let fixed = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+            fixed.width = .padding
+            
+            let flexible = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            
+            toolbar.items = [backItem, fixed, forwardItem, fixed, refreshItem, flexible, shareItem, fixed, safariItem]
+        }
+    }
+    
+    func updateShareItem() {
+        shareItem = createShareItem()
+        setBarButtonItemsToToolbarIfPossible()
+    }
+    
+    fileprivate func syncToolbarNavigationItems() {
+        backItem.isEnabled = webView.canGoBack
+        forwardItem.isEnabled = webView.canGoForward
+    }
+    
+    // MARK: Toolbar Actions
+    
+    @objc fileprivate func backAction() {
+        webView.goBack()
+    }
+    
+    @objc fileprivate func forwardAction() {
+        webView.goForward()
+    }
+    
+    @objc func refreshAction() {
+        if webView.url == nil {
+            let resetURL = url
+            url = resetURL
+            
+        } else {
+            webView.reload()
+        }
+        
+        AnalyticsTrackers.standard.track("Refreshed webpage", properties: [
+            "url": url?.absoluteString ?? ""
+            ])
+    }
+    
+    @objc fileprivate func shareAction() {
+        guard let url = url else {
+            return
+        }
+        
+        isShorteningURL = true
+        updateShareItem()
+        
+        NetworkingModel.shortenUrl(url) { shortenedURL in
+            if let shortenedURL = shortenedURL {
+                let controller = UIActivityViewController(activityItems: [shortenedURL], applicationActivities: nil)
+                self.present(controller, animated: true, completion: nil)
+            }
+            
+            self.isShorteningURL = false
+            self.updateShareItem()
+        }
+    }
+    
+    @objc fileprivate func safariAction() {
+        guard let url = url else {
+            return
+        }
+        
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
     
     // MARK: Loading
+    
+    var loaderLabelText = "webview.loading".localized
+    
+    fileprivate var loadingCoverView: UIImageView?
+    fileprivate var loader: Loader?
     
     fileprivate func showLoadingView() {
         guard self.loadingCoverView == nil else {
@@ -214,7 +360,7 @@ class _WebViewController : BaseViewController {
         let button = MainButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .crazeGreen
-        button.setTitle("Get More Coins", for: .normal)
+        button.setTitle("game.enter".localized, for: .normal)
         button.addTarget(self, action: #selector(showLoadingGame), for: .touchUpInside)
         loadingCoverView.addSubview(button)
         button.bottomAnchor.constraint(lessThanOrEqualTo: loadingCoverView.layoutMarginsGuide.bottomAnchor, constant: -.extendedPadding).isActive = true
@@ -246,17 +392,61 @@ class _WebViewController : BaseViewController {
     
     // MARK: Game
     
+    fileprivate var isShowingGame = false
+    
     @objc fileprivate func showLoadingGame() {
+        guard let loadingCoverView = loadingCoverView,
+            let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene else {
+            return
+        }
         
+        isShowingGame = true
+        
+        let gameView = SKView()
+        gameView.translatesAutoresizingMaskIntoConstraints = false
+        gameView.ignoresSiblingOrder = true
+        loadingCoverView.addSubview(gameView)
+        gameView.topAnchor.constraint(equalTo: loadingCoverView.topAnchor).isActive = true
+        gameView.leadingAnchor.constraint(equalTo: loadingCoverView.leadingAnchor).isActive = true
+        gameView.bottomAnchor.constraint(equalTo: loadingCoverView.layoutMarginsGuide.bottomAnchor).isActive = true
+        gameView.trailingAnchor.constraint(equalTo: loadingCoverView.trailingAnchor).isActive = true
+        
+        scene.gameDelegate = self
+        scene.scaleMode = .aspectFill
+        gameView.presentScene(scene)
+        
+        loader?.stopAnimation()
     }
 }
 
-extension _WebViewController : WKNavigationDelegate {
+extension WebViewController : WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        if !didLoadInitialPage {
+            showLoadingView()
+            
+            if didViewAppear {
+                loader?.startAnimation()
+            }
+        }
+    }
     
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        didLoadInitialPage = true
+        
+        if !isShowingGame {
+            hideLoadingView()
+        }
+    }
 }
 
-
-
-
-
-
+extension WebViewController : GameSceneDelegate {
+    func gameSceneDidStartGame(_ gameScene: GameScene) {
+        
+    }
+    
+    func gameSceneDidEndGame(_ gameScene: GameScene) {
+        if didLoadInitialPage {
+            hideLoadingView()
+        }
+    }
+}

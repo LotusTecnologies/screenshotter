@@ -223,13 +223,13 @@ public class TutorialEmailSlideView : HelperView {
     }
     
     private class func webViewController(withTitle title: String, url: URL, doneTarget target: Any?, action: Selector?) -> UIViewController? {
-        let webVC = WebViewController()
-        webVC.url = url
-        webVC.toolbarEnabled = false
-        webVC.navigationItem.title = title
-        webVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: target, action: action)
+        let viewController = WebViewController()
+        viewController.url = url
+        viewController.isToolbarEnabled = false
+        viewController.navigationItem.title = title
+        viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: target, action: action)
         
-        return UINavigationController(rootViewController: webVC)
+        return UINavigationController(rootViewController: viewController)
     }
     
     // MARK: Keyboard

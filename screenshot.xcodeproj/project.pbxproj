@@ -45,7 +45,6 @@
 		C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CE1FE90C8D00198955 /* TutorialVideoOverlayView.swift */; };
 		C54088171FE90C8E00198955 /* TutorialTrySlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */; };
 		C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */; };
-		C54088191FE90C8E00198955 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087D31FE90C8D00198955 /* WebViewController.m */; };
 		C540881A1FE90C8E00198955 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087D41FE90C8D00198955 /* WebView.swift */; };
 		C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */; };
 		C540881C1FE90C8E00198955 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087D91FE90C8D00198955 /* ShoppablesToolbar.m */; };
@@ -150,9 +149,7 @@
 		C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideView.swift; sourceTree = "<group>"; };
 		C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		C54087D11FE90C8D00198955 /* TutorialProductsPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorialProductsPageViewController.h; sourceTree = "<group>"; };
-		C54087D31FE90C8D00198955 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		C54087D41FE90C8D00198955 /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
-		C54087D51FE90C8D00198955 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		C54087D71FE90C8D00198955 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppableCollectionViewCell.swift; sourceTree = "<group>"; };
 		C54087D91FE90C8D00198955 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
@@ -400,8 +397,6 @@
 			isa = PBXGroup;
 			children = (
 				C54087D41FE90C8D00198955 /* WebView.swift */,
-				C54087D51FE90C8D00198955 /* WebViewController.h */,
-				C54087D31FE90C8D00198955 /* WebViewController.m */,
 				C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */,
 			);
 			path = WebView;
@@ -929,7 +924,6 @@
 				C540882B1FE90C8E00198955 /* DiscoverWebViewController.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
-				C54088191FE90C8E00198955 /* WebViewController.m in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
 				C54088171FE90C8E00198955 /* TutorialTrySlideView.swift in Sources */,
