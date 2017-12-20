@@ -841,6 +841,7 @@ extension Shoppable {
         let shoppableID = self.objectID
         let imageUrl = self.screenshot?.uploadedImageURL
         let offersUrl = self.offersURL
+        let category = self.label
         let b0x = self.b0x
         let b0y = self.b0y
         let b1x = self.b1x
@@ -873,6 +874,11 @@ extension Shoppable {
                     augmentedOffersUrl = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersUrl, optionsMask: optionsMask)?.absoluteString
                 }
                 NetworkingPromise.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
+                if positive {
+                    AnalyticsTrackers.standard.track("Shoppable rating positive", properties: ["Rating" : positiveRating, "Screenshot" : imageUrl ?? "-", "Category" : category ?? "-", "AugmentedOffersUrl" : augmentedOffersUrl ?? "-"])
+                } else {
+                    AnalyticsTrackers.standard.track("Shoppable rating negative", properties: ["Rating" : negativeRating, "Screenshot" : imageUrl ?? "-", "Category" : category ?? "-", "AugmentedOffersUrl" : augmentedOffersUrl ?? "-"])
+                }
                 try managedObjectContext.save()
             } catch {
                 print("setRating shoppableID:\(shoppableID) results with error:\(error)")

@@ -620,17 +620,13 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)productsRatePositiveAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:YES];
-    
-    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
 }
 
 - (void)productsRateNegativeAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:NO];
     
-    [self presentProductsRateNegativeAlert];
-    
-    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
+    [self presentProductsRateNegativeAlert];    
 }
 
 - (void)presentProductsRateNegativeAlert {
