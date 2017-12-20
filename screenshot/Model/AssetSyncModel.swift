@@ -753,7 +753,7 @@ class AssetSyncModel: NSObject {
         isRecentlyForeground = false
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            if backgroundScreenshotIds.count > 0 || (wasRecentlyForeground && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) {
+            if wasRecentlyForeground && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
                 self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
             }
         }
@@ -921,6 +921,7 @@ class AssetSyncModel: NSObject {
         guard addToSelected(assetId: assetId) else {
             return
         }
+        backgroundScreenshotAssetIds.remove(assetId)
         let accumulator = AccumulatorModel.sharedInstance
         if accumulator.getNewScreenshotsCount() > 0 {
             accumulator.addToNewScreenshots(count: -1)
