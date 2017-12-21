@@ -161,7 +161,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y + self.rateView.intrinsicContentSize.height, minimumSpacing.x);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
-        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
+        // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
+        // Then test why the control view jumps before being dragged away.
+        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
@@ -318,33 +320,35 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (void)reloadProductsForShoppableAtIndex:(NSInteger)index {
+    self.products = @[];
+    self.productsUnfilteredCount = 0;
+    
     if ([self hasShoppables]) {
         [self repositionRateView];
         
-        BOOL hadProducts = self.products.count > 0;
         Shoppable *shoppable = [self.shoppablesController shoppableAt:index];
-        self.products = [self productsForShoppable:shoppable];
         
-        if (self.products.count == 0) {
-            self.state = (self.productsUnfilteredCount == 0) ? ProductsViewControllerStateLoading : ProductsViewControllerStateEmpty;
+        if (shoppable.productFilterCount == -1) {
+            self.state = ProductsViewControllerStateRetry;
             
         } else {
-            self.state = ProductsViewControllerStateProducts;
+            self.products = [self productsForShoppable:shoppable];
+            
+            if (shoppable.productFilterCount == 0 && self.productsUnfilteredCount == 0) {
+                self.state = ProductsViewControllerStateLoading;
+                
+            } else {
+                self.state = (self.products.count == 0) ? ProductsViewControllerStateEmpty : ProductsViewControllerStateProducts;
+            }
         }
         
-        if (hadProducts || self.products.count) {
-            [self.collectionView reloadData];
-            
-            [self.rateView setRating:[shoppable getRating] animated:NO];
-        }
+        [self.collectionView reloadData];
+        [self.rateView setRating:[shoppable getRating] animated:NO];
         
         if (self.products.count) {
             // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
-        
-    } else {
-        self.products = @[];
     }
 }
 
@@ -616,17 +620,13 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)productsRatePositiveAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:YES];
-    
-    [AnalyticsTrackers.standard track:@"Shoppable rating positive" properties:nil];
 }
 
 - (void)productsRateNegativeAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
     [shoppable setRatingWithPositive:NO];
     
-    [self presentProductsRateNegativeAlert];
-    
-    [AnalyticsTrackers.standard track:@"Shoppable rating negative" properties:nil];
+    [self presentProductsRateNegativeAlert];    
 }
 
 - (void)presentProductsRateNegativeAlert {

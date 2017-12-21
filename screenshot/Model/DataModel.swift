@@ -118,7 +118,7 @@ class DataModel: NSObject {
         
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "b0x", ascending: true), NSSortDescriptor(key: "b0y", ascending: true), NSSortDescriptor(key: "b1x", ascending: true), NSSortDescriptor(key: "b1y", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
-        request.predicate = NSPredicate(format: "screenshot == %@ AND productCount > 0", screenshot)
+        request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
         let fetchedResultsController = ShoppableFrc(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil, hasShoppablesFrc: hasShoppablesFrc!)
         shoppableFrc = fetchedResultsController as NSFetchedResultsController<Shoppable>
         shoppableFrc?.delegate = self
@@ -751,6 +751,7 @@ extension Shoppable {
         let productFilterToSave = ProductFilter(context: managedObjectContext)
         productFilterToSave.optionsMask = Int32(optionsMask.rawValue)
         productFilterToSave.rating = rating
+        productFilterToSave.productCount = 0
         productFilterToSave.dateSet = NSDate()
         productFilterToSave.shoppable = self
     }
@@ -796,14 +797,20 @@ extension Shoppable {
                 for shoppable in results {
                     if let matchingFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMaskInt)).first as? ProductFilter {
                         matchingFilter.dateSet = NSDate()
+                        if matchingFilter.productCount == 0,
+                          let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count {
+                            matchingFilter.productCount = Int16(actualFilteredProductCount)
+                        }
+                        shoppable.productFilterCount = matchingFilter.productCount
                         continue
                     }
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask)
+                    shoppable.productFilterCount = 0
                     guard let offersURL = shoppable.offersURL else {
                         continue
                     }
-                    if let existingProducts = shoppable.products as? Set<Product>,
-                        existingProducts.contains(where: { $0.optionsMask == optionsMaskInt }) {
+                    if let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count,
+                      actualFilteredProductCount > 0 {
                         continue
                     }
                     AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
@@ -832,6 +839,14 @@ extension Shoppable {
     
     @objc public func setRating(positive: Bool) {
         let shoppableID = self.objectID
+        let imageUrl = self.screenshot?.uploadedImageURL
+        let offersUrl = self.offersURL
+        let category = self.label
+        let b0x = self.b0x
+        let b0y = self.b0y
+        let b1x = self.b1x
+        let b1y = self.b1y
+
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
@@ -843,13 +858,26 @@ extension Shoppable {
                 let positiveRating: Int16 = 5
                 let negativeRating: Int16 = 1
                 let ratingValue: Int16 = positive ? positiveRating : negativeRating
+                let optionsMask: ProductsOptionsMask
                 if let productFilter = results.first {
                     productFilter.rating = ratingValue
+                    optionsMask = ProductsOptionsMask(rawValue: Int(productFilter.optionsMask))
                 } else {
                     guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableID) else {
                         return
                     }
-                    shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: ProductsOptionsMask(rawValue: 9), rating: ratingValue)
+                    optionsMask = ProductsOptionsMask(rawValue: 9)
+                    shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask, rating: ratingValue)
+                }
+                var augmentedOffersUrl: String? = nil
+                if let offersUrl = offersUrl {
+                    augmentedOffersUrl = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersUrl, optionsMask: optionsMask)?.absoluteString
+                }
+                NetworkingPromise.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
+                if positive {
+                    AnalyticsTrackers.standard.track("Shoppable rating positive", properties: ["Rating" : positiveRating, "Screenshot" : imageUrl ?? "-", "Category" : category ?? "-", "AugmentedOffersUrl" : augmentedOffersUrl ?? "-"])
+                } else {
+                    AnalyticsTrackers.standard.track("Shoppable rating negative", properties: ["Rating" : negativeRating, "Screenshot" : imageUrl ?? "-", "Category" : category ?? "-", "AugmentedOffersUrl" : augmentedOffersUrl ?? "-"])
                 }
                 try managedObjectContext.save()
             } catch {

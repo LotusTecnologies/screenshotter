@@ -100,7 +100,13 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     [super viewWillAppear:animated];
     
     [self refreshTabBarSettingsBadge];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     [self presentUpdatePromptIfNeeded];
+    [self presentChangelogAlertIfNeeded];
 }
 
 - (void)viewSafeAreaInsetsDidChange {
@@ -263,6 +269,12 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         self.updatePromptHandler = [[UpdatePromptHandler alloc] init];
         [self.updatePromptHandler presentUpdatePromptIfNeeded];
     }
+}
+
+#pragma mark - Changelog Alerts
+
+- (void)presentChangelogAlertIfNeeded {
+    [ChangelogAlertController presentIfNeededInViewController:self];
 }
 
 @end

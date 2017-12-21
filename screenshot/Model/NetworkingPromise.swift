@@ -41,6 +41,56 @@ class NetworkingPromise: NSObject {
         }
     }
     
+    static func feedbackToSyte(isPositive: Bool, imageUrl: String?, offersUrl: String?, b0x: Double, b0y: Double, b1x: Double, b1y: Double) {
+        // From an email from Adi Mizrahi on Dec. 20, 2017 at 11:43 am:
+//        Headers:
+//        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTM3NjEzNzI1OTksInV1aWQiOiJjMTliZmVkNy05M2FmLTVkZjAtYTQ1ZS1kNWQ5ZGVmMjMzMjYifQ.6KtjqtvusixdqoaZjfp3au9b6SU5x-mdyq8WEJJx2U0
+//
+//        Request:
+//
+//        http://syteapi.com/et?
+//        name=negative_feedback
+//        &account_id=6677
+//        &image_url=http%3A%2F%2Ffashionforward.mako.co.il%2Fwp-content%2Fuploads%2F2017%2F11%2FGettyImages-545137798.jpg
+//        &offers_url=http%3A%2F%2Fd1wt9iscpot47x.cloudfront.net%2Foffers%3Fimage_url%3DaHR0cDovL2Zhc2hpb25mb3J3YXJkLm1ha28uY28uaWwvd3AtY29udGVudC91cGxvYWRzLzIwMTcvMTEvNjMyNS5qcGc%253D%26crop%3DeyJ5MiI6MC42MjcyMjI1Nzc4NTQ5OTA5LCJ5IjowLjIxNzk1MjgzNzQyMjQ5MDE0LCJ4MiI6MC42MDg4NDYzOTgwNzA0NTQ2LCJ4IjowLjM5OTQwNjA3MzYxNDk1NDk1fQ%253D%253D%26cats%3DWyJQdWxsb3ZlckFuZFNoaXJ0cyJd%26prob%3D0.4632%26gender%3Dmale%26feed%3Ddefault%26country%3DIL%26account_id%3D46%26session_id%3D84500797%26sig%3DCsDPsDJZ47WlTHOjhJx6QB6Jm3nAZhOPH2Tw3c9HmmI%253D%26account_id%3D46%26session_id%3D84500797%26sig%3DCsDPsDJZ47WlTHOjhJx6QB6Jm3nAZhOPH2Tw3c9HmmI%253D&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D
+//        &tags=feedback
+//        &coords=eyJ5MSI6MC42MjcyMjI1Nzc4NTQ5OTA5LCJ5MCI6MC4yMTc5NTI4Mzc0MjI0OTAxNCwieDEiOjAuNjA4ODQ2Mzk4MDcwNDU0NiwieDAiOjAuMzk5NDA2MDczNjE0OTU0OTV9
+//
+//        * image_url and offers_url should be urlencoded
+//        * please notice that name and tags changed to: name: negative_feedback || positive_feedback, tags: feedback
+//        * coords should be a base64 encoded JSON, for example Base64('{"x0": 0.2, "y0": 0.2, "x1": 0.4, "y1": 0.5}')
+        let urlEncodedImageUrl = imageUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+        let urlEncodedOffersUrl = offersUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+        let coordsObject = ["x0": b0x, "y0": b0y, "x1": b1x, "y1": b1y]
+        let base64EncodedJsonCoords = jsonStringify(object: coordsObject)?.data(using: .utf8)?.base64EncodedString() ?? ""
+        let urlString = "https://syteapi.com/et" +
+            "?name=\(isPositive ? "positive_feedback" : "negative_feedback")" +
+            "&account_id=\(Constants.syteAccountId)" +
+            "&image_url=\(urlEncodedImageUrl)" +
+            "&offers_url=\(urlEncodedOffersUrl)" +
+            "&tags=feedback" +
+            "&coords=\(base64EncodedJsonCoords)"
+        guard let url = URL(string: urlString) else {
+            print("feedbackToSyte failed to create feedback url from string:\(urlString)")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.addValue(Constants.syteHardcodedAuth, forHTTPHeaderField: "Authorization")
+        let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                print("feedbackToSyte received error:\(error) for urlString:\(urlString)")
+                return
+            }
+            guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode >= 200,
+              httpResponse.statusCode <  300 else {
+                print("feedbackToSyte invalid http statusCode for urlString:\(urlString)")
+                return
+            }
+        }
+        dataTask.resume()
+    }
+    
     static func jsonStringify(object: Any) -> String? {
         if let objectData = try? JSONSerialization.data(withJSONObject: object, options: []) {
             let objectString = String(data: objectData, encoding: .utf8)
@@ -55,6 +105,30 @@ class NetworkingPromise: NSObject {
                 return nil
         }
         return segments
+    }
+    
+    static func downloadJsonArray(url: URL) -> Promise<NSArray> {
+        let request = URLRequest(url: url)
+        let session = URLSession.shared
+        let dataPromise: URLDataPromise = session.dataTask(with: request)
+        return dataPromise.asArray()
+    }
+    
+    // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
+    static func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
+        var attempts = 0
+        
+        func attempt() -> Promise<T> {
+            attempts += 1
+            return body().recover { error -> Promise<T> in
+                guard attempts < maxRepeat else { throw error }
+                return after(interval: interdelay).then {
+                    return attempt()
+                }
+            }
+        }
+        
+        return attempt()
     }
     
     static func downloadInfo(url: URL) -> Promise<[String : Any]> {
@@ -74,6 +148,25 @@ class NetworkingPromise: NSObject {
             }
             dataTask.resume()
         }
+    }
+    
+    static func downloadProducts(url: URL) -> Promise<[String : Any]> {
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
+            if let productsDict = nsDict as? [String : Any] {
+                if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    return Promise(value: productsDict)
+                } else {
+                    let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
+                    return Promise(error: error)
+                }
+            }
+            let error = NSError(domain: "Craze", code: 5, userInfo: [NSLocalizedDescriptionKey: "downloadProducts unknown error"])
+            return Promise(error: error)
+        }
+    }
+    
+    static func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
+        return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {downloadProducts(url: url)})
     }
     
     static func downloadImage(url: URL, screenshotDict: [String : Any]) -> Promise<(Data, [String : Any])> {

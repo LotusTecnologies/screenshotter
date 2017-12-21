@@ -11,6 +11,8 @@
 // https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
+"changelog.title" = "What's New";
+
 "currency.auto" = "Automatic";
 
 "discover.load" = "Loading Discover...";
@@ -23,6 +25,7 @@
 "favorites.empty.title" = "No Favorites";
 "favorites.title" = "Favorites";
 
+"game.enter" = "Get More Coins";
 "game.restart" = "Tap to play again";
 "game.score" = "My coins: %d";
 "game.start" = "Tap to get more coins";
@@ -116,9 +119,4 @@
 "update.request.title" = "New Version Available";
 "update.request.message" = "Update now for the best Screenshop experience!";
 
-
-
-
-
-
-
+"webview.loading" = "Loading...";
