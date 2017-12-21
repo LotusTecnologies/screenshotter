@@ -14,11 +14,12 @@ import PromiseKit
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath)
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath)
     func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath)
+    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath)
     func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>)
 }
 
 enum CZChangeKind {
-    case none, singleAdd, singleDelete, singleUpdate, multiple
+    case none, singleAdd, singleDelete, singleUpdate, singleMove, multiple
 }
 
 
@@ -206,6 +207,9 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             case .update:
                 changeKind = .singleUpdate
                 changeIndexPath = indexPath
+            case .move:
+                changeKind = .singleMove
+                changeIndexPath = newIndexPath
             default:
                 changeKind = .multiple
             }
@@ -252,6 +256,13 @@ extension DataModel: NSFetchedResultsControllerDelegate {
                 frcDelegate?.frc(frc, oneUpdatedAt: changeIndexPath)
             } else {
                 print("Error DataModel singleAdd changeIndexPath nil")
+                frcDelegate?.frcReloadData(frc)
+            }
+        case .singleMove:
+            if let changeIndexPath = changeIndexPath {
+                frcDelegate?.frc(frc, oneMovedTo: changeIndexPath)
+            } else {
+                print("Error DataModel singleMove changeIndexPath nil")
                 frcDelegate?.frcReloadData(frc)
             }
         case .multiple:

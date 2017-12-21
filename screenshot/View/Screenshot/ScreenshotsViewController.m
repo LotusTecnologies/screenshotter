@@ -504,6 +504,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
+- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneMovedTo:(NSIndexPath *)indexPath {
+    if (frc == self.screenshotFrc) {
+        NSIndexPath *collectionViewIndexPath = [self screenshotFrcToCollectionViewIndexPath:indexPath.item];
+        
+        [self.collectionView reloadData];
+        [self.collectionView scrollToItemAtIndexPath:collectionViewIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+    }
+}
+
 - (void)frcReloadData:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc {
     if (frc == self.screenshotFrc) {
         [self.collectionView reloadData];

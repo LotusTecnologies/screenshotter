@@ -177,6 +177,9 @@ class AssetSyncModel: NSObject {
                                 screenshot.shoppablesCount = 0
                             }
                             dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                            // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
+                            screenshot.lastModified = NSDate()
+                            dataModel.saveMoc(managedObjectContext: managedObjectContext)
                             fulfill((imageData, screenshot.shoppablesCount <= 0))
                         } else {
                             let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(asset.localIdentifier)"])
