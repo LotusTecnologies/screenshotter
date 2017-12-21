@@ -179,7 +179,7 @@ extension FavoritesViewController : UICollectionViewDelegate {
         let webViewController = WebViewController()
         webViewController.addNavigationItemLogo()
         webViewController.hidesBottomBarWhenPushed = true
-        webViewController.url = URL(string: offer)
+        webViewController.rebaseURL(URL(string: offer))
 
         navigationController?.pushViewController(webViewController, animated: true)
         

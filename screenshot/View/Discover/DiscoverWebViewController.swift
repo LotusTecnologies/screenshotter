@@ -79,7 +79,7 @@ class DiscoverWebViewController : WebViewController {
         
         for potentialURL in potentialURLs {
             if let potentialURL = potentialURL, UIApplication.shared.canOpenURL(potentialURL) {
-                url = potentialURL
+                loadURL(potentialURL)
                 break
             }
         }
@@ -90,10 +90,8 @@ class DiscoverWebViewController : WebViewController {
 
         if let urls = AppDelegate.shared.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            let randomURL = urls[randomIndex]
             
-            // Check the URL's validity
-            if let randomURL = randomURL {
+            if let randomURL = urls[randomIndex] {
                 if UIApplication.shared.canOpenURL(randomURL) {
                     url = randomURL
                     
@@ -106,7 +104,17 @@ class DiscoverWebViewController : WebViewController {
         return url
     }
     
-    // MARK: Bar Button Item
+    fileprivate func isGoogleURL(_ url: URL?) -> Bool {
+        let isHostGoogle = url?.host?.contains("google") ?? false
+        let isAMP = url?.path.split(separator: "/").first == "amp"
+        return isHostGoogle && !isAMP
+    }
+    
+    fileprivate func googleSearchURL(_ query: String) -> URL? {
+        return URL(string: "https://google.com/search?q=\(query)")
+    }
+    
+    // MARK: Toolbar
     
     func leftBarButtonItems() -> [UIBarButtonItem] {
         return [backItem!, forwardItem!]
@@ -122,7 +130,7 @@ class DiscoverWebViewController : WebViewController {
         navigationItem.rightBarButtonItems = rightBarButtonItems()
     }
 
-    // MARK: Bar Button Item Actions
+    // MARK: Toolbar Actions
     
     @objc override func refreshAction() {
         reloadURL()
@@ -137,14 +145,26 @@ extension DiscoverWebViewController : UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if let text = searchBar.text, !text.isEmpty {
-            url = googleSearchURL(text)
-            
+            loadURL(googleSearchURL(text))
+            syncSearchBarVisibility()
             searchBar.resignFirstResponder()
         }
     }
     
-    private func googleSearchURL(_ query: String) -> URL? {
-        return URL(string: "https://google.com/search?q=\(query)")
+    fileprivate func syncSearchBarVisibility() {
+        searchBar.isHidden = isGoogleURL(webView.url)
+    }
+}
+
+extension DiscoverWebViewController { // WKNavigationDelegate
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        decisionHandler(.allow)
+        
+        if view.window != nil {
+            print("||| \(isGoogleURL(webView.url))   \(webView.url)   \(navigationAction.request.url)")
+            
+            syncSearchBarVisibility()
+        }
     }
 }
 
