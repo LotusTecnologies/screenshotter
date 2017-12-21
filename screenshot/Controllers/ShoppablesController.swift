@@ -88,6 +88,10 @@ extension ShoppablesController {
         }
     }
     
+    func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath) {
+        frcReloadData(frc)
+    }
+    
     func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>) {
         if frc == shoppablesFrc {
             preserveSelectedItem {
