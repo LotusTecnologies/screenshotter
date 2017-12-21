@@ -41,21 +41,22 @@ class DiscoverWebViewController : WebViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        webView.scrollView.delegate = self
-        webView.scrollView.keyboardDismissMode = .onDrag
-        
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
         searchBar.barTintColor = .white
-        
         searchBar.setImage(UIImage(named: "InviteGoogleIcon"), for: .search, state: .normal)
-        
-        
         view.addSubview(searchBar)
         searchBar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
         searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-
+        
+        webView.scrollView.delegate = self
+        webView.scrollView.keyboardDismissMode = .onDrag
+        
+        var contentInset = webView.scrollView.contentInset
+        contentInset.top += searchBar.intrinsicContentSize.height
+        webView.scrollView.contentInset = contentInset
+        
         reloadURL()
         
         AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url ?? ""])

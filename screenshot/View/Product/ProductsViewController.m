@@ -124,6 +124,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         toolbar;
     });
     
+    
+//    [[ScrollRevealController alloc] initWithConnectedTo:self.collectionView onEdge:1];
+    
     _rateView = ({
         ProductsRateView *view = [[ProductsRateView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
@@ -484,7 +487,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [self animateRateViewIfNeeded];
 }
 
-- (UIEdgeInsets)scrollViewAjustedContentInset:(UIScrollView *)scrollView {
+- (UIEdgeInsets)scrollViewAdjustedContentInset:(UIScrollView *)scrollView {
     UIEdgeInsets insets = UIEdgeInsetsZero;
     
     if (@available(iOS 11.0, *)) {
@@ -500,12 +503,12 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (CGFloat)scrollViewExpectedContentOffsetY:(UIScrollView *)scrollView {
-    UIEdgeInsets ajustedContentInset = [self scrollViewAjustedContentInset:scrollView];
-    return scrollView.contentOffset.y + ajustedContentInset.top;
+    UIEdgeInsets adjustedContentInset = [self scrollViewAdjustedContentInset:scrollView];
+    return scrollView.contentOffset.y + adjustedContentInset.top;
 }
 
 - (CGFloat)scrollViewExpectedContentSizeHeight:(UIScrollView *)scrollView {
-    UIEdgeInsets ajustedContentInset = [self scrollViewAjustedContentInset:scrollView];
+    UIEdgeInsets ajustedContentInset = [self scrollViewAdjustedContentInset:scrollView];
     return scrollView.contentOffset.y + scrollView.bounds.size.height - ajustedContentInset.bottom;
 }
 
