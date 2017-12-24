@@ -32,10 +32,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 @property (nonatomic, strong) ProductsOptions *productsOptions;
+@property (nonatomic, strong) ScrollRevealController *scrollRevealController;
 @property (nonatomic, strong) ProductsRateView *rateView;
-@property (nonatomic, strong) NSLayoutConstraint *rateViewTopConstraint;
-@property (nonatomic) CGFloat rateViewOffsetY;
-@property (nonatomic) CGFloat rateViewPreviousOffsetY;
 @property (nonatomic, strong) UIAlertAction *productsRateNegativeFeedbackSubmitAction;
 @property (nonatomic, strong) UITextField *productsRateNegativeFeedbackTextField;
 
@@ -124,27 +122,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         toolbar;
     });
     
-    
-//    [[ScrollRevealController alloc] initWithConnectedTo:self.collectionView onEdge:1];
-    
     _rateView = ({
         ProductsRateView *view = [[ProductsRateView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
         [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:view];
-        _rateViewTopConstraint = [view.topAnchor constraintEqualToAnchor:self.view.bottomAnchor];
-        self.rateViewTopConstraint.active = YES;
-        [view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        
-        CGFloat height = view.intrinsicContentSize.height;
-        
-        if (@available(iOS 11.0, *)) {
-            height += [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
-        }
-        
-        [view.heightAnchor constraintEqualToConstant:height].active = YES;
         view;
     });
     
@@ -177,6 +159,23 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
     });
+    
+    _scrollRevealController = [[ScrollRevealController alloc] initWithConnectedTo:self.collectionView onEdge:1];
+    
+    [self.scrollRevealController.view addSubview:self.rateView];
+    [self.rateView.topAnchor constraintEqualToAnchor:self.scrollRevealController.view.topAnchor].active = YES;
+    [self.rateView.leadingAnchor constraintEqualToAnchor:self.scrollRevealController.view.leadingAnchor].active = YES;
+    [self.rateView.bottomAnchor constraintEqualToAnchor:self.scrollRevealController.view.bottomAnchor].active = YES;
+    [self.rateView.trailingAnchor constraintEqualToAnchor:self.scrollRevealController.view.trailingAnchor].active = YES;
+    
+    CGFloat height = self.rateView.intrinsicContentSize.height;
+    
+    if (@available(iOS 11.0, *)) {
+        height += [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
+    }
+    
+    [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
+    
     
     [self updateOptionsView];
     [self reloadProductsForShoppableAtIndex:0];
@@ -327,7 +326,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     self.productsUnfilteredCount = 0;
     
     if ([self hasShoppables]) {
-        [self repositionRateView];
+        [self.scrollRevealController resetViewOffset];
         
         Shoppable *shoppable = [self.shoppablesController shoppableAt:index];
         
@@ -468,48 +467,19 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     [self dismissOptions];
-    [self resetRateViewOffsetY:scrollView];
+    [self.scrollRevealController scrollViewWillBeginDragging:scrollView];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if ([scrollView isDragging]) {
-        [self adjustRateViewOffsetWithScrollView:scrollView];
-    }
+    [self.scrollRevealController scrollViewDidScroll:scrollView];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        [self animateRateViewIfNeeded];
-    }
+    [self.scrollRevealController scrollViewDidEndDragging:scrollView will:decelerate];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [self animateRateViewIfNeeded];
-}
-
-- (UIEdgeInsets)scrollViewAdjustedContentInset:(UIScrollView *)scrollView {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    
-    if (@available(iOS 11.0, *)) {
-        insets.top = scrollView.adjustedContentInset.top;
-        insets.bottom = scrollView.adjustedContentInset.bottom;
-        
-    } else {
-        insets.top = CGRectGetMaxY(self.navigationController.navigationBar.frame) + scrollView.contentInset.top;
-        insets.bottom = scrollView.contentInset.bottom;
-    }
-    
-    return insets;
-}
-
-- (CGFloat)scrollViewExpectedContentOffsetY:(UIScrollView *)scrollView {
-    UIEdgeInsets adjustedContentInset = [self scrollViewAdjustedContentInset:scrollView];
-    return scrollView.contentOffset.y + adjustedContentInset.top;
-}
-
-- (CGFloat)scrollViewExpectedContentSizeHeight:(UIScrollView *)scrollView {
-    UIEdgeInsets ajustedContentInset = [self scrollViewAdjustedContentInset:scrollView];
-    return scrollView.contentOffset.y + scrollView.bounds.size.height - ajustedContentInset.bottom;
+    [self.scrollRevealController scrollViewDidEndDecelerating:scrollView];
 }
 
 
@@ -585,40 +555,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 
 #pragma mark - Rate View
-
-- (void)adjustRateViewOffsetWithScrollView:(UIScrollView *)scrollView {
-    CGFloat expectedContentOffsetY = [self scrollViewExpectedContentOffsetY:scrollView];
-    CGFloat expectedContentSizeHeight = [self scrollViewExpectedContentSizeHeight:scrollView];
-    
-    // Dont change the constraint when bouncing
-    if (expectedContentOffsetY > 0 && expectedContentSizeHeight < scrollView.contentSize.height) {
-        self.rateViewTopConstraint.constant = MIN(0.f, MAX(-self.rateView.bounds.size.height, self.rateViewOffsetY - scrollView.contentOffset.y));
-    }
-    
-    [self resetRateViewOffsetY:scrollView];
-    self.rateViewPreviousOffsetY = scrollView.contentOffset.y;
-}
-
-- (void)resetRateViewOffsetY:(UIScrollView *)scrollView {
-    self.rateViewOffsetY = scrollView.contentOffset.y + self.rateViewTopConstraint.constant;
-}
-
-- (void)animateRateViewIfNeeded {
-    CGFloat minHeight = -self.rateView.bounds.size.height;
-    CGFloat maxHeight = 0.f;
-    CGFloat offsetY = self.rateViewTopConstraint.constant;
-    
-    if (offsetY > minHeight && offsetY < maxHeight) {
-        [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
-            self.rateViewTopConstraint.constant = (offsetY * 2.f > minHeight) ? maxHeight : minHeight;
-            [self.view layoutIfNeeded];
-        }];
-    }
-}
-
-- (void)repositionRateView {
-    self.rateViewTopConstraint.constant = 0.f;
-}
 
 - (void)productsRatePositiveAction {
     Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];

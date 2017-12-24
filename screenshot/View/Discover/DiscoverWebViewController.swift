@@ -10,6 +10,9 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
+    fileprivate lazy var scrollRevealController = {
+        return ScrollRevealController(connectedTo: self.webView.scrollView, onEdge: .top)
+    }()
     fileprivate let searchBar = UISearchBar()
     
     override var title: String? {
@@ -45,14 +48,15 @@ class DiscoverWebViewController : WebViewController {
         searchBar.delegate = self
         searchBar.barTintColor = .white
         searchBar.setImage(UIImage(named: "InviteGoogleIcon"), for: .search, state: .normal)
-        view.addSubview(searchBar)
-        searchBar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        scrollRevealController.view.addSubview(searchBar)
+        searchBar.topAnchor.constraint(equalTo: scrollRevealController.view.topAnchor).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: scrollRevealController.view.leadingAnchor).isActive = true
+        searchBar.bottomAnchor.constraint(equalTo: scrollRevealController.view.bottomAnchor).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: scrollRevealController.view.trailingAnchor).isActive = true
         
         webView.scrollView.delegate = self
         webView.scrollView.keyboardDismissMode = .onDrag
-        
+
         var contentInset = webView.scrollView.contentInset
         contentInset.top += searchBar.intrinsicContentSize.height
         webView.scrollView.contentInset = contentInset
@@ -60,6 +64,18 @@ class DiscoverWebViewController : WebViewController {
         reloadURL()
         
         AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url ?? ""])
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        navigationController?.navigationBar.alpha = 0.2 // !!!: DEBUG
     }
     
     // MARK: URL
@@ -141,7 +157,7 @@ class DiscoverWebViewController : WebViewController {
 
 extension DiscoverWebViewController : UISearchBarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
-        return .topAttached
+        return .top
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -162,14 +178,28 @@ extension DiscoverWebViewController { // WKNavigationDelegate
         decisionHandler(.allow)
         
         if view.window != nil {
-            print("||| \(isGoogleURL(webView.url))   \(webView.url)   \(navigationAction.request.url)")
-            
             syncSearchBarVisibility()
         }
     }
 }
 
 extension DiscoverWebViewController : UIScrollViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        scrollRevealController.scrollViewWillBeginDragging(scrollView)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollRevealController.scrollViewDidScroll(scrollView)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        scrollRevealController.scrollViewDidEndDragging(scrollView, will: decelerate)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        scrollRevealController.scrollViewDidEndDecelerating(scrollView)
+    }
+    
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return nil
     }

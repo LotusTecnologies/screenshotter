@@ -16,11 +16,13 @@ enum ScrollRevealEdge : UInt {
 
 class ScrollRevealController : NSObject {
     let view = UIView()
+    var adjustedContentInset: UIEdgeInsets = .zero
     
     fileprivate let scrollView: UIScrollView
     fileprivate let edge: ScrollRevealEdge
     fileprivate var edgeConstraint: NSLayoutConstraint?
     fileprivate var offsetY: CGFloat = 0
+    fileprivate var previousOffsetY: CGFloat = 0
     
     convenience init(connectedTo scrollView: UIScrollView, onEdge edge: UInt) {
         self.init(connectedTo: scrollView, onEdge: ScrollRevealEdge(rawValue: edge)!)
@@ -33,60 +35,51 @@ class ScrollRevealController : NSObject {
         
         if let superview = scrollView.superview {
             view.translatesAutoresizingMaskIntoConstraints = false
-            view.backgroundColor = .red
             superview.insertSubview(view, aboveSubview: scrollView)
             view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
             view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
             
             if edge == .top {
-                // TODO: create extension for this in ios10
-//                view.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor).isActive = true
-                edgeConstraint = view.topAnchor.constraint(equalTo: scrollView.topAnchor)
+                edgeConstraint = view.bottomAnchor.constraint(equalTo: superview.topAnchor, constant: adjustedContentInset.top)
                 
             } else {
-                edgeConstraint = view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
+                edgeConstraint = view.topAnchor.constraint(equalTo: superview.bottomAnchor, constant: -adjustedContentInset.bottom)
             }
+            
+            edgeConstraint?.isActive = true
         }
     }
-    
-    fileprivate func adjustRateViewOffsetWithScrollView() {
-        let expectedContentOffsetY = scrollViewExpectedContentOffsetY
-        let expectedContentSizeHeight = scrollViewExpectedContentSizeHeight
-        
-        // Dont change the constraint when bouncing
-        if expectedContentOffsetY > 0 && expectedContentSizeHeight < scrollView.contentSize.height {
-//            self.rateViewTopConstraint.constant = MIN(0.f, MAX(-self.rateView.bounds.size.height, self.rateViewOffsetY - scrollView.contentOffset.y));
-        }
+}
 
-//        [self resetRateViewOffsetY:scrollView];
-//        self.rateViewPreviousOffsetY = scrollView.contentOffset.y;
+extension ScrollRevealController {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if self.scrollView == scrollView {
+            prepareViewOffset()
+        }
     }
     
-    fileprivate func resetRateViewOffsetY() { // TODO: should be named with set, or rebase, etc
-        offsetY = scrollView.contentOffset.y + (edgeConstraint?.constant ?? 0)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if self.scrollView == scrollView && scrollView.isDragging {
+            adjustViewOffset()
+        }
     }
     
-    fileprivate func repositionView() { // TODO: should be named reset
-        edgeConstraint?.constant = 0
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, will decelerate: Bool) {
+        if self.scrollView == scrollView && !decelerate {
+            completeViewOffset()
+        }
     }
     
-    
-    // MARK: Scroll View
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if self.scrollView == scrollView {
+            completeViewOffset()
+        }
+    }
     
     fileprivate var scrollViewAdjustedContentInset: UIEdgeInsets {
         var insets: UIEdgeInsets = .zero
-        
-        if #available(iOS 11.0, *) {
-            insets.top = scrollView.adjustedContentInset.top
-            insets.bottom = scrollView.adjustedContentInset.bottom
-            
-        } else {
-            // ???: how to get this value
-            let v = CGFloat(0) // CGRectGetMaxY(self.navigationController.navigationBar.frame)
-            insets.top = v + scrollView.contentInset.top
-            insets.bottom = scrollView.contentInset.bottom
-        }
-        
+        insets.top = scrollView.contentInset.top + adjustedContentInset.top
+        insets.bottom = scrollView.contentInset.bottom  + adjustedContentInset.bottom
         return insets
     }
     
@@ -96,5 +89,47 @@ class ScrollRevealController : NSObject {
     
     fileprivate var scrollViewExpectedContentSizeHeight: CGFloat {
         return scrollView.contentOffset.y + scrollView.bounds.size.height - scrollViewAdjustedContentInset.bottom
+    }
+    
+    fileprivate func adjustViewOffset() {
+        guard let edgeConstraint = edgeConstraint else {
+            return
+        }
+        
+        // Dont change the constraint when bouncing
+        if scrollViewExpectedContentOffsetY > 0 && scrollViewExpectedContentSizeHeight < scrollView.contentSize.height {
+            let currentOffsetY = offsetY - scrollView.contentOffset.y
+            
+            if edge == .top {
+                edgeConstraint.constant = min(adjustedContentInset.top + view.bounds.size.height, max(adjustedContentInset.top, currentOffsetY))
+                
+            } else {
+                edgeConstraint.constant = min(0, max(-(view.bounds.size.height + adjustedContentInset.bottom), currentOffsetY));
+            }
+        }
+        
+        prepareViewOffset()
+        previousOffsetY = scrollView.contentOffset.y
+    }
+    
+    fileprivate func prepareViewOffset() {
+        offsetY = scrollView.contentOffset.y + (edgeConstraint?.constant ?? 0)
+    }
+    
+    func resetViewOffset() {
+        edgeConstraint?.constant = 0
+    }
+    
+    fileprivate func completeViewOffset() {
+        let minHeight = -view.bounds.size.height
+        let maxHeight = CGFloat(0)
+        let offsetY = edgeConstraint?.constant ?? 0
+        
+        if offsetY > minHeight && offsetY < maxHeight {
+            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                self.edgeConstraint?.constant = offsetY * 2 > minHeight ? maxHeight : minHeight
+                self.view.superview?.layoutIfNeeded()
+            })
+        }
     }
 }
