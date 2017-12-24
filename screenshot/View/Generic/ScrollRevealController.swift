@@ -18,20 +18,23 @@ class ScrollRevealController : NSObject {
     let view = UIView()
     var adjustedContentInset: UIEdgeInsets = .zero
     
-    fileprivate let scrollView: UIScrollView
+    fileprivate var scrollView: UIScrollView?
     fileprivate let edge: ScrollRevealEdge
     fileprivate var edgeConstraint: NSLayoutConstraint?
     fileprivate var offsetY: CGFloat = 0
     fileprivate var previousOffsetY: CGFloat = 0
     
-    convenience init(connectedTo scrollView: UIScrollView, onEdge edge: UInt) {
-        self.init(connectedTo: scrollView, onEdge: ScrollRevealEdge(rawValue: edge)!)
+    convenience init(edge: UInt) {
+        self.init(edge: ScrollRevealEdge(rawValue: edge)!)
     }
     
-    init(connectedTo scrollView: UIScrollView, onEdge edge: ScrollRevealEdge) {
-        self.scrollView = scrollView
+    init(edge: ScrollRevealEdge) {
         self.edge = edge
         super.init()
+    }
+    
+    func insertAbove(_ scrollView: UIScrollView) {
+        self.scrollView = scrollView
         
         if let superview = scrollView.superview {
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -40,10 +43,10 @@ class ScrollRevealController : NSObject {
             view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
             
             if edge == .top {
-                edgeConstraint = view.bottomAnchor.constraint(equalTo: superview.topAnchor, constant: adjustedContentInset.top)
+                edgeConstraint = view.bottomAnchor.constraint(equalTo: superview.topAnchor, constant: revealedOffset)
                 
             } else {
-                edgeConstraint = view.topAnchor.constraint(equalTo: superview.bottomAnchor, constant: -adjustedContentInset.bottom)
+                edgeConstraint = view.topAnchor.constraint(equalTo: superview.bottomAnchor, constant: revealedOffset)
             }
             
             edgeConstraint?.isActive = true
@@ -78,34 +81,49 @@ extension ScrollRevealController {
     
     fileprivate var scrollViewAdjustedContentInset: UIEdgeInsets {
         var insets: UIEdgeInsets = .zero
-        insets.top = scrollView.contentInset.top + adjustedContentInset.top
-        insets.bottom = scrollView.contentInset.bottom  + adjustedContentInset.bottom
+        insets.top = (scrollView?.contentInset.top ?? 0) + adjustedContentInset.top
+        insets.bottom = (scrollView?.contentInset.bottom ?? 0) + adjustedContentInset.bottom
         return insets
     }
     
     fileprivate var scrollViewExpectedContentOffsetY: CGFloat {
-        return scrollView.contentOffset.y + scrollViewAdjustedContentInset.top
+        return (scrollView?.contentOffset.y ?? 0) + scrollViewAdjustedContentInset.top
     }
     
     fileprivate var scrollViewExpectedContentSizeHeight: CGFloat {
-        return scrollView.contentOffset.y + scrollView.bounds.size.height - scrollViewAdjustedContentInset.bottom
+        return (scrollView?.contentOffset.y ?? 0) + (scrollView?.bounds.size.height ?? 0) - scrollViewAdjustedContentInset.bottom
+    }
+    
+    fileprivate var revealedOffset: CGFloat {
+        if edge == .top {
+            return adjustedContentInset.top + view.bounds.size.height
+            
+        } else {
+            return -adjustedContentInset.bottom
+        }
+    }
+    
+    fileprivate var concealedOffset: CGFloat {
+        if edge == .top {
+            return adjustedContentInset.top
+            
+        } else {
+            return -(view.bounds.size.height + adjustedContentInset.bottom)
+        }
+    }
+    
+    func resetViewOffset() {
+        edgeConstraint?.constant = 0
     }
     
     fileprivate func adjustViewOffset() {
-        guard let edgeConstraint = edgeConstraint else {
+        guard let scrollView = scrollView, let edgeConstraint = edgeConstraint else {
             return
         }
         
         // Dont change the constraint when bouncing
         if scrollViewExpectedContentOffsetY > 0 && scrollViewExpectedContentSizeHeight < scrollView.contentSize.height {
-            let currentOffsetY = offsetY - scrollView.contentOffset.y
-            
-            if edge == .top {
-                edgeConstraint.constant = min(adjustedContentInset.top + view.bounds.size.height, max(adjustedContentInset.top, currentOffsetY))
-                
-            } else {
-                edgeConstraint.constant = min(0, max(-(view.bounds.size.height + adjustedContentInset.bottom), currentOffsetY));
-            }
+            edgeConstraint.constant = min(revealedOffset, max(concealedOffset, offsetY - scrollView.contentOffset.y))
         }
         
         prepareViewOffset()
@@ -113,21 +131,19 @@ extension ScrollRevealController {
     }
     
     fileprivate func prepareViewOffset() {
-        offsetY = scrollView.contentOffset.y + (edgeConstraint?.constant ?? 0)
-    }
-    
-    func resetViewOffset() {
-        edgeConstraint?.constant = 0
+        offsetY = (scrollView?.contentOffset.y ?? 0) + (edgeConstraint?.constant ?? 0)
     }
     
     fileprivate func completeViewOffset() {
-        let minHeight = -view.bounds.size.height
-        let maxHeight = CGFloat(0)
-        let offsetY = edgeConstraint?.constant ?? 0
+        let concealed = concealedOffset
+        let revealed = revealedOffset
+        let offset = edgeConstraint?.constant ?? 0
         
-        if offsetY > minHeight && offsetY < maxHeight {
+        if offset > concealed && offset < revealed {
+            let shouldReveal = revealed - offset < view.bounds.size.height / 2
+            
             UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                self.edgeConstraint?.constant = offsetY * 2 > minHeight ? maxHeight : minHeight
+                self.edgeConstraint?.constant = shouldReveal ? revealed : concealed
                 self.view.superview?.layoutIfNeeded()
             })
         }

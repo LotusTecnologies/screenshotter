@@ -10,9 +10,7 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
-    fileprivate lazy var scrollRevealController = {
-        return ScrollRevealController(connectedTo: self.webView.scrollView, onEdge: .top)
-    }()
+    fileprivate let scrollRevealController = ScrollRevealController(edge: .top)
     fileprivate let searchBar = UISearchBar()
     
     override var title: String? {
@@ -44,9 +42,13 @@ class DiscoverWebViewController : WebViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+        scrollRevealController.insertAbove(webView.scrollView)
+        
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
         searchBar.barTintColor = .white
+        searchBar.tintColor = .crazeRed
         searchBar.setImage(UIImage(named: "InviteGoogleIcon"), for: .search, state: .normal)
         scrollRevealController.view.addSubview(searchBar)
         searchBar.topAnchor.constraint(equalTo: scrollRevealController.view.topAnchor).isActive = true
@@ -64,18 +66,6 @@ class DiscoverWebViewController : WebViewController {
         reloadURL()
         
         AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url ?? ""])
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        navigationController?.navigationBar.alpha = 0.2 // !!!: DEBUG
     }
     
     // MARK: URL
@@ -176,6 +166,8 @@ extension DiscoverWebViewController : UISearchBarDelegate {
 extension DiscoverWebViewController { // WKNavigationDelegate
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         decisionHandler(.allow)
+        
+        // TODO: wikipedia search dont always show the search bar
         
         if view.window != nil {
             syncSearchBarVisibility()

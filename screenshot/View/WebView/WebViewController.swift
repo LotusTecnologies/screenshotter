@@ -45,6 +45,7 @@ class WebViewController : BaseViewController {
         webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoBack), options: [.new, .old], context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoForward), options: [.new, .old], context: nil)
         
+        syncToolbar()
         setBarButtonItemsToToolbarIfPossible()
         loadURL(url)
     }
@@ -165,6 +166,12 @@ class WebViewController : BaseViewController {
     
     // MARK: Toolbar
     
+    var isToolbarEnabled = true {
+        didSet {
+            syncToolbar()
+        }
+    }
+    
     fileprivate lazy var toolbar: UIToolbar = {
         let toolbar = UIToolbar()
         toolbar.frame = CGRect(x: 0, y: 0, width: 0, height: toolbar.intrinsicContentSize.height)
@@ -186,8 +193,13 @@ class WebViewController : BaseViewController {
         return toolbar
     }()
     
-    var isToolbarEnabled = true {
-        didSet {
+    fileprivate func syncToolbar() {
+        if isViewLoaded {
+            // Don't lazy load the toolbar when initially setting to false
+            if !isToolbarEnabled && view.subviews.first(where: { $0 is UIToolbar }) == nil {
+                return
+            }
+            
             toolbar.isHidden = !isToolbarEnabled
         }
     }

@@ -160,7 +160,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView;
     });
     
-    _scrollRevealController = [[ScrollRevealController alloc] initWithConnectedTo:self.collectionView onEdge:1];
+    _scrollRevealController = [[ScrollRevealController alloc] initWithEdge:1];
+    self.scrollRevealController.adjustedContentInset = UIEdgeInsetsMake(CGRectGetMaxY(self.navigationController.navigationBar.frame), 0.f, 0.f, 0.f);
+    [self.scrollRevealController insertAbove:self.collectionView];
     
     [self.scrollRevealController.view addSubview:self.rateView];
     [self.rateView.topAnchor constraintEqualToAnchor:self.scrollRevealController.view.topAnchor].active = YES;
