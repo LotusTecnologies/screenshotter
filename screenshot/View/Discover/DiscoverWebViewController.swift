@@ -12,6 +12,7 @@ import DeepLinkKit
 class DiscoverWebViewController : WebViewController {
     fileprivate let scrollRevealController = ScrollRevealController(edge: .top)
     fileprivate let searchBar = UISearchBar()
+    fileprivate var previousWebViewURL: URL?
     
     override var title: String? {
         set {}
@@ -150,13 +151,13 @@ extension DiscoverWebViewController : UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if let text = searchBar.text, !text.isEmpty {
             loadURL(googleSearchURL(text))
-            syncSearchBarVisibility()
+            syncSearchBarVisibility(url: webView.url)
             searchBar.resignFirstResponder()
         }
     }
     
-    fileprivate func syncSearchBarVisibility() {
-        scrollRevealController.isViewHidden = isGoogleURL(webView.url)
+    fileprivate func syncSearchBarVisibility(url: URL?) {
+        scrollRevealController.isViewHidden = isGoogleURL(url)
     }
 }
 
@@ -164,10 +165,21 @@ extension DiscoverWebViewController { // WKNavigationDelegate
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         decisionHandler(.allow)
         
-        // TODO: wikipedia search dont always show the search bar
-        
         if view.window != nil {
-            syncSearchBarVisibility()
+            // Some featured links in Goolge will set the navigationAction.request.url
+            // before setting the webView.url. Below should fix the search bar syncing
+            // on those sites, such as Wikipedia
+            let url: URL?
+            
+            if webView.url == previousWebViewURL {
+                url = navigationAction.request.url
+                
+            } else {
+                url = webView.url
+            }
+            
+            syncSearchBarVisibility(url: url)
+            previousWebViewURL = webView.url
         }
     }
 }
