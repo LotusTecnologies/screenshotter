@@ -122,14 +122,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         toolbar;
     });
     
-    _rateView = ({
-        ProductsRateView *view = [[ProductsRateView alloc] init];
-        view.translatesAutoresizingMaskIntoConstraints = NO;
-        [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
-        [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
-        view;
-    });
-    
     _collectionView = ({
         UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
         CGFloat p = [Geometry padding];
@@ -143,7 +135,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y + self.rateView.intrinsicContentSize.height, minimumSpacing.x);
+        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
@@ -158,6 +150,14 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
         [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         collectionView;
+    });
+    
+    _rateView = ({
+        ProductsRateView *view = [[ProductsRateView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
+        [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
+        view;
     });
     
     _scrollRevealController = [[ScrollRevealController alloc] initWithEdge:1];

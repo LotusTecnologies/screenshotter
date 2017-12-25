@@ -200,6 +200,7 @@ extension ScrollRevealController {
             
             UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
                 self.edgeConstraint?.constant = shouldReveal ? min : max
+                self.adjustScrollViewInsets()
                 self.view.superview?.layoutIfNeeded()
             })
         }
@@ -210,16 +211,17 @@ extension ScrollRevealController {
             return
         }
         
+        let inset = abs(edgeConstraint.constant - concealedOffset)
         var contentInset = scrollView.contentInset
         var scrollIndicatorInsets = scrollView.scrollIndicatorInsets
         
         if edge == .top {
-            contentInset.top = edgeConstraint.constant - adjustedContentInset.top
-            scrollIndicatorInsets.top = contentInset.top
+            contentInset.top = inset
+            scrollIndicatorInsets.top = inset
             
         } else {
-            contentInset.bottom = edgeConstraint.constant - adjustedContentInset.bottom
-            scrollIndicatorInsets.bottom = contentInset.bottom
+            contentInset.bottom = inset
+            scrollIndicatorInsets.bottom = inset
         }
         
         scrollView.contentInset = contentInset
