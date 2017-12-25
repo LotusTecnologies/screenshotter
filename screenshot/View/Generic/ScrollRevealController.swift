@@ -93,7 +93,6 @@ extension ScrollRevealController {
             }
             
             adjustViewOffset()
-            adjustScrollViewInsets()
         }
     }
     
@@ -178,8 +177,14 @@ extension ScrollRevealController {
         }
         
         // Dont change the constraint when bouncing
-        if scrollViewExpectedContentOffsetY > 0 && scrollViewExpectedContentSizeHeight < scrollView.contentSize.height {
+        let isInContent = scrollViewExpectedContentOffsetY >= 0 && scrollViewExpectedContentSizeHeight <= scrollView.contentSize.height
+        
+        // Allow changes when tracking beyond the bounds
+        let isTrackingBeyondBounds = scrollView.isTracking && abs(edgeConstraint.constant) < abs(revealedOffset)
+        
+        if isInContent || isTrackingBeyondBounds {
             edgeConstraint.constant = min(minOffset, max(maxOffset, offsetY - scrollView.contentOffset.y))
+            adjustScrollViewInsets()
         }
         
         prepareViewOffset()
@@ -224,7 +229,14 @@ extension ScrollRevealController {
             scrollIndicatorInsets.bottom = inset
         }
         
+        // Setting the contentInset will call the scrollViewDidScroll delegate.
+        // This will create a recursive loop and cause jumping.
+        let scrollViewDelegate = scrollView.delegate
+        scrollView.delegate = nil
+        
         scrollView.contentInset = contentInset
         scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+        
+        scrollView.delegate = scrollViewDelegate
     }
 }
