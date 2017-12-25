@@ -138,6 +138,7 @@ public class TutorialEmailSlideView : HelperView {
         textField.textAlignment = .center
         textField.font = UIFont.preferredFont(forTextStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
+        textField.tintColor = .crazeGreen
         textField.backgroundColor = .white
         textField.borderStyle = .none
         textField.spellCheckingType = .no

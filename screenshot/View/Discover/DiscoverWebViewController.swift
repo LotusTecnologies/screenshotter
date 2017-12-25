@@ -46,7 +46,7 @@ class DiscoverWebViewController : WebViewController {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
         searchBar.barTintColor = .white
-        searchBar.tintColor = .crazeRed
+        searchBar.tintColor = .crazeGreen
         searchBar.setImage(UIImage(named: "InviteGoogleIcon"), for: .search, state: .normal)
         scrollRevealController.view.addSubview(searchBar)
         searchBar.topAnchor.constraint(equalTo: scrollRevealController.view.topAnchor).isActive = true

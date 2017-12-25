@@ -590,6 +590,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         textField.delegate = self;
         textField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
         textField.enablesReturnKeyAutomatically = YES;
+        textField.tintColor = [UIColor crazeGreen];
         self.productsRateNegativeFeedbackTextField = textField;
     }];
     
