@@ -8,6 +8,7 @@
 
 import UIKit
 import Lottie
+import Appsee
 
 class FavoriteButton: UIButton {
     private let heartSwitch = LOTAnimatedSwitch(named: "FavoriteHeart")
@@ -61,5 +62,7 @@ class FavoriteButton: UIButton {
         animate = false
         
         TapticHelper.peek()
+        
+        Appsee.resume()
     }
 }
