@@ -42,9 +42,6 @@ class DiscoverWebViewController : WebViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
-        scrollRevealController.insertAbove(webView.scrollView)
-        
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
         searchBar.barTintColor = .white
@@ -56,12 +53,12 @@ class DiscoverWebViewController : WebViewController {
         searchBar.bottomAnchor.constraint(equalTo: scrollRevealController.view.bottomAnchor).isActive = true
         searchBar.trailingAnchor.constraint(equalTo: scrollRevealController.view.trailingAnchor).isActive = true
         
+        scrollRevealController.isAutoShowingView = true
+        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+        scrollRevealController.insertAbove(webView.scrollView)
+        
         webView.scrollView.delegate = self
         webView.scrollView.keyboardDismissMode = .onDrag
-
-        var contentInset = webView.scrollView.contentInset
-        contentInset.top += searchBar.intrinsicContentSize.height
-        webView.scrollView.contentInset = contentInset
         
         reloadURL()
         
@@ -159,7 +156,7 @@ extension DiscoverWebViewController : UISearchBarDelegate {
     }
     
     fileprivate func syncSearchBarVisibility() {
-        searchBar.isHidden = isGoogleURL(webView.url)
+        scrollRevealController.isViewHidden = isGoogleURL(webView.url)
     }
 }
 
