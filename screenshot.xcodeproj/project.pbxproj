@@ -18,6 +18,7 @@
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
+		C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */; };
 		C50EE2761FC40DCD002B4259 /* Hind 700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C50EE2751FC40DCC002B4259 /* Hind 700.ttf */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
@@ -120,6 +121,7 @@
 		52E547431FE2487B00627D6D /* ScreenshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotHelper.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
+		C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollRevealController.swift; path = screenshot/View/Generic/ScrollRevealController.swift; sourceTree = SOURCE_ROOT; };
 		C50EE2751FC40DCC002B4259 /* Hind 700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind 700.ttf"; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
@@ -500,6 +502,7 @@
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
 				C54088411FE90E2200198955 /* PresentationController */,
 				C56F88A01FE949560006914C /* Protocol */,
+				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C540884A1FE90E2200198955 /* TextView */,
 			);
@@ -962,6 +965,7 @@
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C54088521FE90E2200198955 /* BaseViewController.m in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
+				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */,
 				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				C54088391FE90C8E00198955 /* ScreenshotsViewController.m in Sources */,

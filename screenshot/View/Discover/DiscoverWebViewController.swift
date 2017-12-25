@@ -10,6 +10,10 @@ import WebKit.WKWebView
 import DeepLinkKit
 
 class DiscoverWebViewController : WebViewController {
+    fileprivate let scrollRevealController = ScrollRevealController(edge: .top)
+    fileprivate let searchBar = UISearchBar()
+    fileprivate var previousWebViewURL: URL?
+    
     override var title: String? {
         set {}
         get {
@@ -39,8 +43,24 @@ class DiscoverWebViewController : WebViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.delegate = self
+        searchBar.barTintColor = .white
+        searchBar.tintColor = .crazeRed
+        searchBar.setImage(UIImage(named: "InviteGoogleIcon"), for: .search, state: .normal)
+        scrollRevealController.view.addSubview(searchBar)
+        searchBar.topAnchor.constraint(equalTo: scrollRevealController.view.topAnchor).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: scrollRevealController.view.leadingAnchor).isActive = true
+        searchBar.bottomAnchor.constraint(equalTo: scrollRevealController.view.bottomAnchor).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: scrollRevealController.view.trailingAnchor).isActive = true
+        
+        scrollRevealController.isAutoShowingView = true
+        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+        scrollRevealController.insertAbove(webView.scrollView)
+        
         webView.scrollView.delegate = self
-
+        webView.scrollView.keyboardDismissMode = .onDrag
+        
         reloadURL()
         
         AnalyticsTrackers.standard.track("Loaded Discover Web Page", properties: ["url": url ?? ""])
@@ -64,7 +84,7 @@ class DiscoverWebViewController : WebViewController {
         
         for potentialURL in potentialURLs {
             if let potentialURL = potentialURL, UIApplication.shared.canOpenURL(potentialURL) {
-                url = potentialURL
+                loadURL(potentialURL)
                 break
             }
         }
@@ -75,10 +95,8 @@ class DiscoverWebViewController : WebViewController {
 
         if let urls = AppDelegate.shared.settings.discoverURLs {
             let randomIndex = Int(arc4random_uniform(UInt32(urls.count)))
-            let randomURL = urls[randomIndex]
             
-            // Check the URL's validity
-            if let randomURL = randomURL {
+            if let randomURL = urls[randomIndex] {
                 if UIApplication.shared.canOpenURL(randomURL) {
                     url = randomURL
                     
@@ -91,7 +109,17 @@ class DiscoverWebViewController : WebViewController {
         return url
     }
     
-    // MARK: Bar Button Item
+    fileprivate func isGoogleURL(_ url: URL?) -> Bool {
+        let isHostGoogle = url?.host?.contains("google") ?? false
+        let isAMP = url?.path.split(separator: "/").first == "amp"
+        return isHostGoogle && !isAMP
+    }
+    
+    fileprivate func googleSearchURL(_ query: String) -> URL? {
+        return URL(string: "https://google.com/search?q=\(query)")
+    }
+    
+    // MARK: Toolbar
     
     func leftBarButtonItems() -> [UIBarButtonItem] {
         return [backItem!, forwardItem!]
@@ -107,7 +135,7 @@ class DiscoverWebViewController : WebViewController {
         navigationItem.rightBarButtonItems = rightBarButtonItems()
     }
 
-    // MARK: Bar Button Item Actions
+    // MARK: Toolbar Actions
     
     @objc override func refreshAction() {
         reloadURL()
@@ -115,7 +143,64 @@ class DiscoverWebViewController : WebViewController {
     }
 }
 
-extension DiscoverWebViewController: UIScrollViewDelegate {
+extension DiscoverWebViewController : UISearchBarDelegate {
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .top
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if let text = searchBar.text, !text.isEmpty {
+            loadURL(googleSearchURL(text))
+            syncSearchBarVisibility(url: webView.url)
+            searchBar.resignFirstResponder()
+        }
+    }
+    
+    fileprivate func syncSearchBarVisibility(url: URL?) {
+        scrollRevealController.isViewHidden = isGoogleURL(url)
+    }
+}
+
+extension DiscoverWebViewController { // WKNavigationDelegate
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        decisionHandler(.allow)
+        
+        if view.window != nil {
+            // Some featured links in Goolge will set the navigationAction.request.url
+            // before setting the webView.url. Below should fix the search bar syncing
+            // on those sites, such as Wikipedia
+            let url: URL?
+            
+            if webView.url == previousWebViewURL {
+                url = navigationAction.request.url
+                
+            } else {
+                url = webView.url
+            }
+            
+            syncSearchBarVisibility(url: url)
+            previousWebViewURL = webView.url
+        }
+    }
+}
+
+extension DiscoverWebViewController : UIScrollViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        scrollRevealController.scrollViewWillBeginDragging(scrollView)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollRevealController.scrollViewDidScroll(scrollView)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        scrollRevealController.scrollViewDidEndDragging(scrollView, will: decelerate)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        scrollRevealController.scrollViewDidEndDecelerating(scrollView)
+    }
+    
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return nil
     }
