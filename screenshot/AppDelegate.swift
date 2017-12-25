@@ -222,11 +222,18 @@ extension AppDelegate {
             
             // "channel" will be the Instagram username of the ambassador who shared this link.
             if let channel = params["channel"] as? String {
-                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.ambasssadorUsername)
-                
-                if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
-                    tutorialVC.video = .ambassador(username: channel)
+                if channel.hasPrefix("@") {
+                    // Ambassador referral.
+                    UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.ambasssadorUsername)
+                    
+                    if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
+                        tutorialVC.video = .ambassador(username: channel)
+                    }
+                } else {
+                    UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
                 }
+            } else {
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.referralChannel)
             }
             
             // "discoverURL" will be the discover URL that should be used during this session.
