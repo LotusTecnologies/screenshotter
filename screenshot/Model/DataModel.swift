@@ -210,8 +210,6 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             case .move:
                 changeKind = .singleMove
                 changeIndexPath = newIndexPath
-            default:
-                changeKind = .multiple
             }
         }
     }
