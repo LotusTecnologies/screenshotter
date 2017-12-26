@@ -62,7 +62,5 @@ class FavoriteButton: UIButton {
         animate = false
         
         TapticHelper.peek()
-        
-        Appsee.resume()
     }
 }
