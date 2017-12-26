@@ -609,8 +609,12 @@ fileprivate extension SettingsViewController {
             }
             
         case .productGender:
+            guard let control = productsOptionsControls.genderControl.copy() as? UISegmentedControl else {
+                return nil
+            }
+            
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-            let control = productsOptionsControls.genderControl
+            
             control.tintColor = .crazeGreen
             control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
             control.isExclusiveTouch = true
@@ -618,8 +622,12 @@ fileprivate extension SettingsViewController {
             return control
             
         case .productSize:
+            guard let control = productsOptionsControls.sizeControl.copy() as? UISegmentedControl else {
+                return nil
+            }
+            
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
-            let control = productsOptionsControls.sizeControl
+            
             control.tintColor = .crazeGreen
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
             control.isExclusiveTouch = true
