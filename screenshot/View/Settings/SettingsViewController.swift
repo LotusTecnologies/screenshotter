@@ -58,6 +58,8 @@ class SettingsViewController : BaseViewController {
         ]
     }()
     
+    fileprivate let productsOptionsControls = ProductsOptionsControls()
+    
     override var title: String? {
         set {}
         get {
@@ -590,25 +592,19 @@ fileprivate extension SettingsViewController {
             
         case .productGender:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-            let control = UISegmentedControl(items: [
-                ProductsOptionsGender.female.stringValue,
-                ProductsOptionsGender.male.stringValue,
-                ProductsOptionsGender.auto.stringValue
-                ])
+            let control = productsOptionsControls.genderControl
             control.tintColor = .crazeGreen
             control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
+            control.isExclusiveTouch = true
             control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
             return control
             
         case .productSize:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
-            let control = UISegmentedControl(items: [
-                ProductsOptionsSize.child.stringValue,
-                ProductsOptionsSize.adult.stringValue,
-//                ProductsOptionsSize.plus.stringValue
-                ])
+            let control = productsOptionsControls.sizeControl
             control.tintColor = .crazeGreen
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
+            control.isExclusiveTouch = true
             control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
             return control
             
