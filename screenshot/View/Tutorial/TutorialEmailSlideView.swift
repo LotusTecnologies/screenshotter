@@ -165,33 +165,14 @@ public class TutorialEmailSlideView : HelperView {
         UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
         UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
         
-        let user = AnalyticsUser(name: name, email: email)
+        let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel)
+        
+        let user = AnalyticsUser(name: name, email: email, channel: channel)
         AnalyticsTrackers.standard.identify(user)
         AnalyticsTrackers.branch.identify(user)
         
-        if let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel) {
-            IntercomHelper.sharedInstance.performUserUpdate { attrs in
-                var attributes = attrs.customAttributes ?? [:]
-                attributes["referralChannel"] = channel
-                attrs.customAttributes = attributes
-            }
-            
-            AnalyticsTrackers.standard.track("User Acquired", properties: ["source" : channel])
-        }
-        
-        if email.count > 0 {
-            AnalyticsTrackers.standard.track("Submitted email", properties: [
-                "id": user.identifier,
-                "name": name,
-                "email": email
-                ])
-            
-        } else {
-            AnalyticsTrackers.standard.track("Submitted blank email", properties: [
-                "id": user.identifier,
-                "name": name
-                ])
-        }
+        let eventName = email.count > 0 ? "Submitted email" : "Submitted blank email"
+        AnalyticsTrackers.standard.track(eventName, properties: user.analyticsProperties)
 
         UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
         UserDefaults.standard.synchronize()
