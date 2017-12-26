@@ -220,7 +220,6 @@ extension AppDelegate {
                 self.showScreenshotListTop()
             }
             
-            // "channel" will be the Instagram username of the ambassador who shared this link.
             if let channel = params["channel"] as? String {
                 UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
             }
