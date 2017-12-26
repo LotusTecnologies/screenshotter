@@ -15,7 +15,6 @@ import UIKit
 class TutorialViewController : UIViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
-    var video = TutorialVideo.standard
     let scrollView = UIScrollView()
     let contentView = UIView()
     
@@ -188,7 +187,7 @@ extension TutorialViewController : UIScrollViewDelegate {
 
 extension TutorialViewController : TutorialVideoViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
     @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
-        let viewController = TutorialVideoViewController(video: video)
+        let viewController = TutorialVideoViewController()
         viewController.modalTransitionStyle = .crossDissolve
         viewController.delegate = self
         present(viewController, animated: true, completion: nil)

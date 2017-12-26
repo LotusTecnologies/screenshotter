@@ -193,12 +193,6 @@ public class TutorialEmailSlideView : HelperView {
                 ])
         }
 
-        if let ambassadorUsername = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername) {
-            AnalyticsTrackers.standard.track("Referring Ambassador", properties: [
-                "username": ambassadorUsername
-                ])
-        }
-        
         UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
         UserDefaults.standard.synchronize()
         

@@ -13,7 +13,6 @@ class UserDefaultsKeys : NSObject {
     static let email = "Email"
     static let name = "Name"
     static let userID = "UserID"
-    static let ambasssadorUsername = "AmbasssadorUsername"
     static let referralChannel = "ReferralChannel"
     
     // Screenshot

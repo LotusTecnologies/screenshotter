@@ -9,19 +9,6 @@
 import UIKit
 import AVFoundation
 
-enum TutorialVideo {
-    case standard
-    case ambassador(username: String)
-    
-    var url: URL {
-        switch self {
-        case .ambassador(let username):
-            return URL(string: "https://res.cloudinary.com/crazeapp/video/upload/\(username).mp4")!
-        case .standard:
-            return Bundle.main.url(forResource: "Craze_Video", withExtension: "mp4")!
-        }
-    }
-}
 
 @objc protocol TutorialVideoViewControllerDelegate {
     @objc optional func tutorialVideoViewControllerDidPause(_ viewController:TutorialVideoViewController)
@@ -35,8 +22,6 @@ class TutorialVideoViewController : BaseViewController {
     var showsReplayButtonUponFinishing: Bool = true
     
     weak var delegate: TutorialVideoViewControllerDelegate?
-    
-    private(set) var video: TutorialVideo!
     
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
@@ -52,8 +37,8 @@ class TutorialVideoViewController : BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(video vid: TutorialVideo) {
-        let playerItem = AVPlayerItem(url: vid.url)
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: "Craze_Video", withExtension: "mp4")!)
         
         player = AVPlayer(playerItem: playerItem)
         player.allowsExternalPlayback = false
@@ -63,8 +48,6 @@ class TutorialVideoViewController : BaseViewController {
         playerLayer = AVPlayerLayer(player: player)
         
         super.init(nibName: nil, bundle: nil)
-        
-        video = vid
     }
     
     deinit {
@@ -145,29 +128,6 @@ class TutorialVideoViewController : BaseViewController {
     private func beginObserving(playerItem item:AVPlayerItem) {
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
-
-        observers.append(item.observe(\.status, options: [.new, .initial]) { playerItem, change in
-            guard let video = self.video, playerItem == self.player.currentItem else {
-                return
-            }
-            
-            if case .ambassador(_) = video,
-                playerItem.status == .failed {
-                guard let error = playerItem.error as NSError?, error.domain == NSURLErrorDomain, error.code == -1100 else {
-                    return
-                }
-                
-                // Ambassador video failed to download, use standard one
-                
-                self.video = .standard
-                
-                let standardPlayerItem = AVPlayerItem(url: TutorialVideo.standard.url)
-                self.player.replaceCurrentItem(with: standardPlayerItem)
-                self.beginObserving(playerItem: standardPlayerItem)
-                self.player.play()
-                self.delegate?.tutorialVideoViewControllerDidPlay?(self)
-            }
-        })
     }
     
     private func endObserving() {

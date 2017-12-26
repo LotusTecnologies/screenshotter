@@ -403,15 +403,7 @@ extension SettingsViewController : UITableViewDelegate {
             navigationController?.pushViewController(viewController, animated: true)
         
         case .tutorialVideo:
-            var viewController: TutorialVideoViewController
-            
-            if let username = UserDefaults.standard.string(forKey: UserDefaultsKeys.ambasssadorUsername) {
-                viewController = TutorialVideoViewController(video: .ambassador(username: username))
-                
-            } else {
-                viewController = TutorialVideoViewController(video: .standard)
-            }
-            
+            let viewController = TutorialVideoViewController()
             viewController.showsReplayButtonUponFinishing = false
             viewController.delegate = self
             viewController.modalTransitionStyle = .crossDissolve
