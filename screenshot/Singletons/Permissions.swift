@@ -44,6 +44,11 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             }
             
             AnalyticsTrackers.standard.track(name, properties: properties)
+            
+            // Reidentify
+            if let current = AnalyticsUser.current {
+                AnalyticsTrackers.standard.identify(current)
+            }
         }
     }
     

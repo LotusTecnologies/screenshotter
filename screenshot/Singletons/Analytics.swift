@@ -36,7 +36,24 @@ public class AnalyticsUser : NSObject {
             props["name"] = name
         }
         
+        props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
+        
+        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data {
+            props["pushToken"] = token.description
+        }
+        
         return props
+    }
+}
+
+extension AnalyticsUser {
+    static var current: AnalyticsUser? {
+        guard let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) else {
+            return nil
+        }
+
+        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+        return AnalyticsUser(name: name, email: email)
     }
 }
 
