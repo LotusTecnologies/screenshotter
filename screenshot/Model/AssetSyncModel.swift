@@ -419,7 +419,8 @@ class AssetSyncModel: NSObject {
     
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
         let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
-        let sizeParamString = isChild ? "&feed=kids_craze" : ""
+        let isPlus = optionsMask.rawValue & ProductsOptionsMask.sizePlus.rawValue > 0
+        let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : ""
         var genderParamString = ""
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
             genderParamString = isChild ? "&force_gender=boy" : "&force_gender=male"
