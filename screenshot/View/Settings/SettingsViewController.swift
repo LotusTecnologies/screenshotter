@@ -344,15 +344,19 @@ extension SettingsViewController : UITableViewDataSource {
         }
         
         if indexPath.section == SettingsSection.product.rawValue && (row == .productGender || row == .productSize) {
-            let width = max(productsOptionsControls.genderControl.bounds.width, productsOptionsControls.sizeControl.bounds.width)
+            guard let genderControl = productsOptionsControls.genderControl, let sizeControl = productsOptionsControls.sizeControl else {
+                return
+            }
             
-            var frame = productsOptionsControls.genderControl.frame
-            frame.size.width = width
-            productsOptionsControls.genderControl.frame = frame
+            let width = max(genderControl.bounds.width, sizeControl.bounds.width)
             
-            frame = productsOptionsControls.sizeControl.frame
+            var frame = genderControl.frame
             frame.size.width = width
-            productsOptionsControls.sizeControl.frame = frame
+            genderControl.frame = frame
+            
+            frame = sizeControl.frame
+            frame.size.width = width
+            sizeControl.frame = frame
         }
     }
     
@@ -609,12 +613,9 @@ fileprivate extension SettingsViewController {
             }
             
         case .productGender:
-            guard let control = productsOptionsControls.genderControl.copy() as? UISegmentedControl else {
-                return nil
-            }
-            
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
             
+            let control = productsOptionsControls.createGenderControl()
             control.tintColor = .crazeGreen
             control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
             control.isExclusiveTouch = true
@@ -622,12 +623,9 @@ fileprivate extension SettingsViewController {
             return control
             
         case .productSize:
-            guard let control = productsOptionsControls.sizeControl.copy() as? UISegmentedControl else {
-                return nil
-            }
-            
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
             
+            let control = productsOptionsControls.createSizeControl()
             control.tintColor = .crazeGreen
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
             control.isExclusiveTouch = true

@@ -178,39 +178,53 @@ extension ProductsOptions : UIPickerViewDelegate {
 }
 
 class ProductsOptionsControls : NSObject {
-    private(set) lazy var genderControl: UISegmentedControl = {
-        self.isGenderControlLoaded = true
-        
+    private(set) var genderControl: UISegmentedControl?
+    
+    func createGenderControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
             ProductsOptionsGender.female.stringValue,
             ProductsOptionsGender.male.stringValue,
             ProductsOptionsGender.auto.stringValue
             ])
         control.addTarget(self, action: #selector(syncGenderControl), for: .valueChanged)
-        return control
-    }()
-    
-    private(set) lazy var sizeControl: UISegmentedControl = {
-        self.isSizeControlLoaded = true
         
+        genderControl?.removeFromSuperview()
+        genderControl = control
+        
+        sync()
+        return control
+    }
+    
+    private(set) var sizeControl: UISegmentedControl?
+    
+    func createSizeControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
             ProductsOptionsSize.child.stringValue,
             ProductsOptionsSize.adult.stringValue,
             ProductsOptionsSize.plus.stringValue
             ])
         control.addTarget(self, action: #selector(syncSizeControl), for: .valueChanged)
+        
+        sizeControl?.removeFromSuperview()
+        sizeControl = control
+        
+        sync()
         return control
-    }()
+    }
     
-    private(set) lazy var saleControl: UISegmentedControl = {
-        return UISegmentedControl(items: [
+    private(set) var saleControl: UISegmentedControl?
+    
+    func createSaleControl() -> UISegmentedControl {
+        let control = UISegmentedControl(items: [
             ProductsOptionsSale.sale.stringValue,
             ProductsOptionsSale.all.stringValue
             ])
-    }()
-    
-    private var isGenderControlLoaded = false
-    private var isSizeControlLoaded = false
+        
+        saleControl?.removeFromSuperview()
+        saleControl = control
+        
+        return control
+    }
     
     func sync() {
         syncGenderControl()
@@ -218,7 +232,7 @@ class ProductsOptionsControls : NSObject {
     }
     
     @objc private func syncGenderControl() {
-        guard isSizeControlLoaded else {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
             return
         }
         
@@ -227,7 +241,7 @@ class ProductsOptionsControls : NSObject {
     }
     
     @objc private func syncSizeControl() {
-        guard isGenderControlLoaded else {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
             return
         }
         
@@ -263,7 +277,7 @@ class ProductsOptionsView : UIView {
         borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
         
-        genderControl = controls.genderControl
+        genderControl = controls.createGenderControl()
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.tintColor = .crazeGreen
         genderControl.isExclusiveTouch = true
@@ -274,7 +288,7 @@ class ProductsOptionsView : UIView {
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        sizeControl = controls.sizeControl
+        sizeControl = controls.createSizeControl()
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         sizeControl.tintColor = .crazeGreen
         sizeControl.isExclusiveTouch = true
@@ -285,7 +299,7 @@ class ProductsOptionsView : UIView {
         sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        saleControl = controls.saleControl
+        saleControl = controls.createSaleControl()
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.tintColor = .crazeGreen
         addSubview(saleControl)
