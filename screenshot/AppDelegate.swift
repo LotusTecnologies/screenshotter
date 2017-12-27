@@ -16,6 +16,7 @@ import Firebase
 import GoogleSignIn
 import PromiseKit
 import DeepLinkKit
+import Segment_Amplitude
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -197,6 +198,8 @@ extension AppDelegate {
         configuration.recordScreenViews = true
         configuration.trackDeepLinks = true
         configuration.trackPushNotifications = true
+        configuration.use(SEGAmplitudeIntegrationFactory.instance())
+        
         SEGAnalytics.setup(with: configuration)
         
         Appsee.start(Constants.appSeeApiKey)
