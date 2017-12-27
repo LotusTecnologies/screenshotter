@@ -150,25 +150,7 @@ class DataModel: NSObject {
     fileprivate var hasShoppablesChangeKind: CZChangeKind = .none
 
     
-    public lazy var favoriteFrc: NSFetchedResultsController<Product> = {
-        let request: NSFetchRequest<Product> = Product.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
-        request.predicate = NSPredicate(format: "isFavorite == TRUE")
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch favorites from core data:\(error)")
-        }
-        return fetchedResultsController
-    }()
-    weak open var favoriteFrcDelegate: FrcDelegateProtocol?
-    
-    fileprivate var favoriteChangeIndexPath: IndexPath?
-    fileprivate var favoriteChangeKind: CZChangeKind = .none
-    
-    public lazy var _favoriteFrc: NSFetchedResultsController<Screenshot> = {
+    public lazy var favoriteFrc: NSFetchedResultsController<Screenshot> = {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
         request.predicate = NSPredicate(format: "lastFavorited != nil")
@@ -181,10 +163,10 @@ class DataModel: NSObject {
         }
         return fetchedResultsController
     }()
-    weak open var _favoriteFrcDelegate: FrcDelegateProtocol?
+    weak open var favoriteFrcDelegate: FrcDelegateProtocol?
     
-    fileprivate var _favoriteChangeIndexPath: IndexPath?
-    fileprivate var _favoriteChangeKind: CZChangeKind = .none
+    fileprivate var favoriteChangeIndexPath: IndexPath?
+    fileprivate var favoriteChangeKind: CZChangeKind = .none
     
 }
 
@@ -996,8 +978,10 @@ extension Product {
                 }
                 try managedObjectContext.save()
                 
-                let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
-                UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
+                if toFavorited {
+                    let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
+                    UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
+                }
             } catch {
                 print("setFavorited objectID:\(managedObjectID) results with error:\(error)")
             }
