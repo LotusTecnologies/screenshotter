@@ -142,7 +142,6 @@ class ProductsOptions : NSObject {
 }
 
 extension ProductsOptions {
-    
     // MARK: Objc
     
     func _gender() -> Int {
@@ -178,21 +177,83 @@ extension ProductsOptions : UIPickerViewDelegate {
     }
 }
 
+class ProductsOptionsControls : NSObject {
+    var genderControl: UISegmentedControl?
+    
+    func createGenderControl() -> UISegmentedControl {
+        let control = UISegmentedControl(items: [
+            ProductsOptionsGender.female.stringValue,
+            ProductsOptionsGender.male.stringValue,
+            ProductsOptionsGender.auto.stringValue
+            ])
+        control.addTarget(self, action: #selector(syncGenderControl), for: .valueChanged)
+        
+        genderControl?.removeFromSuperview()
+        genderControl = control
+        
+        return control
+    }
+    
+    var sizeControl: UISegmentedControl?
+    
+    func createSizeControl() -> UISegmentedControl {
+        let control = UISegmentedControl(items: [
+            ProductsOptionsSize.child.stringValue,
+            ProductsOptionsSize.adult.stringValue,
+            ProductsOptionsSize.plus.stringValue
+            ])
+        control.addTarget(self, action: #selector(syncSizeControl), for: .valueChanged)
+        
+        sizeControl?.removeFromSuperview()
+        sizeControl = control
+        
+        return control
+    }
+    
+    private(set) var saleControl: UISegmentedControl?
+    
+    func createSaleControl() -> UISegmentedControl {
+        let control = UISegmentedControl(items: [
+            ProductsOptionsSale.sale.stringValue,
+            ProductsOptionsSale.all.stringValue
+            ])
+        
+        saleControl?.removeFromSuperview()
+        saleControl = control
+        
+        return control
+    }
+    
+    func sync() {
+        syncGenderControl()
+        syncSizeControl()
+    }
+    
+    @objc private func syncGenderControl() {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+            return
+        }
+        
+        let isMale = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) == .male
+        sizeControl.setEnabled(!isMale, forSegmentAt: ProductsOptionsSize.plus.offsetValue)
+    }
+    
+    @objc private func syncSizeControl() {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+            return
+        }
+        
+        let isPlus = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) == .plus
+        genderControl.setEnabled(!isPlus, forSegmentAt: ProductsOptionsGender.male.offsetValue)
+    }
+}
+
 class ProductsOptionsView : UIView {
-    let genderControl = UISegmentedControl(items: [
-        ProductsOptionsGender.female.stringValue,
-        ProductsOptionsGender.male.stringValue,
-        ProductsOptionsGender.auto.stringValue
-        ])
-    let sizeControl = UISegmentedControl(items: [
-        ProductsOptionsSize.child.stringValue,
-        ProductsOptionsSize.adult.stringValue,
-//        ProductsOptionsSize.plus.stringValue
-        ])
-    let saleControl = UISegmentedControl(items: [
-        ProductsOptionsSale.sale.stringValue,
-        ProductsOptionsSale.all.stringValue
-        ])
+    private let controls = ProductsOptionsControls()
+    
+    private(set) var genderControl: UISegmentedControl!
+    private(set) var sizeControl: UISegmentedControl!
+    private(set) var saleControl: UISegmentedControl!
     let sortPickerView = UIPickerView()
     let doneButton = MainButton()
     
@@ -214,8 +275,10 @@ class ProductsOptionsView : UIView {
         borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
         
+        genderControl = controls.createGenderControl()
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.tintColor = .crazeGreen
+        genderControl.isExclusiveTouch = true
         addSubview(genderControl)
         genderControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         genderControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
@@ -223,8 +286,10 @@ class ProductsOptionsView : UIView {
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
+        sizeControl = controls.createSizeControl()
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         sizeControl.tintColor = .crazeGreen
+        sizeControl.isExclusiveTouch = true
         addSubview(sizeControl)
         sizeControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         sizeControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
@@ -232,6 +297,7 @@ class ProductsOptionsView : UIView {
         sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
+        saleControl = controls.createSaleControl()
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.tintColor = .crazeGreen
         addSubview(saleControl)
@@ -271,6 +337,12 @@ class ProductsOptionsView : UIView {
         doneButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
         doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+    }
+    
+    override func willMove(toWindow newWindow: UIWindow?) {
+        super.willMove(toWindow: newWindow)
+        
+        controls.sync()
     }
     
     override func layoutSubviews() {

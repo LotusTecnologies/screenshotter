@@ -58,6 +58,8 @@ class SettingsViewController : BaseViewController {
         ]
     }()
     
+    fileprivate let productsOptionsControls = ProductsOptionsControls()
+    
     override var title: String? {
         set {}
         get {
@@ -167,7 +169,7 @@ class SettingsViewController : BaseViewController {
         
         let tableFooterTextViewRect = rectForTableFooterTextView()
 
-        if tableView.tableFooterView?.bounds.size.height != tableFooterTextViewRect.size.height {
+        if tableView.tableFooterView?.bounds.height != tableFooterTextViewRect.height {
             tableFooterTextView.frame = tableFooterTextViewRect
             tableView.tableFooterView = tableFooterTextView
         }
@@ -184,6 +186,16 @@ class SettingsViewController : BaseViewController {
         super.viewWillDisappear(animated)
         
         dismissKeyboard()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        // Very important to clear the controls to prevent retaining
+        // the same property in multiple cells. Not doing this will
+        // freeze the app on subsequent view will appears.
+        productsOptionsControls.genderControl = nil
+        productsOptionsControls.sizeControl = nil
     }
     
     @objc private func applicationDidBecomeActive(_ notification: Notification) {
@@ -324,7 +336,7 @@ extension SettingsViewController : UITableViewDataSource {
         
         var cell: UITableViewCell
         
-        if indexPath.section == SettingsSection.info.rawValue && (row == SettingsRow.name || row == SettingsRow.email) {
+        if indexPath.section == SettingsSection.info.rawValue && (row == .name || row == .email) {
             cell = self.tableView(tableView, inputCellForRowAt: indexPath, withRow: row)
             
         } else {
@@ -334,6 +346,28 @@ extension SettingsViewController : UITableViewDataSource {
         cell.accessoryType = cellAccessoryType(for: row)
         cell.accessoryView = cellAccessoryView(for: row)
         return cell;
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let row = settingsRow(for: indexPath) else {
+            return
+        }
+        
+        if indexPath.section == SettingsSection.product.rawValue && (row == .productGender || row == .productSize) {
+            guard let genderControl = productsOptionsControls.genderControl, let sizeControl = productsOptionsControls.sizeControl else {
+                return
+            }
+            
+            let width = max(genderControl.bounds.width, sizeControl.bounds.width)
+            
+            var frame = genderControl.frame
+            frame.size.width = width
+            genderControl.frame = frame
+            
+            frame = sizeControl.frame
+            frame.size.width = width
+            sizeControl.frame = frame
+        }
     }
     
     private func tableView(_ tableView: UITableView, inputCellForRowAt indexPath: IndexPath, withRow row: SettingsRow) -> UITableViewCell {
@@ -590,26 +624,40 @@ fileprivate extension SettingsViewController {
             
         case .productGender:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-            let control = UISegmentedControl(items: [
-                ProductsOptionsGender.female.stringValue,
-                ProductsOptionsGender.male.stringValue,
-                ProductsOptionsGender.auto.stringValue
-                ])
-            control.tintColor = .crazeGreen
+            let control: UISegmentedControl
+            
+            if productsOptionsControls.genderControl != nil {
+                control = productsOptionsControls.genderControl!
+                
+            } else {
+                control = productsOptionsControls.createGenderControl()
+                control.tintColor = .crazeGreen
+                control.isExclusiveTouch = true
+                control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
+            }
+            
             control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
-            control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
+            productsOptionsControls.sync()
+            
             return control
             
         case .productSize:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
-            let control = UISegmentedControl(items: [
-                ProductsOptionsSize.child.stringValue,
-                ProductsOptionsSize.adult.stringValue,
-//                ProductsOptionsSize.plus.stringValue
-                ])
-            control.tintColor = .crazeGreen
+            let control: UISegmentedControl
+            
+            if productsOptionsControls.sizeControl != nil {
+                control = productsOptionsControls.sizeControl!
+                
+            } else {
+                control = productsOptionsControls.createSizeControl()
+                control.tintColor = .crazeGreen
+                control.isExclusiveTouch = true
+                control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
+            }
+            
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
-            control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
+            productsOptionsControls.sync()
+            
             return control
             
         default:
@@ -618,11 +666,11 @@ fileprivate extension SettingsViewController {
     }
     
     func rectForTableFooterTextView() -> CGRect {
-        let maxWidth = view.bounds.size.width - tableFooterTextView.textContainerInset.left - tableFooterTextView.textContainerInset.right
+        let maxWidth = view.bounds.width - tableFooterTextView.textContainerInset.left - tableFooterTextView.textContainerInset.right
         let size = CGSize(width: maxWidth, height: .greatestFiniteMagnitude)
         var rect = tableFooterTextView.attributedText.boundingRect(with: size, options: [.usesLineFragmentOrigin, .usesFontLeading], context: nil)
-        rect.size.width = ceil(rect.size.width) + tableFooterTextView.textContainerInset.left + tableFooterTextView.textContainerInset.right
-        rect.size.height = ceil(rect.size.height) + tableFooterTextView.textContainerInset.top + tableFooterTextView.textContainerInset.bottom + .padding
+        rect.size.width = ceil(rect.width) + tableFooterTextView.textContainerInset.left + tableFooterTextView.textContainerInset.right
+        rect.size.height = ceil(rect.height) + tableFooterTextView.textContainerInset.top + tableFooterTextView.textContainerInset.bottom + .padding
         return rect
     }
     
