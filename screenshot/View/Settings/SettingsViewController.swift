@@ -188,6 +188,16 @@ class SettingsViewController : BaseViewController {
         dismissKeyboard()
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        // Very important to clear the controls to prevent retaining
+        // the same property in multiple cells. Not doing this will
+        // freeze the app on subsequent view will appears.
+        productsOptionsControls.genderControl = nil
+        productsOptionsControls.sizeControl = nil
+    }
+    
     @objc private func applicationDidBecomeActive(_ notification: Notification) {
         if view?.window != nil {
             // Use did become active since the permissions values can change through an alert view
@@ -614,22 +624,40 @@ fileprivate extension SettingsViewController {
             
         case .productGender:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
+            let control: UISegmentedControl
             
-            let control = productsOptionsControls.createGenderControl()
-            control.tintColor = .crazeGreen
+            if productsOptionsControls.genderControl != nil {
+                control = productsOptionsControls.genderControl!
+                
+            } else {
+                control = productsOptionsControls.createGenderControl()
+                control.tintColor = .crazeGreen
+                control.isExclusiveTouch = true
+                control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
+            }
+            
             control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
-            control.isExclusiveTouch = true
-            control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
+            productsOptionsControls.sync()
+            
             return control
             
         case .productSize:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
+            let control: UISegmentedControl
             
-            let control = productsOptionsControls.createSizeControl()
-            control.tintColor = .crazeGreen
+            if productsOptionsControls.sizeControl != nil {
+                control = productsOptionsControls.sizeControl!
+                
+            } else {
+                control = productsOptionsControls.createSizeControl()
+                control.tintColor = .crazeGreen
+                control.isExclusiveTouch = true
+                control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
+            }
+            
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
-            control.isExclusiveTouch = true
-            control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
+            productsOptionsControls.sync()
+            
             return control
             
         default:

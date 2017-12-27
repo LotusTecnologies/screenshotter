@@ -178,7 +178,7 @@ extension ProductsOptions : UIPickerViewDelegate {
 }
 
 class ProductsOptionsControls : NSObject {
-    private(set) var genderControl: UISegmentedControl?
+    var genderControl: UISegmentedControl?
     
     func createGenderControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -191,11 +191,10 @@ class ProductsOptionsControls : NSObject {
         genderControl?.removeFromSuperview()
         genderControl = control
         
-        sync()
         return control
     }
     
-    private(set) var sizeControl: UISegmentedControl?
+    var sizeControl: UISegmentedControl?
     
     func createSizeControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -208,7 +207,6 @@ class ProductsOptionsControls : NSObject {
         sizeControl?.removeFromSuperview()
         sizeControl = control
         
-        sync()
         return control
     }
     
