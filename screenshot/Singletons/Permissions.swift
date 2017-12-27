@@ -36,18 +36,22 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     private var pushStatus: PermissionStatus = .undetermined {
         didSet {
             let enabled = pushStatus == .authorized
-            let name = enabled ? "APN Enabled" : "APN Disabled"
-            var properties: [String : String]?
             
-            if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data {
-                properties = ["token": token.description]
-            }
-            
-            AnalyticsTrackers.standard.track(name, properties: properties)
-            
-            // Reidentify
-            if let current = AnalyticsUser.current {
-                AnalyticsTrackers.standard.identify(current)
+            let mainQueueSync: (() -> Void) -> Void = Thread.isMainThread ? { block in block() } : DispatchQueue.main.sync
+            mainQueueSync {
+                let name = enabled ? "APN Enabled" : "APN Disabled"
+                var properties: [String : String]?
+                
+                if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
+                    properties = ["token": token.description]
+                }
+                
+                AnalyticsTrackers.standard.track(name, properties: properties)
+                
+                // Reidentify
+                if let current = AnalyticsUser.current {
+                    AnalyticsTrackers.standard.identify(current)
+                }
             }
         }
     }

@@ -38,7 +38,7 @@ public class AnalyticsUser : NSObject {
         
         props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
         
-        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data {
+        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
             props["pushToken"] = token.description
         }
         
