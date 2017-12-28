@@ -13,6 +13,15 @@ import Branch
 import FBSDKCoreKit
 
 public class AnalyticsUser : NSObject {
+    static var current: AnalyticsUser? {
+        guard let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) else {
+            return nil
+        }
+        
+        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+        return AnalyticsUser(name: name, email: email)
+    }
+
     let identifier: String
     let name: String?
     let email: String?
@@ -43,17 +52,6 @@ public class AnalyticsUser : NSObject {
         }
         
         return props
-    }
-}
-
-extension AnalyticsUser {
-    static var current: AnalyticsUser? {
-        guard let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) else {
-            return nil
-        }
-
-        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
-        return AnalyticsUser(name: name, email: email)
     }
 }
 
