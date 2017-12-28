@@ -11,7 +11,8 @@ import Foundation
 class FavoriteProductsViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
     
-    fileprivate let favoriteFrc = DataModel.sharedInstance.favoriteFrc
+    var products: [Product]?
+    
     fileprivate var unfavoriteProducts: [Product] = []
     
     override var title: String? {
@@ -54,7 +55,6 @@ class FavoriteProductsViewController : BaseViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         removeUnfavorited()
     }
     
@@ -65,7 +65,7 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Favorites
     
-    func removeUnfavorited() {
+    fileprivate func removeUnfavorited() {
         guard unfavoriteProducts.count > 0 else {
             return
         }
@@ -81,21 +81,20 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return favoriteFrc.fetchedObjects?.count ?? 0
+        return products?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let product = favoriteFrc.object(at: indexPath)
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
-//        if let cell = cell as? ProductCollectionViewCell {
-//            cell.delegate = self
-//            cell.contentView.backgroundColor = collectionView.backgroundColor
-//            cell.title = product.productDescription
-//            cell.price = product.price
-//            cell.imageUrl = product.imageURL
-//            cell.favoriteButton.isSelected = product.isFavorite
-//        }
+        if let cell = cell as? ProductCollectionViewCell, let product = products?[indexPath.item] {
+            cell.delegate = self
+            cell.contentView.backgroundColor = collectionView.backgroundColor
+            cell.title = product.productDescription
+            cell.price = product.price
+            cell.imageUrl = product.imageURL
+            cell.favoriteButton.isSelected = product.isFavorite
+        }
         
         return cell
     }
@@ -109,22 +108,20 @@ extension FavoriteProductsViewController : UICollectionViewDelegate {
             return
         }
         
-        let product = favoriteFrc.object(at: indexPath)
-        
-//        guard let offer = product.offer else {
-//            return
-//        }
-//
-//        // TODO: use shared web view like screenshots navigation controller
-//        let webViewController = WebViewController()
-//        webViewController.addNavigationItemLogo()
-//        webViewController.hidesBottomBarWhenPushed = true
-//        webViewController.url = URL(string: offer)
-//
-//        navigationController?.pushViewController(webViewController, animated: true)
-//
-//        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Favorites")
-//        AnalyticsTrackers.branch.track("Tapped on product")
+        guard let product = products?[indexPath.item], let offer = product.offer else {
+            return
+        }
+
+        // TODO: use shared web view like screenshots navigation controller
+        let webViewController = WebViewController()
+        webViewController.addNavigationItemLogo()
+        webViewController.hidesBottomBarWhenPushed = true
+        webViewController.url = URL(string: offer)
+
+        navigationController?.pushViewController(webViewController, animated: true)
+
+        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Favorites")
+        AnalyticsTrackers.branch.track("Tapped on product")
     }
 }
 
@@ -141,22 +138,21 @@ extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
 
 extension FavoriteProductsViewController : ProductCollectionViewCellDelegate {
     func productCollectionViewCellDidTapFavorite(_ cell: ProductCollectionViewCell!) {
-        guard let indexPath = collectionView.indexPath(for: cell) else {
+        guard let indexPath = collectionView.indexPath(for: cell), let product = products?[indexPath.item] else {
             return
         }
         
         let isFavorited = cell.favoriteButton.isSelected
-        let product = favoriteFrc.object(at: indexPath)
         
-//        if isFavorited {
-//            if let index = unfavoriteProducts.index(of: product) {
-//                unfavoriteProducts.remove(at: index)
-//            }
-//
-//        } else {
-//            unfavoriteProducts.append(product)
-//        }
-//
-//        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
+        if isFavorited {
+            if let index = unfavoriteProducts.index(of: product) {
+                unfavoriteProducts.remove(at: index)
+            }
+
+        } else {
+            unfavoriteProducts.append(product)
+        }
+
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
     }
 }
