@@ -42,6 +42,9 @@ class UserDefaultsKeys : NSObject {
     static let persistentVersion = "PersistentVersion"
     static let dailyStreak = "dailyStreak"
     
+    // DB
+    static let lastDbVersionMigrated = "LastDbVersionMigrated"
+    
     // Clarifai
     static let isModelDownloaded = "IsModelDownloaded"
     

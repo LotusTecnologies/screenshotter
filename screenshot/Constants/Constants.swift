@@ -20,6 +20,9 @@ class Constants: NSObject {
     // Default UI / UX
     static let defaultAnimationDuration = 0.25
     
+    // DB
+    static let currentMomVersion = 7
+    
     // Syte
     static let syteAccountId = 6677
     static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="

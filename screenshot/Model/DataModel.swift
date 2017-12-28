@@ -38,11 +38,6 @@ class DataModel: NSObject {
         let _ = DataModel.sharedInstance
     }
 
-    public static func docsDirURL() -> URL {
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return urls.last! // If no documents dir, just crash.
-    }
-    
     public var coreDataStackFailureHandler: (() -> Void)?
     public var coreDataStackCompletionHandler: (() -> Void)?
     public var isCoreDataStackReady = false
@@ -60,6 +55,11 @@ class DataModel: NSObject {
             } else {
                 container.viewContext.automaticallyMergesChangesFromParent = true
                 self.isCoreDataStackReady = true
+                let lastDbVersionMigrated = UserDefaults.standard.integer(forKey: UserDefaultsKeys.lastDbVersionMigrated)
+                if lastDbVersionMigrated != Constants.currentMomVersion {
+                    self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: container)
+                    UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
+                }
                 if let handler = self.coreDataStackCompletionHandler {
                     DispatchQueue.main.async {
                         handler()
@@ -82,6 +82,15 @@ class DataModel: NSObject {
         super.init()
         DispatchQueue.global(qos: .userInitiated).async {
             let _ = self.persistentContainer
+        }
+    }
+    
+    func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
+        let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
+        if from < 7 && to >= 7 && installDate != nil {
+            dbQ.async {
+                self.fixEmptyLastFavoriteds(managedObjectContext: container.newBackgroundContext())
+            }
         }
     }
     
@@ -582,6 +591,20 @@ extension DataModel {
             } catch {
                 print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
             }
+        }
+    }
+    
+    func fixEmptyLastFavoriteds(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND shoppable.screenshot.lastFavorited == nil")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            let uniqueScreenshotsWithEmptyLastFavoriteds = Set<Screenshot>(results.flatMap {$0.shoppable?.screenshot})
+            uniqueScreenshotsWithEmptyLastFavoriteds.forEach {$0.updateLastFavorited()}
+        } catch {
+            print("fixEmptyLastFavoriteds results with error:\(error)")
         }
     }
     
