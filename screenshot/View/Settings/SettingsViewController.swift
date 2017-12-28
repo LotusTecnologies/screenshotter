@@ -290,12 +290,18 @@ class SettingsViewController : BaseViewController {
     // MARK: Product Options
     
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
-        let integer = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex).rawValue
+        let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
+        let integer = gender.rawValue
+        
+        track("Set Global Gender Filter to \(gender.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
     @objc fileprivate func sizeControlAction(_ control: UISegmentedControl) {
-        let integer = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex).rawValue
+        let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        let integer = size.rawValue
+        
+        track("Set Global Size Filter to \(size.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
