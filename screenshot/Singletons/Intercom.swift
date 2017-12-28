@@ -72,6 +72,10 @@ class IntercomHelper : NSObject {
         track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
+    func registerAnonymousUser() {
+        Intercom.registerUnidentifiedUser()
+    }
+    
     func registerUser(withID id:String, email: String? = nil, name: String? = nil) {
         updateIntercomDeviceToken()
         

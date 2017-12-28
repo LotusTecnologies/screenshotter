@@ -39,6 +39,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        setupThirdPartyLibraries(application, launchOptions: launchOptions)
+        
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
+            // Identify as an anonymous user if we haven't signed up yet.
+            AnalyticsTrackers.standard.identifyAnonymousUser()
+        }
+
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
         DataModel.setup() // Sets up Core Data stack on a background queue.
@@ -51,8 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared.fetchPushPermissionStatus()
-        
-        setupThirdPartyLibraries(application, launchOptions: launchOptions)
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
