@@ -43,6 +43,8 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
                 var properties: [String : String]?
                 
                 if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
+                    //Only NSData's description method gives us the data in the hex format we want.
+
                     properties = ["token": token.description]
                 }
                 
