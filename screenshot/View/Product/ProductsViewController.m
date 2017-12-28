@@ -530,8 +530,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)presentOptions:(ProductsViewControllerControl *)control {
     if ([control isFirstResponder]) {
         [control resignFirstResponder];
-        
     } else {
+        [AnalyticsTrackers.standard track:@"Opened Filters View" properties:nil];
+        
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         [self.productsOptions syncOptionsWithMask:[shoppable getLast]];
         
