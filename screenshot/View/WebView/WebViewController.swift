@@ -42,14 +42,12 @@ class WebViewController : BaseViewController {
         webView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         webView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         webView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoBack), options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoForward), options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoBack), options: [.new, .old], context: nil)
+        webView.addObserver(self, forKeyPath: #keyPath(WebView.canGoForward), options: [.new, .old], context: nil)
         
+        syncToolbar()
         setBarButtonItemsToToolbarIfPossible()
-        
-        if let url = url {
-            loadRequestURL(url)
-        }
+        loadURL(url)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -148,21 +146,31 @@ class WebViewController : BaseViewController {
     
     private var isShorteningURL = false
     
-    var url: URL? {
-        didSet {
-            if let url = url, isViewLoaded {
-                webView.removeAllBackForwardListItems()
-                loadRequestURL(url)
-            }
-        }
-    }
+    private(set) var url: URL?
     
-    fileprivate func loadRequestURL(_ url: URL) {
+    func loadURL(_ url: URL?) {
+        self.url = url
+        
+        guard let url = url, isViewLoaded else {
+            return
+        }
+        
         didLoadInitialPage = false
         webView.load(URLRequest(url: url))
     }
     
+    func rebaseURL(_ url: URL?) {
+        webView.removeAllBackForwardListItems()
+        loadURL(url)
+    }
+    
     // MARK: Toolbar
+    
+    var isToolbarEnabled = true {
+        didSet {
+            syncToolbar()
+        }
+    }
     
     fileprivate lazy var toolbar: UIToolbar = {
         let toolbar = UIToolbar()
@@ -185,8 +193,13 @@ class WebViewController : BaseViewController {
         return toolbar
     }()
     
-    var isToolbarEnabled = true {
-        didSet {
+    fileprivate func syncToolbar() {
+        if isViewLoaded {
+            // Don't lazy load the toolbar when initially setting to false
+            if !isToolbarEnabled && view.subviews.first(where: { $0 is UIToolbar }) == nil {
+                return
+            }
+            
             toolbar.isHidden = !isToolbarEnabled
         }
     }

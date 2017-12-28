@@ -184,6 +184,7 @@ fileprivate let marketingBrands = [
 extension AnalyticsTracker {
     func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
         let favoriteEvent = favorited ? "Product favorited" : "Product unfavorited"
+        
         track(favoriteEvent, properties: [
             "screenshot" : product.shoppable?.screenshot?.uploadedImageURL ?? "",
             "merchant": product.merchant ?? "",
