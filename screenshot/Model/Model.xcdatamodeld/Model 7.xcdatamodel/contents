@@ -28,6 +28,7 @@
     <entity name="Screenshot" representedClassName="Screenshot" syncable="YES" codeGenerationType="class">
         <attribute name="assetId" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="favoritesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <attribute name="isFashion" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isFromShare" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -58,7 +59,7 @@
     <elements>
         <element name="Product" positionX="358" positionY="189" width="128" height="283"/>
         <element name="ProductFilter" positionX="124" positionY="72" width="128" height="120"/>
-        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="255"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="270"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
     </elements>
 </model>

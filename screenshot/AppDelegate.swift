@@ -285,7 +285,7 @@ extension AppDelegate {
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {
-                    // TODO:
+                    print("Core Data stack failed")
                 }
             }
         }

@@ -89,7 +89,8 @@ class DataModel: NSObject {
         let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
         if from < 7 && to >= 7 && installDate != nil {
             dbQ.async {
-                self.fixEmptyLastFavoriteds(managedObjectContext: container.newBackgroundContext())
+                let managedObjectContext = container.newBackgroundContext()
+                self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
             }
         }
     }
@@ -577,12 +578,14 @@ extension DataModel {
                 var screenshotsToUpdate = Set<Screenshot>()
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
-                    if let screenshot = product.shoppable?.screenshot,
+                    let screenshot = product.shoppable?.screenshot
+                    if let screenshot = screenshot,
                       let screenshotFavoritedDate = screenshot.lastFavorited,
                       let productFavoritedDate = product.dateFavorited,
                       (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
                         screenshotsToUpdate.insert(screenshot)
                     }
+                    screenshot?.favoritesCount -= 1
                     product.isFavorite = false
                     product.dateFavorited = nil
                 }
@@ -594,17 +597,46 @@ extension DataModel {
         }
     }
     
-    func fixEmptyLastFavoriteds(managedObjectContext: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND shoppable.screenshot.lastFavorited == nil")
-        fetchRequest.sortDescriptors = nil
+    func initializeFavoritesCounts(managedObjectContext: NSManagedObjectContext) {
+        // Favorites count grouped by screenshot
+        let countKeypathExp = NSExpression(forKeyPath: "isFavorite")
+        let countExpression = NSExpression(forFunction: "count:", arguments: [countKeypathExp])
+        let countDesc = NSExpressionDescription()
+        countDesc.expression = countExpression
+        countDesc.name = "count"
+        countDesc.expressionResultType = .integer16AttributeType
+        
+        // lastDateFavorited grouped by screenshot
+        let maxKeypathExp = NSExpression(forKeyPath: "dateFavorited")
+        let maxExpression = NSExpression(forFunction: "max:", arguments: [maxKeypathExp])
+        let maxDesc = NSExpressionDescription()
+        maxDesc.expression = maxExpression
+        maxDesc.name = "max"
+        maxDesc.expressionResultType = .dateAttributeType
+        
+        let request: NSFetchRequest<NSDictionary> = NSFetchRequest(entityName: "Product")
+        request.returnsObjectsAsFaults = false
+        request.propertiesToGroupBy = ["shoppable.screenshot"]
+        request.propertiesToFetch = ["shoppable.screenshot", countDesc, maxDesc]
+        request.resultType = .dictionaryResultType
+        request.predicate = NSPredicate(format: "isFavorite == TRUE")
         
         do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            let uniqueScreenshotsWithEmptyLastFavoriteds = Set<Screenshot>(results.flatMap {$0.shoppable?.screenshot})
-            uniqueScreenshotsWithEmptyLastFavoriteds.forEach {$0.updateLastFavorited()}
+            let results = try managedObjectContext.fetch(request)
+            for dict in results {
+                if let favoritesCount = dict["count"] as? Int16,
+                  let lastFavorited = dict["max"] as? NSDate,
+                  let screenshotId = dict["shoppable.screenshot"] as? NSManagedObjectID,
+                  let screenshot = managedObjectContext.object(with: screenshotId) as? Screenshot {
+                    screenshot.favoritesCount = favoritesCount
+                    screenshot.lastFavorited = lastFavorited
+                } else {
+                    print("Migration screenshot.favoritesCount screenshot.lastFavorited failed")
+                }
+            }
+            try managedObjectContext.save()
         } catch {
-            print("fixEmptyLastFavoriteds results with error:\(error)")
+            print("initializeFavoritesCounts results with error:\(error)")
         }
     }
     
@@ -980,15 +1012,20 @@ extension Product {
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
-                    product.isFavorite = toFavorited
                     if toFavorited {
-                      let now = NSDate()
+                        let now = NSDate()
                         product.dateFavorited = now
                         product.shoppable?.screenshot?.lastFavorited = now
+                        if product.isFavorite != toFavorited {
+                            product.shoppable?.screenshot?.favoritesCount += 1
+                        }
                     } else {
                         let dateFavorited = product.dateFavorited
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
+                            if product.isFavorite != toFavorited {
+                                screenshot.favoritesCount -= 1
+                            }
                             if let dateFavorited = dateFavorited,
                               let screenshotLastFavorited = screenshot.lastFavorited,
                                 dateFavorited.compare(screenshotLastFavorited as Date) == .orderedAscending {
@@ -998,6 +1035,7 @@ extension Product {
                             }
                         }
                     }
+                    product.isFavorite = toFavorited
                 }
                 try managedObjectContext.save()
                 
