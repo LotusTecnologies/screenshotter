@@ -57,7 +57,9 @@ class FavoritesTableViewCell : UITableViewCell {
         centerView.centerYAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerYAnchor).isActive = true
         
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.backgroundColor = .green
+        label.textColor = .gray3
+        label.font = UIFont.preferredFont(forTextStyle: .title3)
+        label.adjustsFontForContentSizeCategory = true
         centerView.addSubview(label)
         label.topAnchor.constraint(equalTo: centerView.topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
@@ -65,10 +67,10 @@ class FavoritesTableViewCell : UITableViewCell {
         
         shoppableContainerView.translatesAutoresizingMaskIntoConstraints = false
         centerView.addSubview(shoppableContainerView)
-        shoppableContainerView.topAnchor.constraint(equalTo: label.bottomAnchor).isActive = true
-        shoppableContainerView.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
+        shoppableContainerView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding / 2).isActive = true
+        shoppableContainerView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
         shoppableContainerView.bottomAnchor.constraint(equalTo: centerView.bottomAnchor).isActive = true
-        shoppableContainerView.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
+        shoppableContainerView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
     }
     
     // MARK: Products
@@ -130,6 +132,10 @@ class FavoritesTableViewCell : UITableViewCell {
             if i == 0 {
                 productView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: shoppableContainerView.leadingAnchor).isActive = true
                 
+                var shoppableLayoutMargins = shoppableContainerView.layoutMargins
+                shoppableLayoutMargins.left = abs(layoutMargins.left)
+                shoppableContainerView.layoutMargins = shoppableLayoutMargins
+                
             } else {
                 let previousView = shoppableContainerView.subviews[i - 1]
                 productView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: previousView.layoutMarginsGuide.trailingAnchor).isActive = true
@@ -137,6 +143,10 @@ class FavoritesTableViewCell : UITableViewCell {
             
             if i == maxProducts.count - 1 {
                 productView.layoutMarginsGuide.trailingAnchor.constraint(lessThanOrEqualTo: shoppableContainerView.trailingAnchor).isActive = true
+                
+                var shoppableLayoutMargins = shoppableContainerView.layoutMargins
+                shoppableLayoutMargins.right = abs(layoutMargins.right)
+                shoppableContainerView.layoutMargins = shoppableLayoutMargins
             }
         }
     }

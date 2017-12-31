@@ -30,6 +30,8 @@ class FavoritesViewController : BaseViewController {
     
     // MARK: Life Cycle
     
+    private var isViewWillAppear = false
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -75,6 +77,7 @@ class FavoritesViewController : BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        isViewWillAppear = true
         
         if screenshotAssetIds.count == 0 {
             syncScreenshotAssetIds()
@@ -82,6 +85,11 @@ class FavoritesViewController : BaseViewController {
         
         updateScreenshotsProductsIfNeeded()
         syncHelperViewVisibility()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        isViewWillAppear = false
     }
     
     deinit {
@@ -127,15 +135,29 @@ class FavoritesViewController : BaseViewController {
         }
         
         reloadProductsSet.insert(assetId)
+        
+        if indexPath.row == 0 {
+            tableView.scrollToRow(at: indexPath, at: .top, animated: false)
+        }
+        
+        updateScreenshotsProductsIfNeeded()
     }
     
     fileprivate func updateRemoveProductsSet(at indexPath: IndexPath) {
         removeProductsSet.insert(screenshotAssetIds[indexPath.row])
+        
+        updateScreenshotsProductsIfNeeded()
+    }
+    
+    fileprivate func insertUniqueScreenshotProducts(withScreenshot screenshot: Screenshot) {
+        if let assetId = screenshot.assetId, screenshotsProducts[assetId] == nil {
+            screenshotsProducts[assetId] = screenshot.favoritedProducts
+        }
     }
     
     fileprivate func updateScreenshotsProducts(withAssetIds assetIds: [String]) {
         assetIds.forEach { assetId in
-            if let screenshot = self.screenshot(withAssetId: assetId) {
+            if screenshotsProducts[assetId] != nil, let screenshot = self.screenshot(withAssetId: assetId) {
                 screenshotsProducts[assetId] = screenshot.favoritedProducts
             }
         }
@@ -147,19 +169,32 @@ class FavoritesViewController : BaseViewController {
         }
     }
     
+    fileprivate func removeAllScreenshotsProducts() {
+        screenshotsProducts.removeAll()
+    }
+    
     fileprivate func updateScreenshotsProductsIfNeeded() {
-        if screenshotsProducts.count == 0 {
-            updateScreenshotsProducts(withAssetIds: screenshotAssetIds)
+        guard isViewWillAppear else {
+            return
         }
+        
+        var didChangeData = false
         
         if reloadProductsSet.count > 0 {
             updateScreenshotsProducts(withAssetIds: Array(reloadProductsSet))
             reloadProductsSet.removeAll()
+            didChangeData = true
         }
         
         if removeProductsSet.count > 0 {
             removeScreenshotsProducts(withAssetIds: Array(removeProductsSet))
             removeProductsSet.removeAll()
+            didChangeData = true
+        }
+        
+        if didChangeData {
+            tableView.reloadData()
+            syncHelperViewVisibility()
         }
     }
     
@@ -184,11 +219,17 @@ extension FavoritesViewController : UITableViewDataSource {
         return favoriteFrc.fetchedObjects?.count ?? 0
     }
     
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        // Prevent all cells from calculating immediately
+        return tableView.rowHeight
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let screenshot = screenshot(at: indexPath) else {
             return UITableViewCell()
         }
         
+        insertUniqueScreenshotProducts(withScreenshot: screenshot)
         let products = self.products(for: screenshot)
         let identifier: String
         
@@ -226,32 +267,23 @@ extension FavoritesViewController : FrcDelegateProtocol {
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath) {
         syncScreenshotAssetIds()
         updateReloadProductsSet(at: indexPath)
-        
-        tableView.reloadData()
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath) {
         updateRemoveProductsSet(at: indexPath)
         syncScreenshotAssetIds()
-        
-        tableView.reloadData()
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
         updateReloadProductsSet(at: indexPath)
-        
-        tableView.reloadData()
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath) {
         updateReloadProductsSet(at: indexPath)
-        
-        tableView.reloadData()
     }
     
     func frcReloadData(_ frc: NSFetchedResultsController<NSFetchRequestResult>) {
+        removeAllScreenshotsProducts()
         syncScreenshotAssetIds()
-        
-        tableView.reloadData()
     }
 }
