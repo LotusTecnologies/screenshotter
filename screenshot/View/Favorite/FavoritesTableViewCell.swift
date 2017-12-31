@@ -57,7 +57,6 @@ class FavoritesTableViewCell : UITableViewCell {
         
         label.translatesAutoresizingMaskIntoConstraints = false
         label.backgroundColor = .green
-        label.text = "derp'n"
         contentView.addSubview(label)
         label.topAnchor.constraint(equalTo: centerView.topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true

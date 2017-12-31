@@ -20,8 +20,6 @@ class FavoritesViewController : BaseViewController {
     private let helperView = HelperView()
     
     fileprivate let favoriteFrc = DataModel.sharedInstance.favoriteFrc
-    fileprivate var screenshotsProducts: [[Product]] = []
-    fileprivate var reloadProductsSet: Set<Int> = Set()
     
     override var title: String? {
         set {}
@@ -52,7 +50,7 @@ class FavoritesViewController : BaseViewController {
         tableView.dataSource = self
         tableView.backgroundColor = view.backgroundColor
         tableView.register(FavoritesTableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.rowHeight = 150
+        tableView.rowHeight = 170
         tableView.tableFooterView = UIView() // Remove empty cells
         tableView.separatorInset = .zero
         view.addSubview(tableView)
@@ -76,11 +74,11 @@ class FavoritesViewController : BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if (reloadProductsSet.count > 0) {
-            // TODO:
-            reloadProductsSet.removeAll()
+        if screenshotAssetIds.count == 0 {
+            syncScreenshotAssetIds()
         }
         
+        updateScreenshotsProductsIfNeeded()
         syncHelperViewVisibility()
     }
     
@@ -101,6 +99,77 @@ class FavoritesViewController : BaseViewController {
         return screenshots[indexPath.row]
     }
     
+    func screenshot(withAssetId assetId: String) -> Screenshot? {
+        return favoriteFrc.fetchedObjects?.first(where: { screenshot -> Bool in
+            return screenshot.assetId == assetId
+        })
+    }
+    
+    fileprivate var screenshotAssetIds: [String] = []
+    
+    fileprivate func syncScreenshotAssetIds() {
+        screenshotAssetIds = favoriteFrc.fetchedObjects?.map { screenshot -> String in
+            return screenshot.assetId ?? ""
+        } ?? []
+    }
+    
+    // MARK: Products
+    
+    fileprivate var screenshotsProducts: [String : [Product]] = [:]
+    fileprivate var reloadProductsSet: Set<String> = Set()
+    fileprivate var removeProductsSet: Set<String> = Set()
+    
+    fileprivate func updateReloadProductsSet(at indexPath: IndexPath) {
+        guard let assetId = screenshot(at: indexPath)?.assetId else {
+            return
+        }
+        
+        reloadProductsSet.insert(assetId)
+    }
+    
+    fileprivate func updateRemoveProductsSet(at indexPath: IndexPath) {
+        removeProductsSet.insert(screenshotAssetIds[indexPath.row])
+    }
+    
+    fileprivate func updateScreenshotsProducts(withAssetIds assetIds: [String]) {
+        assetIds.forEach { assetId in
+            if let screenshot = self.screenshot(withAssetId: assetId) {
+                screenshotsProducts[assetId] = screenshot.favoritedProducts
+            }
+        }
+    }
+    
+    fileprivate func removeScreenshotsProducts(withAssetIds assetIds: [String]) {
+        assetIds.forEach { assetId in
+            screenshotsProducts.removeValue(forKey: assetId)
+        }
+    }
+    
+    fileprivate func updateScreenshotsProductsIfNeeded() {
+        if screenshotsProducts.count == 0 {
+            updateScreenshotsProducts(withAssetIds: screenshotAssetIds)
+        }
+        
+        if reloadProductsSet.count > 0 {
+            updateScreenshotsProducts(withAssetIds: Array(reloadProductsSet))
+            reloadProductsSet.removeAll()
+        }
+        
+        if removeProductsSet.count > 0 {
+            removeScreenshotsProducts(withAssetIds: Array(removeProductsSet))
+            removeProductsSet.removeAll()
+        }
+    }
+    
+    func products(for screenshot: Screenshot) -> [Product] {
+        if let assetId = screenshot.assetId {
+            return screenshotsProducts[assetId] ?? []
+            
+        } else {
+            return screenshot.favoritedProducts
+        }
+    }
+    
     // MARK: Helper View
     
     fileprivate func syncHelperViewVisibility() {
@@ -119,10 +188,11 @@ extension FavoritesViewController : UITableViewDataSource {
             return UITableViewCell()
         }
         
-//        screenshot.favoritedProducts
+        let products = self.products(for: screenshot)
         
-        cell.imageData = screenshot.imageData
         cell.backgroundColor = view.backgroundColor
+        cell.imageData = screenshot.imageData
+        cell.textLabel?.text = "\(products.count) Favorited Items" // TODO: localize
         cell.accessoryType = .disclosureIndicator
         return cell
     }
@@ -136,26 +206,32 @@ extension FavoritesViewController : UITableViewDelegate {
 
 extension FavoritesViewController : FrcDelegateProtocol {
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath) {
-        tableView.reloadData()
+        syncScreenshotAssetIds()
+        updateReloadProductsSet(at: indexPath)
         
-        reloadProductsSet.insert(indexPath.row)
+        tableView.reloadData()
+    }
+    
+    func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath) {
+        updateRemoveProductsSet(at: indexPath)
+        syncScreenshotAssetIds()
+        
+        tableView.reloadData()
+    }
+    
+    func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
+        updateReloadProductsSet(at: indexPath)
+        
+        tableView.reloadData()
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath) {
         tableView.reloadData()
     }
     
-    func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath) {
-        tableView.reloadData()
-        
-        reloadProductsSet.remove(indexPath.row)
-    }
-    
-    func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
-        tableView.reloadData()
-    }
-    
     func frcReloadData(_ frc: NSFetchedResultsController<NSFetchRequestResult>) {
+        syncScreenshotAssetIds()
+        
         tableView.reloadData()
     }
 }

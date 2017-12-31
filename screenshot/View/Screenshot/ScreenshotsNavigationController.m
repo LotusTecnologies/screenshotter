@@ -134,7 +134,7 @@
         
         self.webViewFavoriteButton.selected = self.webViewProduct.isFavorite;
         
-        self.webViewController.url = [NSURL URLWithString:self.webViewProduct.offer];
+        [self.webViewController rebaseURL:[NSURL URLWithString:self.webViewProduct.offer]];
         [self pushViewController:self.webViewController animated:YES];
     }
 }

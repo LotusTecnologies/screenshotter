@@ -9,6 +9,8 @@ screenshot.ipa
 
 # fastlane specific
 fastlane/report.xml
+fastlane/README.md
+fastlane/Appfile
 
 # deliver temporary files
 fastlane/Preview.html

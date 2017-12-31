@@ -138,6 +138,7 @@ public class TutorialEmailSlideView : HelperView {
         textField.textAlignment = .center
         textField.font = UIFont.preferredFont(forTextStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
+        textField.tintColor = .crazeGreen
         textField.backgroundColor = .white
         textField.borderStyle = .none
         textField.spellCheckingType = .no
@@ -224,7 +225,7 @@ public class TutorialEmailSlideView : HelperView {
     
     private class func webViewController(withTitle title: String, url: URL, doneTarget target: Any?, action: Selector?) -> UIViewController? {
         let viewController = WebViewController()
-        viewController.url = url
+        viewController.rebaseURL(url)
         viewController.isToolbarEnabled = false
         viewController.navigationItem.title = title
         viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: target, action: action)

@@ -22,6 +22,7 @@ class TextFieldTableViewCell : UITableViewCell {
         textField.returnKeyType = .done
         textField.font = UIFont.preferredFont(forTextStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
+        textField.tintColor = .crazeGreen
         contentView.addSubview(textField)
         textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         textField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
