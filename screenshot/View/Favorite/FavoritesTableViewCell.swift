@@ -10,6 +10,7 @@ import Foundation
 
 class FavoritesTableViewCell : UITableViewCell {
     fileprivate let screenshotImageView = UIImageView()
+    fileprivate let shoppableContainerView = UIView()
     
     var imageData: NSData? {
         didSet {
@@ -57,10 +58,94 @@ class FavoritesTableViewCell : UITableViewCell {
         
         label.translatesAutoresizingMaskIntoConstraints = false
         label.backgroundColor = .green
-        contentView.addSubview(label)
+        centerView.addSubview(label)
         label.topAnchor.constraint(equalTo: centerView.topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
-        label.bottomAnchor.constraint(equalTo: centerView.bottomAnchor).isActive = true
         label.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
+        
+        shoppableContainerView.translatesAutoresizingMaskIntoConstraints = false
+        centerView.addSubview(shoppableContainerView)
+        shoppableContainerView.topAnchor.constraint(equalTo: label.bottomAnchor).isActive = true
+        shoppableContainerView.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
+        shoppableContainerView.bottomAnchor.constraint(equalTo: centerView.bottomAnchor).isActive = true
+        shoppableContainerView.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
+    }
+    
+    // MARK: Products
+    
+    fileprivate let maxProductCount = 3
+    
+    var products: [Product]? {
+        didSet {
+            if let products = products {
+                maxProducts = Array(products.prefix(maxProductCount))
+                
+            } else {
+                maxProducts = []
+            }
+            
+            if maxProducts.count == 0 {
+                removeProductViews()
+                
+            } else {
+                if shoppableContainerView.subviews.count != maxProducts.count {
+                    removeProductViews()
+                    setupProductViews()
+                }
+                
+                updateProductViews()
+            }
+        }
+    }
+    
+    fileprivate var maxProducts: [Product] = []
+    
+    private func removeProductViews() {
+        shoppableContainerView.subviews.forEach { productView in
+            productView.removeFromSuperview()
+        }
+    }
+    
+    private func setupProductViews() {
+        guard shoppableContainerView.subviews.count == 0, maxProducts.count > 0 else {
+            return
+        }
+        
+        maxProducts.enumerated().forEach { (i: Int, product: Product) in
+            let productView = ProductView()
+            
+            var layoutMargins = productView.layoutMargins
+            layoutMargins.left = -.padding / 2 + abs(layoutMargins.left)
+            layoutMargins.right = -.padding / 2 + abs(layoutMargins.right)
+            productView.layoutMargins = layoutMargins
+            
+            productView.imageURL = product.imageURL
+            productView.translatesAutoresizingMaskIntoConstraints = false
+            shoppableContainerView.addSubview(productView)
+            productView.layoutMarginsGuide.topAnchor.constraint(equalTo: shoppableContainerView.topAnchor).isActive = true
+            productView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: shoppableContainerView.bottomAnchor).isActive = true
+            productView.layoutMarginsGuide.widthAnchor.constraint(equalTo: shoppableContainerView.widthAnchor, multiplier: 1 / CGFloat(maxProductCount)).isActive = true
+            productView.heightAnchor.constraint(equalTo: productView.widthAnchor).isActive = true
+            
+            if i == 0 {
+                productView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: shoppableContainerView.leadingAnchor).isActive = true
+                
+            } else {
+                let previousView = shoppableContainerView.subviews[i - 1]
+                productView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: previousView.layoutMarginsGuide.trailingAnchor).isActive = true
+            }
+            
+            if i == maxProducts.count - 1 {
+                productView.layoutMarginsGuide.trailingAnchor.constraint(lessThanOrEqualTo: shoppableContainerView.trailingAnchor).isActive = true
+            }
+        }
+    }
+    
+    private func updateProductViews() {
+        maxProducts.enumerated().forEach { (i: Int, product: Product) in
+            if let productView = shoppableContainerView.subviews[i] as? ProductView {
+                productView.imageURL = product.imageURL
+            }
+        }
     }
 }

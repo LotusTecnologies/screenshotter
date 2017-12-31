@@ -49,7 +49,9 @@ class FavoritesViewController : BaseViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundColor = view.backgroundColor
-        tableView.register(FavoritesTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(FavoritesTableViewCell.self, forCellReuseIdentifier: "cell1")
+        tableView.register(FavoritesTableViewCell.self, forCellReuseIdentifier: "cell2")
+        tableView.register(FavoritesTableViewCell.self, forCellReuseIdentifier: "cell3")
         tableView.rowHeight = 170
         tableView.tableFooterView = UIView() // Remove empty cells
         tableView.separatorInset = .zero
@@ -183,17 +185,33 @@ extension FavoritesViewController : UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? FavoritesTableViewCell,
-            let screenshot = screenshot(at: indexPath) else {
+        guard let screenshot = screenshot(at: indexPath) else {
             return UITableViewCell()
         }
         
         let products = self.products(for: screenshot)
+        let identifier: String
         
-        cell.backgroundColor = view.backgroundColor
-        cell.imageData = screenshot.imageData
-        cell.textLabel?.text = "\(products.count) Favorited Items" // TODO: localize
-        cell.accessoryType = .disclosureIndicator
+        switch products.count {
+        case 1:
+            identifier = "cell1"
+        case 2:
+            identifier = "cell2"
+        default:
+            identifier = "cell3"
+        }
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
+        
+        if let cell = cell as? FavoritesTableViewCell {
+            cell.backgroundColor = view.backgroundColor
+            cell.imageData = screenshot.imageData
+            cell.textLabel?.text = "\(products.count) Favorited Items" // TODO: localize
+            cell.products = products
+            cell.accessoryType = .disclosureIndicator
+            cell.selectionStyle = .none
+        }
+        
         return cell
     }
 }
@@ -226,6 +244,8 @@ extension FavoritesViewController : FrcDelegateProtocol {
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath) {
+        updateReloadProductsSet(at: indexPath)
+        
         tableView.reloadData()
     }
     
