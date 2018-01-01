@@ -54,6 +54,15 @@ class EmbossedView : UIView {
     
     // MARK: Image
     
+    override var contentMode: UIViewContentMode {
+        set {
+            imageView.contentMode = newValue
+        }
+        get {
+            return imageView.contentMode
+        }
+    }
+    
     var image: UIImage? {
         return imageView.image
     }
