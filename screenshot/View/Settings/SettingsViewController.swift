@@ -9,39 +9,39 @@
 import Foundation
 import MessageUI
 
-fileprivate enum SettingsSection : Int {
-    // Order reflects in the TableView
-    case info
-    case permission
-    case product
-    case follow
-    case about
-}
-
-fileprivate enum SettingsRow : Int {
-    case photoPermission
-    case pushPermission
-    case email
-    case name
-    case tutorialVideo
-    case tellFriend
-    case usageStreak
-    case contactUs
-    case bug
-    case version
-    case coins
-    case productGender
-    case productSize
-    case currency
-    case followFacebook
-    case followInstagram
-}
-
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
 }
 
 class SettingsViewController : BaseViewController {
+    fileprivate enum Section : Int {
+        // Order reflects in the TableView
+        case info
+        case permission
+        case product
+        case follow
+        case about
+    }
+    
+    fileprivate enum Row : Int {
+        case photoPermission
+        case pushPermission
+        case email
+        case name
+        case tutorialVideo
+        case tellFriend
+        case usageStreak
+        case contactUs
+        case bug
+        case version
+        case coins
+        case productGender
+        case productSize
+        case currency
+        case followFacebook
+        case followInstagram
+    }
+    
     weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
@@ -221,7 +221,7 @@ class SettingsViewController : BaseViewController {
     
     // MARK: Data
     
-    fileprivate let data: [SettingsSection : [SettingsRow]] = [
+    fileprivate let data: [SettingsViewController.Section : [SettingsViewController.Row]] = [
         .permission: [
             .photoPermission,
             .pushPermission
@@ -250,14 +250,14 @@ class SettingsViewController : BaseViewController {
         ]
     ]
     
-    fileprivate func settingsRow(for indexPath: IndexPath) -> SettingsRow? {
-        guard let section = SettingsSection(rawValue: indexPath.section) else {
+    fileprivate func settingsRow(for indexPath: IndexPath) -> SettingsViewController.Row? {
+        guard let section = SettingsViewController.Section(rawValue: indexPath.section) else {
             return nil
         }
         return data[section]?[indexPath.row]
     }
     
-    fileprivate func indexPath(for row: SettingsRow, in section: SettingsSection) -> IndexPath? {
+    fileprivate func indexPath(for row: SettingsViewController.Row, in section: SettingsViewController.Section) -> IndexPath? {
         guard let rowValue = data[section]?.index(of: row) else {
             return nil
         }
@@ -316,14 +316,14 @@ extension SettingsViewController : UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let settingsSection = SettingsSection(rawValue: section) else {
+        guard let settingsSection = SettingsViewController.Section(rawValue: section) else {
             return 0
         }
         return data[settingsSection]?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        guard let settingsSection = SettingsSection(rawValue: section) else {
+        guard let settingsSection = SettingsViewController.Section(rawValue: section) else {
             return nil
         }
         return sectionText(for: settingsSection)
@@ -336,7 +336,7 @@ extension SettingsViewController : UITableViewDataSource {
         
         var cell: UITableViewCell
         
-        if indexPath.section == SettingsSection.info.rawValue && (row == .name || row == .email) {
+        if indexPath.section == SettingsViewController.Section.info.rawValue && (row == .name || row == .email) {
             cell = self.tableView(tableView, inputCellForRowAt: indexPath, withRow: row)
             
         } else {
@@ -353,7 +353,7 @@ extension SettingsViewController : UITableViewDataSource {
             return
         }
         
-        if indexPath.section == SettingsSection.product.rawValue && (row == .productGender || row == .productSize) {
+        if indexPath.section == SettingsViewController.Section.product.rawValue && (row == .productGender || row == .productSize) {
             guard let genderControl = productsOptionsControls.genderControl, let sizeControl = productsOptionsControls.sizeControl else {
                 return
             }
@@ -370,7 +370,7 @@ extension SettingsViewController : UITableViewDataSource {
         }
     }
     
-    private func tableView(_ tableView: UITableView, inputCellForRowAt indexPath: IndexPath, withRow row: SettingsRow) -> UITableViewCell {
+    private func tableView(_ tableView: UITableView, inputCellForRowAt indexPath: IndexPath, withRow row: SettingsViewController.Row) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: "input") as? TextFieldTableViewCell
         let cell = reusableCell ?? TextFieldTableViewCell(style: .default, reuseIdentifier: "input")
         
@@ -392,7 +392,7 @@ extension SettingsViewController : UITableViewDataSource {
         return cell
     }
     
-    private func tableView(_ tableView: UITableView, defaultCellForRowAt indexPath: IndexPath, withRow row: SettingsRow) -> UITableViewCell {
+    private func tableView(_ tableView: UITableView, defaultCellForRowAt indexPath: IndexPath, withRow row: SettingsViewController.Row) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.imageView?.image = cellImage(for: row)
@@ -491,7 +491,7 @@ extension SettingsViewController : UITableViewDelegate {
 }
 
 fileprivate extension SettingsViewController {
-    func sectionText(for section: SettingsSection) -> String {
+    func sectionText(for section: SettingsViewController.Section) -> String {
         switch section {
         case .permission:
             return "settings.section.permission".localized
@@ -506,7 +506,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellImage(for row: SettingsRow) -> UIImage? {
+    func cellImage(for row: SettingsViewController.Row) -> UIImage? {
         switch (row) {
         case .followInstagram:
             return UIImage(named: "SettingsInstagram")
@@ -517,7 +517,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellText(for row: SettingsRow) -> String {
+    func cellText(for row: SettingsViewController.Row) -> String {
         switch (row) {
         case .usageStreak:
             return "settings.row.usage_streak.title".localized
@@ -554,7 +554,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellDetailedText(for row: SettingsRow) -> String? {
+    func cellDetailedText(for row: SettingsViewController.Row) -> String? {
         switch (row) {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
@@ -580,7 +580,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellEnabledText(for row: SettingsRow) -> String? {
+    func cellEnabledText(for row: SettingsViewController.Row) -> String? {
         guard let permissionType = row.permissionType else {
             return nil
         }
@@ -593,7 +593,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellAccessoryType(for row: SettingsRow) -> UITableViewCellAccessoryType {
+    func cellAccessoryType(for row: SettingsViewController.Row) -> UITableViewCellAccessoryType {
         switch row {
         case .tellFriend, .currency:
             return .disclosureIndicator
@@ -602,7 +602,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellAccessoryView(for row: SettingsRow) -> UIView? {
+    func cellAccessoryView(for row: SettingsViewController.Row) -> UIView? {
         switch (row) {
         case .photoPermission, .pushPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
@@ -675,13 +675,13 @@ fileprivate extension SettingsViewController {
     }
     
     func reloadChangeableIndexPaths() {
-        func append(section: SettingsSection, row: SettingsRow, to indexPaths: inout [IndexPath]) {
+        func append(section: SettingsViewController.Section, row: SettingsViewController.Row, to indexPaths: inout [IndexPath]) {
             if let indexPath = indexPath(for: row, in: section) {
                 indexPaths.append(indexPath)
             }
         }
         
-        func sectionIndexPaths(_ section: SettingsSection) -> [IndexPath] {
+        func sectionIndexPaths(_ section: SettingsViewController.Section) -> [IndexPath] {
             var indexPaths: [IndexPath] = []
             
             data[section]?.forEach { row in
@@ -815,7 +815,7 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
 
 // MARK: - Permissions
 
-fileprivate extension SettingsRow {
+fileprivate extension SettingsViewController.Row {
     var permissionType: PermissionType? {
         switch self {
         case .photoPermission:
