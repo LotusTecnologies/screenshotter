@@ -125,7 +125,7 @@ class FavoritesViewController : BaseViewController {
     
     // MARK: Products
     
-    fileprivate var screenshotsProducts: [String : [Product]] = [:]
+    fileprivate var screenshotsProducts: [String : ScreenshotProducts] = [:]
     fileprivate var reloadProductsSet: Set<String> = Set()
     fileprivate var removeProductsSet: Set<String> = Set()
     
@@ -151,14 +151,14 @@ class FavoritesViewController : BaseViewController {
     
     fileprivate func insertUniqueScreenshotProducts(withScreenshot screenshot: Screenshot) {
         if let assetId = screenshot.assetId, screenshotsProducts[assetId] == nil {
-            screenshotsProducts[assetId] = screenshot.favoritedProducts
+            screenshotsProducts[assetId] = screenshotProductsForScreenshot(screenshot)
         }
     }
     
     fileprivate func updateScreenshotsProducts(withAssetIds assetIds: [String]) {
         assetIds.forEach { assetId in
             if screenshotsProducts[assetId] != nil, let screenshot = self.screenshot(withAssetId: assetId) {
-                screenshotsProducts[assetId] = screenshot.favoritedProducts
+                screenshotsProducts[assetId] = screenshotProductsForScreenshot(screenshot)
             }
         }
     }
@@ -198,12 +198,18 @@ class FavoritesViewController : BaseViewController {
         }
     }
     
-    func products(for screenshot: Screenshot) -> [Product] {
-        if let assetId = screenshot.assetId {
-            return screenshotsProducts[assetId] ?? []
+    fileprivate func screenshotProductsForScreenshot(_ screenshot: Screenshot) -> ScreenshotProducts {
+        let favoritedProducts = screenshot.favoritedProducts
+        let products = FavoritesTableViewCell.maxProducts(favoritedProducts)
+        return ScreenshotProducts(totalCount: favoritedProducts.count, products: products)
+    }
+    
+    fileprivate func cachedScreenshotProductsForScreenshot(_ screenshot: Screenshot) -> ScreenshotProducts {
+        if let assetId = screenshot.assetId, let screenshotsProduct = screenshotsProducts[assetId] {
+            return screenshotsProduct
             
         } else {
-            return screenshot.favoritedProducts
+            return screenshotProductsForScreenshot(screenshot)
         }
     }
     
@@ -230,10 +236,10 @@ extension FavoritesViewController : UITableViewDataSource {
         }
         
         insertUniqueScreenshotProducts(withScreenshot: screenshot)
-        let products = self.products(for: screenshot)
+        let screenshotProducts = cachedScreenshotProductsForScreenshot(screenshot)
         let identifier: String
         
-        switch products.count {
+        switch screenshotProducts.totalCount {
         case 1:
             identifier = "cell1"
         case 2:
@@ -247,8 +253,8 @@ extension FavoritesViewController : UITableViewDataSource {
         if let cell = cell as? FavoritesTableViewCell {
             cell.backgroundColor = view.backgroundColor
             cell.imageData = screenshot.imageData
-            cell.textLabel?.text = "\(products.count) Favorited Items" // TODO: localize
-            cell.products = products
+            cell.textLabel?.text = "\(screenshotProducts.totalCount) Favorited Items" // TODO: localize
+            cell.setProducts(screenshotProducts.products)
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .none
         }
@@ -286,4 +292,9 @@ extension FavoritesViewController : FrcDelegateProtocol {
         removeAllScreenshotsProducts()
         syncScreenshotAssetIds()
     }
+}
+
+fileprivate struct ScreenshotProducts {
+    var totalCount: Int
+    var products: [Product]
 }

@@ -1,5 +1,5 @@
 //
-//  ProductView.swift
+//  EmbossedView.swift
 //  screenshot
 //
 //  Created by Corey Werner on 12/31/17.
@@ -9,20 +9,9 @@
 import Foundation
 import SDWebImage
 
-class ProductView : UIView {
+class EmbossedView : UIView {
     fileprivate let imageView = UIImageView()
-    fileprivate let placeholderImage = UIImage(named: "DefaultProduct")
-    
-    var imageURL: String? {
-        didSet {
-            if let imageString = imageURL {
-                imageView.sd_setImage(with: URL(string: imageString), placeholderImage: placeholderImage, options: [.retryFailed, .highPriority], completed: nil)
-                
-            } else {
-                imageView.image = placeholderImage
-            }
-        }
-    }
+    var placeholderImage: UIImage?
     
     // MARK: Life Cycle
     
@@ -61,5 +50,38 @@ class ProductView : UIView {
                 layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: imageView.layer.cornerRadius).cgPath
             }
         }
+    }
+    
+    // MARK: Image
+    
+    var image: UIImage? {
+        return imageView.image
+    }
+    
+    func setImage(withURLString urlString: String?) {
+        guard let urlString = urlString else {
+            imageView.image = placeholderImage
+            return
+        }
+        
+        imageView.sd_setImage(with: URL(string: urlString), placeholderImage: placeholderImage, options: [.retryFailed, .highPriority], completed: nil)
+    }
+    
+    func setImage(withData data: Data?) {
+        guard let data = data else {
+            imageView.image = placeholderImage
+            return
+        }
+        
+        imageView.image = UIImage(data: data)
+    }
+    
+    func setImage(withNSData data: NSData?) {
+        guard let data = data as Data? else {
+            imageView.image = placeholderImage
+            return
+        }
+        
+        setImage(withData: data)
     }
 }

@@ -9,17 +9,16 @@
 import Foundation
 
 class FavoritesTableViewCell : UITableViewCell {
-    fileprivate let screenshotImageView = UIImageView()
+    private let screenshotContainerView = NotifyChangeView()
+    fileprivate let screenshotView = EmbossedView()
+    private var screenshotImageViewWidthConstraint: NSLayoutConstraint!
+    private var screenshotImageViewHeightConstraint: NSLayoutConstraint!
     fileprivate let shoppableContainerView = UIView()
     
     var imageData: NSData? {
         didSet {
-            if let imageData = imageData as Data? {
-                screenshotImageView.image = UIImage(data: imageData)
-                
-            } else {
-                screenshotImageView.image = nil
-            }
+            screenshotView.setImage(withNSData: imageData)
+            updateScreenshotImageViewSize()
         }
     }
     
@@ -38,20 +37,34 @@ class FavoritesTableViewCell : UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        // TODO: do math for setting the shadow around the image and not the image view (ie. landscape image)
-        screenshotImageView.translatesAutoresizingMaskIntoConstraints = false
-        screenshotImageView.contentMode = .scaleAspectFit
-        contentView.addSubview(screenshotImageView)
-        screenshotImageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
-        screenshotImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        screenshotImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
-        screenshotImageView.widthAnchor.constraint(equalTo: contentView.layoutMarginsGuide.heightAnchor, multiplier: Screenshot.ratio.width).isActive = true
+        screenshotContainerView.translatesAutoresizingMaskIntoConstraints = false
+        screenshotContainerView.notifySizeChange = { size in
+            self.updateScreenshotImageViewSize()
+        }
+        contentView.addSubview(screenshotContainerView)
+        screenshotContainerView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        screenshotContainerView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        screenshotContainerView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        screenshotContainerView.widthAnchor.constraint(equalTo: contentView.layoutMarginsGuide.heightAnchor, multiplier: Screenshot.ratio.width).isActive = true
+        
+        screenshotView.translatesAutoresizingMaskIntoConstraints = false
+        screenshotContainerView.addSubview(screenshotView)
+        screenshotView.topAnchor.constraint(greaterThanOrEqualTo: screenshotContainerView.topAnchor).isActive = true
+        screenshotView.leadingAnchor.constraint(greaterThanOrEqualTo: screenshotContainerView.leadingAnchor).isActive = true
+        screenshotView.bottomAnchor.constraint(lessThanOrEqualTo: screenshotContainerView.bottomAnchor).isActive = true
+        screenshotView.trailingAnchor.constraint(lessThanOrEqualTo: screenshotContainerView.trailingAnchor).isActive = true
+        screenshotView.centerXAnchor.constraint(equalTo: screenshotContainerView.centerXAnchor).isActive = true
+        screenshotView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
+        screenshotImageViewWidthConstraint = screenshotView.widthAnchor.constraint(equalToConstant: 0)
+        screenshotImageViewWidthConstraint.isActive = true
+        screenshotImageViewHeightConstraint = screenshotView.heightAnchor.constraint(equalToConstant: 0)
+        screenshotImageViewHeightConstraint.isActive = true
         
         let centerView = UIView()
         centerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(centerView)
         centerView.topAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
-        centerView.leadingAnchor.constraint(equalTo: screenshotImageView.trailingAnchor, constant: .padding).isActive = true
+        centerView.leadingAnchor.constraint(equalTo: screenshotContainerView.trailingAnchor, constant: .padding).isActive = true
         centerView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         centerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         centerView.centerYAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerYAnchor).isActive = true
@@ -73,34 +86,50 @@ class FavoritesTableViewCell : UITableViewCell {
         shoppableContainerView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
     }
     
-    // MARK: Products
+    // MARK: Screenshot
     
-    fileprivate let maxProductCount = 3
-    
-    var products: [Product]? {
-        didSet {
-            if let products = products {
-                maxProducts = Array(products.prefix(maxProductCount))
-                
-            } else {
-                maxProducts = []
+    fileprivate func updateScreenshotImageViewSize() {
+        if let imageSize = screenshotView.image?.size, !screenshotContainerView.bounds.isEmpty {
+            let rect = imageSize.aspectFitRectInSize(screenshotContainerView.bounds.size)
+            
+            if screenshotImageViewWidthConstraint.constant != rect.size.width {
+                screenshotImageViewWidthConstraint.constant = rect.size.width
+            }
+            if screenshotImageViewHeightConstraint.constant != rect.size.height {
+                screenshotImageViewHeightConstraint.constant = rect.size.height
             }
             
-            if maxProducts.count == 0 {
-                removeProductViews()
-                
-            } else {
-                if shoppableContainerView.subviews.count != maxProducts.count {
-                    removeProductViews()
-                    setupProductViews()
-                }
-                
-                updateProductViews()
-            }
+        } else {
+            screenshotImageViewWidthConstraint.constant = 0
+            screenshotImageViewHeightConstraint.constant = 0
         }
     }
     
+    // MARK: Products
+    
+    static let maxProductCount = 3
+    
+    static func maxProducts(_ products: [Product]) -> [Product] {
+        return Array(products.prefix(maxProductCount))
+    }
+    
     fileprivate var maxProducts: [Product] = []
+    
+    func setProducts(_ products: [Product]) {
+        maxProducts = type(of: self).maxProducts(products)
+        
+        if maxProducts.count == 0 {
+            removeProductViews()
+            
+        } else {
+            if shoppableContainerView.subviews.count != maxProducts.count {
+                removeProductViews()
+                setupProductViews()
+            }
+            
+            updateProductViews()
+        }
+    }
     
     private func removeProductViews() {
         shoppableContainerView.subviews.forEach { productView in
@@ -114,19 +143,20 @@ class FavoritesTableViewCell : UITableViewCell {
         }
         
         maxProducts.enumerated().forEach { (i: Int, product: Product) in
-            let productView = ProductView()
+            let productView = EmbossedView()
             
             var layoutMargins = productView.layoutMargins
             layoutMargins.left = -.padding / 2 + abs(layoutMargins.left)
             layoutMargins.right = -.padding / 2 + abs(layoutMargins.right)
             productView.layoutMargins = layoutMargins
             
-            productView.imageURL = product.imageURL
+            productView.placeholderImage = UIImage(named: "DefaultProduct")
+            productView.setImage(withURLString: product.imageURL)
             productView.translatesAutoresizingMaskIntoConstraints = false
             shoppableContainerView.addSubview(productView)
             productView.layoutMarginsGuide.topAnchor.constraint(equalTo: shoppableContainerView.topAnchor).isActive = true
             productView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: shoppableContainerView.bottomAnchor).isActive = true
-            productView.layoutMarginsGuide.widthAnchor.constraint(equalTo: shoppableContainerView.widthAnchor, multiplier: 1 / CGFloat(maxProductCount)).isActive = true
+            productView.layoutMarginsGuide.widthAnchor.constraint(equalTo: shoppableContainerView.widthAnchor, multiplier: 1 / CGFloat(type(of: self).maxProductCount)).isActive = true
             productView.heightAnchor.constraint(equalTo: productView.widthAnchor).isActive = true
             
             if i == 0 {
@@ -153,8 +183,8 @@ class FavoritesTableViewCell : UITableViewCell {
     
     private func updateProductViews() {
         maxProducts.enumerated().forEach { (i: Int, product: Product) in
-            if let productView = shoppableContainerView.subviews[i] as? ProductView {
-                productView.imageURL = product.imageURL
+            if let productView = shoppableContainerView.subviews[i] as? EmbossedView {
+                productView.setImage(withURLString: product.imageURL)
             }
         }
     }

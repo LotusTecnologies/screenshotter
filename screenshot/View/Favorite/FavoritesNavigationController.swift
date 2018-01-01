@@ -8,7 +8,7 @@
 
 import Foundation
 
-class FavoritesNavigationController : UINavigationController, ViewControllerLifeCycle {
+class FavoritesNavigationController : UINavigationController {
     let favoritesViewController = FavoritesViewController()
     
     // MARK: Life Cycle
@@ -30,13 +30,6 @@ class FavoritesNavigationController : UINavigationController, ViewControllerLife
         
         view.backgroundColor = .background
     }
-    
-    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
-        if let favoriteProductsViewController = viewController as? FavoriteProductsViewController {
-//            favoriteProductsViewController.removeUnfavorited()
-//            favoritesViewController.
-        }
-    }
 }
 
 extension FavoritesNavigationController : FavoritesViewControllerDelegate {
@@ -46,8 +39,7 @@ extension FavoritesNavigationController : FavoritesViewControllerDelegate {
         }
         
         let favoriteProductsViewController = FavoriteProductsViewController()
-        favoriteProductsViewController.lifeCycleDelegate = self
-        favoriteProductsViewController.products = viewController.products(for: screenshot)
+        favoriteProductsViewController.products = screenshot.favoritedProducts
         favoriteProductsViewController.hidesBottomBarWhenPushed = true
         pushViewController(favoriteProductsViewController, animated: true)
     }
