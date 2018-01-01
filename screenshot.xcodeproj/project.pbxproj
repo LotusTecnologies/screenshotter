@@ -93,11 +93,11 @@
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
 		C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E641FFA2D2600F491C0 /* Size.swift */; };
 		C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E661FFA363500F491C0 /* EmbossedView.swift */; };
-		C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5C8465F1F9740D400BCCB3E /* GameScene.sks */; };
-		C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C846601F9740D400BCCB3E /* GameScene.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
+		C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5D98CCA1FFA642300CC1A97 /* GameScene.sks */; };
+		C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCB1FFA642300CC1A97 /* GameScene.swift */; };
 		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
 		C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */; };
@@ -214,11 +214,11 @@
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		C5AC7E641FFA2D2600F491C0 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
 		C5AC7E661FFA363500F491C0 /* EmbossedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbossedView.swift; sourceTree = "<group>"; };
-		C5C8465F1F9740D400BCCB3E /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		C5C846601F9740D400BCCB3E /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
+		C5D98CCA1FFA642300CC1A97 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		C5D98CCB1FFA642300CC1A97 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapticHelper.swift; sourceTree = "<group>"; };
@@ -359,6 +359,7 @@
 				C54087DA1FE90C8D00198955 /* Currency */,
 				C54087F61FE90C8E00198955 /* Discover */,
 				C54087F31FE90C8E00198955 /* Favorite */,
+				C5D98CC91FFA642300CC1A97 /* Game */,
 				C54087F81FE90C8E00198955 /* Generic */,
 				C54087DC1FE90C8D00198955 /* Invite */,
 				C54087C11FE90C8D00198955 /* Loading */,
@@ -611,15 +612,6 @@
 			path = Protocol;
 			sourceTree = "<group>";
 		};
-		C5C8465E1F9740D400BCCB3E /* Game */ = {
-			isa = PBXGroup;
-			children = (
-				C5C8465F1F9740D400BCCB3E /* GameScene.sks */,
-				C5C846601F9740D400BCCB3E /* GameScene.swift */,
-			);
-			path = Game;
-			sourceTree = "<group>";
-		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -633,6 +625,15 @@
 				52E547431FE2487B00627D6D /* ScreenshotHelper.swift */,
 			);
 			path = Categories;
+			sourceTree = "<group>";
+		};
+		C5D98CC91FFA642300CC1A97 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				C5D98CCA1FFA642300CC1A97 /* GameScene.sks */,
+				C5D98CCB1FFA642300CC1A97 /* GameScene.swift */,
+			);
+			path = Game;
 			sourceTree = "<group>";
 		};
 		E4139D371F09083B00E8A53B = {
@@ -660,7 +661,6 @@
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
 				C528DC131F57F33900F4E723 /* Controllers */,
-				C5C8465E1F9740D400BCCB3E /* Game */,
 				C5278FB81F3C38510090E422 /* Model */,
 				C5233F091F6FEFEB00F25C7C /* Protocols */,
 				52807FFA1F9530E70075111D /* Resources */,
@@ -788,12 +788,12 @@
 			files = (
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
-				C5C846611F9740D400BCCB3E /* GameScene.sks in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
+				C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */,
 				C50EE2761FC40DCD002B4259 /* Hind 700.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -966,7 +966,6 @@
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				C54088241FE90C8E00198955 /* ScreenshotDisplayNavigationController.m in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
-				C5C846621F9740D400BCCB3E /* GameScene.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C54088131FE90C8E00198955 /* TutorialSlideView.swift in Sources */,
 				C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */,
@@ -1007,6 +1006,7 @@
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
 				C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */,
+				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
 				C540881C1FE90C8E00198955 /* ShoppablesToolbar.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
