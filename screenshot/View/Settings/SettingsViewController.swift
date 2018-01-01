@@ -675,23 +675,25 @@ fileprivate extension SettingsViewController {
     }
     
     func reloadChangeableIndexPaths() {
+        func append(section: SettingsSection, row: SettingsRow, to indexPaths: inout [IndexPath]) {
+            if let indexPath = indexPath(for: row, in: section) {
+                indexPaths.append(indexPath)
+            }
+        }
+        
         func sectionIndexPaths(_ section: SettingsSection) -> [IndexPath] {
             var indexPaths: [IndexPath] = []
             
             data[section]?.forEach { row in
-                if let indexPath = indexPath(for: row, in: section) {
-                    indexPaths.append(indexPath)
-                }
+                append(section: section, row: row, to: &indexPaths)
             }
             
             return indexPaths
         }
         
-        var indexPaths = sectionIndexPaths(.permission) + sectionIndexPaths(.product)
-        
-        if let indexPath = indexPath(for: .usageStreak, in: .about) {
-            indexPaths.append(indexPath)
-        }
+        var indexPaths = sectionIndexPaths(.permission)
+        append(section: .about, row: .usageStreak, to: &indexPaths)
+        append(section: .about, row: .coins, to: &indexPaths)
         
         tableView.reloadRows(at: indexPaths, with: .none)
     }
