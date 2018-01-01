@@ -253,10 +253,16 @@ extension FavoritesViewController : UITableViewDataSource {
         if let cell = cell as? FavoritesTableViewCell {
             cell.backgroundColor = view.backgroundColor
             cell.imageData = screenshot.imageData
-            cell.textLabel?.text = "\(screenshotProducts.totalCount) Favorited Items" // TODO: localize
             cell.setProducts(screenshotProducts.products)
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .none
+            
+            if screenshotProducts.totalCount == 1 {
+                cell.textLabel?.text = "favorites.screenshot.title.single".localized(withFormat: screenshotProducts.totalCount)
+                
+            } else {
+                cell.textLabel?.text = "favorites.screenshot.title.plural".localized(withFormat: screenshotProducts.totalCount)
+            }
         }
         
         return cell

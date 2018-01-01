@@ -23,8 +23,10 @@
 
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
-"favorites.title" = "Favorites";
 "favorites.items.title" = "Favorited Items";
+"favorites.screenshot.title.single" = "%d Favorited Item";
+"favorites.screenshot.title.plural" = "%d Favorited Items";
+"favorites.title" = "Favorites";
 
 "game.enter" = "Get More Coins";
 "game.restart" = "Tap to play again";
