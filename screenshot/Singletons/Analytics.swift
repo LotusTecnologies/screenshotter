@@ -46,6 +46,7 @@ public class AnalyticsUser : NSObject {
         }
         
         props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
+        props["dailyStreak"] = "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak))"
         
         if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
             props["pushToken"] = token.description
