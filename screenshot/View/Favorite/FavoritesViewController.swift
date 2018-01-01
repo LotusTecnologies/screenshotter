@@ -64,6 +64,7 @@ class FavoritesViewController : BaseViewController {
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
+        helperView.backgroundColor = view.backgroundColor
         helperView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
         helperView.titleLabel.text = "favorites.empty.title".localized
         helperView.subtitleLabel.text = "favorites.empty.detail".localized
@@ -84,6 +85,13 @@ class FavoritesViewController : BaseViewController {
         }
         
         updateScreenshotsProductsIfNeeded()
+        syncHelperViewVisibility()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Resync since it's possible for a race condition to occur.
         syncHelperViewVisibility()
     }
     
