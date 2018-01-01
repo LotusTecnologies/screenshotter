@@ -136,11 +136,11 @@ class FavoritesViewController : BaseViewController {
         
         reloadProductsSet.insert(assetId)
         
-        if indexPath.row == 0 {
+        updateScreenshotsProductsIfNeeded()
+        
+        if tableView.numberOfRows(inSection: 0) > 0 && indexPath.row == 0 {
             tableView.scrollToRow(at: indexPath, at: .top, animated: false)
         }
-        
-        updateScreenshotsProductsIfNeeded()
     }
     
     fileprivate func updateRemoveProductsSet(at indexPath: IndexPath) {
