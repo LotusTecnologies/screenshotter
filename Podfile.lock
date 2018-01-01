@@ -17,12 +17,12 @@ PODS:
   - Amplitude-iOS (4.0.4)
   - Analytics (3.6.9)
   - Appsee (2.3.6)
-  - Bolts (1.8.4):
-    - Bolts/AppLinks (= 1.8.4)
-    - Bolts/Tasks (= 1.8.4)
-  - Bolts/AppLinks (1.8.4):
+  - Bolts (1.9.0):
+    - Bolts/AppLinks (= 1.9.0)
+    - Bolts/Tasks (= 1.9.0)
+  - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
-  - Bolts/Tasks (1.8.4)
+  - Bolts/Tasks (1.9.0)
   - Branch (0.22.3):
     - Branch/Core (= 0.22.3)
   - Branch/Core (0.22.3)
@@ -166,7 +166,7 @@ SPEC CHECKSUMS:
   Amplitude-iOS: 2ad4d7270c99186236c1272a3a9425463b1ae1a7
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
-  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 0ed788929e6bfdc9b1888ecc34c3f7ffae046797
   Clarifai-Apple-SDK: a79af4fe1a6e556d42c32ebe4b60a87fc4859ab6
   DeepLinkKit: bffd3b5e51549222f974d631b4e0e7484600b9d8
