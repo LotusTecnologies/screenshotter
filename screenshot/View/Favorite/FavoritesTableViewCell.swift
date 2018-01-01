@@ -48,6 +48,7 @@ class FavoritesTableViewCell : UITableViewCell {
         screenshotContainerView.widthAnchor.constraint(equalTo: contentView.layoutMarginsGuide.heightAnchor, multiplier: Screenshot.ratio.width).isActive = true
         
         screenshotView.translatesAutoresizingMaskIntoConstraints = false
+        screenshotView.contentMode = .scaleAspectFill
         screenshotContainerView.addSubview(screenshotView)
         screenshotView.topAnchor.constraint(greaterThanOrEqualTo: screenshotContainerView.topAnchor).isActive = true
         screenshotView.leadingAnchor.constraint(greaterThanOrEqualTo: screenshotContainerView.leadingAnchor).isActive = true
