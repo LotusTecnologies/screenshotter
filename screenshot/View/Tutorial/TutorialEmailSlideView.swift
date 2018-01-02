@@ -103,11 +103,11 @@ public class TutorialEmailSlideView : HelperView {
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
             
             let tappableText: [[String : Bool]] = [
-                ["By tapping \"Submit\" above, you agree to our ": false],
-                ["Terms of Service": true],
-                [" and ": false],
-                ["Privacy Policy": true],
-                [" ": false]
+                ["tutorial.email.legal.start".localized: false],
+                ["tutorial.email.legal.tos".localized: true],
+                ["tutorial.email.legal.middle".localized: false],
+                ["tutorial.email.legal.pp".localized: true],
+                ["tutorial.email.legal.end".localized: false]
             ]
             
             let paragraph = NSMutableParagraphStyle()

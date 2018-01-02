@@ -13,7 +13,11 @@ class TutorialVideoOverlayView : UIView {
     private(set) var replayPauseButton = UIButton()
     private(set) var volumeToggleButton = UIButton()
     
-    // MARK: - UIView
+    // MARK: - Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,7 +43,7 @@ class TutorialVideoOverlayView : UIView {
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.alpha = 0
         doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 12, 8, 12)
-        doneButton.setTitle("Done", for: .normal)
+        doneButton.setTitle("generic.done".localized, for: .normal)
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 1
         doneButton.layer.masksToBounds = true
@@ -59,10 +63,6 @@ class TutorialVideoOverlayView : UIView {
         addSubview(volumeToggleButton)
         volumeToggleButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .padding).isActive = true
         volumeToggleButton.centerYAnchor.constraint(equalTo: doneButton.centerYAnchor).isActive = true
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Public

@@ -38,7 +38,7 @@ class TutorialViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        track("Started Tutorial")
+        AnalyticsTrackers.standard.track("Started Tutorial")
         
         view.backgroundColor = .white
         
@@ -220,7 +220,7 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        track("Finished Tutorial")
+        AnalyticsTrackers.standard.track("Finished Tutorial")
         AnalyticsTrackers.branch.track("Finished Tutorial")
         
         delegate?.tutoriaViewControllerDidComplete(self)

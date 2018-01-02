@@ -19,11 +19,11 @@ class TutorialWelcomeSlideView : HelperView {
         super.init(frame: frame)
         
         titleLabel.attributedText = titleLabelAttributedText
-        subtitleLabel.text = "Any fashion picture you screenshot becomes shoppable in the app"
+        subtitleLabel.text = "tutorial.welcome.detail".localized
         contentImage = UIImage(named: "TutorialWelcomeScreenshopIcon")
         
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Get Started", for: .normal)
+        button.setTitle("tutorial.welcome.start".localized, for: .normal)
         button.backgroundColor = .crazeGreen
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
@@ -52,7 +52,7 @@ class TutorialWelcomeSlideView : HelperView {
 //        let font = UIFont(name: "DINCondensed-Bold", size: 28) ?? UIFont.systemFont(ofSize: 28)
         
         
-        let prefix = "Welcome to "
+        let prefix = "tutorial.welcome.title".localized
         let attachmentString = NSAttributedString(attachment: attachment)
         let attachmentRange = NSMakeRange(prefix.count - 1, attachmentString.length)
         let mutableString = NSMutableAttributedString(string: prefix)

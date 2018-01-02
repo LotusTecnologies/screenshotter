@@ -37,8 +37,8 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         imageView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
         imageView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
         
-        let shareButtonItem = UIBarButtonItem(title: "SHARE", style: .plain, target: self, action: #selector(shareAction))
-        let deleteButtonItem = UIBarButtonItem(title: "DELETE", style: .plain, target: self, action: #selector(deleteAction))
+        let shareButtonItem = UIBarButtonItem(title: "screenshot.option.share".localized, style: .plain, target: self, action: #selector(shareAction))
+        let deleteButtonItem = UIBarButtonItem(title: "screenshot.option.delete".localized, style: .plain, target: self, action: #selector(deleteAction))
         let flexilbeItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Even though this is set globally, it is possible to hit a race condition

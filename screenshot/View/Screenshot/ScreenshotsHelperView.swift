@@ -30,7 +30,7 @@ class ScreenshotsHelperView: HelperView {
         super.init(frame: frame)
         
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Allow Access", for: .normal)
+        button.setTitle("screenshot.permission.allow".localized, for: .normal)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
@@ -42,15 +42,15 @@ class ScreenshotsHelperView: HelperView {
     
     private func syncType() {
         if (type == .permission) {
-            titleLabel.text = "Shop With CRAZE"
-            subtitleLabel.text = "Allow CRAZE to access your screenshots to start shopping!"
+            titleLabel.text = "screenshot.permission.title".localized
+            subtitleLabel.text = "screenshot.permission.detail".localized
             contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
             button.isHidden = false
             buttonHeightConstraint.isActive = false
             
         } else if (type == .screenshot) {
-            titleLabel.text = "No Screenshots Yet"
-            subtitleLabel.text = "Add screenshots you want to shop by pressing the power & home buttons at the same time"
+            titleLabel.text = "screenshot.empty.title".localized
+            subtitleLabel.text = "screenshot.empty.detail".localized
             contentImage = UIImage(named: "ScreenshotsEmptyListGraphic")
             button.isHidden = true
             buttonHeightConstraint.isActive = true

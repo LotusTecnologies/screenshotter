@@ -86,12 +86,12 @@ class ProductsRateView : UIView {
     private func syncLabel() {
         if hasRating {
             label.textColor = .white
-            label.text = "Thanks for your feedback!"
+            label.text = "products.rate.rated".localized
             label.textAlignment = .center
             
         } else {
             label.textColor = .gray3
-            label.text = "Are these results relevant?"
+            label.text = "products.rate.unrated".localized
             label.textAlignment = .natural
         }
     }

@@ -37,11 +37,13 @@
 "generic.done" = "Done";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";
+"generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
 "generic.setup" = "Setup";
 "generic.submit" = "Submit";
 "generic.update" = "Update";
+"generic.yes" = "Yes";
 
 "invite.facebook" = "Facebook Invite";
 "invite.google" = "Google Invite";
@@ -83,6 +85,18 @@
 "products.options.sort.price_des" = "Price (highest first)";
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
+"products.rate.rated" = "Thanks for your feedback!";
+"products.rate.unrated" = "Are these results relevant?";
+
+"screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
+"screenshot.empty.title" = "No Screenshots Yet";
+"screenshot.import.latest" = "Import your latest screenshot?";
+"screenshot.import.multiple" = "You have %@ new screenshots, do you want to import them?";
+"screenshot.option.share" = "SHARE";
+"screenshot.option.delete" = "DELETE";
+"screenshot.permission.allow" = "Allow Access";
+"screenshot.permission.detail" = "Allow CRAZE to access your screenshots to start shopping!";
+"screenshot.permission.title" = "Shop With CRAZE";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
@@ -116,6 +130,19 @@
 "tutorial.email.email" = "Email";
 "tutorial.email.name" = "Name";
 "tutorial.email.title" = "Sign Up";
+"tutorial.email.legal.start" = "By tapping \"Submit\" above, you agree to our ";
+"tutorial.email.legal.tos" = "Terms of Service";
+"tutorial.email.legal.middle" = " and ";
+"tutorial.email.legal.pp" = "Privacy Policy";
+"tutorial.email.legal.end" = " ";
+"tutorial.try.detail" = "Press the home & power buttons to take a screenshot of this page";
+"tutorial.try.detail.x" = "Press the volume up & power buttons to take a screenshot of this page";
+"tutorial.try.title" = "Try It Out";
+"tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
+"tutorial.video.mute.title" = "Turn up the volume!";
+"tutorial.welcome.start" = "Get Started";
+"tutorial.welcome.detail" = "Any fashion picture you screenshot becomes shoppable in the app";
+"tutorial.welcome.title" = "Welcome to ";
 
 "update.force.title" = "Update Required";
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";

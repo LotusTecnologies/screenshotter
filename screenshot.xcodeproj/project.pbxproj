@@ -401,12 +401,12 @@
 				C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */,
 				C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */,
 				C54087CB1FE90C8D00198955 /* TutorialSlideView.swift */,
+				C54087D11FE90C8D00198955 /* TutorialProductsPageViewController.h */,
 				C54087CC1FE90C8D00198955 /* TutorialProductsPageViewController.m */,
 				C54087CD1FE90C8D00198955 /* TutorialViewController.swift */,
 				C54087CE1FE90C8D00198955 /* TutorialVideoOverlayView.swift */,
 				C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */,
 				C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */,
-				C54087D11FE90C8D00198955 /* TutorialProductsPageViewController.h */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -423,8 +423,8 @@
 		C54087D61FE90C8D00198955 /* Shoppable */ = {
 			isa = PBXGroup;
 			children = (
-				C54087D71FE90C8D00198955 /* ShoppablesToolbar.h */,
 				C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */,
+				C54087D71FE90C8D00198955 /* ShoppablesToolbar.h */,
 				C54087D91FE90C8D00198955 /* ShoppablesToolbar.m */,
 			);
 			path = Shoppable;
@@ -458,8 +458,8 @@
 		C54087E11FE90C8D00198955 /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
-				C54087E21FE90C8D00198955 /* MainTabBarController.m */,
 				C54087E31FE90C8D00198955 /* MainTabBarController.h */,
+				C54087E21FE90C8D00198955 /* MainTabBarController.m */,
 			);
 			path = TabBar;
 			sourceTree = "<group>";
@@ -547,8 +547,8 @@
 		C54088411FE90E2200198955 /* PresentationController */ = {
 			isa = PBXGroup;
 			children = (
-				C54088421FE90E2200198955 /* InsetPresentationController.m */,
 				C54088431FE90E2200198955 /* InsetPresentationController.h */,
+				C54088421FE90E2200198955 /* InsetPresentationController.m */,
 			);
 			path = PresentationController;
 			sourceTree = "<group>";

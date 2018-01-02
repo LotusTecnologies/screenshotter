@@ -166,12 +166,11 @@ class TutorialVideoViewController : BaseViewController {
     
     @objc private func volumeToggleButtonTapped() {
         let button = overlayView.volumeToggleButton
+        let isVolumeMute = AVAudioSession.sharedInstance().outputVolume == 0
         
-        if AVAudioSession.sharedInstance().outputVolume == 0 && button.isSelected {
-            // Volume is muted, ask user to turn up the volume?
-            
-            let alert = UIAlertController(title: "Turn up the volume!", message: "In order to hear the sound in the video, please turn up the volume on your phone!", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        if isVolumeMute && button.isSelected {
+            let alert = UIAlertController(title: "tutorial.video.mute.title".localized, message: "tutorial.video.mute.detail".localized, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
             present(alert, animated: true)
             
             return
@@ -191,6 +190,7 @@ class TutorialVideoViewController : BaseViewController {
             
             track("Paused Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPause?(self)
+            
         } else {
             track("Continued Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPlay?(self)

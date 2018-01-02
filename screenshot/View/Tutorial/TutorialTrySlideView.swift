@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol TutorialTrySlideViewDelegate : class {
+protocol TutorialTrySlideViewDelegate : NSObjectProtocol {
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView)
 }
 
@@ -18,14 +18,14 @@ public class TutorialTrySlideView : HelperView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        titleLabel.text = "Try It Out"
+        titleLabel.text = "tutorial.try.title".localized
         
         if UIDevice.isHomeButtonless {
-            subtitleLabel.text = "Press the volume up & power buttons to take a screenshot of this page"
+            subtitleLabel.text = "tutorial.try.detail.x".localized
             contentImage = UIImage(named: "TutorialTryGraphicX")
             
         } else {
-            subtitleLabel.text = "Press the home & power buttons to take a screenshot of this page"
+            subtitleLabel.text = "tutorial.try.detail".localized
             
             if UIDevice.is568h || UIDevice.is480h {
                 contentImage = UIImage(named: "TutorialTryGraphicSE")

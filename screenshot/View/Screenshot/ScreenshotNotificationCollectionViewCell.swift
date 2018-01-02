@@ -112,7 +112,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         
         let rejectButton = UIButton()
         rejectButton.translatesAutoresizingMaskIntoConstraints = false
-        rejectButton.setTitle("No", for: .normal)
+        rejectButton.setTitle("generic.no".localized, for: .normal)
         rejectButton.setTitleColor(.gray3, for: .normal)
         rejectButton.setTitleColor(.gray7, for: .highlighted)
         rejectButton.titleLabel?.font = buttonFont
@@ -127,7 +127,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         
         let confirmButton = UIButton()
         confirmButton.translatesAutoresizingMaskIntoConstraints = false
-        confirmButton.setTitle("Yes", for: .normal)
+        confirmButton.setTitle("generic.yes".localized, for: .normal)
         confirmButton.setTitleColor(.gray3, for: .normal)
         confirmButton.setTitleColor(.gray7, for: .highlighted)
         confirmButton.titleLabel?.font = buttonFont
@@ -208,10 +208,10 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
             text = nil
             break
         case .importSingleScreenshot:
-            text = "Import your latest screenshot?"
+            text = "screenshot.import.latest".localized
             break
         case .importMultipleScreenshots:
-            text = "You have \(AccumulatorModel.sharedInstance.getNewScreenshotsCount()) new screenshots, do you want to import them?"
+            text = "screenshot.import.multiple".localized(withFormat: AccumulatorModel.sharedInstance.getNewScreenshotsCount())
             break
         }
         
