@@ -62,7 +62,6 @@ public class AnalyticsUser : NSObject {
 @objc public protocol AnalyticsTracker {
     func track(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
-    func identifyAnonymousUser()
 }
 
 public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -97,10 +96,6 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     public func identify(_ user: AnalyticsUser) {
         trackers.values.forEach { $0.identify(user) }
     }
-    
-    public func identifyAnonymousUser() {
-        trackers.values.forEach { $0.identifyAnonymousUser() }
-    }
 }
 
 class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -110,14 +105,6 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
-    }
-    
-    func identifyAnonymousUser() {
-        SEGAnalytics.shared().identify(SEGAnalytics.shared().getAnonymousId())
-    }
-    
-    func error(withDescription description: String) {
-        SEGAnalytics.shared().track("Error", properties: ["Description" : description])
     }
 }
 
@@ -150,10 +137,6 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
         
         track("User Properties", properties: user.analyticsProperties)
     }
-    
-    func identifyAnonymousUser() {
-        // Not needed for AppSee
-    }
 }
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -163,10 +146,6 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         IntercomHelper.sharedInstance.register(user: user)
-    }
-    
-    func identifyAnonymousUser() {
-        IntercomHelper.sharedInstance.registerAnonymousUser()
     }
 }
 
@@ -181,10 +160,6 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
         if let isEmpty = user.email?.isEmpty, isEmpty == false {
             Branch.getInstance().userCompletedAction("Submitted email")
         }
-    }
-    
-    func identifyAnonymousUser() {
-        // Not needed for Branch
     }
 }
 
