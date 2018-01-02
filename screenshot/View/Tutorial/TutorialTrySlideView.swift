@@ -52,7 +52,7 @@ public class TutorialTrySlideView : HelperView {
     
     @objc func applicationUserDidTakeScreenshot() {
         PermissionsManager.shared.requestPermission(for: .photo) { granted in
-            AssetSyncModel.sharedInstance.syncTutorialPhoto(image: UIImage(named: "TutorialScreenshot")!)
+            AssetSyncModel.sharedInstance.syncTutorialPhoto(image: type(of: self).rawGraphic!)
             self.delegate?.tutorialTrySlideViewDidComplete(self)
         }
     }
