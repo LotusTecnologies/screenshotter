@@ -16,6 +16,7 @@ import Firebase
 import GoogleSignIn
 import PromiseKit
 import DeepLinkKit
+import Segment_Amplitude
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -202,6 +203,8 @@ extension AppDelegate {
         configuration.recordScreenViews = true
         configuration.trackDeepLinks = true
         configuration.trackPushNotifications = true
+        configuration.use(SEGAmplitudeIntegrationFactory.instance())
+        
         SEGAnalytics.setup(with: configuration)
         
         Appsee.start(Constants.appSeeApiKey)
@@ -225,13 +228,8 @@ extension AppDelegate {
                 self.showScreenshotListTop()
             }
             
-            // "channel" will be the Instagram username of the ambassador who shared this link.
             if let channel = params["channel"] as? String {
-                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.ambasssadorUsername)
-                
-                if let tutorialVC = self.window?.rootViewController as? TutorialViewController {
-                    tutorialVC.video = .ambassador(username: channel)
-                }
+                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
             }
             
             // "discoverURL" will be the discover URL that should be used during this session.
@@ -290,7 +288,7 @@ extension AppDelegate {
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {
-                    // TODO:
+                    print("Core Data stack failed")
                 }
             }
         }

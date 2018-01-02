@@ -220,6 +220,7 @@ class AssetSyncModel: NSObject {
                             // Syte returned no segments
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
+                            track("received response from Syte", properties: ["segmentCount" : 0])
                         default:
                             break
                         }
@@ -538,6 +539,7 @@ class AssetSyncModel: NSObject {
                 }
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
             }
+            track("received products from Syte", properties: ["productCount" : productsArray.count])
         }
             
         NetworkingPromise.downloadProductsWithRetry(url: url)

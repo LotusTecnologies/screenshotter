@@ -22,6 +22,7 @@ def shared_pods
     pod 'GoogleSignIn'
     pod 'DeepLinkKit'
     pod 'lottie-ios'
+    pod 'Segment-Amplitude'
 end
 
 target 'screenshot' do

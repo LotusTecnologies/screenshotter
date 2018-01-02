@@ -136,8 +136,26 @@ class ProductsOptions : NSObject {
         let saleChanged = previousSale.rawValue != sale.rawValue
         let sortChanged = previousSort.rawValue != sort.rawValue
         let changed = maskChanged || saleChanged || sortChanged
-            
+        
         delegate?.productsOptionsDidComplete(self, withChange: changed)
+        
+        guard changed == true else {
+            return
+        }
+        
+        // Track which filters have changed.
+        let changeMap = [
+            "Gender" : (new: gender.stringValue, old: previousMask.gender.stringValue),
+            "Size" : (new: size.stringValue, old: previousMask.size.stringValue),
+            "Sale" : (new: sale.stringValue, old: previousSale.stringValue),
+            "Sort" : (new: sort.stringValue, old: previousSort.stringValue)
+        ]
+        
+        for (name, tuple) in changeMap {
+            if tuple.new != tuple.old {
+                track("Set \(name) Filter to \(tuple.new)")
+            }
+        }
     }
 }
 

@@ -13,13 +13,24 @@ import Branch
 import FBSDKCoreKit
 
 public class AnalyticsUser : NSObject {
+    static var current: AnalyticsUser? {
+        guard let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) else {
+            return nil
+        }
+        
+        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+        return AnalyticsUser(name: name, email: email)
+    }
+
     let identifier: String
     let name: String?
     let email: String?
+    let referringChannel: String?
     
-    init(name: String?, email: String?) {
+    init(name: String?, email: String?, channel: String?) {
         self.name = name
         self.email = (email?.count ?? 0 > 0) ? email : nil
+        self.referringChannel = channel
         
         let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID)
         identifier = persistedID ?? UUID().uuidString
@@ -34,6 +45,10 @@ public class AnalyticsUser : NSObject {
         
         if let name = name {
             props["name"] = name
+        }
+        
+        if let channel = referringChannel {
+            props["referringChannel"] = channel
         }
         
         return props
@@ -143,7 +158,7 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name)
+        IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name, channel: user.referringChannel)
     }
     
     func identifyAnonymousUser() {
@@ -157,6 +172,8 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
+        Branch.getInstance().setIdentity(user.email ?? user.identifier)
+        
         if let isEmpty = user.email?.isEmpty, isEmpty == false {
             Branch.getInstance().userCompletedAction("Submitted email")
         }
@@ -180,8 +197,8 @@ public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracke
     tracker.track(name, properties: properties)
 }
 
-public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
-    let user = AnalyticsUser(name: name, email: email)
+public func identify(_ name: String? = nil, email: String? = nil, channel: String?, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
+    let user = AnalyticsUser(name: name, email: email, channel: channel)
     tracker.identify(user)
     return user
 }

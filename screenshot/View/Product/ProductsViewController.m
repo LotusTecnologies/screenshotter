@@ -530,8 +530,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)presentOptions:(ProductsViewControllerControl *)control {
     if ([control isFirstResponder]) {
         [control resignFirstResponder];
-        
     } else {
+        [AnalyticsTrackers.standard track:@"Opened Filters View" properties:nil];
+        
         Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
         [self.productsOptions syncOptionsWithMask:[shoppable getLast]];
         
@@ -576,6 +577,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
+        
         NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
         [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
     }]];
