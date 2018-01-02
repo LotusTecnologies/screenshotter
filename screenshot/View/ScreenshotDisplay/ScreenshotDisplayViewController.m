@@ -11,7 +11,7 @@
 #import "screenshot-Swift.h"
 
 // Uncomment to calculate b0,b1 for a new tutorial screenshot.
-#define STORE_NEW_TUTORIAL_SCREENSHOT 1
+//#define STORE_NEW_TUTORIAL_SCREENSHOT 1
 
 @interface ScreenshotDisplayViewController () <UIScrollViewDelegate>
 

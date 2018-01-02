@@ -293,121 +293,20 @@ class AssetSyncModel: NSObject {
     }
     
     func tupleForRawGraphic() -> (String, [[String : Any]]) {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/aKeeu5_UE5rQj09XPjla5"
+        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/-hJEtepr-0ctvjWrtAs28"
         let segments = [
-            ["label":"Skirts","gender":"female",
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC44MzQ1MjQ1NjQwNzI0ODk4LCJ5IjowLjMxNTc4MTgwOTc2MjEyMDMsIngyIjowLjczMTM4OTQ1Mjg4OTU2MTYsIngiOjAuMzYwNzQwNTgyMjcyNDEwNH0%3D&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.7441&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Jackets","gender":"female",
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC41MjEzNTk2OTk1OTE5OTQyLCJ5IjowLjE2OTM2NDQ2NDY1NTUxODU1LCJ4MiI6MC42NTIxMDM5NjIwMDQxODQ3LCJ4IjowLjM0NDgwMjA4MDA5NDgxNDMzfQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.8739&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-           ["label":"Bags","gender":"female",
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC43MTI0MzIyNzEyNDIxNDE3LCJ5IjowLjU0MDc4NDgyOTg1NDk2NTIsIngyIjowLjM5ODcwODUxMzM3OTA5Njk2LCJ4IjowLjMwMzUyMzYwOTA0MjE2Nzd9&cats=WyJIYW5kYmFncyJd&prob=0.7504&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female", // Heeled shoe
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC45NjI4MjczMDk5NjYwODczLCJ5IjowLjgzMDg1NDA3MzE2Njg0NzIsIngyIjowLjQ2NDg3NDE5MjMyNzI2MDk2LCJ4IjowLjM4MzQxNDE2NDkzMDU4MjA2fQ%3D%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.7713&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female", // Invisible heel
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkL2FLZWV1NV9VRTVyUWowOVhQamxhNQ%3D%3D&crop=eyJ5MiI6MC45MzAzMjQ1NjkzNDQ1MjA2LCJ5IjowLjgwODgzNzYzNzMwNTI1OTcsIngyIjowLjU5ODI1MTQ0MTEyMTEwMTQsIngiOjAuNTEzMjgyNTU4MzIxOTUyOH0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.8184&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
+            ["label":"Shoes","gender":"female","b0":[0.385934054851532, 0.6467227935791016],"b1":[0.4655290246009827, 0.7181835174560547],
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC43Mzc3MTAxMTgyOTM3NjIyLCJ5IjowLjYyNzE5NjE5Mjc0MTM5NCwieDIiOjAuNDg3Mjc4MzEyNDQ0Njg2OSwieCI6MC4zNjQxODQ3NjcwMDc4Mjc3Nn0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6160&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Shoes","gender":"female","b0":[0.514782726764679, 0.6339549422264099],"b1":[0.6010540127754211, 0.7061108946800232],
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC43MjUyNTQ1OTUyNzk2OTM2LCJ5IjowLjYxNDgxMTI0MTYyNjczOTUsIngyIjowLjYyMzk0MjY3MzIwNjMyOTMsIngiOjAuNDkxODk0MDY2MzMzNzcwNzV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6405&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Bags","gender":"female","b0":[0.3161032795906067, 0.4687742590904236],"b1":[0.4117679595947266, 0.5696807503700256],
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC41OTI2NjM5NDM3Njc1NDc2LCJ5IjowLjQ0NTc5MTA2NTY5MjkwMTYsIngyIjowLjQzMzU1NzIxMjM1Mjc1MjcsIngiOjAuMjk0MzE0MDI2ODMyNTgwNTd9&cats=WyJIYW5kYmFncyJd&prob=0.7384&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Jackets","gender":"female","b0":[0.319490909576416, 0.2713195383548737],"b1":[0.6690635085105896, 0.4435304701328278],
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC40NTQyMTExNzU0NDE3NDE5NCwieSI6MC4yNjA2Mzg4MzMwNDU5NTk1LCJ4MiI6MC42OTA3NDQ0MDAwMjQ0MTQxLCJ4IjowLjI5NzgxMDA3NzY2NzIzNjMzfQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.7578&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Skirts","gender":"female","b0":[0.3360975980758667, 0.3655535876750946],"b1":[0.7115286588668823, 0.6397957801818848],
+             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC42NDk5OTM1OTg0NjExNTExLCJ5IjowLjM1NTM1NTc5OTE5ODE1MDYzLCJ4MiI6MC43MjU0ODkxOTkxNjE1Mjk1LCJ4IjowLjMyMjEzNzA1Nzc4MTIxOTV9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.8272&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
         ]
         return (imageURL, segments)
-    }
-    
-    func tupleForRatio15000() -> (String, [[String : Any]]) {
-        let rawGraphicTuple = self.tupleForRawGraphic()
-        var segments = rawGraphicTuple.1
-        segments[0]["b0"] = [0.44328701, 0.55790961]                   // skirt
-        segments[0]["b1"] = [0.58159721, 0.67620057]
-        segments[1]["b0"] = [0.45023148148148145, 0.54166666666666663] // jacket
-        segments[1]["b1"] = [0.54861111111111116, 0.61979166666666663]
-        segments[2]["b0"] = [0.43981481481481477, 0.61545138888888884] // bag
-        segments[2]["b1"] = [0.48495370370370366, 0.65364583333333337]
-        segments[3]["b0"] = [0.46296296296296291, 0.67664930555555547] // heeled shoe
-        segments[3]["b1"] = [0.49537037037037035, 0.70616319444444431]
-        segments[4]["b0"] = [0.50231481481481477, 0.67230902777777768] // flat shoe
-        segments[4]["b1"] = [0.53356481481481477, 0.70182291666666663]
-        return (rawGraphicTuple.0, segments)
-    }
-    
-    func tupleForRatio17750() -> (String, [[String : Any]]) {
-        let rawGraphicTuple = self.tupleForRawGraphic()
-        var segments = rawGraphicTuple.1
-        segments[0]["b0"] = [0.44328701, 0.55790961] // skirt
-        segments[0]["b1"] = [0.58159721, 0.67620057]
-        segments[1]["b0"] = [0.4380787, 0.51624292]  // jacket
-        segments[1]["b1"] = [0.55497682, 0.58615816]
-        segments[2]["b0"] = [0.41550925925925924, 0.59110169491525422] // bag
-        segments[2]["b1"] = [0.46875, 0.67549435028248583]
-        segments[3]["b0"] = [0.45081018518518512, 0.66419491525423724] // heeled shoe
-        segments[3]["b1"] = [0.49016203703703698, 0.72387005649717506]
-        segments[4]["b0"] = [0.50289351851851849, 0.67161016949152541] // flat shoe
-        segments[4]["b1"] = [0.55034722222222221, 0.72598870056497167]
-        return (rawGraphicTuple.0, segments)
-    }
-    
-    func tupleForRatio17777() -> (String, [[String : Any]]) {
-        let rawGraphicTuple = self.tupleForRawGraphic()
-        var segments = rawGraphicTuple.1
-        segments[0]["b0"] = [0.45157109968941067, 0.5366802879937731]  // skirt
-        segments[0]["b1"] = [0.58665370415977025, 0.6534345203346954]
-        segments[1]["b0"] = [0.44677137870855144, 0.49513888623979357] // jacket
-        segments[1]["b1"] = [0.55206514528284523, 0.56215277777777772]
-        segments[2]["b0"] = [0.40945902170391962, 0.58124148073213111] // bag
-        segments[2]["b1"] = [0.47942986718496916, 0.63183498438241115]
-        segments[3]["b0"] = [0.43602202291584408, 0.64915352587710096] // heeled shoe
-        segments[3]["b1"] = [0.49206349206349204, 0.69157423326351641]
-        segments[4]["b0"] = [0.5046971169420148, 0.65207238762405129]  // flat shoe
-        segments[4]["b1"] = [0.5468091949275059, 0.68748783216237042]
-        return (rawGraphicTuple.0, segments)
-    }
-    
-    func tupleForRatio17786() -> (String, [[String : Any]]) {
-        let rawGraphicTuple = self.tupleForRawGraphic()
-        var segments = rawGraphicTuple.1
-        segments[0]["b0"] = [0.44412050534499509, 0.53736135434909515] // skirt
-        segments[0]["b1"] = [0.58551992225461613, 0.65148861646234679]
-        segments[1]["b0"] = [0.43828960155490765, 0.49357851722124924] // jacket
-        segments[1]["b1"] = [0.55733722060252666, 0.5642148277875072]
-        segments[2]["b0"] = [0.4139941690962099, 0.58990075890251015]  // bag
-        segments[2]["b1"] = [0.46064139941690962, 0.62930531231757147]
-        segments[3]["b0"] = [0.44946550048590861, 0.66053706946876822] // heeled shoe
-        segments[3]["b1"] = [0.48250728862973763, 0.69118505545826026]
-        segments[4]["b0"] = [0.50874635568513116, 0.65703444249854048] // flat shoe
-        segments[4]["b1"] = [0.53838678328474243, 0.68563922942206657]
-        return (rawGraphicTuple.0, segments)
-    }
-    
-    func tupleForRatio21653() -> (String, [[String : Any]]) {
-        let rawGraphicTuple = self.tupleForRawGraphic()
-        var segments = rawGraphicTuple.1
-        segments[0]["b0"] = [0.44962746014979649, 0.53225261735900031] // skirt
-        segments[0]["b1"] = [0.58956915111189556, 0.63492062976737951]
-        segments[1]["b0"] = [0.43861353571143857, 0.49240121322884345] // jacket
-        segments[1]["b1"] = [0.56073858114674435, 0.55673758607585455]
-        segments[2]["b0"] = [0.41690962099125367, 0.57598783936866105] // bag
-        segments[2]["b1"] = [0.46161321671525746, 0.60840931859865088]
-        segments[3]["b0"] = [0.45124716058996139, 0.6377912841508292]  // heeled shoe
-        segments[3]["b1"] = [0.48720440062883408, 0.6656534928641018]
-        segments[4]["b0"] = [0.51182376724406276, 0.63542721538034808] // flat shoe
-        segments[4]["b1"] = [0.54065435203796919, 0.66024991041580916]
-        return (rawGraphicTuple.0, segments)
-    }
-    
-    func tupleByAspectRatio() -> (String, [[String : Any]]) {
-        let nativeSize = UIScreen.main.nativeBounds.size
-        let deviceAspectRatio = nativeSize.height / nativeSize.width
-        let aspectRatio5Digit = Int(deviceAspectRatio * 10000)
-        print("nativeSize:\(nativeSize)  aspectRatio5Digit:\(aspectRatio5Digit)  deviceAspectRatio:\(deviceAspectRatio)")
-        switch aspectRatio5Digit {
-        case 15000: // iPad, iPad Air, iPad Pro 9.7", iPad Pro 10.5"
-            return self.tupleForRatio15000()
-        case 17750: // iPhone 5C,5,5S
-            return self.tupleForRatio17750()
-        case 17777: // iPhone 6+,6S+,7+
-            return self.tupleForRatio17777()
-        case 17786: // iPhone 6,6S,7,8; iPad Pro 12.9"
-            return self.tupleForRatio17786()
-        case 21653: // iPhone X
-            return self.tupleForRatio21653()
-        default:
-            return self.tupleForRatio17750()
-        }
     }
     
     func currencyParam() -> String {
@@ -916,7 +815,7 @@ class AssetSyncModel: NSObject {
             let _ = self.tupleByAspectRatio() // Just want print of aspectRatio.
             self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
 #else
-            let tuple = self.tupleByAspectRatio()
+            let tuple = self.tupleForRawGraphic()
             self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
 #endif
             self.endSync()
