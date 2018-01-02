@@ -51,27 +51,8 @@ public class TutorialTrySlideView : HelperView {
     // MARK: Screenshot handling
     
     @objc func applicationUserDidTakeScreenshot() {
-        guard let window = window else {
-            return
-        }
-        
-        let scale = UIScreen.main.scale
-        var snapshotImage:UIImage? = nil
-        var rect = CGRect.zero
-        rect.size.width = window.bounds.size.width * scale
-        rect.size.height = window.bounds.size.height * scale
-        
-        UIGraphicsBeginImageContext(rect.size)
-        window.drawHierarchy(in: rect, afterScreenUpdates: false)
-        snapshotImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        guard let image = snapshotImage else {
-            return
-        }
-    
         PermissionsManager.shared.requestPermission(for: .photo) { granted in
-            AssetSyncModel.sharedInstance.syncTutorialPhoto(image: image)
+            AssetSyncModel.sharedInstance.syncTutorialPhoto(image: type(of: self).rawGraphic!)
             self.delegate?.tutorialTrySlideViewDidComplete(self)
         }
     }
@@ -90,5 +71,5 @@ extension TutorialTrySlideView : TutorialSlideView {
 // MARK: - Parse Image Helper
 
 extension TutorialTrySlideView {
-    static let rawGraphic = UIImage(named: "TutorialTryRawGraphic")
+    static let rawGraphic = UIImage(named: "TutorialScreenshot")
 }
