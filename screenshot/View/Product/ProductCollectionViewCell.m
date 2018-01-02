@@ -13,7 +13,7 @@
 
 @interface ProductCollectionViewCell ()
 
-@property (nonatomic, strong) ProductView *productView;
+@property (nonatomic, strong) EmbossedView *productView;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *priceLabel;
 @property (nonatomic, strong) UILabel *originalPriceLabel;
@@ -31,8 +31,9 @@
         _productView = ({
             CGRect pathRect = CGRectMake(0.f, 0.f, self.bounds.size.width, self.bounds.size.width);
             
-            ProductView *productView = [[ProductView alloc] init];
+            EmbossedView *productView = [[EmbossedView alloc] init];
             productView.translatesAutoresizingMaskIntoConstraints = NO;
+            productView.placeholderImage = [UIImage imageNamed:@"DefaultProduct"];
             productView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:[_Shadow pathRect:pathRect] cornerRadius:[Geometry defaultCornerRadius]].CGPath;
             [self.contentView addSubview:productView];
             [productView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
@@ -232,7 +233,7 @@
     if (_imageUrl != imageUrl) {
         _imageUrl = imageUrl;
         
-        self.productView.imageURL = imageUrl;
+        [self.productView setImageWithURLString:imageUrl];
     }
 }
 

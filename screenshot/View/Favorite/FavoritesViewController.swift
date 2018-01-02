@@ -64,6 +64,7 @@ class FavoritesViewController : BaseViewController {
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
+        helperView.backgroundColor = view.backgroundColor
         helperView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
         helperView.titleLabel.text = "favorites.empty.title".localized
         helperView.subtitleLabel.text = "favorites.empty.detail".localized
@@ -83,7 +84,14 @@ class FavoritesViewController : BaseViewController {
             syncScreenshotAssetIds()
         }
         
-        updateScreenshotsProductsIfNeeded()
+        updateScreenshotsFavoritesIfNeeded()
+        syncHelperViewVisibility()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Resync since it's possible for a race condition to occur.
         syncHelperViewVisibility()
     }
     
@@ -125,7 +133,7 @@ class FavoritesViewController : BaseViewController {
     
     // MARK: Products
     
-    fileprivate var screenshotsProducts: [String : [Product]] = [:]
+    fileprivate var screenshotsFavorites: [String : ScreenshotFavorites] = [:]
     fileprivate var reloadProductsSet: Set<String> = Set()
     fileprivate var removeProductsSet: Set<String> = Set()
     
@@ -136,44 +144,44 @@ class FavoritesViewController : BaseViewController {
         
         reloadProductsSet.insert(assetId)
         
-        if indexPath.row == 0 {
+        updateScreenshotsFavoritesIfNeeded()
+        
+        if tableView.numberOfRows(inSection: 0) > 0 && indexPath.row == 0 {
             tableView.scrollToRow(at: indexPath, at: .top, animated: false)
         }
-        
-        updateScreenshotsProductsIfNeeded()
     }
     
     fileprivate func updateRemoveProductsSet(at indexPath: IndexPath) {
         removeProductsSet.insert(screenshotAssetIds[indexPath.row])
         
-        updateScreenshotsProductsIfNeeded()
+        updateScreenshotsFavoritesIfNeeded()
     }
     
-    fileprivate func insertUniqueScreenshotProducts(withScreenshot screenshot: Screenshot) {
-        if let assetId = screenshot.assetId, screenshotsProducts[assetId] == nil {
-            screenshotsProducts[assetId] = screenshot.favoritedProducts
+    fileprivate func insertUniqueScreenshotFavorites(withScreenshot screenshot: Screenshot) {
+        if let assetId = screenshot.assetId, screenshotsFavorites[assetId] == nil {
+            screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
         }
     }
     
-    fileprivate func updateScreenshotsProducts(withAssetIds assetIds: [String]) {
+    fileprivate func updateScreenshotsFavorites(withAssetIds assetIds: [String]) {
         assetIds.forEach { assetId in
-            if screenshotsProducts[assetId] != nil, let screenshot = self.screenshot(withAssetId: assetId) {
-                screenshotsProducts[assetId] = screenshot.favoritedProducts
+            if screenshotsFavorites[assetId] != nil, let screenshot = self.screenshot(withAssetId: assetId) {
+                screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
             }
         }
     }
     
-    fileprivate func removeScreenshotsProducts(withAssetIds assetIds: [String]) {
+    fileprivate func removeScreenshotsFavorites(withAssetIds assetIds: [String]) {
         assetIds.forEach { assetId in
-            screenshotsProducts.removeValue(forKey: assetId)
+            screenshotsFavorites.removeValue(forKey: assetId)
         }
     }
     
-    fileprivate func removeAllScreenshotsProducts() {
-        screenshotsProducts.removeAll()
+    fileprivate func removeAllScreenshotsFavorites() {
+        screenshotsFavorites.removeAll()
     }
     
-    fileprivate func updateScreenshotsProductsIfNeeded() {
+    fileprivate func updateScreenshotsFavoritesIfNeeded() {
         guard isViewWillAppear else {
             return
         }
@@ -181,13 +189,13 @@ class FavoritesViewController : BaseViewController {
         var didChangeData = false
         
         if reloadProductsSet.count > 0 {
-            updateScreenshotsProducts(withAssetIds: Array(reloadProductsSet))
+            updateScreenshotsFavorites(withAssetIds: Array(reloadProductsSet))
             reloadProductsSet.removeAll()
             didChangeData = true
         }
         
         if removeProductsSet.count > 0 {
-            removeScreenshotsProducts(withAssetIds: Array(removeProductsSet))
+            removeScreenshotsFavorites(withAssetIds: Array(removeProductsSet))
             removeProductsSet.removeAll()
             didChangeData = true
         }
@@ -198,12 +206,20 @@ class FavoritesViewController : BaseViewController {
         }
     }
     
-    func products(for screenshot: Screenshot) -> [Product] {
-        if let assetId = screenshot.assetId {
-            return screenshotsProducts[assetId] ?? []
+    fileprivate func screenshotFavoritesForScreenshot(_ screenshot: Screenshot) -> ScreenshotFavorites {
+        let favoritedProducts = screenshot.favoritedProducts
+        let products = FavoritesTableViewCell.maxProducts(favoritedProducts)
+        let favoritedEachShoppable = screenshot.shoppablesCount == screenshot.favoritedShoppablesCount
+        
+        return ScreenshotFavorites(count: favoritedProducts.count, products: products, favoritedEachShoppable: favoritedEachShoppable)
+    }
+    
+    fileprivate func cachedScreenshotFavoritesForScreenshot(_ screenshot: Screenshot) -> ScreenshotFavorites {
+        if let assetId = screenshot.assetId, let screenshotsProduct = screenshotsFavorites[assetId] {
+            return screenshotsProduct
             
         } else {
-            return screenshot.favoritedProducts
+            return screenshotFavoritesForScreenshot(screenshot)
         }
     }
     
@@ -229,11 +245,11 @@ extension FavoritesViewController : UITableViewDataSource {
             return UITableViewCell()
         }
         
-        insertUniqueScreenshotProducts(withScreenshot: screenshot)
-        let products = self.products(for: screenshot)
+        insertUniqueScreenshotFavorites(withScreenshot: screenshot)
+        let screenshotFavorites = cachedScreenshotFavoritesForScreenshot(screenshot)
         let identifier: String
         
-        switch products.count {
+        switch screenshotFavorites.count {
         case 1:
             identifier = "cell1"
         case 2:
@@ -247,10 +263,17 @@ extension FavoritesViewController : UITableViewDataSource {
         if let cell = cell as? FavoritesTableViewCell {
             cell.backgroundColor = view.backgroundColor
             cell.imageData = screenshot.imageData
-            cell.textLabel?.text = "\(products.count) Favorited Items" // TODO: localize
-            cell.products = products
+            cell.setProducts(screenshotFavorites.products)
+            cell.hasGoldHeart = screenshotFavorites.favoritedEachShoppable
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .none
+            
+            if screenshotFavorites.count == 1 {
+                cell.textLabel?.text = "favorites.screenshot.title.single".localized(withFormat: screenshotFavorites.count)
+                
+            } else {
+                cell.textLabel?.text = "favorites.screenshot.title.plural".localized(withFormat: screenshotFavorites.count)
+            }
         }
         
         return cell
@@ -283,7 +306,13 @@ extension FavoritesViewController : FrcDelegateProtocol {
     }
     
     func frcReloadData(_ frc: NSFetchedResultsController<NSFetchRequestResult>) {
-        removeAllScreenshotsProducts()
+        removeAllScreenshotsFavorites()
         syncScreenshotAssetIds()
     }
+}
+
+fileprivate struct ScreenshotFavorites {
+    var count: Int
+    var products: [Product]
+    var favoritedEachShoppable: Bool
 }
