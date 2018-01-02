@@ -54,7 +54,8 @@ class IntercomHelper : NSObject {
         if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
             registerUser(withID: id,
                          email: UserDefaults.standard.string(forKey: UserDefaultsKeys.email),
-                         name: UserDefaults.standard.string(forKey: UserDefaultsKeys.name))
+                         name: UserDefaults.standard.string(forKey: UserDefaultsKeys.name),
+                         channel: UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel))
         } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             // Backwards compatible w/version < 1.2
             Intercom.registerUser(withEmail: email)
@@ -72,7 +73,7 @@ class IntercomHelper : NSObject {
         track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
-    func registerUser(withID id:String, email: String? = nil, name: String? = nil) {
+    func registerUser(withID id:String, email: String? = nil, name: String? = nil, channel: String?) {
         updateIntercomDeviceToken()
         
         if let email = email {
@@ -91,6 +92,13 @@ class IntercomHelper : NSObject {
             if let name = name {
                 attrs.name = name
             }
+            
+            var customAttrs = attrs.customAttributes ?? [:]
+            if let referringChannel = channel {
+                customAttrs["referringChannel"] = referringChannel
+            }
+            
+            attrs.customAttributes = customAttrs
         }
     }
     

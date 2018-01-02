@@ -46,7 +46,7 @@ class ScreenshotPickerNavigationController: UINavigationController {
         }
         
         let title = screenshotPickerViewController.selectedSegmentTitle()
-        track("Imported Photos", properties: ["Section":title, "Count":assets.count])
+        AnalyticsTrackers.standard.track("Imported Photos", properties: ["Section":title, "Count":assets.count])
     }
 }
 
@@ -204,7 +204,7 @@ class ScreenshotPickerViewController: BaseViewController {
     
     @objc private func segmentsChanged() {
         prepareSegmentReload()
-        track("Tapped \(selectedSegmentTitle()) Picker List")
+        AnalyticsTrackers.standard.track("Tapped \(selectedSegmentTitle()) Picker List")
     }
     
     fileprivate func setSegmentsIndex(_ index: Int) {
@@ -278,14 +278,14 @@ extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINav
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
             
-            track("Created Photo")
+            AnalyticsTrackers.standard.track("Created Photo")
         }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.presentingViewController?.dismiss(animated: true, completion: nil)
         
-        track("Canceled Photo Creation")
+        AnalyticsTrackers.standard.track("Canceled Photo Creation")
     }
     
     func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {

@@ -108,7 +108,10 @@
     productsViewController.screenshot = screenshot;
     [self pushViewController:productsViewController animated:YES];
     
-    [screenshot setViewed];
+    if (screenshot.isNew) {
+        [screenshot setViewed];
+    }
+    
     [[RatingFlow sharedInstance] recordSignificantEvent];
 }
 

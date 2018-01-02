@@ -89,6 +89,8 @@
 
 #pragma mark - Layout
 
+// TOOD: when converting to swift use CGSize extension aspectFitRectInSize
+
 - (CGRect)aspectFitRectForImageSized:(CGSize)imageSize inViewSized:(CGSize)viewSize {
     CGFloat imageScale = MIN(viewSize.width / imageSize.width, viewSize.height / imageSize.height);
     CGSize scaledImageSize = CGSizeMake(imageSize.width * imageScale, imageSize.height * imageScale);
