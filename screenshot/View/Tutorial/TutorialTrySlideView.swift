@@ -90,5 +90,5 @@ extension TutorialTrySlideView : TutorialSlideView {
 // MARK: - Parse Image Helper
 
 extension TutorialTrySlideView {
-    static let rawGraphic = UIImage(named: "TutorialTryRawGraphic")
+    static let rawGraphic = UIImage(named: "TutorialScreenshot")
 }
