@@ -166,9 +166,7 @@ public class TutorialEmailSlideView : HelperView {
         UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
         UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
         
-        let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel)
-        
-        let user = AnalyticsUser(name: name, email: email, channel: channel)
+        let user = AnalyticsUser(name: name, email: email)
         AnalyticsTrackers.standard.identify(user)
         AnalyticsTrackers.branch.identify(user)
         

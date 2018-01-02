@@ -51,11 +51,8 @@ class IntercomHelper : NSObject {
         #endif
 
         // Register the user if we're already logged in.
-        if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            registerUser(withID: id,
-                         email: UserDefaults.standard.string(forKey: UserDefaultsKeys.email),
-                         name: UserDefaults.standard.string(forKey: UserDefaultsKeys.name),
-                         channel: UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel))
+        if let user = AnalyticsUser.current {
+            register(user: user)
         } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             // Backwards compatible w/version < 1.2
             Intercom.registerUser(withEmail: email)
@@ -73,20 +70,31 @@ class IntercomHelper : NSObject {
         track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
-    func registerUser(withID id:String, email: String? = nil, name: String? = nil, channel: String?) {
+    func register(user: AnalyticsUser) {
         updateIntercomDeviceToken()
         
-        Intercom.registerUser(withUserId: id)
+        if let email = user.email {
+            Intercom.registerUser(withUserId: user.identifier, email: email)
+        } else {
+            Intercom.registerUser(withUserId: user.identifier)
+        }
+        
         performUserUpdate { attrs in
-            attrs.userId = id
-            attrs.email = email
-            attrs.name = name
+            attrs.userId = user.identifier
             
-            if let referringChannel = channel {
-                var customAttrs = attrs.customAttributes ?? [:]
-                customAttrs["referringChannel"] = referringChannel
-                attrs.customAttributes = customAttrs
+            if let email = user.email {
+                attrs.email = email
             }
+            
+            if let name = user.name {
+                attrs.name = name
+            }
+            
+            var customAttrs = attrs.customAttributes ?? [:]
+            user.analyticsProperties.forEach { key, value in
+                customAttrs[key] = value
+            }
+            attrs.customAttributes = customAttrs
         }
     }
     
