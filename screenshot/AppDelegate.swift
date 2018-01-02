@@ -54,6 +54,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        //        setupLogging()
+        setupThirdPartyLibraries(application, launchOptions: launchOptions)
+        
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
+            // Identify as an anonymous user if we haven't signed up yet.
+            AnalyticsTrackers.standard.identifyAnonymousUser()
+        }
+        
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
 
