@@ -76,17 +76,29 @@ class IntercomHelper : NSObject {
     func registerUser(withID id:String, email: String? = nil, name: String? = nil, channel: String?) {
         updateIntercomDeviceToken()
         
-        Intercom.registerUser(withUserId: id)
+        if let email = email {
+            Intercom.registerUser(withEmail: email)
+        } else {
+            Intercom.registerUser(withUserId: id)
+        }
+        
         performUserUpdate { attrs in
             attrs.userId = id
-            attrs.email = email
-            attrs.name = name
             
-            if let referringChannel = channel {
-                var customAttrs = attrs.customAttributes ?? [:]
-                customAttrs["referringChannel"] = referringChannel
-                attrs.customAttributes = customAttrs
+            if let email = email {
+                attrs.email = email
             }
+            
+            if let name = name {
+                attrs.name = name
+            }
+            
+            var customAttrs = attrs.customAttributes ?? [:]
+            if let referringChannel = channel {
+                customAttrs["referringChannel"] = referringChannel
+            }
+            
+            attrs.customAttributes = customAttrs
         }
     }
     
