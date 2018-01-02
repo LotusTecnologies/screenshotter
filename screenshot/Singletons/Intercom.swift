@@ -73,10 +73,10 @@ class IntercomHelper : NSObject {
     func register(user: AnalyticsUser) {
         updateIntercomDeviceToken()
         
-        if let email = user.email {
-            Intercom.registerUser(withUserId: user.identifier, email: email)
+        if let email = email {
+            Intercom.registerUser(withEmail: email)
         } else {
-            Intercom.registerUser(withUserId: user.identifier)
+            Intercom.registerUser(withUserId: id)
         }
         
         performUserUpdate { attrs in
