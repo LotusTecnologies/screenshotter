@@ -748,7 +748,7 @@ extension SettingsViewController : UITextFieldDelegate {
     fileprivate func reidentify() {
         let name = nameTextField?.text?.trimmingCharacters(in: .whitespaces)
         let email = emailTextField?.text?.trimmingCharacters(in: .whitespaces)
-        let user = AnalyticsUser(name: name, email: email, channel: UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel))
+        let user = AnalyticsUser(name: name, email: email)
         
         AnalyticsTrackers.standard.identify(user)
         AnalyticsTrackers.branch.identify(user)
