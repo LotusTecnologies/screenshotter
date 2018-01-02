@@ -50,6 +50,12 @@ public class AnalyticsUser : NSObject {
         if let channel = referringChannel {
             props["referringChannel"] = channel
         }
+
+        props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
+        
+        if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
+            props["pushToken"] = token.description
+        }
         
         return props
     }
