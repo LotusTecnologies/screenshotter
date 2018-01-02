@@ -14,6 +14,7 @@ class FavoritesTableViewCell : UITableViewCell {
     private var screenshotImageViewWidthConstraint: NSLayoutConstraint!
     private var screenshotImageViewHeightConstraint: NSLayoutConstraint!
     fileprivate let shoppableContainerView = UIView()
+    fileprivate let heartView = FavoriteBadgeView()
     
     var imageData: NSData? {
         didSet {
@@ -36,6 +37,11 @@ class FavoritesTableViewCell : UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        var layoutMargins = contentView.layoutMargins
+        layoutMargins.top += 4
+        layoutMargins.bottom += 4
+        contentView.layoutMargins = layoutMargins
         
         screenshotContainerView.translatesAutoresizingMaskIntoConstraints = false
         screenshotContainerView.notifySizeChange = { size in
@@ -61,6 +67,11 @@ class FavoritesTableViewCell : UITableViewCell {
         screenshotImageViewHeightConstraint = screenshotView.heightAnchor.constraint(equalToConstant: 0)
         screenshotImageViewHeightConstraint.isActive = true
         
+        heartView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(heartView)
+        heartView.centerXAnchor.constraint(equalTo: screenshotContainerView.leadingAnchor).isActive = true
+        heartView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
+        
         let centerView = UIView()
         centerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(centerView)
@@ -85,6 +96,12 @@ class FavoritesTableViewCell : UITableViewCell {
         shoppableContainerView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
         shoppableContainerView.bottomAnchor.constraint(equalTo: centerView.bottomAnchor).isActive = true
         shoppableContainerView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
+    }
+    
+    override var backgroundColor: UIColor? {
+        didSet {
+            heartView.backgroundColor = backgroundColor
+        }
     }
     
     // MARK: Screenshot
@@ -187,6 +204,14 @@ class FavoritesTableViewCell : UITableViewCell {
             if let productView = shoppableContainerView.subviews[i] as? EmbossedView {
                 productView.setImage(withURLString: product.imageURL)
             }
+        }
+    }
+    
+    // MARK: Heart
+    
+    var hasGoldHeart: Bool = false {
+        didSet {
+            heartView.tintColor = hasGoldHeart ? .clear : .crazeRed
         }
     }
 }
