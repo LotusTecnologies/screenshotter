@@ -25,12 +25,10 @@ public class AnalyticsUser : NSObject {
     let identifier: String
     let name: String?
     let email: String?
-    let referringChannel: String?
     
-    init(name: String?, email: String?, channel: String?) {
+    init(name: String?, email: String?) {
         self.name = name
         self.email = (email?.count ?? 0 > 0) ? email : nil
-        self.referringChannel = channel
         
         let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID)
         identifier = persistedID ?? UUID().uuidString
@@ -47,7 +45,7 @@ public class AnalyticsUser : NSObject {
             props["name"] = name
         }
         
-        if let channel = referringChannel {
+        if let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel) {
             props["referringChannel"] = channel
         }
 
@@ -151,7 +149,7 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     }
     
     func identify(_ user: AnalyticsUser) {
-        IntercomHelper.sharedInstance.registerUser(withID: user.identifier, email: user.email, name: user.name, channel: user.referringChannel)
+        IntercomHelper.sharedInstance.register(user: user)
     }
 }
 
@@ -182,8 +180,8 @@ public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracke
     tracker.track(name, properties: properties)
 }
 
-public func identify(_ name: String? = nil, email: String? = nil, channel: String?, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
-    let user = AnalyticsUser(name: name, email: email, channel: channel)
+public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
+    let user = AnalyticsUser(name: name, email: email)
     tracker.identify(user)
     return user
 }

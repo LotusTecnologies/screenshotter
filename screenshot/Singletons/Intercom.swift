@@ -51,11 +51,8 @@ class IntercomHelper : NSObject {
         #endif
 
         // Register the user if we're already logged in.
-        if let id = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            registerUser(withID: id,
-                         email: UserDefaults.standard.string(forKey: UserDefaultsKeys.email),
-                         name: UserDefaults.standard.string(forKey: UserDefaultsKeys.name),
-                         channel: UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel))
+        if let user = AnalyticsUser.current {
+            register(user: user)
         } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             // Backwards compatible w/version < 1.2
             Intercom.registerUser(withEmail: email)
@@ -73,7 +70,7 @@ class IntercomHelper : NSObject {
         track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
-    func registerUser(withID id:String, email: String? = nil, name: String? = nil, channel: String?) {
+    func register(user: AnalyticsUser) {
         updateIntercomDeviceToken()
         
         if let email = email {
@@ -83,21 +80,20 @@ class IntercomHelper : NSObject {
         }
         
         performUserUpdate { attrs in
-            attrs.userId = id
+            attrs.userId = user.identifier
             
-            if let email = email {
+            if let email = user.email {
                 attrs.email = email
             }
             
-            if let name = name {
+            if let name = user.name {
                 attrs.name = name
             }
             
             var customAttrs = attrs.customAttributes ?? [:]
-            if let referringChannel = channel {
-                customAttrs["referringChannel"] = referringChannel
+            user.analyticsProperties.forEach { key, value in
+                customAttrs[key] = value
             }
-            
             attrs.customAttributes = customAttrs
         }
     }
