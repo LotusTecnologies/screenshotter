@@ -13,7 +13,7 @@ class UserDefaultsKeys : NSObject {
     static let email = "Email"
     static let name = "Name"
     static let userID = "UserID"
-    static let ambasssadorUsername = "AmbasssadorUsername"
+    static let referralChannel = "ReferralChannel"
     
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
@@ -41,6 +41,9 @@ class UserDefaultsKeys : NSObject {
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
     static let persistentVersion = "PersistentVersion"
     static let dailyStreak = "dailyStreak"
+    
+    // DB
+    static let lastDbVersionMigrated = "LastDbVersionMigrated"
     
     // Clarifai
     static let isModelDownloaded = "IsModelDownloaded"

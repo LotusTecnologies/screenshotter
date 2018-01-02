@@ -156,10 +156,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Layout
 
-- (CGFloat)screenshotRatio {
-    return 16.f / 9.f;
-}
-
 - (void)insertScreenshotHelperView {
     BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
     
@@ -178,7 +174,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [contentView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:layout.minimumLineSpacing].active = YES;
         [contentView.trailingAnchor constraintEqualToAnchor:backgroundView.trailingAnchor constant:-layout.minimumInteritemSpacing].active = YES;
         [contentView.widthAnchor constraintEqualToAnchor:backgroundView.widthAnchor multiplier:.5f constant:-layout.minimumInteritemSpacing * 1.5f].active = YES;
-        [contentView.heightAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:[self screenshotRatio]].active = YES;
+        [contentView.heightAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:[Screenshot ratio].height].active = YES;
         
         UILabel *titleLabel = [[UILabel alloc] init];
         titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -289,7 +285,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         NSInteger columns = [self numberOfCollectionViewImageColumns];
         
         size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
-        size.height = ceil(size.width * [self screenshotRatio]);
+        size.height = ceil(size.width * [Screenshot ratio].height);
     }
     
     return size;

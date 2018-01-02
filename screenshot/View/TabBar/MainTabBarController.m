@@ -14,7 +14,7 @@
     BOOL _isObservingSettingsBadgeFont;
 }
 
-@property (nonatomic, strong) UINavigationController *favoritesNavigationController;
+@property (nonatomic, strong) FavoritesNavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) UINavigationController *discoverNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
@@ -45,11 +45,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         _favoritesNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarHeart"];
             
-            FavoritesViewController *viewController = [[FavoritesViewController alloc] init];
-            
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-            navigationController.title = viewController.title;
-            navigationController.view.backgroundColor = [UIColor background];
+            FavoritesNavigationController *navigationController = [[FavoritesNavigationController alloc] init];
+            navigationController.title = navigationController.favoritesViewController.title;
             navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:1];
             navigationController;
         });
