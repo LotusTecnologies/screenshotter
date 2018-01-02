@@ -56,6 +56,8 @@ class IntercomHelper : NSObject {
         } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             // Backwards compatible w/version < 1.2
             Intercom.registerUser(withEmail: email)
+        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
+            registerAnonymousUser()
         }
         
         if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
