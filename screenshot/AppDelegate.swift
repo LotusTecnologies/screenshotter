@@ -247,7 +247,10 @@ extension AppDelegate {
         
         IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
         
-        FirebaseApp.configure()
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
+        
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
     }
     
