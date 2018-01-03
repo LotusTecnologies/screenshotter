@@ -87,10 +87,11 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
-            }.then (on: processingQ) { image -> Promise<(Bool, UIImage)> in
+            }.then (on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
                 track("sent image to Clarifai")
-                return ClarifaiModel.sharedInstance.isFashion(image: image)
-            }.then(on: processingQ) { isFashion, image -> Promise<(Bool, Data?)> in
+                return ClarifaiModel.sharedInstance.classify(image: image)
+            }.then(on: processingQ) { classification, image -> Promise<(Bool, Data?)> in
+                let isFashion: Bool = (classification != ClarifaiModel.ImageClassification.unrecognized)
                 track("received response from Clarifai", properties: ["isFashion" : isFashion])
                 let imageData: Data? = isFashion ? self.data(for: image) : nil
                 return Promise { fulfill, reject in

@@ -12,6 +12,10 @@ import PromiseKit
 
 class ClarifaiModel: NSObject {
 
+    enum ImageClassification {
+        case human, furniture, unrecognized
+    }
+    
     public static let sharedInstance = ClarifaiModel()
     
     public static func setup() {
@@ -138,5 +142,20 @@ class ClarifaiModel: NSObject {
         }
     }
     
+    func classify(image: UIImage) -> Promise<(ImageClassification, UIImage)> {
+        return localClarifaiOutputs(image: image).then { outputs -> Promise<(ImageClassification, UIImage)> in
+            let conceptsArray = outputs.flatMap {$0.dataAsset.concepts}
+            let concepts = conceptsArray.flatMap {$0}
+            let conceptNames: [String] = concepts.flatMap {$0.name}
+            print("classify conceptsArray:\(conceptsArray)  concepts:\(concepts)  conceptNames:\(conceptNames)")
+            if conceptNames.contains("woman") || conceptNames.contains("man") {
+                return Promise(value: (.human, image))
+            } else if conceptNames.contains("furniture") {
+                return Promise(value: (.furniture, image))
+            } else {
+                return Promise(value: (.unrecognized, image))
+            }
+        }
+    }
     
 }
