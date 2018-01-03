@@ -124,9 +124,9 @@ PODS:
     - PromiseKit/CorePromise
   - Protobuf (3.5.0)
   - RateView (1.2)
-  - SDWebImage (4.2.2):
-    - SDWebImage/Core (= 4.2.2)
-  - SDWebImage/Core (4.2.2)
+  - SDWebImage (4.2.3):
+    - SDWebImage/Core (= 4.2.3)
+  - SDWebImage/Core (4.2.3)
   - Segment-Amplitude (2.0.0):
     - Amplitude-iOS (~> 4.0)
     - Analytics (~> 3.6)
@@ -192,7 +192,7 @@ SPEC CHECKSUMS:
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 89a9d32cd520bbb46eb14e541d5109b3564af198
+  SDWebImage: 791bb72962b3492327ddcac4b1880bd1b5458431
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
 PODFILE CHECKSUM: 8ad9507954bdb1ab6b2157b9e6b28f8448d849a7

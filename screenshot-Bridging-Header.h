@@ -11,5 +11,6 @@
 #import "MainTabBarController.h"
 #import "InsetPresentationController.h"
 #import "ProductCollectionViewCell.h"
+#import "ScreenshotDisplayViewController.h"
 
 #endif /* screenshot_Bridging_Header_h */
