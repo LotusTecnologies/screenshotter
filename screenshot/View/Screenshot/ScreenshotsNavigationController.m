@@ -31,6 +31,8 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.restorationIdentifier = NSStringFromClass([self class]);
+        
         _screenshotsViewController = ({
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;

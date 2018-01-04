@@ -19,7 +19,7 @@ class FavoritesViewController : BaseViewController {
     fileprivate let tableView = UITableView()
     private let helperView = HelperView()
     
-    fileprivate let favoriteFrc = DataModel.sharedInstance.favoriteFrc
+    fileprivate var favoriteFrc: NSFetchedResultsController<Screenshot>?
     
     override var title: String? {
         set {}
@@ -39,7 +39,9 @@ class FavoritesViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        DataModel.sharedInstance.favoriteFrcDelegate = self
+        restorationIdentifier = String(describing: type(of: self))
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: NSNotification.Name(NotificationCenterKeys.coreDataStackCompleted), object: nil)
         
         addNavigationItemLogo()
     }
@@ -100,9 +102,23 @@ class FavoritesViewController : BaseViewController {
         isViewWillAppear = false
     }
     
+    @objc fileprivate func coreDataStackCompleted(_ notification: Notification) {
+        guard favoriteFrc == nil else {
+            return
+        }
+        
+        DataModel.sharedInstance.favoriteFrcDelegate = self
+        favoriteFrc = DataModel.sharedInstance.favoriteFrc
+        
+        tableView.reloadData()
+        syncHelperViewVisibility()
+    }
+    
     deinit {
         tableView.delegate = nil
         tableView.dataSource = nil
+        
+        NotificationCenter.default.removeObserver(self)
         
         DataModel.sharedInstance.favoriteFrcDelegate = nil
     }
@@ -110,7 +126,7 @@ class FavoritesViewController : BaseViewController {
     // MARK: Screenshot
     
     func screenshot(at indexPath: IndexPath) -> Screenshot? {
-        guard let screenshots = favoriteFrc.fetchedObjects else {
+        guard let screenshots = favoriteFrc?.fetchedObjects else {
             return nil
         }
         
@@ -118,7 +134,7 @@ class FavoritesViewController : BaseViewController {
     }
     
     func screenshot(withAssetId assetId: String) -> Screenshot? {
-        return favoriteFrc.fetchedObjects?.first(where: { screenshot -> Bool in
+        return favoriteFrc?.fetchedObjects?.first(where: { screenshot -> Bool in
             return screenshot.assetId == assetId
         })
     }
@@ -126,7 +142,7 @@ class FavoritesViewController : BaseViewController {
     fileprivate var screenshotAssetIds: [String] = []
     
     fileprivate func syncScreenshotAssetIds() {
-        screenshotAssetIds = favoriteFrc.fetchedObjects?.map { screenshot -> String in
+        screenshotAssetIds = favoriteFrc?.fetchedObjects?.map { screenshot -> String in
             return screenshot.assetId ?? ""
         } ?? []
     }
@@ -232,7 +248,7 @@ class FavoritesViewController : BaseViewController {
 
 extension FavoritesViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return favoriteFrc.fetchedObjects?.count ?? 0
+        return favoriteFrc?.fetchedObjects?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {

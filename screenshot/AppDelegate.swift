@@ -30,6 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
+    fileprivate lazy var mainTabBarController: MainTabBarController = {
+        return MainTabBarController()
+    }()
+    
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
@@ -43,20 +47,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
         DataModel.setup() // Sets up Core Data stack on a background queue.
-        return true
-    }
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
+        
+        
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
-
+        
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
             // Identify as an anonymous user if we haven't signed up yet.
             AnalyticsTrackers.standard.identifyAnonymousUser()
         }
-
+        
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
-
+        
         prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared.fetchPushPermissionStatus()
         
@@ -70,6 +73,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
+        
+        
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -179,6 +189,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    
+    func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
+        return true
+    }
+    
+    func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
+        return true
+    }
 }
 
 extension AppDelegate {
@@ -255,10 +273,12 @@ extension AppDelegate {
         var viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+            viewController = mainTabBarController
+            
             if DataModel.sharedInstance.isCoreDataStackReady {
-                viewController = MainTabBarController()
-            } else {
-                viewController = LoadingViewController()
+//                viewController = MainTabBarController()
+//            } else {
+//                viewController = LoadingViewController()
             }
         } else {
             let tutorialViewController = TutorialViewController()
@@ -285,7 +305,10 @@ extension AppDelegate {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
                     syncPhotos()
                     
-                    self.transitionTo(self.nextViewController())
+                    let name = Notification.Name(NotificationCenterKeys.coreDataStackCompleted)
+                    NotificationCenter.default.post(name: name, object: nil, userInfo: nil)
+                    
+//                    self.transitionTo(self.nextViewController())
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {
@@ -319,7 +342,7 @@ extension AppDelegate: TutorialViewControllerDelegate {
     func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
-        self.prepareDataStackCompletionIfNeeded()
+        prepareDataStackCompletionIfNeeded()
         
         // Create a delay for a more natural feel after taking the screenshot
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

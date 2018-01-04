@@ -40,14 +40,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.restorationIdentifier = NSStringFromClass([self class]);
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(coreDataStackCompleted:) name:[NotificationCenterKeys coreDataStackCompleted] object:nil];
         
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
-        
-        [DataModel sharedInstance].screenshotFrcDelegate = self;
-        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
     }
     return self;
 }
@@ -140,6 +140,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
+        [self syncHelperViewVisibility];
+    }
+}
+
+- (void)coreDataStackCompleted:(NSNotification *)notification {
+    if (!self.screenshotFrc) {
+        [DataModel sharedInstance].screenshotFrcDelegate = self;
+        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+        
+        [self.collectionView reloadData];
         [self syncHelperViewVisibility];
     }
 }

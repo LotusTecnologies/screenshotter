@@ -31,6 +31,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.delegate = self;
+        self.restorationIdentifier = NSStringFromClass([self class]);
         
         _screenshotsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarScreenshot"];
@@ -62,7 +63,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:2];
             navigationController;
         });
-
+        
         _settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
