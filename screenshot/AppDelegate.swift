@@ -49,6 +49,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DataModel.setup() // Sets up Core Data stack on a background queue.
         
         
+        // TODO: the code below used to be in the did finish launching.
+        // it needs to be here for state restoration. verify everything works!
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
         
@@ -73,8 +75,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
-        
-        
         
         return true
     }
@@ -275,11 +275,6 @@ extension AppDelegate {
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             viewController = mainTabBarController
             
-            if DataModel.sharedInstance.isCoreDataStackReady {
-//                viewController = MainTabBarController()
-//            } else {
-//                viewController = LoadingViewController()
-            }
         } else {
             let tutorialViewController = TutorialViewController()
             tutorialViewController.delegate = self
@@ -301,14 +296,13 @@ extension AppDelegate {
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             if DataModel.sharedInstance.isCoreDataStackReady {
                 syncPhotos()
+                
             } else {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
                     syncPhotos()
                     
                     let name = Notification.Name(NotificationCenterKeys.coreDataStackCompleted)
                     NotificationCenter.default.post(name: name, object: nil, userInfo: nil)
-                    
-//                    self.transitionTo(self.nextViewController())
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {

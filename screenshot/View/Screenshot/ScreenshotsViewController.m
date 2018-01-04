@@ -23,6 +23,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
+@property (nonatomic, strong) UIView *loaderContainerView;
+
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @property (nonatomic, copy) NSString *notificationCellAssetId;
@@ -112,6 +114,18 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         helperView;
     });
+    
+    if (![DataModel sharedInstance].isCoreDataStackReady) {
+        UIView *loaderContainerView = [[UIView alloc] init];
+        loaderContainerView.translatesAutoresizingMaskIntoConstraints = NO;
+        loaderContainerView.backgroundColor = [UIColor yellowColor];
+        [self.view addSubview:loaderContainerView];
+        [loaderContainerView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+        [loaderContainerView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+        [loaderContainerView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+        [loaderContainerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+        self.loaderContainerView = loaderContainerView;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -151,6 +165,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [self.collectionView reloadData];
         [self syncHelperViewVisibility];
+        
+        [self.loaderContainerView removeFromSuperview];
+        self.loaderContainerView = nil;
     }
 }
 

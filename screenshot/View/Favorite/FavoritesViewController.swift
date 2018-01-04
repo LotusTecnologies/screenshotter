@@ -18,6 +18,7 @@ class FavoritesViewController : BaseViewController {
     
     fileprivate let tableView = UITableView()
     private let helperView = HelperView()
+    private var loaderContainerView: UIView?
     
     fileprivate var favoriteFrc: NSFetchedResultsController<Screenshot>?
     
@@ -76,6 +77,18 @@ class FavoritesViewController : BaseViewController {
         helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        if !DataModel.sharedInstance.isCoreDataStackReady {
+            let loaderContainerView = UIView()
+            loaderContainerView.translatesAutoresizingMaskIntoConstraints = false
+            loaderContainerView.backgroundColor = .yellow
+            view.addSubview(loaderContainerView)
+            loaderContainerView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            loaderContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            loaderContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            loaderContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            self.loaderContainerView = loaderContainerView
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -112,6 +125,9 @@ class FavoritesViewController : BaseViewController {
         
         tableView.reloadData()
         syncHelperViewVisibility()
+        
+        loaderContainerView?.removeFromSuperview()
+        loaderContainerView = nil
     }
     
     deinit {
