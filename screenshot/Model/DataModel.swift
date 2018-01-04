@@ -308,7 +308,8 @@ extension DataModel {
                         isFashion: Bool,
                         isFromShare: Bool,
                         isHidden: Bool,
-                        imageData: Data?) -> Screenshot {
+                        imageData: Data?,
+                        classification: String?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
         if let nsDate = createdAt as NSDate? {
@@ -322,6 +323,9 @@ extension DataModel {
             screenshotToSave.imageData = nsData
         }
         screenshotToSave.lastModified = NSDate()
+        if let classification = classification {
+            screenshotToSave.syteJson = classification // Dual-purposing syteJson field
+        }
         do {
             try managedObjectContext.save()
         } catch {
