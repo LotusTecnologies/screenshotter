@@ -54,7 +54,8 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         _discoverNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarGlobe"];
             
-            DiscoverWebViewController *viewController = [[DiscoverWebViewController alloc] init];
+//            DiscoverWebViewController *viewController = [[DiscoverWebViewController alloc] init];
+            DiscoverScreenshotViewController *viewController = [[DiscoverScreenshotViewController alloc] init];
             
             UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
             navigationController.title = viewController.title;

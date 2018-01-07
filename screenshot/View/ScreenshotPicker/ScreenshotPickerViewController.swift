@@ -101,7 +101,7 @@ class ScreenshotPickerViewController: BaseViewController {
         layout.minimumInteritemSpacing = 1
         layout.minimumLineSpacing = 1
         
-        collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
