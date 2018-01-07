@@ -110,6 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         ApplicationStateModel.sharedInstance.applicationState = .active
         FBSDKAppEvents.activateApp()
+        AnalyticsTrackers.standard.trackUserAge()
     }
     
 //    func applicationWillTerminate(_ application: UIApplication) {

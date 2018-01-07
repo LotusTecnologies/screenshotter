@@ -55,6 +55,7 @@ public class AnalyticsUser : NSObject {
             props["pushToken"] = token.description
         }
         
+        props["userAge"] = "\(userAge())"
         return props
     }
 }
@@ -224,6 +225,15 @@ fileprivate let marketingBrands = [
 ]
 
 extension AnalyticsTracker {
+    func trackUserAge() {
+        guard let current = AnalyticsUser.current else {
+            return
+        }
+        
+        track("User Age", properties: ["age": userAge()])
+        identify(current)
+    }
+    
     func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
         let favoriteEvent = favorited ? "Product favorited" : "Product unfavorited"
         
@@ -270,4 +280,18 @@ class AnalyticsTrackerObjCBridge : NSObject {
     static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String) {
         tracker.trackTappedOnProduct(product, onPage: page)
     }
+}
+
+// Returns the user's age in days.
+fileprivate func userAge() -> Int {
+    guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {
+        return 0
+    }
+    
+    let components = Set<Calendar.Component>([.day])
+    guard let ageInDays = Calendar.current.dateComponents(components, from: dateInstalled, to: Date()).day else {
+        return 0
+    }
+    
+    return ageInDays
 }
