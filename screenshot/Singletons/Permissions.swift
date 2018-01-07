@@ -43,7 +43,14 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
                 properties = ["token": token.description]
             }
             
-            AnalyticsTrackers.standard.track(name, properties: properties)
+            DispatchQueue.main.async {
+                AnalyticsTrackers.standard.track(name, properties: properties)
+                
+                // Reidentify user to update push-related user properties.
+                if let current = AnalyticsUser.current {
+                    AnalyticsTrackers.standard.identify(current)
+                }
+            }
         }
     }
     
