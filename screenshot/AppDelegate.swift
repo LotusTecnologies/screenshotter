@@ -34,6 +34,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return MainTabBarController()
     }()
     
+    fileprivate var restorationViewControllers: [String : UIViewController] = [:]
+    
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
@@ -196,6 +198,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
         return true
+    }
+    
+    func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
+        guard let identifier = identifierComponents.last as? String else {
+            return nil
+        }
+        
+        // TODO: setup classes like this and connect all interactions
+        
+        if identifier == "ScreenshotsNavigationController" {
+            let vc = ScreenshotsNavigationController()
+            restorationViewControllers[identifier] = vc
+            return vc
+            
+        } else if identifier == "ScreenshotPickerNavigationController" {
+            let sn = restorationViewControllers["ScreenshotsNavigationController"] as! ScreenshotsNavigationController
+            let vc = ScreenshotPickerNavigationController(nibName: nil, bundle: nil)
+            sn.restore(vc)
+            restorationViewControllers[identifier] = vc
+            return vc
+            
+        } else if identifier == "ScreenshotPickerViewController" {
+            let vc = restorationViewControllers["ScreenshotPickerNavigationController"] as! ScreenshotPickerNavigationController
+            return vc.screenshotPickerViewController
+        }
+        
+        return nil
     }
 }
 

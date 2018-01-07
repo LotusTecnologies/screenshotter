@@ -305,4 +305,14 @@
     }
 }
 
+
+#pragma mark - Restoration
+
+- (void)restoreScreenshotPickerNavigationController:(ScreenshotPickerNavigationController *)controller {
+    controller.cancelButton.target = self;
+    controller.cancelButton.action = @selector(pickerViewControllerDidCancel);
+    controller.doneButton.target = self;
+    controller.doneButton.action = @selector(pickerViewControllerDidFinish);
+}
+
 @end
