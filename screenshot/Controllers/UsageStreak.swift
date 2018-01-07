@@ -99,6 +99,11 @@ final class UsageStreakManager {
                 AnalyticsTrackers.standard.track("Daily Streak", properties: ["current": streak])
                 UserDefaults.standard.set(streak, forKey: UserDefaultsKeys.dailyStreak)
                 updateDateOfLastSession()
+                
+                if let current = AnalyticsUser.current {
+                    // Should never be nil, but let's still be safe
+                    AnalyticsTrackers.standard.identify(current)
+                }
             }
         } else {
             UserDefaults.standard.set(1, forKey: UserDefaultsKeys.dailyStreak)
