@@ -8,8 +8,13 @@
 
 import Foundation
 
+protocol DiscoverScreenshotCollectionViewLayoutDelegate : NSObjectProtocol {
+    func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool
+}
 
 class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
+    weak var delegate: DiscoverScreenshotCollectionViewLayoutDelegate?
+    
     private var cardCount = 2
     private var contentRect: CGRect = .zero
     private var cardFrame: CGRect = .zero
@@ -19,7 +24,7 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     private var insertedItems: [IndexPath] = []
     
     
-    open override func prepare() {
+    override func prepare() {
         guard let collectionView = collectionView else {
             return
         }
@@ -31,29 +36,36 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         insertedItems = []
     }
     
-    open override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
-        deletedItems = updateItems
-            .filter { $0.updateAction == .delete }
-            .flatMap { $0.indexPathBeforeUpdate }
-        insertedItems = updateItems
-            .filter { $0.updateAction == .insert }
-            .flatMap { $0.indexPathAfterUpdate }
+    
+    override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+        deletedItems = updateItems.filter({ collectionViewUpdateItem -> Bool in
+            return collectionViewUpdateItem.updateAction == .delete
+        }).flatMap({ collectionViewUpdateItem -> IndexPath? in
+            return collectionViewUpdateItem.indexPathBeforeUpdate
+        })
+        
+        insertedItems = updateItems.filter({ collectionViewUpdateItem -> Bool in
+            return collectionViewUpdateItem.updateAction == .insert
+        }).flatMap({ collectionViewUpdateItem -> IndexPath? in
+            return collectionViewUpdateItem.indexPathAfterUpdate
+        })
     }
     
-    open override var collectionViewContentSize: CGSize {
+    override var collectionViewContentSize: CGSize {
         return contentRect.size
     }
     
-    open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         return visibleCardAttributes
     }
     
-    open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return makeLayoutAttributesForItem(at: indexPath)
     }
     
-    open override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         let attr = makeLayoutAttributesForItem(at: itemIndexPath)
+        
         if insertedItems.contains(itemIndexPath) {
 //            if let callback = delegate?.collectionView(_:deckLayout:willInsertItem:) {
 //                callback(collectionView!, self, attr)
@@ -61,30 +73,30 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
                 attr.alpha = 0
 //            }
         }
+        
         return attr
     }
     
-    open override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        let attr = makeLayoutAttributesForItem(at: itemIndexPath)
-        if deletedItems.contains(itemIndexPath)  {
-            attr.zIndex += 1
-//            if let callback = delegate?.collectionView(_:deckLayout:willDeleteItem:) {
-//                callback(collectionView!, self, attr)
-//            } else {
-                attr.alpha = 0
-//            }
+    override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        let attributes = makeLayoutAttributesForItem(at: itemIndexPath)
+        
+        if deletedItems.contains(itemIndexPath) || itemIndexPath.item == 0 {
+            attributes.zIndex += 1
+            
+            let isAdded = delegate?.discoverScreenshotCollectionViewLayoutIsAdding(self) ?? false
+            let direction: CGFloat = isAdded ? 1 : -1
+            let rotationAngle = CGFloat(Double.pi * 0.1) * direction
+            let rotatedRect = attributes.frame.applying(CGAffineTransform(rotationAngle: rotationAngle))
+            
+            attributes.transform = CGAffineTransform(translationX: rotatedRect.size.width * direction, y: 50).rotated(by: rotationAngle)
         }
-        return attr
+        
+        return attributes
     }
     
-    open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return true
     }
-    
-//    private var delegate: DeckCollectionViewLayoutDelegate? {
-//        return collectionView?.delegate as? DeckCollectionViewLayoutDelegate
-//    }
-    
     
     private func makeVisibleCardAttributes() -> [UICollectionViewLayoutAttributes] {
         var result: [UICollectionViewLayoutAttributes] = []
@@ -119,7 +131,12 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         
         attr.frame = cardFrame
         attr.zIndex = -offset * 2
-        attr.transform = CGAffineTransform.identity // ???: needed?
+        
+        let scaleRatio = CGFloat(0.9)
+        let scale = max(0, 1 - (1 - scaleRatio) * CGFloat(offset))
+        
+        attr.transform = CGAffineTransform(scaleX: scale, y: scale)
+        
         return attr
     }
 }
@@ -127,6 +144,10 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
 
 class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
+    
+    fileprivate var isAdding = false
+    
+    // MARK: Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -151,6 +172,10 @@ class DiscoverScreenshotViewController : BaseViewController {
         addButton.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -.padding).isActive = true
         addButton.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
+            layout.delegate = self
+        }
+        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -161,21 +186,33 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(collectionViewPanGestureAction(_:)))
+        collectionView.addGestureRecognizer(panGesture)
+    }
+    
+    deinit {
+        collectionView.dataSource = nil
+        collectionView.delegate = nil
     }
     
     fileprivate var count = 10
     
     @objc private func passButtonAction() {
+        isAdding = false
+        
         collectionView.performBatchUpdates({
             self.count -= 1
             collectionView.deleteItems(at: [IndexPath(item: 0, section: 0)])
             
         }, completion: { _ in
-            
+            // TODO: disable additional button presses until completed
         })
     }
     
     @objc private func addButtonAction() {
+        isAdding = true
+        
         collectionView.performBatchUpdates({
             self.count += 1
             collectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
@@ -204,4 +241,57 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
 
 extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     
+}
+
+extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
+    func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
+        return isAdding
+    }
+}
+
+extension DiscoverScreenshotViewController : UIGestureRecognizerDelegate {
+    @objc fileprivate func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
+        guard let collectionViewLayout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout else {
+            return
+        }
+        
+        let translation = panGesture.translation(in: panGesture.view)
+//        let location = panGesture.location(in: panGesture.view)
+        
+        // TODO: add var which only does the changed if the pan location started on the cell
+        
+        switch panGesture.state {
+        case .changed:
+            isAdding = translation.x > 0
+            
+            collectionView.indexPathsForVisibleItems.forEach { indexPath in
+                if let cell = collectionView.cellForItem(at: indexPath),
+                    let attributes = collectionViewLayout.finalLayoutAttributesForDisappearingItem(at: indexPath)
+                {
+                    
+                    let minDistanceNeeded = CGFloat(150)
+                    
+                    // Only the first cell should move in the expected direction
+                    let direction = CGFloat(indexPath.item == 0 ? 0 : 1)
+                    let percent = abs(direction - min(1, abs(translation.x / 2) / collectionView.center.x))
+                    
+                    let t1 = CGAffineTransform.identity
+                    let t2 = attributes.transform
+                    
+                    var t3 = cell.transform
+                    t3.a = t1.a + (t2.a - t1.a) * percent
+                    t3.b = t1.b + (t2.b - t1.b) * percent
+                    t3.c = t1.c + (t2.c - t1.c) * percent
+                    t3.d = t1.d + (t2.d - t1.d) * percent
+                    t3.tx = t1.tx + (t2.tx - t1.tx) * percent
+                    t3.ty = t1.ty + (t2.ty - t1.ty) * percent
+                    cell.transform = t3
+                }
+            }
+            
+        default:
+            print("")
+        }
+        
+    }
 }
