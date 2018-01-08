@@ -730,6 +730,7 @@ class AssetSyncModel: NSObject {
             }
             if toUpload.count > 0 {
                 track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
+                print("GMK toUpload:\(toUpload.description)")
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
@@ -789,6 +790,7 @@ class AssetSyncModel: NSObject {
     }
     
     @objc public func syncTutorialPhoto(image: UIImage) {
+        print("syncTutorialPhoto image:\(image)")
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
             guard dataModel.isCoreDataStackReady,
@@ -796,28 +798,45 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let imageData: Data?
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-            imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
-#else
-            imageData = self.data(for: image)
-#endif
-            dataModel.performBackgroundTask { (managedObjectContext) in
-                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                 assetId: Constants.tutorialScreenshotAssetId,
-                                                 createdAt: Date(),
-                                                 isFashion: true,
-                                                 isFromShare: false,
-                                                 isHidden: false,
-                                                 imageData: imageData)
+            
+            self.processingQ.async {
+                firstly { _ -> Promise<Data?> in
+                    let imageData: Data?
+                    #if STORE_NEW_TUTORIAL_SCREENSHOT
+                        imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                    #else
+                        imageData = self.data(for: image)
+                    #endif
+                    return Promise(value: imageData)
+                    }.then(on: self.processingQ) { imageData -> Promise<Data?> in
+                        print("syncTutorialPhoto 1. dataModel.saveScreenshot assetId:\(Constants.tutorialScreenshotAssetId)")
+                        return Promise { fulfill, reject in
+                            dataModel.performBackgroundTask { (managedObjectContext) in
+                                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                 assetId: Constants.tutorialScreenshotAssetId,
+                                                                 createdAt: Date(),
+                                                                 isFashion: true,
+                                                                 isFromShare: false,
+                                                                 isHidden: false,
+                                                                 imageData: imageData)
+                                print("syncTutorialPhoto 2. dataModel.saveScreenshot finished assetId:\(Constants.tutorialScreenshotAssetId)")
+                                fulfill(imageData)
+                            }
+                        }
+                    }.then (on: self.processingQ) { imageData -> Void in
+                        #if STORE_NEW_TUTORIAL_SCREENSHOT
+                            let _ = self.tupleByAspectRatio() // Just want print of aspectRatio.
+                            self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
+                        #else
+                            let tuple = self.tupleForRawGraphic()
+                            print("syncTutorialPhoto 3. saveShoppables assetId:\(Constants.tutorialScreenshotAssetId)  uploadedURLString:\(tuple.0)  segments:\(tuple.1)")
+                            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
+                        #endif
+                    }.catch { error in
+                        print("syncTutorialPhoto outer catch error:\(error)")
+                }
             }
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-            let _ = self.tupleByAspectRatio() // Just want print of aspectRatio.
-            self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
-#else
-            let tuple = self.tupleForRawGraphic()
-            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
-#endif
+            
             self.endSync()
         }
     }
