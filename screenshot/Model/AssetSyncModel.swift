@@ -796,28 +796,42 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let imageData: Data?
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-            imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
-#else
-            imageData = self.data(for: image)
-#endif
-            dataModel.performBackgroundTask { (managedObjectContext) in
-                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                 assetId: Constants.tutorialScreenshotAssetId,
-                                                 createdAt: Date(),
-                                                 isFashion: true,
-                                                 isFromShare: false,
-                                                 isHidden: false,
-                                                 imageData: imageData)
+            
+            self.processingQ.async {
+                firstly { _ -> Promise<Data?> in
+                    let imageData: Data?
+                    #if STORE_NEW_TUTORIAL_SCREENSHOT
+                        imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                    #else
+                        imageData = self.data(for: image)
+                    #endif
+                    return Promise(value: imageData)
+                    }.then(on: self.processingQ) { imageData -> Promise<Data?> in
+                        return Promise { fulfill, reject in
+                            dataModel.performBackgroundTask { (managedObjectContext) in
+                                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                 assetId: Constants.tutorialScreenshotAssetId,
+                                                                 createdAt: Date(),
+                                                                 isFashion: true,
+                                                                 isFromShare: false,
+                                                                 isHidden: false,
+                                                                 imageData: imageData)
+                                fulfill(imageData)
+                            }
+                        }
+                    }.then (on: self.processingQ) { imageData -> Void in
+                        #if STORE_NEW_TUTORIAL_SCREENSHOT
+                            let _ = self.tupleByAspectRatio() // Just want print of aspectRatio.
+                            self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
+                        #else
+                            let tuple = self.tupleForRawGraphic()
+                            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
+                        #endif
+                    }.catch { error in
+                        print("syncTutorialPhoto outer catch error:\(error)")
+                }
             }
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-            let _ = self.tupleByAspectRatio() // Just want print of aspectRatio.
-            self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
-#else
-            let tuple = self.tupleForRawGraphic()
-            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
-#endif
+            
             self.endSync()
         }
     }
