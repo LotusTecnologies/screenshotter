@@ -730,7 +730,6 @@ class AssetSyncModel: NSObject {
             }
             if toUpload.count > 0 {
                 track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
-                print("GMK toUpload:\(toUpload.description)")
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
@@ -790,7 +789,6 @@ class AssetSyncModel: NSObject {
     }
     
     @objc public func syncTutorialPhoto(image: UIImage) {
-        print("syncTutorialPhoto image:\(image)")
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
             guard dataModel.isCoreDataStackReady,
@@ -809,7 +807,6 @@ class AssetSyncModel: NSObject {
                     #endif
                     return Promise(value: imageData)
                     }.then(on: self.processingQ) { imageData -> Promise<Data?> in
-                        print("syncTutorialPhoto 1. dataModel.saveScreenshot assetId:\(Constants.tutorialScreenshotAssetId)")
                         return Promise { fulfill, reject in
                             dataModel.performBackgroundTask { (managedObjectContext) in
                                 let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -819,7 +816,6 @@ class AssetSyncModel: NSObject {
                                                                  isFromShare: false,
                                                                  isHidden: false,
                                                                  imageData: imageData)
-                                print("syncTutorialPhoto 2. dataModel.saveScreenshot finished assetId:\(Constants.tutorialScreenshotAssetId)")
                                 fulfill(imageData)
                             }
                         }
@@ -829,7 +825,6 @@ class AssetSyncModel: NSObject {
                             self.syteProcessing(shouldProcess: true, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
                         #else
                             let tuple = self.tupleForRawGraphic()
-                            print("syncTutorialPhoto 3. saveShoppables assetId:\(Constants.tutorialScreenshotAssetId)  uploadedURLString:\(tuple.0)  segments:\(tuple.1)")
                             self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
                         #endif
                     }.catch { error in
