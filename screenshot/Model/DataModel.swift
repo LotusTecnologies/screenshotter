@@ -93,6 +93,12 @@ class DataModel: NSObject {
                 self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
             }
         }
+        if from < 8 && to >= 8 && installDate != nil {
+            dbQ.async {
+                let managedObjectContext = container.newBackgroundContext()
+                self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
+            }
+        }
     }
     
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
@@ -578,16 +584,17 @@ extension DataModel {
                 var screenshotsToUpdate = Set<Screenshot>()
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
-                    let screenshot = product.shoppable?.screenshot
-                    if let screenshot = screenshot,
-                      let screenshotFavoritedDate = screenshot.lastFavorited,
-                      let productFavoritedDate = product.dateFavorited,
-                      (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
-                        screenshotsToUpdate.insert(screenshot)
-                    }
-                    screenshot?.favoritesCount -= 1
                     product.isFavorite = false
                     product.dateFavorited = nil
+                    if let screenshot = product.screenshot {
+                        screenshot.removeFromFavorites(product)
+                        screenshot.favoritesCount -= 1
+                        if let screenshotFavoritedDate = screenshot.lastFavorited,
+                          let productFavoritedDate = product.dateFavorited,
+                          (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
+                            screenshotsToUpdate.insert(screenshot)
+                        }
+                    }
                 }
                 screenshotsToUpdate.forEach {$0.updateLastFavorited()}
                 try managedObjectContext.save()
@@ -637,6 +644,22 @@ extension DataModel {
             try managedObjectContext.save()
         } catch {
             print("initializeFavoritesCounts results with error:\(error)")
+        }
+    }
+    
+    func initializeFavoritesSets(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for product in results {
+                product.shoppable?.screenshot?.addToFavorites(product)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("initializeFavoritesSets results with error:\(error)")
         }
     }
     
@@ -782,17 +805,12 @@ extension Screenshot {
     // Typically called after unfavoriting a product, its screenshot's lastFavorited needs to be set to the most recently favorited,
     // so the favoriteFrc correctly orders the screenshots.
     func updateLastFavorited() {
-        let distantPast = Date.distantPast
-        var latest = distantPast
-        shoppables?.forEach {($0 as! Shoppable).products?.forEach({ product in
-            if let favorite = product as? Product,
-              favorite.isFavorite,
-              let nsDateFavorited = favorite.dateFavorited,
-              latest < nsDateFavorited as Date {
-                latest = nsDateFavorited as Date
-            }
-        })}
-        lastFavorited = (latest == distantPast ? nil : latest as NSDate)
+        if let favoritesArray = favorites?.allObjects as? [Product] {
+            let latest = favoritesArray.flatMap({$0.dateFavorited as Date?}).reduce(Date.distantPast, { $0 > $1 ? $0 : $1 })
+            lastFavorited = (latest == Date.distantPast ? nil : latest as NSDate)
+        } else {
+            lastFavorited = nil
+        }
     }
     
     var favoritedShoppablesCount: Int {
@@ -804,16 +822,9 @@ extension Screenshot {
     
     
     var favoritedProducts: [Product] {
-        let managedObjectContext = DataModel.sharedInstance.mainMoc()
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND shoppable.screenshot == %@", objectID)
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
-
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            return results
-        } catch {
-            print("favoritedProducts screenshot objectID:\(objectID) results with error:\(error)")
+        let sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        if let sortedFavorites = favorites?.sortedArray(using: sortDescriptors) as? [Product] {
+            return sortedFavorites
         }
         return []
     }
@@ -1012,30 +1023,39 @@ extension Product {
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
+                    product.isFavorite = toFavorited
                     if toFavorited {
                         let now = NSDate()
                         product.dateFavorited = now
-                        product.shoppable?.screenshot?.lastFavorited = now
-                        if product.isFavorite != toFavorited {
-                            product.shoppable?.screenshot?.favoritesCount += 1
+                        if let screenshot = product.shoppable?.screenshot {
+                            screenshot.addToFavorites(product)
+                            if let favoritesCount = screenshot.favorites?.count {
+                                screenshot.favoritesCount = Int16(favoritesCount)
+                            } else {
+                                screenshot.favoritesCount += 1
+                            }
+                            screenshot.lastFavorited = now
                         }
                     } else {
                         let dateFavorited = product.dateFavorited
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
-                            if product.isFavorite != toFavorited {
-                                screenshot.favoritesCount -= 1
-                            }
-                            if let dateFavorited = dateFavorited,
-                              let screenshotLastFavorited = screenshot.lastFavorited,
-                                dateFavorited.compare(screenshotLastFavorited as Date) == .orderedAscending {
-                                // No need to update the screenshot's lastFavorited.
+                            screenshot.removeFromFavorites(product)
+                            if let favorites = screenshot.favorites {
+                                screenshot.favoritesCount = Int16(favorites.count)
+                                if let dateFavorited = dateFavorited,
+                                    let screenshotLastFavorited = screenshot.lastFavorited,
+                                    dateFavorited.compare(screenshotLastFavorited as Date) == .orderedAscending {
+                                    // No need to update the screenshot's lastFavorited.
+                                } else {
+                                    screenshot.updateLastFavorited()
+                                }
                             } else {
-                                screenshot.updateLastFavorited()
+                                screenshot.favoritesCount = 0
+                                screenshot.lastFavorited = nil
                             }
                         }
                     }
-                    product.isFavorite = toFavorited
                 }
                 try managedObjectContext.save()
                 

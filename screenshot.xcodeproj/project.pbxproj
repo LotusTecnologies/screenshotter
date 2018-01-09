@@ -245,6 +245,7 @@
 		E4D6D8A51F61AF3A009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		E4D6D8A61F61B047009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E4F9B9552005315E0019264E /* Model 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 8.xcdatamodel"; sourceTree = "<group>"; };
 		E564B3319115D6C7FCDFE967 /* Pods-screenshot.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devrelease.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1377,6 +1378,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				E4F9B9552005315E0019264E /* Model 8.xcdatamodel */,
 				E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */,
 				E41D98791FE26114006EB79E /* Model 6.xcdatamodel */,
 				E492765B1FC6FADB009DD239 /* Model 5.xcdatamodel */,
@@ -1385,7 +1387,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */;
+			currentVersion = E4F9B9552005315E0019264E /* Model 8.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
