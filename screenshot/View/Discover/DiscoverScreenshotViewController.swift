@@ -30,7 +30,10 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         }
         
         contentRect = UIEdgeInsetsInsetRect(collectionView.bounds, collectionView.contentInset)
-        cardFrame = UIEdgeInsetsInsetRect(contentRect, UIEdgeInsetsMake(20, 20, 20, 20)) // TOOD: create card size from ratio and collection view size
+        
+        let screenshotSize = CGSize(width: contentRect.size.height * Screenshot.discoverRatio.width, height: contentRect.size.height)
+        cardFrame = screenshotSize.aspectFitRectInSize(contentRect.size)
+        
         visibleCardAttributes = makeVisibleCardAttributes()
         deletedItems = []
         insertedItems = []
@@ -147,6 +150,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isAdding = false
     
+    fileprivate var count = 10
+    
     // MARK: Life Cycle
     
     override func viewDidLoad() {
@@ -180,7 +185,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.backgroundColor = .yellow
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        collectionView.scrollsToTop = false
+        collectionView.register(DiscoverScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         view.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -192,11 +199,15 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     deinit {
+        if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
+            layout.delegate = nil
+        }
+        
         collectionView.dataSource = nil
         collectionView.delegate = nil
     }
     
-    fileprivate var count = 10
+    // MARK: Actions
     
     @objc private func passButtonAction() {
         isAdding = false
@@ -213,14 +224,130 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc private func addButtonAction() {
         isAdding = true
         
+        let indexPath = IndexPath(item: 0, section: 0)
+        let cell = collectionView.cellForItem(at: indexPath)
+        
         collectionView.performBatchUpdates({
-            self.count += 1
-            collectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
+            if let cell = cell as? DiscoverScreenshotCollectionViewCell {
+//                cell.decisionValue = 1
+                cell.layer.speed = 0.2
+            }
+            
+            self.count -= 1
+            collectionView.deleteItems(at: [indexPath])
             
         }, completion: { _ in
             
         })
     }
+    
+    @objc private func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
+        // TODO: use UIDynamicItem to create correct gravity effect. if view goes beyond threshold, update target point
+        // only do this if can not get code to work
+        
+        guard let collectionViewLayout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout else {
+            return
+        }
+        
+        var translation = panGesture.translation(in: panGesture.view)
+//        let location = panGesture.location(in: panGesture.view)
+        
+        let percent = min(1, max(-1, (translation.x / 2) / collectionView.center.x))
+        let decisionValueThreshold = percent * 3
+        
+        // TODO: add var which only does the changed if the pan location started on the cell
+        
+//        var a = 1
+//        print("|||1 \(a)")
+        func updateCell(atIndexPath indexPath: IndexPath) {
+            if let cell = collectionView.cellForItem(at: indexPath) as? DiscoverScreenshotCollectionViewCell,
+                let attributes = collectionViewLayout.finalLayoutAttributesForDisappearingItem(at: indexPath)
+            {
+                let percent = min(1, max(-1, (translation.x / 2) / collectionView.center.x))
+                let decisionValueThreshold = percent * 3
+                
+                // Only the first cell should move in the expected direction
+                let direction = CGFloat(indexPath.item == 0 ? 0 : 1)
+                let itemPercent = abs(direction - abs(percent))
+                
+//                print("|||2 \(a)")
+                if indexPath.item == 0 {
+                    cell.decisionValue = decisionValueThreshold
+                }
+                
+                let t1 = CGAffineTransform.identity
+                let t2 = attributes.transform
+                
+                var t3 = cell.transform
+                t3.a = t1.a + (t2.a - t1.a) * itemPercent
+                t3.b = t1.b + (t2.b - t1.b) * itemPercent
+                t3.c = t1.c + (t2.c - t1.c) * itemPercent
+                t3.d = t1.d + (t2.d - t1.d) * itemPercent
+                t3.tx = t1.tx + (t2.tx - t1.tx) * itemPercent
+                t3.ty = t1.ty + (t2.ty - t1.ty) * itemPercent
+                cell.transform = t3
+            }
+        }
+        
+        switch panGesture.state {
+        case .changed:
+            isAdding = translation.x > 0
+            
+            collectionView.indexPathsForVisibleItems.forEach { indexPath in
+                updateCell(atIndexPath: indexPath)
+            }
+        
+        case .ended:
+            let indexPath = IndexPath(item: 0, section: 0)
+            
+            let velocity = panGesture.velocity(in: panGesture.view)
+            let resistance = CGFloat(0.25)
+            let velocityPercent = (velocity.x * resistance) / collectionView.center.x
+            
+            let distance = sqrt(abs(translation.x) * abs(velocity.x)) / 2
+            
+            print("||| \(distance)  \(velocityPercent)  \(percent)  \(decisionValueThreshold)")
+            
+//            let didSwitchDirections = 
+            
+            if abs(decisionValueThreshold) >= 1 {
+                
+            } else {
+                if abs(velocityPercent) >= 1 {
+                    // commit direction
+                } else {
+                    
+                }
+            }
+            
+            
+            if abs(decisionValueThreshold) >= 1 {
+                if decisionValueThreshold > 0 {
+                    translation.x = collectionView.bounds.width
+                    
+                } else {
+                    translation.x = -collectionView.bounds.width
+                }
+                
+            } else {
+                translation.x = 0
+            }
+            
+            
+            
+            UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [], animations: {
+                updateCell(atIndexPath: indexPath)
+            }, completion: nil)
+            
+        default:
+            print("")
+        }
+        
+    }
+    
+    // MARK: Animation
+    
+    
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
@@ -231,10 +358,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
-        let r = CGFloat(arc4random_uniform(255))
-        let g = CGFloat(arc4random_uniform(255))
-        let b = CGFloat(arc4random_uniform(255))
-        cell.backgroundColor = UIColor(red: r/255, green: g/255, blue: b/255, alpha: 1)
         return cell
     }
 }
@@ -246,52 +369,5 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
-    }
-}
-
-extension DiscoverScreenshotViewController : UIGestureRecognizerDelegate {
-    @objc fileprivate func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
-        guard let collectionViewLayout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout else {
-            return
-        }
-        
-        let translation = panGesture.translation(in: panGesture.view)
-//        let location = panGesture.location(in: panGesture.view)
-        
-        // TODO: add var which only does the changed if the pan location started on the cell
-        
-        switch panGesture.state {
-        case .changed:
-            isAdding = translation.x > 0
-            
-            collectionView.indexPathsForVisibleItems.forEach { indexPath in
-                if let cell = collectionView.cellForItem(at: indexPath),
-                    let attributes = collectionViewLayout.finalLayoutAttributesForDisappearingItem(at: indexPath)
-                {
-                    
-                    let minDistanceNeeded = CGFloat(150)
-                    
-                    // Only the first cell should move in the expected direction
-                    let direction = CGFloat(indexPath.item == 0 ? 0 : 1)
-                    let percent = abs(direction - min(1, abs(translation.x / 2) / collectionView.center.x))
-                    
-                    let t1 = CGAffineTransform.identity
-                    let t2 = attributes.transform
-                    
-                    var t3 = cell.transform
-                    t3.a = t1.a + (t2.a - t1.a) * percent
-                    t3.b = t1.b + (t2.b - t1.b) * percent
-                    t3.c = t1.c + (t2.c - t1.c) * percent
-                    t3.d = t1.d + (t2.d - t1.d) * percent
-                    t3.tx = t1.tx + (t2.tx - t1.tx) * percent
-                    t3.ty = t1.ty + (t2.ty - t1.ty) * percent
-                    cell.transform = t3
-                }
-            }
-            
-        default:
-            print("")
-        }
-        
     }
 }

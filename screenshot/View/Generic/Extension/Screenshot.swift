@@ -9,9 +9,15 @@
 import Foundation
 
 extension Screenshot {
-    class var ratio: CGSize {
-        let width = CGFloat(9)
-        let height = CGFloat(16)
+    private class func createRatio(width: CGFloat, height: CGFloat) -> CGSize {
         return CGSize(width: width / height, height: height / width)
+    }
+    
+    class var ratio: CGSize {
+        return createRatio(width: 9, height: 16)
+    }
+    
+    class var discoverRatio: CGSize {
+        return createRatio(width: 15, height: 23)
     }
 }
