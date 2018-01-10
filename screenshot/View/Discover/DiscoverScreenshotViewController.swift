@@ -17,7 +17,7 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     
     private var cardCount = 2
     private var contentRect: CGRect = .zero
-    private var cardFrame: CGRect = .zero
+    private(set) var cardFrame: CGRect = .zero
     private var visibleCardAttributes: [UICollectionViewLayoutAttributes] = []
     
     private var deletedItems: [IndexPath] = []
@@ -91,7 +91,11 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
             let rotationAngle = CGFloat(Double.pi * 0.1) * direction
             let rotatedRect = attributes.frame.applying(CGAffineTransform(rotationAngle: rotationAngle))
             
-            attributes.transform = CGAffineTransform(translationX: rotatedRect.size.width * direction, y: 50).rotated(by: rotationAngle)
+            attributes.center = CGPoint(x: attributes.frame.midX + (rotatedRect.size.width * direction), y: cardFrame.midY)
+            
+//            attributes.transform = CGAffineTransform(translationX: rotatedRect.size.width * direction, y: 50).rotated(by: rotationAngle)
+            attributes.transform = CGAffineTransform(rotationAngle: rotationAngle)
+            
         }
         
         return attributes
@@ -137,10 +141,38 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         
         let scaleRatio = CGFloat(0.9)
         let scale = max(0, 1 - (1 - scaleRatio) * CGFloat(offset))
-        
         attr.transform = CGAffineTransform(scaleX: scale, y: scale)
         
         return attr
+    }
+    
+    func progressFinalAttributes(_ attributes: UICollectionViewLayoutAttributes, cell: DiscoverScreenshotCollectionViewCell, percent: CGFloat) {
+//        let r1 = cardFrame
+//        let r2 = attributes.frame
+//        var r3 = cell.frame
+//        r3.origin.x = r1.origin.x + (r2.origin.x - r1.origin.x) * percent
+//        r3.origin.y = r1.origin.y + (r2.origin.y - r1.origin.y) * percent
+//        r3.size.width = r1.size.width + (r2.size.width - r1.size.width) * percent
+//        r3.size.height = r1.size.height + (r2.size.height - r1.size.height) * percent
+//        cell.frame = r3
+        
+        let c1 = CGPoint(x: cardFrame.midX, y: cardFrame.midY)
+        let c2 = attributes.center
+        var c3 = cell.center
+        c3.x = c1.x + (c2.x - c1.x) * percent
+        c3.y = c1.y + (c2.y - c1.y) * percent
+        cell.center = c3
+        
+        let t1 = CGAffineTransform.identity
+        let t2 = attributes.transform
+        var t3 = cell.transform
+        t3.a = t1.a + (t2.a - t1.a) * percent
+        t3.b = t1.b + (t2.b - t1.b) * percent
+        t3.c = t1.c + (t2.c - t1.c) * percent
+        t3.d = t1.d + (t2.d - t1.d) * percent
+        t3.tx = t1.tx + (t2.tx - t1.tx) * percent
+        t3.ty = t1.ty + (t2.ty - t1.ty) * percent
+        cell.transform = t3
     }
 }
 
@@ -152,6 +184,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var count = 10
     
+    fileprivate var animator: UIDynamicAnimator?
     // MARK: Life Cycle
     
     override func viewDidLoad() {
@@ -181,6 +214,8 @@ class DiscoverScreenshotViewController : BaseViewController {
             layout.delegate = self
         }
         
+        // TODO: add bottom insets for the rotated cell to appear
+        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -196,6 +231,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(collectionViewPanGestureAction(_:)))
         collectionView.addGestureRecognizer(panGesture)
+        
+        
+        animator = UIDynamicAnimator(referenceView: collectionView)
     }
     
     deinit {
@@ -241,6 +279,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         })
     }
     
+    var behavior: DiscoverScreenshotDynamicBehavior?
+    
     @objc private func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
         // TODO: use UIDynamicItem to create correct gravity effect. if view goes beyond threshold, update target point
         // only do this if can not get code to work
@@ -259,11 +299,11 @@ class DiscoverScreenshotViewController : BaseViewController {
         
 //        var a = 1
 //        print("|||1 \(a)")
-        func updateCell(atIndexPath indexPath: IndexPath) {
+        func updateCell(atIndexPath indexPath: IndexPath, percent: CGFloat? = nil) {
             if let cell = collectionView.cellForItem(at: indexPath) as? DiscoverScreenshotCollectionViewCell,
                 let attributes = collectionViewLayout.finalLayoutAttributesForDisappearingItem(at: indexPath)
             {
-                let percent = min(1, max(-1, (translation.x / 2) / collectionView.center.x))
+                let percent = min(1, max(-1, percent ?? (translation.x / 2) / collectionView.center.x))
                 let decisionValueThreshold = percent * 3
                 
                 // Only the first cell should move in the expected direction
@@ -275,21 +315,14 @@ class DiscoverScreenshotViewController : BaseViewController {
                     cell.decisionValue = decisionValueThreshold
                 }
                 
-                let t1 = CGAffineTransform.identity
-                let t2 = attributes.transform
-                
-                var t3 = cell.transform
-                t3.a = t1.a + (t2.a - t1.a) * itemPercent
-                t3.b = t1.b + (t2.b - t1.b) * itemPercent
-                t3.c = t1.c + (t2.c - t1.c) * itemPercent
-                t3.d = t1.d + (t2.d - t1.d) * itemPercent
-                t3.tx = t1.tx + (t2.tx - t1.tx) * itemPercent
-                t3.ty = t1.ty + (t2.ty - t1.ty) * itemPercent
-                cell.transform = t3
+                collectionViewLayout.progressFinalAttributes(attributes, cell: cell, percent: itemPercent)
             }
         }
         
         switch panGesture.state {
+        case .began:
+            animator?.removeAllBehaviors()
+            
         case .changed:
             isAdding = translation.x > 0
             
@@ -298,44 +331,82 @@ class DiscoverScreenshotViewController : BaseViewController {
             }
         
         case .ended:
+            // TODO: use panGesture.view not collectionView
             let indexPath = IndexPath(item: 0, section: 0)
-            
+            let cell = collectionView.cellForItem(at: indexPath) as! DiscoverScreenshotCollectionViewCell
             let velocity = panGesture.velocity(in: panGesture.view)
+            
+            
+//            let behavior = DiscoverScreenshotDynamicBehavior(item: cell, attachedTo: collectionView)
+//            behavior.targetPoint = CGPoint(x: collectionViewLayout.cardFrame.midX, y: collectionViewLayout.cardFrame.midY)
+//            behavior.velocity = velocity
+//            behavior.action = {
+//                let translation = cell.center
+//                let collectionViewCenter = CGPoint(x: self.collectionView.contentSize.width / 2, y: self.collectionView.contentSize.height / 2)
+//                let percent = 1 - min(1, max(-1, translation.x / collectionViewCenter.x))
+//                let decisionValueThreshold = percent * 3
+//
+//                print("||| \(percent)  \(translation.x)")
+//
+////                if percent > 1 {
+////                    behavior.targetPoint = CGPoint(x: -200, y: collectionViewLayout.cardFrame.midY)
+////
+////                } else {
+//                    cell.decisionValue = percent
+//
+//                    let attributes = collectionViewLayout.finalLayoutAttributesForDisappearingItem(at: indexPath)!
+//                    let t1 = CGAffineTransform.identity
+//                    let t2 = attributes.transform
+//                    var t3 = cell.transform
+//                    t3.a = t1.a + (t2.a - t1.a) * percent
+//                    t3.b = t1.b + (t2.b - t1.b) * percent
+//                    t3.c = t1.c + (t2.c - t1.c) * percent
+//                    t3.d = t1.d + (t2.d - t1.d) * percent
+//                    t3.tx = t1.tx + (t2.tx - t1.tx) * percent
+//                    t3.ty = t1.ty + (t2.ty - t1.ty) * percent
+//                    cell.transform = t3
+////                }
+//            }
+//            self.behavior = behavior
+//
+//            animator?.addBehavior(behavior)
+            
+            
             let resistance = CGFloat(0.25)
             let velocityPercent = (velocity.x * resistance) / collectionView.center.x
-            
+
             let distance = sqrt(abs(translation.x) * abs(velocity.x)) / 2
-            
-            print("||| \(distance)  \(velocityPercent)  \(percent)  \(decisionValueThreshold)")
-            
-//            let didSwitchDirections = 
-            
+
+//            print("||| \(distance)  \(velocityPercent)  \(percent)  \(decisionValueThreshold)")
+
+//            let didSwitchDirections =
+
             if abs(decisionValueThreshold) >= 1 {
-                
+
             } else {
                 if abs(velocityPercent) >= 1 {
                     // commit direction
                 } else {
-                    
+
                 }
             }
-            
-            
+
+
             if abs(decisionValueThreshold) >= 1 {
                 if decisionValueThreshold > 0 {
                     translation.x = collectionView.bounds.width
-                    
+
                 } else {
                     translation.x = -collectionView.bounds.width
                 }
-                
+
             } else {
                 translation.x = 0
             }
-            
-            
-            
-            UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [], animations: {
+
+
+
+            UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                 updateCell(atIndexPath: indexPath)
             }, completion: nil)
             
@@ -369,5 +440,79 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
+    }
+}
+
+class DiscoverScreenshotDynamicBehavior : UIDynamicBehavior {
+    let item: UIDynamicItem
+    private let attachmentBehavior: UIAttachmentBehavior
+    private let itemBehavior: UIDynamicItemBehavior
+    private let snapBehavior: UISnapBehavior
+    private let gravityBehavior: UIGravityBehavior
+    private let radialGravity: UIFieldBehavior
+    
+    init(item: UIDynamicItem, attachedTo attachedItem: UIDynamicItem) {
+        self.item = item
+        
+        attachmentBehavior = UIAttachmentBehavior(item: item, attachedTo: attachedItem)
+        attachmentBehavior.frequency = 10
+        attachmentBehavior.damping = 3
+        attachmentBehavior.length = 0
+        
+        itemBehavior = UIDynamicItemBehavior(items: [item])
+        itemBehavior.resistance = 30
+        itemBehavior.density = 0.5 // 12
+        
+        snapBehavior = UISnapBehavior(item: item, snapTo: attachedItem.center)
+        
+        gravityBehavior = UIGravityBehavior(items: [item])
+        gravityBehavior.gravityDirection = CGVector(dx: 0, dy: 0)
+        gravityBehavior.magnitude = 2
+        gravityBehavior.angle = 0
+        
+        radialGravity = UIFieldBehavior.radialGravityField(position: attachedItem.center)
+        radialGravity.region = UIRegion(radius: 200)
+//        radialGravity.strength = -1 //repel items
+        radialGravity.strength = 1.5 // 3
+        radialGravity.falloff = 4.0 // 4
+        radialGravity.minimumRadius = 50.0 // 5
+        radialGravity.addItem(item)
+        
+        
+        let vortex: UIFieldBehavior = UIFieldBehavior.vortexField() // 6
+        vortex.position = attachedItem.center // 7
+        vortex.region = UIRegion(radius: 200.0) // 8
+        vortex.strength = 0.005 // 9
+        vortex.addItem(item) // 14
+        
+        
+        super.init()
+        
+//        addChildBehavior(attachmentBehavior)
+        addChildBehavior(itemBehavior)
+//        addChildBehavior(snapBehavior)
+//        addChildBehavior(gravityBehavior)
+        addChildBehavior(radialGravity)
+        addChildBehavior(vortex)
+        
+    }
+    
+    var targetPoint: CGPoint {
+        set {
+            snapBehavior.snapPoint = newValue
+//            attachmentBehavior.anchorPoint = newValue
+        }
+        get {
+//            return snapBehavior.snapPoint
+            return attachmentBehavior.anchorPoint
+        }
+    }
+    
+    var velocity: CGPoint = .zero {
+        didSet {
+            let currentVelocity = itemBehavior.linearVelocity(for: item)
+            let velocityDelta = CGPoint(x: velocity.x - currentVelocity.x, y: velocity.y - currentVelocity.y)
+//            itemBehavior.addLinearVelocity(velocityDelta, for: item)
+        }
     }
 }
