@@ -68,7 +68,7 @@ class DiscoverScreenshotCollectionViewCell : ShadowCollectionViewCell {
                 decisionView.backgroundColor = UIColor.crazeGreen.withAlphaComponent(0.75)
                 decisionImageView.isHighlighted = true
                 
-            } else {
+            } else if value < 0 {
                 decisionView.backgroundColor = UIColor.black.withAlphaComponent(0.75)
                 decisionImageView.isHighlighted = false
             }

@@ -91,6 +91,8 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
             let rotationAngle = CGFloat(Double.pi * 0.1) * direction
             let rotatedRect = attributes.frame.applying(CGAffineTransform(rotationAngle: rotationAngle))
             
+            // Better to use center then translation on the transform incase
+            // future development will incorporate UIDynamics
             attributes.center = CGPoint(x: attributes.frame.midX + (rotatedRect.size.width * direction), y: cardFrame.midY)
             
 //            attributes.transform = CGAffineTransform(translationX: rotatedRect.size.width * direction, y: 50).rotated(by: rotationAngle)
@@ -147,15 +149,6 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     }
     
     func progressFinalAttributes(_ attributes: UICollectionViewLayoutAttributes, cell: DiscoverScreenshotCollectionViewCell, percent: CGFloat) {
-//        let r1 = cardFrame
-//        let r2 = attributes.frame
-//        var r3 = cell.frame
-//        r3.origin.x = r1.origin.x + (r2.origin.x - r1.origin.x) * percent
-//        r3.origin.y = r1.origin.y + (r2.origin.y - r1.origin.y) * percent
-//        r3.size.width = r1.size.width + (r2.size.width - r1.size.width) * percent
-//        r3.size.height = r1.size.height + (r2.size.height - r1.size.height) * percent
-//        cell.frame = r3
-        
         let c1 = CGPoint(x: cardFrame.midX, y: cardFrame.midY)
         let c2 = attributes.center
         var c3 = cell.center
@@ -263,14 +256,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         isAdding = true
         
         let indexPath = IndexPath(item: 0, section: 0)
-        let cell = collectionView.cellForItem(at: indexPath)
         
         collectionView.performBatchUpdates({
-            if let cell = cell as? DiscoverScreenshotCollectionViewCell {
-//                cell.decisionValue = 1
-                cell.layer.speed = 0.2
-            }
-            
             self.count -= 1
             collectionView.deleteItems(at: [indexPath])
             
@@ -319,9 +306,11 @@ class DiscoverScreenshotViewController : BaseViewController {
             }
         }
         
+        print("|||| state = \(panGesture.state.rawValue)")
+        
         switch panGesture.state {
-        case .began:
-            animator?.removeAllBehaviors()
+//        case .began:
+//            animator?.removeAllBehaviors()
             
         case .changed:
             isAdding = translation.x > 0
@@ -381,34 +370,49 @@ class DiscoverScreenshotViewController : BaseViewController {
 
 //            let didSwitchDirections =
 
-            if abs(decisionValueThreshold) >= 1 {
+//            if abs(decisionValueThreshold) >= 1 {
+//
+//            } else {
+//                if abs(velocityPercent) >= 1 {
+//                    // commit direction
+//                } else {
+//
+//                }
+//            }
 
-            } else {
-                if abs(velocityPercent) >= 1 {
-                    // commit direction
-                } else {
 
-                }
-            }
+//            if abs(decisionValueThreshold) >= 1 {
+//                if decisionValueThreshold > 0 {
+//                    translation.x = collectionView.bounds.width
+//
+//                } else {
+//                    translation.x = -collectionView.bounds.width
+//                }
+//
+//            } else {
+//                translation.x = 0
+//            }
 
 
+            
             if abs(decisionValueThreshold) >= 1 {
                 if decisionValueThreshold > 0 {
-                    translation.x = collectionView.bounds.width
-
+                    self.addButtonAction()
+                    
                 } else {
-                    translation.x = -collectionView.bounds.width
+                    self.passButtonAction()
                 }
-
+                
             } else {
-                translation.x = 0
+                UIView.animate(withDuration: 2.4, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
+                    
+                    translation.x = 0
+                    updateCell(atIndexPath: indexPath)
+                    
+                }, completion: nil)
             }
-
-
-
-            UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
-                updateCell(atIndexPath: indexPath)
-            }, completion: nil)
+            
+            
             
         default:
             print("")
