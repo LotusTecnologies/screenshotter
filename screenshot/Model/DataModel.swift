@@ -85,22 +85,6 @@ class DataModel: NSObject {
         }
     }
     
-    func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
-        let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
-        if from < 7 && to >= 7 && installDate != nil {
-            dbQ.async {
-                let managedObjectContext = container.newBackgroundContext()
-                self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
-            }
-        }
-        if from < 8 && to >= 8 && installDate != nil {
-            dbQ.async {
-                let managedObjectContext = container.newBackgroundContext()
-                self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
-            }
-        }
-    }
-    
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
     let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
 
@@ -604,65 +588,6 @@ extension DataModel {
         }
     }
     
-    func initializeFavoritesCounts(managedObjectContext: NSManagedObjectContext) {
-        // Favorites count grouped by screenshot
-        let countKeypathExp = NSExpression(forKeyPath: "isFavorite")
-        let countExpression = NSExpression(forFunction: "count:", arguments: [countKeypathExp])
-        let countDesc = NSExpressionDescription()
-        countDesc.expression = countExpression
-        countDesc.name = "count"
-        countDesc.expressionResultType = .integer16AttributeType
-        
-        // lastDateFavorited grouped by screenshot
-        let maxKeypathExp = NSExpression(forKeyPath: "dateFavorited")
-        let maxExpression = NSExpression(forFunction: "max:", arguments: [maxKeypathExp])
-        let maxDesc = NSExpressionDescription()
-        maxDesc.expression = maxExpression
-        maxDesc.name = "max"
-        maxDesc.expressionResultType = .dateAttributeType
-        
-        let request: NSFetchRequest<NSDictionary> = NSFetchRequest(entityName: "Product")
-        request.returnsObjectsAsFaults = false
-        request.propertiesToGroupBy = ["shoppable.screenshot"]
-        request.propertiesToFetch = ["shoppable.screenshot", countDesc, maxDesc]
-        request.resultType = .dictionaryResultType
-        request.predicate = NSPredicate(format: "isFavorite == TRUE")
-        
-        do {
-            let results = try managedObjectContext.fetch(request)
-            for dict in results {
-                if let favoritesCount = dict["count"] as? Int16,
-                  let lastFavorited = dict["max"] as? NSDate,
-                  let screenshotId = dict["shoppable.screenshot"] as? NSManagedObjectID,
-                  let screenshot = managedObjectContext.object(with: screenshotId) as? Screenshot {
-                    screenshot.favoritesCount = favoritesCount
-                    screenshot.lastFavorited = lastFavorited
-                } else {
-                    print("Migration screenshot.favoritesCount screenshot.lastFavorited failed")
-                }
-            }
-            try managedObjectContext.save()
-        } catch {
-            print("initializeFavoritesCounts results with error:\(error)")
-        }
-    }
-    
-    func initializeFavoritesSets(managedObjectContext: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE")
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for product in results {
-                product.shoppable?.screenshot?.addToFavorites(product)
-            }
-            try managedObjectContext.save()
-        } catch {
-            print("initializeFavoritesSets results with error:\(error)")
-        }
-    }
-    
     public func setNoShoppables(assetId: String, uploadedURLString: String?) {
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
@@ -745,9 +670,122 @@ extension DataModel {
         }
     }
 
+// MARK: DB Migration
+
+    func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
+        let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
+        if from < 7 && to >= 7 && installDate != nil {
+            dbQ.async {
+                let managedObjectContext = container.newBackgroundContext()
+                self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
+            }
+        }
+        if from < 8 && to >= 8 && installDate != nil {
+            dbQ.async {
+                let managedObjectContext = container.newBackgroundContext()
+                self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
+                self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
+            }
+        }
+    }
+    
+    func initializeFavoritesCounts(managedObjectContext: NSManagedObjectContext) {
+        // Favorites count grouped by screenshot
+        let countKeypathExp = NSExpression(forKeyPath: "isFavorite")
+        let countExpression = NSExpression(forFunction: "count:", arguments: [countKeypathExp])
+        let countDesc = NSExpressionDescription()
+        countDesc.expression = countExpression
+        countDesc.name = "count"
+        countDesc.expressionResultType = .integer16AttributeType
+        
+        // lastDateFavorited grouped by screenshot
+        let maxKeypathExp = NSExpression(forKeyPath: "dateFavorited")
+        let maxExpression = NSExpression(forFunction: "max:", arguments: [maxKeypathExp])
+        let maxDesc = NSExpressionDescription()
+        maxDesc.expression = maxExpression
+        maxDesc.name = "max"
+        maxDesc.expressionResultType = .dateAttributeType
+        
+        let request: NSFetchRequest<NSDictionary> = NSFetchRequest(entityName: "Product")
+        request.returnsObjectsAsFaults = false
+        request.propertiesToGroupBy = ["shoppable.screenshot"]
+        request.propertiesToFetch = ["shoppable.screenshot", countDesc, maxDesc]
+        request.resultType = .dictionaryResultType
+        request.predicate = NSPredicate(format: "isFavorite == TRUE")
+        
+        do {
+            let results = try managedObjectContext.fetch(request)
+            for dict in results {
+                if let favoritesCount = dict["count"] as? Int16,
+                  let lastFavorited = dict["max"] as? NSDate,
+                  let screenshotId = dict["shoppable.screenshot"] as? NSManagedObjectID,
+                  let screenshot = managedObjectContext.object(with: screenshotId) as? Screenshot {
+                    screenshot.favoritesCount = favoritesCount
+                    screenshot.lastFavorited = lastFavorited
+                } else {
+                    print("Migration screenshot.favoritesCount screenshot.lastFavorited failed")
+                }
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("initializeFavoritesCounts results with error:\(error)")
+        }
+    }
+    
+    func initializeFavoritesSets(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for product in results {
+                product.shoppable?.screenshot?.addToFavorites(product)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("initializeFavoritesSets results with error:\(error)")
+        }
+    }
+
+    func cleanDeletedScreenshots(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isHidden == TRUE")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for screenshot in results {
+                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("cleanDeletedScreenshots results with error:\(error)")
+        }
+    }
+
 }
 
 extension Screenshot {
+    
+    // hideWorkhorse is not meant to be called from UI code,
+    // but may be called on the main queue, even if generally called on a background queue.
+    func hideWorkhorse(managedObjectContext: NSManagedObjectContext) {
+        isHidden = true
+        syteJson = nil
+        shareLink = nil
+        uploadedImageURL = nil
+        if let favoriteSet = favorites as? Set<Product>,
+          favoriteSet.count > 0 {
+            favoriteSet.forEach { $0.shoppable = nil }
+        } else {
+            imageData = nil
+        }
+        if let shoppablesSet = shoppables as? Set<Shoppable> {
+            shoppablesSet.forEach { managedObjectContext.delete($0) }
+        }
+        shoppablesCount = -1
+    }
     
     @objc public func setHide() {
         let managedObjectID = self.objectID
@@ -759,8 +797,7 @@ extension Screenshot {
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for screenshot in results {
-                    screenshot.isHidden = true
-                    screenshot.imageData = nil
+                    screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                 }
                 try managedObjectContext.save()
             } catch {

@@ -167,20 +167,21 @@ class AssetSyncModel: NSObject {
                 return Promise { fulfill, reject in
                     dataModel.performBackgroundTask { (managedObjectContext) in
                         if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: asset.localIdentifier) {
-                            if screenshot.imageData == nil {
-                                screenshot.imageData = imageData as NSData?
+                            if screenshot.shoppablesCount > 0 {
+                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                             }
-                            screenshot.isHidden = false
-                            screenshot.isFashion = true
-                            screenshot.lastModified = NSDate()
                             if screenshot.shoppablesCount < 0 {
                                 screenshot.shoppablesCount = 0
                             }
+                            screenshot.imageData = imageData as NSData?
+                            screenshot.isHidden = false
+                            screenshot.isFashion = true
+                            screenshot.lastModified = NSDate()
                             dataModel.saveMoc(managedObjectContext: managedObjectContext)
                             // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
                             screenshot.lastModified = NSDate()
                             dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                            fulfill((imageData, screenshot.shoppablesCount <= 0))
+                            fulfill((imageData, true))
                         } else {
                             let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(asset.localIdentifier)"])
                             reject(error)
