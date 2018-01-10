@@ -17,7 +17,7 @@
         <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="screenshot" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="favorites" inverseEntity="Screenshot" syncable="YES"/>
-        <relationship name="shoppable" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="products" inverseEntity="Shoppable" syncable="YES"/>
+        <relationship name="shoppable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="products" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
     <entity name="ProductFilter" representedClassName="ProductFilter" syncable="YES" codeGenerationType="class">
         <attribute name="dateSet" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
