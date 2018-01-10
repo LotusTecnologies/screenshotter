@@ -91,7 +91,7 @@
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
 "screenshot.empty.title" = "No Screenshots Yet";
 "screenshot.import.latest" = "Import your latest screenshot?";
-"screenshot.import.multiple" = "You have %@ new screenshots, do you want to import them?";
+"screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
 "screenshot.option.share" = "SHARE";
 "screenshot.option.delete" = "DELETE";
 "screenshot.permission.allow" = "Allow Access";
