@@ -196,6 +196,21 @@ extension ProductsOptions : UIPickerViewDelegate {
 }
 
 class ProductsOptionsControls : NSObject {
+    var categoryControl: UISegmentedControl?
+    
+    func createCategoryControl() -> UISegmentedControl {
+        let control = UISegmentedControl(items: [
+            ProductsOptionsCategory.fashion.stringValue,
+            ProductsOptionsCategory.furniture.stringValue
+            ])
+        control.addTarget(self, action: #selector(syncCategoryControl), for: .valueChanged)
+        
+        categoryControl?.removeFromSuperview()
+        categoryControl = control
+        
+        return control
+    }
+    
     var genderControl: UISegmentedControl?
     
     func createGenderControl() -> UISegmentedControl {
@@ -228,7 +243,7 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    private(set) var saleControl: UISegmentedControl?
+    var saleControl: UISegmentedControl?
     
     func createSaleControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -243,32 +258,93 @@ class ProductsOptionsControls : NSObject {
     }
     
     func sync() {
-        syncGenderControl()
-        syncSizeControl()
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+            return
+        }
+        
+        let enabledControls = self.enabledControls
+        
+        for index in 0 ..< genderControl.numberOfSegments {
+            let isEnabled = enabledControls[genderControl]?[index] ?? true
+            genderControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+        
+        for index in 0 ..< sizeControl.numberOfSegments {
+            let isEnabled = enabledControls[sizeControl]?[index] ?? true
+            sizeControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+    }
+    
+    private var enabledControls: [UIControl : [Int : Bool]] {
+        var enabledControls: [UIControl : [Int : Bool]] = [:]
+        
+        if let genderControl = genderControl, let sizeControl = sizeControl {
+            let isFashion: Bool
+            
+            if let categoryControl = categoryControl {
+                isFashion = ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion
+                
+            } else {
+                isFashion = ProductsOptionsCategory.default == .fashion
+            }
+            
+            enabledControls[genderControl] = [:]
+            
+            for i in 0 ..< genderControl.numberOfSegments {
+                var isEnabled = true
+                
+                if i == ProductsOptionsGender.male.offsetValue {
+                    isEnabled = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) != .plus
+                }
+                
+                enabledControls[genderControl]?[i] = isFashion ? isEnabled : false
+            }
+            
+            enabledControls[sizeControl] = [:]
+            
+            for i in 0 ..< sizeControl.numberOfSegments {
+                var isEnabled = true
+                
+                if i == ProductsOptionsSize.plus.offsetValue {
+                    isEnabled = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) != .male
+                }
+                
+                enabledControls[sizeControl]?[i] = isFashion ? isEnabled : false
+            }
+        }
+        
+        return enabledControls
+    }
+    
+    @objc private func syncCategoryControl() {
+        sync()
     }
     
     @objc private func syncGenderControl() {
-        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+        guard genderControl != nil, let sizeControl = sizeControl else {
             return
         }
         
-        let isMale = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) == .male
-        sizeControl.setEnabled(!isMale, forSegmentAt: ProductsOptionsSize.plus.offsetValue)
+        let index = ProductsOptionsSize.plus.offsetValue
+        let isEnabled = enabledControls[sizeControl]?[index] ?? true
+        sizeControl.setEnabled(isEnabled, forSegmentAt: index)
     }
     
     @objc private func syncSizeControl() {
-        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+        guard let genderControl = genderControl, sizeControl != nil else {
             return
         }
         
-        let isPlus = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) == .plus
-        genderControl.setEnabled(!isPlus, forSegmentAt: ProductsOptionsGender.male.offsetValue)
+        let index = ProductsOptionsGender.male.offsetValue
+        let isEnabled = enabledControls[genderControl]?[index] ?? true
+        genderControl.setEnabled(isEnabled, forSegmentAt: index)
     }
 }
 
 class ProductsOptionsView : UIView {
     private let controls = ProductsOptionsControls()
     
+    private(set) var categoryControl: UISegmentedControl!
     private(set) var genderControl: UISegmentedControl!
     private(set) var sizeControl: UISegmentedControl!
     private(set) var saleControl: UISegmentedControl!
@@ -293,6 +369,17 @@ class ProductsOptionsView : UIView {
         borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
         
+        categoryControl = controls.createCategoryControl()
+        categoryControl.translatesAutoresizingMaskIntoConstraints = false
+        categoryControl.tintColor = .crazeGreen
+        categoryControl.isExclusiveTouch = true
+        addSubview(categoryControl)
+        categoryControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        categoryControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        categoryControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
+        categoryControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        categoryControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
         genderControl = controls.createGenderControl()
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.tintColor = .crazeGreen
@@ -300,7 +387,7 @@ class ProductsOptionsView : UIView {
         addSubview(genderControl)
         genderControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         genderControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        genderControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
+        genderControl.topAnchor.constraint(equalTo: categoryControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -372,6 +459,40 @@ class ProductsOptionsView : UIView {
     
     override var intrinsicContentSize: CGSize {
         return UILayoutFittingExpandedSize
+    }
+}
+
+enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case fashion = 1
+    case furniture
+    
+    static let `default` = ProductsOptionsCategory.fashion
+    
+    static var globalValue: ProductsOptionsCategory {
+        return ProductsOptionsCategory(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCategory))
+    }
+    
+    init(intValue: Int) {
+        self = ProductsOptionsCategory(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
+    }
+    
+    var stringValue: String {
+        var string: String
+        
+        switch self {
+        case .fashion: string = "products.options.category.fashion".localized
+        case .furniture: string = "products.options.category.furniture".localized
+        }
+        
+        return string
     }
 }
 
