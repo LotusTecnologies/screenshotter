@@ -201,18 +201,14 @@ class AssetSyncModel: NSObject {
                             } else {
                                 imageClassification = .human
                             }
-                            if screenshot.imageData == nil {
-                                screenshot.imageData = imageData as NSData?
+                            if screenshot.shoppablesCount > 0 {
+                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                             }
+                            screenshot.shoppablesCount = 0
+                            screenshot.imageData = imageData as NSData?
                             screenshot.isHidden = false
                             screenshot.isFashion = true
                             screenshot.lastModified = NSDate()
-                            if screenshot.shoppablesCount < 0 {
-                                screenshot.shoppablesCount = 0
-                            }
-                            if screenshot.shoppablesCount > 0 {
-                                imageClassification = .unrecognized
-                            }
                             dataModel.saveMoc(managedObjectContext: managedObjectContext)
                             // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
                             screenshot.lastModified = NSDate()
@@ -834,28 +830,42 @@ class AssetSyncModel: NSObject {
                     return
             }
             self.beginSync()
-            let imageData: Data?
+            
+            self.processingQ.async {
+                firstly { _ -> Promise<Data?> in
+                    let imageData: Data?
 #if STORE_NEW_TUTORIAL_SCREENSHOT
-            imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                        imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
 #else
-            imageData = self.data(for: image)
+                        imageData = self.data(for: image)
 #endif
-            dataModel.performBackgroundTask { (managedObjectContext) in
-                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                 assetId: Constants.tutorialScreenshotAssetId,
-                                                 createdAt: Date(),
-                                                 isFashion: true,
-                                                 isFromShare: false,
-                                                 isHidden: false,
-                                                 imageData: imageData,
-                                                 classification: nil)
+                    return Promise(value: imageData)
+                    }.then(on: self.processingQ) { imageData -> Promise<Data?> in
+                        return Promise { fulfill, reject in
+                            dataModel.performBackgroundTask { (managedObjectContext) in
+                                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                 assetId: Constants.tutorialScreenshotAssetId,
+                                                                 createdAt: Date(),
+                                                                 isFashion: true,
+                                                                 isFromShare: false,
+                                                                 isHidden: false,
+                                                                 imageData: imageData,
+                                                                 classification: nil)
+                                fulfill(imageData)
+                            }
+                        }
+                    }.then (on: self.processingQ) { imageData -> Void in
+#if STORE_NEW_TUTORIAL_SCREENSHOT
+                            self.syteProcessing(imageClassification: .human, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
+#else
+                            let tuple = self.tupleForRawGraphic()
+                            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
+#endif
+                    }.catch { error in
+                        print("syncTutorialPhoto outer catch error:\(error)")
+                }
             }
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-            self.syteProcessing(imageClassification: .human, imageData: imageData, assetId: Constants.tutorialScreenshotAssetId)
-#else
-            let tuple = self.tupleForRawGraphic()
-            self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
-#endif
+            
             self.endSync()
         }
     }
