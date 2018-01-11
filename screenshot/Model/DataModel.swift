@@ -933,24 +933,8 @@ extension Shoppable {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
-       var optionsMaskInt: Int
-        switch productsOptions.gender {
-        case .male:
-            optionsMaskInt = ProductsOptionsMask.genderMale.rawValue
-        case .female:
-            optionsMaskInt = ProductsOptionsMask.genderFemale.rawValue
-        case .auto:
-            optionsMaskInt = ProductsOptionsMask.genderAuto.rawValue
-        }
-        switch productsOptions.size {
-        case .adult:
-            optionsMaskInt |= ProductsOptionsMask.sizeAdult.rawValue
-        case .child:
-            optionsMaskInt |= ProductsOptionsMask.sizeChild.rawValue
-        case .plus:
-            optionsMaskInt |= ProductsOptionsMask.sizePlus.rawValue
-        }
-        let optionsMask = ProductsOptionsMask(rawValue: optionsMaskInt)
+        let optionsMask = ProductsOptionsMask(productsOptions.category, productsOptions.gender, productsOptions.size)
+        let optionsMaskInt = optionsMask.rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshotId)
