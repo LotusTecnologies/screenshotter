@@ -116,6 +116,9 @@ class ProductsOptions : NSObject {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.sortPickerView.dataSource = self
         view.sortPickerView.delegate = self
+        view.categoryControl.addTarget(self, action: #selector(categoryControlAction), for: .valueChanged)
+        view.genderControl.addTarget(self, action: #selector(genderControlAction), for: .valueChanged)
+        view.sizeControl.addTarget(self, action: #selector(sizeControlAction), for: .valueChanged)
         view.doneButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
         self.syncOptions(withView: view)
         return view
@@ -137,6 +140,22 @@ class ProductsOptions : NSObject {
         view.sizeControl.selectedSegmentIndex = size.offsetValue
         view.saleControl.selectedSegmentIndex = sale.offsetValue
         view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+    }
+    
+    @objc private func categoryControlAction() {
+        if ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex) == .fashion {
+            view.genderControl.selectedSegmentIndex = gender.offsetValue
+            view.sizeControl.selectedSegmentIndex = size.offsetValue
+            view.controls.sync()
+        }
+    }
+    
+    @objc private func genderControlAction() {
+        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
+    }
+    
+    @objc private func sizeControlAction() {
+        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
     }
     
     @objc private func doneButtonAction() {
@@ -366,7 +385,7 @@ class ProductsOptionsControls : NSObject {
 }
 
 class ProductsOptionsView : UIView {
-    private let controls = ProductsOptionsControls()
+    fileprivate let controls = ProductsOptionsControls()
     
     private(set) var categoryControl: UISegmentedControl!
     private(set) var genderControl: UISegmentedControl!
