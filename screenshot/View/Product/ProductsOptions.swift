@@ -85,6 +85,7 @@ class _ProductsOptionsMask : NSObject {
 class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
+    fileprivate(set) var category = ProductsOptionsCategory.globalValue
     fileprivate(set) var gender = ProductsOptionsGender.globalValue
     fileprivate(set) var size = ProductsOptionsSize.globalValue
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
@@ -103,6 +104,7 @@ class ProductsOptions : NSObject {
     }()
     
     func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
+        category = ProductsOptionsCategory.globalValue
         gender = mask?.gender ?? ProductsOptionsGender.globalValue
         size = mask?.size ?? ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
@@ -112,17 +114,20 @@ class ProductsOptions : NSObject {
     }
     
     private func syncOptions(withView view: ProductsOptionsView) {
-        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+        view.categoryControl.selectedSegmentIndex = category.offsetValue
         view.genderControl.selectedSegmentIndex = gender.offsetValue
         view.sizeControl.selectedSegmentIndex = size.offsetValue
         view.saleControl.selectedSegmentIndex = sale.offsetValue
+        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
     }
     
     @objc private func doneButtonAction() {
+        let previousCategory = category
         let previousMask = ProductsOptionsMask(gender, size)
         let previousSale = sale
         let previousSort = sort
         
+        category = ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex)
         gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
@@ -132,15 +137,17 @@ class ProductsOptions : NSObject {
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
+        let categoryChanged = previousCategory.rawValue != category.rawValue
         let maskChanged = previousMask.rawValue != ProductsOptionsMask(gender, size).rawValue
         let saleChanged = previousSale.rawValue != sale.rawValue
         let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = maskChanged || saleChanged || sortChanged
+        let changed = categoryChanged || maskChanged || saleChanged || sortChanged
         
         delegate?.productsOptionsDidComplete(self, withChange: changed)
         
         if changed {
             let changeMap = [
+                "Category": (new: category.stringValue, old: previousCategory.stringValue),
                 "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
                 "Size": (new: size.stringValue, old: previousMask.size.stringValue),
                 "Sale": (new: sale.stringValue, old: previousSale.stringValue),
@@ -158,6 +165,10 @@ class ProductsOptions : NSObject {
 
 extension ProductsOptions {
     // MARK: Objc
+    
+    func _category() -> Int {
+        return category.rawValue
+    }
     
     func _gender() -> Int {
         return gender.rawValue
