@@ -144,18 +144,18 @@ class ProductsOptions : NSObject {
     
     @objc private func categoryControlAction() {
         if ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex) == .fashion {
-            view.genderControl.selectedSegmentIndex = gender.offsetValue
-            view.sizeControl.selectedSegmentIndex = size.offsetValue
-            view.controls.sync()
+//            view.genderControl.selectedSegmentIndex = gender.offsetValue
+//            view.sizeControl.selectedSegmentIndex = size.offsetValue
+//            view.controls.sync()
         }
     }
     
     @objc private func genderControlAction() {
-        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
+//        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
     }
     
     @objc private func sizeControlAction() {
-        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
+//        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
     }
     
     @objc private func doneButtonAction() {
@@ -240,6 +240,12 @@ extension ProductsOptions : UIPickerViewDelegate {
 
 class ProductsOptionsControls : NSObject {
     var categoryControl: UISegmentedControl?
+    var genderControl: UISegmentedControl?
+    var sizeControl: UISegmentedControl?
+    var saleControl: UISegmentedControl?
+    
+    private var gender: ProductsOptionsGender?
+    private var size: ProductsOptionsSize?
     
     func createCategoryControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -253,8 +259,6 @@ class ProductsOptionsControls : NSObject {
         
         return control
     }
-    
-    var genderControl: UISegmentedControl?
     
     func createGenderControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -270,8 +274,6 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    var sizeControl: UISegmentedControl?
-    
     func createSizeControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
             ProductsOptionsSize.child.stringValue,
@@ -285,8 +287,6 @@ class ProductsOptionsControls : NSObject {
         
         return control
     }
-    
-    var saleControl: UISegmentedControl?
     
     func createSaleControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -360,13 +360,30 @@ class ProductsOptionsControls : NSObject {
     }
     
     @objc private func syncCategoryControl() {
+        guard let categoryControl = categoryControl else {
+            return
+        }
+        
+        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion {
+            if let genderControl = genderControl, let gender = gender {
+                genderControl.selectedSegmentIndex = gender.offsetValue
+            }
+            
+            if let sizeControl = sizeControl, let size = size {
+                sizeControl.selectedSegmentIndex = size.offsetValue
+            }
+        }
+        
         sync()
     }
     
     @objc private func syncGenderControl() {
-        guard genderControl != nil, let sizeControl = sizeControl else {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
             return
         }
+        
+        // TODO: these values need to be set on the start as well, not just after being changed
+        gender = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex)
         
         let index = ProductsOptionsSize.plus.offsetValue
         let isEnabled = enabledControls[sizeControl]?[index] ?? true
@@ -374,9 +391,11 @@ class ProductsOptionsControls : NSObject {
     }
     
     @objc private func syncSizeControl() {
-        guard let genderControl = genderControl, sizeControl != nil else {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
             return
         }
+        
+        size = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex)
         
         let index = ProductsOptionsGender.male.offsetValue
         let isEnabled = enabledControls[genderControl]?[index] ?? true
