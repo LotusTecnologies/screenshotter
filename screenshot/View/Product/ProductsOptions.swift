@@ -19,24 +19,34 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
+    static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 6) // 64
+    static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 7) // 128
+    
     static var global: ProductsOptionsMask {
-        return ProductsOptionsMask(ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
+        return ProductsOptionsMask(ProductsOptionsCategory.globalValue, ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
     }
     
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    convenience init(_ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
-        var value: Int
+    convenience init(_ category: ProductsOptionsCategory, _ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
+        var value: Int = 0
+        
+        switch category {
+        case .furniture:
+            value |= ProductsOptionsMask.categoryFurniture.rawValue
+        default:
+            value |= ProductsOptionsMask.categoryFashion.rawValue
+        }
         
         switch gender {
         case .male:
-            value = ProductsOptionsMask.genderMale.rawValue
+            value |= ProductsOptionsMask.genderMale.rawValue
         case .female:
-            value = ProductsOptionsMask.genderFemale.rawValue
+            value |= ProductsOptionsMask.genderFemale.rawValue
         default:
-            value = ProductsOptionsMask.genderAuto.rawValue
+            value |= ProductsOptionsMask.genderAuto.rawValue
         }
         
         switch size {
@@ -49,6 +59,14 @@ class ProductsOptionsMask : NSObject {
         }
         
         self.init(rawValue: value)
+    }
+    
+    var category: ProductsOptionsCategory {
+        if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
+            return .furniture
+        } else {
+            return .fashion
+        }
     }
     
     var gender: ProductsOptionsGender {
@@ -104,7 +122,7 @@ class ProductsOptions : NSObject {
     }()
     
     func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
-        category = ProductsOptionsCategory.globalValue
+        category = mask?.category ?? ProductsOptionsCategory.globalValue
         gender = mask?.gender ?? ProductsOptionsGender.globalValue
         size = mask?.size ?? ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
@@ -122,8 +140,7 @@ class ProductsOptions : NSObject {
     }
     
     @objc private func doneButtonAction() {
-        let previousCategory = category
-        let previousMask = ProductsOptionsMask(gender, size)
+        let previousMask = ProductsOptionsMask(category, gender, size)
         let previousSale = sale
         let previousSort = sort
         
@@ -137,17 +154,16 @@ class ProductsOptions : NSObject {
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
-        let categoryChanged = previousCategory.rawValue != category.rawValue
-        let maskChanged = previousMask.rawValue != ProductsOptionsMask(gender, size).rawValue
+        let maskChanged = previousMask.rawValue != ProductsOptionsMask(category, gender, size).rawValue
         let saleChanged = previousSale.rawValue != sale.rawValue
         let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = categoryChanged || maskChanged || saleChanged || sortChanged
+        let changed = maskChanged || saleChanged || sortChanged
         
         delegate?.productsOptionsDidComplete(self, withChange: changed)
         
         if changed {
             let changeMap = [
-                "Category": (new: category.stringValue, old: previousCategory.stringValue),
+                "Category": (new: category.stringValue, old: previousMask.category.stringValue),
                 "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
                 "Size": (new: size.stringValue, old: previousMask.size.stringValue),
                 "Sale": (new: sale.stringValue, old: previousSale.stringValue),
