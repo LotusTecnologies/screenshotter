@@ -139,21 +139,18 @@ class ProductsOptions : NSObject {
         
         delegate?.productsOptionsDidComplete(self, withChange: changed)
         
-        guard changed == true else {
-            return
-        }
-        
-        // Track which filters have changed.
-        let changeMap = [
-            "Gender" : (new: gender.stringValue, old: previousMask.gender.stringValue),
-            "Size" : (new: size.stringValue, old: previousMask.size.stringValue),
-            "Sale" : (new: sale.stringValue, old: previousSale.stringValue),
-            "Sort" : (new: sort.stringValue, old: previousSort.stringValue)
-        ]
-        
-        for (name, tuple) in changeMap {
-            if tuple.new != tuple.old {
-                track("Set \(name) Filter to \(tuple.new)")
+        if changed {
+            let changeMap = [
+                "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
+                "Size": (new: size.stringValue, old: previousMask.size.stringValue),
+                "Sale": (new: sale.stringValue, old: previousSale.stringValue),
+                "Sort": (new: sort.stringValue, old: previousSort.stringValue)
+            ]
+            
+            for (name, value) in changeMap {
+                if value.new != value.old {
+                    AnalyticsTrackers.standard.track("Set \(name) Filter to \(value.new)")
+                }
             }
         }
     }
