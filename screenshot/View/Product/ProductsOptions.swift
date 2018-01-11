@@ -265,24 +265,6 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    func sync() {
-        guard let genderControl = genderControl, let sizeControl = sizeControl else {
-            return
-        }
-        
-        let enabledControls = self.enabledControls
-        
-        for index in 0 ..< genderControl.numberOfSegments {
-            let isEnabled = enabledControls[genderControl]?[index] ?? true
-            genderControl.setEnabled(isEnabled, forSegmentAt: index)
-        }
-        
-        for index in 0 ..< sizeControl.numberOfSegments {
-            let isEnabled = enabledControls[sizeControl]?[index] ?? true
-            sizeControl.setEnabled(isEnabled, forSegmentAt: index)
-        }
-    }
-    
     private var enabledControls: [UIControl : [Int : Bool]] {
         var enabledControls: [UIControl : [Int : Bool]] = [:]
         
@@ -322,6 +304,24 @@ class ProductsOptionsControls : NSObject {
         }
         
         return enabledControls
+    }
+    
+    func sync() {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+            return
+        }
+        
+        let enabledControls = self.enabledControls
+        
+        for index in 0 ..< genderControl.numberOfSegments {
+            let isEnabled = enabledControls[genderControl]?[index] ?? true
+            genderControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+        
+        for index in 0 ..< sizeControl.numberOfSegments {
+            let isEnabled = enabledControls[sizeControl]?[index] ?? true
+            sizeControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
     }
     
     @objc private func syncCategoryControl() {
