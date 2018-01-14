@@ -221,6 +221,31 @@ extension ProductsOptions : UIPickerViewDelegate {
 
 class ProductsOptionsControls : NSObject {
     var categoryControl: UISegmentedControl?
+    var genderControl: UISegmentedControl?
+    var sizeControl: UISegmentedControl?
+    var saleControl: UISegmentedControl?
+    
+    private var gender: ProductsOptionsGender?
+    private var size: ProductsOptionsSize?
+    
+    private class SegmentedControl : UISegmentedControl {
+        private var needsSelectedIndexUpdate = true
+        var didUpdateSelectedIndex: (() -> ())?
+        
+        override func setEnabled(_ enabled: Bool, forSegmentAt segment: Int) {
+            needsSelectedIndexUpdate = false
+            super.setEnabled(enabled, forSegmentAt: segment)
+            needsSelectedIndexUpdate = true
+        }
+        
+        override var selectedSegmentIndex: Int {
+            didSet {
+                if needsSelectedIndexUpdate {
+                    didUpdateSelectedIndex?()
+                }
+            }
+        }
+    }
     
     func createCategoryControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -235,15 +260,16 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    var genderControl: UISegmentedControl?
-    
     func createGenderControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = SegmentedControl(items: [
             ProductsOptionsGender.female.stringValue,
             ProductsOptionsGender.male.stringValue,
             ProductsOptionsGender.auto.stringValue
             ])
         control.addTarget(self, action: #selector(syncGenderControl), for: .valueChanged)
+        control.didUpdateSelectedIndex = {
+            self.gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
+        }
         
         genderControl?.removeFromSuperview()
         genderControl = control
@@ -251,23 +277,22 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    var sizeControl: UISegmentedControl?
-    
     func createSizeControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = SegmentedControl(items: [
             ProductsOptionsSize.child.stringValue,
             ProductsOptionsSize.adult.stringValue,
             ProductsOptionsSize.plus.stringValue
             ])
         control.addTarget(self, action: #selector(syncSizeControl), for: .valueChanged)
+        control.didUpdateSelectedIndex = {
+            self.size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        }
         
         sizeControl?.removeFromSuperview()
         sizeControl = control
         
         return control
     }
-    
-    var saleControl: UISegmentedControl?
     
     func createSaleControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -279,24 +304,6 @@ class ProductsOptionsControls : NSObject {
         saleControl = control
         
         return control
-    }
-    
-    func sync() {
-        guard let genderControl = genderControl, let sizeControl = sizeControl else {
-            return
-        }
-        
-        let enabledControls = self.enabledControls
-        
-        for index in 0 ..< genderControl.numberOfSegments {
-            let isEnabled = enabledControls[genderControl]?[index] ?? true
-            genderControl.setEnabled(isEnabled, forSegmentAt: index)
-        }
-        
-        for index in 0 ..< sizeControl.numberOfSegments {
-            let isEnabled = enabledControls[sizeControl]?[index] ?? true
-            sizeControl.setEnabled(isEnabled, forSegmentAt: index)
-        }
     }
     
     private var enabledControls: [UIControl : [Int : Bool]] {
@@ -340,14 +347,48 @@ class ProductsOptionsControls : NSObject {
         return enabledControls
     }
     
+    func sync() {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+            return
+        }
+        
+        let enabledControls = self.enabledControls
+        
+        for index in 0 ..< genderControl.numberOfSegments {
+            let isEnabled = enabledControls[genderControl]?[index] ?? true
+            genderControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+        
+        for index in 0 ..< sizeControl.numberOfSegments {
+            let isEnabled = enabledControls[sizeControl]?[index] ?? true
+            sizeControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+    }
+    
     @objc private func syncCategoryControl() {
+        guard let categoryControl = categoryControl else {
+            return
+        }
+        
+        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion {
+            if let genderControl = genderControl, let gender = gender {
+                genderControl.selectedSegmentIndex = gender.offsetValue
+            }
+            
+            if let sizeControl = sizeControl, let size = size {
+                sizeControl.selectedSegmentIndex = size.offsetValue
+            }
+        }
+        
         sync()
     }
     
     @objc private func syncGenderControl() {
-        guard genderControl != nil, let sizeControl = sizeControl else {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
             return
         }
+        
+        gender = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex)
         
         let index = ProductsOptionsSize.plus.offsetValue
         let isEnabled = enabledControls[sizeControl]?[index] ?? true
@@ -355,9 +396,11 @@ class ProductsOptionsControls : NSObject {
     }
     
     @objc private func syncSizeControl() {
-        guard let genderControl = genderControl, sizeControl != nil else {
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
             return
         }
+        
+        size = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex)
         
         let index = ProductsOptionsGender.male.offsetValue
         let isEnabled = enabledControls[genderControl]?[index] ?? true
@@ -366,7 +409,7 @@ class ProductsOptionsControls : NSObject {
 }
 
 class ProductsOptionsView : UIView {
-    private let controls = ProductsOptionsControls()
+    fileprivate let controls = ProductsOptionsControls()
     
     private(set) var categoryControl: UISegmentedControl!
     private(set) var genderControl: UISegmentedControl!

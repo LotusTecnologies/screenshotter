@@ -293,21 +293,6 @@ class SettingsViewController : BaseViewController {
     
     @objc fileprivate func categoryControlAction(_ control: UISegmentedControl) {
         let category = ProductsOptionsCategory(offsetValue: control.selectedSegmentIndex)
-        
-        if category == .fashion {
-            if let genderControl = productsOptionsControls.genderControl {
-                let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-                genderControl.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
-            }
-            
-            if let sizeControl = productsOptionsControls.sizeControl {
-                let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
-                sizeControl.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
-            }
-            
-            productsOptionsControls.sync()
-        }
-        
         let integer = category.rawValue
         
         AnalyticsTrackers.standard.track("Set Global Category Filter to \(category.stringValue)")
