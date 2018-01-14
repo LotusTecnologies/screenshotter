@@ -93,7 +93,7 @@ class TutorialVideoViewController : BaseViewController {
             player.play()
             delegate?.tutorialVideoViewControllerDidPlay?(self)
             
-            track("Started Tutorial Video")
+            AnalyticsTrackers.standard.track("Started Tutorial Video")
         }
     }
     
@@ -154,12 +154,12 @@ class TutorialVideoViewController : BaseViewController {
             }
         }
         
-        track("Replayed Tutorial Video")
+        AnalyticsTrackers.standard.track("Replayed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidPlay?(self)
     }
     
     @objc private func doneButtonTapped() {
-        track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
+        AnalyticsTrackers.standard.track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
         
         delegate?.tutorialVideoViewControllerDidTapDone(self)
     }
@@ -188,11 +188,11 @@ class TutorialVideoViewController : BaseViewController {
         if player.togglePlayback() == .paused {
             overlayView.flashPauseOverlay()
             
-            track("Paused Tutorial Video")
+            AnalyticsTrackers.standard.track("Paused Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPause?(self)
             
         } else {
-            track("Continued Tutorial Video")
+            AnalyticsTrackers.standard.track("Continued Tutorial Video")
             delegate?.tutorialVideoViewControllerDidPlay?(self)
         }
     }
@@ -206,7 +206,7 @@ class TutorialVideoViewController : BaseViewController {
         
         overlayView.hideVolumeToggleButton()
         
-        track("Completed Tutorial Video")
+        AnalyticsTrackers.standard.track("Completed Tutorial Video")
         delegate?.tutorialVideoViewControllerDidEnd?(self)
     }
 }
