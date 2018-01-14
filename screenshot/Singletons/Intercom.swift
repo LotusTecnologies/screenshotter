@@ -69,7 +69,7 @@ class IntercomHelper : NSObject {
         let isIntercomNotification = Intercom.isIntercomPushNotification(userInfo)
         let trackingPrefix = opened ? "Opened with" : "Received"
         
-        track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
+        AnalyticsTrackers.standard.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": isIntercomNotification ? "true": "false"])
     }
     
     func registerAnonymousUser() {
@@ -79,11 +79,7 @@ class IntercomHelper : NSObject {
     func register(user: AnalyticsUser) {
         updateIntercomDeviceToken()
         
-        if let email = user.email {
-            Intercom.registerUser(withEmail: email)
-        } else {
-            Intercom.registerUser(withUserId: user.identifier)
-        }
+        Intercom.registerUser(withUserId: user.identifier)
         
         performUserUpdate { attrs in
             attrs.userId = user.identifier

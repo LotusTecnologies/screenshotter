@@ -153,7 +153,7 @@ class ProductsOptions : NSObject {
         
         for (name, tuple) in changeMap {
             if tuple.new != tuple.old {
-                track("Set \(name) Filter to \(tuple.new)")
+                AnalyticsTrackers.standard.track("Set \(name) Filter to \(tuple.new)")
             }
         }
     }
