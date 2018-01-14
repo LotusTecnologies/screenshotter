@@ -23,7 +23,6 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     private var deletedItems: [IndexPath] = []
     private var insertedItems: [IndexPath] = []
     
-    
     override func prepare() {
         guard let collectionView = collectionView else {
             return
@@ -38,7 +37,6 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         deletedItems = []
         insertedItems = []
     }
-    
     
     override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
         deletedItems = updateItems.filter({ collectionViewUpdateItem -> Bool in

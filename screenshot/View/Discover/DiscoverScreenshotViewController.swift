@@ -12,6 +12,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
+    fileprivate var helper: DiscoverScreenshotHelperView?
     
     fileprivate var isAdding = false
     
@@ -155,6 +156,10 @@ class DiscoverScreenshotViewController : BaseViewController {
                 canPanScreenshot = true
                 panGesture.setTranslation(.zero, in: panGesture.view)
                 translation = panGesture.translation(in: panGesture.view)
+                
+                if helper != nil {
+                    dismissHelperView()
+                }
             }
             
             isAdding = translation.x > 0
@@ -203,6 +208,18 @@ class DiscoverScreenshotViewController : BaseViewController {
             collectionViewLayout.progressFinalAttributes(attributes, cell: cell, percent: itemPercent)
         }
     }
+    
+    // MARK: Helper View
+    
+    @objc fileprivate func dismissHelperView() {
+        UIView.animate(withDuration: 0.2, animations: {
+            self.helper?.alpha = 0
+            
+        }) { completion in
+            self.helper?.removeFromSuperview()
+            self.helper = nil
+        }
+    }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
@@ -218,7 +235,32 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDelegate {
-    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let cell = cell as? DiscoverScreenshotCollectionViewCell else {
+            return
+        }
+        
+        guard self.helper == nil else {
+            return
+        }
+        
+//        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
+            let helper = DiscoverScreenshotHelperView()
+            helper.translatesAutoresizingMaskIntoConstraints = false
+            cell.mainView.addSubview(helper)
+            helper.topAnchor.constraint(equalTo: cell.mainView.topAnchor).isActive = true
+            helper.leadingAnchor.constraint(equalTo: cell.mainView.leadingAnchor).isActive = true
+            helper.bottomAnchor.constraint(equalTo: cell.mainView.bottomAnchor).isActive = true
+            helper.trailingAnchor.constraint(equalTo: cell.mainView.trailingAnchor).isActive = true
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissHelperView))
+        helper.addGestureRecognizer(tapGesture)
+        
+            self.helper = helper
+            
+//            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
+//        }
+    }
 }
 
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
