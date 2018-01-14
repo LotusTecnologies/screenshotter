@@ -116,9 +116,6 @@ class ProductsOptions : NSObject {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.sortPickerView.dataSource = self
         view.sortPickerView.delegate = self
-        view.categoryControl.addTarget(self, action: #selector(categoryControlAction), for: .valueChanged)
-        view.genderControl.addTarget(self, action: #selector(genderControlAction), for: .valueChanged)
-        view.sizeControl.addTarget(self, action: #selector(sizeControlAction), for: .valueChanged)
         view.doneButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
         self.syncOptions(withView: view)
         return view
@@ -140,22 +137,6 @@ class ProductsOptions : NSObject {
         view.sizeControl.selectedSegmentIndex = size.offsetValue
         view.saleControl.selectedSegmentIndex = sale.offsetValue
         view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
-    }
-    
-    @objc private func categoryControlAction() {
-        if ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex) == .fashion {
-//            view.genderControl.selectedSegmentIndex = gender.offsetValue
-//            view.sizeControl.selectedSegmentIndex = size.offsetValue
-//            view.controls.sync()
-        }
-    }
-    
-    @objc private func genderControlAction() {
-//        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
-    }
-    
-    @objc private func sizeControlAction() {
-//        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
     }
     
     @objc private func doneButtonAction() {
@@ -247,6 +228,25 @@ class ProductsOptionsControls : NSObject {
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
     
+    private class SegmentedControl : UISegmentedControl {
+        private var needsSelectedIndexUpdate = true
+        var didUpdateSelectedIndex: (() -> ())?
+        
+        override func setEnabled(_ enabled: Bool, forSegmentAt segment: Int) {
+            needsSelectedIndexUpdate = false
+            super.setEnabled(enabled, forSegmentAt: segment)
+            needsSelectedIndexUpdate = true
+        }
+        
+        override var selectedSegmentIndex: Int {
+            didSet {
+                if needsSelectedIndexUpdate {
+                    didUpdateSelectedIndex?()
+                }
+            }
+        }
+    }
+    
     func createCategoryControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
             ProductsOptionsCategory.fashion.stringValue,
@@ -261,12 +261,15 @@ class ProductsOptionsControls : NSObject {
     }
     
     func createGenderControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = SegmentedControl(items: [
             ProductsOptionsGender.female.stringValue,
             ProductsOptionsGender.male.stringValue,
             ProductsOptionsGender.auto.stringValue
             ])
         control.addTarget(self, action: #selector(syncGenderControl), for: .valueChanged)
+        control.didUpdateSelectedIndex = {
+            self.gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
+        }
         
         genderControl?.removeFromSuperview()
         genderControl = control
@@ -275,12 +278,15 @@ class ProductsOptionsControls : NSObject {
     }
     
     func createSizeControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = SegmentedControl(items: [
             ProductsOptionsSize.child.stringValue,
             ProductsOptionsSize.adult.stringValue,
             ProductsOptionsSize.plus.stringValue
             ])
         control.addTarget(self, action: #selector(syncSizeControl), for: .valueChanged)
+        control.didUpdateSelectedIndex = {
+            self.size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        }
         
         sizeControl?.removeFromSuperview()
         sizeControl = control
@@ -382,7 +388,6 @@ class ProductsOptionsControls : NSObject {
             return
         }
         
-        // TODO: these values need to be set on the start as well, not just after being changed
         gender = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex)
         
         let index = ProductsOptionsSize.plus.offsetValue
