@@ -16,6 +16,8 @@
 "currency.auto" = "Automatic";
 
 "discover.load" = "Loading Discover...";
+"discover.screenshot.add" = "Add";
+"discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
 
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
