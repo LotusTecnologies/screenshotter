@@ -93,7 +93,7 @@ class DataModel: NSObject {
     public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = NSPredicate(format: "isHidden == FALSE AND isFashion == TRUE")
+        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {
@@ -295,7 +295,7 @@ extension DataModel {
     func saveScreenshot(managedObjectContext: NSManagedObjectContext,
                         assetId: String,
                         createdAt: Date?,
-                        isFashion: Bool,
+                        isRecognized: Bool,
                         isFromShare: Bool,
                         isHidden: Bool,
                         imageData: Data?,
@@ -305,7 +305,7 @@ extension DataModel {
         if let nsDate = createdAt as NSDate? {
             screenshotToSave.createdAt = nsDate
         }
-        screenshotToSave.isFashion = isFashion
+        screenshotToSave.isRecognized = isRecognized
         screenshotToSave.isFromShare = isFromShare
         screenshotToSave.isHidden = isHidden
         screenshotToSave.isNew = true
@@ -329,7 +329,7 @@ extension DataModel {
     }
     
     func retrieveCompleteAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
-        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isFashion != nil"))
+        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isRecognized != nil"))
     }
     
     func retrieveHiddenAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
@@ -338,7 +338,7 @@ extension DataModel {
     
     func retrieveLastScreenshotAssetId(managedObjectContext: NSManagedObjectContext) -> String? {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
-        fetchRequest.predicate = NSPredicate(format: "isFashion == TRUE AND isFromShare == FALSE AND isHidden == TRUE") // match uploadScreenshotWithClarifai
+        fetchRequest.predicate = NSPredicate(format: "isRecognized == TRUE AND isFromShare == FALSE AND isHidden == TRUE") // match uploadScreenshotWithClarifai
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
         fetchRequest.fetchLimit = 1
         fetchRequest.includesSubentities = false

@@ -111,7 +111,7 @@ class AssetSyncModel: NSObject {
                         let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                          assetId: asset.localIdentifier,
                                                          createdAt: asset.creationDate,
-                                                         isFashion: isRecognized,
+                                                         isRecognized: isRecognized,
                                                          isFromShare: false,
                                                          isHidden: !isRecognized || !isForeground,
                                                          imageData: imageData,
@@ -157,7 +157,7 @@ class AssetSyncModel: NSObject {
                         let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                          assetId: asset.localIdentifier,
                                                          createdAt: asset.creationDate,
-                                                         isFashion: true,
+                                                         isRecognized: true,
                                                          isFromShare: false,
                                                          isHidden: false,
                                                          imageData: imageData,
@@ -219,7 +219,7 @@ class AssetSyncModel: NSObject {
                     screenshot.shoppablesCount = 0
                     screenshot.imageData = imageData as NSData?
                     screenshot.isHidden = false
-                    screenshot.isFashion = true
+                    screenshot.isRecognized = true
                     screenshot.lastModified = NSDate()
                     dataModel.saveMoc(managedObjectContext: managedObjectContext)
                     // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
@@ -319,7 +319,7 @@ class AssetSyncModel: NSObject {
                     return dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: shareId,
                                                     createdAt: Date(),
-                                                    isFashion: true,
+                                                    isRecognized: true,
                                                     isFromShare: true,
                                                     isHidden: false,
                                                     imageData: imageData,
@@ -862,7 +862,7 @@ class AssetSyncModel: NSObject {
                                 let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                  assetId: Constants.tutorialScreenshotAssetId,
                                                                  createdAt: Date(),
-                                                                 isFashion: true,
+                                                                 isRecognized: true,
                                                                  isFromShare: false,
                                                                  isHidden: false,
                                                                  imageData: imageData,
