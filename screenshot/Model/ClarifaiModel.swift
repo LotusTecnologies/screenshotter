@@ -122,7 +122,15 @@ class ClarifaiModel: NSObject {
         return localClarifaiOutputs(image: image).then { outputs -> Promise<(ImageClassification, UIImage)> in
             let conceptNamesArray = outputs.flatMap({$0.dataAsset.concepts}).flatMap({$0}).flatMap({$0.name})
             let conceptNames = Set<String>(conceptNamesArray)
+
+            // TODO: Remove alert after experimenting in dev.
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: nil, message: conceptNames.joined(separator: " "), preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
+                AppDelegate.shared.window?.rootViewController?.present(alert, animated: true, completion: nil)
+            }
             print("classify conceptNames:\(conceptNames)")
+
             if !conceptNames.isDisjoint(with: ["woman", "man", "child"]) {
                 return Promise(value: (.human, image))
             } else if !conceptNames.isDisjoint(with: ["furniture", "chair", "table", "desk", "sofa", "couch", "rug", "drapes", "bookshelf"]) {

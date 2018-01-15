@@ -981,7 +981,7 @@ extension Shoppable {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
                     if let lastSetMask = shoppable.getLast(),
-                      lastSetMask.rawValue & ProductsOptionsMask.categoryFurniture.rawValue != optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue {
+                      lastSetMask.rawValue & 0xC0 != optionsMaskInt & 0xC0 {
                         if let screenshot = shoppable.screenshot {
                             screenshot.hideWorkhorse(managedObjectContext: managedObjectContext, deleteImage: false)
                             screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
