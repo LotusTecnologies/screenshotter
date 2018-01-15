@@ -31,10 +31,8 @@ class DiscoverScreenshotHelperView : UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let edgePadding: CGFloat = 20
-        
         backgroundColor = UIColor.crazeRed.withAlphaComponent(0.8)
-        layoutMargins = UIEdgeInsets(top: edgePadding, left: edgePadding, bottom: edgePadding, right: edgePadding)
+        layoutMargins = UIEdgeInsets(top: .padding + 4, left: .padding, bottom: 0, right: .padding)
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textColor = .white
@@ -67,9 +65,17 @@ class DiscoverScreenshotHelperView : UIView {
         
         swipeLeftLabel.translatesAutoresizingMaskIntoConstraints = false
         swipeLeftLabel.textColor = .white
-        swipeLeftLabel.text = "Swipe Left\nto pass"
+        swipeLeftLabel.attributedText = {
+            let text = NSMutableAttributedString(string: "Swipe Left", attributes: [
+                NSFontAttributeName: UIFont.boldSystemFont(ofSize: 20)
+                ])
+            let text2 = NSAttributedString(string: "\nto pass", attributes: [
+                NSFontAttributeName: UIFont.systemFont(ofSize: 20)
+                ])
+            text.append(text2)
+            return text
+        }()
         swipeLeftLabel.textAlignment = .center
-        swipeLeftLabel.font = UIFont.systemFont(ofSize: 20)
         swipeLeftLabel.adjustsFontSizeToFitWidth = true
         swipeLeftLabel.minimumScaleFactor = 0.7
         swipeLeftLabel.numberOfLines = 0
@@ -81,9 +87,17 @@ class DiscoverScreenshotHelperView : UIView {
         
         swipeRightLabel.translatesAutoresizingMaskIntoConstraints = false
         swipeRightLabel.textColor = .white
-        swipeRightLabel.text = "Swipe Right\nto add to your collection"
+        swipeRightLabel.attributedText = {
+            let text = NSMutableAttributedString(string: "Swipe Right", attributes: [
+                NSFontAttributeName: UIFont.boldSystemFont(ofSize: 20)
+                ])
+            let text2 = NSAttributedString(string: "\nto add to your collection", attributes: [
+                NSFontAttributeName: UIFont.systemFont(ofSize: 20)
+                ])
+            text.append(text2)
+            return text
+        }()
         swipeRightLabel.textAlignment = .center
-        swipeRightLabel.font = UIFont.systemFont(ofSize: 20)
         swipeRightLabel.adjustsFontSizeToFitWidth = true
         swipeRightLabel.minimumScaleFactor = 0.7
         swipeRightLabel.numberOfLines = 0
@@ -114,9 +128,17 @@ class DiscoverScreenshotHelperView : UIView {
         
         tapLabel.translatesAutoresizingMaskIntoConstraints = false
         tapLabel.textColor = .white
-        tapLabel.text = "Tap to shop"
+        tapLabel.attributedText = {
+            let text = NSMutableAttributedString(string: "Tap", attributes: [
+                NSFontAttributeName: UIFont.boldSystemFont(ofSize: 20)
+                ])
+            let text2 = NSAttributedString(string: " to shop", attributes: [
+                NSFontAttributeName: UIFont.systemFont(ofSize: 20)
+                ])
+            text.append(text2)
+            return text
+        }()
         tapLabel.textAlignment = .center
-        tapLabel.font = UIFont.systemFont(ofSize: 20)
         tapLabel.adjustsFontSizeToFitWidth = true
         tapLabel.minimumScaleFactor = 0.7
         tapLabel.numberOfLines = 0
