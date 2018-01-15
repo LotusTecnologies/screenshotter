@@ -11,7 +11,7 @@
         <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="merchant" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="offer" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="optionsMask" attributeType="Integer 32" defaultValueString="9" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="optionsMask" attributeType="Integer 32" defaultValueString="73" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="order" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="originalPrice" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
@@ -59,8 +59,8 @@
         <relationship name="screenshot" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="shoppables" inverseEntity="Screenshot" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Product" positionX="358" positionY="189" width="128" height="300"/>
-        <element name="ProductFilter" positionX="124" positionY="72" width="128" height="120"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="298"/>
+        <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="285"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
     </elements>

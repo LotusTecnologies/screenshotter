@@ -689,6 +689,8 @@ extension DataModel {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
+                self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
+                self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
         }
     }
@@ -767,22 +769,56 @@ extension DataModel {
             print("cleanDeletedScreenshots results with error:\(error)")
         }
     }
-
+    
+    func fixProductFiltersNoClassification(managedObjectContext: NSManagedObjectContext) {
+        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
+        let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
+        fetchRequest.predicate = noClassificationPredicate
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for productFilter in results {
+                productFilter.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("fixProductFiltersNoClassification results with error:\(error)")
+        }
+    }
+    
+    func fixProductsNoClassification(managedObjectContext: NSManagedObjectContext) {
+        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = noClassificationPredicate
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for product in results {
+                product.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("fixProductsNoClassification results with error:\(error)")
+        }
+    }
+    
 }
 
 extension Screenshot {
     
     // hideWorkhorse is not meant to be called from UI code,
     // but may be called on the main queue, even if generally called on a background queue.
-    func hideWorkhorse(managedObjectContext: NSManagedObjectContext) {
-        isHidden = true
+    // It does not actually hide the screenshot.
+    func hideWorkhorse(managedObjectContext: NSManagedObjectContext, deleteImage: Bool = true) {
         syteJson = nil
         shareLink = nil
         uploadedImageURL = nil
         if let favoriteSet = favorites as? Set<Product>,
           favoriteSet.count > 0 {
             favoriteSet.forEach { $0.shoppable = nil }
-        } else {
+        } else if deleteImage {
             imageData = nil
         }
         if let shoppablesSet = shoppables as? Set<Shoppable> {
@@ -801,6 +837,7 @@ extension Screenshot {
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for screenshot in results {
+                    screenshot.isHidden = true
                     screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                 }
                 try managedObjectContext.save()
@@ -943,6 +980,17 @@ extension Shoppable {
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
+                    if let lastSetMask = shoppable.getLast(),
+                      lastSetMask.rawValue & ProductsOptionsMask.categoryFurniture.rawValue != optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue {
+                        if let screenshot = shoppable.screenshot {
+                            screenshot.hideWorkhorse(managedObjectContext: managedObjectContext, deleteImage: false)
+                            screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
+                            AssetSyncModel.sharedInstance.processingQ.async {
+                                AssetSyncModel.sharedInstance.rescanClassification(assetId: screenshot.assetId!, imageData: screenshot.imageData as Data?)
+                            }
+                        }
+                        break // Break out of the shoppable for loop
+                    }
                     if let matchingFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMaskInt)).first as? ProductFilter {
                         matchingFilter.dateSet = NSDate()
                         if matchingFilter.productCount == 0,
@@ -1014,7 +1062,7 @@ extension Shoppable {
                     guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableID) else {
                         return
                     }
-                    optionsMask = ProductsOptionsMask(rawValue: 9)
+                    optionsMask = ProductsOptionsMask(rawValue: 73)
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask, rating: ratingValue)
                 }
                 var augmentedOffersUrl: String? = nil

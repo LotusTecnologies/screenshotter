@@ -175,7 +175,6 @@ class AssetSyncModel: NSObject {
     }
     
     func retryScreenshot(asset: PHAsset) {
-        let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<Data?> in
@@ -183,43 +182,7 @@ class AssetSyncModel: NSObject {
                 let imageData = self.data(for: image)
                 return Promise(value: imageData)
             }.then (on: processingQ) { imageData -> Promise<(Data?, ClarifaiModel.ImageClassification)> in
-                return Promise { fulfill, reject in
-                    dataModel.performBackgroundTask { (managedObjectContext) in
-                        if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: asset.localIdentifier) {
-                            var imageClassification: ClarifaiModel.ImageClassification
-                            if let classification = screenshot.syteJson,
-                              classification.utf8.count == 1 { // Dual-purposing syteJson for imageClassification, if one character
-                                screenshot.syteJson = nil
-                                switch classification {
-                                case "h":
-                                    imageClassification = .human
-                                case "f":
-                                    imageClassification = .furniture
-                                default:
-                                    imageClassification = .human
-                                }
-                            } else {
-                                imageClassification = .human
-                            }
-                            if screenshot.shoppablesCount > 0 {
-                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
-                            }
-                            screenshot.shoppablesCount = 0
-                            screenshot.imageData = imageData as NSData?
-                            screenshot.isHidden = false
-                            screenshot.isFashion = true
-                            screenshot.lastModified = NSDate()
-                            dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                            // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
-                            screenshot.lastModified = NSDate()
-                            dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                            fulfill((imageData, imageClassification))
-                        } else {
-                            let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(asset.localIdentifier)"])
-                            reject(error)
-                        }
-                    }
-                }
+                return self.resaveScreenshot(assetId: asset.localIdentifier, imageData: imageData)
             }.then (on: processingQ) { (imageData, imageClassification) -> Void in
                 print("retryScreenshot imageClassification:\(imageClassification)")
                 self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
@@ -227,6 +190,59 @@ class AssetSyncModel: NSObject {
                 self.decrementScreenshots()
             }.catch { error in
                 print("retryScreenshot catch error:\(error)")
+        }
+    }
+    
+    func resaveScreenshot(assetId: String, imageData: Data?) -> Promise<(Data?, ClarifaiModel.ImageClassification)> {
+        let dataModel = DataModel.sharedInstance
+        return Promise { fulfill, reject in
+            dataModel.performBackgroundTask { (managedObjectContext) in
+                if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
+                    var imageClassification: ClarifaiModel.ImageClassification
+                    if let classification = screenshot.syteJson,
+                        classification.utf8.count == 1 { // Dual-purposing syteJson for imageClassification, if one character
+                        screenshot.syteJson = nil
+                        switch classification {
+                        case "h":
+                            imageClassification = .human
+                        case "f":
+                            imageClassification = .furniture
+                        default:
+                            imageClassification = .human
+                        }
+                    } else {
+                        imageClassification = .human
+                    }
+                    if screenshot.shoppablesCount > 0 {
+                        screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                    }
+                    screenshot.shoppablesCount = 0
+                    screenshot.imageData = imageData as NSData?
+                    screenshot.isHidden = false
+                    screenshot.isFashion = true
+                    screenshot.lastModified = NSDate()
+                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
+                    screenshot.lastModified = NSDate()
+                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    fulfill((imageData, imageClassification))
+                } else {
+                    let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(assetId)"])
+                    reject(error)
+                }
+            }
+        }
+    }
+    
+    func rescanClassification(assetId: String, imageData: Data?) {
+        track("bypassed Clarifai on retry")
+        firstly {
+            self.resaveScreenshot(assetId: assetId, imageData: imageData)
+            }.then (on: processingQ) { (imageData, imageClassification) -> Void in
+                print("rescanClassification imageClassification:\(imageClassification)")
+                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: assetId)
+            }.catch { error in
+                print("rescanClassification catch error:\(error)")
         }
     }
     
