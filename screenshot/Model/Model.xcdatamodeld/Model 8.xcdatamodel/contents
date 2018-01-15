@@ -26,7 +26,7 @@
         <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="shoppable" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="productFilters" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
-    <entity name="Screenshot" representedClassName="Screenshot" elementID="isFashion" syncable="YES" codeGenerationType="class">
+    <entity name="Screenshot" representedClassName="Screenshot" syncable="YES" codeGenerationType="class">
         <attribute name="assetId" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="favoritesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
