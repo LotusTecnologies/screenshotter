@@ -177,16 +177,6 @@ public class AnalyticsTrackers : NSObject {
     static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom])
 }
 
-public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
-    tracker.track(name, properties: properties)
-}
-
-public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
-    let user = AnalyticsUser(name: name, email: email)
-    tracker.identify(user)
-    return user
-}
-
 fileprivate let marketingBrands = [
     "boohoo",
     "missguided",

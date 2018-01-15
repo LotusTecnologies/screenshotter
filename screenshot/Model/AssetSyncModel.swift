@@ -88,7 +88,7 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                track("sent image to Clarifai")
+                AnalyticsTrackers.standard.track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.classify(image: image)
             }.then(on: processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                 let isRecognized: Bool
@@ -104,7 +104,7 @@ class AssetSyncModel: NSObject {
                     isRecognized = false
                     classification = nil
                 }
-                track("received response from Clarifai", properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+                AnalyticsTrackers.standard.track("received response from Clarifai", properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
                 let imageData: Data? = isRecognized ? self.data(for: image) : nil
                 return Promise { fulfill, reject in
                     dataModel.performBackgroundTask { (managedObjectContext) in
@@ -146,10 +146,10 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                track("sent image to Clarifai")
+                AnalyticsTrackers.standard.track("sent image to Clarifai")
                 return ClarifaiModel.sharedInstance.classify(image: image)
             }.then(on: processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                track("received response from Clarifai", properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+                AnalyticsTrackers.standard.track("received response from Clarifai", properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
                 let imageData: Data? = self.data(for: image)
                 let guaranteedImageClassification = (imageClassification == .unrecognized ? .human : imageClassification)
                 return Promise { fulfill, reject in
@@ -178,7 +178,7 @@ class AssetSyncModel: NSObject {
         firstly {
             return image(asset: asset)
             }.then (on: processingQ) { image -> Promise<Data?> in
-                track("bypassed Clarifai on retry")
+                AnalyticsTrackers.standard.track("bypassed Clarifai on retry")
                 let imageData = self.data(for: image)
                 return Promise(value: imageData)
             }.then (on: processingQ) { imageData -> Promise<(Data?, ClarifaiModel.ImageClassification)> in
@@ -235,7 +235,7 @@ class AssetSyncModel: NSObject {
     }
     
     func rescanClassification(assetId: String, imageData: Data?) {
-        track("bypassed Clarifai on retry")
+        AnalyticsTrackers.standard.track("bypassed Clarifai on retry")
         firstly {
             self.resaveScreenshot(assetId: assetId, imageData: imageData)
             }.then (on: processingQ) { (imageData, imageClassification) -> Void in
@@ -254,7 +254,7 @@ class AssetSyncModel: NSObject {
             firstly { _ -> Promise<(String, [[String : Any]])> in
                 return NetworkingPromise.uploadToSyte(imageData: imageData, imageClassification: imageClassification)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    track("received response from Syte", properties: ["segmentCount" : segments.count])
+                    AnalyticsTrackers.standard.track("received response from Syte", properties: ["segmentCount" : segments.count])
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
@@ -269,7 +269,7 @@ class AssetSyncModel: NSObject {
                             // Syte returned no segments
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            track("received response from Syte", properties: ["segmentCount" : 0])
+                            AnalyticsTrackers.standard.track("received response from Syte", properties: ["segmentCount" : 0])
                         default:
                             break
                         }
@@ -488,7 +488,7 @@ class AssetSyncModel: NSObject {
                 }
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
             }
-            track("received products from Syte", properties: ["productCount" : productsArray.count])
+            AnalyticsTrackers.standard.track("received products from Syte", properties: ["productCount" : productsArray.count])
         }
             
         NetworkingPromise.downloadProductsWithRetry(url: url)
@@ -579,7 +579,7 @@ class AssetSyncModel: NSObject {
         
         guard let asset = assets.firstObject else {
             print("No asset for assetId:\(assetId)")
-            track("err img hang", properties: ["reason" : "No asset for assetId:\(assetId)"])
+            AnalyticsTrackers.standard.track("err img hang", properties: ["reason" : "No asset for assetId:\(assetId)"])
             callback(nil, nil)
             return
         }
@@ -607,13 +607,13 @@ class AssetSyncModel: NSObject {
         return Promise { fulfill, reject in
             image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
                 if let imageError = info?[PHImageErrorKey] as? NSError {
-                    track("err img hang", properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
+                    AnalyticsTrackers.standard.track("err img hang", properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
                     reject(imageError)
                     return
                 }
                 if let isCancelled = info?[PHImageCancelledKey] as? Bool,
                     isCancelled == true {
-                    track("err img hang", properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
+                    AnalyticsTrackers.standard.track("err img hang", properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
                     let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
                     reject(cancelledError)
                     return
@@ -626,7 +626,7 @@ class AssetSyncModel: NSObject {
                 if let image = image {
                     fulfill(image)
                 } else {
-                    track("err img hang", properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
+                    AnalyticsTrackers.standard.track("err img hang", properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
                     let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
                     reject(emptyError)
                 }
@@ -779,7 +779,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toUpload.count > 0 {
-                track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
+                AnalyticsTrackers.standard.track("user imported screenshots", properties: ["numScreenshots" : toUpload.count])
                 self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if toUpload.contains(asset.localIdentifier) {
                         self.screenshotsToProcess += 1
@@ -790,7 +790,7 @@ class AssetSyncModel: NSObject {
                 })
             }
             if toDownload.count > 0 {
-                track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
+                AnalyticsTrackers.standard.track("user received shared screenshots", properties: ["numScreenshots" : toDownload.count]) // Always 1?
                 self.screenshotsToProcess += toDownload.count
                 toDownload.forEach { shareId in
                     self.processingQ.async {
@@ -799,7 +799,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toBypassClarifai.count > 0 {
-                track("user imported old screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
+                AnalyticsTrackers.standard.track("user imported old screenshots", properties: ["numScreenshots" : toBypassClarifai.count])
                 self.selectedScreenshotAssets
                     .filter { toBypassClarifai.contains($0.localIdentifier) }
                     .forEach { asset in
@@ -810,7 +810,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             if toRetry.count > 0 {
-                track("user retried screenshots", properties: ["numScreenshots" : toRetry.count])
+                AnalyticsTrackers.standard.track("user retried screenshots", properties: ["numScreenshots" : toRetry.count])
                 self.selectedScreenshotAssets
                     .filter { toRetry.contains($0.localIdentifier) }
                     .forEach { asset in
@@ -953,7 +953,7 @@ extension AssetSyncModel {
             if let error = error {
                 print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
             } else {
-                track("app sent local push notification")
+                AnalyticsTrackers.standard.track("app sent local push notification")
             }
         })
     }
