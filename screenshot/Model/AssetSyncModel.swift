@@ -234,19 +234,19 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    func rescanClassification(assetId: String, imageData: Data?) {
+    func rescanClassification(assetId: String, imageData: Data?, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
         AnalyticsTrackers.standard.track("bypassed Clarifai on retry")
         firstly {
             self.resaveScreenshot(assetId: assetId, imageData: imageData)
             }.then (on: processingQ) { (imageData, imageClassification) -> Void in
                 print("rescanClassification imageClassification:\(imageClassification)")
-                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: assetId)
+                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: assetId, optionsMask: optionsMask)
             }.catch { error in
                 print("rescanClassification catch error:\(error)")
         }
     }
     
-    func syteProcessing(imageClassification: ClarifaiModel.ImageClassification, imageData: Data?, assetId: String) {
+    func syteProcessing(imageClassification: ClarifaiModel.ImageClassification, imageData: Data?, assetId: String, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
         if imageClassification != .unrecognized {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
@@ -258,7 +258,7 @@ class AssetSyncModel: NSObject {
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
-                    self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments)
+                    self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments, optionsMask: optionsMask)
                 }.always {
                     self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Product)
                 }.catch { error in
@@ -380,8 +380,7 @@ class AssetSyncModel: NSObject {
         return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + sizeParamString + genderParamString)
     }
     
-    func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]]) { //-> Promise<[String]> {
-        let optionsMask = ProductsOptionsMask.global
+    func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]], optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) { //-> Promise<[String]> {
         for segment in segments {
             guard let offersURL = segment["offers"] as? String,
                 let url = augmentedUrl(offersURL: offersURL, optionsMask: optionsMask),

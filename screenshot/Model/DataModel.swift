@@ -986,7 +986,7 @@ extension Shoppable {
                             screenshot.hideWorkhorse(managedObjectContext: managedObjectContext, deleteImage: false)
                             screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
                             AssetSyncModel.sharedInstance.processingQ.async {
-                                AssetSyncModel.sharedInstance.rescanClassification(assetId: screenshot.assetId!, imageData: screenshot.imageData as Data?)
+                                AssetSyncModel.sharedInstance.rescanClassification(assetId: screenshot.assetId!, imageData: screenshot.imageData as Data?, optionsMask: optionsMask)
                             }
                         }
                         break // Break out of the shoppable for loop
