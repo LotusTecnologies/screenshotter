@@ -126,10 +126,12 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     @objc private func passButtonAction() {
         decisionAction(isAdded: false)
+        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "tap"])
     }
     
     @objc private func addButtonAction() {
         decisionAction(isAdded: true)
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
     }
     
     private var canPanScreenshot = false
@@ -175,7 +177,14 @@ class DiscoverScreenshotViewController : BaseViewController {
             
             UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                 if abs(decisionValueThreshold) >= 1 {
-                    decisionValueThreshold > 0 ? self.addButtonAction() : self.passButtonAction()
+                    if decisionValueThreshold > 0 {
+                        self.decisionAction(isAdded: true)
+                        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
+                        
+                    } else {
+                        self.decisionAction(isAdded: false)
+                        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
+                    }
                     
                 } else {
                     self.updateCell(atIndexPath: self.topIndexPath, percent: 0)
