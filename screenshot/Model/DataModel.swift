@@ -831,7 +831,7 @@ extension Screenshot {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@ AND isHidden == FALSE", managedObjectID)
             fetchRequest.sortDescriptors = nil
             
             do {
