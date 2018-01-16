@@ -34,6 +34,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        automaticallyAdjustsScrollViewInsets = false
+        
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = self
         }
@@ -178,11 +180,13 @@ class DiscoverScreenshotViewController : BaseViewController {
             UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                 if abs(decisionValueThreshold) >= 1 {
                     if decisionValueThreshold > 0 {
-                        self.decisionAction(isAdded: true)
+                        self.updateCell(atIndexPath: self.topIndexPath, percent: 1)
+//                        self.decisionAction(isAdded: true)
                         AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
                         
                     } else {
-                        self.decisionAction(isAdded: false)
+                        self.updateCell(atIndexPath: self.topIndexPath, percent: -1)
+//                        self.decisionAction(isAdded: false)
                         AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
                     }
                     

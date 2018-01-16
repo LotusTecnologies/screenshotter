@@ -17,7 +17,7 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     
     private var cardCount = 2
     private var contentRect: CGRect = .zero
-    private(set) var cardFrame: CGRect = .zero
+    private(set) var cardRect: CGRect = .zero
     private var visibleCardAttributes: [UICollectionViewLayoutAttributes] = []
     
     private var deletedItems: [IndexPath] = []
@@ -30,8 +30,12 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         
         contentRect = UIEdgeInsetsInsetRect(collectionView.bounds, collectionView.contentInset)
         
-        let screenshotSize = CGSize(width: contentRect.size.height * Screenshot.discoverRatio.width, height: contentRect.size.height)
-        cardFrame = screenshotSize.aspectFitRectInSize(contentRect.size)
+        var maxContentRect = contentRect
+        maxContentRect.size.height = min(460, maxContentRect.size.height)
+        
+        let screenshotSize = CGSize(width: maxContentRect.size.height * Screenshot.discoverRatio.width, height: maxContentRect.size.height)
+        cardRect = screenshotSize.aspectFitRectInSize(maxContentRect.size)
+        cardRect.origin.y += (contentRect.size.height - cardRect.size.height) / 2
         
         visibleCardAttributes = makeVisibleCardAttributes()
         deletedItems = []
@@ -88,10 +92,21 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
             let direction: CGFloat = isAdded ? 1 : -1
             let rotationAngle = CGFloat(Double.pi * 0.1) * direction
             let rotatedRect = attributes.frame.applying(CGAffineTransform(rotationAngle: rotationAngle))
+            let centerX: CGFloat
             
-            // Better to use center then translation on the transform incase
+            if let collectionView = collectionView {
+                let halfWidthDiff = (rotatedRect.width - contentRect.width) / 2
+                let directionInset = isAdded ? collectionView.contentInset.right : collectionView.contentInset.left
+                centerX = attributes.frame.midX + ((rotatedRect.width + directionInset - halfWidthDiff) * direction)
+                
+            } else {
+                // This should never happen
+                centerX = attributes.frame.midX + (max(contentRect.width, rotatedRect.width) * direction)
+            }
+        
+            // Better to use center then translation on the transform in case
             // future development will incorporate UIDynamics
-            attributes.center = CGPoint(x: attributes.frame.midX + (rotatedRect.size.width * direction), y: cardFrame.midY)
+            attributes.center = CGPoint(x: centerX, y: cardRect.midY)
             
             attributes.transform = CGAffineTransform(rotationAngle: rotationAngle)
         }
@@ -134,7 +149,7 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
             return item + collectionView.numberOfItems(inSection: section)
         }
         
-        attr.frame = cardFrame
+        attr.frame = cardRect
         attr.zIndex = -offset * 2
         
         let scaleRatio = CGFloat(0.9)
@@ -145,7 +160,7 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     }
     
     func progressFinalAttributes(_ attributes: UICollectionViewLayoutAttributes, cell: DiscoverScreenshotCollectionViewCell, percent: CGFloat) {
-        let c1 = CGPoint(x: cardFrame.midX, y: cardFrame.midY)
+        let c1 = CGPoint(x: cardRect.midX, y: cardRect.midY)
         let c2 = attributes.center
         var c3 = cell.center
         c3.x = c1.x + (c2.x - c1.x) * percent
