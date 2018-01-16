@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Appsee
 
 protocol TutorialEmailSlideViewDelegate : class {
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView)
@@ -271,12 +272,14 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
 }
 
 extension TutorialEmailSlideView : TutorialSlideView {
-    public func didEnterSlide() {
+    func didEnterSlide() {
+        Appsee.startScreen("Tutorial Email")
+        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
     }
     
-    public func willLeaveSlide() {
+    func willLeaveSlide() {
         NotificationCenter.default.removeObserver(self)
     }
 }

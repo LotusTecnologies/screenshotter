@@ -8,7 +8,7 @@
 
 import Foundation
 
- @objc public protocol TutorialSlideView {
+@objc protocol TutorialSlideView {
     func didEnterSlide()
     func willLeaveSlide()
 }
