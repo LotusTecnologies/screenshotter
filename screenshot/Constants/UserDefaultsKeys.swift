@@ -56,6 +56,9 @@ class UserDefaultsKeys : NSObject {
     static let lastTimeZone = "LastTimeZone"
     static let subscriptionARN = "SubscriptionARN"
     static let enabledSilentPush = "EnabledSilentPush"
+    
+    // Matchsticks
+    static let matchsticksSyncToken = "MatchsticksSyncToken"
 }
 
 extension UIApplication {

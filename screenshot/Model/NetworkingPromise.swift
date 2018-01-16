@@ -188,6 +188,22 @@ class NetworkingPromise: NSObject {
         }
     }
     
+    static func nextMatchsticks() -> Promise<NSDictionary> {
+        let syncTokenParam: String
+        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
+          !matchsticksSyncToken.isEmpty {
+            syncTokenParam = "?start=\(matchsticksSyncToken)"
+        } else {
+            syncTokenParam = ""
+        }
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
+            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            return Promise(error: error)
+        }
+        let promise = URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary()
+        return promise
+    }
+    
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
     static func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "push-subscribe") else {
