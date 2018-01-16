@@ -24,6 +24,7 @@ class UserDefaultsKeys : NSObject {
     static let productSale = "ProductSale"
     static let productSort = "ProductSort"
     static let productCurrency = "ProductCurrency"
+    static let productCategory = "ProductCategory"
     
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"

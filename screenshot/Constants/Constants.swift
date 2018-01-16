@@ -21,7 +21,7 @@ class Constants: NSObject {
     static let defaultAnimationDuration = 0.25
     
     // DB
-    static let currentMomVersion = 7
+    static let currentMomVersion = 8
     
     // Syte
     static let syteAccountId = 6677

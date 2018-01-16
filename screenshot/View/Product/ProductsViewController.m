@@ -177,8 +177,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
-    
-    [self updateOptionsView];
+    self.state = ProductsViewControllerStateLoading;
     [self reloadProductsForShoppableAtIndex:0];
 }
 
@@ -218,6 +217,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)setState:(ProductsViewControllerState)state {
     _state = state;
+    
+    [self updateOptionsView];
+    self.shoppablesToolbar.hidden = [self shouldHideToolbar];
     
     switch (state) {
         case ProductsViewControllerStateLoading:
@@ -352,6 +354,10 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             // TODO: maybe call setContentOffset:
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
+        
+    } else {
+        self.state = ProductsViewControllerStateLoading;
+        [self.collectionView reloadData];
     }
 }
 
@@ -529,6 +535,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)presentOptions:(ProductsViewControllerControl *)control {
     if ([control isFirstResponder]) {
         [control resignFirstResponder];
+        
     } else {
         [AnalyticsTrackers.standard track:@"Opened Filters View" properties:nil];
         
@@ -633,9 +640,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
     if (self.products.count == 0 && [self isViewLoaded]) {
-        toolbar.hidden = [self shouldHideToolbar];
-        
-        [self updateOptionsView];
         [self reloadProductsForShoppableAtIndex:0];
     }
 }

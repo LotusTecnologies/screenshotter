@@ -11,12 +11,22 @@
 
 @implementation NetworkingModel
 
-+(void)uploadToSyte:(NSData *_Nonnull)imageData completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
-    NSDictionary *dictParams = @{@"account_id"      : @(6677),
-                                 @"sig"             : @"GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=",
-                                 @"feed"            : @"default",//@"awin_asos",
-                                 @"payload_type"    : @"image_bin"};
-    NSString *strService = @"https://syteapi.com/offers/bb";
++(void)uploadToSyte:(NSData *_Nonnull)imageData isFashion:(BOOL)isFashion completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
+    NSDictionary *dictParams;
+    NSString *strService;
+    if (isFashion) {
+        dictParams = @{@"account_id"      : @(6677),
+                       @"sig"             : @"GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=",
+                       @"feed"            : @"default",
+                       @"payload_type"    : @"image_bin"};
+        strService = @"https://syteapi.com/offers/bb";
+    } else { // furniture
+        dictParams = @{@"account_id"      : @(6722),
+                       @"sig"             : @"G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=",
+                       @"feed"            : @"craze_home",
+                       @"payload_type"    : @"image_bin"};
+        strService = @"https://homedecor.syteapi.com/offers/bb";
+    }
     
     NSError *error;
     

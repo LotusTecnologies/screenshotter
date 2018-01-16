@@ -19,24 +19,34 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
+    static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 6) // 64
+    static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 7) // 128
+    
     static var global: ProductsOptionsMask {
-        return ProductsOptionsMask(ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
+        return ProductsOptionsMask(ProductsOptionsCategory.globalValue, ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
     }
     
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    convenience init(_ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
-        var value: Int
+    convenience init(_ category: ProductsOptionsCategory, _ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
+        var value: Int = 0
+        
+        switch category {
+        case .furniture:
+            value |= ProductsOptionsMask.categoryFurniture.rawValue
+        default:
+            value |= ProductsOptionsMask.categoryFashion.rawValue
+        }
         
         switch gender {
         case .male:
-            value = ProductsOptionsMask.genderMale.rawValue
+            value |= ProductsOptionsMask.genderMale.rawValue
         case .female:
-            value = ProductsOptionsMask.genderFemale.rawValue
+            value |= ProductsOptionsMask.genderFemale.rawValue
         default:
-            value = ProductsOptionsMask.genderAuto.rawValue
+            value |= ProductsOptionsMask.genderAuto.rawValue
         }
         
         switch size {
@@ -49,6 +59,14 @@ class ProductsOptionsMask : NSObject {
         }
         
         self.init(rawValue: value)
+    }
+    
+    var category: ProductsOptionsCategory {
+        if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
+            return .furniture
+        } else {
+            return .fashion
+        }
     }
     
     var gender: ProductsOptionsGender {
@@ -85,6 +103,7 @@ class _ProductsOptionsMask : NSObject {
 class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
+    fileprivate(set) var category = ProductsOptionsCategory.globalValue
     fileprivate(set) var gender = ProductsOptionsGender.globalValue
     fileprivate(set) var size = ProductsOptionsSize.globalValue
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
@@ -103,6 +122,7 @@ class ProductsOptions : NSObject {
     }()
     
     func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
+        category = mask?.category ?? ProductsOptionsCategory.globalValue
         gender = mask?.gender ?? ProductsOptionsGender.globalValue
         size = mask?.size ?? ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
@@ -112,17 +132,19 @@ class ProductsOptions : NSObject {
     }
     
     private func syncOptions(withView view: ProductsOptionsView) {
-        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+        view.categoryControl.selectedSegmentIndex = category.offsetValue
         view.genderControl.selectedSegmentIndex = gender.offsetValue
         view.sizeControl.selectedSegmentIndex = size.offsetValue
         view.saleControl.selectedSegmentIndex = sale.offsetValue
+        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
     }
     
     @objc private func doneButtonAction() {
-        let previousMask = ProductsOptionsMask(gender, size)
+        let previousMask = ProductsOptionsMask(category, gender, size)
         let previousSale = sale
         let previousSort = sort
         
+        category = ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex)
         gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
@@ -132,28 +154,26 @@ class ProductsOptions : NSObject {
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
-        let maskChanged = previousMask.rawValue != ProductsOptionsMask(gender, size).rawValue
+        let maskChanged = previousMask.rawValue != ProductsOptionsMask(category, gender, size).rawValue
         let saleChanged = previousSale.rawValue != sale.rawValue
         let sortChanged = previousSort.rawValue != sort.rawValue
         let changed = maskChanged || saleChanged || sortChanged
         
         delegate?.productsOptionsDidComplete(self, withChange: changed)
         
-        guard changed == true else {
-            return
-        }
-        
-        // Track which filters have changed.
-        let changeMap = [
-            "Gender" : (new: gender.stringValue, old: previousMask.gender.stringValue),
-            "Size" : (new: size.stringValue, old: previousMask.size.stringValue),
-            "Sale" : (new: sale.stringValue, old: previousSale.stringValue),
-            "Sort" : (new: sort.stringValue, old: previousSort.stringValue)
-        ]
-        
-        for (name, tuple) in changeMap {
-            if tuple.new != tuple.old {
-                AnalyticsTrackers.standard.track("Set \(name) Filter to \(tuple.new)")
+        if changed {
+            let changeMap = [
+                "Category": (new: category.stringValue, old: previousMask.category.stringValue),
+                "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
+                "Size": (new: size.stringValue, old: previousMask.size.stringValue),
+                "Sale": (new: sale.stringValue, old: previousSale.stringValue),
+                "Sort": (new: sort.stringValue, old: previousSort.stringValue)
+            ]
+            
+            for (name, value) in changeMap {
+                if value.new != value.old {
+                    AnalyticsTrackers.standard.track("Set \(name) Filter to \(value.new)")
+                }
             }
         }
     }
@@ -161,6 +181,10 @@ class ProductsOptions : NSObject {
 
 extension ProductsOptions {
     // MARK: Objc
+    
+    func _category() -> Int {
+        return category.rawValue
+    }
     
     func _gender() -> Int {
         return gender.rawValue
@@ -196,15 +220,56 @@ extension ProductsOptions : UIPickerViewDelegate {
 }
 
 class ProductsOptionsControls : NSObject {
+    var categoryControl: UISegmentedControl?
     var genderControl: UISegmentedControl?
+    var sizeControl: UISegmentedControl?
+    var saleControl: UISegmentedControl?
+    
+    private var gender: ProductsOptionsGender?
+    private var size: ProductsOptionsSize?
+    
+    private class SegmentedControl : UISegmentedControl {
+        private var needsSelectedIndexUpdate = true
+        var didUpdateSelectedIndex: (() -> ())?
+        
+        override func setEnabled(_ enabled: Bool, forSegmentAt segment: Int) {
+            needsSelectedIndexUpdate = false
+            super.setEnabled(enabled, forSegmentAt: segment)
+            needsSelectedIndexUpdate = true
+        }
+        
+        override var selectedSegmentIndex: Int {
+            didSet {
+                if needsSelectedIndexUpdate {
+                    didUpdateSelectedIndex?()
+                }
+            }
+        }
+    }
+    
+    func createCategoryControl() -> UISegmentedControl {
+        let control = UISegmentedControl(items: [
+            ProductsOptionsCategory.fashion.stringValue,
+            ProductsOptionsCategory.furniture.stringValue
+            ])
+        control.addTarget(self, action: #selector(syncCategoryControl), for: .valueChanged)
+        
+        categoryControl?.removeFromSuperview()
+        categoryControl = control
+        
+        return control
+    }
     
     func createGenderControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = SegmentedControl(items: [
             ProductsOptionsGender.female.stringValue,
             ProductsOptionsGender.male.stringValue,
             ProductsOptionsGender.auto.stringValue
             ])
         control.addTarget(self, action: #selector(syncGenderControl), for: .valueChanged)
+        control.didUpdateSelectedIndex = {
+            self.gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
+        }
         
         genderControl?.removeFromSuperview()
         genderControl = control
@@ -212,23 +277,22 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    var sizeControl: UISegmentedControl?
-    
     func createSizeControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = SegmentedControl(items: [
             ProductsOptionsSize.child.stringValue,
             ProductsOptionsSize.adult.stringValue,
             ProductsOptionsSize.plus.stringValue
             ])
         control.addTarget(self, action: #selector(syncSizeControl), for: .valueChanged)
+        control.didUpdateSelectedIndex = {
+            self.size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
+        }
         
         sizeControl?.removeFromSuperview()
         sizeControl = control
         
         return control
     }
-    
-    private(set) var saleControl: UISegmentedControl?
     
     func createSaleControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
@@ -242,9 +306,81 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
+    private var enabledControls: [UIControl : [Int : Bool]] {
+        var enabledControls: [UIControl : [Int : Bool]] = [:]
+        
+        if let genderControl = genderControl, let sizeControl = sizeControl {
+            let isFashion: Bool
+            
+            if let categoryControl = categoryControl {
+                isFashion = ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion
+                
+            } else {
+                isFashion = ProductsOptionsCategory.default == .fashion
+            }
+            
+            enabledControls[genderControl] = [:]
+            
+            for i in 0 ..< genderControl.numberOfSegments {
+                var isEnabled = true
+                
+                if i == ProductsOptionsGender.male.offsetValue {
+                    isEnabled = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) != .plus
+                }
+                
+                enabledControls[genderControl]?[i] = isFashion ? isEnabled : false
+            }
+            
+            enabledControls[sizeControl] = [:]
+            
+            for i in 0 ..< sizeControl.numberOfSegments {
+                var isEnabled = true
+                
+                if i == ProductsOptionsSize.plus.offsetValue {
+                    isEnabled = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) != .male
+                }
+                
+                enabledControls[sizeControl]?[i] = isFashion ? isEnabled : false
+            }
+        }
+        
+        return enabledControls
+    }
+    
     func sync() {
-        syncGenderControl()
-        syncSizeControl()
+        guard let genderControl = genderControl, let sizeControl = sizeControl else {
+            return
+        }
+        
+        let enabledControls = self.enabledControls
+        
+        for index in 0 ..< genderControl.numberOfSegments {
+            let isEnabled = enabledControls[genderControl]?[index] ?? true
+            genderControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+        
+        for index in 0 ..< sizeControl.numberOfSegments {
+            let isEnabled = enabledControls[sizeControl]?[index] ?? true
+            sizeControl.setEnabled(isEnabled, forSegmentAt: index)
+        }
+    }
+    
+    @objc private func syncCategoryControl() {
+        guard let categoryControl = categoryControl else {
+            return
+        }
+        
+        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion {
+            if let genderControl = genderControl, let gender = gender {
+                genderControl.selectedSegmentIndex = gender.offsetValue
+            }
+            
+            if let sizeControl = sizeControl, let size = size {
+                sizeControl.selectedSegmentIndex = size.offsetValue
+            }
+        }
+        
+        sync()
     }
     
     @objc private func syncGenderControl() {
@@ -252,8 +388,11 @@ class ProductsOptionsControls : NSObject {
             return
         }
         
-        let isMale = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) == .male
-        sizeControl.setEnabled(!isMale, forSegmentAt: ProductsOptionsSize.plus.offsetValue)
+        gender = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex)
+        
+        let index = ProductsOptionsSize.plus.offsetValue
+        let isEnabled = enabledControls[sizeControl]?[index] ?? true
+        sizeControl.setEnabled(isEnabled, forSegmentAt: index)
     }
     
     @objc private func syncSizeControl() {
@@ -261,14 +400,18 @@ class ProductsOptionsControls : NSObject {
             return
         }
         
-        let isPlus = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) == .plus
-        genderControl.setEnabled(!isPlus, forSegmentAt: ProductsOptionsGender.male.offsetValue)
+        size = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex)
+        
+        let index = ProductsOptionsGender.male.offsetValue
+        let isEnabled = enabledControls[genderControl]?[index] ?? true
+        genderControl.setEnabled(isEnabled, forSegmentAt: index)
     }
 }
 
 class ProductsOptionsView : UIView {
-    private let controls = ProductsOptionsControls()
+    fileprivate let controls = ProductsOptionsControls()
     
+    private(set) var categoryControl: UISegmentedControl!
     private(set) var genderControl: UISegmentedControl!
     private(set) var sizeControl: UISegmentedControl!
     private(set) var saleControl: UISegmentedControl!
@@ -293,6 +436,17 @@ class ProductsOptionsView : UIView {
         borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
         
+        categoryControl = controls.createCategoryControl()
+        categoryControl.translatesAutoresizingMaskIntoConstraints = false
+        categoryControl.tintColor = .crazeGreen
+        categoryControl.isExclusiveTouch = true
+        addSubview(categoryControl)
+        categoryControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        categoryControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        categoryControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
+        categoryControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        categoryControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
         genderControl = controls.createGenderControl()
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.tintColor = .crazeGreen
@@ -300,7 +454,7 @@ class ProductsOptionsView : UIView {
         addSubview(genderControl)
         genderControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         genderControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        genderControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
+        genderControl.topAnchor.constraint(equalTo: categoryControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -372,6 +526,40 @@ class ProductsOptionsView : UIView {
     
     override var intrinsicContentSize: CGSize {
         return UILayoutFittingExpandedSize
+    }
+}
+
+enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+    case fashion = 1
+    case furniture
+    
+    static let `default` = ProductsOptionsCategory.fashion
+    
+    static var globalValue: ProductsOptionsCategory {
+        return ProductsOptionsCategory(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCategory))
+    }
+    
+    init(intValue: Int) {
+        self = ProductsOptionsCategory(rawValue: intValue) ?? .default
+    }
+    
+    init(offsetValue: Int) {
+        self.init(intValue: offsetValue + 1)
+    }
+    
+    var offsetValue: Int {
+        return self.rawValue - 1
+    }
+    
+    var stringValue: String {
+        var string: String
+        
+        switch self {
+        case .fashion: string = "products.options.category.fashion".localized
+        case .furniture: string = "products.options.category.furniture".localized
+        }
+        
+        return string
     }
 }
 

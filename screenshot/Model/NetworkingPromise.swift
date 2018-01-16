@@ -11,15 +11,16 @@ import PromiseKit
 
 class NetworkingPromise: NSObject {
     
-    static func uploadToSyte(imageData: Data?) -> Promise<(String, [[String : Any]])> {
+    static func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
         return Promise { fulfill, reject in
-            guard let imageData = imageData else {
+            guard let imageData = imageData,
+              imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
                 reject(emptyError)
                 return
             }
             AnalyticsTrackers.standard.track("sent image to Syte")
-            NetworkingModel.upload(toSyte: imageData, completionHandler: { (response: URLResponse, responseObject: Any?, error: Error?) in
+            NetworkingModel.upload(toSyte: imageData, isFashion: (imageClassification == .human), completionHandler: { (response: URLResponse, responseObject: Any?, error: Error?) in
                 guard error == nil,
                     let responseObjectDict = responseObject as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
