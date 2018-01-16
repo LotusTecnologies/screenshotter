@@ -265,11 +265,11 @@ class AssetSyncModel: NSObject {
                     let nsError = error as NSError
                     if nsError.domain == "Craze" {
                         switch nsError.code {
-                        case 3, 4:
+                        case 3, 4, 22:
                             // Syte returned no segments
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            AnalyticsTrackers.standard.track("received response from Syte", properties: ["segmentCount" : 0])
+                            AnalyticsTrackers.standard.track("received response from Syte", properties: nsError.code == 22 ? ["segmentCount" : 0, "timeout" : 1] : ["segmentCount" : 0])
                         default:
                             break
                         }
