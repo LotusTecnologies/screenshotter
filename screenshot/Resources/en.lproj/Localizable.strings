@@ -17,7 +17,15 @@
 
 "discover.load" = "Loading Discover...";
 "discover.screenshot.add" = "Add";
+"discover.screenshot.helper.title" = "Discover Fashion";
+"discover.screenshot.helper.swipe_left.detail" = "\nto pass";
+"discover.screenshot.helper.swipe_left.title" = "Swipe Left";
+"discover.screenshot.helper.swipe_right.detail" = "\nto add to your collection";
+"discover.screenshot.helper.swipe_right.title" = "Swipe Right";
+"discover.screenshot.helper.tap.detail" = " to shop";
+"discover.screenshot.helper.tap.title" = "Tap";
 "discover.screenshot.pass" = "Pass";
+"discover.screenshot.title" = "Matchsticks";
 "discover.title" = "Discover";
 
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";

@@ -17,7 +17,21 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var isAdding = false
     
     fileprivate var count = 10
+    fileprivate var isListEmpty = false {
+        didSet {
+            if isListEmpty {
+                AnalyticsTrackers.standard.track("Matchsticks Empty")
+            }
+        }
+    }
     fileprivate let topIndexPath = IndexPath(item: 0, section: 0)
+    
+    override var title: String? {
+        set {}
+        get {
+            return "discover.screenshot.title".localized
+        }
+    }
     
     // MARK: Life Cycle
     
@@ -120,18 +134,22 @@ class DiscoverScreenshotViewController : BaseViewController {
             self.count -= 1
             collectionView.deleteItems(at: [topIndexPath])
             
+            if self.count == 0 {
+                self.isListEmpty = true
+            }
+            
         }) { completed in
             self.passButton.isEnabled = true
             self.addButton.isEnabled = true
         }
     }
     
-    @objc private func passButtonAction() {
+    @objc fileprivate func passButtonAction() {
         decisionAction(isAdded: false)
         AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "tap"])
     }
     
-    @objc private func addButtonAction() {
+    @objc fileprivate func addButtonAction() {
         decisionAction(isAdded: true)
         AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
     }
@@ -180,13 +198,11 @@ class DiscoverScreenshotViewController : BaseViewController {
             UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                 if abs(decisionValueThreshold) >= 1 {
                     if decisionValueThreshold > 0 {
-                        self.updateCell(atIndexPath: self.topIndexPath, percent: 1)
-//                        self.decisionAction(isAdded: true)
+                        self.decisionAction(isAdded: true)
                         AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
                         
                     } else {
-                        self.updateCell(atIndexPath: self.topIndexPath, percent: -1)
-//                        self.decisionAction(isAdded: false)
+                        self.decisionAction(isAdded: false)
                         AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
                     }
                     
@@ -243,21 +259,21 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
+        if let cell = cell as? DiscoverScreenshotCollectionViewCell {
+            
+        }
+        
         return cell
     }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? DiscoverScreenshotCollectionViewCell else {
+        guard let cell = cell as? DiscoverScreenshotCollectionViewCell, self.helper == nil else {
             return
         }
         
-        guard self.helper == nil else {
-            return
-        }
-        
-//        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
+        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
             let helper = DiscoverScreenshotHelperView()
             helper.translatesAutoresizingMaskIntoConstraints = false
             cell.mainView.addSubview(helper)
@@ -265,14 +281,20 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
             helper.leadingAnchor.constraint(equalTo: cell.mainView.leadingAnchor).isActive = true
             helper.bottomAnchor.constraint(equalTo: cell.mainView.bottomAnchor).isActive = true
             helper.trailingAnchor.constraint(equalTo: cell.mainView.trailingAnchor).isActive = true
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissHelperView))
-        helper.addGestureRecognizer(tapGesture)
-        
+            
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissHelperView))
+            helper.addGestureRecognizer(tapGesture)
+            
             self.helper = helper
             
-//            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
-//        }
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        addButtonAction()
+        
+        AnalyticsTrackers.standard.track("Matchsticks Opened Screenshot")
     }
 }
 

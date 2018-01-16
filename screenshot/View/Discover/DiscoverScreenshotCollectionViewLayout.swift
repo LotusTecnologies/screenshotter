@@ -72,11 +72,7 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
         let attr = makeLayoutAttributesForItem(at: itemIndexPath)
         
         if insertedItems.contains(itemIndexPath) {
-            //            if let callback = delegate?.collectionView(_:deckLayout:willInsertItem:) {
-            //                callback(collectionView!, self, attr)
-            //            } else {
             attr.alpha = 0
-            //            }
         }
         
         return attr

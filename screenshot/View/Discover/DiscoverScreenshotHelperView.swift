@@ -51,7 +51,7 @@ class DiscoverScreenshotHelperView : UIView {
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textColor = .white
-        titleLabel.text = "Discover Fashion"
+        titleLabel.text = "discover.screenshot.helper.title".localized
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont(name: "DINCondensed-Bold", size: 34)
         titleLabel.adjustsFontSizeToFitWidth = true
@@ -84,10 +84,10 @@ class DiscoverScreenshotHelperView : UIView {
         swipeLeftLabel.translatesAutoresizingMaskIntoConstraints = false
         swipeLeftLabel.textColor = .white
         swipeLeftLabel.attributedText = {
-            let text = NSMutableAttributedString(string: "Swipe Left", attributes: [
+            let text = NSMutableAttributedString(string: "discover.screenshot.helper.swipe_left.title".localized, attributes: [
                 NSFontAttributeName: UIFont.boldSystemFont(ofSize: fontSize)
                 ])
-            let text2 = NSAttributedString(string: "\nto pass", attributes: [
+            let text2 = NSAttributedString(string: "discover.screenshot.helper.swipe_left.detail".localized, attributes: [
                 NSFontAttributeName: UIFont.systemFont(ofSize: fontSize)
                 ])
             text.append(text2)
@@ -106,10 +106,10 @@ class DiscoverScreenshotHelperView : UIView {
         swipeRightLabel.translatesAutoresizingMaskIntoConstraints = false
         swipeRightLabel.textColor = .white
         swipeRightLabel.attributedText = {
-            let text = NSMutableAttributedString(string: "Swipe Right", attributes: [
+            let text = NSMutableAttributedString(string: "discover.screenshot.helper.swipe_right.title".localized, attributes: [
                 NSFontAttributeName: UIFont.boldSystemFont(ofSize: fontSize)
                 ])
-            let text2 = NSAttributedString(string: "\nto add to your collection", attributes: [
+            let text2 = NSAttributedString(string: "discover.screenshot.helper.swipe_right.detail".localized, attributes: [
                 NSFontAttributeName: UIFont.systemFont(ofSize: fontSize)
                 ])
             text.append(text2)
@@ -151,10 +151,10 @@ class DiscoverScreenshotHelperView : UIView {
         tapLabel.translatesAutoresizingMaskIntoConstraints = false
         tapLabel.textColor = .white
         tapLabel.attributedText = {
-            let text = NSMutableAttributedString(string: "Tap", attributes: [
+            let text = NSMutableAttributedString(string: "discover.screenshot.helper.tap.title".localized, attributes: [
                 NSFontAttributeName: UIFont.boldSystemFont(ofSize: fontSize)
                 ])
-            let text2 = NSAttributedString(string: " to shop", attributes: [
+            let text2 = NSAttributedString(string: "discover.screenshot.helper.tap.detail".localized, attributes: [
                 NSFontAttributeName: UIFont.systemFont(ofSize: fontSize)
                 ])
             text.append(text2)
