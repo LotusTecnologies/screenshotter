@@ -12,7 +12,7 @@ import PromiseKit
 class NetworkingPromise: NSObject {
     
     static func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
-        return Promise { fulfill, reject in
+        let uploadPromise: Promise<(String, [[String : Any]])> = Promise { fulfill, reject in
             guard let imageData = imageData,
               imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
@@ -40,6 +40,11 @@ class NetworkingPromise: NSObject {
                 fulfill(uploadedURLString, segments)
             })
         }
+        let timeout = after(seconds: 15).then { _ -> Promise<(String, [[String : Any]])> in
+            let error = NSError(domain: "Craze", code: 22, userInfo: [NSLocalizedDescriptionKey : "Syte upload timeout"])
+            return Promise(error: error)
+        }
+        return race(uploadPromise, timeout)
     }
     
     static func feedbackToSyte(isPositive: Bool, imageUrl: String?, offersUrl: String?, b0x: Double, b0y: Double, b1x: Double, b1y: Double) {
