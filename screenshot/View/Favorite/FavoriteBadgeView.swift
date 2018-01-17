@@ -46,9 +46,10 @@ class FavoriteBadgeView : UIView {
         return size
     }
     
-    // iOS can attempt to make performance improvements when setting
-    // the tintColor. Instead of using .clear and having an incorrect
-    // comparison, create a unique clear color and use that.
+    // Clear color will not be comparable with the setting,
+    // Accessibility -> Increase Contrast -> Reduce Transparency
+    // turned on. Create a non UIKit defined clear color to
+    // avoid this issue.
     let clearColor = UIColor(white: 1, alpha: 0)
     
     override var tintColor: UIColor! {
