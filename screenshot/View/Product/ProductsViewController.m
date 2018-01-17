@@ -177,7 +177,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
-    self.state = ProductsViewControllerStateLoading;
     [self reloadProductsForShoppableAtIndex:0];
 }
 
