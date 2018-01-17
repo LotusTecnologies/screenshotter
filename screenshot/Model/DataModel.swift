@@ -981,7 +981,7 @@ extension Shoppable {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
                     if let lastSetMask = shoppable.getLast(),
-                      lastSetMask.rawValue & 0xC0 != optionsMaskInt & 0xC0 {
+                      lastSetMask.rawValue & 0x01C0 != optionsMaskInt & 0x01C0 { // Category bits
                         if let screenshot = shoppable.screenshot {
                             screenshot.hideWorkhorse(managedObjectContext: managedObjectContext, deleteImage: false)
                             screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
@@ -1062,7 +1062,7 @@ extension Shoppable {
                     guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableID) else {
                         return
                     }
-                    optionsMask = ProductsOptionsMask(rawValue: 73)
+                    optionsMask = ProductsOptionsMask(.auto, .auto, .adult) // Historical value that was never set.
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask, rating: ratingValue)
                 }
                 var augmentedOffersUrl: String? = nil

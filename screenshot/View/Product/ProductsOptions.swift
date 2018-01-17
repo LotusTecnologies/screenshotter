@@ -40,7 +40,7 @@ class ProductsOptionsMask : NSObject {
         case .furniture:
             value |= ProductsOptionsMask.categoryFurniture.rawValue
         default:
-            value |= ProductsOptionsMask.categoryFashion.rawValue
+            value |= ProductsOptionsMask.categoryAuto.rawValue
         }
         
         switch gender {
@@ -70,7 +70,7 @@ class ProductsOptionsMask : NSObject {
         } else if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
             return .furniture
         } else {
-            return .fashion
+            return .auto
         }
     }
     
