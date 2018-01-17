@@ -59,7 +59,7 @@ public class TutorialTrySlideView : HelperView {
     }
 }
 
-extension TutorialTrySlideView : TutorialSlideView {
+extension TutorialTrySlideView : TutorialSlideViewProtocol {
     func didEnterSlide() {
         Appsee.startScreen("Tutorial Try")
         

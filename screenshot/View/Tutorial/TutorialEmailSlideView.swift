@@ -271,7 +271,7 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
     }
 }
 
-extension TutorialEmailSlideView : TutorialSlideView {
+extension TutorialEmailSlideView : TutorialSlideViewProtocol {
     func didEnterSlide() {
         Appsee.startScreen("Tutorial Email")
         
