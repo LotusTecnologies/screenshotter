@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Appsee
 
 protocol TutorialTrySlideViewDelegate : NSObjectProtocol {
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView)
@@ -58,12 +59,14 @@ public class TutorialTrySlideView : HelperView {
     }
 }
 
-extension TutorialTrySlideView : TutorialSlideView {
-    public func didEnterSlide() {
+extension TutorialTrySlideView : TutorialSlideViewProtocol {
+    func didEnterSlide() {
+        Appsee.startScreen("Tutorial Try")
+        
         NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
     }
     
-    public func willLeaveSlide() {
+    func willLeaveSlide() {
         NotificationCenter.default.removeObserver(self)
     }
 }

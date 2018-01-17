@@ -450,11 +450,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-        [[self screenshotAtIndex:indexPath.item] setHide];
         
-        [self removeScreenshotHelperView];
-        
-        [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > indexPath.row) {
+            [[self screenshotAtIndex:indexPath.item] setHide];
+            [self removeScreenshotHelperView];
+            
+            [UIView animateWithDuration:0.25 animations:^{
+                cell.isEnabled = NO;
+            }];
+            
+            [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
+        }
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }

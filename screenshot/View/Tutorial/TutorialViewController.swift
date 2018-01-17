@@ -65,6 +65,16 @@ class TutorialViewController : UIViewController {
         prepareSlideViews()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        currentSlide.didEnterSlide()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        currentSlide.willLeaveSlide()
+    }
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
@@ -88,9 +98,9 @@ class TutorialViewController : UIViewController {
     
     // MARK: - Slides
     
-    var slides = [UIView]()
+    var slides: [TutorialSlideView] = []
     
-    private func buildSlides() -> [UIView] {
+    private func buildSlides() -> [TutorialSlideView] {
         let welcomeSlide = TutorialWelcomeSlideView()
         welcomeSlide.button.addTarget(self, action: #selector(tutorialWelcomeSlideViewDidComplete), for: .touchUpInside)
         
@@ -111,7 +121,7 @@ class TutorialViewController : UIViewController {
         return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
     }
     
-    fileprivate var currentSlide: UIView {
+    fileprivate var currentSlide: TutorialSlideView {
         return slides[currentSlideIndex]
     }
     
@@ -121,7 +131,7 @@ class TutorialViewController : UIViewController {
         }
         
         scrollViewIsScrollingAnimation = true
-        (currentSlide as? TutorialSlideView)?.willLeaveSlide()
+        currentSlide.willLeaveSlide()
         
         var offset = CGPoint.zero
         offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
@@ -139,7 +149,6 @@ class TutorialViewController : UIViewController {
             
             if i == 0 {
                 slide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-                (slide as? TutorialSlideView)?.didEnterSlide()
                 
             } else if i == slides.count - 1 {
                 slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -180,8 +189,7 @@ class TutorialViewController : UIViewController {
 extension TutorialViewController : UIScrollViewDelegate {
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         scrollViewIsScrollingAnimation = false
-        
-        (currentSlide as? TutorialSlideView)?.didEnterSlide()
+        currentSlide.didEnterSlide()
     }
 }
 
