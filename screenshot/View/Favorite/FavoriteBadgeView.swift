@@ -46,6 +46,11 @@ class FavoriteBadgeView : UIView {
         return size
     }
     
+    // iOS can attempt to make performance improvements when setting
+    // the tintColor. Instead of using .clear and having an incorrect
+    // comparison, create a unique clear color and use that.
+    let clearColor = UIColor(white: 1, alpha: 0)
+    
     override var tintColor: UIColor! {
         didSet {
             imageView.tintColor = tintColor
@@ -54,7 +59,7 @@ class FavoriteBadgeView : UIView {
     }
     
     private func syncedImage() -> UIImage? {
-        if tintColor == .clear {
+        if tintColor == clearColor {
             return image
             
         } else {
