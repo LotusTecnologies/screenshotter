@@ -19,8 +19,9 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
-    static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 6) // 64
-    static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 7) // 128
+    static let categoryAuto      = ProductsOptionsMask(rawValue: 1 << 6) // 64
+    static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 7) // 128
+    static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 8) // 256
     
     static var global: ProductsOptionsMask {
         return ProductsOptionsMask(ProductsOptionsCategory.globalValue, ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
