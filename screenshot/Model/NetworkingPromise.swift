@@ -200,7 +200,9 @@ class NetworkingPromise: NSObject {
             let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
             return Promise(error: error)
         }
-        let promise = URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary()
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 0.2
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
         return promise
     }
     

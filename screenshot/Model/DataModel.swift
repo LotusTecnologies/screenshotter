@@ -1157,3 +1157,68 @@ extension Product {
     }
     
 }
+
+extension Matchstick {
+
+    @objc public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        let managedObjectID = self.objectID
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                if let matchstick: Matchstick = results.first {
+                    let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                   assetId: matchstick.remoteId!,
+                                                                   createdAt: Date(),
+                                                                   isRecognized: true,
+                                                                   isFromShare: true,
+                                                                   isHidden: false,
+                                                                   imageData: matchstick.imageData as Data?,
+                                                                   classification: nil)
+                    addedScreenshot.syteJson = matchstick.syteJson
+                    addedScreenshot.uploadedImageURL = matchstick.imageUrl
+                    managedObjectContext.delete(matchstick)
+                    try managedObjectContext.save()
+                    if let callback = callback {
+                        let addedScreenshotOID = addedScreenshot.objectID
+                        DispatchQueue.main.async {
+                            if let mainScreenshot = dataModel.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
+                                callback(mainScreenshot)
+                            }
+                        }
+                    }
+                } else {
+                    print("matchstick add managedObjectID:\(managedObjectID) not found")
+                }
+            } catch {
+                print("matchstick add managedObjectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
+    @objc public func pass() {
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                if let matchstick = results.first {
+                    managedObjectContext.delete(matchstick)
+                    try managedObjectContext.save()
+                } else {
+                    print("matchstick pass managedObjectID:\(managedObjectID) not found")
+                }
+            } catch {
+                print("matchstick pass managedObjectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
+}
