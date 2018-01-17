@@ -17,6 +17,8 @@
 
 "discover.load" = "Loading Discover...";
 "discover.screenshot.add" = "Add";
+"discover.screenshot.empty.detail" = "You're swiping a bit too fast for us, try again later.";
+"discover.screenshot.empty.title" = "That's It!";
 "discover.screenshot.helper.title" = "Discover Fashion";
 "discover.screenshot.helper.swipe_left.detail" = "\nto pass";
 "discover.screenshot.helper.swipe_left.title" = "Swipe Left";

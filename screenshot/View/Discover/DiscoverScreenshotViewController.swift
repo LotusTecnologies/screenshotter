@@ -16,14 +16,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isAdding = false
     
-    fileprivate var count = 10
-    fileprivate var isListEmpty = false {
-        didSet {
-            if isListEmpty {
-                AnalyticsTrackers.standard.track("Matchsticks Empty")
-            }
-        }
-    }
+    fileprivate var count = 2
     fileprivate let topIndexPath = IndexPath(item: 0, section: 0)
     
     override var title: String? {
@@ -57,7 +50,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.backgroundColor = view.backgroundColor
+        collectionView.backgroundColor = .clear
         collectionView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         collectionView.scrollsToTop = false
         collectionView.register(DiscoverScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
@@ -139,8 +132,9 @@ class DiscoverScreenshotViewController : BaseViewController {
             }
             
         }) { completed in
-            self.passButton.isEnabled = true
-            self.addButton.isEnabled = true
+            let isEnabled = !self.isListEmpty
+            self.passButton.isEnabled = isEnabled
+            self.addButton.isEnabled = isEnabled
         }
     }
     
@@ -249,6 +243,52 @@ class DiscoverScreenshotViewController : BaseViewController {
             self.helper = nil
         }
     }
+    
+    // MARK: Empty View
+    
+    fileprivate var isListEmpty = false {
+        didSet {
+            if isListEmpty {
+                showEmptyView()
+                passButton.isEnabled = false
+                passButton.alpha = 0.5
+                addButton.isEnabled = false
+                addButton.alpha = 0.5
+                AnalyticsTrackers.standard.track("Matchsticks Empty")
+                
+            } else {
+                hideEmptyView()
+                passButton.isEnabled = true
+                passButton.alpha = 1
+                addButton.isEnabled = true
+                addButton.alpha = 1
+            }
+        }
+    }
+    
+    fileprivate var emptyView: HelperView?
+    
+    fileprivate func showEmptyView() {
+        if emptyView == nil {
+            let helperView = HelperView()
+            helperView.translatesAutoresizingMaskIntoConstraints = false
+            helperView.titleLabel.text = "discover.screenshot.empty.title".localized
+            helperView.subtitleLabel.text = "discover.screenshot.empty.detail".localized
+            helperView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
+            helperView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
+            view.insertSubview(helperView, belowSubview: collectionView)
+            helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+            helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            helperView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
+            helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            emptyView = helperView
+        }
+    }
+    
+    fileprivate func hideEmptyView() {
+        emptyView?.removeFromSuperview()
+        emptyView = nil
+    }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
@@ -260,7 +300,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
-            
+            cell.backgroundColor = view.backgroundColor
         }
         
         return cell
