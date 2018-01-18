@@ -10,6 +10,7 @@ import UIKit
 import Appsee
 
 protocol TutorialTrySlideViewDelegate : NSObjectProtocol {
+    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideView)
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView)
 }
 
@@ -36,6 +37,16 @@ public class TutorialTrySlideView : HelperView {
             }
         }
         
+        let skipButton = UIButton()
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.setTitle("tutorial.try.skip".localized, for: .normal)
+        skipButton.setTitleColor(.crazeGreen, for: .normal)
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        skipButton.addTarget(self, action: #selector(skipButtonAction), for: .touchUpInside)
+        addSubview(skipButton)
+        skipButton.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        skipButton.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
         if UIDevice.isSimulator {
             addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(applicationUserDidTakeScreenshot)))
         }
@@ -56,6 +67,12 @@ public class TutorialTrySlideView : HelperView {
             AssetSyncModel.sharedInstance.syncTutorialPhoto(image: type(of: self).rawGraphic!)
             self.delegate?.tutorialTrySlideViewDidComplete(self)
         }
+    }
+    
+    // MARK: Skip
+    
+    @objc func skipButtonAction() {
+        self.delegate?.tutorialTrySlideViewDidSkip(self)
     }
 }
 
