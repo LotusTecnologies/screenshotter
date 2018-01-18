@@ -12,7 +12,7 @@ import PromiseKit
 class NetworkingPromise: NSObject {
     
     static func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
-        return Promise { fulfill, reject in
+        let uploadPromise: Promise<(String, [[String : Any]])> = Promise { fulfill, reject in
             guard let imageData = imageData,
               imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
@@ -40,6 +40,11 @@ class NetworkingPromise: NSObject {
                 fulfill(uploadedURLString, segments)
             })
         }
+        let timeout = after(seconds: 15).then { _ -> Promise<(String, [[String : Any]])> in
+            let error = NSError(domain: "Craze", code: 22, userInfo: [NSLocalizedDescriptionKey : "Syte upload timeout"])
+            return Promise(error: error)
+        }
+        return race(uploadPromise, timeout)
     }
     
     static func feedbackToSyte(isPositive: Bool, imageUrl: String?, offersUrl: String?, b0x: Double, b0y: Double, b1x: Double, b1y: Double) {
@@ -60,13 +65,23 @@ class NetworkingPromise: NSObject {
 //        * image_url and offers_url should be urlencoded
 //        * please notice that name and tags changed to: name: negative_feedback || positive_feedback, tags: feedback
 //        * coords should be a base64 encoded JSON, for example Base64('{"x0": 0.2, "y0": 0.2, "x1": 0.4, "y1": 0.5}')
+        let accountId: Int
+        let auth: String
+        if let offersUrl = offersUrl,
+            offersUrl.contains("&account_id=\(Constants.furnitureAccountId)") || offersUrl.contains("&feed=craze_home") {
+            accountId = Constants.furnitureAccountId
+            auth = Constants.furnitureHardcodedAuth
+        } else {
+            accountId = Constants.syteAccountId
+            auth = Constants.syteHardcodedAuth
+        }
         let urlEncodedImageUrl = imageUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
         let urlEncodedOffersUrl = offersUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
         let coordsObject = ["x0": b0x, "y0": b0y, "x1": b1x, "y1": b1y]
         let base64EncodedJsonCoords = jsonStringify(object: coordsObject)?.data(using: .utf8)?.base64EncodedString() ?? ""
         let urlString = "https://syteapi.com/et" +
             "?name=\(isPositive ? "positive_feedback" : "negative_feedback")" +
-            "&account_id=\(Constants.syteAccountId)" +
+            "&account_id=\(accountId)" +
             "&image_url=\(urlEncodedImageUrl)" +
             "&offers_url=\(urlEncodedOffersUrl)" +
             "&tags=feedback" +
@@ -76,7 +91,7 @@ class NetworkingPromise: NSObject {
             return
         }
         var request = URLRequest(url: url)
-        request.addValue(Constants.syteHardcodedAuth, forHTTPHeaderField: "Authorization")
+        request.addValue(auth, forHTTPHeaderField: "Authorization")
         let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 print("feedbackToSyte received error:\(error) for urlString:\(urlString)")

@@ -2,13 +2,15 @@
 //  TutorialSlideView.swift
 //  screenshot
 //
-//  Created by Jacob Relkin on 10/22/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Created by Corey Werner on 1/17/18.
+//  Copyright © 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 
- @objc public protocol TutorialSlideView {
+typealias TutorialSlideView = UIView & TutorialSlideViewProtocol
+
+protocol TutorialSlideViewProtocol : NSObjectProtocol {
     func didEnterSlide()
     func willLeaveSlide()
 }

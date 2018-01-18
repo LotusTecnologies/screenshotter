@@ -46,7 +46,7 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
     }
     
     func shoppableCount() -> Int {
-        return shoppablesFrc.fetchedObjects!.count
+        return Int(screenshot.shoppablesCount)
     }
     
     func shoppables() -> [Shoppable] {

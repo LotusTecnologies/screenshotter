@@ -19,8 +19,9 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
-    static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 6) // 64
-    static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 7) // 128
+    static let categoryAuto      = ProductsOptionsMask(rawValue: 1 << 6) // 64
+    static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 7) // 128
+    static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 8) // 256
     
     static var global: ProductsOptionsMask {
         return ProductsOptionsMask(ProductsOptionsCategory.globalValue, ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
@@ -34,10 +35,12 @@ class ProductsOptionsMask : NSObject {
         var value: Int = 0
         
         switch category {
+        case .fashion:
+            value |= ProductsOptionsMask.categoryFashion.rawValue
         case .furniture:
             value |= ProductsOptionsMask.categoryFurniture.rawValue
         default:
-            value |= ProductsOptionsMask.categoryFashion.rawValue
+            value |= ProductsOptionsMask.categoryAuto.rawValue
         }
         
         switch gender {
@@ -62,10 +65,12 @@ class ProductsOptionsMask : NSObject {
     }
     
     var category: ProductsOptionsCategory {
-        if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
+        if rawValue & ProductsOptionsMask.categoryFashion.rawValue > 0 {
+            return .fashion
+        } else if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
             return .furniture
         } else {
-            return .fashion
+            return .auto
         }
     }
     
@@ -250,7 +255,8 @@ class ProductsOptionsControls : NSObject {
     func createCategoryControl() -> UISegmentedControl {
         let control = UISegmentedControl(items: [
             ProductsOptionsCategory.fashion.stringValue,
-            ProductsOptionsCategory.furniture.stringValue
+            ProductsOptionsCategory.furniture.stringValue,
+            ProductsOptionsCategory.auto.stringValue
             ])
         control.addTarget(self, action: #selector(syncCategoryControl), for: .valueChanged)
         
@@ -313,10 +319,10 @@ class ProductsOptionsControls : NSObject {
             let isFashion: Bool
             
             if let categoryControl = categoryControl {
-                isFashion = ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion
+                isFashion = ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) != .furniture
                 
             } else {
-                isFashion = ProductsOptionsCategory.default == .fashion
+                isFashion = ProductsOptionsCategory.default != .furniture
             }
             
             enabledControls[genderControl] = [:]
@@ -370,7 +376,7 @@ class ProductsOptionsControls : NSObject {
             return
         }
         
-        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) == .fashion {
+        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) != .furniture {
             if let genderControl = genderControl, let gender = gender {
                 genderControl.selectedSegmentIndex = gender.offsetValue
             }
@@ -532,8 +538,9 @@ class ProductsOptionsView : UIView {
 enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case fashion = 1
     case furniture
+    case auto
     
-    static let `default` = ProductsOptionsCategory.fashion
+    static let `default` = ProductsOptionsCategory.auto
     
     static var globalValue: ProductsOptionsCategory {
         return ProductsOptionsCategory(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCategory))
@@ -557,6 +564,7 @@ enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtoco
         switch self {
         case .fashion: string = "products.options.category.fashion".localized
         case .furniture: string = "products.options.category.furniture".localized
+        case .auto: string = "products.options.category.auto".localized
         }
         
         return string

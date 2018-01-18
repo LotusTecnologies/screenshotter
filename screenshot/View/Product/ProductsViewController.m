@@ -94,14 +94,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         barButtonItem;
     });
     
-    if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
-        // TODO: Refactor this so the below views are still created, just not shown
-        // You shall not pass!
-        self.state = ProductsViewControllerStateRetry;
-        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
-        return;
-    }
-    
     _shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
@@ -122,9 +114,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     });
     
     _collectionView = ({
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat p = [Geometry padding];
-        CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+        CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
         
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = minimumSpacing.x;
@@ -138,7 +128,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
-        // Then test why the control view jumps before being dragged away.
+        // Then test why the control view (products options view) jumps before being dragged away.
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -177,8 +167,16 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
-    self.state = ProductsViewControllerStateLoading;
-    [self reloadProductsForShoppableAtIndex:0];
+    if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
+        // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
+        // rateView and scrollRevealController can all be lazy loaded. They dont
+        // need to exist if this condition is true.
+        self.state = ProductsViewControllerStateRetry;
+        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+        
+    } else {
+        [self reloadProductsForShoppableAtIndex:0];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -229,6 +227,19 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             break;
             
         case ProductsViewControllerStateProducts:
+            if (@available(iOS 11.0, *)) {} else {
+                if (!self.automaticallyAdjustsScrollViewInsets) {
+                    // Setting back to YES doesn't update. Need to manually adjust.
+                    UIEdgeInsets scrollInsets = self.collectionView.scrollIndicatorInsets;
+                    scrollInsets.top = self.shoppablesToolbar.bounds.size.height + CGRectGetMaxY(self.navigationController.navigationBar.frame);
+                    self.collectionView.scrollIndicatorInsets = scrollInsets;
+                    
+                    UIEdgeInsets insets = self.collectionView.contentInset;
+                    insets.top = scrollInsets.top + [self collectionViewMinimumSpacing].y;
+                    self.collectionView.contentInset = insets;
+                }
+            }
+            
             [self stopAndRemoveLoader];
             [self hideNoItemsHelperView];
             self.rateView.hidden = NO;
@@ -236,6 +247,10 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             
         case ProductsViewControllerStateRetry:
         case ProductsViewControllerStateEmpty:
+            if (@available(iOS 11.0, *)) {} else {
+                self.automaticallyAdjustsScrollViewInsets = NO;
+            }
+            
             [self stopAndRemoveLoader];
             self.rateView.hidden = YES;
             [self hideNoItemsHelperView];
@@ -267,7 +282,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 #pragma mark - Shoppables
 
 - (BOOL)hasShoppables {
-    return [self.shoppablesController shoppableCount];
+    return [self.shoppablesController shoppableCount] > 0;
 }
 
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
@@ -363,6 +378,12 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 
 #pragma mark - Collection View
+
+- (CGPoint)collectionViewMinimumSpacing {
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat p = [Geometry padding];
+    return CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+}
 
 - (NSInteger)numberOfCollectionViewProductColumns {
     return 2;
