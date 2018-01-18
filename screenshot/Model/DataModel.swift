@@ -1164,25 +1164,27 @@ extension Matchstick {
         let managedObjectID = self.objectID
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
-            fetchRequest.sortDescriptors = nil
-            
             do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                if let matchstick: Matchstick = results.first {
+                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick,
+                  let assetId = matchstick.remoteId,
+                  let uploadedImageURL = matchstick.imageUrl,
+                  let syteJson = matchstick.syteJson,
+                  let segments = NetworkingPromise.jsonDestringify(string: syteJson) {
                     let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                                   assetId: matchstick.remoteId!,
+                                                                   assetId: assetId,
                                                                    createdAt: Date(),
                                                                    isRecognized: true,
                                                                    isFromShare: true,
                                                                    isHidden: false,
                                                                    imageData: matchstick.imageData as Data?,
                                                                    classification: nil)
-                    addedScreenshot.syteJson = matchstick.syteJson
-                    addedScreenshot.uploadedImageURL = matchstick.imageUrl
+                    addedScreenshot.uploadedImageURL = uploadedImageURL
+                    addedScreenshot.syteJson = syteJson
                     managedObjectContext.delete(matchstick)
                     try managedObjectContext.save()
+                    AssetSyncModel.sharedInstance.processingQ.async {
+                        AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)
+                    }
                     if let callback = callback {
                         let addedScreenshotOID = addedScreenshot.objectID
                         DispatchQueue.main.async {
@@ -1203,13 +1205,8 @@ extension Matchstick {
     @objc public func pass() {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
-            fetchRequest.sortDescriptors = nil
-            
             do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                if let matchstick = results.first {
+                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick {
                     managedObjectContext.delete(matchstick)
                     try managedObjectContext.save()
                 } else {
