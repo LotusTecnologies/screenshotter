@@ -423,7 +423,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     if (indexPath.section == ProductsSectionTooltip) {
         size.width = collectionView.bounds.size.width;
-        size.height = 70.f;
+        size.height = [ProductsTooltipCollectionViewCell heightWithCellWidth:size.width];
         
     } else if (indexPath.section == ProductsSectionProduct) {
         NSInteger columns = [self numberOfCollectionViewProductColumns];
@@ -438,7 +438,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ProductsSectionTooltip) {
         ProductsTooltipCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"tooltip" forIndexPath:indexPath];
-        cell.text = @"Tap to shop different types of products";
         return cell;
         
     } else if (indexPath.section == ProductsSectionProduct) {
