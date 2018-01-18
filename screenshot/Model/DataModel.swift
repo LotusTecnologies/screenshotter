@@ -572,8 +572,6 @@ extension DataModel {
                 var screenshotsToUpdate = Set<Screenshot>()
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
-                    product.isFavorite = false
-                    product.dateFavorited = nil
                     if let screenshot = product.screenshot {
                         screenshot.removeFromFavorites(product)
                         screenshot.favoritesCount -= 1
@@ -583,6 +581,8 @@ extension DataModel {
                             screenshotsToUpdate.insert(screenshot)
                         }
                     }
+                    product.isFavorite = false
+                    product.dateFavorited = nil
                 }
                 screenshotsToUpdate.forEach {$0.updateLastFavorited()}
                 try managedObjectContext.save()
