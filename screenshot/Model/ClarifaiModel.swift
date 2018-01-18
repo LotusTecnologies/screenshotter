@@ -32,35 +32,11 @@ class ClarifaiModel: NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(modelAvailable), name: Notification.Name.CAIModelDidBecomeAvailable, object: nil)
         Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
         if !isModelDownloaded {
-            startTimer()
+            kickoffModelDownload()
         }
-    }
-    
-    // See: https://stackoverflow.com/questions/25951980/do-something-every-x-minutes-in-swift
-    var timer: DispatchSourceTimer?
-    
-    func startTimer() {
-        let queue = DispatchQueue.global(qos: .default) // DispatchQueue.main
-        timer?.cancel()
-        timer = DispatchSource.makeTimerSource(queue: queue)
-        timer?.scheduleRepeating(deadline: .now(), interval: .seconds(60), leeway: .seconds(1))
-        timer?.setEventHandler {
-            if self.isModelDownloaded {
-                self.stopTimer()
-            } else {
-                self.kickoffModelDownload()
-            }
-        }
-        timer?.resume()
-    }
-    
-    func stopTimer() {
-        timer?.cancel()
-        timer = nil
     }
     
     deinit {
-        stopTimer()
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -80,7 +56,6 @@ class ClarifaiModel: NSObject {
     func modelDownloaded() {
         isModelDownloaded = true
         UserDefaults.standard.set(isModelDownloaded, forKey: UserDefaultsKeys.isModelDownloaded)
-        stopTimer()
     }
     
     func kickoffModelDownload() {
@@ -100,10 +75,6 @@ class ClarifaiModel: NSObject {
     }
     
     func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
-        guard isModelDownloaded else {
-            let error = NSError(domain: "Craze", code: 19, userInfo: [NSLocalizedDescriptionKey : "Clarifai model unavailable"])
-            return Promise(error: error)
-        }
         return Promise { fulfill, reject in
             localPredict(image: image) { (outputs: [Output]?, error: Error?) in
                 if let error = error {
