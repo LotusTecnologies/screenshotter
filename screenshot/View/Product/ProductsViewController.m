@@ -94,8 +94,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         barButtonItem;
     });
     
-    // Here
-    
     _shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
@@ -170,14 +168,15 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
     if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
-        // TODO: Refactor this so the below views are still created, just not shown
-        // You shall not pass!
+        // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
+        // rateView and scrollRevealController can all be lazy loaded. They dont
+        // need to exist if this condition is true.
         self.state = ProductsViewControllerStateRetry;
         [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
-        return;
+        
+    } else {
+        [self reloadProductsForShoppableAtIndex:0];
     }
-    
-    [self reloadProductsForShoppableAtIndex:0];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -219,14 +218,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self updateOptionsView];
     self.shoppablesToolbar.hidden = [self shouldHideToolbar];
-    
-    // Note: automaticallyAdjustsScrollViewInsets is only needed for iOS 10
-    
-    // TODO: test scenario on ios 10 and 11 of,
-    // no wifi
-    // import image (rety state is presented)
-    // enable wifi and retry
-    // everything should look ok including scroll insets
     
     switch (state) {
         case ProductsViewControllerStateLoading:
