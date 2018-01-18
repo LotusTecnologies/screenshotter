@@ -227,7 +227,7 @@ class ScreenshotPickerViewController: BaseViewController {
     
     private func presentPhotoPermissionsAlert() {
         let alertController = UIAlertController(title: "picker.permission.title".localized, message: "picker.permission.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "generic.no_thanks".localized, style: .cancel, handler: { (action) in
+        alertController.addAction(UIAlertAction(title: "generic.no_thanks".localized, style: .cancel, handler: { action in
             if let cancelButton = self.navigationItem.leftBarButtonItem,
                 let cancelAction = cancelButton.action,
                 let cancelTarget = cancelButton.target
@@ -235,11 +235,20 @@ class ScreenshotPickerViewController: BaseViewController {
                 UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
             }
         }))
-        alertController.addAction(UIAlertAction(title: "picker.permission.add".localized, style: .default, handler: { (action) in
-            if let alertController = PermissionsManager.shared.deniedAlertController(for: .photo) {
-                self.present(alertController, animated: true, completion: nil)
+        let addAction = UIAlertAction(title: "picker.permission.add".localized, style: .default, handler: { action in
+            if PermissionsManager.shared.permissionStatus(for: .photo) == .undetermined {
+                PermissionsManager.shared.requestPermission(for: .photo, response: { granted in
+                    self.reloadAssets()
+                })
+                
+            } else {
+                if let alertController = PermissionsManager.shared.deniedAlertController(for: .photo) {
+                    self.present(alertController, animated: true, completion: nil)
+                }
             }
-        }))
+        })
+        alertController.addAction(addAction)
+        alertController.preferredAction = addAction
         present(alertController, animated: true, completion: nil)
     }
     
