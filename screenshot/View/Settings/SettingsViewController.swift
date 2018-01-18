@@ -293,7 +293,7 @@ class SettingsViewController : BaseViewController {
         let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
         let integer = gender.rawValue
         
-        track("Set Global Gender Filter to \(gender.stringValue)")
+        AnalyticsTrackers.standard.track("Set Global Gender Filter to \(gender.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
@@ -301,7 +301,7 @@ class SettingsViewController : BaseViewController {
         let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
         let integer = size.rawValue
         
-        track("Set Global Size Filter to \(size.stringValue)")
+        AnalyticsTrackers.standard.track("Set Global Size Filter to \(size.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -359,13 +359,12 @@ extension SettingsViewController : UITableViewDataSource {
             return
         }
         
-        if indexPath.section == SettingsViewController.Section.product.rawValue && (row == .productGender || row == .productSize) {
-            guard let genderControl = productsOptionsControls.genderControl, let sizeControl = productsOptionsControls.sizeControl else {
-                return
-            }
-            
-            let width = max(genderControl.bounds.width, sizeControl.bounds.width)
-            
+        if indexPath.section == SettingsViewController.Section.product.rawValue &&
+            (row == .productGender || row == .productSize),
+            let genderControl = productsOptionsControls.genderControl,
+            let sizeControl = productsOptionsControls.sizeControl,
+            let width = [genderControl.bounds.width, sizeControl.bounds.width].max()
+        {
             var frame = genderControl.frame
             frame.size.width = width
             genderControl.frame = frame

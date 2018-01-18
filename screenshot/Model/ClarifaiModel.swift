@@ -12,6 +12,10 @@ import PromiseKit
 
 class ClarifaiModel: NSObject {
 
+    enum ImageClassification {
+        case human, furniture, unrecognized
+    }
+    
     public static let sharedInstance = ClarifaiModel()
     
     public static func setup() {
@@ -61,12 +65,12 @@ class ClarifaiModel: NSObject {
     }
     
     func modelDownloadStarted() {
-        track("started downloading Clarifai model")
+        AnalyticsTrackers.standard.track("started downloading Clarifai model")
     }
     
     func modelDownloadFinished() {
         modelDownloaded()
-        track("finished downloading Clarifai model")
+        AnalyticsTrackers.standard.track("finished downloading Clarifai model")
     }
     
     func modelAvailable() {
@@ -114,29 +118,19 @@ class ClarifaiModel: NSObject {
         }
     }
     
-    func isFashion(image: UIImage) -> Promise<(Bool, UIImage)> {
-        return localClarifaiOutputs(image: image).then { outputs -> Promise<(Bool, UIImage)> in
-            var isFashion = false
-            var j: Int = 0
-            for output in outputs {
-                guard let concepts = output.dataAsset.concepts else {
-                    continue
-                }
-                for concept in concepts {
-                    switch concept.name {
-                    case "woman", "man", "fashion", "beauty", "glamour", "dress", "jewelry", "garment", "apparel", "shirt", "jacket", "vogue", "ensemble":
-                        isFashion = true
-                    default:
-                        break
-                    }
-                    j += 1
-                    //print("\(j)  \(concept.score * 100.0)  \(concept.name ?? "-")")
-                }
+    func classify(image: UIImage) -> Promise<(ImageClassification, UIImage)> {
+        return localClarifaiOutputs(image: image).then { outputs -> Promise<(ImageClassification, UIImage)> in
+            let conceptNamesArray = outputs.flatMap({$0.dataAsset.concepts}).flatMap({$0}).flatMap({$0.name})
+            let conceptNames = Set<String>(conceptNamesArray)
+            print("classify conceptNames:\(conceptNames.joined(separator: ", "))")
+            if !conceptNames.isDisjoint(with: ["woman", "man", "child"]) {
+                return Promise(value: (.human, image))
+            } else if !conceptNames.isDisjoint(with: ["furniture", "chair", "table", "desk", "sofa", "couch", "rug", "drapes", "bookshelf"]) {
+                return Promise(value: (.furniture, image))
+            } else {
+                return Promise(value: (.unrecognized, image))
             }
-            print("isFashion: \(isFashion ? "YES" : "NO")")
-            return Promise(value: (isFashion, image))
         }
     }
-    
     
 }

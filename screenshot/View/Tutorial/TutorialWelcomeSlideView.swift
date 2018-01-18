@@ -6,7 +6,8 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import Appsee
 
 class TutorialWelcomeSlideView : HelperView {
     private(set) var button = MainButton()
@@ -65,5 +66,15 @@ class TutorialWelcomeSlideView : HelperView {
         mutableString.addAttributes([NSForegroundColorAttributeName: UIColor.crazeRed], range: attachmentRange)
         
         return mutableString
+    }
+}
+
+extension TutorialWelcomeSlideView : TutorialSlideViewProtocol {
+    func didEnterSlide() {
+        Appsee.startScreen("Tutorial Welcome")
+    }
+    
+    func willLeaveSlide() {
+        
     }
 }

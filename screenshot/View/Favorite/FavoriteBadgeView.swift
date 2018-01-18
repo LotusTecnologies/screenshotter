@@ -46,6 +46,12 @@ class FavoriteBadgeView : UIView {
         return size
     }
     
+    // Clear color will not be comparable with the setting,
+    // Accessibility -> Increase Contrast -> Reduce Transparency
+    // turned on. Create a non UIKit defined clear color to
+    // avoid this issue.
+    let clearColor = UIColor(white: 1, alpha: 0)
+    
     override var tintColor: UIColor! {
         didSet {
             imageView.tintColor = tintColor
@@ -54,7 +60,7 @@ class FavoriteBadgeView : UIView {
     }
     
     private func syncedImage() -> UIImage? {
-        if tintColor == .clear {
+        if tintColor == clearColor {
             return image
             
         } else {

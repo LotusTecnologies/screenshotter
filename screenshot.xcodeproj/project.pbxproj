@@ -43,7 +43,6 @@
 		C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C71FE90C8D00198955 /* SettingsViewController.swift */; };
 		C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */; };
 		C54088121FE90C8E00198955 /* TutorialEmailSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */; };
-		C54088131FE90C8E00198955 /* TutorialSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CB1FE90C8D00198955 /* TutorialSlideView.swift */; };
 		C54088141FE90C8E00198955 /* TutorialProductsPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087CC1FE90C8D00198955 /* TutorialProductsPageViewController.m */; };
 		C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CD1FE90C8D00198955 /* TutorialViewController.swift */; };
 		C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087CE1FE90C8D00198955 /* TutorialVideoOverlayView.swift */; };
@@ -102,6 +101,7 @@
 		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
 		C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */; };
+		C5FF4142200F299D00342DEC /* TutorialSlideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FF4141200F299D00342DEC /* TutorialSlideView.swift */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
@@ -154,7 +154,6 @@
 		C54087C71FE90C8D00198955 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideView.swift; sourceTree = "<group>"; };
 		C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideView.swift; sourceTree = "<group>"; };
-		C54087CB1FE90C8D00198955 /* TutorialSlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialSlideView.swift; sourceTree = "<group>"; };
 		C54087CC1FE90C8D00198955 /* TutorialProductsPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorialProductsPageViewController.m; sourceTree = "<group>"; };
 		C54087CD1FE90C8D00198955 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 		C54087CE1FE90C8D00198955 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
@@ -223,6 +222,7 @@
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapticHelper.swift; sourceTree = "<group>"; };
+		C5FF4141200F299D00342DEC /* TutorialSlideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialSlideView.swift; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E41449FF1F41890900B1F039 /* ClarifaiModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiModel.swift; sourceTree = "<group>"; };
@@ -245,6 +245,7 @@
 		E4D6D8A51F61AF3A009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		E4D6D8A61F61B047009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E4F9B9552005315E0019264E /* Model 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 8.xcdatamodel"; sourceTree = "<group>"; };
 		E564B3319115D6C7FCDFE967 /* Pods-screenshot.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devrelease.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -397,15 +398,15 @@
 		C54087C81FE90C8D00198955 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
-				C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */,
 				C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */,
-				C54087CB1FE90C8D00198955 /* TutorialSlideView.swift */,
 				C54087D11FE90C8D00198955 /* TutorialProductsPageViewController.h */,
 				C54087CC1FE90C8D00198955 /* TutorialProductsPageViewController.m */,
-				C54087CD1FE90C8D00198955 /* TutorialViewController.swift */,
-				C54087CE1FE90C8D00198955 /* TutorialVideoOverlayView.swift */,
+				C5FF4141200F299D00342DEC /* TutorialSlideView.swift */,
 				C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */,
+				C54087CE1FE90C8D00198955 /* TutorialVideoOverlayView.swift */,
 				C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */,
+				C54087CD1FE90C8D00198955 /* TutorialViewController.swift */,
+				C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -968,7 +969,6 @@
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
-				C54088131FE90C8E00198955 /* TutorialSlideView.swift in Sources */,
 				C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
@@ -1014,6 +1014,7 @@
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
+				C5FF4142200F299D00342DEC /* TutorialSlideView.swift in Sources */,
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
@@ -1150,7 +1151,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 89;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1175,7 +1176,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 89;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1255,7 +1256,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 89;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1331,7 +1332,7 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
-				CURRENT_PROJECT_VERSION = 77;
+				CURRENT_PROJECT_VERSION = 89;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1377,6 +1378,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				E4F9B9552005315E0019264E /* Model 8.xcdatamodel */,
 				E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */,
 				E41D98791FE26114006EB79E /* Model 6.xcdatamodel */,
 				E492765B1FC6FADB009DD239 /* Model 5.xcdatamodel */,
@@ -1385,7 +1387,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */;
+			currentVersion = E4F9B9552005315E0019264E /* Model 8.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

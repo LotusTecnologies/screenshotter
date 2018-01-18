@@ -50,11 +50,13 @@ public class AnalyticsUser : NSObject {
         }
 
         props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
+        props["dailyStreak"] = "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak))"
         
         if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
             props["pushToken"] = token.description
         }
         
+        props["userAge"] = "\(userAge())"
         return props
     }
 }
@@ -62,7 +64,6 @@ public class AnalyticsUser : NSObject {
 @objc public protocol AnalyticsTracker {
     func track(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
-    func identifyAnonymousUser()
 }
 
 public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -97,10 +98,6 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     public func identify(_ user: AnalyticsUser) {
         trackers.values.forEach { $0.identify(user) }
     }
-    
-    public func identifyAnonymousUser() {
-        trackers.values.forEach { $0.identifyAnonymousUser() }
-    }
 }
 
 class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -110,10 +107,6 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
-    }
-    
-    func identifyAnonymousUser() {
-        SEGAnalytics.shared().identify(SEGAnalytics.shared().getAnonymousId())
     }
     
     func error(withDescription description: String) {
@@ -150,10 +143,6 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
         
         track("User Properties", properties: user.analyticsProperties)
     }
-    
-    func identifyAnonymousUser() {
-        // Not needed for AppSee
-    }
 }
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -163,10 +152,6 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         IntercomHelper.sharedInstance.register(user: user)
-    }
-    
-    func identifyAnonymousUser() {
-        IntercomHelper.sharedInstance.registerAnonymousUser()
     }
 }
 
@@ -182,10 +167,6 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
             Branch.getInstance().userCompletedAction("Submitted email")
         }
     }
-    
-    func identifyAnonymousUser() {
-        // Not needed for Branch
-    }
 }
 
 public class AnalyticsTrackers : NSObject {
@@ -195,16 +176,6 @@ public class AnalyticsTrackers : NSObject {
     static let branch = BranchAnalyticsTracker()
     
     static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom])
-}
-
-public func track(_ name: String, properties: [AnyHashable : Any]? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) {
-    tracker.track(name, properties: properties)
-}
-
-public func identify(_ name: String? = nil, email: String? = nil, tracker: AnalyticsTracker = AnalyticsTrackers.standard) -> AnalyticsUser {
-    let user = AnalyticsUser(name: name, email: email)
-    tracker.identify(user)
-    return user
 }
 
 fileprivate let marketingBrands = [
@@ -224,6 +195,15 @@ fileprivate let marketingBrands = [
 ]
 
 extension AnalyticsTracker {
+    func trackUserAge() {
+        guard let current = AnalyticsUser.current else {
+            return
+        }
+        
+        track("User Age", properties: ["age": userAge()])
+        identify(current)
+    }
+    
     func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
         let favoriteEvent = favorited ? "Product favorited" : "Product unfavorited"
         
@@ -270,4 +250,18 @@ class AnalyticsTrackerObjCBridge : NSObject {
     static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String) {
         tracker.trackTappedOnProduct(product, onPage: page)
     }
+}
+
+// Returns the user's age in days.
+fileprivate func userAge() -> Int {
+    guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {
+        return 0
+    }
+    
+    let components = Set<Calendar.Component>([.day])
+    guard let ageInDays = Calendar.current.dateComponents(components, from: dateInstalled, to: Date()).day else {
+        return 0
+    }
+    
+    return ageInDays
 }

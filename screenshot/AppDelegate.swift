@@ -56,11 +56,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         setupThirdPartyLibraries(application, launchOptions: launchOptions)
         
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
-            // Identify as an anonymous user if we haven't signed up yet.
-            AnalyticsTrackers.standard.identifyAnonymousUser()
-        }
-        
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
         
@@ -104,7 +99,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
         ApplicationStateModel.sharedInstance.applicationState = .background
-        track("sessionEnded")
+        AnalyticsTrackers.standard.track("sessionEnded")
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
@@ -114,7 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
-        track("sessionStarted")
+        AnalyticsTrackers.standard.track("sessionStarted")
         AssetSyncModel.sharedInstance.syncPhotosUponForeground()
     }
     
@@ -122,6 +117,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         ApplicationStateModel.sharedInstance.applicationState = .active
         FBSDKAppEvents.activateApp()
+        AnalyticsTrackers.standard.trackUserAge()
     }
     
 //    func applicationWillTerminate(_ application: UIApplication) {
@@ -442,6 +438,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         completionHandler()
         
-        track("app opened from local notification")
+        AnalyticsTrackers.standard.track("app opened from local notification")
     }
 }
