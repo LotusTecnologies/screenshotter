@@ -130,7 +130,7 @@ class ScreenshotPickerViewController: BaseViewController {
         
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
             let p = CGFloat.padding
-            
+
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false
             fab.setImage(UIImage(named: "FABCamera"), for: .normal)
@@ -143,7 +143,9 @@ class ScreenshotPickerViewController: BaseViewController {
             fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
         }
         
-        reloadAssets()
+        if PermissionsManager.shared.hasPermission(for: .photo) {
+            reloadAssets()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
