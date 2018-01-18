@@ -116,9 +116,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     });
     
     _collectionView = ({
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat p = [Geometry padding];
-        CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+        CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
         
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = minimumSpacing.x;
@@ -132,7 +130,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
-        // Then test why the control view jumps before being dragged away.
+        // Then test why the control view (products options view) jumps before being dragged away.
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
         
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -232,14 +230,25 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     switch (state) {
         case ProductsViewControllerStateLoading:
-            self.automaticallyAdjustsScrollViewInsets = YES;
             [self hideNoItemsHelperView];
             self.rateView.hidden = YES;
             [self.loader startAnimation];
             break;
             
         case ProductsViewControllerStateProducts:
-            self.automaticallyAdjustsScrollViewInsets = YES;
+            if (@available(iOS 11.0, *)) {} else {
+                if (!self.automaticallyAdjustsScrollViewInsets) {
+                    // Setting back to YES doesn't update. Need to manually adjust.
+                    UIEdgeInsets scrollInsets = self.collectionView.scrollIndicatorInsets;
+                    scrollInsets.top = self.shoppablesToolbar.bounds.size.height + CGRectGetMaxY(self.navigationController.navigationBar.frame);
+                    self.collectionView.scrollIndicatorInsets = scrollInsets;
+                    
+                    UIEdgeInsets insets = self.collectionView.contentInset;
+                    insets.top = scrollInsets.top + [self collectionViewMinimumSpacing].y;
+                    self.collectionView.contentInset = insets;
+                }
+            }
+            
             [self stopAndRemoveLoader];
             [self hideNoItemsHelperView];
             self.rateView.hidden = NO;
@@ -247,7 +256,10 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             
         case ProductsViewControllerStateRetry:
         case ProductsViewControllerStateEmpty:
-            self.automaticallyAdjustsScrollViewInsets = NO;
+            if (@available(iOS 11.0, *)) {} else {
+                self.automaticallyAdjustsScrollViewInsets = NO;
+            }
+            
             [self stopAndRemoveLoader];
             self.rateView.hidden = YES;
             [self hideNoItemsHelperView];
@@ -375,6 +387,12 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 
 #pragma mark - Collection View
+
+- (CGPoint)collectionViewMinimumSpacing {
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat p = [Geometry padding];
+    return CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+}
 
 - (NSInteger)numberOfCollectionViewProductColumns {
     return 2;
