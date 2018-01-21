@@ -16,7 +16,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isAdding = false
     
-    fileprivate var count = 2
+    fileprivate var count = 10
     fileprivate let topIndexPath = IndexPath(item: 0, section: 0)
     
     override var title: String? {
@@ -289,6 +289,58 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView?.removeFromSuperview()
         emptyView = nil
     }
+    
+    // MARK: Flag
+    
+    @objc fileprivate func presentReportAlertController() {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.title".localized, message: "discover.screenshot.flag.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.inappropriate".localized, style: .default, handler: { action in
+            // TODO: hide card
+            
+            self.presentInappropriateAlertController()
+        }))
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.copyright".localized, style: .default, handler: { action in
+            self.presentCopyrightAlertController()
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    fileprivate func presentInappropriateAlertController() {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.inappropriate.title".localized, message: "discover.screenshot.flag.inappropriate.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        
+        AnalyticsTrackers.standard.track("Matchsticks Flagged", properties: [
+            "url": "", // TODO: include url
+            "why": "Inappropriate"
+            ])
+    }
+    
+    fileprivate func presentCopyrightAlertController() {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.copyright.title".localized, message: "discover.screenshot.flag.copyright.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "legal.terms_of_service".localized, style: .default, handler: { action in
+            self.presentTermsOfServiceViewController()
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        
+        AnalyticsTrackers.standard.track("Matchsticks Flagged", properties: [
+            "url": "", // TODO: include url
+            "why": "Copyright"
+            ])
+    }
+    
+    fileprivate func presentTermsOfServiceViewController() {
+        // TODO: move the class function to a caller that makes more sense
+        if let termsOfServiceViewController = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(termsOfServiceViewController, animated: true, completion: nil)
+        }
+    }
+    
+    @objc fileprivate func dismissViewController() {
+        dismiss(animated: true, completion: nil)
+    }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
@@ -300,7 +352,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
-            cell.backgroundColor = view.backgroundColor
+            cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
         }
         
         return cell

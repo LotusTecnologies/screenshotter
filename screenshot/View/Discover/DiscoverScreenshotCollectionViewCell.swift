@@ -10,6 +10,7 @@ import Foundation
 
 class DiscoverScreenshotCollectionViewCell : ShadowCollectionViewCell {
     fileprivate let imageView = UIImageView()
+    let flagButton = UIButton()
     
     // MARK: Life Cycle
     
@@ -29,8 +30,16 @@ class DiscoverScreenshotCollectionViewCell : ShadowCollectionViewCell {
         imageView.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
         
+        flagButton.translatesAutoresizingMaskIntoConstraints = false
+        flagButton.setImage(UIImage(named: "DiscoverScreenshotFlag"), for: .normal)
+        flagButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        mainView.addSubview(flagButton)
+        flagButton.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        flagButton.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
+        
         decisionView.translatesAutoresizingMaskIntoConstraints = false
         decisionView.alpha = 0
+        decisionView.isUserInteractionEnabled = false
         mainView.addSubview(decisionView)
         decisionView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
         decisionView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true

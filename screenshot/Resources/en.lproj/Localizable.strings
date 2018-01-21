@@ -19,6 +19,14 @@
 "discover.screenshot.add" = "Add";
 "discover.screenshot.empty.detail" = "You're swiping a bit too fast for us, try again later.";
 "discover.screenshot.empty.title" = "That's It!";
+"discover.screenshot.flag.copyright" = "This Is My Image";
+"discover.screenshot.flag.copyright.message" = "Discover content is submitted by our users and is not reviewed for copyright infringement. If your intellectual property was used without your permission we will remove it.\nPlease refer to our Terms of Service for DMCA compliance.";
+"discover.screenshot.flag.copyright.title" = "Is This Yours?";
+"discover.screenshot.flag.inappropriate" = "Inappropriate Image";
+"discover.screenshot.flag.inappropriate.message" = "We’ll review this as soon as possible.";
+"discover.screenshot.flag.inappropriate.title" = "Thanks For Letting Us Know!";
+"discover.screenshot.flag.message" = "What’s wrong?";
+"discover.screenshot.flag.title" = "Report Screenshot";
 "discover.screenshot.helper.title" = "Discover Fashion";
 "discover.screenshot.helper.swipe_left.detail" = "\nto pass";
 "discover.screenshot.helper.swipe_left.title" = "Swipe Left";
@@ -45,6 +53,7 @@
 "game.score" = "My coins: %d";
 "game.start" = "Tap to get more coins";
 
+"generic.cancel" = "Cancel";
 "generic.disabled" = "Disabled";
 "generic.done" = "Done";
 "generic.enabled" = "Enabled";
