@@ -332,9 +332,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     fileprivate func presentTermsOfServiceViewController() {
-        // TODO: move the class function to a caller that makes more sense
-        if let termsOfServiceViewController = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(termsOfServiceViewController, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
     }
     

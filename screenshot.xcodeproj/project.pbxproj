@@ -100,6 +100,7 @@
 		C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCB1FFA642300CC1A97 /* GameScene.swift */; };
 		C5D98CCF1FFB65A700CC1A97 /* FavoriteBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCE1FFB65A700CC1A97 /* FavoriteBadgeView.swift */; };
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
+		C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */; };
 		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
 		C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */; };
@@ -225,6 +226,7 @@
 		C5D98CCB1FFA642300CC1A97 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5D98CCE1FFB65A700CC1A97 /* FavoriteBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteBadgeView.swift; sourceTree = "<group>"; };
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
+		C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalViewControllerFactory.swift; sourceTree = "<group>"; };
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		C5F8D63E1FA0DF420067C26A /* TapticHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapticHelper.swift; sourceTree = "<group>"; };
@@ -372,6 +374,7 @@
 				C5D98CC91FFA642300CC1A97 /* Game */,
 				C54087F81FE90C8E00198955 /* Generic */,
 				C54087DC1FE90C8D00198955 /* Invite */,
+				C5F53D8C2014A57F003A57EC /* Legal */,
 				C54087C11FE90C8D00198955 /* Loading */,
 				C54087EC1FE90C8E00198955 /* Product */,
 				C54088051FE90C8E00198955 /* Screenshot */,
@@ -648,6 +651,14 @@
 				C5D98CCB1FFA642300CC1A97 /* GameScene.swift */,
 			);
 			path = Game;
+			sourceTree = "<group>";
+		};
+		C5F53D8C2014A57F003A57EC /* Legal */ = {
+			isa = PBXGroup;
+			children = (
+				C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */,
+			);
+			path = Legal;
 			sourceTree = "<group>";
 		};
 		E4139D371F09083B00E8A53B = {
@@ -940,6 +951,7 @@
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
+				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C54088271FE90C8E00198955 /* ProductCollectionViewCell.m in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,

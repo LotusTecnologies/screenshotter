@@ -213,14 +213,14 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
     }
     
     func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
     }
     
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
     }
     
