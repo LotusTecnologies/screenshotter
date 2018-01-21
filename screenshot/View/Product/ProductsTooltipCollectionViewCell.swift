@@ -21,7 +21,9 @@ class ProductsTooltipCollectionViewCell : UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundView = UIImageView(image: UIImage(named: "ProductsTooltipConfetti"))
+        let backgroundImageView = UIImageView(image: UIImage(named: "ProductsTooltipConfetti"))
+        backgroundImageView.contentMode = .top
+        backgroundView = backgroundImageView
         
         let contentInset = type(of: self).contentInset
         
@@ -34,7 +36,7 @@ class ProductsTooltipCollectionViewCell : UICollectionViewCell {
         centerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -contentInset.right).isActive = true
         centerView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         
-        let arrowImageView = UIImageView(image: UIImage(named: "ProductsTooltipArrow"))
+        let arrowImageView = UIImageView(image: type(of: self).arrowImage)
         arrowImageView.translatesAutoresizingMaskIntoConstraints = false
         arrowImageView.contentMode = .scaleAspectFit
         centerView.addSubview(arrowImageView)
@@ -50,19 +52,23 @@ class ProductsTooltipCollectionViewCell : UICollectionViewCell {
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 0
         centerView.addSubview(label)
-        label.topAnchor.constraint(equalTo: arrowImageView.bottomAnchor, constant: 4).isActive = true
+        label.topAnchor.constraint(equalTo: arrowImageView.bottomAnchor, constant: type(of: self).imageToLabelPadding).isActive = true
         label.leadingAnchor.constraint(equalTo: centerView.leadingAnchor).isActive = true
         label.bottomAnchor.constraint(equalTo: centerView.bottomAnchor).isActive = true
         label.trailingAnchor.constraint(equalTo: centerView.trailingAnchor).isActive = true
     }
     
-    // MARK: Label / Text
+    // MARK: Label / Text / Image
     
     static fileprivate let text = "Tap to shop different types of products"
     
     fileprivate static var labelFont: UIFont {
         return UIFont.preferredFont(forTextStyle: .body)
     }
+    
+    static fileprivate let arrowImage = UIImage(named: "ProductsTooltipArrow")
+    
+    static fileprivate let imageToLabelPadding: CGFloat = 4
 }
 
 // MARK: - Size
@@ -78,6 +84,6 @@ extension ProductsTooltipCollectionViewCell {
         
         let boundingBox = text.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
         
-        return contentInset.top + ceil(boundingBox.height) + contentInset.bottom
+        return contentInset.top + (arrowImage?.size.height ?? 0) + imageToLabelPadding + ceil(boundingBox.height) + contentInset.bottom
     }
 }

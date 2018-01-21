@@ -63,6 +63,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+        
         _productsOptions = [[ProductsOptions alloc] init];
         self.productsOptions.delegate = self;
         
@@ -205,11 +207,19 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [self dismissOptions];
 }
 
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    if (self.view.window && [self.collectionView numberOfItemsInSection:ProductsSectionTooltip] > 0) {
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ProductsSectionTooltip]]];
+    }
+}
+
 - (void)dealloc {
     self.shoppablesToolbar.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     self.shoppablesController.delegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
