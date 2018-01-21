@@ -9,7 +9,6 @@
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
 #import "ShoppablesToolbar.h"
-#import "TutorialProductsPageViewController.h"
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
@@ -41,8 +40,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 @property (nonatomic) NSUInteger productsUnfilteredCount;
 
 @property (nonatomic, copy) UIImage *image;
-
-@property (nonatomic, strong) TransitioningController *transitioningController;
 
 @property (nonatomic) ProductsViewControllerState state;
 
@@ -197,8 +194,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [super viewDidAppear:animated];
     
     self.shoppablesToolbar.didViewControllerAppear = YES;
-    
-    [self presentTutorialHelperIfNeeded];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -724,25 +719,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (BOOL)shouldHideToolbar {
     return ![self hasShoppables];
-}
-
-
-#pragma mark - Tutorial
-
-- (void)presentTutorialHelperIfNeeded {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedProductHelper];
-    
-    if (!hasPresented) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedProductHelper];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    
-        self.transitioningController = [[TransitioningController alloc] init];
-    
-        TutorialProductsPageViewController *viewController = [[TutorialProductsPageViewController alloc] init];
-        viewController.modalPresentationStyle = UIModalPresentationCustom;
-        viewController.transitioningDelegate = self.transitioningController;
-        [self presentViewController:viewController animated:YES completion:nil];
-    }
 }
 
 
