@@ -79,10 +79,12 @@ class IntercomHelper : NSObject {
         remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any]
         
         closePreviousConversations { (success, error) in
-            guard success == true else {
+            guard error == nil else {
                 // handle error
                 if let error = error as NSError? {
                     print(error.localizedDescription)
+                } else {
+                    print(error)
                 }
                 
                 return
