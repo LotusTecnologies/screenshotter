@@ -404,7 +404,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ProductsSectionTooltip) {
-        return [[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys productCompletedTooltip]] ? 0 : 1;
+        BOOL shouldPresentTooldtip = ![[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys productCompletedTooltip]];
+        BOOL hasProducts = self.products.count > 0;
+        return (shouldPresentTooldtip && hasProducts) ? 1 : 0;
         
     } else if (section == ProductsSectionProduct) {
         return self.products.count;
