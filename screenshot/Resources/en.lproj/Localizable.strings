@@ -84,6 +84,7 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 
+"products.options.category.auto" = "Auto";
 "products.options.category.fashion" = "Fashion";
 "products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
@@ -114,7 +115,6 @@
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
-"settings.row.category.title" = "Category";
 "settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
 "settings.row.currency.title" = "Currency";
@@ -152,6 +152,7 @@
 "tutorial.email.legal.end" = " ";
 "tutorial.try.detail" = "Press the home & power buttons to take a screenshot of this page";
 "tutorial.try.detail.x" = "Press the volume up & power buttons to take a screenshot of this page";
+"tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";

@@ -211,7 +211,7 @@ class FavoritesTableViewCell : UITableViewCell {
     
     var hasGoldHeart: Bool = false {
         didSet {
-            heartView.tintColor = hasGoldHeart ? .clear : .crazeRed
+            heartView.tintColor = hasGoldHeart ? heartView.clearColor : .crazeRed
         }
     }
 }

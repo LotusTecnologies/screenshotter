@@ -531,7 +531,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)helperViewAllowAccessAction {
-    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:nil];
+    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:^(BOOL granted) {
+        [self syncHelperViewVisibility];
+    }];
 }
 
 

@@ -35,7 +35,6 @@ class SettingsViewController : BaseViewController {
         case bug
         case version
         case coins
-        case productCategory
         case productGender
         case productSize
         case currency
@@ -246,7 +245,6 @@ class SettingsViewController : BaseViewController {
             .followFacebook
         ],
         .product: [
-            .productCategory,
             .productGender,
             .productSize
         ]
@@ -290,14 +288,6 @@ class SettingsViewController : BaseViewController {
     }
     
     // MARK: Product Options
-    
-    @objc fileprivate func categoryControlAction(_ control: UISegmentedControl) {
-        let category = ProductsOptionsCategory(offsetValue: control.selectedSegmentIndex)
-        let integer = category.rawValue
-        
-        AnalyticsTrackers.standard.track("Set Global Category Filter to \(category.stringValue)")
-        UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productCategory)
-    }
     
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
         let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
@@ -370,11 +360,10 @@ extension SettingsViewController : UITableViewDataSource {
         }
         
         if indexPath.section == SettingsViewController.Section.product.rawValue &&
-            (row == .productCategory || row == .productGender || row == .productSize),
+            (row == .productGender || row == .productSize),
             let genderControl = productsOptionsControls.genderControl,
             let sizeControl = productsOptionsControls.sizeControl,
-            let categoryControl = productsOptionsControls.categoryControl,
-            let width = [genderControl.bounds.width, sizeControl.bounds.width, categoryControl.bounds.width].max()
+            let width = [genderControl.bounds.width, sizeControl.bounds.width].max()
         {
             var frame = genderControl.frame
             frame.size.width = width
@@ -383,10 +372,6 @@ extension SettingsViewController : UITableViewDataSource {
             frame = sizeControl.frame
             frame.size.width = width
             sizeControl.frame = frame
-            
-            frame = categoryControl.frame
-            frame.size.width = width
-            categoryControl.frame = frame
         }
     }
     
@@ -429,7 +414,7 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .email, .coins, .productCategory, .productGender, .productSize, .usageStreak:
+        case .version, .email, .coins, .productGender, .productSize, .usageStreak:
             return false
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
@@ -553,8 +538,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.version.title".localized
         case .coins:
             return "settings.row.coins.title".localized
-        case .productCategory:
-            return "settings.row.category.title".localized
         case .productGender:
             return "settings.row.gender.title".localized
         case .productSize:
@@ -635,25 +618,6 @@ fileprivate extension SettingsViewController {
             } else {
                 return nil
             }
-            
-        case .productCategory:
-            let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCategory)
-            let control: UISegmentedControl
-            
-            if productsOptionsControls.categoryControl != nil {
-                control = productsOptionsControls.categoryControl!
-                
-            } else {
-                control = productsOptionsControls.createCategoryControl()
-                control.tintColor = .crazeGreen
-                control.isExclusiveTouch = true
-                control.addTarget(self, action: #selector(categoryControlAction(_:)), for: .valueChanged)
-            }
-            
-            control.selectedSegmentIndex = ProductsOptionsCategory(intValue: integer).offsetValue
-            productsOptionsControls.sync()
-            
-            return control
             
         case .productGender:
             let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)

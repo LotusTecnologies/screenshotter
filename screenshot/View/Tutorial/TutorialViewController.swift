@@ -224,6 +224,12 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         }
     }
     
+    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideView) {
+        tutorialTrySlideViewDidComplete(slideView)
+        
+        AnalyticsTrackers.standard.track("Skipped Tutorial")
+    }
+    
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {
         slideView.delegate = nil
         
