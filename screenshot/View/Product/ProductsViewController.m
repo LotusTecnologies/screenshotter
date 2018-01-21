@@ -127,7 +127,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
+        collectionView.contentInset = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, minimumSpacing.y, 0.f);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
@@ -377,9 +377,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [self.collectionView reloadData];
         [self.rateView setRating:[shoppable getRating] animated:NO];
         
-        if (self.products.count) {
-            // TODO: maybe call setContentOffset:
-            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+        if ([self.collectionView numberOfItemsInSection:ProductsSectionTooltip] > 0) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:ProductsSectionTooltip] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+            
+        } else if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > 0) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:ProductsSectionProduct] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
         
     } else {
@@ -407,7 +409,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ProductsSectionTooltip) {
-        return 1;
+        return [[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys productCompletedTooltip]] ? 0 : 1;
         
     } else if (section == ProductsSectionProduct) {
         return self.products.count;
@@ -419,7 +421,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     if (section == ProductsSectionProduct) {
-        return UIEdgeInsetsMake([self collectionViewMinimumSpacing].y, 0.f, 0.f, 0.f);
+        CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
+        return UIEdgeInsetsMake(minimumSpacing.y, minimumSpacing.x, 0.f, minimumSpacing.x);
         
     } else {
         return UIEdgeInsetsZero;
@@ -712,6 +715,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys productCompletedTooltip]];
+    
     [self reloadProductsForShoppableAtIndex:index];
     
     [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];

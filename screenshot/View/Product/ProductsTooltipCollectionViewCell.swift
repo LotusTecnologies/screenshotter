@@ -60,7 +60,7 @@ class ProductsTooltipCollectionViewCell : UICollectionViewCell {
     
     // MARK: Label / Text / Image
     
-    static fileprivate let text = "Tap to shop different types of products"
+    static fileprivate let text = "products.tooltip.title".localized
     
     fileprivate static var labelFont: UIFont {
         return UIFont.preferredFont(forTextStyle: .body)

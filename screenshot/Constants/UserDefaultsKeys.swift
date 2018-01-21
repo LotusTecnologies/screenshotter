@@ -19,6 +19,7 @@ class UserDefaultsKeys : NSObject {
     static let newScreenshotsCount = "NewScreenshotsCount"
     
     // Product
+    static let productCompletedTooltip = "ProductCompletedTooltip"
     static let productGender = "ProductGender"
     static let productSize = "ProductSize"
     static let productSale = "ProductSale"
