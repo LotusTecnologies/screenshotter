@@ -50,6 +50,9 @@ class UserDefaultsKeys : NSObject {
     // Clarifai
     static let isModelDownloaded = "IsModelDownloaded"
     
+    // Discover
+    static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
+    
     // Game
     static let gameScore = "GameScore"
     
