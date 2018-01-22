@@ -216,9 +216,26 @@ class NetworkingPromise: NSObject {
             return Promise(error: error)
         }
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 0.2
+        sessionConfiguration.timeoutIntervalForResource = 30
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
         return promise
+    }
+    
+    static func downloadImageData(urlString: String) -> Promise<Data> {
+        guard let url = URL(string: urlString) else {
+            let error = NSError(domain: "Craze", code: 25, userInfo: [NSLocalizedDescriptionKey: "Cannot form image url:\(urlString)"])
+            return Promise(error: error)
+        }
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 26, userInfo: [NSLocalizedDescriptionKey: "downloadImageData invalid http statusCode for urlString:\(urlString)"])
+                    print("downloadImageData httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            return Promise(value: data)
+        }
     }
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud

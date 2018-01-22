@@ -65,6 +65,7 @@ class DataModel: NSObject {
                         handler()
                     }
                 }
+                MatchstickModel.shared.fetchNextIfBelowWatermark()
             }
         }
         return container
@@ -168,6 +169,26 @@ class DataModel: NSObject {
     fileprivate var favoriteChangeIndexPath: IndexPath?
     fileprivate var favoriteChangeKind: CZChangeKind = .none
     
+    
+    public lazy var matchstickFrc: NSFetchedResultsController<Matchstick> = {
+        let request: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: false)]
+        request.predicate = NSPredicate(format: "imageData != nil")
+        request.fetchLimit = 3
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            print("Failed to fetch matchsticks from core data:\(error)")
+        }
+        return fetchedResultsController
+    }()
+    weak open var matchstickFrcDelegate: FrcDelegateProtocol?
+    
+    fileprivate var matchstickChangeIndexPath: IndexPath?
+    fileprivate var matchstickChangeKind: CZChangeKind = .none
+    
 }
 
 extension DataModel: NSFetchedResultsControllerDelegate {
@@ -188,6 +209,9 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case favoriteFrc:
             favoriteChangeKind = .none
             favoriteChangeIndexPath = nil
+        case matchstickFrc:
+            matchstickChangeKind = .none
+            matchstickChangeIndexPath = nil
         default:
             print("Unknown controller:\(controller) in controllerWillChangeContent")
         }
@@ -226,6 +250,8 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             didChange(changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
             didChange(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
+        case matchstickFrc:
+            didChange(changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         default:
             print("Unknown controller:\(controller) in controller didChange")
         }
@@ -282,6 +308,8 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             didChangeContent(frc: controller, changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, frcDelegate: shoppableFrcDelegate)
         case favoriteFrc:
             didChangeContent(frc: controller, changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
+        case matchstickFrc:
+            didChangeContent(frc: controller, changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, frcDelegate: matchstickFrcDelegate)
         default:
             print("Unknown controller:\(controller) in controllerDidChangeContent")
         }
@@ -537,6 +565,34 @@ extension DataModel {
         return productToSave
     }
     
+    func saveMatchstick(managedObjectContext: NSManagedObjectContext,
+                        remoteId: String,
+                        imageUrl: String,
+                        syteJson: String) -> Matchstick {
+        let matchstickToSave = Matchstick(context: managedObjectContext)
+        matchstickToSave.remoteId = remoteId
+        matchstickToSave.imageUrl = imageUrl
+        matchstickToSave.syteJson = syteJson
+        matchstickToSave.receivedAt = NSDate()
+        return matchstickToSave
+    }
+
+    func addImageDataToMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String, imageData: Data) {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for matchstick in results {
+                matchstick.imageData = imageData as NSData
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("addImageDataToMatchstick imageUrl:\(imageUrl) results with error:\(error)")
+        }
+    }
+
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
@@ -641,6 +697,21 @@ extension DataModel {
             count = try managedObjectContext.count(for: fetchRequest)
         } catch {
             print("countScreenshotWorkhorse results with error:\(error)")
+        }
+        return count
+    }
+    
+    func countMatchsticks(managedObjectContext: NSManagedObjectContext) -> Int {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = nil
+        fetchRequest.resultType = .countResultType
+        fetchRequest.includesSubentities = false
+        
+        var count: Int = 0
+        do {
+            count = try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            print("countMatchsticks results with error:\(error)")
         }
         return count
     }
@@ -1193,6 +1264,7 @@ extension Matchstick {
                             }
                         }
                     }
+                    MatchstickModel.shared.fetchNextIfBelowWatermark()
                 } else {
                     print("matchstick add managedObjectID:\(managedObjectID) not found")
                 }
@@ -1209,6 +1281,7 @@ extension Matchstick {
                 if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick {
                     managedObjectContext.delete(matchstick)
                     try managedObjectContext.save()
+                    MatchstickModel.shared.fetchNextIfBelowWatermark()
                 } else {
                     print("matchstick pass managedObjectID:\(managedObjectID) not found")
                 }
