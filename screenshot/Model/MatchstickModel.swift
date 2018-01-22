@@ -47,7 +47,7 @@ class MatchstickModel: NSObject {
                 if let matchsticksArray = dict["screenshots"] as? [[String : Any]] {
                     dataModel.performBackgroundTask { (managedObjectContext) in
                         // Reverse order received, so we can always take latest saved.
-                        for matchstick in matchsticksArray.reversed() {
+                        for matchstick in matchsticksArray {
                             if let remoteId = matchstick["id"] as? String,
                                 let imageUrl = matchstick["image"] as? String,
                                 let syteJson = matchstick["syteJson"] as? String {

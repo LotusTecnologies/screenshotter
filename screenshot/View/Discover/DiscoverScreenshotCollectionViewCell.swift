@@ -83,4 +83,15 @@ class DiscoverScreenshotCollectionViewCell : ShadowCollectionViewCell {
             }
         }
     }
+    
+    // MARK: Image
+    
+    var image: UIImage? {
+        set {
+            imageView.image = newValue
+        }
+        get {
+            return imageView.image
+        }
+    }
 }
