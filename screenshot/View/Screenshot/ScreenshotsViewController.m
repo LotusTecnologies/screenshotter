@@ -42,6 +42,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
@@ -141,6 +142,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self syncHelperViewVisibility];
+    }
+}
+
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    if (self.view.window && [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
     }
 }
 

@@ -22,12 +22,25 @@ public class TutorialTrySlideView : HelperView {
         
         titleLabel.text = "tutorial.try.title".localized
         
+        let font = UIFont.preferredFont(forTextStyle: .title3)
+        var boldFont = font
+        
+        if let descriptor = boldFont.fontDescriptor.withSymbolicTraits(.traitBold) {
+            boldFont = UIFont(descriptor: descriptor, size: 0)
+        }
+        
+        let attributes = [
+            [NSFontAttributeName: boldFont],
+            [NSFontAttributeName: font, NSForegroundColorAttributeName: UIColor.crazeRed],
+            [NSFontAttributeName: font]
+        ]
+        
         if UIDevice.isHomeButtonless {
-            subtitleLabel.text = "tutorial.try.detail.x".localized
+            subtitleLabel.attributedText = NSMutableAttributedString(segmentedString: "tutorial.try.detail.x", attributes: attributes)
             contentImage = UIImage(named: "TutorialTryGraphicX")
             
         } else {
-            subtitleLabel.text = "tutorial.try.detail".localized
+            subtitleLabel.attributedText = NSMutableAttributedString(segmentedString: "tutorial.try.detail", attributes: attributes)
             
             if UIDevice.is568h || UIDevice.is480h {
                 contentImage = UIImage(named: "TutorialTryGraphicSE")

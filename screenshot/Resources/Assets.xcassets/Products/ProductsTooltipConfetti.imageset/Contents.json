@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "InviteFacebookIcon.png",
+      "filename" : "ProductsTooltipConfetti.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "InviteFacebookIcon@2x.png",
+      "filename" : "ProductsTooltipConfetti@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "InviteFacebookIcon@3x.png",
+      "filename" : "ProductsTooltipConfetti@3x.png",
       "scale" : "3x"
     }
   ],
