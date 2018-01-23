@@ -174,7 +174,7 @@ class DataModel: NSObject {
         let request: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
         request.predicate = NSPredicate(format: "imageData != nil")
-//        request.fetchLimit = 3
+        request.fetchLimit = 3
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {

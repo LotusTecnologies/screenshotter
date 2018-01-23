@@ -15,7 +15,7 @@ protocol DiscoverScreenshotCollectionViewLayoutDelegate : NSObjectProtocol {
 class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     weak var delegate: DiscoverScreenshotCollectionViewLayoutDelegate?
     
-    private var cardCount = 2
+    let cardCount = 2
     private var contentRect: CGRect = .zero
     private(set) var cardRect: CGRect = .zero
     private var visibleCardAttributes: [UICollectionViewLayoutAttributes] = []

@@ -11,12 +11,11 @@ import CoreData
 
 class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
-    fileprivate var matchstickFrc: NSFetchedResultsController<Matchstick>!
+    fileprivate var matchstickFrc = DataModel.sharedInstance.matchstickFrc
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
-    fileprivate var helper: DiscoverScreenshotHelperView?
-    
-    fileprivate var isAdding = false
+    fileprivate var cardHelperView: DiscoverScreenshotHelperView?
+    fileprivate let emptyView = HelperView()
     
     override var title: String? {
         set {}
@@ -36,9 +35,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         addNavigationItemLogo()
         
-        matchstickFrc = DataModel.sharedInstance.matchstickFrc
         DataModel.sharedInstance.matchstickFrcDelegate = self
-//        count = matchstickFrc.fetchedObjects?.count ?? 0
     }
     
     override func viewDidLoad() {
@@ -76,6 +73,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         passButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: arrowPadding, bottom: .padding, right: .padding)
         passButton.addTarget(self, action: #selector(passButtonAction), for: .touchUpInside)
         passButton.adjustsImageWhenDisabled = false
+        passButton.isExclusiveTouch = true
         view.addSubview(passButton)
         passButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: -.padding).isActive = true
         passButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -92,11 +90,30 @@ class DiscoverScreenshotViewController : BaseViewController {
         addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: arrowPadding, bottom: .padding, right: .padding)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
         addButton.adjustsImageWhenDisabled = false
+        addButton.isExclusiveTouch = true
         view.addSubview(addButton)
         addButton.topAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         addButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: .padding).isActive = true
         addButton.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         addButton.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        emptyView.translatesAutoresizingMaskIntoConstraints = false
+        emptyView.titleLabel.text = "discover.screenshot.empty.title".localized
+        emptyView.subtitleLabel.text = "discover.screenshot.empty.detail".localized
+        emptyView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
+        emptyView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
+        view.insertSubview(emptyView, belowSubview: collectionView)
+        emptyView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
+        emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        if matchstickFrc.fetchedObjects?.count ?? 0 > 0 {
+            isListEmpty = false
+            
+        } else {
+            syncEmptyListViews()
+        }
     }
     
     deinit {
@@ -110,136 +127,51 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     // MARK: Matchstick
     
-    fileprivate var count: Int {
-        return min(2, matchstickFrc.fetchedObjects?.count ?? 0)
-    }
-    
-    fileprivate var topIndex = 0
-    fileprivate var topIndexPath: IndexPath {
-        return IndexPath(item: topIndex, section: 0)
+    fileprivate var currentIndexPath: IndexPath {
+        return IndexPath(item: 0, section: 0)
     }
     
     fileprivate var currentMatchstick: Matchstick? {
-        print("||| currentMatchstick \(topIndexPath)")
-        return matchstickFrc.object(at: topIndexPath)
+        return matchstickFrc.object(at: currentIndexPath)
     }
     
-    // MARK: Actions
+    // MARK: Decision
     
-    private func decisionAction(isAdded: Bool) {
-        guard collectionView.numberOfItems(inSection: 0) > 0 else {
-            return
-        }
-        
-//        passButton.isEnabled = false
-//        addButton.isEnabled = false
-        
-        isAdding = isAdded
-        
-        updateCell(atIndexPath: self.topIndexPath, percent: isAdded ? 1 : -1)
-        
-//        if let cell = collectionView.cellForItem(at: topIndexPath) as? DiscoverScreenshotCollectionViewCell {
-//            UIView.animate(withDuration: 0.2) {
-//                cell.decisionValue = isAdded ? 1 : -1
-//            }
-//        }
-//
-//        collectionView.performBatchUpdates({
-////            count -= 1
-////            collectionView.deleteItems(at: [topIndexPath])
-//            collectionView.moveItem(at: topIndexPath, to: IndexPath(item: 1, section: 0))
-//
-//            if count == 0 {
-//                isListEmpty = true
-//            }
-//
-//        }) { completed in
-//            // ???: force reload to update image. not sure if needed
-//            self.collectionView.reloadItems(at: [IndexPath(item: 1, section: 0)])
-//
-//            let isEnabled = !self.isListEmpty
-//            self.passButton.isEnabled = isEnabled
-//            self.addButton.isEnabled = isEnabled
-//        }
+    fileprivate var isAdding = false
+    
+    fileprivate let decisionValueMultiplier: CGFloat = 3
+    
+    fileprivate func decisionValueThreshold(_ percent: CGFloat) -> CGFloat {
+        return percent * decisionValueMultiplier
     }
     
-    @objc fileprivate func passButtonAction() {
-        decisionAction(isAdded: false)
+    fileprivate func preDecision() {
+        passButton.isDisabled(true)
+        addButton.isDisabled(true)
+        collectionView.isUserInteractionEnabled = false
+    }
+    
+    fileprivate func postDecision() {
+        let isEnabled = !isListEmpty
+        
+        passButton.isDisabled(!isEnabled)
+        addButton.isDisabled(!isEnabled)
+        collectionView.isUserInteractionEnabled = isEnabled
+    }
+    
+    fileprivate func decidedToPass() {
+        isAdding = false
         currentMatchstick?.pass()
-        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "tap"])
     }
     
-    @objc fileprivate func addButtonAction() {
-        decisionAction(isAdded: true)
+    fileprivate func decidedToAdd() {
+        isAdding = true
         currentMatchstick?.add()
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
     }
     
-    private var canPanScreenshot = false
+    // MARK: Cell
     
-    private func decisionValueThreshold(_ percent: CGFloat) -> CGFloat {
-        return percent * 3
-    }
-    
-    @objc private func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
-        var translation = panGesture.translation(in: panGesture.view)
-        var percent: CGFloat {
-            return min(1, max(-1, (translation.x / 2) / collectionView.center.x))
-        }
-        
-        switch panGesture.state {
-        case .began:
-            canPanScreenshot = false
-            
-        case .changed:
-            let location = panGesture.location(in: panGesture.view)
-            let indexPathAtLocation = collectionView.indexPathForItem(at: location)
-            
-            if !canPanScreenshot && indexPathAtLocation != nil {
-                canPanScreenshot = true
-                panGesture.setTranslation(.zero, in: panGesture.view)
-                translation = panGesture.translation(in: panGesture.view)
-                
-                if helper != nil {
-                    dismissHelperView()
-                }
-            }
-            
-            isAdding = translation.x > 0
-            
-            if canPanScreenshot {
-                collectionView.indexPathsForVisibleItems.forEach { indexPath in
-                    updateCell(atIndexPath: indexPath, percent: percent)
-                }
-            }
-            
-        case .ended, .cancelled:
-            let decisionValueThreshold = self.decisionValueThreshold(percent)
-            
-            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
-                if abs(decisionValueThreshold) >= 1 {
-                    if decisionValueThreshold > 0 {
-                        self.decisionAction(isAdded: true)
-                        self.currentMatchstick?.add()
-                        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
-                        
-                    } else {
-                        self.decisionAction(isAdded: false)
-                        self.currentMatchstick?.pass()
-                        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
-                    }
-                    
-                } else {
-                    self.updateCell(atIndexPath: self.topIndexPath, percent: 0)
-                }
-            })
-            
-        default:
-            break
-        }
-    }
-    
-    private func updateCell(atIndexPath indexPath: IndexPath, percent: CGFloat) {
+    fileprivate func updateCell(atIndexPath indexPath: IndexPath, percent: CGFloat) {
         guard let collectionViewLayout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout else {
             return
         }
@@ -261,62 +193,122 @@ class DiscoverScreenshotViewController : BaseViewController {
         }
     }
     
+    // MARK: User Interaction
+    
+    private var canPanScreenshot = false
+    
+    @objc private func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
+        var translation = panGesture.translation(in: panGesture.view)
+        var percent: CGFloat {
+            return min(1, max(-1, (translation.x / 2) / collectionView.center.x))
+        }
+        
+        switch panGesture.state {
+        case .began:
+            preDecision()
+            canPanScreenshot = false
+            
+        case .changed:
+            let location = panGesture.location(in: panGesture.view)
+            let indexPathAtLocation = collectionView.indexPathForItem(at: location)
+            
+            if !canPanScreenshot && indexPathAtLocation != nil {
+                canPanScreenshot = true
+                panGesture.setTranslation(.zero, in: panGesture.view)
+                translation = panGesture.translation(in: panGesture.view)
+                
+                if cardHelperView != nil {
+                    dismissHelperView()
+                }
+            }
+            
+            isAdding = translation.x > 0
+            
+            if canPanScreenshot {
+                collectionView.indexPathsForVisibleItems.forEach { indexPath in
+                    updateCell(atIndexPath: indexPath, percent: percent)
+                }
+                
+                if self.matchstickFrc.fetchedObjects?.count == 1 {
+                    emptyView.alpha = abs(percent)
+                }
+            }
+            
+        case .ended, .cancelled:
+            guard canPanScreenshot else {
+                postDecision()
+                return
+            }
+            
+            let decisionValueThreshold = self.decisionValueThreshold(percent)
+            
+            if abs(decisionValueThreshold) >= 1 {
+                if decisionValueThreshold > 0 {
+                    decidedToAdd()
+                    AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
+                    
+                } else {
+                    decidedToPass()
+                    AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
+                }
+                
+            } else {
+                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
+                    self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
+                    self.postDecision()
+                })
+            }
+            
+        default:
+            break
+        }
+    }
+    
+    @objc fileprivate func passButtonAction() {
+        decidedToPass()
+        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "tap"])
+    }
+    
+    @objc fileprivate func addButtonAction() {
+        decidedToAdd()
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
+    }
+    
     // MARK: Helper View
     
     @objc fileprivate func dismissHelperView() {
         UIView.animate(withDuration: 0.2, animations: {
-            self.helper?.alpha = 0
+            self.cardHelperView?.alpha = 0
             
         }) { completion in
-            self.helper?.removeFromSuperview()
-            self.helper = nil
+            self.cardHelperView?.removeFromSuperview()
+            self.cardHelperView = nil
         }
     }
     
     // MARK: Empty View
     
-    fileprivate var isListEmpty = false {
+    fileprivate func syncEmptyListViews() {
+        if isListEmpty {
+            emptyView.alpha = 1
+            passButton.isDisabled(true)
+            addButton.isDisabled(true)
+            
+        } else {
+            emptyView.alpha = 0
+            passButton.isDisabled(false)
+            addButton.isDisabled(false)
+        }
+    }
+    
+    fileprivate var isListEmpty = true {
         didSet {
+            syncEmptyListViews()
+            
             if isListEmpty {
-                showEmptyView()
-                passButton.isEnabled = false
-                passButton.alpha = 0.5
-                addButton.isEnabled = false
-                addButton.alpha = 0.5
                 AnalyticsTrackers.standard.track("Matchsticks Empty")
-                
-            } else {
-                hideEmptyView()
-                passButton.isEnabled = true
-                passButton.alpha = 1
-                addButton.isEnabled = true
-                addButton.alpha = 1
             }
         }
-    }
-    
-    fileprivate var emptyView: HelperView?
-    
-    fileprivate func showEmptyView() {
-        if emptyView == nil {
-            let helperView = HelperView()
-            helperView.translatesAutoresizingMaskIntoConstraints = false
-            helperView.titleLabel.text = "discover.screenshot.empty.title".localized
-            helperView.subtitleLabel.text = "discover.screenshot.empty.detail".localized
-            helperView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
-            helperView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
-            view.insertSubview(helperView, belowSubview: collectionView)
-            helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-            helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            helperView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
-            helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            emptyView = helperView
-        }
-    }
-    
-    fileprivate func hideEmptyView() {
-        emptyView?.removeFromSuperview()
-        emptyView = nil
     }
     
     // MARK: Flag
@@ -324,8 +316,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func presentReportAlertController() {
         let alertController = UIAlertController(title: "discover.screenshot.flag.title".localized, message: "discover.screenshot.flag.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.inappropriate".localized, style: .default, handler: { action in
-            // TODO: hide card
-            
+            self.decidedToPass()
             self.presentInappropriateAlertController()
         }))
         alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.copyright".localized, style: .default, handler: { action in
@@ -341,7 +332,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         present(alertController, animated: true, completion: nil)
         
         AnalyticsTrackers.standard.track("Matchsticks Flagged", properties: [
-            "url": "", // TODO: include url
+            "url": currentMatchstick?.imageUrl ?? "",
             "why": "Inappropriate"
             ])
     }
@@ -355,7 +346,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         present(alertController, animated: true, completion: nil)
         
         AnalyticsTrackers.standard.track("Matchsticks Flagged", properties: [
-            "url": "", // TODO: include url
+            "url": currentMatchstick?.imageUrl ?? "",
             "why": "Copyright"
             ])
     }
@@ -373,7 +364,7 @@ class DiscoverScreenshotViewController : BaseViewController {
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return matchstickFrc.fetchedObjects?.count ?? 0 // count
+        return matchstickFrc.fetchedObjects?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -381,6 +372,12 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
+            
+            let matchstick = matchstickFrc.object(at: indexPath)
+            
+            if let imageData = matchstick.imageData as Data? {
+                cell.image = UIImage(data: imageData)
+            }
         }
         
         return cell
@@ -393,14 +390,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
             return
         }
         
-        let matchstick = matchstickFrc.object(at: indexPath)
-        
-        if let imageData = matchstick.imageData as Data?, let image = UIImage(data: imageData) {
-            print("||| \(matchstick.imageUrl)")
-            cell.image = image
-        }
-        
-        if self.helper == nil && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
+        if self.cardHelperView == nil && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
             let helper = DiscoverScreenshotHelperView()
             helper.translatesAutoresizingMaskIntoConstraints = false
             cell.mainView.addSubview(helper)
@@ -412,7 +402,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
             let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissHelperView))
             helper.addGestureRecognizer(tapGesture)
             
-            self.helper = helper
+            self.cardHelperView = helper
             
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
         }
@@ -427,30 +417,94 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 
 extension DiscoverScreenshotViewController : FrcDelegateProtocol {
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath) {
-//        count = frc.fetchedObjects?.count ?? 0
-        collectionView.insertItems(at: [indexPath])
+        guard isViewLoaded else {
+            return
+        }
+        
+        reloadIfNeeded()
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath) {
-//        count = frc.fetchedObjects?.count ?? 0
-        collectionView.deleteItems(at: [indexPath])
+        guard isViewLoaded else {
+            return
+        }
+        
+        preDecision()
+        
+        let duration = 0.3
+        let updateCellDuration = Double(CGFloat(duration) / decisionValueMultiplier) / duration
+        
+        let animationOptions: UIViewAnimationOptions = .curveEaseOut
+        let keyframeAnimationOptions: UIViewKeyframeAnimationOptions = UIViewKeyframeAnimationOptions(rawValue: animationOptions.rawValue)
+        
+        // TODO: see if using spring animation has better feel
+
+        
+        UIView.animateKeyframes(withDuration: duration, delay: 0, options: keyframeAnimationOptions, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: updateCellDuration, animations: {
+                if let cell = self.collectionView.cellForItem(at: indexPath) as? DiscoverScreenshotCollectionViewCell {
+                    cell.decisionValue = self.decisionValueThreshold(self.isAdding ? 1 : -1)
+                }
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1, animations: {
+                if self.matchstickFrc.fetchedObjects?.count == 0 {
+                    self.isListEmpty = true
+                }
+                
+                self.collectionView.performBatchUpdates({
+                    self.collectionView.deleteItems(at: [indexPath])
+                    
+                }, completion: { completed in
+                    self.postDecision()
+                })
+            })
+        })
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath) {
+        guard isViewLoaded else {
+            return
+        }
+        
         collectionView.reloadItems(at: [indexPath])
     }
     
     func frc(_ frc: NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath) {
-        collectionView.reloadData()
+        guard isViewLoaded else {
+            return
+        }
+        
+        reloadIfNeeded()
     }
     
     func frcReloadData(_ frc: NSFetchedResultsController<NSFetchRequestResult>) {
-        collectionView.reloadData()
+        guard isViewLoaded else {
+            return
+        }
+        
+        reloadIfNeeded()
+    }
+    
+    private func reloadIfNeeded() {
+        guard let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout else {
+            return
+        }
+        
+        if layout.cardCount > collectionView.indexPathsForVisibleItems.count {
+            collectionView.reloadData()
+        }
     }
 }
 
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
+    }
+}
+
+extension UIButton {
+    fileprivate func isDisabled(_ disabled: Bool) {
+        isEnabled = !disabled
+        alpha = disabled ? 0.5 : 1
     }
 }

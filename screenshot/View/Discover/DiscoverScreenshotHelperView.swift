@@ -47,7 +47,7 @@ class DiscoverScreenshotHelperView : UIView {
             fontSize = 20
         }
         
-        backgroundColor = UIColor.crazeRed.withAlphaComponent(0.8)
+        backgroundColor = UIColor.crazeRed.withAlphaComponent(0.9)
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textColor = .white

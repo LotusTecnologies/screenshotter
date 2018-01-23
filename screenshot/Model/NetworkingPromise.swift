@@ -211,7 +211,8 @@ class NetworkingPromise: NSObject {
         } else {
             syncTokenParam = ""
         }
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
+        // !!!: DEBUG
+        guard let url = URL(string: "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/" + "screenshots/matchsticks" + syncTokenParam) else {
             let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
             return Promise(error: error)
         }

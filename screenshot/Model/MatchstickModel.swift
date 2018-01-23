@@ -19,7 +19,7 @@ class MatchstickModel: NSObject {
     
     @objc func fetchNextIfBelowWatermark() {
         let lowWatermark = 10
-        let dataModel = DataModel.sharedInstance
+        let dataModel = DataModel.sharedInstance        
         serialQ.promise { _ -> Promise<Bool> in
             guard self.isFetchingNext == false else {
                 // Not really an error. Just an easy way to cancel further processing.
