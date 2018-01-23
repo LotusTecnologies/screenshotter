@@ -7,9 +7,9 @@
 //
 
 #import "BaseViewController.h"
-#import "screenshot-Swift.h"
 
 @class ProductsViewController;
+@class Screenshot, Product;
 
 @protocol ProductsViewControllerDelegate <NSObject>
 @required

@@ -10,6 +10,7 @@
 #import "ProductCollectionViewCell.h"
 #import "ShoppablesToolbar.h"
 #import "TutorialProductsPageViewController.h"
+#import "screenshot-Swift.h"
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 

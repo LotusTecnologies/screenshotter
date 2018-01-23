@@ -132,6 +132,10 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     fileprivate var currentMatchstick: Matchstick? {
+        guard collectionView.numberOfItems(inSection: 0) > 0 else {
+            return nil
+        }
+        
         return matchstickFrc.object(at: currentIndexPath)
     }
     
@@ -164,9 +168,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         currentMatchstick?.pass()
     }
     
-    fileprivate func decidedToAdd() {
+    fileprivate func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
         isAdding = true
-        currentMatchstick?.add()
+        currentMatchstick?.add(callback: callback)
     }
     
     // MARK: Cell
@@ -409,8 +413,21 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        addButtonAction()
+        decidedToAdd(callback: { screenshot in
+            let viewController = ProductsViewController()
+            //                viewController.delegate = self
+            viewController.screenshot = screenshot
+            viewController.hidesBottomBarWhenPushed = true
+            
+            self.navigationController?.pushViewController(viewController, animated: true)
+            
+//            self.present(viewController, animated: true, completion: {
+                self.addButtonAction()
+//            })
+        })
         
+        // TODO: ask caras how he wants these analytics set up
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
         AnalyticsTrackers.standard.track("Matchsticks Opened Screenshot")
     }
 }
