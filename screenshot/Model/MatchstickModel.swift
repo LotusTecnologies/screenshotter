@@ -15,7 +15,7 @@ class MatchstickModel: NSObject {
 
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.matchsticks.serial")
     let processingQ = DispatchQueue.global(qos: .utility)
-    var isFetchingNext = false
+    private(set) var isFetchingNext = false
     
     @objc func fetchNextIfBelowWatermark() {
         serialQ.async {

@@ -79,7 +79,7 @@ class DataModel: NSObject {
         return persistentContainer.newBackgroundContext()
     }
     
-    private(set) var isMainPinned = false
+    fileprivate(set) var isMainPinned = false
     
     override init() {
         super.init()
@@ -737,17 +737,13 @@ extension DataModel {
         }
     }
     
-    // Update changes made in the background
-    public func saveMain() {
-        saveMoc(managedObjectContext: mainMoc())
-    }
-    
     public func pinMain() {
         guard !isMainPinned else {
             return
         }
         do {
             try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
+            isMainPinned = true
         } catch {
             print("pinMain results with error:\(error)")
         }
@@ -759,6 +755,7 @@ extension DataModel {
         }
         do {
             try mainMoc().setQueryGenerationFrom(nil)
+            isMainPinned = false
         } catch {
             print("unpinMain results with error:\(error)")
         }
