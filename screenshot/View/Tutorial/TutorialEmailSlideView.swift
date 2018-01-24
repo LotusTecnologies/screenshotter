@@ -188,7 +188,7 @@ public class TutorialEmailSlideView : HelperView {
     // MARK: Legal
     
     class func termsOfServiceViewController(withDoneTarget target: Any?, action: Selector?) -> UIViewController? {
-        guard let url = URL(string: "http://crazeapp.com/legal/#tos") else {
+        guard let url = URL(string: "https://screenshopit.com/terms-of-use/") else {
             return nil
         }
         
@@ -198,7 +198,7 @@ public class TutorialEmailSlideView : HelperView {
     }
 
     class func privacyPolicyViewController(withDoneTarget target: Any?, action: Selector?) -> UIViewController? {
-        guard let url = URL(string: "http://crazeapp.com/legal/#privacy") else {
+        guard let url = URL(string: "https://screenshopit.com/privacy-policy/") else {
             return nil
         }
         
