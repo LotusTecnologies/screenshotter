@@ -718,15 +718,19 @@ extension DataModel {
         return count
     }
     
+    func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
+        let lowWatermark = 10
+        return matchstickCount <= lowWatermark
+    }
+    
     // Returns a promise of the count of matchsticks in the DB,
     // and, crucially, errors if above the low water mark,
     // allowing chained promises to not execute.
     public func nextMatchsticksIfNeeded() -> Promise<Int> {
-        let lowWatermark = 10
         return Promise { fulfill, reject in
             performBackgroundTask { (managedObjectContext) in
                 let matchstickCount = self.countMatchsticks(managedObjectContext: managedObjectContext)
-                if matchstickCount < lowWatermark {
+                if self.isNextMatchsticksNeeded(matchstickCount: matchstickCount) {
                     fulfill(matchstickCount)
                 } else {
                     // Not really an error. Just an easy way to cancel further processing.
@@ -1290,7 +1294,10 @@ extension Matchstick {
                             }
                         }
                     }
-                    MatchstickModel.shared.fetchNextIfBelowWatermark()
+                    if callback == nil,
+                      dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
+                        MatchstickModel.shared.fetchNextIfBelowWatermark()
+                    }
                 } else {
                     print("matchstick add managedObjectID:\(managedObjectID) not found")
                 }
@@ -1302,12 +1309,15 @@ extension Matchstick {
     
     @objc public func pass() {
         let managedObjectID = self.objectID
-        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { (managedObjectContext) in
             do {
                 if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick {
                     managedObjectContext.delete(matchstick)
                     try managedObjectContext.save()
-                    MatchstickModel.shared.fetchNextIfBelowWatermark()
+                    if dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
+                        MatchstickModel.shared.fetchNextIfBelowWatermark()
+                    }
                 } else {
                     print("matchstick pass managedObjectID:\(managedObjectID) not found")
                 }
