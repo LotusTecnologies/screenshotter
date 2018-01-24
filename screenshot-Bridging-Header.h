@@ -9,7 +9,6 @@
 
 #import "NetworkingModel.h"
 #import "MainTabBarController.h"
-#import "InsetPresentationController.h"
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
 #import "ScreenshotDisplayViewController.h"
