@@ -65,6 +65,7 @@ class DataModel: NSObject {
                         handler()
                     }
                 }
+                MatchstickModel.shared.prepareMatchsticks()
             }
         }
         return container
@@ -77,6 +78,8 @@ class DataModel: NSObject {
     public func adHocMoc() -> NSManagedObjectContext {
         return persistentContainer.newBackgroundContext()
     }
+    
+    fileprivate(set) var isMainPinned = false
     
     override init() {
         super.init()
@@ -168,6 +171,26 @@ class DataModel: NSObject {
     fileprivate var favoriteChangeIndexPath: IndexPath?
     fileprivate var favoriteChangeKind: CZChangeKind = .none
     
+    
+    public lazy var matchstickFrc: NSFetchedResultsController<Matchstick> = {
+        let request: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
+        request.predicate = NSPredicate(format: "imageData != nil")
+        request.fetchBatchSize = 3
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            print("Failed to fetch matchsticks from core data:\(error)")
+        }
+        return fetchedResultsController
+    }()
+    weak open var matchstickFrcDelegate: FrcDelegateProtocol?
+    
+    fileprivate var matchstickChangeIndexPath: IndexPath?
+    fileprivate var matchstickChangeKind: CZChangeKind = .none
+    
 }
 
 extension DataModel: NSFetchedResultsControllerDelegate {
@@ -188,6 +211,9 @@ extension DataModel: NSFetchedResultsControllerDelegate {
         case favoriteFrc:
             favoriteChangeKind = .none
             favoriteChangeIndexPath = nil
+        case matchstickFrc:
+            matchstickChangeKind = .none
+            matchstickChangeIndexPath = nil
         default:
             print("Unknown controller:\(controller) in controllerWillChangeContent")
         }
@@ -226,6 +252,8 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             didChange(changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         case favoriteFrc:
             didChange(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
+        case matchstickFrc:
+            didChange(changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
         default:
             print("Unknown controller:\(controller) in controller didChange")
         }
@@ -282,6 +310,8 @@ extension DataModel: NSFetchedResultsControllerDelegate {
             didChangeContent(frc: controller, changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, frcDelegate: shoppableFrcDelegate)
         case favoriteFrc:
             didChangeContent(frc: controller, changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
+        case matchstickFrc:
+            didChangeContent(frc: controller, changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, frcDelegate: matchstickFrcDelegate)
         default:
             print("Unknown controller:\(controller) in controllerDidChangeContent")
         }
@@ -537,6 +567,50 @@ extension DataModel {
         return productToSave
     }
     
+    func saveMatchstick(managedObjectContext: NSManagedObjectContext,
+                        remoteId: String,
+                        imageUrl: String,
+                        syteJson: String) -> Matchstick {
+        let matchstickToSave = Matchstick(context: managedObjectContext)
+        matchstickToSave.remoteId = remoteId
+        matchstickToSave.imageUrl = imageUrl
+        matchstickToSave.syteJson = syteJson
+        matchstickToSave.receivedAt = NSDate()
+        return matchstickToSave
+    }
+
+    func addImageDataToMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String, imageData: Data) {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for matchstick in results {
+                matchstick.imageData = imageData as NSData
+            }
+            try managedObjectContext.save()
+        } catch {
+            print("addImageDataToMatchstick imageUrl:\(imageUrl) results with error:\(error)")
+        }
+    }
+
+    func retrieveMatchstickImageUrlsWithNoData(managedObjectContext: NSManagedObjectContext) -> [String] {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageData == nil")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let imageUrls = results.flatMap({$0.imageUrl}).flatMap({$0.copy()}) as? [String] {
+                return imageUrls
+            }
+        } catch {
+            print("retrieveMatchstickImageUrlsWithNoData results with error:\(error)")
+        }
+        return []
+    }
+    
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
@@ -645,22 +719,63 @@ extension DataModel {
         return count
     }
     
-    // Update changes made in the background
-    public func saveMain() {
-        saveMoc(managedObjectContext: mainMoc())
+    func countMatchsticks(managedObjectContext: NSManagedObjectContext) -> Int {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = nil
+        fetchRequest.resultType = .countResultType
+        fetchRequest.includesSubentities = false
+        
+        var count: Int = 0
+        do {
+            count = try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            print("countMatchsticks results with error:\(error)")
+        }
+        return count
+    }
+    
+    func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
+        let lowWatermark = 10
+        return matchstickCount <= lowWatermark
+    }
+    
+    // Returns a promise of the count of matchsticks in the DB,
+    // and, crucially, errors if above the low water mark,
+    // allowing chained promises to not execute.
+    public func nextMatchsticksIfNeeded() -> Promise<Int> {
+        return Promise { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                let matchstickCount = self.countMatchsticks(managedObjectContext: managedObjectContext)
+                if self.isNextMatchsticksNeeded(matchstickCount: matchstickCount) {
+                    fulfill(matchstickCount)
+                } else {
+                    // Not really an error. Just an easy way to cancel further processing.
+                    let error = NSError(domain: "Craze", code: 24, userInfo: [NSLocalizedDescriptionKey : "Good. We have enough, \(matchstickCount) matchsticks."])
+                    reject(error)
+                }
+            }
+        }
     }
     
     public func pinMain() {
+        guard !isMainPinned else {
+            return
+        }
         do {
             try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
+            isMainPinned = true
         } catch {
             print("pinMain results with error:\(error)")
         }
     }
     
     public func unpinMain() {
+        guard isMainPinned else {
+            return
+        }
         do {
             try mainMoc().setQueryGenerationFrom(nil)
+            isMainPinned = false
         } catch {
             print("unpinMain results with error:\(error)")
         }
@@ -1154,6 +1269,78 @@ extension Product {
     
     @objc public func isSale() -> Bool {
         return floatPrice < floatOriginalPrice
+    }
+    
+}
+
+extension Matchstick {
+
+    @objc public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        let managedObjectID = self.objectID
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { (managedObjectContext) in
+            do {
+                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick,
+                  let assetId = matchstick.remoteId,
+                  let uploadedImageURL = matchstick.imageUrl,
+                  let syteJson = matchstick.syteJson,
+                  let segments = NetworkingPromise.jsonDestringify(string: syteJson) {
+                    let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                   assetId: assetId,
+                                                                   createdAt: Date(),
+                                                                   isRecognized: true,
+                                                                   isFromShare: true,
+                                                                   isHidden: false,
+                                                                   imageData: matchstick.imageData as Data?,
+                                                                   classification: nil)
+                    addedScreenshot.uploadedImageURL = uploadedImageURL
+                    addedScreenshot.syteJson = syteJson
+                    if callback == nil {
+                        managedObjectContext.delete(matchstick)
+                    }
+                    try managedObjectContext.save()
+                    AssetSyncModel.sharedInstance.processingQ.async {
+                        AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)
+                    }
+                    if let callback = callback {
+                        let addedScreenshotOID = addedScreenshot.objectID
+                        DispatchQueue.main.async {
+                            if let mainScreenshot = dataModel.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
+                                callback(mainScreenshot)
+                            }
+                        }
+                    }
+                    if callback == nil,
+                      dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
+                        MatchstickModel.shared.fetchNextIfBelowWatermark()
+                    }
+                } else {
+                    print("matchstick add managedObjectID:\(managedObjectID) not found")
+                }
+            } catch {
+                print("matchstick add managedObjectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
+    @objc public func pass() {
+        let managedObjectID = self.objectID
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { (managedObjectContext) in
+            do {
+                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick {
+                    managedObjectContext.delete(matchstick)
+                    try managedObjectContext.save()
+                    if dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
+                        MatchstickModel.shared.fetchNextIfBelowWatermark()
+                    }
+                } else {
+                    print("matchstick pass managedObjectID:\(managedObjectID) not found")
+                }
+            } catch {
+                print("matchstick pass managedObjectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
     }
     
 }

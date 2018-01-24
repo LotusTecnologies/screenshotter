@@ -203,6 +203,41 @@ class NetworkingPromise: NSObject {
         }
     }
     
+    static func nextMatchsticks() -> Promise<NSDictionary> {
+        let syncTokenParam: String
+        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
+          !matchsticksSyncToken.isEmpty {
+            syncTokenParam = "?start=\(matchsticksSyncToken)"
+        } else {
+            syncTokenParam = ""
+        }
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
+            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            return Promise(error: error)
+        }
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 30
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
+        return promise
+    }
+    
+    static func downloadImageData(urlString: String) -> Promise<Data> {
+        guard let url = URL(string: urlString) else {
+            let error = NSError(domain: "Craze", code: 25, userInfo: [NSLocalizedDescriptionKey: "Cannot form image url:\(urlString)"])
+            return Promise(error: error)
+        }
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 26, userInfo: [NSLocalizedDescriptionKey: "downloadImageData invalid http statusCode for urlString:\(urlString)"])
+                    print("downloadImageData httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            return Promise(value: data)
+        }
+    }
+    
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
     static func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "push-subscribe") else {

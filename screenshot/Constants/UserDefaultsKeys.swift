@@ -49,6 +49,9 @@ class UserDefaultsKeys : NSObject {
     // Clarifai
     static let isModelDownloaded = "IsModelDownloaded"
     
+    // Discover
+    static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
+    
     // Game
     static let gameScore = "GameScore"
     
@@ -56,6 +59,9 @@ class UserDefaultsKeys : NSObject {
     static let lastTimeZone = "LastTimeZone"
     static let subscriptionARN = "SubscriptionARN"
     static let enabledSilentPush = "EnabledSilentPush"
+    
+    // Matchsticks
+    static let matchsticksSyncToken = "MatchsticksSyncToken"
 }
 
 extension UIApplication {
