@@ -113,7 +113,7 @@ PODS:
   - GTMSessionFetcher/Full (1.1.12):
     - GTMSessionFetcher/Core (= 1.1.12)
   - Intercom (4.1.8)
-  - lottie-ios (2.1.5)
+  - lottie-ios (2.5.0)
   - nanopb (0.3.8):
     - nanopb/decode (= 0.3.8)
     - nanopb/encode (= 0.3.8)
@@ -187,7 +187,7 @@ SPEC CHECKSUMS:
   GTMOAuth2: c77fe325e4acd453837e72d91e3b5f13116857b2
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
   Intercom: 2d2f4ad2d24f7b7e2d5b2b0d74bb02bc0e0f756a
-  lottie-ios: 836cdbba92f62f3c6a00e37a4ce485321fe317cf
+  lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PromiseKit: 445dac9b2c3c3b4b31b5f842bc325700b848a8bd
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
