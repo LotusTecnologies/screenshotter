@@ -30,7 +30,6 @@ class UserDefaultsKeys : NSObject {
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
-    static let onboardingPresentedProductHelper = "OnboardingPresentedProductHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     
@@ -73,9 +72,6 @@ extension UIApplication {
         }
         if UserDefaults.standard.bool(forKey: "TutorialPresentedScreenshotHelper") {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
-        }
-        if UserDefaults.standard.bool(forKey: "TutorialPresentedProductHelper") {
-            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedProductHelper)
         }
     }
 }
