@@ -339,11 +339,12 @@ class DiscoverScreenshotViewController : BaseViewController {
     // MARK: Empty View
     
     fileprivate func syncInteractionElements() {
-        let isEnabled = !isListEmpty
+        let isInteractionEnabled = !isListEmpty && !isMidDecision
+        let isButtonEnabled = isInteractionEnabled && cardHelperView == nil
         
-        passButton.isDisabled(!isEnabled)
-        addButton.isDisabled(!isEnabled)
-        collectionView.isUserInteractionEnabled = isEnabled
+        passButton.isDisabled(!isButtonEnabled)
+        addButton.isDisabled(!isButtonEnabled)
+        collectionView.isUserInteractionEnabled = isInteractionEnabled
     }
     
     fileprivate func syncEmptyListViews() {

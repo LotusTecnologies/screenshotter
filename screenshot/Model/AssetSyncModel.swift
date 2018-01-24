@@ -570,6 +570,11 @@ class AssetSyncModel: NSObject {
     }
     
     func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
+        guard !assetId.isEmpty else {
+            print("assetId is blank")
+            callback(nil, nil)
+            return
+        }
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 1;
