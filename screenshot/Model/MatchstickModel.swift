@@ -17,7 +17,18 @@ class MatchstickModel: NSObject {
     let processingQ = DispatchQueue.global(qos: .utility)
     private(set) var isFetchingNext = false
     
-    @objc func fetchNextIfBelowWatermark() {
+    public func prepareMatchsticks() {
+        serialQ.async {
+            if self.isFetchingNext {
+                print("prepareMatchsticks is already fetching next matchsticks. What??")
+            }
+            self.isFetchingNext = true
+            self.fetchMissingImages() // Don't call fetchMissingImages after fetchNextWorkhorse, or its images could be fetched twice
+            self.fetchNextWorkhorse()
+        }
+    }
+    
+    public func fetchNextIfBelowWatermark() {
         serialQ.async {
             guard self.isFetchingNext == false else {
                 return
@@ -68,7 +79,19 @@ class MatchstickModel: NSObject {
         }
     }
     
-    @objc func fetchImageData(imageUrl: String) {
+    func fetchMissingImages() {
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { (managedObjectContext) in
+            let imageUrls = dataModel.retrieveMatchstickImageUrlsWithNoData(managedObjectContext: managedObjectContext)
+            for imageUrl in imageUrls {
+                self.processingQ.async {
+                    self.fetchImageData(imageUrl: imageUrl)
+                }
+            }
+        }
+    }
+    
+    func fetchImageData(imageUrl: String) {
         let dataModel = DataModel.sharedInstance
         NetworkingPromise.downloadImageData(urlString: imageUrl)
             .then(on: processingQ) { imageData -> Void in

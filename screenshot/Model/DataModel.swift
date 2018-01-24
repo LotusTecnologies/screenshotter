@@ -65,7 +65,7 @@ class DataModel: NSObject {
                         handler()
                     }
                 }
-                MatchstickModel.shared.fetchNextIfBelowWatermark()
+                MatchstickModel.shared.prepareMatchsticks()
             }
         }
         return container
@@ -595,6 +595,22 @@ extension DataModel {
         }
     }
 
+    func retrieveMatchstickImageUrlsWithNoData(managedObjectContext: NSManagedObjectContext) -> [String] {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageData == nil")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let imageUrls = results.flatMap({$0.imageUrl}).flatMap({$0.copy()}) as? [String] {
+                return imageUrls
+            }
+        } catch {
+            print("retrieveMatchstickImageUrlsWithNoData results with error:\(error)")
+        }
+        return []
+    }
+    
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
