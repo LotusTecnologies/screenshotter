@@ -716,6 +716,25 @@ extension DataModel {
         return count
     }
     
+    // Returns a promise of the count of matchsticks in the DB,
+    // and, crucially, errors if above the low water mark,
+    // allowing chained promises to not execute.
+    public func nextMatchsticksIfNeeded() -> Promise<Int> {
+        let lowWatermark = 10
+        return Promise { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                let matchstickCount = self.countMatchsticks(managedObjectContext: managedObjectContext)
+                if matchstickCount < lowWatermark {
+                    fulfill(matchstickCount)
+                } else {
+                    // Not really an error. Just an easy way to cancel further processing.
+                    let error = NSError(domain: "Craze", code: 24, userInfo: [NSLocalizedDescriptionKey : "Good. We have enough, \(matchstickCount) matchsticks."])
+                    reject(error)
+                }
+            }
+        }
+    }
+    
     // Update changes made in the background
     public func saveMain() {
         saveMoc(managedObjectContext: mainMoc())

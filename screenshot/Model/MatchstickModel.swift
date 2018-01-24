@@ -18,30 +18,19 @@ class MatchstickModel: NSObject {
     var isFetchingNext = false
     
     @objc func fetchNextIfBelowWatermark() {
-        let lowWatermark = 10
-        let dataModel = DataModel.sharedInstance        
-        serialQ.promise { _ -> Promise<Bool> in
+        serialQ.async {
             guard self.isFetchingNext == false else {
-                // Not really an error. Just an easy way to cancel further processing.
-                let error = NSError(domain: "Craze", code: 23, userInfo: [NSLocalizedDescriptionKey : "Already fetching next matchsticks."])
-                return Promise(error: error)
+                return
             }
             self.isFetchingNext = true
-            return Promise(value: true)
-            }.then(on: processingQ) { _ -> Promise<Int> in
-                return Promise { fulfill, reject in
-                    dataModel.performBackgroundTask { (managedObjectContext) in
-                        let matchstickCount = dataModel.countMatchsticks(managedObjectContext: managedObjectContext)
-                        if matchstickCount < lowWatermark {
-                            fulfill(matchstickCount)
-                        } else {
-                            // Not really an error. Just an easy way to cancel further processing.
-                            let error = NSError(domain: "Craze", code: 24, userInfo: [NSLocalizedDescriptionKey : "Good. We have enough, \(matchstickCount) matchsticks."])
-                            reject(error)
-                        }
-                    }
-                }
-            }.then(on: processingQ) { matchstickCount -> Promise<NSDictionary> in
+            self.fetchNextWorkhorse()
+        }
+    }
+    
+    func fetchNextWorkhorse() {
+        let dataModel = DataModel.sharedInstance
+        dataModel.nextMatchsticksIfNeeded()
+            .then(on: processingQ) { matchstickCount -> Promise<NSDictionary> in
                 return NetworkingPromise.nextMatchsticks()
             }.then(on: processingQ) { dict -> Void in
                 if let matchsticksArray = dict["screenshots"] as? [[String : Any]] {
