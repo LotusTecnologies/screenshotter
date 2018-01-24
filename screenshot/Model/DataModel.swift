@@ -79,6 +79,8 @@ class DataModel: NSObject {
         return persistentContainer.newBackgroundContext()
     }
     
+    private(set) var isMainPinned = false
+    
     override init() {
         super.init()
         DispatchQueue.global(qos: .userInitiated).async {
@@ -741,6 +743,9 @@ extension DataModel {
     }
     
     public func pinMain() {
+        guard !isMainPinned else {
+            return
+        }
         do {
             try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
         } catch {
@@ -749,6 +754,9 @@ extension DataModel {
     }
     
     public func unpinMain() {
+        guard isMainPinned else {
+            return
+        }
         do {
             try mainMoc().setQueryGenerationFrom(nil)
         } catch {
@@ -1270,7 +1278,9 @@ extension Matchstick {
                                                                    classification: nil)
                     addedScreenshot.uploadedImageURL = uploadedImageURL
                     addedScreenshot.syteJson = syteJson
-                    managedObjectContext.delete(matchstick)
+                    if callback == nil {
+                        managedObjectContext.delete(matchstick)
+                    }
                     try managedObjectContext.save()
                     AssetSyncModel.sharedInstance.processingQ.async {
                         AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)

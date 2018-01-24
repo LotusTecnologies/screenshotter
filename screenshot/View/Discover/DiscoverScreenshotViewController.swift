@@ -9,6 +9,10 @@
 import Foundation
 import CoreData
 
+protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
+    func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath)
+}
+
 class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc = DataModel.sharedInstance.matchstickFrc
@@ -17,10 +21,12 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
     fileprivate let emptyView = HelperView()
     
+    weak var delegate: DiscoverScreenshotViewControllerDelegate?
+    
     override var title: String? {
         set {}
         get {
-            return "discover.screenshot.title".localized
+            return "discover.title".localized
         }
     }
     
@@ -110,10 +116,13 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         if matchstickFrc.fetchedObjects?.count ?? 0 > 0 {
             isListEmpty = false
-            
-        } else {
-            syncEmptyListViews()
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        syncEmptyListViews()
     }
     
     deinit {
@@ -126,6 +135,16 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     // MARK: Matchstick
+    
+    fileprivate var pseudoMatchsticksCount = 0
+    
+    fileprivate func updateMatchsticksCount() {
+        pseudoMatchsticksCount = matchstickFrc.fetchedObjects?.count ?? 0
+        
+        if isListEmpty && pseudoMatchsticksCount > 0 {
+            isListEmpty = false
+        }
+    }
     
     fileprivate var currentIndexPath: IndexPath {
         return IndexPath(item: 0, section: 0)
@@ -142,6 +161,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     // MARK: Decision
     
     fileprivate var isAdding = false
+    fileprivate var isMidDecision = false
+    fileprivate var needsToReloadAfterDecision = false
     
     fileprivate let decisionValueMultiplier: CGFloat = 3
     
@@ -150,27 +171,35 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     fileprivate func preDecision() {
-        passButton.isDisabled(true)
-        addButton.isDisabled(true)
-        collectionView.isUserInteractionEnabled = false
+        isMidDecision = true
+        syncInteractionElements()
     }
     
     fileprivate func postDecision() {
-        let isEnabled = !isListEmpty
-        
-        passButton.isDisabled(!isEnabled)
-        addButton.isDisabled(!isEnabled)
-        collectionView.isUserInteractionEnabled = isEnabled
+        isMidDecision = false
+        syncInteractionElements()
     }
     
-    fileprivate func decidedToPass() {
+    func decidedToPass() {
         isAdding = false
+        preDecision()
         currentMatchstick?.pass()
     }
     
-    fileprivate func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
+    private var needsToCompleteDecision = false
+    
+    func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
         isAdding = true
+        preDecision()
         currentMatchstick?.add(callback: callback)
+        needsToCompleteDecision = callback != nil
+    }
+    
+    func completeDecision() {
+        if needsToCompleteDecision {
+            needsToCompleteDecision = false
+            currentMatchstick?.pass()
+        }
     }
     
     // MARK: Cell
@@ -280,9 +309,26 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     // MARK: Helper View
     
+    fileprivate func showHelperView(inCell cell: DiscoverScreenshotCollectionViewCell) {
+        let helper = DiscoverScreenshotHelperView()
+        helper.translatesAutoresizingMaskIntoConstraints = false
+        cell.mainView.addSubview(helper)
+        helper.topAnchor.constraint(equalTo: cell.mainView.topAnchor).isActive = true
+        helper.leadingAnchor.constraint(equalTo: cell.mainView.leadingAnchor).isActive = true
+        helper.bottomAnchor.constraint(equalTo: cell.mainView.bottomAnchor).isActive = true
+        helper.trailingAnchor.constraint(equalTo: cell.mainView.trailingAnchor).isActive = true
+        helper.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissHelperView)))
+        cardHelperView = helper
+        
+        passButton.isDisabled(true)
+        addButton.isDisabled(true)
+    }
+    
     @objc fileprivate func dismissHelperView() {
         UIView.animate(withDuration: 0.2, animations: {
             self.cardHelperView?.alpha = 0
+            self.passButton.isDisabled(false)
+            self.addButton.isDisabled(false)
             
         }) { completion in
             self.cardHelperView?.removeFromSuperview()
@@ -292,17 +338,18 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     // MARK: Empty View
     
+    fileprivate func syncInteractionElements() {
+        let isInteractionEnabled = !isListEmpty && !isMidDecision
+        let isButtonEnabled = isInteractionEnabled && cardHelperView == nil
+        
+        passButton.isDisabled(!isButtonEnabled)
+        addButton.isDisabled(!isButtonEnabled)
+        collectionView.isUserInteractionEnabled = isInteractionEnabled
+    }
+    
     fileprivate func syncEmptyListViews() {
-        if isListEmpty {
-            emptyView.alpha = 1
-            passButton.isDisabled(true)
-            addButton.isDisabled(true)
-            
-        } else {
-            emptyView.alpha = 0
-            passButton.isDisabled(false)
-            addButton.isDisabled(false)
-        }
+        emptyView.alpha = isListEmpty ? 1 : 0
+        syncInteractionElements()
     }
     
     fileprivate var isListEmpty = true {
@@ -368,7 +415,11 @@ class DiscoverScreenshotViewController : BaseViewController {
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return matchstickFrc.fetchedObjects?.count ?? 0
+        if pseudoMatchsticksCount == 0 {
+            updateMatchsticksCount()
+        }
+        
+        return pseudoMatchsticksCount
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -395,36 +446,13 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
         }
         
         if self.cardHelperView == nil && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
-            let helper = DiscoverScreenshotHelperView()
-            helper.translatesAutoresizingMaskIntoConstraints = false
-            cell.mainView.addSubview(helper)
-            helper.topAnchor.constraint(equalTo: cell.mainView.topAnchor).isActive = true
-            helper.leadingAnchor.constraint(equalTo: cell.mainView.leadingAnchor).isActive = true
-            helper.bottomAnchor.constraint(equalTo: cell.mainView.bottomAnchor).isActive = true
-            helper.trailingAnchor.constraint(equalTo: cell.mainView.trailingAnchor).isActive = true
-            
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissHelperView))
-            helper.addGestureRecognizer(tapGesture)
-            
-            self.cardHelperView = helper
-            
+            showHelperView(inCell: cell)
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        decidedToAdd(callback: { screenshot in
-            let viewController = ProductsViewController()
-            //                viewController.delegate = self
-            viewController.screenshot = screenshot
-            viewController.hidesBottomBarWhenPushed = true
-            
-            self.navigationController?.pushViewController(viewController, animated: true)
-            
-//            self.present(viewController, animated: true, completion: {
-                self.addButtonAction()
-//            })
-        })
+        delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
         
         // TODO: ask caras how he wants these analytics set up
         AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
@@ -455,7 +483,6 @@ extension DiscoverScreenshotViewController : FrcDelegateProtocol {
         let keyframeAnimationOptions: UIViewKeyframeAnimationOptions = UIViewKeyframeAnimationOptions(rawValue: animationOptions.rawValue)
         
         // TODO: see if using spring animation has better feel
-
         
         UIView.animateKeyframes(withDuration: duration, delay: 0, options: keyframeAnimationOptions, animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: updateCellDuration, animations: {
@@ -464,7 +491,9 @@ extension DiscoverScreenshotViewController : FrcDelegateProtocol {
                 }
             })
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1, animations: {
-                if self.matchstickFrc.fetchedObjects?.count == 0 {
+                self.pseudoMatchsticksCount -= 1
+                
+                if self.pseudoMatchsticksCount == 0 {
                     self.isListEmpty = true
                 }
                 
@@ -472,6 +501,12 @@ extension DiscoverScreenshotViewController : FrcDelegateProtocol {
                     self.collectionView.deleteItems(at: [indexPath])
                     
                 }, completion: { completed in
+                    if self.needsToReloadAfterDecision {
+                        self.needsToReloadAfterDecision = false
+                        self.updateMatchsticksCount()
+                        self.collectionView.reloadData()
+                    }
+                    
                     self.postDecision()
                 })
             })
@@ -503,11 +538,11 @@ extension DiscoverScreenshotViewController : FrcDelegateProtocol {
     }
     
     private func reloadIfNeeded() {
-        guard let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout else {
-            return
-        }
-        
-        if layout.cardCount > collectionView.indexPathsForVisibleItems.count {
+        if isMidDecision {
+            needsToReloadAfterDecision = true
+
+        } else {
+            updateMatchsticksCount()
             collectionView.reloadData()
         }
     }
