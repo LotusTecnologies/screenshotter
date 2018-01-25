@@ -16,6 +16,25 @@
 "currency.auto" = "Automatic";
 
 "discover.load" = "Loading Discover...";
+"discover.screenshot.add" = "Add";
+"discover.screenshot.empty.detail" = "You're swiping a bit too fast for us, try again later.";
+"discover.screenshot.empty.title" = "That's It!";
+"discover.screenshot.flag.copyright" = "This Is My Image";
+"discover.screenshot.flag.copyright.message" = "Discover content is submitted by our users and is not reviewed for copyright infringement. If your intellectual property was used without your permission we will remove it.\nPlease refer to our Terms of Service for DMCA compliance.";
+"discover.screenshot.flag.copyright.title" = "Is This Yours?";
+"discover.screenshot.flag.inappropriate" = "Inappropriate Image";
+"discover.screenshot.flag.inappropriate.message" = "We’ll review this as soon as possible.";
+"discover.screenshot.flag.inappropriate.title" = "Thanks For Letting Us Know!";
+"discover.screenshot.flag.message" = "What’s wrong?";
+"discover.screenshot.flag.title" = "Report Screenshot";
+"discover.screenshot.helper.title" = "Discover Fashion";
+"discover.screenshot.helper.swipe_left.detail" = "\nto pass";
+"discover.screenshot.helper.swipe_left.title" = "Swipe Left";
+"discover.screenshot.helper.swipe_right.detail" = "\nto add to your collection";
+"discover.screenshot.helper.swipe_right.title" = "Swipe Right";
+"discover.screenshot.helper.tap.detail" = " to shop";
+"discover.screenshot.helper.tap.title" = "Tap";
+"discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
 
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
@@ -33,6 +52,7 @@
 "game.score" = "My coins: %d";
 "game.start" = "Tap to get more coins";
 
+"generic.cancel" = "Cancel";
 "generic.disabled" = "Disabled";
 "generic.done" = "Done";
 "generic.enabled" = "Enabled";
@@ -45,7 +65,6 @@
 "generic.update" = "Update";
 "generic.yes" = "Yes";
 
-"invite.facebook" = "Facebook Invite";
 "invite.google" = "Google Invite";
 "invite.other" = "Share To Other Apps";
 "invite.share.message" = "Download SCREENSHOP, the app that lets you shop any screenshot, for free!";
@@ -72,6 +91,9 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 
+"products.options.category.auto" = "Auto";
+"products.options.category.fashion" = "Fashion";
+"products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
 "products.options.gender.male" = "Male";
@@ -87,11 +109,12 @@
 "products.options.sort.title" = "Sort by";
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.unrated" = "Are these results relevant?";
+"products.tooltip.title" = "Tap to shop different types of products";
 
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
 "screenshot.empty.title" = "No Screenshots Yet";
 "screenshot.import.latest" = "Import your latest screenshot?";
-"screenshot.import.multiple" = "You have %@ new screenshots, do you want to import them?";
+"screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
 "screenshot.option.share" = "SHARE";
 "screenshot.option.delete" = "DELETE";
 "screenshot.permission.allow" = "Allow Access";
@@ -135,8 +158,15 @@
 "tutorial.email.legal.middle" = " and ";
 "tutorial.email.legal.pp" = "Privacy Policy";
 "tutorial.email.legal.end" = " ";
-"tutorial.try.detail" = "Press the home & power buttons to take a screenshot of this page";
-"tutorial.try.detail.x" = "Press the volume up & power buttons to take a screenshot of this page";
+
+"tutorial.try.detail.0" = "Press the home & power buttons";
+"tutorial.try.detail.1" = " on your phone";
+"tutorial.try.detail.2" = " to take a screenshot";
+"tutorial.try.detail.x.0" = "Press the volume up & power buttons";
+"tutorial.try.detail.x.1" = " on your phone";
+"tutorial.try.detail.x.2" = " to take a screenshot";
+
+"tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";
@@ -150,3 +180,4 @@
 "update.request.message" = "Update now for the best Screenshop experience!";
 
 "webview.loading" = "Loading...";
+"webview.product.loading" = "Loading your store...";

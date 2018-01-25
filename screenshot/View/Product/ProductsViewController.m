@@ -9,11 +9,12 @@
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
 #import "ShoppablesToolbar.h"
-#import "TutorialProductsPageViewController.h"
+#import "screenshot-Swift.h"
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
 typedef NS_ENUM(NSUInteger, ProductsSection) {
+    ProductsSectionTooltip,
     ProductsSectionProduct
 };
 
@@ -24,7 +25,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     ProductsViewControllerStateEmpty
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
@@ -40,8 +41,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 @property (nonatomic) NSUInteger productsUnfilteredCount;
 
 @property (nonatomic, copy) UIImage *image;
-
-@property (nonatomic, strong) TransitioningController *transitioningController;
 
 @property (nonatomic) ProductsViewControllerState state;
 
@@ -62,6 +61,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+        
         _productsOptions = [[ProductsOptions alloc] init];
         self.productsOptions.delegate = self;
         
@@ -94,14 +95,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         barButtonItem;
     });
     
-    if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
-        // TODO: Refactor this so the below views are still created, just not shown
-        // You shall not pass!
-        self.state = ProductsViewControllerStateRetry;
-        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
-        return;
-    }
-    
     _shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
@@ -122,9 +115,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     });
     
     _collectionView = ({
-        UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-        CGFloat p = [Geometry padding];
-        CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+        CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
         
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = minimumSpacing.x;
@@ -134,13 +125,14 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y + self.shoppablesToolbar.bounds.size.height, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
+        collectionView.contentInset = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, minimumSpacing.y, 0.f);
         collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
         collectionView.backgroundColor = self.view.backgroundColor;
         // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
-        // Then test why the control view jumps before being dragged away.
+        // Then test why the control view (products options view) jumps before being dragged away.
         collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
         
+        [collectionView registerClass:[ProductsTooltipCollectionViewCell class] forCellWithReuseIdentifier:@"tooltip"];
         [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
         [self.view insertSubview:collectionView atIndex:0];
@@ -177,9 +169,16 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
-    
-    [self updateOptionsView];
-    [self reloadProductsForShoppableAtIndex:0];
+    if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
+        // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
+        // rateView and scrollRevealController can all be lazy loaded. They dont
+        // need to exist if this condition is true.
+        self.state = ProductsViewControllerStateRetry;
+        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+        
+    } else {
+        [self reloadProductsForShoppableAtIndex:0];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -190,14 +189,14 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     if (![self hasShoppables] && !self.noItemsHelperView) {
         self.state = ProductsViewControllerStateLoading;
     }
+    
+    [ProductWebViewController shared].lifeCycleDelegate = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
     self.shoppablesToolbar.didViewControllerAppear = YES;
-    
-    [self presentTutorialHelperIfNeeded];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -206,11 +205,33 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [self dismissOptions];
 }
 
+- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
+    if (viewController == [ProductWebViewController shared] && [self.navigationController.topViewController isKindOfClass:[ProductsViewController class]]) {
+        ProductsViewController *productsViewController = (ProductsViewController *)self.navigationController.topViewController;
+        NSInteger index = [productsViewController indexForProduct:[ProductWebViewController shared].product];
+        [productsViewController reloadProductCellAtIndex:index];
+    }
+}
+
+- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
+    if (viewController == [ProductWebViewController shared] && ![self.navigationController.viewControllers containsObject:viewController]) {
+        [ProductWebViewController shared].product = nil;
+    }
+}
+
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    if (self.view.window && [self.collectionView numberOfItemsInSection:ProductsSectionTooltip] > 0) {
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ProductsSectionTooltip]]];
+    }
+}
+
 - (void)dealloc {
     self.shoppablesToolbar.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     self.shoppablesController.delegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -218,6 +239,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)setState:(ProductsViewControllerState)state {
     _state = state;
+    
+    [self updateOptionsView];
+    self.shoppablesToolbar.hidden = [self shouldHideToolbar];
     
     switch (state) {
         case ProductsViewControllerStateLoading:
@@ -227,6 +251,19 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             break;
             
         case ProductsViewControllerStateProducts:
+            if (@available(iOS 11.0, *)) {} else {
+                if (!self.automaticallyAdjustsScrollViewInsets) {
+                    // Setting back to YES doesn't update. Need to manually adjust.
+                    UIEdgeInsets scrollInsets = self.collectionView.scrollIndicatorInsets;
+                    scrollInsets.top = self.shoppablesToolbar.bounds.size.height + CGRectGetMaxY(self.navigationController.navigationBar.frame);
+                    self.collectionView.scrollIndicatorInsets = scrollInsets;
+                    
+                    UIEdgeInsets insets = self.collectionView.contentInset;
+                    insets.top = scrollInsets.top;
+                    self.collectionView.contentInset = insets;
+                }
+            }
+            
             [self stopAndRemoveLoader];
             [self hideNoItemsHelperView];
             self.rateView.hidden = NO;
@@ -234,6 +271,10 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             
         case ProductsViewControllerStateRetry:
         case ProductsViewControllerStateEmpty:
+            if (@available(iOS 11.0, *)) {} else {
+                self.automaticallyAdjustsScrollViewInsets = NO;
+            }
+            
             [self stopAndRemoveLoader];
             self.rateView.hidden = YES;
             [self hideNoItemsHelperView];
@@ -265,7 +306,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 #pragma mark - Shoppables
 
 - (BOOL)hasShoppables {
-    return [self.shoppablesController shoppableCount];
+    return [self.shoppablesController shoppableCount] > 0;
 }
 
 - (void)shoppablesControllerIsEmpty:(ShoppablesController *)controller {
@@ -348,15 +389,27 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [self.collectionView reloadData];
         [self.rateView setRating:[shoppable getRating] animated:NO];
         
-        if (self.products.count) {
-            // TODO: maybe call setContentOffset:
-            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+        if ([self.collectionView numberOfItemsInSection:ProductsSectionTooltip] > 0) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:ProductsSectionTooltip] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+            
+        } else if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > 0) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:ProductsSectionProduct] atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
         }
+        
+    } else {
+        self.state = ProductsViewControllerStateLoading;
+        [self.collectionView reloadData];
     }
 }
 
 
 #pragma mark - Collection View
+
+- (CGPoint)collectionViewMinimumSpacing {
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat p = [Geometry padding];
+    return CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
+}
 
 - (NSInteger)numberOfCollectionViewProductColumns {
     return 2;
@@ -367,11 +420,26 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (section == ProductsSectionProduct) {
+    if (section == ProductsSectionTooltip) {
+        BOOL shouldPresentTooldtip = ![[NSUserDefaults standardUserDefaults] boolForKey:[UserDefaultsKeys productCompletedTooltip]];
+        BOOL hasProducts = self.products.count > 0;
+        return (shouldPresentTooldtip && hasProducts) ? 1 : 0;
+        
+    } else if (section == ProductsSectionProduct) {
         return self.products.count;
         
     } else {
         return 0;
+    }
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    if (section == ProductsSectionProduct) {
+        CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
+        return UIEdgeInsetsMake(minimumSpacing.y, minimumSpacing.x, 0.f, minimumSpacing.x);
+        
+    } else {
+        return UIEdgeInsetsZero;
     }
 }
 
@@ -380,7 +448,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
     CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
-    if (indexPath.section == ProductsSectionProduct) {
+    if (indexPath.section == ProductsSectionTooltip) {
+        size.width = collectionView.bounds.size.width;
+        size.height = [ProductsTooltipCollectionViewCell heightWithCellWidth:size.width];
+        
+    } else if (indexPath.section == ProductsSectionProduct) {
         NSInteger columns = [self numberOfCollectionViewProductColumns];
         
         size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
@@ -391,7 +463,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ProductsSectionProduct) {
+    if (indexPath.section == ProductsSectionTooltip) {
+        ProductsTooltipCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"tooltip" forIndexPath:indexPath];
+        return cell;
+        
+    } else if (indexPath.section == ProductsSectionProduct) {
         Product *product = [self productAtIndex:indexPath.item];
         
         ProductCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
@@ -410,9 +486,18 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     }
 }
 
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    return indexPath.section != ProductsSectionTooltip;
+}
+
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ProductsSectionProduct) {
-        [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
+        // Somehow users were able to tap twice, this condition will prevent that.
+        if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
+            [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
+            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:[ProductWebViewController shared].product.offer]];
+            [self.navigationController pushViewController:[ProductWebViewController shared] animated:YES];
+        }
         
         Product *product = [self productAtIndex:indexPath.item];
         
@@ -458,8 +543,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)reloadProductCellAtIndex:(NSInteger)index {
     if ([self.collectionView numberOfItemsInSection:ProductsSectionProduct] > index) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
-        [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+        [self.collectionView reloadItemsAtIndexPaths:@[[self shoppablesFrcToCollectionViewIndexPath:index]]];
     }
 }
 
@@ -481,6 +565,17 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     [self.scrollRevealController scrollViewDidEndDecelerating:scrollView];
+}
+
+
+#pragma mark - Fetched Results Controller
+
+- (NSIndexPath *)collectionViewToShoppablesFrcIndexPath:(NSInteger)index {
+    return [NSIndexPath indexPathForItem:index inSection:0];
+}
+
+- (NSIndexPath *)shoppablesFrcToCollectionViewIndexPath:(NSInteger)index {
+    return [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
 }
 
 
@@ -529,6 +624,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)presentOptions:(ProductsViewControllerControl *)control {
     if ([control isFirstResponder]) {
         [control resignFirstResponder];
+        
     } else {
         [AnalyticsTrackers.standard track:@"Opened Filters View" properties:nil];
         
@@ -633,14 +729,13 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
     if (self.products.count == 0 && [self isViewLoaded]) {
-        toolbar.hidden = [self shouldHideToolbar];
-        
-        [self updateOptionsView];
         [self reloadProductsForShoppableAtIndex:0];
     }
 }
 
 - (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys productCompletedTooltip]];
+    
     [self reloadProductsForShoppableAtIndex:index];
     
     [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];
@@ -648,25 +743,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (BOOL)shouldHideToolbar {
     return ![self hasShoppables];
-}
-
-
-#pragma mark - Tutorial
-
-- (void)presentTutorialHelperIfNeeded {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedProductHelper];
-    
-    if (!hasPresented) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedProductHelper];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    
-        self.transitioningController = [[TransitioningController alloc] init];
-    
-        TutorialProductsPageViewController *viewController = [[TutorialProductsPageViewController alloc] init];
-        viewController.modalPresentationStyle = UIModalPresentationCustom;
-        viewController.transitioningDelegate = self.transitioningController;
-        [self presentViewController:viewController animated:YES completion:nil];
-    }
 }
 
 

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Appsee
 
 protocol TutorialEmailSlideViewDelegate : class {
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView)
@@ -184,38 +185,6 @@ public class TutorialEmailSlideView : HelperView {
         endEditing(true)
     }
     
-    // MARK: Legal
-    
-    class func termsOfServiceViewController(withDoneTarget target: Any?, action: Selector?) -> UIViewController? {
-        guard let url = URL(string: "http://crazeapp.com/legal/#tos") else {
-            return nil
-        }
-        
-        let title = "legal.terms_of_service".localized
-        
-        return webViewController(withTitle: title, url: url, doneTarget: target, action: action)
-    }
-
-    class func privacyPolicyViewController(withDoneTarget target: Any?, action: Selector?) -> UIViewController? {
-        guard let url = URL(string: "http://crazeapp.com/legal/#privacy") else {
-            return nil
-        }
-        
-        let title = "legal.privacy_policy".localized
-        
-        return webViewController(withTitle: title, url: url, doneTarget: target, action: action)
-    }
-    
-    private class func webViewController(withTitle title: String, url: URL, doneTarget target: Any?, action: Selector?) -> UIViewController? {
-        let viewController = WebViewController()
-        viewController.rebaseURL(url)
-        viewController.isToolbarEnabled = false
-        viewController.navigationItem.title = title
-        viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: target, action: action)
-        
-        return UINavigationController(rootViewController: viewController)
-    }
-    
     // MARK: Keyboard
     
     @objc func keyboardWillShow(_ notification: NSNotification) {
@@ -270,13 +239,15 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
     }
 }
 
-extension TutorialEmailSlideView : TutorialSlideView {
-    public func didEnterSlide() {
+extension TutorialEmailSlideView : TutorialSlideViewProtocol {
+    func didEnterSlide() {
+        Appsee.startScreen("Tutorial Email")
+        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
     }
     
-    public func willLeaveSlide() {
+    func willLeaveSlide() {
         NotificationCenter.default.removeObserver(self)
     }
 }

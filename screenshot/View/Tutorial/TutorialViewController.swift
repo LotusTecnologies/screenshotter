@@ -65,6 +65,16 @@ class TutorialViewController : UIViewController {
         prepareSlideViews()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        currentSlide.didEnterSlide()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        currentSlide.willLeaveSlide()
+    }
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
@@ -78,7 +88,7 @@ class TutorialViewController : UIViewController {
     
     func contentSizeCategoryDidChange(_ notification: Notification) {
         slides.forEach { slide in
-            slide.layoutMargins = slideLayoutMargins
+            slide.layoutMargins = slideLayoutMargins(slide)
         }
     }
     
@@ -88,9 +98,9 @@ class TutorialViewController : UIViewController {
     
     // MARK: - Slides
     
-    var slides = [UIView]()
+    var slides: [TutorialSlideView] = []
     
-    private func buildSlides() -> [UIView] {
+    private func buildSlides() -> [TutorialSlideView] {
         let welcomeSlide = TutorialWelcomeSlideView()
         welcomeSlide.button.addTarget(self, action: #selector(tutorialWelcomeSlideViewDidComplete), for: .touchUpInside)
         
@@ -111,7 +121,7 @@ class TutorialViewController : UIViewController {
         return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
     }
     
-    fileprivate var currentSlide: UIView {
+    fileprivate var currentSlide: TutorialSlideView {
         return slides[currentSlideIndex]
     }
     
@@ -121,7 +131,7 @@ class TutorialViewController : UIViewController {
         }
         
         scrollViewIsScrollingAnimation = true
-        (currentSlide as? TutorialSlideView)?.willLeaveSlide()
+        currentSlide.willLeaveSlide()
         
         var offset = CGPoint.zero
         offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
@@ -131,7 +141,7 @@ class TutorialViewController : UIViewController {
     private func prepareSlideViews() {
         slides.enumerated().forEach { i, slide in
             slide.translatesAutoresizingMaskIntoConstraints = false
-            slide.layoutMargins = slideLayoutMargins
+            slide.layoutMargins = slideLayoutMargins(slide)
             contentView.addSubview(slide)
             slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
             slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
@@ -139,7 +149,6 @@ class TutorialViewController : UIViewController {
             
             if i == 0 {
                 slide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-                (slide as? TutorialSlideView)?.didEnterSlide()
                 
             } else if i == slides.count - 1 {
                 slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -152,7 +161,7 @@ class TutorialViewController : UIViewController {
         }
     }
     
-    private var slideLayoutMargins: UIEdgeInsets {
+    private func slideLayoutMargins(_ slide: TutorialSlideView) -> UIEdgeInsets {
         var extraTop = CGFloat(0)
         var extraBottom = CGFloat(0)
         
@@ -167,7 +176,22 @@ class TutorialViewController : UIViewController {
             }
         }
         
-        return UIEdgeInsets(top: .padding + extraTop, left: .padding, bottom: .padding + extraBottom, right: .padding)
+        var paddingX: CGFloat = .padding
+        
+        if slide.isKind(of: TutorialTrySlideView.self) {
+            // TODO: when supporting localization, this should be if isEnglish
+            // Only customize insets for default font size
+            if UIApplication.shared.preferredContentSizeCategory == UIContentSizeCategory.large {
+                if UIDevice.is375w {
+                    paddingX = 30
+                    
+                } else if UIDevice.is414w {
+                    paddingX = 45
+                }
+            }
+        }
+        
+        return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
     }
     
     // MARK: - Video
@@ -180,8 +204,7 @@ class TutorialViewController : UIViewController {
 extension TutorialViewController : UIScrollViewDelegate {
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         scrollViewIsScrollingAnimation = false
-        
-        (currentSlide as? TutorialSlideView)?.didEnterSlide()
+        currentSlide.didEnterSlide()
     }
 }
 
@@ -205,15 +228,21 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
     }
     
     func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
     }
     
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
+    }
+    
+    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideView) {
+        tutorialTrySlideViewDidComplete(slideView)
+        
+        AnalyticsTrackers.standard.track("Skipped Tutorial")
     }
     
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {

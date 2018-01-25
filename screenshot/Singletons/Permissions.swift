@@ -54,7 +54,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
         }
     }
     
-    fileprivate func permissionStatus(for type: PermissionType) -> PermissionStatus {
+    func permissionStatus(for type: PermissionType) -> PermissionStatus {
         switch type {
         case .camera:
             return permissionStatus(forCamera: AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo))

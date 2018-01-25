@@ -101,7 +101,7 @@ class ScreenshotPickerViewController: BaseViewController {
         layout.minimumInteritemSpacing = 1
         layout.minimumLineSpacing = 1
         
-        collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -130,7 +130,7 @@ class ScreenshotPickerViewController: BaseViewController {
         
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
             let p = CGFloat.padding
-            
+
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false
             fab.setImage(UIImage(named: "FABCamera"), for: .normal)
@@ -143,7 +143,9 @@ class ScreenshotPickerViewController: BaseViewController {
             fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
         }
         
-        reloadAssets()
+        if PermissionsManager.shared.hasPermission(for: .photo) {
+            reloadAssets()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -225,7 +227,7 @@ class ScreenshotPickerViewController: BaseViewController {
     
     private func presentPhotoPermissionsAlert() {
         let alertController = UIAlertController(title: "picker.permission.title".localized, message: "picker.permission.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "generic.no_thanks".localized, style: .cancel, handler: { (action) in
+        alertController.addAction(UIAlertAction(title: "generic.no_thanks".localized, style: .cancel, handler: { action in
             if let cancelButton = self.navigationItem.leftBarButtonItem,
                 let cancelAction = cancelButton.action,
                 let cancelTarget = cancelButton.target
@@ -233,11 +235,20 @@ class ScreenshotPickerViewController: BaseViewController {
                 UIApplication.shared.sendAction(cancelAction, to: cancelTarget, from: self, for: nil)
             }
         }))
-        alertController.addAction(UIAlertAction(title: "picker.permission.add".localized, style: .default, handler: { (action) in
-            if let alertController = PermissionsManager.shared.deniedAlertController(for: .photo) {
-                self.present(alertController, animated: true, completion: nil)
+        let addAction = UIAlertAction(title: "picker.permission.add".localized, style: .default, handler: { action in
+            if PermissionsManager.shared.permissionStatus(for: .photo) == .undetermined {
+                PermissionsManager.shared.requestPermission(for: .photo, response: { granted in
+                    self.reloadAssets()
+                })
+                
+            } else {
+                if let alertController = PermissionsManager.shared.deniedAlertController(for: .photo) {
+                    self.present(alertController, animated: true, completion: nil)
+                }
             }
-        }))
+        })
+        alertController.addAction(addAction)
+        alertController.preferredAction = addAction
         present(alertController, animated: true, completion: nil)
     }
     

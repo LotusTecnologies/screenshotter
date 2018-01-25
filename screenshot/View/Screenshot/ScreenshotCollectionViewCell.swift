@@ -84,6 +84,12 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         badge.heightAnchor.constraint(equalToConstant: badge.bounds.size.height).isActive = true
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        isEnabled = true
+    }
+    
     // MARK: Screenshot
     
     var screenshot: Screenshot? {
@@ -108,6 +114,21 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
                 
             } else {
                 imageView.image = nil
+            }
+        }
+    }
+    
+    // MARK: Enabled
+    
+    var isEnabled: Bool = true {
+        didSet {
+            if isEnabled {
+                isUserInteractionEnabled = true
+                contentView.alpha = 1
+                
+            } else {
+                isUserInteractionEnabled = false
+                contentView.alpha = 0.5
             }
         }
     }

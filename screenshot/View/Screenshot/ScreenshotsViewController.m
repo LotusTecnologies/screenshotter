@@ -42,6 +42,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
@@ -141,6 +142,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)applicationWillEnterForeground:(NSNotification *)notification {
     if (self.view.window) {
         [self syncHelperViewVisibility];
+    }
+}
+
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    if (self.view.window && [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
     }
 }
 
@@ -450,11 +457,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-        [[self screenshotAtIndex:indexPath.item] setHide];
         
-        [self removeScreenshotHelperView];
-        
-        [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > indexPath.row) {
+            [[self screenshotAtIndex:indexPath.item] setHide];
+            [self removeScreenshotHelperView];
+            
+            [UIView animateWithDuration:0.25 animations:^{
+                cell.isEnabled = NO;
+            }];
+            
+            [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
+        }
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
@@ -525,7 +538,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)helperViewAllowAccessAction {
-    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:nil];
+    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:^(BOOL granted) {
+        [self syncHelperViewVisibility];
+    }];
 }
 
 

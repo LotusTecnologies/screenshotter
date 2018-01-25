@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import Appsee
 
 protocol TutorialTrySlideViewDelegate : NSObjectProtocol {
+    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideView)
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView)
 }
 
@@ -20,12 +22,25 @@ public class TutorialTrySlideView : HelperView {
         
         titleLabel.text = "tutorial.try.title".localized
         
+        let font = UIFont.preferredFont(forTextStyle: .title3)
+        var boldFont = font
+        
+        if let descriptor = boldFont.fontDescriptor.withSymbolicTraits(.traitBold) {
+            boldFont = UIFont(descriptor: descriptor, size: 0)
+        }
+        
+        let attributes = [
+            [NSFontAttributeName: boldFont],
+            [NSFontAttributeName: font, NSForegroundColorAttributeName: UIColor.crazeRed],
+            [NSFontAttributeName: font]
+        ]
+        
         if UIDevice.isHomeButtonless {
-            subtitleLabel.text = "tutorial.try.detail.x".localized
+            subtitleLabel.attributedText = NSMutableAttributedString(segmentedString: "tutorial.try.detail.x", attributes: attributes)
             contentImage = UIImage(named: "TutorialTryGraphicX")
             
         } else {
-            subtitleLabel.text = "tutorial.try.detail".localized
+            subtitleLabel.attributedText = NSMutableAttributedString(segmentedString: "tutorial.try.detail", attributes: attributes)
             
             if UIDevice.is568h || UIDevice.is480h {
                 contentImage = UIImage(named: "TutorialTryGraphicSE")
@@ -34,6 +49,16 @@ public class TutorialTrySlideView : HelperView {
                 contentImage = UIImage(named: "TutorialTryGraphic")
             }
         }
+        
+        let skipButton = UIButton()
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.setTitle("tutorial.try.skip".localized, for: .normal)
+        skipButton.setTitleColor(.crazeGreen, for: .normal)
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        skipButton.addTarget(self, action: #selector(skipButtonAction), for: .touchUpInside)
+        addSubview(skipButton)
+        skipButton.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        skipButton.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         if UIDevice.isSimulator {
             addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(applicationUserDidTakeScreenshot)))
@@ -56,14 +81,23 @@ public class TutorialTrySlideView : HelperView {
             self.delegate?.tutorialTrySlideViewDidComplete(self)
         }
     }
+    
+    // MARK: Skip
+    
+    @objc func skipButtonAction() {
+        AssetSyncModel.sharedInstance.syncPhotos()
+        self.delegate?.tutorialTrySlideViewDidSkip(self)
+    }
 }
 
-extension TutorialTrySlideView : TutorialSlideView {
-    public func didEnterSlide() {
+extension TutorialTrySlideView : TutorialSlideViewProtocol {
+    func didEnterSlide() {
+        Appsee.startScreen("Tutorial Try")
+        
         NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
     }
     
-    public func willLeaveSlide() {
+    func willLeaveSlide() {
         NotificationCenter.default.removeObserver(self)
     }
 }
