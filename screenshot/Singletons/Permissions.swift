@@ -43,6 +43,12 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
                 properties = ["token": token.description]
             }
             
+            /*
+                 This is a required change due to the fact that we can enter into this pushStatus setter from any queue,
+                 and analytics 'identify' logic can only be deterministically executed on the main queue due to
+                 downstream dependencies such as Intercom depending on this constraint.
+             */
+            
             DispatchQueue.main.async {
                 AnalyticsTrackers.standard.track(name, properties: properties)
                 
