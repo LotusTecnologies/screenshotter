@@ -793,7 +793,7 @@ extension DataModel {
 
     func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
         let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
-        if from < 7 && to >= 7 && installDate != nil {
+        if (from < 9 && to >= 7 && installDate != nil) { // Originally was from < 7, but a bug fixed in 9 should re-run for 7 or 8.
             dbQ.async {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
