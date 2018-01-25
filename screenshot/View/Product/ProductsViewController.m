@@ -492,6 +492,10 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ProductsSectionProduct) {
+        ProductViewController *productViewController = [[ProductViewController alloc] init];
+        [self.navigationController pushViewController:productViewController animated:YES];
+        return; // !!!: DEBUG
+        
         // Somehow users were able to tap twice, this condition will prevent that.
         if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
             [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
