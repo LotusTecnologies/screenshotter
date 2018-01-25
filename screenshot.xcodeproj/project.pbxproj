@@ -39,6 +39,7 @@
 		C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46551FBC39B400A8C886 /* AppSettings.swift */; };
 		C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */; };
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
+		C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */; };
 		C540880D1FE90C8E00198955 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C21FE90C8D00198955 /* Loader.swift */; };
 		C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C31FE90C8D00198955 /* LoadingViewController.swift */; };
 		C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C71FE90C8D00198955 /* SettingsViewController.swift */; };
@@ -156,6 +157,7 @@
 		C53B46551FBC39B400A8C886 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterKeys.swift; sourceTree = "<group>"; };
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
+		C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWebViewController.swift; sourceTree = "<group>"; };
 		C54087C21FE90C8D00198955 /* Loader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C54087C31FE90C8D00198955 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		C54087C71FE90C8D00198955 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -424,6 +426,7 @@
 		C54087D21FE90C8D00198955 /* WebView */ = {
 			isa = PBXGroup;
 			children = (
+				C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */,
 				C54087D41FE90C8D00198955 /* WebView.swift */,
 				C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */,
 			);
@@ -946,6 +949,7 @@
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C54088271FE90C8E00198955 /* ProductCollectionViewCell.m in Sources */,
+				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C54088251FE90C8E00198955 /* ProductsViewController.m in Sources */,

@@ -15,9 +15,6 @@
 @interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
-@property (nonatomic, strong) WebViewController *webViewController;
-@property (nonatomic, strong) FavoriteButton *webViewFavoriteButton;
-@property (nonatomic, strong) Product *webViewProduct;
 @property (nonatomic, strong) ClipView *clipView;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
@@ -53,6 +50,12 @@
     self.view.backgroundColor = [UIColor background];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [ProductWebViewController shared].lifeCycleDelegate = self;
+}
+
 - (void)dealloc {
     [AssetSyncModel sharedInstance].networkingIndicatorDelegate = nil;
 }
@@ -82,16 +85,16 @@
 }
 
 - (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
-    if (viewController == self.webViewController && [self.topViewController isKindOfClass:[ProductsViewController class]]) {
+    if (viewController == [ProductWebViewController shared] && [self.topViewController isKindOfClass:[ProductsViewController class]]) {
         ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
-        NSInteger index = [productsViewController indexForProduct:self.webViewProduct];
+        NSInteger index = [productsViewController indexForProduct:[ProductWebViewController shared].product];
         [productsViewController reloadProductCellAtIndex:index];
     }
 }
 
 - (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
-    if (viewController == self.webViewController && ![self.viewControllers containsObject:viewController]) {
-        self.webViewProduct = nil;
+    if (viewController == [ProductWebViewController shared] && ![self.viewControllers containsObject:viewController]) {
+        [ProductWebViewController shared].product = nil;
     }
 }
 
@@ -129,21 +132,12 @@
 #pragma mark - Products
 
 - (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    // Somehow users were able to tap twice, this condition will prevent that.
     if (![self.topViewController isKindOfClass:[WebViewController class]]) {
-        self.webViewProduct = [viewController productAtIndex:indexPath.item];
-        
-        self.webViewFavoriteButton.selected = self.webViewProduct.isFavorite;
-        
-        [self.webViewController rebaseURL:[NSURL URLWithString:self.webViewProduct.offer]];
-        [self pushViewController:self.webViewController animated:YES];
+        [ProductWebViewController shared].product = [viewController productAtIndex:indexPath.item];
+        [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:[ProductWebViewController shared].product.offer]];
+        [self pushViewController:[ProductWebViewController shared] animated:YES];
     }
-}
-
-- (void)productWebViewFavoriteAction:(UIButton *)button {
-    BOOL isFavorited = [button isSelected];
-    
-    [self.webViewProduct setFavoritedToFavorited:isFavorited];
-    [AnalyticsTrackerObjCBridge trackFavoritedProductWithTracker:AnalyticsTrackers.standard favorited:isFavorited product:self.webViewProduct onPage:@"Product Web View"];
 }
 
 
@@ -211,32 +205,6 @@
     
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
     [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-
-#pragma mark - Web View
-
-- (WebViewController *)webViewController {
-    if (!_webViewController) {
-        WebViewController *webViewController = [[WebViewController alloc] init];
-        webViewController.lifeCycleDelegate = self;
-        [webViewController addNavigationItemLogo];
-        webViewController.hidesBottomBarWhenPushed = YES;
-        webViewController.loaderLabelText = @"Loading your store...";
-        webViewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.webViewFavoriteButton];
-        _webViewController = webViewController;
-    }
-    return _webViewController;
-}
-
-- (FavoriteButton *)webViewFavoriteButton {
-    if (!_webViewFavoriteButton) {
-        FavoriteButton *button = [[FavoriteButton alloc] init];
-        [button addTarget:self action:@selector(productWebViewFavoriteAction:) forControlEvents:UIControlEventTouchUpInside];
-        [button sizeToFit];
-        _webViewFavoriteButton = button;
-    }
-    return _webViewFavoriteButton;
 }
 
 
