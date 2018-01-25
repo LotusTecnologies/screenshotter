@@ -83,8 +83,6 @@ class IntercomHelper : NSObject {
                 // handle error
                 if let error = error as NSError? {
                     print(error.localizedDescription)
-                } else {
-                    print(error)
                 }
                 
                 return
