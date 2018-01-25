@@ -11,16 +11,7 @@
 @class ProductsViewController;
 @class Screenshot, Product;
 
-@protocol ProductsViewControllerDelegate <NSObject>
-@required
-
-- (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
-
-@end
-
 @interface ProductsViewController : BaseViewController
-
-@property (nonatomic, weak) id<ProductsViewControllerDelegate> delegate;
 
 @property (nonatomic, strong) Screenshot *screenshot;
 

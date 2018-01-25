@@ -12,7 +12,7 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
-@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate, NetworkingIndicatorProtocol>
+@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) ClipView *clipView;
@@ -50,12 +50,6 @@
     self.view.backgroundColor = [UIColor background];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [ProductWebViewController shared].lifeCycleDelegate = self;
-}
-
 - (void)dealloc {
     [AssetSyncModel sharedInstance].networkingIndicatorDelegate = nil;
 }
@@ -84,20 +78,6 @@
     self.previousDidAppearViewControllerClass = [viewController class];
 }
 
-- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
-    if (viewController == [ProductWebViewController shared] && [self.topViewController isKindOfClass:[ProductsViewController class]]) {
-        ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
-        NSInteger index = [productsViewController indexForProduct:[ProductWebViewController shared].product];
-        [productsViewController reloadProductCellAtIndex:index];
-    }
-}
-
-- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
-    if (viewController == [ProductWebViewController shared] && ![self.viewControllers containsObject:viewController]) {
-        [ProductWebViewController shared].product = nil;
-    }
-}
-
 
 #pragma mark - Screenshots
 
@@ -105,7 +85,6 @@
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
-    productsViewController.delegate = self;
     productsViewController.lifeCycleDelegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
     productsViewController.screenshot = screenshot;
@@ -126,18 +105,6 @@
 
 - (void)screenshotsViewControllerWantsToPresentPicker:(ScreenshotsViewController *)viewController {
     [self presentPickerViewController];
-}
-
-
-#pragma mark - Products
-
-- (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    // Somehow users were able to tap twice, this condition will prevent that.
-    if (![self.topViewController isKindOfClass:[WebViewController class]]) {
-        [ProductWebViewController shared].product = [viewController productAtIndex:indexPath.item];
-        [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:[ProductWebViewController shared].product.offer]];
-        [self pushViewController:[ProductWebViewController shared] animated:YES];
-    }
 }
 
 

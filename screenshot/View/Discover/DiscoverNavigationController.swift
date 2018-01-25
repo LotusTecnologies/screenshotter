@@ -10,9 +10,6 @@ import Foundation
 
 class DiscoverNavigationController : UINavigationController, ViewControllerLifeCycle {
     let discoverScreenshotViewController = DiscoverScreenshotViewController()
-    fileprivate lazy var webViewController: WebViewController = {
-        return WebViewController()
-    }()
     
     // MARK: Life Cycle
     
@@ -45,7 +42,6 @@ extension DiscoverNavigationController : DiscoverScreenshotViewControllerDelegat
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath) {
         discoverScreenshotViewController.decidedToAdd { screenshot in
             let productsViewController = ProductsViewController()
-            productsViewController.delegate = self
             productsViewController.lifeCycleDelegate = self
             productsViewController.screenshot = screenshot
             productsViewController.hidesBottomBarWhenPushed = true
@@ -56,28 +52,5 @@ extension DiscoverNavigationController : DiscoverScreenshotViewControllerDelegat
                 screenshot.setViewed()
             }
         }
-    }
-}
-
-extension DiscoverNavigationController : ProductsViewControllerDelegate {
-    func productsViewController(_ viewController: ProductsViewController!, didSelectItemAt indexPath: IndexPath!) {
-        guard let topViewController = topViewController else {
-            return
-        }
-        
-        // Somehow users were able to tap twice, this condition will prevent that.
-        if !topViewController.isKind(of: WebViewController.self) {
-            
-        }
-        
-        
-//        if (![self.topViewController isKindOfClass:[WebViewController class]]) {
-//            self.webViewProduct = [viewController productAtIndex:indexPath.item];
-//
-//            self.webViewFavoriteButton.selected = self.webViewProduct.isFavorite;
-//
-//            [self.webViewController rebaseURL:[NSURL URLWithString:self.webViewProduct.offer]];
-//            [self pushViewController:self.webViewController animated:YES];
-//        }
     }
 }

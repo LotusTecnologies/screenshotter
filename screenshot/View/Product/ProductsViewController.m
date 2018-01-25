@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     ProductsViewControllerStateEmpty
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
@@ -189,6 +189,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     if (![self hasShoppables] && !self.noItemsHelperView) {
         self.state = ProductsViewControllerStateLoading;
     }
+    
+    [ProductWebViewController shared].lifeCycleDelegate = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -201,6 +203,20 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [super viewWillDisappear:animated];
     
     [self dismissOptions];
+}
+
+- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
+    if (viewController == [ProductWebViewController shared] && [self.navigationController.topViewController isKindOfClass:[ProductsViewController class]]) {
+        ProductsViewController *productsViewController = (ProductsViewController *)self.navigationController.topViewController;
+        NSInteger index = [productsViewController indexForProduct:[ProductWebViewController shared].product];
+        [productsViewController reloadProductCellAtIndex:index];
+    }
+}
+
+- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
+    if (viewController == [ProductWebViewController shared] && ![self.navigationController.viewControllers containsObject:viewController]) {
+        [ProductWebViewController shared].product = nil;
+    }
 }
 
 - (void)contentSizeCategoryDidChange:(NSNotification *)notification {
@@ -476,7 +492,12 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ProductsSectionProduct) {
-        [self.delegate productsViewController:self didSelectItemAtIndexPath:indexPath];
+        // Somehow users were able to tap twice, this condition will prevent that.
+        if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
+            [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
+            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:[ProductWebViewController shared].product.offer]];
+            [self.navigationController pushViewController:[ProductWebViewController shared] animated:YES];
+        }
         
         Product *product = [self productAtIndex:indexPath.item];
         
