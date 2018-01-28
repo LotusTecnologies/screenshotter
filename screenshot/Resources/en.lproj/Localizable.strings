@@ -93,6 +93,8 @@
 
 "product.add" = "Add to Cart";
 "product.buy" = "Buy Now";
+"product.color.default" = "Color";
+"product.size.default" = "Size";
 "product.website" = "Go To %@";
 
 "products.options.category.auto" = "Auto";

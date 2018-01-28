@@ -64,7 +64,9 @@ class DropDownButton : UIControl {
     
     var pickerItems: [String] = [] {
         didSet {
-            titleLabel.text = pickerItems.first
+            if titleLabel.text == nil {
+                titleLabel.text = pickerItems.first
+            }
         }
     }
     

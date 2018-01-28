@@ -139,6 +139,7 @@ class ProductViewController : BaseViewController {
         
         let colorButton = DropDownButton()
         colorButton.translatesAutoresizingMaskIntoConstraints = false
+        colorButton.titleLabel.text = "product.color.default".localized
         colorButton.titleLabel.textColor = selectionColor
         colorButton.addTarget(self, action: #selector(selectionButtonAction(_:)), for: .touchUpInside)
         colorButton.pickerItems = ["Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"]
@@ -150,6 +151,7 @@ class ProductViewController : BaseViewController {
         
         let sizeButton = DropDownButton()
         sizeButton.translatesAutoresizingMaskIntoConstraints = false
+        sizeButton.titleLabel.text = "product.size.default".localized
         sizeButton.titleLabel.textColor = selectionColor
         sizeButton.addTarget(self, action: #selector(selectionButtonAction(_:)), for: .touchUpInside)
         sizeButton.pickerItems = ["Medium", "Small", "Large"]
