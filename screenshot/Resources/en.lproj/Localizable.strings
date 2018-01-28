@@ -91,6 +91,10 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 
+"product.add" = "Add to Cart";
+"product.buy" = "Buy Now";
+"product.website" = "Go To %@";
+
 "products.options.category.auto" = "Auto";
 "products.options.category.fashion" = "Fashion";
 "products.options.category.furniture" = "Furniture";
