@@ -19,6 +19,7 @@ class UserDefaultsKeys : NSObject {
     static let newScreenshotsCount = "NewScreenshotsCount"
     
     // Product
+    static let productCompletedTooltip = "ProductCompletedTooltip"
     static let productGender = "ProductGender"
     static let productSize = "ProductSize"
     static let productSale = "ProductSale"
@@ -29,7 +30,6 @@ class UserDefaultsKeys : NSObject {
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
-    static let onboardingPresentedProductHelper = "OnboardingPresentedProductHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     
@@ -49,6 +49,9 @@ class UserDefaultsKeys : NSObject {
     // Clarifai
     static let isModelDownloaded = "IsModelDownloaded"
     
+    // Discover
+    static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
+    
     // Game
     static let gameScore = "GameScore"
     
@@ -56,6 +59,9 @@ class UserDefaultsKeys : NSObject {
     static let lastTimeZone = "LastTimeZone"
     static let subscriptionARN = "SubscriptionARN"
     static let enabledSilentPush = "EnabledSilentPush"
+    
+    // Matchsticks
+    static let matchsticksSyncToken = "MatchsticksSyncToken"
 }
 
 extension UIApplication {
@@ -66,9 +72,6 @@ extension UIApplication {
         }
         if UserDefaults.standard.bool(forKey: "TutorialPresentedScreenshotHelper") {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
-        }
-        if UserDefaults.standard.bool(forKey: "TutorialPresentedProductHelper") {
-            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedProductHelper)
         }
     }
 }

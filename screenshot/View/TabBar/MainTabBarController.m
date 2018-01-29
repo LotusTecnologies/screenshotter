@@ -16,10 +16,11 @@
 
 @property (nonatomic, strong) FavoritesNavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
-@property (nonatomic, strong) UINavigationController *discoverNavigationController;
+@property (nonatomic, strong) DiscoverNavigationController *discoverNavigationController;
 @property (nonatomic, strong) UINavigationController *settingsNavigationController;
 @property (nonatomic, strong) UITabBarItem *settingsTabBarItem;
 @property (nonatomic, strong) UpdatePromptHandler *updatePromptHandler;
+@property (nonatomic) NSInteger discoverTabTag;
 
 @end
 
@@ -52,14 +53,13 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         });
         
         _discoverNavigationController = ({
+            self.discoverTabTag = 2;
+            
             UIImage *image = [UIImage imageNamed:@"TabBarGlobe"];
             
-            DiscoverWebViewController *viewController = [[DiscoverWebViewController alloc] init];
-            
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-            navigationController.title = viewController.title;
-            navigationController.view.backgroundColor = [UIColor background];
-            navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:2];
+            DiscoverNavigationController *navigationController = [[DiscoverNavigationController alloc] init];
+            navigationController.title = navigationController.discoverScreenshotViewController.title;
+            navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:self.discoverTabTag];
             navigationController;
         });
 
@@ -187,6 +187,10 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 
 - (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
     NSString *tabTitle = self.selectedViewController.title;
+    
+    if (item.tag == self.discoverTabTag) {
+        tabTitle = @"Matchsticks";
+    }
     
     if (tabTitle) {
         [AnalyticsTrackers.standard track:@"Tab Bar tapped" properties:@{@"tab": tabTitle}];

@@ -9,7 +9,7 @@
 import Foundation
 
 class FavoriteProductsViewController : BaseViewController {
-    fileprivate let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
+    fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     var products: [Product]?
     
