@@ -187,7 +187,7 @@ class ProductViewController : BaseViewController {
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         contentTextView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-        contentTextView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
     }
     
     @objc fileprivate func keyboardDidHide(_ notification: Notification) {
@@ -327,17 +327,47 @@ class ProductViewController : BaseViewController {
     }
     
     @objc fileprivate func cartButtonAction() {
-        var areOptionsSet = true
+        var errorItems: [SegmentedDropDownItem] = []
         
         selectionButton.items.forEach { item in
             if item.placeholderTitle == item.title {
-                areOptionsSet = false
-                item.setBorderErrorColor()
+                errorItems.append(item)
             }
         }
         
-        if areOptionsSet {
+        if errorItems.isEmpty {
             // TODO: do stuff
+        }
+        else {
+            func displayErrorItems() {
+                errorItems.forEach { item in
+                    item.setBorderErrorColor()
+                }
+            }
+            
+            let adjustedContentInsetTop: CGFloat
+            
+            if #available(iOS 11.0, *) {
+                adjustedContentInsetTop = scrollView.adjustedContentInset.top
+            }
+            else {
+                adjustedContentInsetTop = topLayoutGuide.length
+            }
+            
+            let currentOffsetY = scrollView.contentOffset.y + adjustedContentInsetTop
+            let minOffsetY = selectionButton.frame.minY
+            
+            if currentOffsetY > minOffsetY {
+                UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    self.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
+                    
+                }, completion: { completed in
+                    displayErrorItems()
+                })
+            }
+            else {
+                displayErrorItems()
+            }
         }
     }
 }
