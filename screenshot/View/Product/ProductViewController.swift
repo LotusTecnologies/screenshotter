@@ -19,6 +19,7 @@ class ProductViewController : BaseViewController {
     fileprivate let priceLabel = UILabel()
     fileprivate let originalPriceLabel = UILabel()
     
+    fileprivate var selectionButton: SegmentedDropDownButton!
     fileprivate let websiteButton = UIButton()
     
     // MARK: Life Cycle
@@ -135,8 +136,10 @@ class ProductViewController : BaseViewController {
         
         let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
         
-        let selectionButton = SegmentedDropDownButton(items: [colorItem, sizeItem, quantityItem])
+        selectionButton = SegmentedDropDownButton(items: [colorItem, sizeItem, quantityItem])
         selectionButton.translatesAutoresizingMaskIntoConstraints = false
+        selectionButton.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
+        selectionButton.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         scrollView.addSubview(selectionButton)
         selectionButton.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
         selectionButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -313,10 +316,29 @@ class ProductViewController : BaseViewController {
         }
     }
     
-    // MARK: Cart
+    // MARK: Actions
+    
+    @objc fileprivate func selectionButtonTouchUpInside() {
+        // ???: need analytics here
+    }
+    
+    @objc fileprivate func selectionButtonValueChanged() {
+        selectionButton.selectedItem?.resetBorderColor()
+    }
     
     @objc fileprivate func cartButtonAction() {
+        var areOptionsSet = true
         
+        selectionButton.items.forEach { item in
+            if item.placeholderTitle == item.title {
+                areOptionsSet = false
+                item.setBorderErrorColor()
+            }
+        }
+        
+        if areOptionsSet {
+            // TODO: do stuff
+        }
     }
 }
 

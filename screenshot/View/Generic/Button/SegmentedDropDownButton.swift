@@ -24,13 +24,41 @@ class SegmentedDropDownItem : NSObject {
         self.pickerItems = pickerItems
         super.init()
     }
+    
+    fileprivate func setBorderColor(_ color: UIColor) {
+        if let frameLayer = frameLayer {
+            frameLayer.strokeColor = color.cgColor
+        }
+        else {
+            segment.layer.borderColor = color.cgColor
+        }
+    }
+    
+    func setBorderErrorColor() {
+        setBorderColor(SegmentedDropDownButton.borderErrorColor)
+        bringToFront()
+    }
+    
+    func resetBorderColor() {
+        setBorderColor(SegmentedDropDownButton.borderColor)
+        sendToBack()
+    }
+    
+    fileprivate func bringToFront() {
+        segment.superview?.bringSubview(toFront: segment)
+    }
+    
+    fileprivate func sendToBack() {
+        segment.superview?.sendSubview(toBack: segment)
+    }
 }
 
-class SegmentedDropDownButton : UIView {
-    fileprivate var items: [SegmentedDropDownItem]!
+class SegmentedDropDownButton : UIControl {
+    private(set) var items: [SegmentedDropDownItem]!
     
     fileprivate let borderWidth: CGFloat = 1
-    fileprivate let borderColor: UIColor = .gray8
+    static fileprivate let borderColor: UIColor = .gray8
+    static fileprivate let borderErrorColor: UIColor = .crazeRed
     
     // MARK: Life Cycle
     
@@ -76,7 +104,7 @@ class SegmentedDropDownButton : UIView {
             }
             
             if items.count == 1 {
-                segment.layer.borderColor = borderColor.cgColor
+                segment.layer.borderColor = type(of: self).borderColor.cgColor
                 segment.layer.borderWidth = borderWidth
                 segment.layer.masksToBounds = true
                 segment.layer.cornerRadius = .defaultCornerRadius
@@ -84,7 +112,7 @@ class SegmentedDropDownButton : UIView {
             } else {
                 // iOS 10 masking happens in the layoutSubviews
                 if #available(iOS 11.0, *) {
-                    segment.layer.borderColor = UIColor.gray8.cgColor
+                    segment.layer.borderColor = type(of: self).borderColor.cgColor
                     segment.layer.borderWidth = borderWidth
 
                     if isFirst || isLast {
@@ -137,7 +165,7 @@ class SegmentedDropDownButton : UIView {
                 
                 let frameLayer = CAShapeLayer()
                 frameLayer.path = maskPath
-                frameLayer.strokeColor = item.frameLayer?.strokeColor ?? borderColor.cgColor
+                frameLayer.strokeColor = item.frameLayer?.strokeColor ?? type(of: self).borderColor.cgColor
                 frameLayer.lineWidth = borderWidth * 2 // 2x since the clipping cuts half
                 frameLayer.fillColor = nil
                 segment.layer.addSublayer(frameLayer)
@@ -150,27 +178,24 @@ class SegmentedDropDownButton : UIView {
     
     @objc fileprivate func touchUpInside(_ button: DropDownButton) {
         if button.isFirstResponder {
-            button.resignFirstResponder()
+            _ = button.resignFirstResponder()
         }
         else {
-            button.becomeFirstResponder()
+            _ = button.becomeFirstResponder()
+        }
+        
+        sendActions(for: .touchUpInside)
+    }
+    
+    var highlightedItem: SegmentedDropDownItem? {
+        return items.first { item -> Bool in
+            return item.segment.isHighlighted
         }
     }
     
-    // MARK: Border
-    
-    func setBorderColor(_ color: UIColor, atIndex index: Int) {
-        guard items.count > index else {
-            return
-        }
-        
-        let item = items[index]
-        
-        if let frameLayer = item.frameLayer {
-            frameLayer.strokeColor = color.cgColor
-        }
-        else {
-            item.segment.layer.borderColor = color.cgColor
+    var selectedItem: SegmentedDropDownItem? {
+        return items.first { item -> Bool in
+            return item.segment.isSelected
         }
     }
 }
@@ -198,6 +223,115 @@ extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate
         let item = items[itemIndex(pickerView: pickerView)]
         item.title = item.pickerItems[row]
         item.segment.titleLabel.text = item.title
-        resignFirstResponder()
+        
+        sendActions(for: .valueChanged)
+        _ = item.segment.resignFirstResponder()
+    }
+}
+
+fileprivate class DropDownButton : UIControl {
+    weak var pickerDataSource: UIPickerViewDataSource?
+    weak var pickerDelegate: UIPickerViewDelegate?
+    
+    let titleLabel = UILabel()
+    
+    fileprivate let image = UIImage(named: "DropDownArrow")
+    
+    // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        let imageView = UIImageView(image: image)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        addSubview(imageView)
+        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        imageView.topAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.topAnchor).isActive = true
+        imageView.bottomAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        imageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        imageView.centerYAnchor.constraint(equalTo: layoutMarginsGuide.centerYAnchor).isActive = true
+        
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize)
+        addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: imageView.leadingAnchor, constant: -_layoutMargins.right).isActive = true
+    }
+    
+    private let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding / 2)
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // Needed here for iOS 10
+        layoutMargins = _layoutMargins
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        var size: CGSize = .zero
+        let labelSize = titleLabel.systemLayoutSizeFitting(super.intrinsicContentSize)
+        let imageWidth = image?.size.width ?? 0
+        
+        size.width = layoutMargins.left + ceil(labelSize.width) + layoutMargins.right + imageWidth + layoutMargins.right
+        size.height = layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom
+        return size
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            backgroundColor = isSelected ? .gray9 : nil
+        }
+    }
+    
+    // MARK: Picker
+    
+    private(set) var isPickerViewInitialized = false
+    
+    fileprivate lazy var pickerView: UIPickerView = {
+        self.isPickerViewInitialized = true
+        
+        let view = UIPickerView()
+        view.dataSource = self.pickerDataSource
+        view.delegate = self.pickerDelegate
+        return view
+    }()
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override var inputView: UIView? {
+        get {
+            return pickerView
+        }
+    }
+    
+    // MARK: First Responder
+    
+    override func becomeFirstResponder() -> Bool {
+        let becomeFirstResponder = super.becomeFirstResponder()
+        
+        if becomeFirstResponder {
+            isSelected = true
+        }
+        
+        return becomeFirstResponder
+    }
+    
+    override func resignFirstResponder() -> Bool {
+        let resignFirstResponder = super.resignFirstResponder()
+        
+        if resignFirstResponder {
+            isSelected = false
+        }
+        
+        return resignFirstResponder
     }
 }
