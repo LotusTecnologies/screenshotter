@@ -121,84 +121,36 @@ class ProductViewController : BaseViewController {
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: priceLabel.leadingAnchor, constant: -.padding).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: originalPriceLabel.leadingAnchor, constant: -.padding).isActive = true
         
-        let borderColor: UIColor = .gray8
-        let selectionColor: UIColor = .gray6
+        let colorItem = SegmentedDropDownItem(pickerItems: [
+            "Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"
+            ])
+        colorItem.placeholderTitle = "product.color.default".localized
+        colorItem.widthRatio = 0.4
         
-        let selectionView = UIView()
-        selectionView.translatesAutoresizingMaskIntoConstraints = false
-        selectionView.backgroundColor = .white
-        selectionView.layer.borderColor = borderColor.cgColor
-        selectionView.layer.borderWidth = 1
-        selectionView.layer.cornerRadius = CGFloat.defaultCornerRadius
-        selectionView.layer.masksToBounds = true
-        scrollView.addSubview(selectionView)
-        selectionView.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
-        selectionView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        selectionView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-        selectionView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        let sizeItem = SegmentedDropDownItem(pickerItems: [
+            "Medium", "Small", "Large"
+            ])
+        sizeItem.placeholderTitle = "product.size.default".localized
+        sizeItem.widthRatio = 0.4
         
-        let colorButton = DropDownButton()
-        colorButton.translatesAutoresizingMaskIntoConstraints = false
-        colorButton.titleLabel.text = "product.color.default".localized
-        colorButton.titleLabel.textColor = selectionColor
-        colorButton.addTarget(self, action: #selector(selectionButtonAction(_:)), for: .touchUpInside)
-        colorButton.pickerItems = ["Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"]
-        selectionView.addSubview(colorButton)
-        colorButton.topAnchor.constraint(equalTo: selectionView.topAnchor).isActive = true
-        colorButton.leadingAnchor.constraint(equalTo: selectionView.leadingAnchor).isActive = true
-        colorButton.bottomAnchor.constraint(equalTo: selectionView.bottomAnchor).isActive = true
-        colorButton.widthAnchor.constraint(equalTo: selectionView.widthAnchor, multiplier: 0.4).isActive = true
+        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
         
-        let sizeButton = DropDownButton()
-        sizeButton.translatesAutoresizingMaskIntoConstraints = false
-        sizeButton.titleLabel.text = "product.size.default".localized
-        sizeButton.titleLabel.textColor = selectionColor
-        sizeButton.addTarget(self, action: #selector(selectionButtonAction(_:)), for: .touchUpInside)
-        sizeButton.pickerItems = ["Medium", "Small", "Large"]
-        selectionView.addSubview(sizeButton)
-        sizeButton.topAnchor.constraint(equalTo: selectionView.topAnchor).isActive = true
-        sizeButton.leadingAnchor.constraint(equalTo: colorButton.trailingAnchor).isActive = true
-        sizeButton.bottomAnchor.constraint(equalTo: selectionView.bottomAnchor).isActive = true
-        sizeButton.widthAnchor.constraint(equalTo: selectionView.widthAnchor, multiplier: 0.4).isActive = true
-        
-        let divider1 = UIView()
-        divider1.translatesAutoresizingMaskIntoConstraints = false
-        divider1.backgroundColor = borderColor
-        divider1.isUserInteractionEnabled = false
-        selectionView.addSubview(divider1)
-        divider1.topAnchor.constraint(equalTo: selectionView.topAnchor).isActive = true
-        divider1.leadingAnchor.constraint(equalTo: sizeButton.leadingAnchor).isActive = true
-        divider1.bottomAnchor.constraint(equalTo: selectionView.bottomAnchor).isActive = true
-        divider1.widthAnchor.constraint(equalToConstant: selectionView.layer.borderWidth).isActive = true
-        
-        let quantityButton = DropDownButton()
-        quantityButton.translatesAutoresizingMaskIntoConstraints = false
-        quantityButton.titleLabel.textColor = selectionColor
-        quantityButton.addTarget(self, action: #selector(selectionButtonAction(_:)), for: .touchUpInside)
-        quantityButton.pickerItems = (1...10).map { "\($0)" }
-        selectionView.addSubview(quantityButton)
-        quantityButton.topAnchor.constraint(equalTo: selectionView.topAnchor).isActive = true
-        quantityButton.leadingAnchor.constraint(equalTo: sizeButton.trailingAnchor).isActive = true
-        quantityButton.bottomAnchor.constraint(equalTo: selectionView.bottomAnchor).isActive = true
-        quantityButton.trailingAnchor.constraint(equalTo: selectionView.trailingAnchor).isActive = true
-        
-        let divider2 = UIView()
-        divider2.translatesAutoresizingMaskIntoConstraints = false
-        divider2.backgroundColor = borderColor
-        divider2.isUserInteractionEnabled = false
-        selectionView.addSubview(divider2)
-        divider2.topAnchor.constraint(equalTo: selectionView.topAnchor).isActive = true
-        divider2.leadingAnchor.constraint(equalTo: quantityButton.leadingAnchor).isActive = true
-        divider2.bottomAnchor.constraint(equalTo: selectionView.bottomAnchor).isActive = true
-        divider2.widthAnchor.constraint(equalToConstant: selectionView.layer.borderWidth).isActive = true
+        let selectionButton = SegmentedDropDownButton(items: [colorItem, sizeItem, quantityItem])
+        selectionButton.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(selectionButton)
+        selectionButton.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
+        selectionButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        selectionButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let cartButton = MainButton()
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.backgroundColor = .crazeGreen
         cartButton.setTitle("product.add".localized, for: .normal)
         cartButton.setTitleColor(.white, for: .normal)
+        cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
         scrollView.addSubview(cartButton)
-        cartButton.topAnchor.constraint(equalTo: selectionView.bottomAnchor, constant: .padding).isActive = true
+        cartButton.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
         cartButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         cartButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -361,15 +313,10 @@ class ProductViewController : BaseViewController {
         }
     }
     
-    // MARK: Selection
+    // MARK: Cart
     
-    @objc fileprivate func selectionButtonAction(_ button: UIButton) {
-        if button.isFirstResponder {
-            button.resignFirstResponder()
-        }
-        else {
-            button.becomeFirstResponder()
-        }
+    @objc fileprivate func cartButtonAction() {
+        
     }
 }
 

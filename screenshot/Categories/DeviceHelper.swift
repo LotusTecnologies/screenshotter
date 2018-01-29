@@ -14,7 +14,7 @@ extension UIDevice {
     static let isSimulator = ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
     
     static var isHomeButtonless: Bool {
-        guard #available(iOS 11, *), let window = UIApplication.shared.windows.first else {
+        guard #available(iOS 11.0, *), let window = UIApplication.shared.windows.first else {
             return false
         }
         

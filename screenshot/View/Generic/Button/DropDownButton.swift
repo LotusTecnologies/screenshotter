@@ -9,6 +9,9 @@
 import Foundation
 
 class DropDownButton : UIControl {
+    weak var pickerDataSource: UIPickerViewDataSource?
+    weak var pickerDelegate: UIPickerViewDelegate?
+    
     let titleLabel = UILabel()
     
     fileprivate let image = UIImage(named: "DropDownArrow")
@@ -62,18 +65,14 @@ class DropDownButton : UIControl {
     
     // MARK: Picker
     
-    var pickerItems: [String] = [] {
-        didSet {
-            if titleLabel.text == nil {
-                titleLabel.text = pickerItems.first
-            }
-        }
-    }
+    private(set) var isPickerViewInitialized = false
     
     fileprivate lazy var pickerView: UIPickerView = {
+        self.isPickerViewInitialized = true
+        
         let view = UIPickerView()
-        view.delegate = self
-        view.dataSource = self
+        view.dataSource = self.pickerDataSource
+        view.delegate = self.pickerDelegate
         return view
     }()
     
@@ -85,26 +84,5 @@ class DropDownButton : UIControl {
         get {
             return pickerView
         }
-    }
-}
-
-extension DropDownButton : UIPickerViewDataSource {
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerItems.count
-    }
-}
-
-extension DropDownButton : UIPickerViewDelegate {
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pickerItems[row]
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        titleLabel.text = pickerItems[row]
-        resignFirstResponder()
     }
 }
