@@ -162,6 +162,7 @@ class ProductViewController : BaseViewController {
         buyButton.backgroundColor = .crazeGreen
         buyButton.setTitle("product.buy".localized, for: .normal)
         buyButton.setTitleColor(.white, for: .normal)
+        buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
         scrollView.addSubview(buyButton)
         buyButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
         buyButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -170,6 +171,7 @@ class ProductViewController : BaseViewController {
         websiteButton.translatesAutoresizingMaskIntoConstraints = false
         websiteButton.setTitleColor(.crazeGreen, for: .normal)
         websiteButton.isHidden = true
+        websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
         scrollView.addSubview(websiteButton)
         websiteButton.topAnchor.constraint(equalTo: buyButton.bottomAnchor, constant: .padding).isActive = true
         websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -369,6 +371,14 @@ class ProductViewController : BaseViewController {
                 displayErrorItems()
             }
         }
+    }
+    
+    @objc fileprivate func buyButtonAction() {
+        // TODO:
+    }
+    
+    @objc fileprivate func pushMerchantURL() {
+        // TODO:
     }
 }
 
