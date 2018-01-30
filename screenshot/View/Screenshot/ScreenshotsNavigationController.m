@@ -120,18 +120,22 @@
     [self dismissPickerClipView];
     
     ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
-    picker.cancelButton.target = self;
-    picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
-    picker.doneButton.target = self;
-    picker.doneButton.action = @selector(pickerViewControllerDidFinish);
-    self.pickerNavigationController = picker;
+    [self attachActionsWithScreenshotPickerNavigationController:picker];
+    self.pickerNavigationController = picker; // ???: is this needed?
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+    [self presentViewController:picker animated:YES completion:nil];
     
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [AnalyticsTrackers.standard track:@"Opened Picker" properties:nil];
+}
+
+- (void)attachActionsWithScreenshotPickerNavigationController:(ScreenshotPickerNavigationController *)viewController {
+    viewController.cancelButton.target = self;
+    viewController.cancelButton.action = @selector(pickerViewControllerDidCancel);
+    viewController.doneButton.target = self;
+    viewController.doneButton.action = @selector(pickerViewControllerDidFinish);
 }
 
 - (void)pickerViewControllerDidCancel {
@@ -238,16 +242,6 @@
             self.clipView = nil;
         }];
     }
-}
-
-
-#pragma mark - Restoration
-
-- (void)restoreScreenshotPickerNavigationController:(ScreenshotPickerNavigationController *)controller {
-    controller.cancelButton.target = self;
-    controller.cancelButton.action = @selector(pickerViewControllerDidCancel);
-    controller.doneButton.target = self;
-    controller.doneButton.action = @selector(pickerViewControllerDidFinish);
 }
 
 @end

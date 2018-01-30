@@ -24,7 +24,6 @@
 @property (nonatomic, strong, readonly) ScreenshotsViewController *screenshotsViewController;
 
 - (void)presentPickerViewController;
-
-- (void)restoreScreenshotPickerNavigationController:(ScreenshotPickerNavigationController *)controller;
+- (void)attachActionsWithScreenshotPickerNavigationController:(ScreenshotPickerNavigationController *)viewController;
 
 @end

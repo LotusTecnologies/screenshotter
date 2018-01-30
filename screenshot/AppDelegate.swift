@@ -34,8 +34,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return MainTabBarController()
     }()
     
-    fileprivate var restorationViewControllers: [String : UIViewController] = [:]
-    
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
@@ -188,6 +186,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    // MARK: State Restoration
+    
+    fileprivate var restorationViewControllers: [String : UIViewController] = [:]
+    
     func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
         return true
     }
@@ -201,26 +203,70 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return nil
         }
         
-        // TODO: setup classes like this and connect all interactions
-        
-        if identifier == "ScreenshotsNavigationController" {
-            let vc = ScreenshotsNavigationController()
-            restorationViewControllers[identifier] = vc
-            return vc
-            
-        } else if identifier == "ScreenshotPickerNavigationController" {
-            let sn = restorationViewControllers["ScreenshotsNavigationController"] as! ScreenshotsNavigationController
-            let vc = ScreenshotPickerNavigationController(nibName: nil, bundle: nil)
-            sn.restore(vc)
-            restorationViewControllers[identifier] = vc
-            return vc
-            
-        } else if identifier == "ScreenshotPickerViewController" {
-            let vc = restorationViewControllers["ScreenshotPickerNavigationController"] as! ScreenshotPickerNavigationController
-            return vc.screenshotPickerViewController
+        // Shorter convenience function
+        func s(_ class: AnyClass) -> String {
+            return String(describing: `class`)
         }
         
-        return nil
+        let viewController: UIViewController?
+        
+        switch identifier {
+        case s(MainTabBarController.self):
+            viewController = mainTabBarController
+            
+        case s(ScreenshotsNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.screenshotsNavigationController
+            
+        case s(ScreenshotsViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.screenshotsViewController
+            
+        case s(FavoritesNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.favoritesNavigationController
+            
+        case s(FavoritesViewController.self):
+            guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.favoritesViewController
+            
+        case s(ScreenshotPickerNavigationController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            let pickerNavigationController = ScreenshotPickerNavigationController(nibName: nil, bundle: nil)
+            navigationController.attachActions(with: pickerNavigationController)
+            viewController = pickerNavigationController
+            
+        case s(ScreenshotPickerViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotPickerNavigationController.self)] as? ScreenshotPickerNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.screenshotPickerViewController
+            
+        default:
+            viewController = nil
+        }
+        
+        if viewController != nil {
+            restorationViewControllers[identifier] = viewController
+        }
+        
+        return viewController
     }
 }
 
