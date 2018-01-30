@@ -117,6 +117,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     });
     
     if (![DataModel sharedInstance].isCoreDataStackReady) {
+        // TODO: udpate
         UIView *loaderContainerView = [[UIView alloc] init];
         loaderContainerView.translatesAutoresizingMaskIntoConstraints = NO;
         loaderContainerView.backgroundColor = [UIColor yellowColor];

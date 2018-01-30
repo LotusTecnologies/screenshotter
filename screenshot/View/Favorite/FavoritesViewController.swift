@@ -79,6 +79,7 @@ class FavoritesViewController : BaseViewController {
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         if !DataModel.sharedInstance.isCoreDataStackReady {
+            // TODO: update
             let loaderContainerView = UIView()
             loaderContainerView.translatesAutoresizingMaskIntoConstraints = false
             loaderContainerView.backgroundColor = .yellow
