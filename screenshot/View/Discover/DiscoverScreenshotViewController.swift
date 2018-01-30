@@ -15,7 +15,7 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
 
 class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
-    fileprivate var matchstickFrc = DataModel.sharedInstance.matchstickFrc
+    fileprivate var matchstickFrc: NSFetchedResultsController<Matchstick>?
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
@@ -41,7 +41,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         addNavigationItemLogo()
         
-        DataModel.sharedInstance.matchstickFrcDelegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: NSNotification.Name(NotificationCenterKeys.coreDataStackCompleted), object: nil)
     }
     
     override func viewDidLoad() {
@@ -114,7 +114,12 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        if matchstickFrc.fetchedObjects?.count ?? 0 > 0 {
+        if DataModel.sharedInstance.isCoreDataStackReady {
+            DataModel.sharedInstance.matchstickFrcDelegate = self
+            matchstickFrc = DataModel.sharedInstance.matchstickFrc
+        }
+        
+        if matchstickFrc?.fetchedObjects?.count ?? 0 > 0 {
             isListEmpty = false
         }
     }
@@ -125,6 +130,15 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncEmptyListViews()
     }
     
+    func coreDataStackCompleted(_ notification: Notification) {
+        if let error = notification.userInfo?["error"] as? NSError {
+            print("DiscoverScreenshotViewController coreDataStackCompleted with error:\(error)")
+        } else {
+            DataModel.sharedInstance.matchstickFrcDelegate = self
+            matchstickFrc = DataModel.sharedInstance.matchstickFrc
+        }
+    }
+    
     deinit {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = nil
@@ -132,6 +146,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         collectionView.dataSource = nil
         collectionView.delegate = nil
+        
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: Matchstick
@@ -139,7 +155,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var pseudoMatchsticksCount = 0
     
     fileprivate func updateMatchsticksCount() {
-        pseudoMatchsticksCount = matchstickFrc.fetchedObjects?.count ?? 0
+        pseudoMatchsticksCount = matchstickFrc?.fetchedObjects?.count ?? 0
         
         if isListEmpty && pseudoMatchsticksCount > 0 {
             isListEmpty = false
@@ -155,7 +171,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return matchstickFrc.object(at: currentIndexPath)
+        return matchstickFrc?.object(at: currentIndexPath)
     }
     
     // MARK: Decision
@@ -262,7 +278,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc.fetchedObjects?.count == 1 {
+                if self.matchstickFrc?.fetchedObjects?.count == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }
@@ -428,9 +444,9 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
-            let matchstick = matchstickFrc.object(at: indexPath)
+            let matchstick = matchstickFrc?.object(at: indexPath)
             
-            if let imageData = matchstick.imageData as Data? {
+            if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
             }
         }
