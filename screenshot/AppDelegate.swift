@@ -46,6 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil)
         DataModel.setup() // Sets up Core Data stack on a background queue.
         
         
@@ -57,7 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
         
-        prepareDataStackCompletionIfNeeded()
         PermissionsManager.shared.fetchPushPermissionStatus()
         
         UIApplication.migrateUserDefaultsKeys()
@@ -355,30 +355,16 @@ extension AppDelegate {
         return viewController
     }
     
-    func prepareDataStackCompletionIfNeeded() {
-        func syncPhotos() {
+    func coreDataStackCompletionHandler(notification: Notification) {
+        if let error = notification.userInfo?["error"] as? NSError {
+            print("Core Data stack failed with error:\(error)")
+        } else {
             if ApplicationStateModel.sharedInstance.isBackground() {
+                print("AppDelegate coreDataStackCompletionHandler calling syncPhotos")
                 AssetSyncModel.sharedInstance.syncPhotos()
             } else {
+                print("AppDelegate coreDataStackCompletionHandler calling syncPhotosUponForeground")
                 AssetSyncModel.sharedInstance.syncPhotosUponForeground()
-            }
-        }
-        
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            if DataModel.sharedInstance.isCoreDataStackReady {
-                syncPhotos()
-                
-            } else {
-                DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    syncPhotos()
-                    
-                    let name = Notification.Name(NotificationCenterKeys.coreDataStackCompleted)
-                    NotificationCenter.default.post(name: name, object: nil, userInfo: nil)
-                }
-                
-                DataModel.sharedInstance.coreDataStackFailureHandler = {
-                    print("Core Data stack failed")
-                }
             }
         }
     }
@@ -406,8 +392,6 @@ extension AppDelegate {
 extension AppDelegate: TutorialViewControllerDelegate {
     func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
-        
-        prepareDataStackCompletionIfNeeded()
         
         // Create a delay for a more natural feel after taking the screenshot
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
