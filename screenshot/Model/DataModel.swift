@@ -45,7 +45,11 @@ class DataModel: NSObject {
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
                 print("loadPersistentStores error:\(error)")
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["error" : error])
+                // Must async, or lazy eval closure called infinitely. Might as well async to main, as most handlers are there.
+                // See https://medium.com/@soapyfrog/dont-forget-that-none-of-this-is-thread-safe-so-it-is-actually-possible-for-the-lazy-eval-closure-add1c9b1dd95
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["error" : error])
+                }
             } else {
                 container.viewContext.automaticallyMergesChangesFromParent = true
                 self.isCoreDataStackReady = true
@@ -54,7 +58,10 @@ class DataModel: NSObject {
                     self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: container)
                     UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                 }
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["success" : true])
+                // See above about lazy eval closure called infinitely if notification not asynced.
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["success" : true])
+                }
                 MatchstickModel.shared.prepareMatchsticks()
             }
         }

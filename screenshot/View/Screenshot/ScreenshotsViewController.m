@@ -169,22 +169,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)coreDataStackCompleted:(NSNotification *)notification {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSError *error = notification.userInfo[@"error"];
-        if (error != nil) {
-            NSLog(@"ScreenshotsViewController coreDataStackCompleted with error:%@", error);
-        } else {
-            NSLog(@"ScreenshotsViewController coreDataStackCompleted successfully");
-            [DataModel sharedInstance].screenshotFrcDelegate = self;
-            self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
-            
-            [self.collectionView reloadData];
-            [self syncHelperViewVisibility];
-            
-            [self.loaderContainerView removeFromSuperview];
-            self.loaderContainerView = nil;
-        }
-    });
+    NSError *error = notification.userInfo[@"error"];
+    if (error != nil) {
+        NSLog(@"ScreenshotsViewController coreDataStackCompleted with error:%@", error);
+    } else {
+        NSLog(@"ScreenshotsViewController coreDataStackCompleted successfully");
+        [DataModel sharedInstance].screenshotFrcDelegate = self;
+        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+        
+        [self.collectionView reloadData];
+        [self syncHelperViewVisibility];
+        
+        [self.loaderContainerView removeFromSuperview];
+        self.loaderContainerView = nil;
+    }
 }
         
 - (void)dealloc {
