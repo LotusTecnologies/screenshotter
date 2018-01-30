@@ -203,6 +203,41 @@ class NetworkingPromise: NSObject {
         }
     }
     
+    static func nextMatchsticks() -> Promise<NSDictionary> {
+        let syncTokenParam: String
+        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
+          !matchsticksSyncToken.isEmpty {
+            syncTokenParam = "?start=\(matchsticksSyncToken)"
+        } else {
+            syncTokenParam = ""
+        }
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
+            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            return Promise(error: error)
+        }
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 30
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
+        return promise
+    }
+    
+    static func downloadImageData(urlString: String) -> Promise<Data> {
+        guard let url = URL(string: urlString) else {
+            let error = NSError(domain: "Craze", code: 25, userInfo: [NSLocalizedDescriptionKey: "Cannot form image url:\(urlString)"])
+            return Promise(error: error)
+        }
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 26, userInfo: [NSLocalizedDescriptionKey: "downloadImageData invalid http statusCode for urlString:\(urlString)"])
+                    print("downloadImageData httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            return Promise(value: data)
+        }
+    }
+    
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
     static func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "push-subscribe") else {
@@ -331,6 +366,57 @@ class NetworkingPromise: NSObject {
             }
             
             task.resume()
+        }
+    }
+    
+    static func closePreviousIntercomConversations(for user:AnalyticsUser?) -> Promise<Bool> {
+        let email = user?.email ?? UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+        let userID = user?.identifier ?? ""
+
+        guard let json:[String : String]? = (email?.count ?? 0) > 0 ? ["email": email!] : (userID.count > 0) ? ["userId": userID] : nil else {
+            let error = NSError(domain: "com.crazeapp.error", code: 100, userInfo: [NSLocalizedDescriptionKey : "Couldn't construct JSON!"])
+            return Promise(error: error)
+        }
+        
+        var body: Data!
+        do {
+            body = try JSONEncoder().encode(json)
+        } catch {
+            return Promise(error: error)
+        }
+        
+        var request = URLRequest(url: URL(string: Constants.screenShotLambdaDomain)!.appendingPathComponent("intercom/closeOldConversations"))
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("\(body.count)", forHTTPHeaderField: "Content-Length")
+        request.httpBody = body
+        
+        let promise: URLDataPromise = URLSession.shared.dataTask(with: request)
+        return promise.asDataAndResponse()
+            .then { data, response in
+            let invalidStatus = ((response as? HTTPURLResponse)?.statusCode ?? 0) >= 400
+            
+            if invalidStatus {
+                let error = NSError(domain: "com.crazeapp.intercom.invalid-status-code", code: 100, userInfo: [NSLocalizedDescriptionKey : "Invalid status code"])
+                return Promise(error: error)
+            }
+            
+            var dictionary: [String: Bool]!
+            
+            do {
+                dictionary = try JSONDecoder().decode([String: Bool].self, from: data)
+            } catch {
+                // Process errors
+                if let errorsJSON = try? JSONDecoder().decode([String: [[String:String]]].self, from: data), let errors = errorsJSON["error"] {
+                    let errorMessage = errors.flatMap { $0["message"] }.reduce("") { $0 + ", " + $1 }
+                    let nsError = NSError(domain: "com.crazeapp.intercom-error", code: 100, userInfo: [NSLocalizedDescriptionKey : errorMessage])
+                    return Promise(error: nsError)
+                }
+                
+                return Promise(error: error)
+            }
+            
+            return Promise(value: dictionary["ok"] ?? false)
         }
     }
 }

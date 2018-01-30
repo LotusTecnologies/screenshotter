@@ -232,7 +232,7 @@ extension ScreenshotNotificationCollectionViewCell {
         }
         
         let contentWidth = width - shadowInsets.left - mainViewLayoutMargins.left - iconWidth - mainViewLayoutMargins.left - mainViewLayoutMargins.right - shadowInsets.right
-        let constraintRect = CGSize(width: CGFloat(contentWidth), height: .greatestFiniteMagnitude)
+        let constraintRect = CGSize(width: contentWidth, height: .greatestFiniteMagnitude)
         
         let boundingBox = string.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
         

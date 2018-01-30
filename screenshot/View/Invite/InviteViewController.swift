@@ -9,11 +9,9 @@
 import Foundation
 import GoogleSignIn
 import Firebase
-import FBSDKShareKit
 
 class InviteViewController: BaseViewController, GIDSignInUIDelegate {
     fileprivate let googleButton = MainButton()
-    fileprivate let facebookButton = MainButton()
     
     // MARK: Life Cycle
     
@@ -39,16 +37,6 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding).isActive = true
         NSLayoutConstraint(item: containerView, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1.1, constant: 0).isActive = true
         
-        facebookButton.translatesAutoresizingMaskIntoConstraints = false
-        facebookButton.backgroundColor = UIColor(red: 60/255, green: 90/255, blue: 150/255, alpha: 1)
-        facebookButton.setTitle("invite.facebook".localized, for: .normal)
-        facebookButton.setImage(UIImage(named: "InviteFacebookIcon"), for: .normal)
-        facebookButton.addTarget(self, action: #selector(presentFacebookInvite), for: .touchUpInside)
-        containerView.addSubview(facebookButton)
-        facebookButton.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
-        facebookButton.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
-        facebookButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
-        
         googleButton.translatesAutoresizingMaskIntoConstraints = false
         googleButton.backgroundColor = .white
         googleButton.setTitleColor(.black, for: .normal)
@@ -57,8 +45,7 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
         googleButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
         containerView.addSubview(googleButton)
         googleButton.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
-        googleButton.topAnchor.constraint(equalTo: facebookButton.bottomAnchor, constant: extendedPadding).isActive = true
-        googleButton.widthAnchor.constraint(equalTo: facebookButton.widthAnchor).isActive = true
+        googleButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: extendedPadding).isActive = true
         googleButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         
         let separator = UIView()
@@ -119,18 +106,6 @@ class InviteViewController: BaseViewController, GIDSignInUIDelegate {
             invite.setCustomImage("https://static.crazeapp.com/screenshop-icon-500.png")
             invite.open()
         }
-    }
-    
-    // MARK: Facebook
-    
-    func presentFacebookInvite() {
-        // https://developers.facebook.com/quickstarts/1960379067541863/?platform=app-links-host
-        
-        let content = FBSDKAppInviteContent()
-        content.appLinkURL = URL(string: "https://fb.me/1992192421027194")
-        content.appInvitePreviewImageURL = URL(string: "https://static.crazeapp.com/screenshop-logo-1200x628.png")
-        
-        FBSDKAppInviteDialog.show(from: self, with: content, delegate: self)
     }
     
     // MARK: Share
@@ -205,17 +180,3 @@ extension InviteViewController: InviteDelegate {
     }
 }
 
-extension InviteViewController: FBSDKAppInviteDialogDelegate {
-    func appInviteDialog(_ appInviteDialog: FBSDKAppInviteDialog!, didCompleteWithResults results: [AnyHashable : Any]!) {
-        if let results = results, results.count > 0 {
-            AnalyticsTrackers.standard.track("Facebook Invite", properties: ["Sent": results])
-            
-        } else {
-            AnalyticsTrackers.standard.track("Facebook Invite Cancelled")
-        }
-    }
-    
-    func appInviteDialog(_ appInviteDialog: FBSDKAppInviteDialog!, didFailWithError error: Error!) {
-        AnalyticsTrackers.standard.track("Facebook Invite", properties: ["Error": error.localizedDescription])
-    }
-}

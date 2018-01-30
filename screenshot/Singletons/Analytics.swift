@@ -205,9 +205,7 @@ extension AnalyticsTracker {
     }
     
     func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
-        let favoriteEvent = favorited ? "Product favorited" : "Product unfavorited"
-        
-        track(favoriteEvent, properties: [
+        let properties = [
             "screenshot" : product.shoppable?.screenshot?.uploadedImageURL ?? "",
             "merchant": product.merchant ?? "",
             "brand": product.brand ?? "",
@@ -215,7 +213,12 @@ extension AnalyticsTracker {
             "imageUrl": product.imageURL ?? "",
             "price": product.price ?? "0",
             "page": page
-        ])
+        ]
+        if favorited {
+            track("Product favorited", properties: properties)
+        } else {
+            track("Product unfavorited", properties: properties)
+        }
         
         let value = favorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo
         FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: value])

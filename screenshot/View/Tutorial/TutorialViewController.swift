@@ -88,7 +88,7 @@ class TutorialViewController : UIViewController {
     
     func contentSizeCategoryDidChange(_ notification: Notification) {
         slides.forEach { slide in
-            slide.layoutMargins = slideLayoutMargins
+            slide.layoutMargins = slideLayoutMargins(slide)
         }
     }
     
@@ -141,7 +141,7 @@ class TutorialViewController : UIViewController {
     private func prepareSlideViews() {
         slides.enumerated().forEach { i, slide in
             slide.translatesAutoresizingMaskIntoConstraints = false
-            slide.layoutMargins = slideLayoutMargins
+            slide.layoutMargins = slideLayoutMargins(slide)
             contentView.addSubview(slide)
             slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
             slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
@@ -161,7 +161,7 @@ class TutorialViewController : UIViewController {
         }
     }
     
-    private var slideLayoutMargins: UIEdgeInsets {
+    private func slideLayoutMargins(_ slide: TutorialSlideView) -> UIEdgeInsets {
         var extraTop = CGFloat(0)
         var extraBottom = CGFloat(0)
         
@@ -176,7 +176,22 @@ class TutorialViewController : UIViewController {
             }
         }
         
-        return UIEdgeInsets(top: .padding + extraTop, left: .padding, bottom: .padding + extraBottom, right: .padding)
+        var paddingX: CGFloat = .padding
+        
+        if slide.isKind(of: TutorialTrySlideView.self) {
+            // TODO: when supporting localization, this should be if isEnglish
+            // Only customize insets for default font size
+            if UIApplication.shared.preferredContentSizeCategory == UIContentSizeCategory.large {
+                if UIDevice.is375w {
+                    paddingX = 30
+                    
+                } else if UIDevice.is414w {
+                    paddingX = 45
+                }
+            }
+        }
+        
+        return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
     }
     
     // MARK: - Video
@@ -213,14 +228,14 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
     }
     
     func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
     }
     
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView) {
-        if let vc = TutorialEmailSlideView.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-            present(vc, animated: true, completion: nil)
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+            present(viewController, animated: true, completion: nil)
         }
     }
     

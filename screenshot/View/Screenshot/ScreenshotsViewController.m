@@ -46,6 +46,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(coreDataStackCompleted:) name:[NotificationCenterKeys coreDataStackCompleted] object:nil];
         
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
@@ -158,6 +159,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
+    if (self.view.window && [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
+        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
+    }
+}
+
 - (void)coreDataStackCompleted:(NSNotification *)notification {
     if (!self.screenshotFrc) {
         [DataModel sharedInstance].screenshotFrcDelegate = self;
@@ -170,7 +177,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         self.loaderContainerView = nil;
     }
 }
-
+        
 - (void)dealloc {
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
@@ -558,7 +565,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)helperViewAllowAccessAction {
-    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:nil];
+    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:^(BOOL granted) {
+        [self syncHelperViewVisibility];
+    }];
 }
 
 

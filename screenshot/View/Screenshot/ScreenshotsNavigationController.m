@@ -12,12 +12,9 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
-@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, ProductsViewControllerDelegate, NetworkingIndicatorProtocol>
+@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
-@property (nonatomic, strong) WebViewController *webViewController;
-@property (nonatomic, strong) FavoriteButton *webViewFavoriteButton;
-@property (nonatomic, strong) Product *webViewProduct;
 @property (nonatomic, strong) ClipView *clipView;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
@@ -83,20 +80,6 @@
     self.previousDidAppearViewControllerClass = [viewController class];
 }
 
-- (void)viewController:(UIViewController *)viewController willDisappear:(BOOL)animated {
-    if (viewController == self.webViewController && [self.topViewController isKindOfClass:[ProductsViewController class]]) {
-        ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
-        NSInteger index = [productsViewController indexForProduct:self.webViewProduct];
-        [productsViewController reloadProductCellAtIndex:index];
-    }
-}
-
-- (void)viewController:(UIViewController *)viewController didDisappear:(BOOL)animated {
-    if (viewController == self.webViewController && ![self.viewControllers containsObject:viewController]) {
-        self.webViewProduct = nil;
-    }
-}
-
 
 #pragma mark - Screenshots
 
@@ -104,7 +87,6 @@
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     
     ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
-    productsViewController.delegate = self;
     productsViewController.lifeCycleDelegate = self;
     productsViewController.hidesBottomBarWhenPushed = YES;
     productsViewController.screenshot = screenshot;
@@ -125,27 +107,6 @@
 
 - (void)screenshotsViewControllerWantsToPresentPicker:(ScreenshotsViewController *)viewController {
     [self presentPickerViewController];
-}
-
-
-#pragma mark - Products
-
-- (void)productsViewController:(ProductsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (![self.topViewController isKindOfClass:[WebViewController class]]) {
-        self.webViewProduct = [viewController productAtIndex:indexPath.item];
-        
-        self.webViewFavoriteButton.selected = self.webViewProduct.isFavorite;
-        
-        [self.webViewController rebaseURL:[NSURL URLWithString:self.webViewProduct.offer]];
-        [self pushViewController:self.webViewController animated:YES];
-    }
-}
-
-- (void)productWebViewFavoriteAction:(UIButton *)button {
-    BOOL isFavorited = [button isSelected];
-    
-    [self.webViewProduct setFavoritedToFavorited:isFavorited];
-    [AnalyticsTrackerObjCBridge trackFavoritedProductWithTracker:AnalyticsTrackers.standard favorited:isFavorited product:self.webViewProduct onPage:@"Product Web View"];
 }
 
 
@@ -213,32 +174,6 @@
     
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedPushAlert];
     [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-
-#pragma mark - Web View
-
-- (WebViewController *)webViewController {
-    if (!_webViewController) {
-        WebViewController *webViewController = [[WebViewController alloc] init];
-        webViewController.lifeCycleDelegate = self;
-        [webViewController addNavigationItemLogo];
-        webViewController.hidesBottomBarWhenPushed = YES;
-        webViewController.loaderLabelText = @"Loading your store...";
-        webViewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.webViewFavoriteButton];
-        _webViewController = webViewController;
-    }
-    return _webViewController;
-}
-
-- (FavoriteButton *)webViewFavoriteButton {
-    if (!_webViewFavoriteButton) {
-        FavoriteButton *button = [[FavoriteButton alloc] init];
-        [button addTarget:self action:@selector(productWebViewFavoriteAction:) forControlEvents:UIControlEventTouchUpInside];
-        [button sizeToFit];
-        _webViewFavoriteButton = button;
-    }
-    return _webViewFavoriteButton;
 }
 
 
