@@ -118,8 +118,8 @@
 "screenshot.option.share" = "SHARE";
 "screenshot.option.delete" = "DELETE";
 "screenshot.permission.allow" = "Allow Access";
-"screenshot.permission.detail" = "Allow CRAZE to access your screenshots to start shopping!";
-"screenshot.permission.title" = "Shop With CRAZE";
+"screenshot.permission.detail" = "Allow Screenshop to access your screenshots to start shopping!";
+"screenshot.permission.title" = "Shop With Screenshop";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
