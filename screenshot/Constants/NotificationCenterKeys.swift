@@ -10,7 +10,5 @@ import Foundation
 
 class NotificationCenterKeys : NSObject {
     static let fetchedAppSettings = "FetchedAppSettings"
-    
-    /// Will be called from a background thread.
     static let coreDataStackCompleted = "CoreDataStackCompleted"
 }
