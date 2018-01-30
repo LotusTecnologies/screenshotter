@@ -228,6 +228,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = navigationController.screenshotsViewController
             
+        case s(ProductsViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.createProductsViewController()
+            
         case s(FavoritesNavigationController.self):
             guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
                 return nil
@@ -247,9 +254,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return nil
             }
             
-            let pickerNavigationController = ScreenshotPickerNavigationController(nibName: nil, bundle: nil)
-            navigationController.attachActions(with: pickerNavigationController)
-            viewController = pickerNavigationController
+            viewController = navigationController.createScreenshotPickerNavigationController()
             
         case s(ScreenshotPickerViewController.self):
             guard let navigationController = restorationViewControllers[s(ScreenshotPickerNavigationController.self)] as? ScreenshotPickerNavigationController else {
@@ -372,8 +377,14 @@ extension AppDelegate {
                 DataModel.sharedInstance.coreDataStackCompletionHandler = {
                     syncPhotos()
                     
-                    let name = Notification.Name(NotificationCenterKeys.coreDataStackCompleted)
-                    NotificationCenter.default.post(name: name, object: nil, userInfo: nil)
+//                    let name = Notification.Name(NotificationCenterKeys.coreDataStackCompleted)
+//                    NotificationCenter.default.post(name: name, object: nil, userInfo: nil)
+                    
+                    // !!!: DEBUG
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                        let name = Notification.Name(NotificationCenterKeys.coreDataStackCompleted)
+                        NotificationCenter.default.post(name: name, object: nil, userInfo: nil)
+                    })
                 }
                 
                 DataModel.sharedInstance.coreDataStackFailureHandler = {

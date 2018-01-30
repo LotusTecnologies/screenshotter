@@ -61,14 +61,18 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.restorationIdentifier = NSStringFromClass([self class]);
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
         _productsOptions = [[ProductsOptions alloc] init];
         self.productsOptions.delegate = self;
-        
-        self.title = @"Products";
     }
     return self;
+}
+
+- (NSString *)title {
+    return @"Products";
 }
 
 - (void)viewDidLoad {

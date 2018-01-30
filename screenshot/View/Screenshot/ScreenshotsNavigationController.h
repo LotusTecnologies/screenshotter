@@ -11,6 +11,7 @@
 
 @class ScreenshotsNavigationController;
 @class ScreenshotPickerNavigationController;
+@class ProductsViewController;
 
 @protocol ScreenshotsNavigationControllerDelegate
 
@@ -23,7 +24,9 @@
 @property (nonatomic, weak) id<ScreenshotsNavigationControllerDelegate> screenshotsNavigationControllerDelegate;
 @property (nonatomic, strong, readonly) ScreenshotsViewController *screenshotsViewController;
 
+- (ScreenshotPickerNavigationController *)createScreenshotPickerNavigationController;
 - (void)presentPickerViewController;
-- (void)attachActionsWithScreenshotPickerNavigationController:(ScreenshotPickerNavigationController *)viewController;
+
+- (ProductsViewController *)createProductsViewController;
 
 @end

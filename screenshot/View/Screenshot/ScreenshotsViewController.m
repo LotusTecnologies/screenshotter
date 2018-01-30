@@ -377,6 +377,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     return [self.screenshotFrc objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
 }
 
+- (NSInteger)indexForScreenshot:(Screenshot *)screenshot {
+    return [self.screenshotFrc indexPathForObject:screenshot].item;
+}
+
 - (void)scrollToTop {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
