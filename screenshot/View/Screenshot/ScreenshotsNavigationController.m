@@ -69,6 +69,8 @@
 
 - (void)dealloc {
     [AssetSyncModel sharedInstance].networkingIndicatorDelegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
