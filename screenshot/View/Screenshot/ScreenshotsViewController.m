@@ -126,6 +126,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [loaderContainerView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
         [loaderContainerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         self.loaderContainerView = loaderContainerView;
+    } else {
+        [DataModel sharedInstance].screenshotFrcDelegate = self;
+        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
     }
 }
 
@@ -166,16 +169,22 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)coreDataStackCompleted:(NSNotification *)notification {
-    if (!self.screenshotFrc) {
-        [DataModel sharedInstance].screenshotFrcDelegate = self;
-        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
-        
-        [self.collectionView reloadData];
-        [self syncHelperViewVisibility];
-        
-        [self.loaderContainerView removeFromSuperview];
-        self.loaderContainerView = nil;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSError *error = notification.userInfo[@"error"];
+        if (error != nil) {
+            NSLog(@"ScreenshotsViewController coreDataStackCompleted with error:%@", error);
+        } else {
+            NSLog(@"ScreenshotsViewController coreDataStackCompleted successfully");
+            [DataModel sharedInstance].screenshotFrcDelegate = self;
+            self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+            
+            [self.collectionView reloadData];
+            [self syncHelperViewVisibility];
+            
+            [self.loaderContainerView removeFromSuperview];
+            self.loaderContainerView = nil;
+        }
+    });
 }
         
 - (void)dealloc {
