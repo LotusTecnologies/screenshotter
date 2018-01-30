@@ -88,6 +88,9 @@ class FavoritesViewController : BaseViewController {
             loaderContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
             loaderContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
             self.loaderContainerView = loaderContainerView
+        } else {
+            DataModel.sharedInstance.favoriteFrcDelegate = self
+            favoriteFrc = DataModel.sharedInstance.favoriteFrc
         }
     }
     
@@ -116,10 +119,6 @@ class FavoritesViewController : BaseViewController {
     }
     
     @objc fileprivate func coreDataStackCompleted(_ notification: Notification) {
-        guard favoriteFrc == nil else {
-            return
-        }
-        
         DataModel.sharedInstance.favoriteFrcDelegate = self
         favoriteFrc = DataModel.sharedInstance.favoriteFrc
         
