@@ -31,10 +31,18 @@ class CoreDataPreparationController : NSObject {
             self.delegate?.coreDataPreparationControllerSetup(self)
         }
         else {
-            let loader = UIView()
-            loader.backgroundColor = .green // TODO:
-            self.loader = loader
-            self.delegate?.coreDataPreparationController(self, presentLoader: loader)
+            let loaderContainer = UIView()
+            loaderContainer.backgroundColor = .background
+            self.loader = loaderContainer
+            
+            let loader = Loader()
+            loader.translatesAutoresizingMaskIntoConstraints = false
+            loader.startAnimation()
+            loaderContainer.addSubview(loader)
+            loader.centerXAnchor.constraint(equalTo: loaderContainer.centerXAnchor).isActive = true
+            loader.centerYAnchor.constraint(equalTo: loaderContainer.centerYAnchor).isActive = true
+            
+            self.delegate?.coreDataPreparationController(self, presentLoader: loaderContainer)
         }
     }
     
