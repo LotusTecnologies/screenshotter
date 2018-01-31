@@ -277,15 +277,23 @@ class DiscoverScreenshotViewController : BaseViewController {
             
             if abs(decisionValueThreshold) >= 1 {
                 if decisionValueThreshold > 0 {
-                    decidedToAdd()
-                    AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
+                    AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+                        "by": "swipe",
+                        "url": currentMatchstick?.imageUrl ?? ""
+                        ])
                     
-                } else {
-                    decidedToPass()
-                    AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
+                    decidedToAdd()
                 }
-                
-            } else {
+                else {
+                    AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
+                        "by": "swipe",
+                        "url": currentMatchstick?.imageUrl ?? ""
+                        ])
+                    
+                    decidedToPass()
+                }
+            }
+            else {
                 UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                     self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
                     self.postDecision()
@@ -298,13 +306,21 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func passButtonAction() {
+        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
+            "by": "tap",
+            "url": currentMatchstick?.imageUrl ?? ""
+            ])
+        
         decidedToPass()
-        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "tap"])
     }
     
     @objc fileprivate func addButtonAction() {
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+            "by": "tap",
+            "url": currentMatchstick?.imageUrl ?? ""
+            ])
+        
         decidedToAdd()
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
     }
     
     // MARK: Helper View
@@ -452,11 +468,13 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
-        
-        // TODO: ask caras how he wants these analytics set up
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+            "by": "open",
+            "url": currentMatchstick?.imageUrl ?? ""
+            ])
         AnalyticsTrackers.standard.track("Matchsticks Opened Screenshot")
+        
+        delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
     }
 }
 
