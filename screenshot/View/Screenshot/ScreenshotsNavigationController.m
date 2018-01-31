@@ -58,12 +58,15 @@
 
 - (void)coreDataStackCompleted:(NSNotification *)notification {
     if (self.restoredScreenshotNumber) {
-        ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
-        
-        if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
-            productsViewController.screenshot = [self.screenshotsViewController screenshotAtIndex:self.restoredScreenshotNumber.integerValue];
-            self.restoredScreenshotNumber = nil;
-        }
+        // Dispatch async to allow other listening objects to first do their setup
+        dispatch_async(dispatch_get_main_queue(), ^{
+            ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
+            
+            if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
+                productsViewController.screenshot = [self.screenshotsViewController screenshotAtIndex:self.restoredScreenshotNumber.integerValue];
+                self.restoredScreenshotNumber = nil;
+            }
+        });
     }
 }
 
@@ -276,6 +279,7 @@
     ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
     
     if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
+        // TODO: its possible for the index to change across sessions. use the screenshot id.
         NSInteger index = [self.screenshotsViewController indexForScreenshot:productsViewController.screenshot];
         [coder encodeInteger:index forKey:@"screenshotIndex"];
     }
@@ -287,19 +291,6 @@
     self.restoredScreenshotNumber = @([coder decodeIntegerForKey:@"screenshotIndex"]);
     
     [super decodeRestorableStateWithCoder:coder];
-}
-
-- (void)applicationFinishedRestoringState {
-    [super applicationFinishedRestoringState];
-    
-//    if (self.restoredScreenshotNumber) {
-//        ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
-//
-//        if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
-//            productsViewController.screenshot = [self.screenshotsViewController screenshotAtIndex:self.restoredScreenshotNumber.integerValue];
-//            self.restoredScreenshotNumber = nil;
-//        }
-//    }
 }
 
 @end

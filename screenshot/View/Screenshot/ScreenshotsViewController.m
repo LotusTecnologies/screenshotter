@@ -16,14 +16,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionImage
 };
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol, CoreDataPreparationControllerDelegate>
+
+@property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
-@property (nonatomic, strong) UIView *loaderContainerView;
 
 @property (nonatomic, strong) NSDate *lastVisited;
 
@@ -47,7 +48,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(coreDataStackCompleted:) name:[NotificationCenterKeys coreDataStackCompleted] object:nil];
+        
+        _coreDataPreparationController = [[CoreDataPreparationController alloc] init];
+        self.coreDataPreparationController.delegate = self;
         
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
@@ -116,21 +119,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         helperView;
     });
     
-    if (![DataModel sharedInstance].isCoreDataStackReady) {
-        // TODO: udpate
-        UIView *loaderContainerView = [[UIView alloc] init];
-        loaderContainerView.translatesAutoresizingMaskIntoConstraints = NO;
-        loaderContainerView.backgroundColor = [UIColor yellowColor];
-        [self.view addSubview:loaderContainerView];
-        [loaderContainerView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        [loaderContainerView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [loaderContainerView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        [loaderContainerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        self.loaderContainerView = loaderContainerView;
-    } else {
-        [DataModel sharedInstance].screenshotFrcDelegate = self;
-        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
-    }
+    [self.coreDataPreparationController viewDidLoad];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -169,24 +158,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
 }
 
-- (void)coreDataStackCompleted:(NSNotification *)notification {
-    NSError *error = notification.userInfo[@"error"];
-    if (error != nil) {
-        NSLog(@"ScreenshotsViewController coreDataStackCompleted with error:%@", error);
-    } else {
-        NSLog(@"ScreenshotsViewController coreDataStackCompleted successfully");
-        [DataModel sharedInstance].screenshotFrcDelegate = self;
-        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
-        
-        [self.collectionView reloadData];
-        [self syncHelperViewVisibility];
-        
-        [self.loaderContainerView removeFromSuperview];
-        self.loaderContainerView = nil;
-    }
-}
-        
 - (void)dealloc {
+    self.coreDataPreparationController.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     
@@ -516,10 +489,37 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)refreshControlAction:(UIRefreshControl *)refreshControl {
     if ([refreshControl isRefreshing]) {
+        // This is for show.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [refreshControl endRefreshing];
         });
     }
+}
+
+
+#pragma mark - Core Data Preparation
+
+- (void)coreDataPreparationControllerSetup:(CoreDataPreparationController *)controller {
+    [DataModel sharedInstance].screenshotFrcDelegate = self;
+    self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+    
+    if ([DataModel sharedInstance].isCoreDataStackReady) {
+        [self.collectionView reloadData];
+        [self syncHelperViewVisibility];
+    }
+}
+
+- (void)coreDataPreparationController:(CoreDataPreparationController *)controller presentLoader:(UIView *)loader {
+    loader.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:loader];
+    [loader.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    [loader.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [loader.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [loader.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+}
+
+- (void)coreDataPreparationController:(CoreDataPreparationController *)controller dismissLoader:(UIView *)loader {
+    [loader removeFromSuperview];
 }
 
 

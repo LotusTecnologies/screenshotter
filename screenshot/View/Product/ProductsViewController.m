@@ -150,20 +150,22 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
-    [self syncScreenshotRelatedObjects];
-    
     if (!self.shoppablesController) {
         self.state = ProductsViewControllerStateLoading;
     }
-    else if ([self.shoppablesController shoppableCount] == -1) {
-        // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
-        // rateView and scrollRevealController can all be lazy loaded. They dont
-        // need to exist if this condition is true.
-        self.state = ProductsViewControllerStateRetry;
-        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
-    }
     else {
-        [self reloadProductsForShoppableAtIndex:0];
+        [self syncScreenshotRelatedObjects];
+        
+        if ([self.shoppablesController shoppableCount] == -1) {
+            // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
+            // rateView and scrollRevealController can all be lazy loaded. They dont
+            // need to exist if this condition is true.
+            self.state = ProductsViewControllerStateRetry;
+            [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+        }
+        else {
+            [self reloadProductsForShoppableAtIndex:0];
+        }
     }
 }
 
@@ -308,8 +310,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         barButtonItem;
     });
     
-    self.shoppablesToolbar.screenshotImage = self.image;
     self.shoppablesToolbar.shoppablesController = self.shoppablesController;
+    self.shoppablesToolbar.screenshotImage = self.image;
 }
 
 - (void)displayScreenshotAction {

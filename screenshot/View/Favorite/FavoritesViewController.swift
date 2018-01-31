@@ -16,9 +16,9 @@ protocol FavoritesViewControllerDelegate : NSObjectProtocol {
 class FavoritesViewController : BaseViewController {
     weak var delegate: FavoritesViewControllerDelegate?
     
+    fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let tableView = UITableView()
     private let helperView = HelperView()
-    private var loaderContainerView: UIView?
     
     fileprivate var favoriteFrc: NSFetchedResultsController<Screenshot>?
     
@@ -42,7 +42,7 @@ class FavoritesViewController : BaseViewController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: NSNotification.Name(NotificationCenterKeys.coreDataStackCompleted), object: nil)
+        coreDataPreparationController.delegate = self
         
         addNavigationItemLogo()
     }
@@ -78,21 +78,7 @@ class FavoritesViewController : BaseViewController {
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        if !DataModel.sharedInstance.isCoreDataStackReady {
-            // TODO: update
-            let loaderContainerView = UIView()
-            loaderContainerView.translatesAutoresizingMaskIntoConstraints = false
-            loaderContainerView.backgroundColor = .yellow
-            view.addSubview(loaderContainerView)
-            loaderContainerView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            loaderContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            loaderContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-            loaderContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            self.loaderContainerView = loaderContainerView
-        } else {
-            DataModel.sharedInstance.favoriteFrcDelegate = self
-            favoriteFrc = DataModel.sharedInstance.favoriteFrc
-        }
+        coreDataPreparationController.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -119,22 +105,10 @@ class FavoritesViewController : BaseViewController {
         isViewWillAppear = false
     }
     
-    @objc fileprivate func coreDataStackCompleted(_ notification: Notification) {
-        DataModel.sharedInstance.favoriteFrcDelegate = self
-        favoriteFrc = DataModel.sharedInstance.favoriteFrc
-        
-        tableView.reloadData()
-        syncHelperViewVisibility()
-        
-        loaderContainerView?.removeFromSuperview()
-        loaderContainerView = nil
-    }
-    
     deinit {
+        coreDataPreparationController.delegate = nil
         tableView.delegate = nil
         tableView.dataSource = nil
-        
-        NotificationCenter.default.removeObserver(self)
         
         DataModel.sharedInstance.favoriteFrcDelegate = nil
     }
@@ -315,6 +289,31 @@ extension FavoritesViewController : UITableViewDataSource {
 extension FavoritesViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.favoritesViewController(self, didSelectItemAt: indexPath)
+    }
+}
+
+extension FavoritesViewController : CoreDataPreparationControllerDelegate {
+    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
+        DataModel.sharedInstance.favoriteFrcDelegate = self
+        favoriteFrc = DataModel.sharedInstance.favoriteFrc
+        
+        if DataModel.sharedInstance.isCoreDataStackReady {
+            tableView.reloadData()
+            syncHelperViewVisibility()
+        }
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loader)
+        loader.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        loader.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        loader.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        loader.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
+        loader.removeFromSuperview()
     }
 }
 

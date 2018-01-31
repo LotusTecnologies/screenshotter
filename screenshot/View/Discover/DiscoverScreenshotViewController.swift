@@ -14,6 +14,7 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
 }
 
 class DiscoverScreenshotViewController : BaseViewController {
+    fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: NSFetchedResultsController<Matchstick>?
     fileprivate let passButton = UIButton()
@@ -41,7 +42,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         addNavigationItemLogo()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: NSNotification.Name(NotificationCenterKeys.coreDataStackCompleted), object: nil)
+        coreDataPreparationController.delegate = self
     }
     
     override func viewDidLoad() {
@@ -114,10 +115,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        if DataModel.sharedInstance.isCoreDataStackReady {
-            DataModel.sharedInstance.matchstickFrcDelegate = self
-            matchstickFrc = DataModel.sharedInstance.matchstickFrc
-        }
+        coreDataPreparationController.viewDidLoad()
         
         if matchstickFrc?.fetchedObjects?.count ?? 0 > 0 {
             isListEmpty = false
@@ -130,24 +128,15 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncEmptyListViews()
     }
     
-    func coreDataStackCompleted(_ notification: Notification) {
-        if let error = notification.userInfo?["error"] as? NSError {
-            print("DiscoverScreenshotViewController coreDataStackCompleted with error:\(error)")
-        } else {
-            DataModel.sharedInstance.matchstickFrcDelegate = self
-            matchstickFrc = DataModel.sharedInstance.matchstickFrc
-        }
-    }
-    
     deinit {
+        coreDataPreparationController.delegate = nil
+        
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = nil
         }
         
         collectionView.dataSource = nil
         collectionView.delegate = nil
-        
-        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: Matchstick
@@ -473,6 +462,26 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
         // TODO: ask caras how he wants these analytics set up
         AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
         AnalyticsTrackers.standard.track("Matchsticks Opened Screenshot")
+    }
+}
+
+extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelegate {
+    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
+        DataModel.sharedInstance.matchstickFrcDelegate = self
+        matchstickFrc = DataModel.sharedInstance.matchstickFrc
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loader)
+        loader.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        loader.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        loader.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        loader.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
+        loader.removeFromSuperview()
     }
 }
 
