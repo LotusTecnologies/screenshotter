@@ -82,6 +82,7 @@
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C55D89BB2021C021004A5245 /* CoreDataPreparationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */; };
+		C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889E1FE949320006914C /* BarButtonItem.swift */; };
 		C56F88A21FE949720006914C /* TappableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F88A11FE949720006914C /* TappableText.swift */; };
@@ -209,6 +210,7 @@
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPreparationController.swift; sourceTree = "<group>"; };
+		C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C56F889E1FE949320006914C /* BarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarButtonItem.swift; sourceTree = "<group>"; };
 		C56F88A11FE949720006914C /* TappableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableText.swift; sourceTree = "<group>"; };
@@ -406,6 +408,7 @@
 		C54087C61FE90C8D00198955 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */,
 				C54087C71FE90C8D00198955 /* SettingsViewController.swift */,
 			);
 			path = Settings;
@@ -1028,6 +1031,7 @@
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
 				C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */,
+				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
 				C54088391FE90C8E00198955 /* ScreenshotsViewController.m in Sources */,

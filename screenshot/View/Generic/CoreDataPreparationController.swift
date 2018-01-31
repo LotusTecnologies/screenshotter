@@ -32,7 +32,7 @@ class CoreDataPreparationController : NSObject {
         }
         else {
             let loader = UIView()
-            loader.backgroundColor = .green
+            loader.backgroundColor = .green // TODO:
             self.loader = loader
             self.delegate?.coreDataPreparationController(self, presentLoader: loader)
         }
@@ -51,8 +51,7 @@ class CoreDataPreparationController : NSObject {
         
         if let loader = loader {
             self.delegate?.coreDataPreparationController(self, dismissLoader: loader)
+            self.loader = nil
         }
-        
-//        loader = nil
     }
 }

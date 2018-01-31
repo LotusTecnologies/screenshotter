@@ -17,7 +17,7 @@
 @property (nonatomic, strong) FavoritesNavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) DiscoverNavigationController *discoverNavigationController;
-@property (nonatomic, strong) UINavigationController *settingsNavigationController;
+@property (nonatomic, strong) SettingsNavigationController *settingsNavigationController;
 @property (nonatomic, strong) UITabBarItem *settingsTabBarItem;
 @property (nonatomic, strong) UpdatePromptHandler *updatePromptHandler;
 @property (nonatomic) NSInteger discoverTabTag;
@@ -67,12 +67,9 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
         _settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
-            SettingsViewController *viewController = [[SettingsViewController alloc] init];
-            viewController.delegate = self;
-            
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-            navigationController.title = viewController.title;
-            navigationController.view.backgroundColor = [UIColor background];
+            SettingsNavigationController *navigationController = [[SettingsNavigationController alloc] init];
+            navigationController.settingsViewController.delegate = self;
+            navigationController.title = navigationController.settingsViewController.title;
             navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:3];
             navigationController.tabBarItem.badgeColor = [UIColor crazeRed];
             _settingsTabBarItem = navigationController.tabBarItem;

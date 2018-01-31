@@ -40,9 +40,11 @@ class DiscoverScreenshotViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        addNavigationItemLogo()
+        restorationIdentifier = String(describing: type(of: self))
         
         coreDataPreparationController.delegate = self
+        
+        addNavigationItemLogo()
     }
     
     override func viewDidLoad() {

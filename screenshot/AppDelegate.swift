@@ -235,20 +235,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = navigationController.createProductsViewController()
             
-        case s(FavoritesNavigationController.self):
-            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
-                return nil
-            }
-            
-            viewController = tabBarController.favoritesNavigationController
-            
-        case s(FavoritesViewController.self):
-            guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.favoritesViewController
-            
         case s(ScreenshotPickerNavigationController.self):
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
                 return nil
@@ -262,6 +248,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             viewController = navigationController.screenshotPickerViewController
+            
+        case s(FavoritesNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.favoritesNavigationController
+            
+        case s(FavoritesViewController.self):
+            guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.favoritesViewController
+        
+        case s(DiscoverNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.discoverNavigationController
+            
+        case s(DiscoverScreenshotViewController.self):
+            guard let navigationController = restorationViewControllers[s(DiscoverNavigationController.self)] as? DiscoverNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.discoverScreenshotViewController
+            
+        case s(SettingsNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.settingsNavigationController
+            
+        case s(SettingsViewController.self):
+            guard let navigationController = restorationViewControllers[s(SettingsNavigationController.self)] as? SettingsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.settingsViewController
             
         default:
             viewController = nil

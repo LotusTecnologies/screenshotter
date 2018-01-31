@@ -20,6 +20,8 @@ class DiscoverNavigationController : UINavigationController, ViewControllerLifeC
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
+        restorationIdentifier = String(describing: type(of: self))
+        
         discoverScreenshotViewController.delegate = self
         
         viewControllers = [discoverScreenshotViewController]
