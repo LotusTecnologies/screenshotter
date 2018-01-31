@@ -81,6 +81,8 @@
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
 "permission.photo.denied.title" = "Allow Permissions To Continue";
 
+"partners.title" = "Partners";
+
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
 "picker.list.gallery" = "Gallery";
@@ -131,6 +133,7 @@
 "settings.row.gender.title" = "Gender";
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
+"settings.row.partners.title" = "Partners";
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.size.title" = "Size";

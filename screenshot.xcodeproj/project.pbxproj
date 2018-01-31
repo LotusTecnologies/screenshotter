@@ -81,6 +81,7 @@
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
+		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889E1FE949320006914C /* BarButtonItem.swift */; };
 		C56F88A21FE949720006914C /* TappableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F88A11FE949720006914C /* TappableText.swift */; };
@@ -207,6 +208,7 @@
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
+		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C56F889E1FE949320006914C /* BarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarButtonItem.swift; sourceTree = "<group>"; };
 		C56F88A11FE949720006914C /* TappableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableText.swift; sourceTree = "<group>"; };
@@ -379,6 +381,7 @@
 				C54087DC1FE90C8D00198955 /* Invite */,
 				C5F53D8C2014A57F003A57EC /* Legal */,
 				C54087C11FE90C8D00198955 /* Loading */,
+				C55D89BE2021EF84004A5245 /* Partners */,
 				C54087EC1FE90C8E00198955 /* Product */,
 				C54088051FE90C8E00198955 /* Screenshot */,
 				C54087E71FE90C8D00198955 /* ScreenshotDisplay */,
@@ -603,6 +606,14 @@
 				528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */,
 			);
 			path = Constants;
+			sourceTree = "<group>";
+		};
+		C55D89BE2021EF84004A5245 /* Partners */ = {
+			isa = PBXGroup;
+			children = (
+				C55D89BF2021EF93004A5245 /* PartnersViewController.swift */,
+			);
+			path = Partners;
 			sourceTree = "<group>";
 		};
 		C56F889D1FE949320006914C /* Extension */ = {
@@ -997,6 +1008,7 @@
 				C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
+				C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,

@@ -40,6 +40,7 @@ class SettingsViewController : BaseViewController {
         case currency
         case followFacebook
         case followInstagram
+        case partners
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -238,7 +239,8 @@ class SettingsViewController : BaseViewController {
             .bug,
             .usageStreak,
             .coins,
-            .version
+            .version,
+            .partners
         ],
         .follow: [
             .followInstagram,
@@ -479,6 +481,11 @@ extension SettingsViewController : UITableViewDelegate {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
             
+        case .partners:
+            let viewController = PartnersViewController()
+            viewController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(viewController, animated: true)
+            
         default:
             break
         }
@@ -548,6 +555,8 @@ fileprivate extension SettingsViewController {
             return "settings.row.instagram.title".localized
         case .followFacebook:
             return "settings.row.facebook.title".localized
+        case .partners:
+            return "settings.row.partners.title".localized
         }
     }
     
@@ -592,7 +601,7 @@ fileprivate extension SettingsViewController {
     
     func cellAccessoryType(for row: SettingsViewController.Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .tellFriend, .currency:
+        case .tellFriend, .currency, .partners:
             return .disclosureIndicator
         default:
             return .none
