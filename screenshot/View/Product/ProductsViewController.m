@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     ProductsViewControllerStateEmpty
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
@@ -191,6 +191,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     }
     
     [ProductWebViewController shared].lifeCycleDelegate = self;
+    [ProductWebViewController shared].delegate = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -813,6 +814,14 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)noItemsRetryAction {
     [self.shoppablesController refetchShoppables];
     self.state = ProductsViewControllerStateLoading;
+}
+
+
+#pragma mark - Web View Controller
+
+- (void)webViewController:(WebViewController *)viewController declinedInvalidURL:(NSURL *)url {
+    [self.navigationController popViewControllerAnimated:YES];
+    [self presentViewController:viewController.declinedInvalidURLAlertController animated:YES completion:nil];
 }
 
 @end
