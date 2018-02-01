@@ -145,11 +145,9 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
-            }.then (on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track("sent image to Clarifai")
-                return ClarifaiModel.sharedInstance.classify(image: image)
-            }.then(on: processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                AnalyticsTrackers.standard.track("received response from Clarifai", properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+            }.then(on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+                AnalyticsTrackers.standard.track("bypassed Clarifai")
+                let imageClassification = ClarifaiModel.ImageClassification.human // Kludged, as ClarifaiModel.sharedInstance.classify often crashes.
                 let imageData: Data? = self.data(for: image)
                 let guaranteedImageClassification = (imageClassification == .unrecognized ? .human : imageClassification)
                 return Promise { fulfill, reject in
