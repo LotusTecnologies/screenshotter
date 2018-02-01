@@ -38,38 +38,9 @@ class DataModel: NSObject {
         let _ = DataModel.sharedInstance
     }
 
-    public var coreDataStackFailureHandler: (() -> Void)?
-    public var coreDataStackCompletionHandler: (() -> Void)?
     public var isCoreDataStackReady = false
     
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Model")
-        container.loadPersistentStores { (storeDescription, error) in
-            if let error = error as NSError? {
-                print("loadPersistentStores error:\(error)")
-                if let handler = self.coreDataStackFailureHandler {
-                    DispatchQueue.main.async {
-                        handler()
-                    }
-                }
-            } else {
-                container.viewContext.automaticallyMergesChangesFromParent = true
-                self.isCoreDataStackReady = true
-                let lastDbVersionMigrated = UserDefaults.standard.integer(forKey: UserDefaultsKeys.lastDbVersionMigrated)
-                if lastDbVersionMigrated != Constants.currentMomVersion {
-                    self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: container)
-                    UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
-                }
-                if let handler = self.coreDataStackCompletionHandler {
-                    DispatchQueue.main.async {
-                        handler()
-                    }
-                }
-                MatchstickModel.shared.prepareMatchsticks()
-            }
-        }
-        return container
-    }()
+    public let persistentContainer = NSPersistentContainer(name: "Model")
     
     func mainMoc() -> NSManagedObjectContext {
         return persistentContainer.viewContext
@@ -84,7 +55,29 @@ class DataModel: NSObject {
     override init() {
         super.init()
         DispatchQueue.global(qos: .userInitiated).async {
-            let _ = self.persistentContainer
+            self.persistentContainer.loadPersistentStores { (storeDescription, error) in
+                if let error = error as NSError? {
+                    print("loadPersistentStores error:\(error)")
+                    // Must async, or lazy eval closure called infinitely. Might as well async to main, as most handlers are there.
+                    // See https://medium.com/@soapyfrog/dont-forget-that-none-of-this-is-thread-safe-so-it-is-actually-possible-for-the-lazy-eval-closure-add1c9b1dd95
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["error" : error])
+                    }
+                } else {
+                    self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
+                    self.isCoreDataStackReady = true
+                    let lastDbVersionMigrated = UserDefaults.standard.integer(forKey: UserDefaultsKeys.lastDbVersionMigrated)
+                    if lastDbVersionMigrated != Constants.currentMomVersion {
+                        self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
+                        UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
+                    }
+                    // See above about lazy eval closure called infinitely if notification not asynced.
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["success" : true])
+                    }
+                    MatchstickModel.shared.prepareMatchsticks()
+                }
+            }
         }
     }
     

@@ -30,6 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
+    fileprivate lazy var mainTabBarController: MainTabBarController = {
+        return MainTabBarController()
+    }()
+    
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
@@ -42,29 +46,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         ClarifaiModel.setup() // Takes a long time to intialize; start early.
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil)
         DataModel.setup() // Sets up Core Data stack on a background queue.
-        return true
-    }
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        setupThirdPartyLibraries(application, launchOptions: launchOptions)
-
-        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        application.applicationIconBadgeNumber = 0
-
-        prepareDataStackCompletionIfNeeded()
-        PermissionsManager.shared.fetchPushPermissionStatus()
+        
+        
+        // TODO: the code below used to be in the did finish launching.
+        // it needs to be here for state restoration. verify everything works!
+        
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         
         fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
+        // !!!: the dispatch solves a serious issue with several of our third party
+        // libraries not playing nicely and blocking the main thread. this is a
+        // temporariy solution and a more proper design should be created.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.setupThirdPartyLibraries(application, launchOptions: launchOptions)
+        }
+        
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+        
+        PermissionsManager.shared.fetchPushPermissionStatus()
+        
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -175,6 +194,122 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    
+    // MARK: State Restoration
+    
+    fileprivate var restorationViewControllers: [String : UIViewController] = [:]
+    
+    func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
+        return false // !!!: restoration needs more testing before being enabled
+    }
+    
+    func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
+        return false
+    }
+    
+    func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
+        guard let identifier = identifierComponents.last as? String else {
+            return nil
+        }
+        
+        // Shorter convenience function
+        func s(_ class: AnyClass) -> String {
+            return String(describing: `class`)
+        }
+        
+        let viewController: UIViewController?
+        
+        switch identifier {
+        case s(MainTabBarController.self):
+            viewController = mainTabBarController
+            
+        case s(ScreenshotsNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.screenshotsNavigationController
+            
+        case s(ScreenshotsViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.screenshotsViewController
+            
+        case s(ProductsViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.createProductsViewController()
+            
+        case s(ScreenshotPickerNavigationController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.createScreenshotPickerNavigationController()
+            
+        case s(ScreenshotPickerViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotPickerNavigationController.self)] as? ScreenshotPickerNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.screenshotPickerViewController
+            
+        case s(FavoritesNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.favoritesNavigationController
+            
+        case s(FavoritesViewController.self):
+            guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.favoritesViewController
+        
+        case s(DiscoverNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.discoverNavigationController
+            
+        case s(DiscoverScreenshotViewController.self):
+            guard let navigationController = restorationViewControllers[s(DiscoverNavigationController.self)] as? DiscoverNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.discoverScreenshotViewController
+            
+        case s(SettingsNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.settingsNavigationController
+            
+        case s(SettingsViewController.self):
+            guard let navigationController = restorationViewControllers[s(SettingsNavigationController.self)] as? SettingsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.settingsViewController
+            
+        default:
+            viewController = nil
+        }
+        
+        if viewController != nil {
+            restorationViewControllers[identifier] = viewController
+        }
+        
+        return viewController
+    }
 }
 
 extension AppDelegate {
@@ -200,7 +335,6 @@ extension AppDelegate {
         configuration.trackDeepLinks = true
         configuration.trackPushNotifications = true
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
-        
         SEGAnalytics.setup(with: configuration)
         
         Appsee.start(Constants.appSeeApiKey)
@@ -239,9 +373,9 @@ extension AppDelegate {
         RatingFlow.sharedInstance.start()
         
         IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
-        
+
         FirebaseApp.configure()
-        
+
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
     }
     
@@ -251,12 +385,9 @@ extension AppDelegate {
         var viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            if DataModel.sharedInstance.isCoreDataStackReady {
-                viewController = MainTabBarController()
-            } else {
-                viewController = LoadingViewController()
-            }
-        } else {
+            viewController = mainTabBarController
+        }
+        else {
             let tutorialViewController = TutorialViewController()
             tutorialViewController.delegate = self
             viewController = tutorialViewController
@@ -265,28 +396,13 @@ extension AppDelegate {
         return viewController
     }
     
-    func prepareDataStackCompletionIfNeeded() {
-        func syncPhotos() {
+    func coreDataStackCompletionHandler(notification: Notification) {
+        if notification.userInfo?["error"] == nil {
             if ApplicationStateModel.sharedInstance.isBackground() {
                 AssetSyncModel.sharedInstance.syncPhotos()
-            } else {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             }
-        }
-        
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            if DataModel.sharedInstance.isCoreDataStackReady {
-                syncPhotos()
-            } else {
-                DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    syncPhotos()
-                    
-                    self.transitionTo(self.nextViewController())
-                }
-                
-                DataModel.sharedInstance.coreDataStackFailureHandler = {
-                    print("Core Data stack failed")
-                }
+            else {
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             }
         }
     }
@@ -314,8 +430,6 @@ extension AppDelegate {
 extension AppDelegate: TutorialViewControllerDelegate {
     func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
-        
-        self.prepareDataStackCompletionIfNeeded()
         
         // Create a delay for a more natural feel after taking the screenshot
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

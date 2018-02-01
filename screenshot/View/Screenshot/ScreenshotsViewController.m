@@ -16,13 +16,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionImage
 };
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol, CoreDataPreparationControllerDelegate>
+
+@property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
+
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @property (nonatomic, copy) NSString *notificationCellAssetId;
@@ -40,15 +43,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.restorationIdentifier = NSStringFromClass([self class]);
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
+        _coreDataPreparationController = [[CoreDataPreparationController alloc] init];
+        self.coreDataPreparationController.delegate = self;
+        
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
-        
-        [DataModel sharedInstance].screenshotFrcDelegate = self;
-        self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
     }
     return self;
 }
@@ -113,6 +118,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
         helperView;
     });
+    
+    [self.coreDataPreparationController viewDidLoad];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -152,6 +159,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)dealloc {
+    self.coreDataPreparationController.delegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     
@@ -350,6 +358,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     return [self.screenshotFrc objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
 }
 
+- (NSInteger)indexForScreenshot:(Screenshot *)screenshot {
+    return [self.screenshotFrc indexPathForObject:screenshot].item;
+}
+
 - (void)scrollToTop {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
@@ -477,10 +489,37 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)refreshControlAction:(UIRefreshControl *)refreshControl {
     if ([refreshControl isRefreshing]) {
+        // This is for show.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [refreshControl endRefreshing];
         });
     }
+}
+
+
+#pragma mark - Core Data Preparation
+
+- (void)coreDataPreparationControllerSetup:(CoreDataPreparationController *)controller {
+    [DataModel sharedInstance].screenshotFrcDelegate = self;
+    self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+    
+    if ([DataModel sharedInstance].isCoreDataStackReady) {
+        [self.collectionView reloadData];
+        [self syncHelperViewVisibility];
+    }
+}
+
+- (void)coreDataPreparationController:(CoreDataPreparationController *)controller presentLoader:(UIView *)loader {
+    loader.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:loader];
+    [loader.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    [loader.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [loader.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [loader.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+}
+
+- (void)coreDataPreparationController:(CoreDataPreparationController *)controller dismissLoader:(UIView *)loader {
+    [loader removeFromSuperview];
 }
 
 

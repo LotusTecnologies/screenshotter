@@ -61,39 +61,22 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.restorationIdentifier = NSStringFromClass([self class]);
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
         
         _productsOptions = [[ProductsOptions alloc] init];
         self.productsOptions.delegate = self;
-        
-        self.title = @"Products";
     }
     return self;
 }
 
+- (NSString *)title {
+    return @"Products";
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.image = [UIImage imageWithData:self.screenshot.imageData];
-    
-    self.navigationItem.rightBarButtonItem = ({
-        CGFloat buttonSize = 32.f;
-        
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
-        button.imageView.contentMode = UIViewContentModeScaleAspectFill;
-        [button setImage:self.image forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
-        button.layer.borderColor = [UIColor crazeGreen].CGColor;
-        button.layer.borderWidth = 1.f;
-        
-        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-        
-        [button.widthAnchor constraintEqualToConstant:button.bounds.size.width].active = YES;
-        [button.heightAnchor constraintEqualToConstant:button.bounds.size.height].active = YES;
-        
-        barButtonItem;
-    });
     
     _shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
@@ -101,8 +84,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         
         ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-        toolbar.screenshotImage = self.image;
-        toolbar.shoppablesController = self.shoppablesController;
         toolbar.delegate = self;
         toolbar.barTintColor = [UIColor whiteColor];
         toolbar.hidden = [self shouldHideToolbar];
@@ -169,15 +150,22 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
     
-    if (!self.shoppablesController || [self.shoppablesController shoppableCount] == -1) {
-        // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
-        // rateView and scrollRevealController can all be lazy loaded. They dont
-        // need to exist if this condition is true.
-        self.state = ProductsViewControllerStateRetry;
-        [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+    if (!self.shoppablesController) {
+        self.state = ProductsViewControllerStateLoading;
+    }
+    else {
+        [self syncScreenshotRelatedObjects];
         
-    } else {
-        [self reloadProductsForShoppableAtIndex:0];
+        if ([self.shoppablesController shoppableCount] == -1) {
+            // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
+            // rateView and scrollRevealController can all be lazy loaded. They dont
+            // need to exist if this condition is true.
+            self.state = ProductsViewControllerStateRetry;
+            [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
+        }
+        else {
+            [self reloadProductsForShoppableAtIndex:0];
+        }
     }
 }
 
@@ -293,7 +281,38 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         
         self.shoppablesController = screenshot ? [[ShoppablesController alloc] initWithScreenshot:screenshot] : nil;
         self.shoppablesController.delegate = self;
+        
+        if ([self isViewLoaded]) {
+            [self syncScreenshotRelatedObjects];
+            [self reloadProductsForShoppableAtIndex:0];
+        }
     }
+}
+
+- (void)syncScreenshotRelatedObjects {
+    self.image = [UIImage imageWithData:self.screenshot.imageData];
+    
+    self.navigationItem.rightBarButtonItem = ({
+        CGFloat buttonSize = 32.f;
+        
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
+        button.imageView.contentMode = UIViewContentModeScaleAspectFill;
+        [button setImage:self.image forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
+        button.layer.borderColor = [UIColor crazeGreen].CGColor;
+        button.layer.borderWidth = 1.f;
+        
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+        
+        [button.widthAnchor constraintEqualToConstant:button.bounds.size.width].active = YES;
+        [button.heightAnchor constraintEqualToConstant:button.bounds.size.height].active = YES;
+        
+        barButtonItem;
+    });
+    
+    self.shoppablesToolbar.shoppablesController = self.shoppablesController;
+    self.shoppablesToolbar.screenshotImage = self.image;
 }
 
 - (void)displayScreenshotAction {

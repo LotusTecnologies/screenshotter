@@ -12,12 +12,14 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
-@interface ScreenshotsNavigationController () <ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
+@interface ScreenshotsNavigationController () <UIStateRestoring, ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) ClipView *clipView;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
+
+@property (nonatomic, strong) NSNumber *restoredScreenshotNumber;
 
 @end
 
@@ -28,6 +30,10 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.restorationIdentifier = NSStringFromClass([self class]);
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(coreDataStackCompleted:) name:[NotificationCenterKeys coreDataStackCompleted] object:nil];
+        
         _screenshotsViewController = ({
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
@@ -50,8 +56,24 @@
     self.view.backgroundColor = [UIColor background];
 }
 
+- (void)coreDataStackCompleted:(NSNotification *)notification {
+    if (self.restoredScreenshotNumber) {
+        // Dispatch async to allow other listening objects to first do their setup
+        dispatch_async(dispatch_get_main_queue(), ^{
+            ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
+            
+            if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
+                productsViewController.screenshot = [self.screenshotsViewController screenshotAtIndex:self.restoredScreenshotNumber.integerValue];
+                self.restoredScreenshotNumber = nil;
+            }
+        });
+    }
+}
+
 - (void)dealloc {
     [AssetSyncModel sharedInstance].networkingIndicatorDelegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -84,9 +106,7 @@
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     
-    ProductsViewController *productsViewController = [[ProductsViewController alloc] init];
-    productsViewController.lifeCycleDelegate = self;
-    productsViewController.hidesBottomBarWhenPushed = YES;
+    ProductsViewController *productsViewController = [self createProductsViewController];
     productsViewController.screenshot = screenshot;
     [self pushViewController:productsViewController animated:YES];
     
@@ -108,7 +128,26 @@
 }
 
 
+#pragma mark - Products
+
+- (ProductsViewController *)createProductsViewController {
+    ProductsViewController *viewController = [[ProductsViewController alloc] init];
+    viewController.lifeCycleDelegate = self;
+    viewController.hidesBottomBarWhenPushed = YES;
+    return viewController;
+}
+
+
 #pragma mark - Screenshot Picker
+
+- (ScreenshotPickerNavigationController *)createScreenshotPickerNavigationController {
+    ScreenshotPickerNavigationController *navigationController = [[ScreenshotPickerNavigationController alloc] init];
+    navigationController.cancelButton.target = self;
+    navigationController.cancelButton.action = @selector(pickerViewControllerDidCancel);
+    navigationController.doneButton.target = self;
+    navigationController.doneButton.action = @selector(pickerViewControllerDidFinish);
+    return navigationController;
+}
 
 - (BOOL)needsToPresentPickerViewController {
     return ![[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
@@ -117,14 +156,10 @@
 - (void)presentPickerViewController {
     [self dismissPickerClipView];
     
-    ScreenshotPickerNavigationController *picker = [[ScreenshotPickerNavigationController alloc] init];
-    picker.cancelButton.target = self;
-    picker.cancelButton.action = @selector(pickerViewControllerDidCancel);
-    picker.doneButton.target = self;
-    picker.doneButton.action = @selector(pickerViewControllerDidFinish);
-    self.pickerNavigationController = picker;
+    ScreenshotPickerNavigationController *picker = [self createScreenshotPickerNavigationController];
+    self.pickerNavigationController = picker; // ???: is this needed?
     
-    [self presentViewController:self.pickerNavigationController animated:YES completion:nil];
+    [self presentViewController:picker animated:YES completion:nil];
     
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotPicker];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -236,6 +271,26 @@
             self.clipView = nil;
         }];
     }
+}
+
+#pragma mark - State Restoration
+
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder {
+    ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
+    
+    if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
+        // TODO: its possible for the index to change across sessions. use the screenshot id.
+        NSInteger index = [self.screenshotsViewController indexForScreenshot:productsViewController.screenshot];
+        [coder encodeInteger:index forKey:@"screenshotIndex"];
+    }
+    
+    [super encodeRestorableStateWithCoder:coder];
+}
+
+- (void)decodeRestorableStateWithCoder:(NSCoder *)coder {
+    self.restoredScreenshotNumber = @([coder decodeIntegerForKey:@"screenshotIndex"]);
+    
+    [super decodeRestorableStateWithCoder:coder];
 }
 
 @end
