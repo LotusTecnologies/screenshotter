@@ -495,7 +495,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         // Somehow users were able to tap twice, this condition will prevent that.
         if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
             [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
-            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:[ProductWebViewController shared].product.offer]];
+            NSString *urlString = [ProductWebViewController shared].product.offer;
+            if ([urlString hasPrefix:@"//"]) {
+                urlString = [@"https:" stringByAppendingString:urlString];
+            }
+            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:urlString]];
             [self.navigationController pushViewController:[ProductWebViewController shared] animated:YES];
         }
         
