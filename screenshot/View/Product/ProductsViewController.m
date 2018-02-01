@@ -831,8 +831,17 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (void)noItemsRetryAction {
-    [self.shoppablesController refetchShoppables];
-    self.state = ProductsViewControllerStateLoading;
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Try again as" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Fashion" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self.shoppablesController refetchShoppablesAsFashion];
+        self.state = ProductsViewControllerStateLoading;
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Furniture" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self.shoppablesController refetchShoppablesAsFurniture];
+        self.state = ProductsViewControllerStateLoading;
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 

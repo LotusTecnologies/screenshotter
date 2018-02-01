@@ -902,13 +902,20 @@ class AssetSyncModel: NSObject {
         syncPhotos()
     }
     
-    @objc public func refetchShoppables(screenshot: Screenshot) {
+    @objc public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
         guard screenshot.shoppablesCount < 0,
           let assetId = screenshot.assetId,
           addToSelected(assetId: assetId) else {
                 return
         }
-        syncPhotos()
+        let dataModel = DataModel.sharedInstance
+        let oid = screenshot.objectID
+        dataModel.performBackgroundTask { (managedObjectContext) in
+            let backgroundScreenshot = managedObjectContext.object(with: oid) as? Screenshot
+            backgroundScreenshot?.syteJson = classificationString
+            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            self.syncPhotos()
+        }
     }
 
     // Called from UI thread.
