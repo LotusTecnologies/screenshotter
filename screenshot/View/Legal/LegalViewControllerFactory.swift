@@ -10,7 +10,7 @@ import UIKit
 
 class LegalViewControllerFactory : NSObject {
     static func termsOfServiceViewController(withDoneTarget target: Any?, action: Selector?) -> UIViewController? {
-        guard let url = URL(string: "http://crazeapp.com/legal/#tos") else {
+        guard let url = URL(string: "https://screenshopit.com/terms-of-use/") else {
             return nil
         }
         
@@ -20,7 +20,7 @@ class LegalViewControllerFactory : NSObject {
     }
     
     static func privacyPolicyViewController(withDoneTarget target: Any?, action: Selector?) -> UIViewController? {
-        guard let url = URL(string: "http://crazeapp.com/legal/#privacy") else {
+        guard let url = URL(string: "https://screenshopit.com/privacy-policy/") else {
             return nil
         }
         
