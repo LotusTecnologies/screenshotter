@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     ProductsViewControllerStateEmpty
 };
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
 
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong) HelperView *noItemsHelperView;
@@ -179,6 +179,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     }
     
     [ProductWebViewController shared].lifeCycleDelegate = self;
+    [ProductWebViewController shared].delegate = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -514,7 +515,11 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         // Somehow users were able to tap twice, this condition will prevent that.
         if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
             [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
-            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:[ProductWebViewController shared].product.offer]];
+            NSString *urlString = [ProductWebViewController shared].product.offer;
+            if ([urlString hasPrefix:@"//"]) {
+                urlString = [@"https:" stringByAppendingString:urlString];
+            }
+            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:urlString]];
             [self.navigationController pushViewController:[ProductWebViewController shared] animated:YES];
         }
         
@@ -828,6 +833,14 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)noItemsRetryAction {
     [self.shoppablesController refetchShoppables];
     self.state = ProductsViewControllerStateLoading;
+}
+
+
+#pragma mark - Web View Controller
+
+- (void)webViewController:(WebViewController *)viewController declinedInvalidURL:(NSURL *)url {
+    [self.navigationController popViewControllerAnimated:YES];
+    [self presentViewController:viewController.declinedInvalidURLAlertController animated:YES completion:nil];
 }
 
 @end
