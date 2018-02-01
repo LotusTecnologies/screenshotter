@@ -18,8 +18,6 @@ class IntercomHelper : NSObject {
         }
     }
     
-    var closedOpenConversations = false
-    var remoteNotification: [AnyHashable: Any]?
     var deviceToken: Data? {
         set {
             if let token = newValue {
@@ -42,28 +40,6 @@ class IntercomHelper : NSObject {
         closure(attributes)
         Intercom.updateUser(attributes)
     }
-    
-    private func register() {
-        if let user = AnalyticsUser.current {
-            register(user: user)
-        } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
-            // Backwards compatible w/version < 1.2
-            Intercom.registerUser(withEmail: email)
-        }
-        
-        if let notification = remoteNotification {
-            handleRemoteNotification(notification, opened: true)
-            remoteNotification = nil
-        }
-    }
-    
-    private func closePreviousConversations(_ completionClosure: @escaping (Bool, Error?) -> Void) {
-        NetworkingPromise.closePreviousIntercomConversations(for: AnalyticsUser.current).then(on: .main) {
-            completionClosure($0, nil)
-        }.catch(on: .main, policy: .allErrors) { (error) in
-            completionClosure(false, error)
-        }
-    }
 
     // MARK: -
     
@@ -74,24 +50,19 @@ class IntercomHelper : NSObject {
             Intercom.enableLogging()
         #endif
         
-        // Always register as an anonymous user to start.
-        registerAnonymousUser()
-        remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any]
-        
-        closePreviousConversations { (success, error) in
-            guard error == nil else {
-                // handle error
-                if let error = error as NSError? {
-                    print(error.localizedDescription)
-                }
-                
-                return
-            }
-            
-            self.closedOpenConversations = true
-            self.register()
+        // Register the user if we're already logged in.
+        if let user = AnalyticsUser.current {
+            register(user: user)
+        } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
+            // Backwards compatible w/version < 1.2
+            Intercom.registerUser(withEmail: email)
+        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
+            registerAnonymousUser()
         }
         
+        if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
+            handleRemoteNotification(remoteNotification, opened: true)
+        }
     }
     
     func handleRemoteNotification(_ userInfo:[AnyHashable : Any], opened:Bool = false) {
@@ -106,10 +77,6 @@ class IntercomHelper : NSObject {
     }
     
     func register(user: AnalyticsUser) {
-        guard closedOpenConversations == true else {
-            return
-        }
-        
         updateIntercomDeviceToken()
         
         Intercom.registerUser(withUserId: user.identifier)

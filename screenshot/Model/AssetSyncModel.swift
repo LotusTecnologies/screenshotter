@@ -254,7 +254,8 @@ class AssetSyncModel: NSObject {
             firstly { _ -> Promise<(String, [[String : Any]])> in
                 return NetworkingPromise.uploadToSyte(imageData: imageData, imageClassification: imageClassification)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    AnalyticsTrackers.standard.track("received response from Syte", properties: ["segmentCount" : segments.count])
+                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
+                    AnalyticsTrackers.standard.track("received response from Syte", properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
@@ -268,8 +269,9 @@ class AssetSyncModel: NSObject {
                         case 3, 4, 22:
                             // Syte returned no segments
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
+                            let imageUrl: String = uploadedURLString ?? ""
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            AnalyticsTrackers.standard.track("received response from Syte", properties: nsError.code == 22 ? ["segmentCount" : 0, "timeout" : 1] : ["segmentCount" : 0])
+                            AnalyticsTrackers.standard.track("received response from Syte", properties: nsError.code == 22 ? ["imageUrl" : imageUrl, "segmentCount" : 0, "timeout" : 1] : ["imageUrl" : imageUrl, "segmentCount" : 0])
                         default:
                             break
                         }
