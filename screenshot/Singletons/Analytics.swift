@@ -147,11 +147,11 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        IntercomHelper.sharedInstance.record(event: event, properties: properties)
+//        IntercomHelper.sharedInstance.record(event: event, properties: properties)
     }
     
     func identify(_ user: AnalyticsUser) {
-        IntercomHelper.sharedInstance.register(user: user)
+//        IntercomHelper.sharedInstance.register(user: user)
     }
 }
 

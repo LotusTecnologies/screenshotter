@@ -53,17 +53,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // TODO: the code below used to be in the did finish launching.
         // it needs to be here for state restoration. verify everything works!
         
-        setupThirdPartyLibraries(application, launchOptions: launchOptions)
-        
-        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        application.applicationIconBadgeNumber = 0
-        
-        PermissionsManager.shared.fetchPushPermissionStatus()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         
         fetchAppSettings()
         
@@ -75,6 +69,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
+        // !!!: the dispatch solves a serious issue with several of our third party
+        // libraries not playing nicely and blocking the main thread. this is a
+        // temporariy solution and a more proper design should be created.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.setupThirdPartyLibraries(application, launchOptions: launchOptions)
+        }
+        
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+        
+        PermissionsManager.shared.fetchPushPermissionStatus()
+        
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -191,11 +200,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     fileprivate var restorationViewControllers: [String : UIViewController] = [:]
     
     func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
-        return true
+        return false // !!!: restoration needs more testing before being enabled
     }
     
     func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
-        return true
+        return false
     }
     
     func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
@@ -326,7 +335,6 @@ extension AppDelegate {
         configuration.trackDeepLinks = true
         configuration.trackPushNotifications = true
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
-        
         SEGAnalytics.setup(with: configuration)
         
         Appsee.start(Constants.appSeeApiKey)
@@ -365,9 +373,9 @@ extension AppDelegate {
         RatingFlow.sharedInstance.start()
         
         IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
-        
+
         FirebaseApp.configure()
-        
+
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
     }
     
@@ -389,16 +397,11 @@ extension AppDelegate {
     }
     
     func coreDataStackCompletionHandler(notification: Notification) {
-        if let error = notification.userInfo?["error"] as? NSError {
-            print("Core Data stack failed with error:\(error)")
-        }
-        else {
+        if notification.userInfo?["error"] == nil {
             if ApplicationStateModel.sharedInstance.isBackground() {
-                print("AppDelegate coreDataStackCompletionHandler calling syncPhotos")
                 AssetSyncModel.sharedInstance.syncPhotos()
             }
             else {
-                print("AppDelegate coreDataStackCompletionHandler calling syncPhotosUponForeground")
                 AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             }
         }
