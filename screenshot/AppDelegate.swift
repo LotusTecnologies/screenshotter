@@ -30,8 +30,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
+    fileprivate let frameworkSetupController = FrameworkSetupController()
+    
     fileprivate lazy var mainTabBarController: MainTabBarController = {
-        return MainTabBarController()
+        let viewController = MainTabBarController()
+        viewController.lifeCycleDelegate = self
+        return viewController
     }()
     
     static var shared: AppDelegate {
@@ -41,25 +45,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     override init() {
         settings = AppSettings(withSetter: self.settingsSetter)
         super.init()
+        frameworkSetupController.delegate = self
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        frameworkSetupController.application(application, willFinishLaunchingWithOptions: launchOptions)
+        
         UNUserNotificationCenter.current().delegate = self
-        ClarifaiModel.setup() // Takes a long time to intialize; start early.
+        
         NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil)
-        DataModel.setup() // Sets up Core Data stack on a background queue.
         
+        // Sets up Core Data stack on a background queue.
+        DataModel.setup()
         
-        // TODO: the code below used to be in the did finish launching.
-        // it needs to be here for state restoration. verify everything works!
-        
+        fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
-        
-        
-        
-        fetchAppSettings()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
@@ -69,21 +71,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
-        // !!!: the dispatch solves a serious issue with several of our third party
-        // libraries not playing nicely and blocking the main thread. this is a
-        // temporariy solution and a more proper design should be created.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.setupThirdPartyLibraries(application, launchOptions: launchOptions)
-        }
-        
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
         
         PermissionsManager.shared.fetchPushPermissionStatus()
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
-        
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -312,22 +305,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
-extension AppDelegate {
-    
-    // MARK: - Helper
-    
-    func showScreenshotListTop() {
-        if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
-            mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
-            mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollToTop()
-            mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController
-        }
+extension AppDelegate : ViewControllerLifeCycle {
+    func viewController(_ viewController: UIViewController, didAppear animated: Bool) {
+        frameworkSetupController.viewController(viewController, didAppear: animated)
+    }
+}
+
+extension AppDelegate : FrameworkSetupControllerDelegate {
+    func frameworkSetupControllerImmediate(_ controller: FrameworkSetupController) {
+        // Takes a long time to intialize; start early.
+        ClarifaiModel.setup()
     }
     
-    // MARK: - Third Party
-
-    func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
-        setupRouter()
+    func frameworkSetupControllerInitialViewDidAppear(_ controller: FrameworkSetupController) {
+        Appsee.start(Constants.appSeeApiKey)
+        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
         
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
@@ -337,15 +329,13 @@ extension AppDelegate {
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
         SEGAnalytics.setup(with: configuration)
         
-        Appsee.start(Constants.appSeeApiKey)
-        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
+        setupRouter()
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
         }
         
-        let branch = Branch.getInstance()
-        branch?.initSession(launchOptions: launchOptions) { params, error in
+        Branch.getInstance()?.initSession(launchOptions: controller.launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
             guard error == nil, let params = params as? [String : AnyObject] else {
@@ -367,22 +357,41 @@ extension AppDelegate {
                 self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
             }
         }
-        
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-        
-        RatingFlow.sharedInstance.start()
-        
-        IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
+    }
+    
+    func frameworkSetupControllerRootViewDidAppear(_ controller: FrameworkSetupController) {
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+            // FIXME: Creating a 1 second delay prevents an indefinite block on the main thread.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions: controller.launchOptions)
+                
+                RatingFlow.sharedInstance.start()
+                
+                IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
+                
+                FirebaseApp.configure()
+                GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+            }
+        }
+    }
+}
 
-        FirebaseApp.configure()
-
-        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+extension AppDelegate {
+    
+    // MARK: - Helper
+    
+    func showScreenshotListTop() {
+        if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+            mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
+            mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollToTop()
+            mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController
+        }
     }
     
     // MARK: - View Controllers
     
     func nextViewController() -> UIViewController {
-        var viewController: UIViewController
+        let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             viewController = mainTabBarController
@@ -390,8 +399,11 @@ extension AppDelegate {
         else {
             let tutorialViewController = TutorialViewController()
             tutorialViewController.delegate = self
+            tutorialViewController.lifeCycleDelegate = self
             viewController = tutorialViewController
         }
+        
+        frameworkSetupController.setIsWaitingForRootViewController()
         
         return viewController
     }
@@ -414,11 +426,9 @@ extension AppDelegate {
             })
         }
     }
-}
-
-// MARK: - Deep Link Router
-
-extension AppDelegate {
+    
+    // MARK: Deep Link Router
+    
     func setupRouter() {
         router = DPLDeepLinkRouter()
         router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
@@ -427,7 +437,7 @@ extension AppDelegate {
 
 // MARK: - Tutorial
 
-extension AppDelegate: TutorialViewControllerDelegate {
+extension AppDelegate : TutorialViewControllerDelegate {
     func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
@@ -494,7 +504,7 @@ extension AppDelegate {
     }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
+extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : String],
           let openingScreen = userInfo[Constants.openingScreenKey],
