@@ -19,28 +19,32 @@ class PartnersViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let syteUrl = "https://syte.ai"
+        let syteVisualString = "https://syte.ai"
+        let syteDestinationString = "https://www.syte.ai/?utm_campaign=screenshop"
+        let attributedText = NSMutableAttributedString(string: "partners.content".localized(withFormat: syteVisualString))
         
-        let attr = NSMutableAttributedString(string: "Visual search powered by \(syteUrl)")
-        
-        if let range = attr.string.range(of: syteUrl), let url = URL(string: "https://www.syte.ai/?utm_campaign=screenshop") {
-            let a: [String : Any] = [
+        if let range = attributedText.string.range(of: syteVisualString), let url = URL(string: syteDestinationString) {
+            let attribute: [String : Any] = [
                 NSLinkAttributeName: url
             ]
-            attr.addAttributes(a, range: NSRange(range, in: attr.string))
+            attributedText.addAttributes(attribute, range: NSRange(range, in: attributedText.string))
         }
         
-        let textView = UITextView()
+        let textView = TextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.attributedText = attr
+        textView.backgroundColor = view.backgroundColor
+        textView.attributedText = attributedText
         textView.isEditable = false
-        textView.isScrollEnabled = false
+        textView.isHighlightable = false
         textView.scrollsToTop = false
-        textView.backgroundColor = .yellow
+        textView.textColor = .gray3
+        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        textView.adjustsFontForContentSizeCategory = true
+        textView.contentInset = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0)
         view.addSubview(textView)
-        textView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: .extendedPadding).isActive = true
+        textView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
         textView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        textView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         textView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
-//        textView.heightAnchor.constraint(equalToConstant: 300).isActive = true
     }
 }

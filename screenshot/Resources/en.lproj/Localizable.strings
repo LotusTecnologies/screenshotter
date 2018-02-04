@@ -82,6 +82,7 @@
 "permission.photo.denied.title" = "Allow Permissions To Continue";
 
 "partners.title" = "Partners";
+"partners.content" = "Visual search powered by %@";
 
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
