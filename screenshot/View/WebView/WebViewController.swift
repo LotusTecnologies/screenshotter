@@ -474,8 +474,7 @@ extension WebViewController : WKNavigationDelegate {
     }
     
     func declinedInvalidURLAlertController() -> UIAlertController {
-        // TODO: confirm copy with coren and localize
-        let alertController = UIAlertController(title: "That's strange", message: "There was an issue accessing the store. Try deleting the screenshot and trying again.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "webview.invalid.title".localized, message: "webview.invalid.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alertController
     }
