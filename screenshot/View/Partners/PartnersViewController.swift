@@ -19,7 +19,7 @@ class PartnersViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let syteVisualString = "https://syte.ai"
+        let syteVisualString = "syte.ai"
         let syteDestinationString = "https://www.syte.ai/?utm_campaign=screenshop"
         let attributedText = NSMutableAttributedString(string: "partners.content".localized(withFormat: syteVisualString))
         
@@ -30,21 +30,20 @@ class PartnersViewController : BaseViewController {
             attributedText.addAttributes(attribute, range: NSRange(range, in: attributedText.string))
         }
         
-        let textView = TextView()
+        let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.backgroundColor = view.backgroundColor
         textView.attributedText = attributedText
         textView.isEditable = false
-        textView.isHighlightable = false
         textView.scrollsToTop = false
         textView.textColor = .gray3
         textView.font = UIFont.preferredFont(forTextStyle: .body)
         textView.adjustsFontForContentSizeCategory = true
-        textView.contentInset = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0)
+        textView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         view.addSubview(textView)
-        textView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-        textView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
-        textView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
-        textView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        textView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        textView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        textView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        textView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
 }
