@@ -11,8 +11,14 @@ import WebKit
 import SpriteKit
 import Appsee
 
+@objc protocol WebViewControllerDelegate : NSObjectProtocol {
+    func webViewController(_ viewController: WebViewController, declinedInvalidURL url: URL)
+}
+
 class WebViewController : BaseViewController {
     let webView = WebView()
+    
+    weak var delegate: WebViewControllerDelegate?
     
     // MARK: Life Cycle
     
@@ -433,6 +439,22 @@ class WebViewController : BaseViewController {
 }
 
 extension WebViewController : WKNavigationDelegate {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if let url = webView.url {
+            if UIApplication.shared.canOpenURL(url) {
+                decisionHandler(.allow)
+            }
+            else {
+                decisionHandler(.cancel)
+                AnalyticsTrackers.standard.track("WebView invalid url", properties: ["url": url.absoluteString])
+                self.delegate?.webViewController(self, declinedInvalidURL: url)
+            }
+        }
+        else {
+            decisionHandler(.cancel)
+        }
+    }
+    
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         if !didLoadInitialPage {
             showLoadingView()
@@ -449,6 +471,13 @@ extension WebViewController : WKNavigationDelegate {
         if !isShowingGame {
             hideLoadingView()
         }
+    }
+    
+    func declinedInvalidURLAlertController() -> UIAlertController {
+        // TODO: confirm copy with coren and localize
+        let alertController = UIAlertController(title: "That's strange", message: "There was an issue accessing the store. Try deleting the screenshot and trying again.", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        return alertController
     }
 }
 
