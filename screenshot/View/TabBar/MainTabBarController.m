@@ -10,7 +10,7 @@
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
+@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
@@ -94,14 +94,38 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:willAppear:)]) {
+        [self.lifeCycleDelegate viewController:self willAppear:animated];
+    }
+    
     [self refreshTabBarSettingsBadge];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:didAppear:)]) {
+        [self.lifeCycleDelegate viewController:self didAppear:animated];
+    }
+    
     [self presentUpdatePromptIfNeeded];
     [self presentChangelogAlertIfNeeded];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:willDisappear:)]) {
+        [self.lifeCycleDelegate viewController:self willDisappear:animated];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:didDisappear:)]) {
+        [self.lifeCycleDelegate viewController:self didDisappear:animated];
+    }
 }
 
 - (void)viewSafeAreaInsetsDidChange {

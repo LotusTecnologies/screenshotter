@@ -12,7 +12,7 @@ import UIKit
     func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController)
 }
 
-class TutorialViewController : UIViewController {
+class TutorialViewController : BaseViewController {
     weak var delegate: TutorialViewControllerDelegate?
     
     let scrollView = UIScrollView()
