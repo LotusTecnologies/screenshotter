@@ -134,6 +134,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [self removeScreenshotHelperView];
 }
 
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    
+    // TODO: setup collection view for editing mode
+}
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
