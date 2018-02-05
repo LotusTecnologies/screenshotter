@@ -920,34 +920,35 @@ extension Screenshot {
     // but may be called on the main queue, even if generally called on a background queue.
     // It does not actually hide the screenshot.
     func hideWorkhorse(managedObjectContext: NSManagedObjectContext, deleteImage: Bool = true) {
-        syteJson = nil
-        shareLink = nil
-        uploadedImageURL = nil
         if let favoriteSet = favorites as? Set<Product>,
           favoriteSet.count > 0 {
             favoriteSet.forEach { $0.shoppable = nil }
         } else if deleteImage {
+            if isFromShare {
+                managedObjectContext.delete(self)
+                return
+            }
             imageData = nil
         }
         if let shoppablesSet = shoppables as? Set<Shoppable> {
             shoppablesSet.forEach { managedObjectContext.delete($0) }
         }
         shoppablesCount = -1
+        syteJson = nil
+        shareLink = nil
+        uploadedImageURL = nil
     }
     
     @objc public func setHide() {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF == %@ AND isHidden == FALSE", managedObjectID)
-            fetchRequest.sortDescriptors = nil
-            
             do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                for screenshot in results {
-                    screenshot.isHidden = true
-                    screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                guard let screenshot = managedObjectContext.object(with: managedObjectID) as? Screenshot,
+                  screenshot.isHidden == false else {
+                    return
                 }
+                screenshot.isHidden = true
+                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                 try managedObjectContext.save()
             } catch {
                 print("setHide objectID:\(managedObjectID) results with error:\(error)")
