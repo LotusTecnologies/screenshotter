@@ -48,7 +48,11 @@ public class AnalyticsUser : NSObject {
         if let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel) {
             props["referringChannel"] = channel
         }
-
+        
+        if let campaign = UserDefaults.standard.string(forKey: UserDefaultsKeys.campaign) {
+            props["campaign"] = campaign
+        }
+        
         props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
         props["dailyStreak"] = "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak))"
         
