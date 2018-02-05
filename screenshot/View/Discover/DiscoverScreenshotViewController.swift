@@ -284,10 +284,22 @@ class DiscoverScreenshotViewController : BaseViewController {
             let velocity = panGesture.velocity(in: self.view)
             let velocityIsNegative = (velocity.x < 0)
             let positionIsNegative = (decisionValueThreshold < 0)
-            let velocityAndPositionIsInSameDirection = (velocityIsNegative == positionIsNegative)
-            let velocityOrPositionPassedThreshhold = ( abs(velocity.x) > 800 ||  abs(decisionValueThreshold) >= 1)
-            if velocityAndPositionIsInSameDirection && velocityOrPositionPassedThreshhold {
+            let velocityAndPositionIsInSameDirection = (decisionValueThreshold == 0 || velocityIsNegative == positionIsNegative)
+            let velocityOrPositionPassedThreshhold = ( abs(velocity.x) > 700 ||  abs(decisionValueThreshold) >= 1)
+            print("velocity :\(velocity) velocityIsNegative:\(velocityIsNegative) positionIsNegative: \(positionIsNegative), decisionValueThreshold:\(decisionValueThreshold) ");
+            let direction:Int = {
                 if decisionValueThreshold > 0 {
+                    return 1
+                }else if decisionValueThreshold < 0 {
+                    return -1
+                }else if velocity.x > 0 {
+                    return 1
+                }else {
+                    return -1
+                }
+            }()
+            if velocityAndPositionIsInSameDirection && velocityOrPositionPassedThreshhold {
+                if direction == 1 {
                     AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
                         "by": "swipe",
                         "url": currentMatchstick?.imageUrl ?? ""
