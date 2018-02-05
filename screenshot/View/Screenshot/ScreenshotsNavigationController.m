@@ -39,7 +39,7 @@
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
             viewController.lifeCycleDelegate = self;
-            viewController.navigationItem.leftBarButtonItem = [self createScreenshotsEditBarButtonItem];
+            viewController.navigationItem.leftBarButtonItem = viewController.editButtonItem;
             viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"NavigationBarAddPhotos"] style:UIBarButtonItemStylePlain target:self action:@selector(presentPickerViewController)];
             viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor crazeRed];
             viewController;
@@ -127,27 +127,6 @@
 
 - (void)screenshotsViewControllerWantsToPresentPicker:(ScreenshotsViewController *)viewController {
     [self presentPickerViewController];
-}
-
-- (UIBarButtonItem *)createScreenshotsEditBarButtonItem {
-    if ([self.screenshotsViewController isEditing]) {
-        return [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(editScreenshotsViewController)];
-    }
-    else {
-        return [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editScreenshotsViewController)];
-    }
-}
-
-- (void)editScreenshotsViewController {
-    [self.screenshotsViewController setEditing:![self.screenshotsViewController isEditing] animated:YES];
-    
-    NSMutableArray *items = [NSMutableArray arrayWithObject:[self createScreenshotsEditBarButtonItem]];
-    
-    if (self.activityBarButtonItem) {
-        [items addObject:self.activityBarButtonItem];
-    }
-    
-    self.screenshotsViewController.navigationItem.leftBarButtonItems = items;
 }
 
 

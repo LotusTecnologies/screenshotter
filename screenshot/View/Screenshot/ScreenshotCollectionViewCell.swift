@@ -19,6 +19,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     private let imageView = UIImageView()
     private let toolbar = UIToolbar()
     private let badge = UIView()
+    private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -82,6 +83,13 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         badge.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: badge.bounds.size.width / 2).isActive = true
         badge.widthAnchor.constraint(equalToConstant: badge.bounds.size.width).isActive = true
         badge.heightAnchor.constraint(equalToConstant: badge.bounds.size.height).isActive = true
+        
+        checkImageView.translatesAutoresizingMaskIntoConstraints = false
+        checkImageView.alpha = 0
+        checkImageView.contentMode = .scaleAspectFit
+        mainView.addSubview(checkImageView)
+        checkImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 6).isActive = true
+        checkImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -6).isActive = true
     }
     
     override func prepareForReuse() {
@@ -118,17 +126,51 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
-    // MARK: Enabled
+    // MARK: States
     
     var isEnabled: Bool = true {
         didSet {
             if isEnabled {
                 isUserInteractionEnabled = true
                 contentView.alpha = 1
-                
-            } else {
+            }
+            else {
                 isUserInteractionEnabled = false
                 contentView.alpha = 0.5
+            }
+        }
+    }
+    
+    var isEditing = false {
+        didSet {
+            if isEditing {
+                toolbar.alpha = 0
+            }
+            else {
+                toolbar.alpha = 1
+                checkImageView.alpha = 0
+                badge.alpha = 1
+            }
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            if isSelected {
+                imageView.alpha = 0.5
+                
+                if isEditing {
+                    checkImageView.alpha = 1
+                    badge.alpha = 0.5
+                }
+            }
+            else {
+                imageView.alpha = 1
+                
+                if isEditing {
+                    checkImageView.alpha = 0
+                    badge.alpha = 1
+                }
             }
         }
     }
