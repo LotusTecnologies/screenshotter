@@ -10,7 +10,6 @@
 #import "ProductsViewController.h"
 #import "screenshot-Swift.h"
 
-#import <FBSDKCoreKit/FBSDKCoreKit.h>
 
 @interface ScreenshotsNavigationController () <UIStateRestoring, ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
 
