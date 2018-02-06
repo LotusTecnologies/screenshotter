@@ -6,7 +6,6 @@
 #define screenshot_Bridging_Header_h
 
 
-#import "NetworkingModel.h"
 #import "MainTabBarController.h"
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"

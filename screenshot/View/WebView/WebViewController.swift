@@ -311,7 +311,7 @@ class WebViewController : BaseViewController {
         isShorteningURL = true
         updateShareItem()
         
-        NetworkingModel.shortenUrl(url) { shortenedURL in
+        NetworkingPromise.shorten(url: url) { shortenedURL in
             if let shortenedURL = shortenedURL {
                 let controller = UIActivityViewController(activityItems: [shortenedURL], applicationActivities: nil)
                 self.present(controller, animated: true, completion: nil)
