@@ -163,6 +163,12 @@
 "tutorial.email.legal.pp" = "Privacy Policy";
 "tutorial.email.legal.end" = " ";
 
+"tutorial.email.legal.0" = "By tapping \"Submit\" above, you agree to our ";
+"tutorial.email.legal.1" = "Terms of Service";
+"tutorial.email.legal.2" = " and ";
+"tutorial.email.legal.3" = "Privacy Policy";
+"tutorial.email.legal.4" = " ";
+
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";
 "tutorial.try.detail.2" = " to take a screenshot";
