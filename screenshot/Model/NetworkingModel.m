@@ -11,40 +11,6 @@
 
 @implementation NetworkingModel
 
-+(void)uploadToSyte:(NSData *_Nonnull)imageData isFashion:(BOOL)isFashion completionHandler:(void(^_Nonnull)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))completionhandler {
-    NSDictionary *dictParams;
-    NSString *strService;
-    if (isFashion) {
-        dictParams = @{@"account_id"      : @(6677),
-                       @"sig"             : @"GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=",
-                       @"feed"            : @"default",
-                       @"payload_type"    : @"image_bin"};
-        strService = @"https://syteapi.com/offers/bb";
-    } else { // furniture
-        dictParams = @{@"account_id"      : @(6722),
-                       @"sig"             : @"G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=",
-                       @"feed"            : @"craze_home",
-                       @"payload_type"    : @"image_bin"};
-        strService = @"https://homedecor.syteapi.com/offers/bb";
-    }
-    
-    NSError *error;
-    
-    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-    serializer.HTTPMethodsEncodingParametersInURI = [serializer.HTTPMethodsEncodingParametersInURI setByAddingObject:@"POST"];
-    
-    NSMutableURLRequest *request = [serializer requestWithMethod:@"POST" URLString:strService parameters:dictParams error:&error];
-    
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-    NSURLSessionUploadTask *uploadTask;
-    uploadTask = [manager uploadTaskWithRequest:request
-                                       fromData:imageData
-                                       progress: nil //^(NSProgress * _Nonnull uploadProgress) { NSLog(@"Wrote %f", uploadProgress.fractionCompleted); }
-                              completionHandler:completionhandler];
-
-    [uploadTask resume];
-}
-
 + (void)shortenUrl:(NSURL * _Nonnull)url completion:(void(^_Nonnull)(NSURL * _Nullable url))completion {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];

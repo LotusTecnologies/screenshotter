@@ -7,7 +7,6 @@ def shared_pods
     use_frameworks!
     pod 'Clarifai-Apple-SDK', '3.0.0-beta14'
     pod 'PromiseKit/Foundation'
-    pod 'AFNetworking'
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
     pod 'Appsee'

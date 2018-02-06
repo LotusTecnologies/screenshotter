@@ -11,40 +11,42 @@ import PromiseKit
 
 class NetworkingPromise: NSObject {
     
-    static func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
-        let uploadPromise: Promise<(String, [[String : Any]])> = Promise { fulfill, reject in
-            guard let imageData = imageData,
-              imageClassification != .unrecognized else {
+    static func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<NSDictionary> {
+        guard let imageData = imageData,
+            imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
-                reject(emptyError)
-                return
-            }
-            AnalyticsTrackers.standard.track("sent image to Syte")
-            NetworkingModel.upload(toSyte: imageData, isFashion: (imageClassification == .human), completionHandler: { (response: URLResponse, responseObject: Any?, error: Error?) in
-                guard error == nil,
-                    let responseObjectDict = responseObject as? [String : Any],
+                return Promise(error: emptyError)
+        }
+        let urlString = imageClassification == .human
+            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=default&payload_type=image_bin"
+            : "https://homedecor.syteapi.com/offers/bb?account_id=6722&sig=G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=&feed=craze_home&payload_type=image_bin"
+        guard let url = URL(string: urlString) else {
+            let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
+            return Promise(error: malformedError)
+        }
+        AnalyticsTrackers.standard.track("sent image to Syte")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = imageData
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 30
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+        return promise
+    }
+
+    static func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
+        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification)
+            .then { dict -> Promise<(String, [[String : Any]])> in
+                guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
                     let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
                     segments.count > 0 else {
-                        var emptyError: NSError
-                        if let responseObjectDict = responseObject as? [String : Any],
-                          let uploadedURLString = responseObjectDict.keys.first {
-                            emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments", Constants.uploadedURLStringKey : uploadedURLString])
-                        } else {
-                            emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments"])
-                        }
-                        print("Syte no segments. responseObject:\(String(describing: responseObject))")
-                        reject(emptyError)
-                        return
+                        let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments"])
+                        print("Syte no segments. responseObject:\(dict)")
+                        return Promise(error: emptyError)
                 }
-                fulfill(uploadedURLString, segments)
-            })
+                return Promise(value: (uploadedURLString, segments))
         }
-        let timeout = after(seconds: 30).then { _ -> Promise<(String, [[String : Any]])> in
-            let error = NSError(domain: "Craze", code: 22, userInfo: [NSLocalizedDescriptionKey : "Syte upload timeout"])
-            return Promise(error: error)
-        }
-        return race(uploadPromise, timeout)
     }
     
     static func feedbackToSyte(isPositive: Bool, imageUrl: String?, offersUrl: String?, b0x: Double, b0y: Double, b1x: Double, b1y: Double) {
