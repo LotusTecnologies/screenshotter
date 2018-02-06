@@ -6,7 +6,6 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-#import <CoreData/CoreData.h>
 
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
