@@ -145,11 +145,9 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         firstly {
             return image(asset: asset)
-            }.then (on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track("sent image to Clarifai")
-                return ClarifaiModel.sharedInstance.classify(image: image)
-            }.then(on: processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                AnalyticsTrackers.standard.track("received response from Clarifai", properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+            }.then(on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+                AnalyticsTrackers.standard.track("bypassed Clarifai")
+                let imageClassification = ClarifaiModel.ImageClassification.human // Kludged, as ClarifaiModel.sharedInstance.classify often crashes.
                 let imageData: Data? = self.data(for: image)
                 let guaranteedImageClassification = (imageClassification == .unrecognized ? .human : imageClassification)
                 return Promise { fulfill, reject in
@@ -254,7 +252,8 @@ class AssetSyncModel: NSObject {
             firstly { _ -> Promise<(String, [[String : Any]])> in
                 return NetworkingPromise.uploadToSyte(imageData: imageData, imageClassification: imageClassification)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    AnalyticsTrackers.standard.track("received response from Syte", properties: ["segmentCount" : segments.count])
+                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
+                    AnalyticsTrackers.standard.track("received response from Syte", properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
@@ -268,8 +267,9 @@ class AssetSyncModel: NSObject {
                         case 3, 4, 22:
                             // Syte returned no segments
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
+                            let imageUrl: String = uploadedURLString ?? ""
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            AnalyticsTrackers.standard.track("received response from Syte", properties: nsError.code == 22 ? ["segmentCount" : 0, "timeout" : 1] : ["segmentCount" : 0])
+                            AnalyticsTrackers.standard.track("received response from Syte", properties: nsError.code == 22 ? ["imageUrl" : imageUrl, "segmentCount" : 0, "timeout" : 1] : ["imageUrl" : imageUrl, "segmentCount" : 0])
                         default:
                             break
                         }
@@ -902,13 +902,20 @@ class AssetSyncModel: NSObject {
         syncPhotos()
     }
     
-    @objc public func refetchShoppables(screenshot: Screenshot) {
+    @objc public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
         guard screenshot.shoppablesCount < 0,
           let assetId = screenshot.assetId,
           addToSelected(assetId: assetId) else {
                 return
         }
-        syncPhotos()
+        let dataModel = DataModel.sharedInstance
+        let oid = screenshot.objectID
+        dataModel.performBackgroundTask { (managedObjectContext) in
+            let backgroundScreenshot = managedObjectContext.object(with: oid) as? Screenshot
+            backgroundScreenshot?.syteJson = classificationString
+            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            self.syncPhotos()
+        }
     }
 
     // Called from UI thread.

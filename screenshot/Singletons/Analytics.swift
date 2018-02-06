@@ -48,7 +48,11 @@ public class AnalyticsUser : NSObject {
         if let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel) {
             props["referringChannel"] = channel
         }
-
+        
+        if let campaign = UserDefaults.standard.string(forKey: UserDefaultsKeys.campaign) {
+            props["campaign"] = campaign
+        }
+        
         props["pushEnabled"] = PermissionsManager.shared.hasPermission(for: .push) ? "true" : "false"
         props["dailyStreak"] = "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak))"
         
@@ -147,11 +151,11 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
     func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        IntercomHelper.sharedInstance.record(event: event, properties: properties)
+//        IntercomHelper.sharedInstance.record(event: event, properties: properties)
     }
     
     func identify(_ user: AnalyticsUser) {
-        IntercomHelper.sharedInstance.register(user: user)
+//        IntercomHelper.sharedInstance.register(user: user)
     }
 }
 

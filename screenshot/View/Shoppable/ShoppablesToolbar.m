@@ -11,10 +11,10 @@
 @class ShoppablesCollectionView;
 
 @interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource> {
-    UIEdgeInsets _preservedCollectionViewContentInset;
     BOOL _needsToSelectFirstShoppable;
 }
 
++ (UIEdgeInsets)preservedCollectionViewContentInset;
 - (void)repositionShoppables;
 
 @end
@@ -36,9 +36,6 @@
     if (self) {
         _collectionView = ({
             CGFloat p = [Geometry padding];
-            CGFloat p2 = p * .5f;
-            
-            _preservedCollectionViewContentInset = UIEdgeInsetsMake(p2, p, p2, p);
             
             UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
             layout.minimumInteritemSpacing = p;
@@ -51,7 +48,7 @@
             collectionView.dataSource = self;
             collectionView.backgroundColor = [UIColor clearColor];
             collectionView.scrollsToTop = NO;
-            collectionView.contentInset = _preservedCollectionViewContentInset;
+            collectionView.contentInset = [[self class] preservedCollectionViewContentInset];
             collectionView.showsHorizontalScrollIndicator = NO;
             
             [collectionView registerClass:[ShoppableCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -77,6 +74,12 @@
 
 #pragma mark - Layout
 
++ (UIEdgeInsets)preservedCollectionViewContentInset {
+    CGFloat p = [Geometry padding];
+    CGFloat p2 = p * .5f;
+    return UIEdgeInsetsMake(p2, p, p2, p);
+}
+
 - (CGSize)shoppableSize {
     CGSize size = CGSizeZero;
     size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
@@ -85,15 +88,17 @@
 }
 
 - (void)repositionShoppables {
-    if ([self.shoppablesController shoppables].count) {
+    NSInteger shoppablesCount = [self.shoppablesController shoppables].count;
+    
+    if (shoppablesCount > 0) {
         CGFloat lineSpacing = ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).minimumLineSpacing;
-        CGFloat spacingsWidth = lineSpacing * ([self.shoppablesController shoppables].count - 1);
-        CGFloat shoppablesWidth = [self shoppableSize].width * [self.shoppablesController shoppables].count;
+        CGFloat spacingsWidth = lineSpacing * (shoppablesCount - 1);
+        CGFloat shoppablesWidth = [self shoppableSize].width * shoppablesCount;
         CGFloat contentWidth = round(spacingsWidth + shoppablesWidth);
         CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
         
         if (width != contentWidth) {
-            CGFloat maxHorizontalInset = _preservedCollectionViewContentInset.left;
+            CGFloat maxHorizontalInset = [[self class] preservedCollectionViewContentInset].left;
             
             UIEdgeInsets insets = self.collectionView.contentInset;
             insets.left = insets.right = MAX(maxHorizontalInset, floor((self.collectionView.bounds.size.width - contentWidth) / 2.f));
@@ -109,6 +114,10 @@
     if (_shoppablesController != shoppablesController) {
         _shoppablesController = shoppablesController;
         _shoppablesController.collectionView = shoppablesController ? self.collectionView : nil;
+        
+        if (shoppablesController && self.screenshotImage) {
+            [self.collectionView reloadData];
+        }
     }
 }
 
@@ -116,7 +125,7 @@
     if (_screenshotImage != screenshotImage) {
         _screenshotImage = screenshotImage;
         
-        if (screenshotImage) {
+        if (self.shoppablesController && screenshotImage) {
             [self.collectionView reloadData];
         }
     }
@@ -181,11 +190,20 @@
     [super setContentSize:contentSize];
     
     if (self.delegate.didViewControllerAppear && [self numberOfItemsInSection:0] > 0) {
-        [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
+        if (self.contentInset.left == [ShoppablesToolbar preservedCollectionViewContentInset].left) {
+            // This generally will happen through state restoration and
+            // is needed to prevent undesired animations
             [self.delegate repositionShoppables];
-        }];
-        
-    } else {
+        }
+        else {
+            [self layoutIfNeeded];
+            
+            [UIView animateWithDuration:Constants.defaultAnimationDuration animations:^{
+                [self.delegate repositionShoppables];
+            }];
+        }
+    }
+    else {
         [self.delegate repositionShoppables];
     }
 }

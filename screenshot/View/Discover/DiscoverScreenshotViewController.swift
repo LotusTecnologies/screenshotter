@@ -14,8 +14,9 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
 }
 
 class DiscoverScreenshotViewController : BaseViewController {
+    fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
-    fileprivate var matchstickFrc = DataModel.sharedInstance.matchstickFrc
+    fileprivate var matchstickFrc: NSFetchedResultsController<Matchstick>?
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
@@ -39,9 +40,11 @@ class DiscoverScreenshotViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        addNavigationItemLogo()
+        restorationIdentifier = String(describing: type(of: self))
         
-        DataModel.sharedInstance.matchstickFrcDelegate = self
+        coreDataPreparationController.delegate = self
+        
+        addNavigationItemLogo()
     }
     
     override func viewDidLoad() {
@@ -114,7 +117,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        if matchstickFrc.fetchedObjects?.count ?? 0 > 0 {
+        coreDataPreparationController.viewDidLoad()
+        
+        if matchstickFrc?.fetchedObjects?.count ?? 0 > 0 {
             isListEmpty = false
         }
     }
@@ -126,6 +131,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     deinit {
+        coreDataPreparationController.delegate = nil
+        
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = nil
         }
@@ -139,7 +146,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var pseudoMatchsticksCount = 0
     
     fileprivate func updateMatchsticksCount() {
-        pseudoMatchsticksCount = matchstickFrc.fetchedObjects?.count ?? 0
+        pseudoMatchsticksCount = matchstickFrc?.fetchedObjects?.count ?? 0
         
         if isListEmpty && pseudoMatchsticksCount > 0 {
             isListEmpty = false
@@ -155,7 +162,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return matchstickFrc.object(at: currentIndexPath)
+        return matchstickFrc?.object(at: currentIndexPath)
     }
     
     // MARK: Decision
@@ -262,7 +269,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc.fetchedObjects?.count == 1 {
+                if self.matchstickFrc?.fetchedObjects?.count == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }
@@ -277,15 +284,23 @@ class DiscoverScreenshotViewController : BaseViewController {
             
             if abs(decisionValueThreshold) >= 1 {
                 if decisionValueThreshold > 0 {
-                    decidedToAdd()
-                    AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "swipe"])
+                    AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+                        "by": "swipe",
+                        "url": currentMatchstick?.imageUrl ?? ""
+                        ])
                     
-                } else {
-                    decidedToPass()
-                    AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "swipe"])
+                    decidedToAdd()
                 }
-                
-            } else {
+                else {
+                    AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
+                        "by": "swipe",
+                        "url": currentMatchstick?.imageUrl ?? ""
+                        ])
+                    
+                    decidedToPass()
+                }
+            }
+            else {
                 UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                     self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
                     self.postDecision()
@@ -298,13 +313,21 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func passButtonAction() {
+        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
+            "by": "tap",
+            "url": currentMatchstick?.imageUrl ?? ""
+            ])
+        
         decidedToPass()
-        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: ["by": "tap"])
     }
     
     @objc fileprivate func addButtonAction() {
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+            "by": "tap",
+            "url": currentMatchstick?.imageUrl ?? ""
+            ])
+        
         decidedToAdd()
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
     }
     
     // MARK: Helper View
@@ -428,9 +451,9 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
-            let matchstick = matchstickFrc.object(at: indexPath)
+            let matchstick = matchstickFrc?.object(at: indexPath)
             
-            if let imageData = matchstick.imageData as Data? {
+            if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
             }
         }
@@ -452,11 +475,33 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
-        
-        // TODO: ask caras how he wants these analytics set up
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: ["by": "tap"])
+        AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+            "by": "open",
+            "url": currentMatchstick?.imageUrl ?? ""
+            ])
         AnalyticsTrackers.standard.track("Matchsticks Opened Screenshot")
+        
+        delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
+    }
+}
+
+extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelegate {
+    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
+        DataModel.sharedInstance.matchstickFrcDelegate = self
+        matchstickFrc = DataModel.sharedInstance.matchstickFrc
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loader)
+        loader.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        loader.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        loader.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        loader.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
+        loader.removeFromSuperview()
     }
 }
 

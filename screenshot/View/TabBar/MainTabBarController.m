@@ -10,14 +10,14 @@
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
 
-@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol> {
+@interface MainTabBarController () <UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle> {
     BOOL _isObservingSettingsBadgeFont;
 }
 
 @property (nonatomic, strong) FavoritesNavigationController *favoritesNavigationController;
 @property (nonatomic, strong) ScreenshotsNavigationController *screenshotsNavigationController;
 @property (nonatomic, strong) DiscoverNavigationController *discoverNavigationController;
-@property (nonatomic, strong) UINavigationController *settingsNavigationController;
+@property (nonatomic, strong) SettingsNavigationController *settingsNavigationController;
 @property (nonatomic, strong) UITabBarItem *settingsTabBarItem;
 @property (nonatomic, strong) UpdatePromptHandler *updatePromptHandler;
 @property (nonatomic) NSInteger discoverTabTag;
@@ -32,6 +32,7 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.delegate = self;
+        self.restorationIdentifier = NSStringFromClass([self class]);
         
         _screenshotsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarScreenshot"];
@@ -62,16 +63,13 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
             navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:self.discoverTabTag];
             navigationController;
         });
-
+        
         _settingsNavigationController = ({
             UIImage *image = [UIImage imageNamed:@"TabBarUser"];
             
-            SettingsViewController *viewController = [[SettingsViewController alloc] init];
-            viewController.delegate = self;
-            
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
-            navigationController.title = viewController.title;
-            navigationController.view.backgroundColor = [UIColor background];
+            SettingsNavigationController *navigationController = [[SettingsNavigationController alloc] init];
+            navigationController.settingsViewController.delegate = self;
+            navigationController.title = navigationController.settingsViewController.title;
             navigationController.tabBarItem = [self tabBarItemWithTitle:navigationController.title image:image tag:3];
             navigationController.tabBarItem.badgeColor = [UIColor crazeRed];
             _settingsTabBarItem = navigationController.tabBarItem;
@@ -96,14 +94,38 @@ NSString *const TabBarBadgeFontKey = @"view.badge.label.font";
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:willAppear:)]) {
+        [self.lifeCycleDelegate viewController:self willAppear:animated];
+    }
+    
     [self refreshTabBarSettingsBadge];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:didAppear:)]) {
+        [self.lifeCycleDelegate viewController:self didAppear:animated];
+    }
+    
     [self presentUpdatePromptIfNeeded];
     [self presentChangelogAlertIfNeeded];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:willDisappear:)]) {
+        [self.lifeCycleDelegate viewController:self willDisappear:animated];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if ([self.lifeCycleDelegate respondsToSelector:@selector(viewController:didDisappear:)]) {
+        [self.lifeCycleDelegate viewController:self didDisappear:animated];
+    }
 }
 
 - (void)viewSafeAreaInsetsDidChange {

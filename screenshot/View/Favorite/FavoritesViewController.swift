@@ -16,10 +16,11 @@ protocol FavoritesViewControllerDelegate : NSObjectProtocol {
 class FavoritesViewController : BaseViewController {
     weak var delegate: FavoritesViewControllerDelegate?
     
+    fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let tableView = UITableView()
     private let helperView = HelperView()
     
-    fileprivate let favoriteFrc = DataModel.sharedInstance.favoriteFrc
+    fileprivate var favoriteFrc: NSFetchedResultsController<Screenshot>?
     
     override var title: String? {
         set {}
@@ -39,7 +40,9 @@ class FavoritesViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        DataModel.sharedInstance.favoriteFrcDelegate = self
+        restorationIdentifier = String(describing: type(of: self))
+        
+        coreDataPreparationController.delegate = self
         
         addNavigationItemLogo()
     }
@@ -74,6 +77,8 @@ class FavoritesViewController : BaseViewController {
         helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        coreDataPreparationController.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -101,6 +106,7 @@ class FavoritesViewController : BaseViewController {
     }
     
     deinit {
+        coreDataPreparationController.delegate = nil
         tableView.delegate = nil
         tableView.dataSource = nil
         
@@ -110,7 +116,7 @@ class FavoritesViewController : BaseViewController {
     // MARK: Screenshot
     
     func screenshot(at indexPath: IndexPath) -> Screenshot? {
-        guard let screenshots = favoriteFrc.fetchedObjects else {
+        guard let screenshots = favoriteFrc?.fetchedObjects else {
             return nil
         }
         
@@ -118,7 +124,7 @@ class FavoritesViewController : BaseViewController {
     }
     
     func screenshot(withAssetId assetId: String) -> Screenshot? {
-        return favoriteFrc.fetchedObjects?.first(where: { screenshot -> Bool in
+        return favoriteFrc?.fetchedObjects?.first(where: { screenshot -> Bool in
             return screenshot.assetId == assetId
         })
     }
@@ -126,7 +132,7 @@ class FavoritesViewController : BaseViewController {
     fileprivate var screenshotAssetIds: [String] = []
     
     fileprivate func syncScreenshotAssetIds() {
-        screenshotAssetIds = favoriteFrc.fetchedObjects?.map { screenshot -> String in
+        screenshotAssetIds = favoriteFrc?.fetchedObjects?.map { screenshot -> String in
             return screenshot.assetId ?? ""
         } ?? []
     }
@@ -232,7 +238,7 @@ class FavoritesViewController : BaseViewController {
 
 extension FavoritesViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return favoriteFrc.fetchedObjects?.count ?? 0
+        return favoriteFrc?.fetchedObjects?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -283,6 +289,31 @@ extension FavoritesViewController : UITableViewDataSource {
 extension FavoritesViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.favoritesViewController(self, didSelectItemAt: indexPath)
+    }
+}
+
+extension FavoritesViewController : CoreDataPreparationControllerDelegate {
+    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
+        DataModel.sharedInstance.favoriteFrcDelegate = self
+        favoriteFrc = DataModel.sharedInstance.favoriteFrc
+        
+        if DataModel.sharedInstance.isCoreDataStackReady {
+            tableView.reloadData()
+            syncHelperViewVisibility()
+        }
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loader)
+        loader.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        loader.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        loader.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        loader.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
+        loader.removeFromSuperview()
     }
 }
 

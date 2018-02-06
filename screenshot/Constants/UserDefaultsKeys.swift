@@ -14,7 +14,8 @@ class UserDefaultsKeys : NSObject {
     static let name = "Name"
     static let userID = "UserID"
     static let referralChannel = "ReferralChannel"
-    
+    static let campaign = "Campaign"
+
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     

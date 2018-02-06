@@ -30,6 +30,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
+    fileprivate let frameworkSetupController = FrameworkSetupController()
+    
+    fileprivate lazy var mainTabBarController: MainTabBarController = {
+        let viewController = MainTabBarController()
+        viewController.lifeCycleDelegate = self
+        return viewController
+    }()
+    
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
@@ -37,34 +45,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     override init() {
         settings = AppSettings(withSetter: self.settingsSetter)
         super.init()
+        frameworkSetupController.delegate = self
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        frameworkSetupController.application(application, willFinishLaunchingWithOptions: launchOptions)
+        
         UNUserNotificationCenter.current().delegate = self
-        ClarifaiModel.setup() // Takes a long time to intialize; start early.
-        DataModel.setup() // Sets up Core Data stack on a background queue.
-        return true
-    }
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        setupThirdPartyLibraries(application, launchOptions: launchOptions)
-
-        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        application.applicationIconBadgeNumber = 0
-
-        prepareDataStackCompletionIfNeeded()
-        PermissionsManager.shared.fetchPushPermissionStatus()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil)
+        
+        // Sets up Core Data stack on a background queue.
+        DataModel.setup()
+        
+        fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
-        
-        fetchAppSettings()
-        
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = nextViewController()
         window?.makeKeyAndVisible()
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        application.applicationIconBadgeNumber = 0
+        
+        PermissionsManager.shared.fetchPushPermissionStatus()
+        
+        SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -175,6 +187,197 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    
+    // MARK: State Restoration
+    
+    fileprivate var restorationViewControllers: [String : UIViewController] = [:]
+    
+    func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
+        return false // !!!: restoration needs more testing before being enabled
+    }
+    
+    func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
+        return false
+    }
+    
+    func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
+        guard let identifier = identifierComponents.last as? String else {
+            return nil
+        }
+        
+        // Shorter convenience function
+        func s(_ class: AnyClass) -> String {
+            return String(describing: `class`)
+        }
+        
+        let viewController: UIViewController?
+        
+        switch identifier {
+        case s(MainTabBarController.self):
+            viewController = mainTabBarController
+            
+        case s(ScreenshotsNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.screenshotsNavigationController
+            
+        case s(ScreenshotsViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.screenshotsViewController
+            
+        case s(ProductsViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.createProductsViewController()
+            
+        case s(ScreenshotPickerNavigationController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.createScreenshotPickerNavigationController()
+            
+        case s(ScreenshotPickerViewController.self):
+            guard let navigationController = restorationViewControllers[s(ScreenshotPickerNavigationController.self)] as? ScreenshotPickerNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.screenshotPickerViewController
+            
+        case s(FavoritesNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.favoritesNavigationController
+            
+        case s(FavoritesViewController.self):
+            guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.favoritesViewController
+        
+        case s(DiscoverNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.discoverNavigationController
+            
+        case s(DiscoverScreenshotViewController.self):
+            guard let navigationController = restorationViewControllers[s(DiscoverNavigationController.self)] as? DiscoverNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.discoverScreenshotViewController
+            
+        case s(SettingsNavigationController.self):
+            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
+                return nil
+            }
+            
+            viewController = tabBarController.settingsNavigationController
+            
+        case s(SettingsViewController.self):
+            guard let navigationController = restorationViewControllers[s(SettingsNavigationController.self)] as? SettingsNavigationController else {
+                return nil
+            }
+            
+            viewController = navigationController.settingsViewController
+            
+        default:
+            viewController = nil
+        }
+        
+        if viewController != nil {
+            restorationViewControllers[identifier] = viewController
+        }
+        
+        return viewController
+    }
+}
+
+extension AppDelegate : ViewControllerLifeCycle {
+    func viewController(_ viewController: UIViewController, didAppear animated: Bool) {
+        frameworkSetupController.viewController(viewController, didAppear: animated)
+    }
+}
+
+extension AppDelegate : FrameworkSetupControllerDelegate {
+    func frameworkSetupControllerImmediate(_ controller: FrameworkSetupController) {
+        // Takes a long time to intialize; start early.
+        ClarifaiModel.setup()
+    }
+    
+    func frameworkSetupControllerInitialViewDidAppear(_ controller: FrameworkSetupController) {
+        Appsee.start(Constants.appSeeApiKey)
+        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
+        
+        let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
+        configuration.trackApplicationLifecycleEvents = true
+        configuration.recordScreenViews = true
+        configuration.trackDeepLinks = true
+        configuration.trackPushNotifications = true
+        configuration.use(SEGAmplitudeIntegrationFactory.instance())
+        SEGAnalytics.setup(with: configuration)
+        
+        setupRouter()
+        
+        if UIApplication.isDev {
+            Branch.setUseTestBranchKey(true)
+        }
+        
+        Branch.getInstance()?.initSession(launchOptions: controller.launchOptions) { params, error in
+            // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
+            // params will be empty if no data found
+            guard error == nil, let params = params as? [String : AnyObject] else {
+                AnalyticsTrackers.segment.error(withDescription: error!.localizedDescription)
+                return
+            }
+            
+            if let shareId = params["shareId"] as? String {
+                AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
+                self.showScreenshotListTop()
+            }
+            
+            if let channel = params["~channel"] as? String {
+                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
+            }
+            
+            if let campaign = params["~campaign"] as? String {
+                UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
+            }
+            
+            // "discoverURL" will be the discover URL that should be used during this session.
+            if let discoverURLString = params["discoverURL"] as? String {
+                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
+            }
+        }
+    }
+    
+    func frameworkSetupControllerRootViewDidAppear(_ controller: FrameworkSetupController) {
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+            // FIXME: Creating a 1 second delay prevents an indefinite block on the main thread.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions: controller.launchOptions)
+                
+                RatingFlow.sharedInstance.start()
+                
+                IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
+                
+                FirebaseApp.configure()
+                GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
+            }
+        }
+    }
 }
 
 extension AppDelegate {
@@ -189,104 +392,33 @@ extension AppDelegate {
         }
     }
     
-    // MARK: - Third Party
-
-    func setupThirdPartyLibraries(_ application: UIApplication, launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
-        setupRouter()
-        
-        let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
-        configuration.trackApplicationLifecycleEvents = true
-        configuration.recordScreenViews = true
-        configuration.trackDeepLinks = true
-        configuration.trackPushNotifications = true
-        configuration.use(SEGAmplitudeIntegrationFactory.instance())
-        
-        SEGAnalytics.setup(with: configuration)
-        
-        Appsee.start(Constants.appSeeApiKey)
-        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
-        
-        if UIApplication.isDev {
-            Branch.setUseTestBranchKey(true)
-        }
-        
-        let branch = Branch.getInstance()
-        branch?.initSession(launchOptions: launchOptions) { params, error in
-            // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
-            // params will be empty if no data found
-            guard error == nil, let params = params as? [String : AnyObject] else {
-                AnalyticsTrackers.segment.error(withDescription: error!.localizedDescription)
-                return
-            }
-            
-            if let shareId = params["shareId"] as? String {
-                AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
-                self.showScreenshotListTop()
-            }
-            
-            if let channel = params["channel"] as? String {
-                UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
-            }
-            
-            // "discoverURL" will be the discover URL that should be used during this session.
-            if let discoverURLString = params["discoverURL"] as? String {
-                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
-            }
-        }
-        
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-        
-        RatingFlow.sharedInstance.start()
-        
-        IntercomHelper.sharedInstance.start(withLaunchOptions: launchOptions ?? [:])
-        
-        FirebaseApp.configure()
-        
-        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
-    }
-    
     // MARK: - View Controllers
     
     func nextViewController() -> UIViewController {
-        var viewController: UIViewController
+        let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            if DataModel.sharedInstance.isCoreDataStackReady {
-                viewController = MainTabBarController()
-            } else {
-                viewController = LoadingViewController()
-            }
-        } else {
+            viewController = mainTabBarController
+        }
+        else {
             let tutorialViewController = TutorialViewController()
             tutorialViewController.delegate = self
+            tutorialViewController.lifeCycleDelegate = self
             viewController = tutorialViewController
         }
+        
+        frameworkSetupController.setIsWaitingForRootViewController()
         
         return viewController
     }
     
-    func prepareDataStackCompletionIfNeeded() {
-        func syncPhotos() {
+    func coreDataStackCompletionHandler(notification: Notification) {
+        if notification.userInfo?["error"] == nil {
             if ApplicationStateModel.sharedInstance.isBackground() {
                 AssetSyncModel.sharedInstance.syncPhotos()
-            } else {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             }
-        }
-        
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            if DataModel.sharedInstance.isCoreDataStackReady {
-                syncPhotos()
-            } else {
-                DataModel.sharedInstance.coreDataStackCompletionHandler = {
-                    syncPhotos()
-                    
-                    self.transitionTo(self.nextViewController())
-                }
-                
-                DataModel.sharedInstance.coreDataStackFailureHandler = {
-                    print("Core Data stack failed")
-                }
+            else {
+                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
             }
         }
     }
@@ -298,11 +430,9 @@ extension AppDelegate {
             })
         }
     }
-}
-
-// MARK: - Deep Link Router
-
-extension AppDelegate {
+    
+    // MARK: Deep Link Router
+    
     func setupRouter() {
         router = DPLDeepLinkRouter()
         router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
@@ -311,11 +441,9 @@ extension AppDelegate {
 
 // MARK: - Tutorial
 
-extension AppDelegate: TutorialViewControllerDelegate {
+extension AppDelegate : TutorialViewControllerDelegate {
     func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
-        
-        self.prepareDataStackCompletionIfNeeded()
         
         // Create a delay for a more natural feel after taking the screenshot
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -380,7 +508,7 @@ extension AppDelegate {
     }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
+extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : String],
           let openingScreen = userInfo[Constants.openingScreenKey],

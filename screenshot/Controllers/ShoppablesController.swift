@@ -41,8 +41,12 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
         DataModel.sharedInstance.clearShoppableFrc();
     }
     
-    func refetchShoppables() {
-        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot)
+    func refetchShoppablesAsFurniture() {
+        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot, classificationString: "f")
+    }
+    
+    func refetchShoppablesAsFashion() {
+        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot, classificationString: "h")
     }
     
     func shoppableCount() -> Int {
@@ -54,7 +58,7 @@ class ShoppablesController: NSObject, FrcDelegateProtocol {
     }
     
     func shoppable(at index: Int) -> Shoppable {
-        return shoppablesFrc.object(at: IndexPath.init(row: index, section: 0))
+        return shoppablesFrc.object(at: IndexPath(item: index, section: 0))
     }
 }
 
