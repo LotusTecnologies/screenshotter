@@ -458,6 +458,10 @@ extension DataModel {
         }
     }
     
+    public func hide(screenshotOIDArray: [NSManagedObjectID]) {
+        
+    }
+    
     // Save a new Shoppable to Core Data.
     func saveShoppable(managedObjectContext: NSManagedObjectContext,
                        screenshot: Screenshot,

@@ -26,6 +26,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
 
 @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
+@property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *deleteScreenshotObjectIDs;
 
 @property (nonatomic, strong) NSDate *lastVisited;
 
@@ -133,6 +134,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [super viewDidDisappear:animated];
     
     [self removeScreenshotHelperView];
+    
+    if ([self isEditing]) {
+        // Incase the app somehow changed view controllers while editing, cancel it.
+        [self setEditing:NO animated:animated];
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -292,10 +298,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     if (editing) {
         self.editButtonItem.title = @"Cancel";
+        
+        self.deleteScreenshotObjectIDs = [NSMutableArray array];
     }
     else {
         // Deselect all cells
         [self.collectionView selectItemAtIndexPath:nil animated:animated scrollPosition:UICollectionViewScrollPositionNone];
+        
+        self.deleteScreenshotObjectIDs = nil;
     }
 }
 
@@ -314,7 +324,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)deleteButtonAction {
-    // TODO:
+    // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
+    
+    if (self.deleteScreenshotObjectIDs.count > 0) {
+        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
+    }
 }
 
 
@@ -447,14 +461,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImage) {
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        
         if ([self isEditing]) {
             [self updateDeleteButtonCount];
+            [self.deleteScreenshotObjectIDs addObject:screenshot.objectID];
         }
         else {
             [collectionView deselectItemAtIndexPath:indexPath animated:NO];
             [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
-            
-            Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
             
             if (screenshot.uploadedImageURL) {
                 [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
@@ -465,7 +480,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImage && [self isEditing]) {
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        
         [self updateDeleteButtonCount];
+        [self.deleteScreenshotObjectIDs removeObject:screenshot.objectID];
     }
 }
 
