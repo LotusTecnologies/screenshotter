@@ -372,6 +372,10 @@ class NetworkingPromise: NSObject {
     }
     
     static func shorten(url: URL, completion: @escaping (URL?) -> Void) {
+        guard let shortenerUrl = URL(string: "https://craz.me/shortener") else {
+            completion(nil)
+            return
+        }
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
@@ -382,7 +386,7 @@ class NetworkingPromise: NSObject {
         let postData = try? JSONSerialization.data(withJSONObject: postDict, options: [])
         let postLength = "\(postData == nil ? 0 : postData!.count)"
         
-        var request = URLRequest(url: URL(string: "https://craz.me/shortener")!)
+        var request = URLRequest(url: shortenerUrl)
         request.httpMethod = "POST"
         request.addValue(postLength, forHTTPHeaderField: "Content-Length")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
