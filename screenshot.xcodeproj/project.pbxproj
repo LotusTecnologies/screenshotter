@@ -86,7 +86,6 @@
 		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889E1FE949320006914C /* BarButtonItem.swift */; };
-		C56F88A21FE949720006914C /* TappableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F88A11FE949720006914C /* TappableText.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
@@ -214,7 +213,6 @@
 		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C56F889E1FE949320006914C /* BarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarButtonItem.swift; sourceTree = "<group>"; };
-		C56F88A11FE949720006914C /* TappableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableText.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
@@ -546,7 +544,6 @@
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
-				C56F88A01FE949560006914C /* Protocol */,
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C540884A1FE90E2200198955 /* TextView */,
@@ -629,14 +626,6 @@
 				C5AC7E641FFA2D2600F491C0 /* Size.swift */,
 			);
 			path = Extension;
-			sourceTree = "<group>";
-		};
-		C56F88A01FE949560006914C /* Protocol */ = {
-			isa = PBXGroup;
-			children = (
-				C56F88A11FE949720006914C /* TappableText.swift */,
-			);
-			path = Protocol;
 			sourceTree = "<group>";
 		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
@@ -983,7 +972,6 @@
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
-				C56F88A21FE949720006914C /* TappableText.swift in Sources */,
 				C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,

@@ -155,13 +155,13 @@
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";
+"tutorial.email.legal.0" = "By tapping \"Submit\" above, you agree to our ";
+"tutorial.email.legal.1" = "Terms of Service";
+"tutorial.email.legal.2" = " and ";
+"tutorial.email.legal.3" = "Privacy Policy";
+"tutorial.email.legal.4" = " ";
 "tutorial.email.name" = "Name";
 "tutorial.email.title" = "Sign Up";
-"tutorial.email.legal.start" = "By tapping \"Submit\" above, you agree to our ";
-"tutorial.email.legal.tos" = "Terms of Service";
-"tutorial.email.legal.middle" = " and ";
-"tutorial.email.legal.pp" = "Privacy Policy";
-"tutorial.email.legal.end" = " ";
 
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";

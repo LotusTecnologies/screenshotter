@@ -23,6 +23,9 @@ public class TutorialEmailSlideView : HelperView {
     fileprivate let textView = TappableTextView()
     fileprivate let button = MainButton()
     
+    fileprivate let legalLinkTOS = "TOS"
+    fileprivate let legalLinkPP = "PP"
+    
     // MARK: Life Cycle
     
     public required init?(coder aDecoder: NSCoder) {
@@ -85,42 +88,53 @@ public class TutorialEmailSlideView : HelperView {
         button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
         button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         
-        {
-            textView.tappableTextDelegate = self
-            textView.translatesAutoresizingMaskIntoConstraints = false
-            textView.backgroundColor = .clear
-            textView.textColor = .gray6
-            textView.textAlignment = .center
-            textView.font = UIFont.preferredFont(forTextStyle: .footnote)
-            textView.adjustsFontForContentSizeCategory = true
-            textView.isEditable = false
-            textView.isScrollEnabled = false
-            textView.scrollsToTop = false
-            contentView.addSubview(textView)
-            textView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-            textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor, constant: .extendedPadding).isActive = true
-            textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-            textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-            textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-            
-            let tappableText: [[String : Bool]] = [
-                ["tutorial.email.legal.start".localized: false],
-                ["tutorial.email.legal.tos".localized: true],
-                ["tutorial.email.legal.middle".localized: false],
-                ["tutorial.email.legal.pp".localized: true],
-                ["tutorial.email.legal.end".localized: false]
-            ]
+        let linkTextColor: UIColor = .crazeGreen
+        
+        textView.delegate = self
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.backgroundColor = .clear
+        textView.adjustsFontForContentSizeCategory = true
+        textView.isEditable = false
+        textView.isScrollEnabled = false
+        textView.scrollsToTop = false
+        textView.linkTextAttributes = [
+            NSForegroundColorAttributeName: linkTextColor,
+            NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
+            NSUnderlineColorAttributeName: linkTextColor
+        ]
+        textView.attributedText = {
+            let textViewFont: UIFont = .preferredFont(forTextStyle: .footnote)
             
             let paragraph = NSMutableParagraphStyle()
-            paragraph.alignment = textView.textAlignment
+            paragraph.alignment = .center
             
-            let attributes: [String : AnyObject] = [
-                NSFontAttributeName: textView.font!,
-                NSParagraphStyleAttributeName: paragraph
-            ]
+            func attributes(_ link: String? = nil) -> [String : Any] {
+                var attributes: [String : Any] = [
+                    NSFontAttributeName: textViewFont,
+                    NSParagraphStyleAttributeName: paragraph
+                ]
+                
+                if let link = link {
+                    attributes[NSLinkAttributeName] = link
+                }
+                
+                return attributes
+            }
             
-            textView.applyTappableText(tappableText, with: attributes)
+            return NSMutableAttributedString(segmentedString: "tutorial.email.legal", attributes: [
+                attributes(),
+                attributes(legalLinkTOS),
+                attributes(),
+                attributes(legalLinkPP),
+                attributes()
+                ])
         }()
+        contentView.addSubview(textView)
+        textView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor, constant: .extendedPadding).isActive = true
+        textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
     }
@@ -211,18 +225,21 @@ public class TutorialEmailSlideView : HelperView {
     }
 }
 
-extension TutorialEmailSlideView : TappableTextDelegate {
-    func tappableText(view: TappableTextProtocol, tappedTextAt index: UInt) {
-        switch index {
-        case 3:
-            delegate?.tutorialEmailSlideViewDidTapPrivacyPolicy(self)
-            break
-        case 1:
+extension TutorialEmailSlideView : UITextViewDelegate {
+    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        
+        switch URL.absoluteString {
+        case legalLinkTOS:
             delegate?.tutorialEmailSlideViewDidTapTermsOfService(self)
-            break
+            
+        case legalLinkPP:
+            delegate?.tutorialEmailSlideViewDidTapPrivacyPolicy(self)
+            
         default:
             break
         }
+        
+        return false
     }
 }
 
