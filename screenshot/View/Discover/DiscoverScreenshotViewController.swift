@@ -285,8 +285,8 @@ class DiscoverScreenshotViewController : BaseViewController {
             let velocityIsNegative = (velocity.x < 0)
             let positionIsNegative = (decisionValueThreshold < 0)
             let velocityAndPositionIsInSameDirection = (decisionValueThreshold == 0 || velocityIsNegative == positionIsNegative)
-            let velocityOrPositionPassedThreshhold = ( abs(velocity.x) > 700 ||  abs(decisionValueThreshold) >= 1)
-            print("velocity :\(velocity) velocityIsNegative:\(velocityIsNegative) positionIsNegative: \(positionIsNegative), decisionValueThreshold:\(decisionValueThreshold) ");
+            let velocityOrPositionPassedThreshhold = (abs(velocity.x) > 700 || abs(decisionValueThreshold) >= 1)
+
             let direction:Int = {
                 if decisionValueThreshold > 0 {
                     return 1
@@ -298,6 +298,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     return -1
                 }
             }()
+            
             if velocityAndPositionIsInSameDirection && velocityOrPositionPassedThreshhold {
                 if direction == 1 {
                     AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
