@@ -7,7 +7,6 @@
 //
 
 #import "NetworkingModel.h"
-#import <AFNetworking/AFNetworking.h>
 
 @implementation NetworkingModel
 
