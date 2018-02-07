@@ -112,6 +112,7 @@
 "products.options.sort.title" = "Sort by";
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.unrated" = "Are these results relevant?";
+"products.rate.backToConverstationWithStylist" = "Talk to your stylist";
 "products.tooltip.title" = "Tap to shop different types of products";
 
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";

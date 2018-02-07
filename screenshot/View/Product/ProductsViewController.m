@@ -10,6 +10,7 @@
 #import "ProductCollectionViewCell.h"
 #import "ShoppablesToolbar.h"
 #import "screenshot-Swift.h"
+#import <PromiseKit/PromiseKit.h>
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
@@ -129,6 +130,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
         [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
+        [view.talkToYourStylistButton addTarget:self action:@selector(talkToYourStylistAction) forControlEvents:UIControlEventTouchUpInside];
+
         view;
     });
     
@@ -689,13 +692,23 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self presentProductsRateNegativeAlert];    
 }
+- (void)talkToYourStylistAction {
+    [IntercomHelper.sharedInstance presentMessagingUI];
+}
 
 - (void)presentProductsRateNegativeAlert {
+    if ( YES ){
+        InAppPurchaseManager.sharedInstance.loadProductInfo;
+    }
+
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry To Hear That!" message:@"We hear you loud and clear and we’re going to look into this. How else can we help?" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//        InAppPurchaseManager.sharedInstance.
+        
+
         [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
         
         NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
