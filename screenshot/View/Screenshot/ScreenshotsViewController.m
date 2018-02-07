@@ -750,7 +750,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
                 BOOL didDeleteScreenshots = YES;
                 
                 for (Screenshot *screenshot in self.screenshotFrc.fetchedObjects) {
-                    if ([self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
+                    // Not sure which is correct...
+//                    [self.deleteScreenshotObjectIDs.firstObject isEqual:screenshot.objectID]
+                    if (self.deleteScreenshotObjectIDs.firstObject == screenshot.objectID) {
                         didDeleteScreenshots = NO;
                         break;
                     }
