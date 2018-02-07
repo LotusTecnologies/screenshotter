@@ -632,8 +632,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [[self screenshotAtIndex:indexPath.item] setHide];
             [self removeScreenshotHelperView];
             
+            // Select the cell for the UI change from selectedState
+            [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+            
             [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
-                // TODO: make sure the state is still selected and this is enabled
                 [cell _setSelectedState:2];
             }];
             
@@ -708,12 +710,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneDeletedAt:(NSIndexPath *)indexPath {
     if (frc == self.screenshotFrc) {
-        [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
-        [self syncHelperViewVisibility];
-        
-        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
-            [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
-        }
+//        [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+//        [self syncHelperViewVisibility];
+//
+//        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
+//            [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
+//        }
     }
 }
 
@@ -733,12 +735,35 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)frcReloadData:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc {
-    // TODO: reset the deleted screenshot array and enable the edit button
-    // take into account the only multiple deletes will come here, deleting
-    // a single item will goto the oneDeletedAt
     if (frc == self.screenshotFrc) {
         [self.collectionView reloadData];
         [self syncHelperViewVisibility];
+        
+        
+        // TODO: reset the deleted screenshot array and enable the edit button
+        // take into account the only multiple deletes will come here, deleting
+        // a single item will goto the oneDeletedAt
+        
+        // Below is not tested. also include for one delete at
+        if (self.deleteScreenshotObjectIDs.count > 0) {
+            if (self.screenshotFrc.fetchedObjects.count > 0) {
+                BOOL didDeleteScreenshots = YES;
+                
+                for (Screenshot *screenshot in self.screenshotFrc.fetchedObjects) {
+                    if ([self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
+                        didDeleteScreenshots = NO;
+                        break;
+                    }
+                }
+                
+                if (didDeleteScreenshots) {
+                    [self deselectDeletedScreenshots];
+                }
+            }
+            else {
+                [self deselectDeletedScreenshots];
+            }
+        }
     }
 }
 
