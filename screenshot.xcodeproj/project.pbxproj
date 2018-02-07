@@ -28,7 +28,6 @@
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
-		C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C5278FC01F3C38510090E422 /* NetworkingModel.m */; };
 		C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C537F39D2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift */; };
 		C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */; };
 		C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C53B15BC1FDD638C00658A78 /* Localizable.strings */; };
@@ -88,7 +87,6 @@
 		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889E1FE949320006914C /* BarButtonItem.swift */; };
-		C56F88A21FE949720006914C /* TappableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F88A11FE949720006914C /* TappableText.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
@@ -150,8 +148,6 @@
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		C5278FBF1F3C38510090E422 /* NetworkingModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkingModel.h; sourceTree = "<group>"; };
-		C5278FC01F3C38510090E422 /* NetworkingModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkingModel.m; sourceTree = "<group>"; };
 		C537F39D2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotCollectionViewCell.swift; sourceTree = "<group>"; };
 		C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = FavoriteHeart.json; sourceTree = "<group>"; };
 		C53B15BB1FDD638C00658A78 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -219,7 +215,6 @@
 		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C56F889E1FE949320006914C /* BarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarButtonItem.swift; sourceTree = "<group>"; };
-		C56F88A11FE949720006914C /* TappableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableText.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
@@ -333,8 +328,6 @@
 				C5278FB91F3C38510090E422 /* AssetSyncModel.swift */,
 				C5278FBA1F3C38510090E422 /* DataModel.swift */,
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
-				C5278FBF1F3C38510090E422 /* NetworkingModel.h */,
-				C5278FC01F3C38510090E422 /* NetworkingModel.m */,
 				E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */,
 				E41449FF1F41890900B1F039 /* ClarifaiModel.swift */,
 				E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */,
@@ -553,7 +546,6 @@
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
-				C56F88A01FE949560006914C /* Protocol */,
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C540884A1FE90E2200198955 /* TextView */,
@@ -637,14 +629,6 @@
 				C5AC7E641FFA2D2600F491C0 /* Size.swift */,
 			);
 			path = Extension;
-			sourceTree = "<group>";
-		};
-		C56F88A01FE949560006914C /* Protocol */ = {
-			isa = PBXGroup;
-			children = (
-				C56F88A11FE949720006914C /* TappableText.swift */,
-			);
-			path = Protocol;
 			sourceTree = "<group>";
 		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
@@ -991,7 +975,6 @@
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
-				C56F88A21FE949720006914C /* TappableText.swift in Sources */,
 				C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
@@ -1015,7 +998,6 @@
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
-				C5278FEF1F3C38510090E422 /* NetworkingModel.m in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C56F889F1FE949330006914C /* BarButtonItem.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,

@@ -370,4 +370,46 @@ class NetworkingPromise: NSObject {
             task.resume()
         }
     }
+    
+    static func shorten(url: URL, completion: @escaping (URL?) -> Void) {
+        guard let shortenerUrl = URL(string: "https://craz.me/shortener") else {
+            completion(nil)
+            return
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
+        let dateNow = dateFormatter.string(from: Date())
+        
+        let postDict = ["type": "long", "long": url.absoluteString, "datePicker": dateNow]
+        
+        let postData = try? JSONSerialization.data(withJSONObject: postDict, options: [])
+        let postLength = "\(postData == nil ? 0 : postData!.count)"
+        
+        var request = URLRequest(url: shortenerUrl)
+        request.httpMethod = "POST"
+        request.addValue(postLength, forHTTPHeaderField: "Content-Length")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = postData
+
+        let session = URLSession.shared
+        let completionHandler = { (data: Data?, response: URLResponse?, error: Error?) in
+            var url: URL? = nil
+            do {
+                if let data = data,
+                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                    let shortString = json["short"] as? String {
+                    url = URL(string: shortString)
+                }
+            } catch {
+                print("NetworkingPromise shorten catch on JSONSerialization data:\(String(describing: data))")
+            }
+            DispatchQueue.main.async {
+                completion(url)
+            }
+        }
+        let dataTask = session.dataTask(with: request, completionHandler: completionHandler)
+        dataTask.resume()
+    }
+
 }

@@ -786,22 +786,53 @@ extension SettingsViewController : TutorialVideoViewControllerDelegate {
 // MARK: - Mail
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
+    func googleMailUrl(to:String?, body:String?, subject:String? ) -> URL? {
+        var components = URLComponents(string: "googlegmail://co")
+        components?.scheme = "googlegmail"
+        
+        var queryItems: [URLQueryItem] = []
+        
+        if let to = to {
+            queryItems.append(URLQueryItem(name: "to", value:to))
+        }
+        
+        if let subject = subject{
+            queryItems.append(URLQueryItem(name: "subject", value:subject))
+        }
+        
+        if let body = body{
+            queryItems.append(URLQueryItem(name: "body", value:body))
+        }
+        
+        if queryItems.isEmpty == false {
+            components?.queryItems = queryItems
+        }
+        
+        return components?.url
+    }
+    
     func presentMailComposer() {
+        let message = [
+            "\n\n\n",
+            "-----------------",
+            "Don't edit below.\n",
+            "version: \(Bundle.displayVersionBuild)"
+        ].joined(separator: "\n")
+        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
+        let subject = "Bug Report"
+        let recipient = "support@screenshopit.com"
+        
         if MFMailComposeViewController.canSendMail() {
-            let message = [
-                "\n\n\n",
-                "-----------------",
-                "Don't edit below.\n",
-                "version: \(Bundle.displayVersionBuild)"
-            ]
-
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
-            mail.setSubject("Bug Report")
-            mail.setMessageBody(message.joined(separator: "\n"), isHTML: false)
-            mail.setToRecipients(["support@screenshopit.com"])
+            mail.setSubject(subject)
+            mail.setMessageBody(message, isHTML: false)
+            mail.setToRecipients([recipient])
             present(mail, animated: true, completion: nil)
-
+            
+        } else if let url = googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            
         } else {
             let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))

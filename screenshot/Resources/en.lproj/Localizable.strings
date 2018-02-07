@@ -28,12 +28,12 @@
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
 "discover.screenshot.helper.title" = "Discover Fashion";
-"discover.screenshot.helper.swipe_left.detail" = "\nto pass";
-"discover.screenshot.helper.swipe_left.title" = "Swipe Left";
-"discover.screenshot.helper.swipe_right.detail" = "\nto add to your collection";
-"discover.screenshot.helper.swipe_right.title" = "Swipe Right";
-"discover.screenshot.helper.tap.detail" = " to shop";
-"discover.screenshot.helper.tap.title" = "Tap";
+"discover.screenshot.helper.swipe_left.0" = "Swipe Left";
+"discover.screenshot.helper.swipe_left.1" = "\nto pass";
+"discover.screenshot.helper.swipe_right.0" = "Swipe Right";
+"discover.screenshot.helper.swipe_right.1" = "\nto add to your collection";
+"discover.screenshot.helper.tap.0" = "Tap";
+"discover.screenshot.helper.tap.1" = " to shop";
 "discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
 
@@ -159,13 +159,13 @@
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";
+"tutorial.email.legal.0" = "By tapping \"Submit\" above, you agree to our ";
+"tutorial.email.legal.1" = "Terms of Service";
+"tutorial.email.legal.2" = " and ";
+"tutorial.email.legal.3" = "Privacy Policy";
+"tutorial.email.legal.4" = " ";
 "tutorial.email.name" = "Name";
 "tutorial.email.title" = "Sign Up";
-"tutorial.email.legal.start" = "By tapping \"Submit\" above, you agree to our ";
-"tutorial.email.legal.tos" = "Terms of Service";
-"tutorial.email.legal.middle" = " and ";
-"tutorial.email.legal.pp" = "Privacy Policy";
-"tutorial.email.legal.end" = " ";
 
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";
