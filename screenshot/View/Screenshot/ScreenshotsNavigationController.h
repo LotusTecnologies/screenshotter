@@ -10,6 +10,8 @@
 #import "ScreenshotsViewController.h"
 
 @class ScreenshotsNavigationController;
+@class ScreenshotPickerNavigationController;
+@class ProductsViewController;
 
 @protocol ScreenshotsNavigationControllerDelegate
 
@@ -22,6 +24,9 @@
 @property (nonatomic, weak) id<ScreenshotsNavigationControllerDelegate> screenshotsNavigationControllerDelegate;
 @property (nonatomic, strong, readonly) ScreenshotsViewController *screenshotsViewController;
 
+- (ScreenshotPickerNavigationController *)createScreenshotPickerNavigationController;
 - (void)presentPickerViewController;
+
+- (ProductsViewController *)createProductsViewController;
 
 @end

@@ -9,11 +9,18 @@
 import Foundation
 import Photos
 
-class ScreenshotPickerNavigationController: UINavigationController {
+class ScreenshotPickerNavigationController : UINavigationController {
     private(set) public var screenshotPickerViewController: ScreenshotPickerViewController!
     private(set) public var cancelButton: UIBarButtonItem!
     private(set) public var doneButton: UIBarButtonItem!
     private var internalDoneButton: UIBarButtonItem!
+    
+    static fileprivate let cancelButtonTargetEncodingKey = "cancelButtonTargetEncodingKey"
+    static fileprivate let cancelButtonActionEncodingKey = "cancelButtonActionEncodingKey"
+    static fileprivate let doneButtonTargetEncodingKey = "doneButtonTargetEncodingKey"
+    static fileprivate let doneButtonActionEncodingKey = "doneButtonActionEncodingKey"
+    
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -21,6 +28,8 @@ class ScreenshotPickerNavigationController: UINavigationController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        restorationIdentifier = String(describing: type(of: self))
         
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
         doneButton = UIBarButtonItem()
@@ -50,7 +59,7 @@ class ScreenshotPickerNavigationController: UINavigationController {
     }
 }
 
-class ScreenshotPickerViewController: BaseViewController {
+class ScreenshotPickerViewController : BaseViewController {
     fileprivate var collectionView: UICollectionView!
     fileprivate var helperView: HelperView!
     fileprivate var segments: UISegmentedControl!
@@ -64,6 +73,8 @@ class ScreenshotPickerViewController: BaseViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        restorationIdentifier = String(describing: type(of: self))
         
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
     }
@@ -284,7 +295,7 @@ class ScreenshotPickerViewController: BaseViewController {
     }
 }
 
-extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
@@ -339,7 +350,7 @@ extension ScreenshotPickerViewController: UIImagePickerControllerDelegate, UINav
 
 // MARK: - Collection View Data Source
 
-extension ScreenshotPickerViewController: UICollectionViewDataSource {
+extension ScreenshotPickerViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return assets?.count ?? 0
     }
@@ -359,7 +370,7 @@ extension ScreenshotPickerViewController: UICollectionViewDataSource {
 
 // MARK: - Collection View Delegate
 
-extension ScreenshotPickerViewController: UICollectionViewDelegate {
+extension ScreenshotPickerViewController : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndexPaths.append(indexPath)
         syncDoneEnabledState()
@@ -376,7 +387,7 @@ extension ScreenshotPickerViewController: UICollectionViewDelegate {
 
 // MARK: - Collection View Delegate Flow Layout
 
-extension ScreenshotPickerViewController: UICollectionViewDelegateFlowLayout {
+extension ScreenshotPickerViewController : UICollectionViewDelegateFlowLayout {
     func collectionViewItemSize() -> CGSize {
         let columnCount = CGFloat(4)
         let interitemSpacing = (collectionView.collectionViewLayout as! UICollectionViewFlowLayout).minimumInteritemSpacing
@@ -393,7 +404,7 @@ extension ScreenshotPickerViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - Toolbar
 
-extension ScreenshotPickerViewController: UIToolbarDelegate {
+extension ScreenshotPickerViewController : UIToolbarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         return .topAttached
     }
