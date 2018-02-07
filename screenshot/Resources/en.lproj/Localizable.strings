@@ -145,6 +145,9 @@
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.version.title" = "App Version";
+"settings.row.restoreInAppPurchase" = "Restore Purchases";
+"settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
+"settings.row.stylistAlreadyPurchase" = "Purchased Personal Stylist";
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
 "settings.section.about" = "About";
@@ -153,6 +156,11 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+"settings.InAppPurchase.Restore" = "In app purchases have been restored successfully";
+"settings.InAppPurchase.RestoreError" = "Error Restoring purchase";
+"settings.InAppPurchase.RestoreNone" = "You have no purchases to restore";
+
+"settings.InAppPurchase.explain" = "You have VIP access to a personal stylist by pressing the thumbs down on a results page";
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";

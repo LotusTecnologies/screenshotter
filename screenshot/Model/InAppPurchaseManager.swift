@@ -10,177 +10,136 @@ import UIKit
 import StoreKit
 import PromiseKit
 
-enum InAppPurchaseProduct : String {
-    case personalStylist = "com.crazeapp.nonconsumable.stylisthelp"
+
+@objc enum InAppPurchaseProduct : Int  {
+    case personalStylist
     
     func productIdentifier() -> String{
-        return self.rawValue
+        switch self {
+        case .personalStylist:
+            return "com.crazeapp.nonconsumable.stylisthelp"
+        }
     }
     static let allProductIdentifiers:Set = [personalStylist.productIdentifier()]
     
 }
 
-class InAppPurchaseInfoProxy : NSObject, SKProductsRequestDelegate  {
-    var dateRetrived:Date?
-    private let (privatePromise, fulfill, reject) = Promise<[SKProduct]>.pending()
-    private var productsRequest:SKProductsRequest?
-    
-    var promise:Promise<[SKProduct]>  {
-        get{
-            return privatePromise
-        }
+extension SKPaymentQueue {
+    public func restorePromise() -> Promise<[String]> {
+        return RestoreObserver.init(queue:self).promise
     }
-    
-     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        dateRetrived = Date.init()
-        print ("found SKProducts \(response.products) invalid:\(response.invalidProductIdentifiers)")
-        fulfill( response.products )
-    }
-     func request(_ request: SKRequest, didFailWithError error: Error) {
-        dateRetrived = Date.init()
-        reject( error )
-    }
-    
-    
-    override init() {
-        super.init()
-        let productsRequest = SKProductsRequest(productIdentifiers: InAppPurchaseProduct.allProductIdentifiers )
-        self.productsRequest = productsRequest
-        productsRequest.delegate = self
-        productsRequest.start()
-        
-    }
-    deinit {
-        productsRequest?.delegate = nil
-        productsRequest?.cancel()
-        if promise.isPending {
-            let error = NSError.init(domain: "Craze", code: -1, userInfo: [NSLocalizedDescriptionKey: "Request was canceled"]) // this shouldn't happen
-            reject(  error )
-        }
-    }
+
 }
 
-
-class InAppPurchaseBuyingProxy : NSObject, SKPaymentTransactionObserver  {
+fileprivate class RestoreObserver: NSObject, SKPaymentTransactionObserver {
+    let (promise, fulfill, reject) = Promise<[String]>.pending()
+    var retainCycle: RestoreObserver?
+    var array:[String] = []
+    init(queue:SKPaymentQueue) {
+        super.init()
+        queue.add(self)
+        queue.restoreCompletedTransactions()
+        retainCycle = self
+    }
+    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+        queue.remove(self)
+        fulfill(array)
+        retainCycle = nil
+    }
+    func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+        queue.remove(self)
+        reject(error)
+        retainCycle = nil
+    }
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
-        for transaction in transactions {
-            if transaction.payment == self.payment {
-                if transaction.transactionState == .purchased || transaction.transactionState == .restored {
-                    fulfill()
-                }else if transaction.transactionState == .failed{
-                    let error = NSError.init(domain: "Craze", code: -3, userInfo: [NSLocalizedDescriptionKey:"Failed to Purchase"])
-                    reject(error)
+        for t in transactions {
+            if t.transactionState == .restored {
+                self.array.append(t.payment.productIdentifier)
+            }
+        }
+    }
+    
+}
+
+class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
+    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+        for t in transactions {
+            let productIdentifier = t.payment.productIdentifier
+            if t.transactionState == .purchased || t.transactionState == .restored {
+                if var array = UserDefaults.standard.object(forKey: UserDefaultsKeys.purchasedProductIdentifier) as? Array<String> {
+                    if !array.contains(productIdentifier) {
+                        array.append(productIdentifier)
+                        UserDefaults.standard.setValue(array, forKey: UserDefaultsKeys.purchasedProductIdentifier)
+                    }
+                }else{
+                    UserDefaults.standard.setValue([productIdentifier], forKey: UserDefaultsKeys.purchasedProductIdentifier)
                 }
             }
         }
     }
     
-    
-    private let (privatePromise, fulfill, reject) = Promise<Void>.pending()
-    private var payment:SKPayment?
-    init(product:SKProduct) {
-        super.init()
-        SKPaymentQueue.default().add(self)
-        let payment = SKPayment.init(product:product)
-        self.payment = payment
-        SKPaymentQueue.default().add(payment)
-    }
-    var promise:Promise<Void>  {
-        get{
-            return privatePromise
-        }
-    }
-    
-    
-    deinit {
-        SKPaymentQueue.default().remove(self)
-        if promise.isPending {
-            let error = NSError.init(domain: "Craze", code: -1, userInfo: [NSLocalizedDescriptionKey: "Request was canceled"]) // this shouldn't happen
-
-            reject( error )  // canceled
-        }
-    }
-}
-
-class InAppPurchaseManager: NSObject {
-    
+    private var productRequest:Promise<SKProductsResponse>?
+    private var buyRequest:Promise<SKProductsResponse>?
+    private var restoreRequest:Promise<[String]>?
     public static let sharedInstance:InAppPurchaseManager = InAppPurchaseManager.init()
 
-    private var infoProxy:InAppPurchaseInfoProxy?
-    private var buyProxy:[SKProduct: InAppPurchaseBuyingProxy?] = [:]
-
-    func didPurchase(_inAppPurchaseProduct:InAppPurchaseProduct) -> Bool {
-        return true
-//        let array = UserDefaults.standard.object(forKey: UserDefaultsKeys.purchasedProductIdentifier) as? Array<String>
-//        if let array = array {
-//            return array.contains(_inAppPurchaseProduct.productIdentifier())
-//        }
-//        
-//        return false
-    }
-     func loadProductInfo() -> (){
-        if infoProxy == nil {
-            infoProxy = InAppPurchaseInfoProxy.init()
+    
+    
+    @objc public func didPurchase(_inAppPurchaseProduct:InAppPurchaseProduct) -> Bool {
+        let array = UserDefaults.standard.object(forKey: UserDefaultsKeys.purchasedProductIdentifier) as? Array<String>
+        if let array = array {
+            return array.contains(_inAppPurchaseProduct.productIdentifier())
         }
+        return false
     }
-    public func buyProduct(_ inAppPurchaseProduct:InAppPurchaseProduct) ->Promise<Void>{
-        let (promise, fulfill, reject) = Promise<Void>.pending()
-
+    @objc func loadProductInfoIfNeeded() {
+        _ = loadProductInfo()
+    }
+    func loadProductInfo() -> Promise<SKProductsResponse>{
+        if productRequest == nil || productRequest!.isRejected { // once you get one successful request no need to do it again
+            productRequest = SKProductsRequest.init(productIdentifiers: InAppPurchaseProduct.allProductIdentifiers).promise()
+        }
+        return productRequest!
         
+    }
+    func restoreInAppPurchases() -> Promise<[String]>{
+        if let restoreRequest = self.restoreRequest, restoreRequest.isPending {
+            return restoreRequest
+        }
+        let reqeust =  SKPaymentQueue.default().restorePromise()
+        self.restoreRequest = reqeust
+        return reqeust
+    }
+
+    @objc func buy ( product:InAppPurchaseProduct, success:@escaping (()->Void), failure:@escaping((Error)->Void)){
+        
+        self.buyProduct(product).then(on:.main, execute: { (_) -> Promise<Bool> in
+            success()
+            return Promise.init(value: true)
+        }).catch(on:.main, execute: { (error) in
+            failure(error)
+        })
+    }
+    
+    public func buyProduct(_ inAppPurchaseProduct:InAppPurchaseProduct) -> Promise<Bool>{
         if didPurchase(_inAppPurchaseProduct: inAppPurchaseProduct) {
-            fulfill()
+            return Promise(value: true)
         }else{
             if SKPaymentQueue.canMakePayments() {
-                
-                if infoProxy == nil {
-                    infoProxy = InAppPurchaseInfoProxy.init()
-                }else if let info = infoProxy {
-                    if info.promise.isRejected {
-                        infoProxy = InAppPurchaseInfoProxy.init()
-                    }else if info.promise.isFulfilled {
-                        if let date = info.dateRetrived {
-                            if date.timeIntervalSinceNow > 60*60*24{
-                                infoProxy = InAppPurchaseInfoProxy.init()
-                            }
-                        }
-                    }
-                }
-                infoProxy?.promise.then(execute: { (products) -> () in
-
-                    var productFound = false
-                    for p in products {
-                        if p.productIdentifier == inAppPurchaseProduct.productIdentifier() {
-                            productFound = true
-                            var buyProxy = self.buyProxy[p]
-                            if  buyProxy == nil {
-                                buyProxy = InAppPurchaseBuyingProxy.init(product: p)
-                            }
-                            buyProxy!?.promise.then( execute:{
-                                fulfill()
-                            }).catch ( execute:{
-                                reject($0)
-                            })
-                            
-                            
-
-                        }
-                    }
-                    if productFound == false{
+                return self.loadProductInfo().then(execute: { (response) -> Promise<Bool> in
+                    if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == inAppPurchaseProduct.productIdentifier() }) {
+                        return SKPayment.init(product: product).promise().then(execute: { (transaction) -> Promise<Bool> in
+                            return Promise(value: true)
+                        })
+                    }else{
                         let error = NSError.init(domain: "Craze", code: -2, userInfo: [NSLocalizedDescriptionKey: "In app purchase not found"]) // this shouldn't happen
-
-                        reject(error)
+                        return Promise.init(error: error)
                     }
-                    
-                }).catch(execute: { (error) in
-                    reject( error )
                 })
             }else{
                 let error = NSError.init(domain: "Craze", code: -2, userInfo: [NSLocalizedDescriptionKey:"You are not authorized for in app purchases on this device"])
-                reject( error )
+                return Promise.init(error: error)
             }
-           
         }
-        return promise
-    }
-    
+    }    
 }

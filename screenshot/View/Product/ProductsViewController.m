@@ -697,8 +697,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 }
 
 - (void)presentProductsRateNegativeAlert {
-    if ( YES ){
-        InAppPurchaseManager.sharedInstance.loadProductInfo;
+
+    if ( [InAppPurchaseManager.sharedInstance didPurchaseWith_inAppPurchaseProduct:InAppPurchaseProductPersonalStylist] ){
+        [InAppPurchaseManager.sharedInstance loadProductInfoIfNeeded];
     }
 
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry To Hear That!" message:@"We hear you loud and clear and we’re going to look into this. How else can we help?" preferredStyle:UIAlertControllerStyleAlert];
@@ -706,13 +707,34 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//        InAppPurchaseManager.sharedInstance.
-        
+        if ( [InAppPurchaseManager.sharedInstance didPurchaseWith_inAppPurchaseProduct:InAppPurchaseProductPersonalStylist] ){
+            [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
+            NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
+            [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
+        } else {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"Unlocking a personal stylist requires and one time in app purchase" preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                //show hud
+                [InAppPurchaseManager.sharedInstance buyWithProduct:InAppPurchaseProductPersonalStylist success:^{
+                    //hide hud
+                    [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
+                    
+                    NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
+                    [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
+                    
+                } failure:^(NSError *error) {
+                    //hide hud
 
-        [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
-        
-        NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
-        [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+                    [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alertController animated:YES completion:nil];
+                }];
+            }]];
+
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alertController animated:YES completion:nil];
+
+        }
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
