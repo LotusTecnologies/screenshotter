@@ -53,6 +53,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         _coreDataPreparationController = [[CoreDataPreparationController alloc] init];
         self.coreDataPreparationController.delegate = self;
         
+        self.editButtonItem.target = self;
+        self.editButtonItem.action = @selector(editButtonAction);
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
     }
@@ -79,6 +81,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
+        collectionView.allowsMultipleSelection = YES;
         
         [collectionView registerClass:[ScreenshotNotificationCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -238,6 +241,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Editing
 
+- (void)editButtonAction {
+    BOOL isEditing = ![self isEditing];
+    
+    if (!isEditing) {
+        // Needs to be before setEditing
+        [self deselectDeletedScreenshots];
+    }
+    
+    [self setEditing:isEditing animated:YES];
+}
+
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     
@@ -270,6 +284,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             
             if ([cell isKindOfClass:[ScreenshotCollectionViewCell class]]) {
                 cell.isEditing = editing;
+                [self syncScreenshotCollectionViewCellSelectedState:cell];
             }
         }
         
@@ -293,19 +308,21 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     }
     
     self.navigationItem.rightBarButtonItem.enabled = !editing;
-    self.collectionView.allowsMultipleSelection = editing;
     
     if (editing) {
         self.editButtonItem.title = @"Cancel";
         
         self.deleteScreenshotObjectIDs = [NSMutableArray array];
     }
-    else {
-        // Deselect all cells
-        [self.collectionView selectItemAtIndexPath:nil animated:animated scrollPosition:UICollectionViewScrollPositionNone];
-        
-        self.deleteScreenshotObjectIDs = nil;
-    }
+}
+
+- (void)deselectDeletedScreenshots {
+    // TODO: call this in cleanup from frc callback
+    
+    // Deselect all cells
+    [self.collectionView selectItemAtIndexPath:nil animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+    
+    self.deleteScreenshotObjectIDs = nil;
 }
 
 - (ScreenshotsDeleteButton *)deleteButton {
@@ -323,11 +340,14 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)deleteButtonAction {
+    [self setEditing:NO animated:YES];
+    self.editButtonItem.enabled = NO;
+    
     // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
     
-    if (self.deleteScreenshotObjectIDs.count > 0) {
-        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
-    }
+//    if (self.deleteScreenshotObjectIDs.count > 0) {
+//        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
+//    }
 }
 
 
@@ -368,7 +388,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ScreenshotsSectionNotification) {
-        return [self hasNewScreenshot] && ![self isEditing];
+        return [self canDisplayNotificationCell];
         
     } else if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjects.count;
@@ -421,8 +441,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         }];
         
         return cell;
-
-    } else if (indexPath.section == ScreenshotsSectionImage) {
+    }
+    else if (indexPath.section == ScreenshotsSectionImage) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
@@ -430,9 +450,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         cell.contentView.backgroundColor = collectionView.backgroundColor;
         cell.screenshot = screenshot;
         cell.isBadgeEnabled = screenshot.isNew;
+        cell.isEditing = [self isEditing];
+        [self syncScreenshotCollectionViewCellSelectedState:cell];
         return cell;
-        
-    } else {
+    }
+    else {
         return nil;
     }
 }
@@ -441,10 +463,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionImage) {
         if (indexPath.item == 0) {
             [self insertScreenshotHelperView];
-        }
-        
-        if ([self isEditing] && [cell isKindOfClass:[ScreenshotCollectionViewCell class]]) {
-            ((ScreenshotCollectionViewCell *)cell).isEditing = YES;
         }
     }
 }
@@ -467,6 +485,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [self.deleteScreenshotObjectIDs addObject:screenshot.objectID];
         }
         else {
+            if (self.deleteScreenshotObjectIDs.count > 0 && [self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
+                return;
+            }
+            
             [collectionView deselectItemAtIndexPath:indexPath animated:NO];
             [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
             
@@ -503,6 +525,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Notification Cell
 
+- (BOOL)canDisplayNotificationCell {
+    return [self hasNewScreenshot] && ![self isEditing];
+}
+
 - (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
     NSUInteger screenshotsCount = [self newScreenshotsCount];
     [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
@@ -531,7 +557,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId {
-    if ([self newScreenshotsCount] > 0) {
+    if ([self canDisplayNotificationCell]) {
         self.notificationCellAssetId = assetId;
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification];
         
@@ -606,14 +632,26 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [[self screenshotAtIndex:indexPath.item] setHide];
             [self removeScreenshotHelperView];
             
-            [UIView animateWithDuration:0.25 animations:^{
-                cell.isEnabled = NO;
+            [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
+                [cell _setSelectedState:2];
             }];
             
             [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
         }
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)syncScreenshotCollectionViewCellSelectedState:(ScreenshotCollectionViewCell *)cell {
+    if ([self isEditing]) {
+        [cell _setSelectedState:1];
+    }
+    else if ([cell isSelected] && self.deleteScreenshotObjectIDs.count > 0) {
+        [cell _setSelectedState:2];
+    }
+    else {
+        [cell _setSelectedState:0];
+    }
 }
 
 
