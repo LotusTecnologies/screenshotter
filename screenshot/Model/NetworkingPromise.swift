@@ -18,7 +18,7 @@ class NetworkingPromise: NSObject {
                 return Promise(error: emptyError)
         }
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=default&payload_type=image_bin"
+            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=shoppable_nordstrom&payload_type=image_bin"
             : "https://homedecor.syteapi.com/offers/bb?account_id=6722&sig=G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=&feed=craze_home&payload_type=image_bin"
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -46,6 +46,7 @@ class NetworkingPromise: NSObject {
                         print("Syte no segments. responseObject:\(dict)")
                         return Promise(error: emptyError)
                 }
+                print("uploadToSyte segments:\(segments)")
                 return Promise(value: (uploadedURLString, segments))
         }
     }
@@ -175,6 +176,7 @@ class NetworkingPromise: NSObject {
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    print("downloadProducts productsArray:\(productsArray)")
                     return Promise(value: productsDict)
                 } else {
                     let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
