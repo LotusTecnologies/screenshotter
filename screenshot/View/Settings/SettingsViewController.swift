@@ -789,7 +789,6 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
     func googleMailUrl(to:String?, body:String?, subject:String? ) -> URL? {
         var components = URLComponents(string: "googlegmail://co")
         components?.scheme = "googlegmail"
-
         
         var queryItems: [URLQueryItem] = []
         
@@ -810,8 +809,8 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
         }
         
         return components?.url
-        
     }
+    
     func presentMailComposer() {
         let message = [
             "\n\n\n",
@@ -822,6 +821,7 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
         let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
         let subject = "Bug Report"
         let recipient = "support@screenshopit.com"
+        
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
@@ -829,10 +829,9 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
             mail.setMessageBody(message, isHTML: false)
             mail.setToRecipients([recipient])
             present(mail, animated: true, completion: nil)
-        } else if let url = googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url){
-            UIApplication.shared.open(url, options: [:], completionHandler: { (success) in
-                
-            })
+            
+        } else if let url = googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
             
         } else {
             let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
