@@ -345,9 +345,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
     
-//    if (self.deleteScreenshotObjectIDs.count > 0) {
-//        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
-//    }
+    if (self.deleteScreenshotObjectIDs.count > 0) {
+        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
+    }
 }
 
 
@@ -633,6 +633,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [self removeScreenshotHelperView];
             
             [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
+                // TODO: make sure the state is still selected and this is enabled
                 [cell _setSelectedState:2];
             }];
             
@@ -732,6 +733,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)frcReloadData:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc {
+    // TODO: reset the deleted screenshot array and enable the edit button
+    // take into account the only multiple deletes will come here, deleting
+    // a single item will goto the oneDeletedAt
     if (frc == self.screenshotFrc) {
         [self.collectionView reloadData];
         [self syncHelperViewVisibility];
