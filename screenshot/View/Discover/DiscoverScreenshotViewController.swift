@@ -269,7 +269,20 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc?.fetchedObjects?.count == 1 {
+                let frcHasOneOrZeroObjects:Bool = {
+                   var count = 0
+                    if let sections = self.matchstickFrc?.sections {
+                        for s in sections{
+                            count = count + s.numberOfObjects
+                            if count > 1 {
+                                return false
+                            }
+                        }
+                    }
+                    
+                    return (count == 0 || count == 1)
+                }()
+                if frcHasOneOrZeroObjects {
                     emptyView.alpha = abs(percent)
                 }
             }
