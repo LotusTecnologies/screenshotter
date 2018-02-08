@@ -465,11 +465,48 @@ extension WebViewController : WKNavigationDelegate {
         }
     }
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        didLoadInitialPage = true
+    func urlIsTracker(url:URL?) -> Bool{
+        let trackers = [
+            "api.shopstyle.com",
+            "doubleclick.net",
+            "adservice.google",
+            "www.googletagmanager.com"
+        ]
+        if let host = url?.host {
+            for t in trackers{
+                if host.contains(t) {
+                    
+                    return true
+                }
+            }
+        }
         
-        if !isShowingGame {
-            hideLoadingView()
+        return false
+        
+    }
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        
+        if didLoadInitialPage == false {
+            if !self.urlIsTracker(url: navigationResponse.response.url){
+                
+                didLoadInitialPage = true
+                
+                if !isShowingGame {
+                    hideLoadingView()
+                }
+            }
+        }
+        
+        decisionHandler(.allow)
+    }
+   
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if didLoadInitialPage == false {
+            didLoadInitialPage = true
+            
+            if !isShowingGame {
+                hideLoadingView()
+            }
         }
     }
     
