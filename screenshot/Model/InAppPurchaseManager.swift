@@ -62,6 +62,14 @@ fileprivate class RestoreObserver: NSObject, SKPaymentTransactionObserver {
 }
 
 class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
+    
+    public static let sharedInstance:InAppPurchaseManager = InAppPurchaseManager.init()
+    private var productRequest:Promise<SKProductsResponse>?
+    private var buyRequest:Promise<SKProductsResponse>?
+    private var restoreRequest:Promise<[String]>?
+    private var productResponse:SKProductsResponse?
+
+
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for t in transactions {
             let productIdentifier = t.payment.productIdentifier
@@ -78,14 +86,6 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         }
     }
     
-    private var productRequest:Promise<SKProductsResponse>?
-    private var buyRequest:Promise<SKProductsResponse>?
-    private var restoreRequest:Promise<[String]>?
-    private var productResponse:SKProductsResponse?
-    public static let sharedInstance:InAppPurchaseManager = InAppPurchaseManager.init()
-
-    
-    
     @objc public func didPurchase(_inAppPurchaseProduct:InAppPurchaseProduct) -> Bool {
         let array = UserDefaults.standard.object(forKey: UserDefaultsKeys.purchasedProductIdentifier) as? Array<String>
         if let array = array {
@@ -93,9 +93,11 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         }
         return false
     }
+    
     @objc func loadProductInfoIfNeeded() {
         _ = loadProductInfo()
     }
+    
     @objc func productIfAvailable(product:InAppPurchaseProduct) -> SKProduct? {
         if let response  = self.productResponse {
             if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == product.productIdentifier() }) {
@@ -113,8 +115,8 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
             }
         }
         return productRequest!
-        
     }
+    
     func restoreInAppPurchases() -> Promise<[String]>{
         if let restoreRequest = self.restoreRequest, restoreRequest.isPending {
             return restoreRequest
@@ -123,6 +125,7 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         self.restoreRequest = request
         return request
     }
+    
     @objc func canPurchase()  -> Bool{
         return SKPaymentQueue.canMakePayments()
     }
