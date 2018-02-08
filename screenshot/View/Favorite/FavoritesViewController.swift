@@ -238,7 +238,7 @@ class FavoritesViewController : BaseViewController {
 
 extension FavoritesViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return favoriteFrc?.fetchedObjects?.count ?? 0
+        return favoriteFrc?.fetchedObjectsCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {

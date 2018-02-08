@@ -1338,3 +1338,11 @@ extension Matchstick {
     }
     
 }
+
+extension NSFetchedResultsController {
+    var fetchedObjectsCount:Int {
+        get {
+            return sections?.reduce(0, {$0 + $1.numberOfObjects}) ?? 0
+        }
+    }
+}
