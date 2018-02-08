@@ -108,11 +108,9 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
     func loadProductInfo() -> Promise<SKProductsResponse>{
         if productRequest == nil || productRequest!.isRejected { // once you get one successful request no need to do it again
             productRequest = SKProductsRequest.init(productIdentifiers: InAppPurchaseProduct.allProductIdentifiers).promise()
-            productRequest?.then(execute: { (response) ->Promise<Void> in
+            productRequest?.then { (response) -> Void in
                 self.productResponse = response
-                print("products: \(response.products) inavlid:\(response.invalidProductIdentifiers)")
-                return Promise(value:true).asVoid()
-            })
+            }
         }
         return productRequest!
         
@@ -121,25 +119,25 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         if let restoreRequest = self.restoreRequest, restoreRequest.isPending {
             return restoreRequest
         }
-        let reqeust =  SKPaymentQueue.default().restorePromise()
-        self.restoreRequest = reqeust
-        return reqeust
+        let request = SKPaymentQueue.default().restorePromise()
+        self.restoreRequest = request
+        return request
     }
     @objc func canPurchase()  -> Bool{
         return SKPaymentQueue.canMakePayments()
     }
 
     @objc func buy ( product:SKProduct, success:@escaping (()->Void), failure:@escaping((Error)->Void)){
-        SKPayment.init(product: product).promise().then(on:.main, execute: { (transaction) -> Promise<Bool> in
+        SKPayment.init(product: product).promise().then(on:.main)  { (transaction) -> Promise<Bool> in
             success()
             return Promise(value:true)
-        }).catch(on: .main, execute:{ (error) in
+        }.catch(on: .main) { (error) in
             failure(error)
-        })
+        }
     }
     
     @objc func load(product:InAppPurchaseProduct, success:@escaping ((SKProduct)->Void), failure:@escaping((Error)->Void) ){
-        self.loadProductInfo().then( on:.main, execute: { (response) -> Promise<Bool> in
+        self.loadProductInfo().then( on:.main) { (response) -> Promise<Bool> in
             if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == product.productIdentifier() }) {
                success(product)
             }else{
@@ -147,8 +145,20 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
                 failure(error)
             }
             return Promise.init(value: true)
-        }).catch(on:.main, execute: { (error) in
+        }.catch(on:.main) { (error) in
             failure(error)
-        })
+        }
+    }
+}
+
+
+extension SKProduct {
+    @objc func localizedPriceString() -> String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.formatterBehavior = .behavior10_4
+        numberFormatter.numberStyle = .currency
+        numberFormatter.locale = self.priceLocale
+        let priceString = numberFormatter.string(from: self.price)
+        return priceString ?? ""
     }
 }

@@ -732,21 +732,13 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
                 SKProduct *product = [InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist];
                 if (product){
                     action.enabled = true;
-                    NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
-                    numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
-                    numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
-                    numberFormatter.locale = product.priceLocale;
-                    NSString* priceString = [numberFormatter stringFromNumber:product.price];
+                    NSString* priceString = product.localizedPriceString;
                     alertController.message = [NSString stringWithFormat:canContinueMessageFormat, priceString];
                 }else{
                     action.enabled = false;
                     [InAppPurchaseManager.sharedInstance loadWithProduct:InAppPurchaseProductPersonalStylist success:^(SKProduct * product) {
                         action.enabled = true;
-                        NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
-                        numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
-                        numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
-                        numberFormatter.locale = product.priceLocale;
-                        NSString* priceString = [numberFormatter stringFromNumber:product.price];
+                        NSString* priceString = product.localizedPriceString;
                         alertController.message = [NSString stringWithFormat:canContinueMessageFormat, priceString];
                     } failure:^(NSError* error){
                         alertController.message = [NSString stringWithFormat:cantGetProductMessageFormat, error.localizedDescription];
