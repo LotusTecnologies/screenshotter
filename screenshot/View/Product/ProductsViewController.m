@@ -716,9 +716,9 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
             [self presentPersonalSylist];
         } else {
             if ([InAppPurchaseManager.sharedInstance canPurchase]){
-                NSString* loadingMessage = @"Unlocking a personal stylist requires and one time in app purchase. \n Connecting to appstore....";
-                NSString* canContinueMessage = @"Unlocking a personal stylist requires and one time in app purchase.";
-                NSString* cantGetProductMessage = @"Unlocking a personal stylist requires and one time in app purchase. \n Unable to connect to the appstore at this time";
+                NSString* loadingMessage = @"Unlocking a personal stylist requires a one time in-app purchase. \n Connecting to appstore....";
+                NSString* canContinueMessageFormat = @"Unlocking a personal stylist requires a one time in-app purchase for %@";
+                NSString* cantGetProductMessageFormat = @"Unlocking a personal stylist requires a one time in-app purchase. \n Unable to connect to the appstore at this time: \n %@";
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:loadingMessage preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction *action = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     [InAppPurchaseManager.sharedInstance buyWithProduct:[InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist] success:^{
@@ -729,17 +729,27 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
                         [self presentViewController:alertController animated:YES completion:nil];
                     }];
                 }];
-                
-                if ([InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist]){
+                SKProduct *product = [InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist];
+                if (product){
                     action.enabled = true;
-                    alertController.message = canContinueMessage;
+                    NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
+                    numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
+                    numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
+                    numberFormatter.locale = product.priceLocale;
+                    NSString* priceString = [numberFormatter stringFromNumber:product.price];
+                    alertController.message = [NSString stringWithFormat:canContinueMessageFormat, priceString];
                 }else{
                     action.enabled = false;
                     [InAppPurchaseManager.sharedInstance loadWithProduct:InAppPurchaseProductPersonalStylist success:^(SKProduct * product) {
                         action.enabled = true;
-                        alertController.message = canContinueMessage;
+                        NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
+                        numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
+                        numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
+                        numberFormatter.locale = product.priceLocale;
+                        NSString* priceString = [numberFormatter stringFromNumber:product.price];
+                        alertController.message = [NSString stringWithFormat:canContinueMessageFormat, priceString];
                     } failure:^(NSError* error){
-                        alertController.message = cantGetProductMessage;
+                        alertController.message = [NSString stringWithFormat:cantGetProductMessageFormat, error.localizedDescription];
                     }];
                 }
                 
