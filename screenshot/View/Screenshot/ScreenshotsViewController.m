@@ -391,7 +391,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         return [self canDisplayNotificationCell];
         
     } else if (section == ScreenshotsSectionImage) {
-        return self.screenshotFrc.fetchedObjects.count;
+        return self.screenshotFrc.fetchedObjectsCount;
         
     } else {
         return 0;
@@ -426,32 +426,39 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     return size;
 }
-
+    
+-(void) setupScreenshotNotificationCollectionViewCell:(ScreenshotNotificationCollectionViewCell*)cell collectionView:(UICollectionView*) collectionView forItemAtIndexPath:(NSIndexPath*) indexPath{
+    cell.delegate = self;
+    cell.contentView.backgroundColor = collectionView.backgroundColor;
+    cell.contentText = [self notificationContentText];
+    [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+    cell.iconImage = nil;
+    
+    [[AssetSyncModel sharedInstance] imageWithAssetId:self.notificationCellAssetId callback:^(UIImage *image, NSDictionary *info) {
+        cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
+    }];
+    
+}
+    
+-(void) setupScreenshotCollectionViewCell:(ScreenshotCollectionViewCell*)cell collectionView:(UICollectionView*) collectionView forItemAtIndexPath:(NSIndexPath*) indexPath{
+    Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+    cell.delegate = self;
+    cell.contentView.backgroundColor = collectionView.backgroundColor;
+    cell.screenshot = screenshot;
+    cell.isBadgeEnabled = screenshot.isNew;
+    cell.isEditing = [self isEditing];
+    [self syncScreenshotCollectionViewCellSelectedState:cell];
+}
+    
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionNotification) {
         ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
-        cell.delegate = self;
-        cell.contentView.backgroundColor = collectionView.backgroundColor;
-        cell.contentText = [self notificationContentText];
-        [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
-        cell.iconImage = nil;
-        
-        [[AssetSyncModel sharedInstance] imageWithAssetId:self.notificationCellAssetId callback:^(UIImage *image, NSDictionary *info) {
-            cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
-        }];
-        
+        [self setupScreenshotNotificationCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
         return cell;
-    }
-    else if (indexPath.section == ScreenshotsSectionImage) {
-        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+    } else if (indexPath.section == ScreenshotsSectionImage) {
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-        cell.delegate = self;
-        cell.contentView.backgroundColor = collectionView.backgroundColor;
-        cell.screenshot = screenshot;
-        cell.isBadgeEnabled = screenshot.isNew;
-        cell.isEditing = [self isEditing];
-        [self syncScreenshotCollectionViewCellSelectedState:cell];
+        [self setupScreenshotCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
         return cell;
     }
     else {
@@ -721,7 +728,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneUpdatedAt:(NSIndexPath *)indexPath {
     if (frc == self.screenshotFrc) {
-        [self.collectionView reloadItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+        NSIndexPath* celIndexPath = [self screenshotFrcToCollectionViewIndexPath:indexPath.item];
+        ScreenshotCollectionViewCell* cell = (ScreenshotCollectionViewCell*)[self.collectionView cellForItemAtIndexPath:celIndexPath];
+        if (cell && [cell isKindOfClass:[ScreenshotCollectionViewCell class]]){
+            [self setupScreenshotCollectionViewCell:cell collectionView:self.collectionView forItemAtIndexPath:indexPath];
+        }
     }
 }
 
