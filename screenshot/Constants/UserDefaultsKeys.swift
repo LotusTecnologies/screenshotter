@@ -63,6 +63,9 @@ class UserDefaultsKeys : NSObject {
     
     // Matchsticks
     static let matchsticksSyncToken = "MatchsticksSyncToken"
+    
+    //In app Purchase
+    static let purchasedProductIdentifier = "PurchasedProductIdentifier"
 }
 
 extension UIApplication {

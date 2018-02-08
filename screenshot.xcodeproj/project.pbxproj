@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
+		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
 		524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */; };
@@ -124,6 +126,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
+		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
 		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -273,6 +277,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */,
+				31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,6 +338,7 @@
 				E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */,
 				C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */,
 				E492CE3C2011051100060FB2 /* MatchstickModel.swift */,
+				31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -733,6 +739,7 @@
 		EED5E55462B98A9C783AC0F5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				31EF9B082029D542006D3B35 /* StoreKit.framework */,
 				46992D2723222F954C7B60D7 /* Pods_screenshot.framework */,
 			);
 			name = Frameworks;
@@ -778,6 +785,9 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
 							com.apple.Push = {
@@ -1027,6 +1037,7 @@
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C5D98CCF1FFB65A700CC1A97 /* FavoriteBadgeView.swift in Sources */,
 				C54088521FE90E2200198955 /* BaseViewController.m in Sources */,
+				31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
@@ -1188,6 +1199,8 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 96;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
@@ -1195,6 +1208,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEV";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1213,6 +1227,8 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 96;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
@@ -1220,6 +1236,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "RELEASE DEV";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -1293,6 +1310,8 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 96;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
@@ -1300,6 +1319,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG PRD";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1369,6 +1389,8 @@
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 96;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
@@ -1376,6 +1398,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "RELEASE PRD";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;

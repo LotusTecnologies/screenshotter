@@ -107,6 +107,8 @@ PODS:
   - PromiseKit/CorePromise (4.5.2)
   - PromiseKit/Foundation (4.5.2):
     - PromiseKit/CorePromise
+  - PromiseKit/StoreKit (4.5.2):
+    - PromiseKit/CorePromise
   - Protobuf (3.5.0)
   - RateView (1.2)
   - SDWebImage (4.3.0):
@@ -132,6 +134,7 @@ DEPENDENCIES:
   - Intercom
   - lottie-ios
   - PromiseKit/Foundation
+  - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
 
@@ -178,6 +181,6 @@ SPEC CHECKSUMS:
   SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: bdc7cc855e7fb486ee838235db7cdad071b0da35
+PODFILE CHECKSUM: 7816c401da11b082c20669d23e820fde9ed08eb2
 
 COCOAPODS: 1.4.0

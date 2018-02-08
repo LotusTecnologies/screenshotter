@@ -12,7 +12,8 @@ class ProductsRateView : UIView {
     fileprivate let contentView = UIView()
     let voteUpButton = UIButton()
     let voteDownButton = UIButton()
-    
+    let talkToYourStylistButton = UIButton()
+
     fileprivate let label = UILabel()
     fileprivate var labelTrailingConstraint: NSLayoutConstraint!
     
@@ -69,6 +70,15 @@ class ProductsRateView : UIView {
         borderView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        
+        contentView.addSubview(talkToYourStylistButton)
+        talkToYourStylistButton.translatesAutoresizingMaskIntoConstraints = false
+        talkToYourStylistButton.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        talkToYourStylistButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        talkToYourStylistButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        talkToYourStylistButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        talkToYourStylistButton.backgroundColor = .clear
+        talkToYourStylistButton.isUserInteractionEnabled = false
     }
     
     override var intrinsicContentSize: CGSize {
@@ -80,19 +90,38 @@ class ProductsRateView : UIView {
     // MARK: Content
     
     func syncBackgroundColor() {
+        if hasRating {
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
+                backgroundColor = .crazeGreen
+            }else{
+                 backgroundColor = .crazeGreen
+            }
+        }else{
+             backgroundColor = .white
+        }
         backgroundColor = hasRating ? .crazeGreen : .white
     }
     
     private func syncLabel() {
         if hasRating {
-            label.textColor = .white
-            label.text = "products.rate.rated".localized
-            label.textAlignment = .center
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
+                label.textColor = .white
+                label.text = "products.rate.backToConverstationWithStylist".localized
+                label.textAlignment = .center
+                talkToYourStylistButton.isUserInteractionEnabled = true
+
+            }else{
+                label.textColor = .white
+                label.text = "products.rate.rated".localized
+                label.textAlignment = .center
+                talkToYourStylistButton.isUserInteractionEnabled = false
+            }
             
         } else {
             label.textColor = .gray3
             label.text = "products.rate.unrated".localized
             label.textAlignment = .natural
+            talkToYourStylistButton.isUserInteractionEnabled = false
         }
     }
     

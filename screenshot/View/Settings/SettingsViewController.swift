@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageUI
+import PromiseKit
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -41,6 +42,7 @@ class SettingsViewController : BaseViewController {
         case followFacebook
         case followInstagram
         case partners
+        case restoreInAppPurchase
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -52,6 +54,7 @@ class SettingsViewController : BaseViewController {
     
     fileprivate var nameTextField: UITextField?
     fileprivate var emailTextField: UITextField?
+    fileprivate var isRestoring = false
     fileprivate lazy var previousTexts = {
         return [
             UserDefaultsKeys.name: self.cellText(for: .name),
@@ -239,6 +242,7 @@ class SettingsViewController : BaseViewController {
             .tutorialVideo,
             .contactUs,
             .bug,
+            .restoreInAppPurchase,
             .usageStreak,
             .coins,
             .version,
@@ -406,6 +410,11 @@ extension SettingsViewController : UITableViewDataSource {
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
+        if row == .restoreInAppPurchase && self.isRestoring {
+            cell.textLabel?.textColor = .gray
+        }else{
+            cell.textLabel?.textColor = .black
+        }
         cell.detailTextLabel?.text = cellDetailedText(for: row)
         return cell
     }
@@ -487,7 +496,41 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
-            
+        case .restoreInAppPurchase:
+            if self.isRestoring == false {
+                self.isRestoring = true
+                tableView.reloadRows(at: [indexPath], with: .none)
+                InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on:.main, execute: { (array) -> Promise<Bool>  in
+                    self.isRestoring = false
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                    var message = "settings.InAppPurchase.Restore".localized
+                    if array.count == 0 {
+                        message = "settings.InAppPurchase.RestoreNone".localized
+                    }
+                    let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (close) in
+                        
+                    }))
+                    if (self.isViewLoaded && self.view.window != nil) {
+                        self.present(alert, animated: true, completion: {
+                            
+                        })
+                    }
+                    return Promise(value: true)
+                }).catch(on: .main, execute: { (error) in
+                    self.isRestoring = false
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                    let alert = UIAlertController.init(title: "settings.InAppPurchase.RestoreError".localized, message: error.localizedDescription, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (close) in
+                    }))
+                    if (self.isViewLoaded && self.view.window != nil) {
+                        self.present(alert, animated: true, completion: {
+                            
+                        })
+                    }
+                })
+            }
+          
         default:
             break
         }
@@ -559,6 +602,12 @@ fileprivate extension SettingsViewController {
             return "settings.row.facebook.title".localized
         case .partners:
             return "settings.row.partners.title".localized
+        case .restoreInAppPurchase:
+            if self.isRestoring {
+                return "settings.row.restoreInAppPurchase.restoring".localized
+            }else{
+                return "settings.row.restoreInAppPurchase".localized
+            }
         }
     }
     
