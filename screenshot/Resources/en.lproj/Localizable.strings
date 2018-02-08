@@ -147,7 +147,6 @@
 "settings.row.version.title" = "App Version";
 "settings.row.restoreInAppPurchase" = "Restore Purchases";
 "settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
-"settings.row.stylistAlreadyPurchase" = "Purchased Personal Stylist";
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
 "settings.section.about" = "About";
