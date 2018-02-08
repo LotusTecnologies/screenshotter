@@ -555,16 +555,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneUpdatedAt:(NSIndexPath *)indexPath {
     if (frc == self.screenshotFrc) {
-        if (indexPath.section == ScreenshotsSectionNotification) {
-            ScreenshotNotificationCollectionViewCell* cell = (ScreenshotNotificationCollectionViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
-            if (cell && [cell isKindOfClass:[ScreenshotNotificationCollectionViewCell class]]){
-                [self setupScreenshotNotificationCollectionViewCell:cell collectionView:self.collectionView forItemAtIndexPath:indexPath];
-            }
-        } else if (indexPath.section == ScreenshotsSectionImage) {
-            ScreenshotCollectionViewCell* cell = (ScreenshotCollectionViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
-            if (cell && [cell isKindOfClass:[ScreenshotCollectionViewCell class]]){
-                [self setupScreenshotCollectionViewCell:cell collectionView:self.collectionView forItemAtIndexPath:indexPath];
-            }
+        NSIndexPath* celIndexPath = [self screenshotFrcToCollectionViewIndexPath:indexPath.item];
+        ScreenshotCollectionViewCell* cell = (ScreenshotCollectionViewCell*)[self.collectionView cellForItemAtIndexPath:celIndexPath];
+        if (cell && [cell isKindOfClass:[ScreenshotCollectionViewCell class]]){
+            [self setupScreenshotCollectionViewCell:cell collectionView:self.collectionView forItemAtIndexPath:indexPath];
         }
     }
 }
