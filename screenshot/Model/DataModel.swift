@@ -437,8 +437,15 @@ extension DataModel {
             do {
                 screenshotOIDArray.forEach { screenshotOID in
                     if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
-                        screenshot.isHidden = true
-                        screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                        do{
+                            try screenshot.validateForUpdate()
+                            screenshot.isHidden = true
+                            screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                        } catch{
+                            
+                        }
+                        
+                        
                     }
                 }
                 try managedObjectContext.save()

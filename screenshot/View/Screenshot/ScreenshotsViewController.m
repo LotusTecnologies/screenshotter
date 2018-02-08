@@ -710,12 +710,12 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneDeletedAt:(NSIndexPath *)indexPath {
     if (frc == self.screenshotFrc) {
-//        [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
-//        [self syncHelperViewVisibility];
-//
-//        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
-//            [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
-//        }
+        [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
+        [self syncHelperViewVisibility];
+
+        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
+            [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
+        }
     }
 }
 
