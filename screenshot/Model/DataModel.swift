@@ -581,6 +581,7 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             for matchstick in results {
                 matchstick.imageData = imageData as NSData
+                matchstick.receivedAt = NSDate()
             }
             try managedObjectContext.save()
         } catch {
@@ -728,7 +729,7 @@ extension DataModel {
     }
     
     func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
-        let lowWatermark = 10
+        let lowWatermark = 20
         return matchstickCount <= lowWatermark
     }
     
