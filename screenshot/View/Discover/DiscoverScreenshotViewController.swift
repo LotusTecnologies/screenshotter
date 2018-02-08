@@ -119,7 +119,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         coreDataPreparationController.viewDidLoad()
         
-        if matchstickFrc?.fetchedObjects?.count ?? 0 > 0 {
+        if matchstickFrc?.fetchedObjectsCount ?? 0 > 0 {
             isListEmpty = false
         }
     }
@@ -146,7 +146,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var pseudoMatchsticksCount = 0
     
     fileprivate func updateMatchsticksCount() {
-        pseudoMatchsticksCount = matchstickFrc?.fetchedObjects?.count ?? 0
+        pseudoMatchsticksCount = matchstickFrc?.fetchedObjectsCount ?? 0
         
         if isListEmpty && pseudoMatchsticksCount > 0 {
             isListEmpty = false
@@ -269,20 +269,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                let frcHasOneOrZeroObjects:Bool = {
-                   var count = 0
-                    if let sections = self.matchstickFrc?.sections {
-                        for s in sections{
-                            count = count + s.numberOfObjects
-                            if count > 1 {
-                                return false
-                            }
-                        }
-                    }
-                    
-                    return (count == 0 || count == 1)
-                }()
-                if frcHasOneOrZeroObjects {
+                if self.matchstickFrc?.fetchedObjectsCount == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }

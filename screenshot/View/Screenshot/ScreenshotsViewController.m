@@ -269,7 +269,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         return [self hasNewScreenshot];
 
     } else if (section == ScreenshotsSectionImage) {
-        return self.screenshotFrc.fetchedObjects.count;
+        return self.screenshotFrc.fetchedObjectsCount;
         
     } else {
         return 0;
