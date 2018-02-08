@@ -124,6 +124,10 @@
 "screenshot.permission.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.title" = "Shop With Screenshop";
 
+"screenshots.delete.placeholder" = "Delete Screenshots";
+"screenshots.delete.single" = "Delete %d Screenshot";
+"screenshots.delete.plural" = "Delete %d Screenshots";
+
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.coins.title" = "Coins Collected";

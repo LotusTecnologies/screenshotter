@@ -8,6 +8,12 @@
 
 import Foundation
 
+enum ScreenshotCollectionViewCellSelectedState : Int {
+    case none
+    case checked
+    case disabled
+}
+
 @objc protocol ScreenshotCollectionViewCellDelegate: NSObjectProtocol {
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell)
     func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell)
@@ -19,6 +25,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     private let imageView = UIImageView()
     private let toolbar = UIToolbar()
     private let badge = UIView()
+    private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -82,12 +89,21 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         badge.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: badge.bounds.size.width / 2).isActive = true
         badge.widthAnchor.constraint(equalToConstant: badge.bounds.size.width).isActive = true
         badge.heightAnchor.constraint(equalToConstant: badge.bounds.size.height).isActive = true
+        
+        checkImageView.translatesAutoresizingMaskIntoConstraints = false
+        checkImageView.alpha = 0
+        checkImageView.contentMode = .scaleAspectFit
+        mainView.addSubview(checkImageView)
+        checkImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 6).isActive = true
+        checkImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -6).isActive = true
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        isEnabled = true
+        isEditing = false
+        isBadgeEnabled = false
+        selectedState = .none
     }
     
     // MARK: Screenshot
@@ -118,18 +134,63 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
-    // MARK: Enabled
+    // MARK: States
     
-    var isEnabled: Bool = true {
+    var selectedState: ScreenshotCollectionViewCellSelectedState = .none {
         didSet {
-            if isEnabled {
-                isUserInteractionEnabled = true
-                contentView.alpha = 1
-                
-            } else {
-                isUserInteractionEnabled = false
-                contentView.alpha = 0.5
-            }
+            syncSelectedState()
+        }
+    }
+    
+    fileprivate func resetSelectedState() {
+        imageView.alpha = 1
+        badge.alpha = 1
+        toolbar.alpha = 1
+        checkImageView.alpha = 0
+        isUserInteractionEnabled = true
+    }
+    
+    fileprivate func syncSelectedState() {
+        guard isSelected else {
+            return
+        }
+        
+        let toolbarAlpha: CGFloat = isEditing ? 0 : 0.5
+        
+        switch selectedState {
+        case .none:
+            resetSelectedState()
+            
+        case .checked:
+            imageView.alpha = 0.5
+            badge.alpha = 0.5
+            toolbar.alpha = toolbarAlpha
+            checkImageView.alpha = 1
+            isUserInteractionEnabled = true
+            
+        case .disabled:
+            imageView.alpha = 0.5
+            badge.alpha = 0.5
+            toolbar.alpha = toolbarAlpha
+            checkImageView.alpha = 0
+            isUserInteractionEnabled = false
+        }
+    }
+    
+    // TODO: only needed for objc
+    func _setSelectedState(_ state: Int) {
+        selectedState = ScreenshotCollectionViewCellSelectedState(rawValue: state) ?? .none
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            isSelected ? syncSelectedState() : resetSelectedState()
+        }
+    }
+    
+    var isEditing = false {
+        didSet {
+            toolbar.alpha = isEditing ? 0 : 1
         }
     }
     

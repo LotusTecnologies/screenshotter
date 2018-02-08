@@ -22,8 +22,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
-
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
+
+@property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
+@property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *deleteScreenshotObjectIDs;
 
 @property (nonatomic, strong) NSDate *lastVisited;
 
@@ -51,6 +53,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         _coreDataPreparationController = [[CoreDataPreparationController alloc] init];
         self.coreDataPreparationController.delegate = self;
         
+        self.editButtonItem.target = self;
+        self.editButtonItem.action = @selector(editButtonAction);
         self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
         [self addNavigationItemLogo];
     }
@@ -77,6 +81,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
+        collectionView.allowsMultipleSelection = YES;
         
         [collectionView registerClass:[ScreenshotNotificationCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
@@ -131,6 +136,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [super viewDidDisappear:animated];
     
     [self removeScreenshotHelperView];
+    
+    if ([self isEditing]) {
+        // Incase the app somehow changed view controllers while editing, cancel it.
+        [self setEditing:NO animated:animated];
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -229,6 +239,118 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 
+#pragma mark - Editing
+
+- (void)editButtonAction {
+    BOOL isEditing = ![self isEditing];
+    
+    if (!isEditing) {
+        // Needs to be before setEditing
+        [self deselectDeletedScreenshots];
+    }
+    
+    [self setEditing:isEditing animated:YES];
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    
+    if (self.tabBarController && editing) {
+        CGFloat bottom = 0.f;
+        
+        if (@available(iOS 11.0, *)) {
+            bottom = [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom / 2.f;
+        }
+        
+        self.deleteButton.alpha = 0.f;
+        self.deleteButton.contentEdgeInsets = UIEdgeInsetsMake(0.f, 0.f, bottom, 0.f);
+        [self.tabBarController.tabBar addSubview:self.deleteButton];
+        [self.deleteButton.topAnchor constraintEqualToAnchor:self.tabBarController.tabBar.topAnchor].active = YES;
+        [self.deleteButton.leadingAnchor constraintEqualToAnchor:self.tabBarController.tabBar.leadingAnchor].active = YES;
+        [self.deleteButton.bottomAnchor constraintEqualToAnchor:self.tabBarController.tabBar.bottomAnchor].active = YES;
+        [self.deleteButton.trailingAnchor constraintEqualToAnchor:self.tabBarController.tabBar.trailingAnchor].active = YES;
+    }
+    
+    dispatch_block_t removeDeleteButton = ^{
+        if (self.tabBarController && !editing) {
+            [self.deleteButton removeFromSuperview];
+            [self updateDeleteButtonCount];
+        }
+    };
+    
+    dispatch_block_t cellEditing = ^{
+        for (NSIndexPath *indexPath in self.collectionView.indexPathsForVisibleItems) {
+            ScreenshotCollectionViewCell *cell = (ScreenshotCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+            
+            if ([cell isKindOfClass:[ScreenshotCollectionViewCell class]]) {
+                cell.isEditing = editing;
+                [self syncScreenshotCollectionViewCellSelectedState:cell];
+            }
+        }
+        
+        if ([self hasNewScreenshot]) {
+            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:ScreenshotsSectionNotification]];
+        }
+        
+        self.deleteButton.alpha = editing;
+    };
+    
+    if (animated) {
+        [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
+            cellEditing();
+        } completion:^(BOOL finished) {
+            removeDeleteButton();
+        }];
+    }
+    else {
+        cellEditing();
+        removeDeleteButton();
+    }
+    
+    self.navigationItem.rightBarButtonItem.enabled = !editing;
+    
+    if (editing) {
+        self.editButtonItem.title = @"Cancel";
+        
+        self.deleteScreenshotObjectIDs = [NSMutableArray array];
+    }
+}
+
+- (void)deselectDeletedScreenshots {
+    // TODO: call this in cleanup from frc callback
+    
+    // Deselect all cells
+    [self.collectionView selectItemAtIndexPath:nil animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+    
+    self.deleteScreenshotObjectIDs = nil;
+}
+
+- (ScreenshotsDeleteButton *)deleteButton {
+    if (!_deleteButton) {
+        ScreenshotsDeleteButton *deleteButton = [ScreenshotsDeleteButton buttonWithType:UIButtonTypeCustom];
+        deleteButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [deleteButton addTarget:self action:@selector(deleteButtonAction) forControlEvents:UIControlEventTouchUpInside];
+        _deleteButton = deleteButton;
+    }
+    return _deleteButton;
+}
+
+- (void)updateDeleteButtonCount {
+    self.deleteButton.deleteCount = self.collectionView.indexPathsForSelectedItems.count;
+}
+
+- (void)deleteButtonAction {
+    [self setEditing:NO animated:YES];
+    self.editButtonItem.enabled = NO;
+    
+    // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
+    
+    if (self.deleteScreenshotObjectIDs.count > 0) {
+        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
+    }
+}
+
+
 #pragma mark - Collection View Sections
 
 - (NSUInteger)newScreenshotsCount {
@@ -266,8 +388,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ScreenshotsSectionNotification) {
-        return [self hasNewScreenshot];
-
+        return [self canDisplayNotificationCell];
+        
     } else if (section == ScreenshotsSectionImage) {
         return self.screenshotFrc.fetchedObjectsCount;
         
@@ -294,8 +416,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (indexPath.section == ScreenshotsSectionNotification) {
         size.width = floor(collectionView.bounds.size.width - (padding * 2));
         size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
-        
-    } else if (indexPath.section == ScreenshotsSectionImage) {
+    }
+    else if (indexPath.section == ScreenshotsSectionImage) {
         NSInteger columns = [self numberOfCollectionViewImageColumns];
         
         size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
@@ -324,6 +446,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     cell.contentView.backgroundColor = collectionView.backgroundColor;
     cell.screenshot = screenshot;
     cell.isBadgeEnabled = screenshot.isNew;
+    cell.isEditing = [self isEditing];
+    [self syncScreenshotCollectionViewCellSelectedState:cell];
 }
     
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -331,33 +455,63 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
         [self setupScreenshotNotificationCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
         return cell;
-
     } else if (indexPath.section == ScreenshotsSectionImage) {
         
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
         [self setupScreenshotCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
         return cell;
-        
-    } else {
+    }
+    else {
         return nil;
     }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImage && indexPath.item == 0) {
-        [self insertScreenshotHelperView];
+    if (indexPath.section == ScreenshotsSectionImage) {
+        if (indexPath.item == 0) {
+            [self insertScreenshotHelperView];
+        }
+    }
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == ScreenshotsSectionNotification && [self isEditing]) {
+        return NO;
+    }
+    else {
+        return YES;
     }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImage) {
-        [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
-        
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
-        if (screenshot.uploadedImageURL) {
-            [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
+        if ([self isEditing]) {
+            [self updateDeleteButtonCount];
+            [self.deleteScreenshotObjectIDs addObject:screenshot.objectID];
         }
+        else {
+            if (self.deleteScreenshotObjectIDs.count > 0 && [self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
+                return;
+            }
+            
+            [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+            [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
+            
+            if (screenshot.uploadedImageURL) {
+                [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
+            }
+        }
+    }
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == ScreenshotsSectionImage && [self isEditing]) {
+        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
+        
+        [self updateDeleteButtonCount];
+        [self.deleteScreenshotObjectIDs removeObject:screenshot.objectID];
     }
 }
 
@@ -377,6 +531,10 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 
 #pragma mark - Notification Cell
+
+- (BOOL)canDisplayNotificationCell {
+    return [self hasNewScreenshot] && ![self isEditing];
+}
 
 - (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
     NSUInteger screenshotsCount = [self newScreenshotsCount];
@@ -406,7 +564,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId {
-    if ([self newScreenshotsCount] > 0) {
+    if ([self canDisplayNotificationCell]) {
         self.notificationCellAssetId = assetId;
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification];
         
@@ -481,14 +639,29 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [[self screenshotAtIndex:indexPath.item] setHide];
             [self removeScreenshotHelperView];
             
-            [UIView animateWithDuration:0.25 animations:^{
-                cell.isEnabled = NO;
+            // Select the cell for the UI change from selectedState
+            [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+            
+            [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
+                [cell _setSelectedState:2];
             }];
             
             [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
         }
     }]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)syncScreenshotCollectionViewCellSelectedState:(ScreenshotCollectionViewCell *)cell {
+    if ([self isEditing]) {
+        [cell _setSelectedState:1];
+    }
+    else if ([cell isSelected] && self.deleteScreenshotObjectIDs.count > 0) {
+        [cell _setSelectedState:2];
+    }
+    else {
+        [cell _setSelectedState:0];
+    }
 }
 
 
@@ -546,7 +719,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (frc == self.screenshotFrc) {
         [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
         [self syncHelperViewVisibility];
-        
+
         if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
             [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
         }
@@ -576,6 +749,34 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if (frc == self.screenshotFrc) {
         [self.collectionView reloadData];
         [self syncHelperViewVisibility];
+        
+        
+        // TODO: reset the deleted screenshot array and enable the edit button
+        // take into account the only multiple deletes will come here, deleting
+        // a single item will goto the oneDeletedAt
+        
+        // Below is not tested. also include for one delete at
+        if (self.deleteScreenshotObjectIDs.count > 0) {
+            if (self.screenshotFrc.fetchedObjects.count > 0) {
+                BOOL didDeleteScreenshots = YES;
+                
+                for (Screenshot *screenshot in self.screenshotFrc.fetchedObjects) {
+                    // Not sure which is correct...
+//                    [self.deleteScreenshotObjectIDs.firstObject isEqual:screenshot.objectID]
+                    if (self.deleteScreenshotObjectIDs.firstObject == screenshot.objectID) {
+                        didDeleteScreenshots = NO;
+                        break;
+                    }
+                }
+                
+                if (didDeleteScreenshots) {
+                    [self deselectDeletedScreenshots];
+                }
+            }
+            else {
+                [self deselectDeletedScreenshots];
+            }
+        }
     }
 }
 
@@ -608,8 +809,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         }
     }
     
-    self.helperView.hidden = ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0 || [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0);
+    BOOL hasScreenshots = [self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0;
+    
+    self.helperView.hidden = (hasScreenshots || [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0);
     self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
+    self.editButtonItem.enabled = hasScreenshots;
 }
 
 @end
