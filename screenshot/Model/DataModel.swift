@@ -581,6 +581,7 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             for matchstick in results {
                 matchstick.imageData = imageData as NSData
+                matchstick.receivedAt = NSDate()
             }
             try managedObjectContext.save()
         } catch {
