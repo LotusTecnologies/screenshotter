@@ -137,6 +137,7 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
             failure(error)
         })
     }
+    
     @objc func load(product:InAppPurchaseProduct, success:@escaping ((SKProduct)->Void), failure:@escaping((Error)->Void) ){
         self.loadProductInfo().then( on:.main, execute: { (response) -> Promise<Bool> in
             if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == product.productIdentifier() }) {
@@ -150,26 +151,4 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
             failure(error)
         })
     }
-    
-    public func buyProduct(_ inAppPurchaseProduct:InAppPurchaseProduct) -> Promise<Bool>{
-        if didPurchase(_inAppPurchaseProduct: inAppPurchaseProduct) {
-            return Promise(value: true)
-        }else{
-            if SKPaymentQueue.canMakePayments() {
-                return self.loadProductInfo().then(execute: { (response) -> Promise<Bool> in
-                    if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == inAppPurchaseProduct.productIdentifier() }) {
-                        return SKPayment.init(product: product).promise().then(execute: { (transaction) -> Promise<Bool> in
-                            return Promise(value: true)
-                        })
-                    }else{
-                        let error = NSError.init(domain: "Craze", code: -2, userInfo: [NSLocalizedDescriptionKey: "In app purchase not found"]) // this shouldn't happen
-                        return Promise.init(error: error)
-                    }
-                })
-            }else{
-                let error = NSError.init(domain: "Craze", code: -2, userInfo: [NSLocalizedDescriptionKey:"You are not authorized for in app purchases on this device"])
-                return Promise.init(error: error)
-            }
-        }
-    }    
 }
