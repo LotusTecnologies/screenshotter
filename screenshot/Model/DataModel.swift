@@ -1341,14 +1341,8 @@ extension Matchstick {
 
 extension NSFetchedResultsController {
     var fetchedObjectsCount:Int {
-        get{
-            var count = 0
-            if let sections = self.sections{
-                for s in sections {
-                    count = count + s.numberOfObjects
-                }
-            }
-            return count
+        get {
+            return sections?.reduce(0, {$0 + $1.numberOfObjects}) ?? 0
         }
     }
 }
