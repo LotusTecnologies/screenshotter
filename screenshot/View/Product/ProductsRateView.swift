@@ -183,7 +183,7 @@ class ProductsRateView : UIView {
                 self.voteUpButton.isSelected = false
                 self.voteDownButton.isSelected = false
             })
-
+            
         } else {
             voteUpButton.isSelected = false
             voteDownButton.isSelected = false
