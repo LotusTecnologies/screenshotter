@@ -724,22 +724,18 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
                     [InAppPurchaseManager.sharedInstance buyWithProduct:[InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist] success:^{
                         [self presentPersonalSylist];
                     } failure:^(NSError *error) {
-                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
-                        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
-                        [self presentViewController:alertController animated:YES completion:nil];
+                       //no reason to present alert - Apple does it for us
                     }];
                 }];
                 SKProduct *product = [InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist];
                 if (product){
                     action.enabled = true;
-                    NSString* priceString = product.localizedPriceString;
-                    alertController.message = [NSString stringWithFormat:canContinueMessageFormat, priceString];
+                    alertController.message = [NSString stringWithFormat:canContinueMessageFormat, product.localizedPriceString];
                 }else{
                     action.enabled = false;
                     [InAppPurchaseManager.sharedInstance loadWithProduct:InAppPurchaseProductPersonalStylist success:^(SKProduct * product) {
                         action.enabled = true;
-                        NSString* priceString = product.localizedPriceString;
-                        alertController.message = [NSString stringWithFormat:canContinueMessageFormat, priceString];
+                        alertController.message = [NSString stringWithFormat:canContinueMessageFormat, product.localizedPriceString];
                     } failure:^(NSError* error){
                         alertController.message = [NSString stringWithFormat:cantGetProductMessageFormat, error.localizedDescription];
                     }];
