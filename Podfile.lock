@@ -133,7 +133,7 @@ DEPENDENCIES:
   - GoogleSignIn
   - Intercom
   - lottie-ios
-  - PromiseKit/Foundation
+  - PromiseKit/Foundation (= 4.5.2)
   - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
@@ -181,6 +181,6 @@ SPEC CHECKSUMS:
   SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: 7816c401da11b082c20669d23e820fde9ed08eb2
+PODFILE CHECKSUM: b43a8096531234e6b9abebf6e2a829d005f9f209
 
 COCOAPODS: 1.4.0
