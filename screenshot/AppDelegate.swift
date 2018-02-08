@@ -57,6 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Sets up Core Data stack on a background queue.
         DataModel.setup()
+        
         fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()

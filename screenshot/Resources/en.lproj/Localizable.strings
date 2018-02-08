@@ -160,8 +160,6 @@
 "settings.InAppPurchase.RestoreError" = "Error Restoring purchase";
 "settings.InAppPurchase.RestoreNone" = "You have no purchases to restore";
 
-"settings.InAppPurchase.explain" = "You have VIP access to a personal stylist by pressing the thumbs down on a results page";
-
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";
 "tutorial.email.name" = "Name";
