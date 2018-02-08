@@ -29,7 +29,8 @@ class NetworkingPromise: NSObject {
         request.httpMethod = "POST"
         request.httpBody = imageData
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 30
+//        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
+        sessionConfiguration.timeoutIntervalForRequest = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
         return promise
     }
@@ -218,7 +219,7 @@ class NetworkingPromise: NSObject {
             return Promise(error: error)
         }
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 30
+        sessionConfiguration.timeoutIntervalForRequest = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
         return promise
     }
@@ -228,7 +229,9 @@ class NetworkingPromise: NSObject {
             let error = NSError(domain: "Craze", code: 25, userInfo: [NSLocalizedDescriptionKey: "Cannot form image url:\(urlString)"])
             return Promise(error: error)
         }
-        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
             guard let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode >= 200,
                 httpResponse.statusCode <  300 else {

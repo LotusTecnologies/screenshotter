@@ -728,7 +728,7 @@ extension DataModel {
     }
     
     func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
-        let lowWatermark = 10
+        let lowWatermark = 20
         return matchstickCount <= lowWatermark
     }
     
