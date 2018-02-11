@@ -7,6 +7,7 @@
 //
 
 #import "ShoppablesToolbar.h"
+#import "screenshot-Swift.h"
 
 @class ShoppablesCollectionView;
 
@@ -34,6 +35,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        [self setupViews];
         _collectionView = ({
             CGFloat p = [Geometry padding];
             

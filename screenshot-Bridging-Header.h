@@ -10,5 +10,6 @@
 #import "ProductsViewController.h"
 #import "ProductCollectionViewCell.h"
 #import "ScreenshotDisplayViewController.h"
+#import "ShoppablesToolbar.h"
 
 #endif /* screenshot_Bridging_Header_h */

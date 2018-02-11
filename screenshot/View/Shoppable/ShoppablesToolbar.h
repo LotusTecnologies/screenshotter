@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "screenshot-Swift.h"
 
 @class ShoppablesToolbar;
 @class Shoppable;
+@protocol ShoppablesControllerProtocol;
 
 @protocol ShoppablesToolbarDelegate <UIToolbarDelegate>
 @required
