@@ -13,36 +13,8 @@
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
-typedef NS_ENUM(NSUInteger, ProductsSection) {
-    ProductsSectionTooltip,
-    ProductsSectionProduct
-};
-
-typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
-    ProductsViewControllerStateLoading,
-    ProductsViewControllerStateProducts,
-    ProductsViewControllerStateRetry,
-    ProductsViewControllerStateEmpty
-};
 
 @interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
-
-@property (nonatomic, strong) Loader *loader;
-@property (nonatomic, strong) HelperView *noItemsHelperView;
-@property (nonatomic, strong) UICollectionView *collectionView;
-@property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
-@property (nonatomic, strong) ProductsOptions *productsOptions;
-@property (nonatomic, strong) ScrollRevealController *scrollRevealController;
-@property (nonatomic, strong) ProductsRateView *rateView;
-@property (nonatomic, strong) UIAlertAction *productsRateNegativeFeedbackSubmitAction;
-@property (nonatomic, strong) UITextField *productsRateNegativeFeedbackTextField;
-
-@property (nonatomic, strong) NSArray<Product *> *products;
-@property (nonatomic) NSUInteger productsUnfilteredCount;
-
-@property (nonatomic, copy) UIImage *image;
-
-@property (nonatomic) ProductsViewControllerState state;
 
 @end
 
@@ -78,7 +50,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _shoppablesToolbar = ({
+    self.shoppablesToolbar = ({
         CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
         CGFloat shoppableHeight = 60.f;
         
@@ -95,7 +67,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         toolbar;
     });
     
-    _collectionView = ({
+    self.collectionView = ({
         CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
         
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
@@ -124,7 +96,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         collectionView;
     });
     
-    _rateView = ({
+    self.rateView = ({
         ProductsRateView *view = [[ProductsRateView alloc] init];
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
@@ -134,7 +106,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         view;
     });
     
-    _scrollRevealController = [[ScrollRevealController alloc] initWithEdge:1];
+    self.scrollRevealController = [[ScrollRevealController alloc] initWithEdge:1];
     self.scrollRevealController.adjustedContentInset = UIEdgeInsetsMake(CGRectGetMaxY(self.navigationController.navigationBar.frame), 0.f, 0.f, 0.f);
     [self.scrollRevealController insertAbove:self.collectionView];
     
@@ -557,7 +529,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 #pragma mark - Product Cell
 
-- (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
+-(void) productCollectionViewCellDidTapFavoriteWithCell:(ProductCollectionViewCell *)cell {
     BOOL isFavorited = [cell.favoriteButton isSelected];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
