@@ -11,20 +11,6 @@
 
 @class ShoppablesCollectionView;
 
-@interface ShoppablesToolbar () <UICollectionViewDelegate, UICollectionViewDataSource> {
-    BOOL _needsToSelectFirstShoppable;
-}
-
-+ (UIEdgeInsets)preservedCollectionViewContentInset;
-- (void)repositionShoppables;
-
-@end
-
-@interface ShoppablesCollectionView : UICollectionView
-
-@property (nonatomic, weak) ShoppablesToolbar* delegate;
-
-@end
 
 @implementation ShoppablesToolbar
 @dynamic delegate;
@@ -36,32 +22,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self setupViews];
-        _collectionView = ({
-            CGFloat p = [Geometry padding];
-            
-            UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-            layout.minimumInteritemSpacing = p;
-            layout.minimumLineSpacing = p;
-            layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-            
-            ShoppablesCollectionView *collectionView = [[ShoppablesCollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
-            collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-            collectionView.delegate = self;
-            collectionView.dataSource = self;
-            collectionView.backgroundColor = [UIColor clearColor];
-            collectionView.scrollsToTop = NO;
-            collectionView.contentInset = [[self class] preservedCollectionViewContentInset];
-            collectionView.showsHorizontalScrollIndicator = NO;
-            
-            [collectionView registerClass:[ShoppableCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-            
-            [self addSubview:collectionView];
-            [collectionView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-            [collectionView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-            [collectionView.leftAnchor constraintEqualToAnchor:self.leftAnchor].active = YES;
-            [collectionView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
-            collectionView;
-        });
+   
     }
     return self;
 }
