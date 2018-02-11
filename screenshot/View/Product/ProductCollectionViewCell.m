@@ -13,13 +13,6 @@
 
 @interface ProductCollectionViewCell ()
 
-@property (nonatomic, strong) EmbossedView *productView;
-@property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) UILabel *priceLabel;
-@property (nonatomic, strong) UILabel *originalPriceLabel;
-@property (nonatomic, strong) NSLayoutConstraint *originalPriceLabelWidthConstraint;
-@property (nonatomic, strong) FavoriteButton *favoriteButton;
-@property (nonatomic, strong) UIImageView *saleImageView;
 
 @end
 
@@ -28,134 +21,12 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _productView = ({
-            CGRect pathRect = CGRectMake(0.f, 0.f, self.bounds.size.width, self.bounds.size.width);
-            
-            EmbossedView *productView = [[EmbossedView alloc] init];
-            productView.translatesAutoresizingMaskIntoConstraints = NO;
-            productView.placeholderImage = [UIImage imageNamed:@"DefaultProduct"];
-            productView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:[_Shadow pathRect:pathRect] cornerRadius:[Geometry defaultCornerRadius]].CGPath;
-            [self.contentView addSubview:productView];
-            [productView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
-            [productView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-            [productView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-            [productView.heightAnchor constraintEqualToAnchor:productView.widthAnchor].active = YES;
-            productView;
-        });
-        
-        _titleLabel = ({
-            UILabel *label = [[UILabel alloc] init];
-            label.translatesAutoresizingMaskIntoConstraints = NO;
-            label.numberOfLines = [[self class] titleLabelNumberOfLines];
-            label.minimumScaleFactor = .7f;
-            label.adjustsFontSizeToFitWidth = YES;
-            label.textAlignment = NSTextAlignmentCenter;
-            label.font = [[self class] labelFont];
-            [self.contentView addSubview:label];
-            
-            [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] titleLableHeight]].active = YES;
-            
-            [label.topAnchor constraintEqualToAnchor:self.productView.bottomAnchor].active = YES;
-            [label.leadingAnchor constraintEqualToAnchor:self.productView.leadingAnchor].active = YES;
-            [label.trailingAnchor constraintEqualToAnchor:self.productView.trailingAnchor].active = YES;
-            label;
-        });
-        
-        UIView *priceContainer = ({
-            UIView *view = [[UIView alloc] init];
-            view.translatesAutoresizingMaskIntoConstraints = NO;
-            [self.contentView addSubview:view];
-            [view.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor].active = YES;
-            [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.titleLabel.leadingAnchor].active = YES;
-            [view.bottomAnchor constraintLessThanOrEqualToAnchor:self.contentView.bottomAnchor].active = YES;
-            [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.titleLabel.trailingAnchor].active = YES;
-            [view.centerXAnchor constraintEqualToAnchor:self.titleLabel.centerXAnchor].active = YES;
-            view;
-        });
-        
-        _priceLabel = ({
-            UILabel *label = [[UILabel alloc] init];
-            label.translatesAutoresizingMaskIntoConstraints = NO;
-            label.textAlignment = NSTextAlignmentCenter;
-            label.font = [[self class] labelFont];
-            label.textColor = [UIColor gray6];
-            label.minimumScaleFactor = .7f;
-            label.adjustsFontSizeToFitWidth = YES;
-            label.layoutMargins = [self priceLabelLayoutMargins];
-            [self.contentView addSubview:label];
-            [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
-            
-            [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;
-            
-            [label.topAnchor constraintEqualToAnchor:priceContainer.topAnchor].active = YES;
-            [label.leadingAnchor constraintEqualToAnchor:priceContainer.leadingAnchor].active = YES;
-            [label.bottomAnchor constraintLessThanOrEqualToAnchor:priceContainer.bottomAnchor].active = YES;
-            label;
-        });
-        
-        _originalPriceLabel = ({
-            UILabel *label = [[UILabel alloc] init];
-            label.translatesAutoresizingMaskIntoConstraints = NO;
-            label.textAlignment = NSTextAlignmentCenter;
-            label.font = [[self class] labelFont];
-            label.textColor = [UIColor gray7];
-            label.minimumScaleFactor = .7f;
-            label.adjustsFontSizeToFitWidth = YES;
-            label.hidden = YES;
-            [self.contentView addSubview:label];
-            
-            [NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:[[self class] priceLabelHeight]].active = YES;
-            
-            [label.topAnchor constraintEqualToAnchor:priceContainer.topAnchor].active = YES;
-            [label.leadingAnchor constraintEqualToAnchor:self.priceLabel.layoutMarginsGuide.trailingAnchor].active = YES;
-            [label.trailingAnchor constraintEqualToAnchor:priceContainer.trailingAnchor].active = YES;
-            [label.bottomAnchor constraintLessThanOrEqualToAnchor:priceContainer.bottomAnchor].active = YES;
-            
-            self.originalPriceLabelWidthConstraint = [label.widthAnchor constraintEqualToConstant:0.f];
-            
-            label;
-        });
-        
-        _favoriteButton = ({
-            FavoriteButton *button = [FavoriteButton buttonWithType:UIButtonTypeCustom];
-            button.translatesAutoresizingMaskIntoConstraints = NO;
-            [button addTarget:self action:@selector(favoriteAction) forControlEvents:UIControlEventTouchUpInside];
-            [self.contentView addSubview:button];
-            [button.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
-            [button.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-            button;
-        });
-        
-        _saleImageView = ({
-            CGFloat padding = 6.f;
-            UIEdgeInsets resizableImageInsets = UIEdgeInsetsMake(0.f, 0.f, 0.f, 4.f);
-            
-            UIImage *image = [UIImage imageNamed:@"ProductSaleBanner"];
-            image = [image resizableImageWithCapInsets:resizableImageInsets];
-            
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-            imageView.translatesAutoresizingMaskIntoConstraints = NO;
-            imageView.layoutMargins = UIEdgeInsetsMake(0.f, padding, 0.f, padding + resizableImageInsets.right);
-            imageView.hidden = YES;
-            [self.productView addSubview:imageView];
-            [imageView.leadingAnchor constraintEqualToAnchor:self.productView.leadingAnchor].active = YES;
-            [imageView.bottomAnchor constraintEqualToAnchor:self.productView.bottomAnchor constant:-[Geometry defaultCornerRadius]].active = YES;
-            
-            UILabel *label = [[UILabel alloc] init];
-            label.translatesAutoresizingMaskIntoConstraints = NO;
-            label.textColor = [UIColor whiteColor];
-            label.font = [UIFont boldSystemFontOfSize:10.f];
-            label.textAlignment = NSTextAlignmentCenter;
-            label.text = @"SALE";
-            [imageView addSubview:label];
-            [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
-            [label.topAnchor constraintEqualToAnchor:imageView.topAnchor].active = YES;
-            [label.leadingAnchor constraintEqualToAnchor:imageView.layoutMarginsGuide.leadingAnchor].active = YES;
-            [label.bottomAnchor constraintEqualToAnchor:imageView.bottomAnchor].active = YES;
-            [label.trailingAnchor constraintEqualToAnchor:imageView.layoutMarginsGuide.trailingAnchor].active = YES;
-            
-            imageView;
-        });
+        [self setupProductView];
+        [self setupTitleView];
+        [self setupPriceLabels];
+        [self setupFavoriteButton];
+        [self setupSaleImageView];
+       
     }
     return self;
 }

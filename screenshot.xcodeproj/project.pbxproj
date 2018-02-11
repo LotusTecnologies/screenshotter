@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3130FF6F203040F200AA881A /* ProductCollectionViewCell+swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell+swift.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -126,6 +127,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3130FF6E203040F200AA881A /* ProductCollectionViewCell+swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductCollectionViewCell+swift.swift"; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 			children = (
 				C54087EF1FE90C8E00198955 /* ProductCollectionViewCell.h */,
 				C54087F11FE90C8E00198955 /* ProductCollectionViewCell.m */,
+				3130FF6E203040F200AA881A /* ProductCollectionViewCell+swift.swift */,
 				C54087EE1FE90C8E00198955 /* ProductsOptions.swift */,
 				C54087F21FE90C8E00198955 /* ProductsRateView.swift */,
 				C51D363E2010B66400943257 /* ProductsTooltipCollectionViewCell.swift */,
@@ -911,7 +914,11 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GINInviteResources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GPPACLPickerResources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Intercom.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/IntercomTranslations.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1023,6 +1030,7 @@
 				C54088121FE90C8E00198955 /* TutorialEmailSlideView.swift in Sources */,
 				C540882A1FE90C8E00198955 /* FavoriteButton.swift in Sources */,
 				C54088261FE90C8E00198955 /* ProductsOptions.swift in Sources */,
+				3130FF6F203040F200AA881A /* ProductCollectionViewCell+swift.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
 				C54088231FE90C8E00198955 /* ScreenshotDisplayViewController.m in Sources */,
