@@ -58,7 +58,6 @@
 		C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */; };
 		C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087E01FE90C8D00198955 /* ScreenshotPickerViewController.swift */; };
 		C54088211FE90C8E00198955 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087E21FE90C8D00198955 /* MainTabBarController.m */; };
-		C54088231FE90C8E00198955 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087E81FE90C8D00198955 /* ScreenshotDisplayViewController.m */; };
 		C54088251FE90C8E00198955 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087ED1FE90C8E00198955 /* ProductsViewController.m */; };
 		C54088261FE90C8E00198955 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087EE1FE90C8E00198955 /* ProductsOptions.swift */; };
 		C54088271FE90C8E00198955 /* ProductCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087F11FE90C8E00198955 /* ProductCollectionViewCell.m */; };
@@ -117,6 +116,7 @@
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
+		E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4859E18203044E100A26985 /* ScreenshotDisplayViewController.swift */; };
 		E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E492CE3C2011051100060FB2 /* MatchstickModel.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
 		E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A671621FA88AAA00250410 /* ScreenshotDetectionProtocol.swift */; };
@@ -182,8 +182,6 @@
 		C54087E01FE90C8D00198955 /* ScreenshotPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotPickerViewController.swift; sourceTree = "<group>"; };
 		C54087E21FE90C8D00198955 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
 		C54087E31FE90C8D00198955 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
-		C54087E81FE90C8D00198955 /* ScreenshotDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayViewController.m; sourceTree = "<group>"; };
-		C54087EB1FE90C8D00198955 /* ScreenshotDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayViewController.h; sourceTree = "<group>"; };
 		C54087ED1FE90C8E00198955 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
 		C54087EE1FE90C8E00198955 /* ProductsOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsOptions.swift; sourceTree = "<group>"; };
 		C54087EF1FE90C8E00198955 /* ProductCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductCollectionViewCell.h; sourceTree = "<group>"; };
@@ -255,6 +253,7 @@
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 7.xcdatamodel"; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
+		E4859E18203044E100A26985 /* ScreenshotDisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayViewController.swift; sourceTree = "<group>"; };
 		E492765B1FC6FADB009DD239 /* Model 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 5.xcdatamodel"; sourceTree = "<group>"; };
 		E492CE3C2011051100060FB2 /* MatchstickModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchstickModel.swift; sourceTree = "<group>"; };
 		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -493,8 +492,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */,
-				C54087EB1FE90C8D00198955 /* ScreenshotDisplayViewController.h */,
-				C54087E81FE90C8D00198955 /* ScreenshotDisplayViewController.m */,
+				E4859E18203044E100A26985 /* ScreenshotDisplayViewController.swift */,
 			);
 			path = ScreenshotDisplay;
 			sourceTree = "<group>";
@@ -911,7 +909,11 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GINInviteResources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GPPACLPickerResources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Intercom.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/IntercomTranslations.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1025,7 +1027,6 @@
 				C54088261FE90C8E00198955 /* ProductsOptions.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
-				C54088231FE90C8E00198955 /* ScreenshotDisplayViewController.m in Sources */,
 				C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
 				C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */,
@@ -1060,6 +1061,7 @@
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C5FF4142200F299D00342DEC /* TutorialSlideView.swift in Sources */,
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
+				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
 			);
