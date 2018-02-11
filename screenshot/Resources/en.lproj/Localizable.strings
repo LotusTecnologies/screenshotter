@@ -151,6 +151,9 @@
 "settings.row.version.title" = "App Version";
 "settings.row.restoreInAppPurchase" = "Restore Purchases";
 "settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
+"settings.row.talkToStylist" = "Talk to your stylist";
+"settings.row.talkToStylist.locked" = "🔒 Talk to your stylist";
+
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
 "settings.section.about" = "About";

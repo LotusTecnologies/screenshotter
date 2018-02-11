@@ -43,6 +43,8 @@ class SettingsViewController : BaseViewController {
         case followInstagram
         case partners
         case restoreInAppPurchase
+        case talkToStylist
+
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -243,6 +245,7 @@ class SettingsViewController : BaseViewController {
             .contactUs,
             .bug,
             .restoreInAppPurchase,
+            .talkToStylist,
             .usageStreak,
             .coins,
             .version,
@@ -530,6 +533,54 @@ extension SettingsViewController : UITableViewDelegate {
                     }
                 })
             }
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                IntercomHelper.sharedInstance.presentMessagingUI()
+            }else {
+                if InAppPurchaseManager.sharedInstance.canPurchase() {
+                    
+                    let loadingMessage = "Unlocking a personal stylist requires a one time in-app purchase. \n Connecting to appstore...."
+                    let canContinueMessageFormat = "Unlocking a personal stylist requires a one time in-app purchase for %@"
+                    let cantGetProductMessageFormat = "Unlocking a personal stylist requires a one time in-app purchase. \n Unable to connect to the appstore at this time: \n %@"
+                    let alertController = UIAlertController.init(title: nil, message: loadingMessage, preferredStyle: .alert)
+                    
+                    
+                    let action = UIAlertAction.init(title: "Continue", style: .default, handler: { (action) in
+                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
+                            IntercomHelper.sharedInstance.presentMessagingUI()
+                        }, failure: { (error) in
+                            //no reason to present alert - Apple does it for us
+                        })
+                        }
+                    })
+                    
+                    
+                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                        action.isEnabled = true;
+                        alertController.message = String.init(format: canContinueMessageFormat, product.localizedPriceString())
+                    }else{
+                        action.isEnabled = false;
+                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
+                            action.isEnabled = true;
+                            alertController.message = String.init(format: canContinueMessageFormat, product.localizedPriceString())
+                        }, failure: { (error) in
+                            alertController.message = String.init(format: cantGetProductMessageFormat, error.localizedDescription)
+                        })
+                    
+                    }
+                    alertController.addAction(action)
+                    alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                }else{
+                    let errorMessge = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases."
+                    let alertController = UIAlertController.init(title: nil, message: errorMessge, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                    
+                }
+            }
+           
           
         default:
             break
@@ -608,7 +659,14 @@ fileprivate extension SettingsViewController {
             }else{
                 return "settings.row.restoreInAppPurchase".localized
             }
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                return "settings.row.talkToStylist".localized
+            }else{
+                return "settings.row.talkToStylist.locked".localized
+            }
         }
+        
     }
     
     func cellDetailedText(for row: SettingsViewController.Row) -> String? {
