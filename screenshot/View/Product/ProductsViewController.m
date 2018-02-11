@@ -7,7 +7,6 @@
 //
 
 #import "ProductsViewController.h"
-#import "ProductCollectionViewCell.h"
 #import "ShoppablesToolbar.h"
 #import "screenshot-Swift.h"
 #import <PromiseKit/PromiseKit.h>
