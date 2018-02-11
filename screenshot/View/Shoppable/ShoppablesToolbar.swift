@@ -34,4 +34,47 @@ extension ShoppablesToolbar {
         }()
     
     }
+    @objc func shoppableSize() -> CGSize {
+        
+        var size = CGSize.zero
+        size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
+        size.width = size.height * 0.8
+        return size
+    }
+    
+    @objc func repositionShoppables(count:Int) {
+        
+        let shoppablesCount = count
+        
+        if (shoppablesCount > 0) {
+            let  lineSpacing = (self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.minimumLineSpacing ?? 0
+            let spacingsWidth:CGFloat = lineSpacing * CGFloat(shoppablesCount - 1)
+            let shoppablesWidth:CGFloat = self.shoppableSize().width * CGFloat(shoppablesCount)
+            let contentWidth:CGFloat = round(spacingsWidth + shoppablesWidth);
+            let width:CGFloat = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
+            
+            if (width != contentWidth) {
+                let maxHorizontalInset:CGFloat = ShoppablesToolbar.preservedCollectionViewContentInset().left
+                
+                var insets = self.collectionView.contentInset;
+                let i = CGFloat.maximum(maxHorizontalInset, floor( (self.collectionView.bounds.size.width - contentWidth) / 2.0) )
+                insets.left = i
+                insets.right = i
+                self.collectionView.contentInset = insets
+            }
+        }
+    }
+    
+    @objc func selectFirstShoppable() {
+        if self.collectionView.numberOfItems(inSection: 0) > 0{
+            self.collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
+        } else {
+            self.needsToSelectFirstShoppable = true
+        }
+    }
+    
+
+    @objc func selectedShoppableIndex() -> Int {
+        return self.collectionView.indexPathsForSelectedItems?.first?.item ?? 0
+    }
 }

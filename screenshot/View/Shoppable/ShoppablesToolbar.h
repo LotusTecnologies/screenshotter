@@ -26,20 +26,18 @@
 
 @end
 
-@interface ShoppablesToolbar : UIToolbar <ShoppablesControllerProtocol, UICollectionViewDelegate, UICollectionViewDataSource> {
-    BOOL _needsToSelectFirstShoppable;
-}
+@interface ShoppablesToolbar : UIToolbar <ShoppablesControllerProtocol, UICollectionViewDelegate, UICollectionViewDataSource>
+
 
 + (UIEdgeInsets)preservedCollectionViewContentInset;
 - (void)repositionShoppables;
 
 @property (nonatomic, weak) id<ShoppablesToolbarDelegate> delegate;
 @property (nonatomic) BOOL didViewControllerAppear;
+@property (nonatomic) BOOL needsToSelectFirstShoppable;
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, copy) UIImage *screenshotImage;
 
-- (void)selectFirstShoppable;
-- (NSInteger)selectedShoppableIndex;
 
 @end

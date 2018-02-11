@@ -42,32 +42,8 @@
     CGFloat p2 = p * .5f;
     return UIEdgeInsetsMake(p2, p, p2, p);
 }
-
-- (CGSize)shoppableSize {
-    CGSize size = CGSizeZero;
-    size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
-    size.width = size.height * .8f;
-    return size;
-}
-
 - (void)repositionShoppables {
-    NSInteger shoppablesCount = [self.shoppablesController shoppables].count;
-    
-    if (shoppablesCount > 0) {
-        CGFloat lineSpacing = ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).minimumLineSpacing;
-        CGFloat spacingsWidth = lineSpacing * (shoppablesCount - 1);
-        CGFloat shoppablesWidth = [self shoppableSize].width * shoppablesCount;
-        CGFloat contentWidth = round(spacingsWidth + shoppablesWidth);
-        CGFloat width = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
-        
-        if (width != contentWidth) {
-            CGFloat maxHorizontalInset = [[self class] preservedCollectionViewContentInset].left;
-            
-            UIEdgeInsets insets = self.collectionView.contentInset;
-            insets.left = insets.right = MAX(maxHorizontalInset, floor((self.collectionView.bounds.size.width - contentWidth) / 2.f));
-            self.collectionView.contentInset = insets;
-        }
-    }
+    [self repositionShoppablesWithCount :[self.shoppablesController shoppables].count];
 }
 
 
@@ -94,19 +70,6 @@
     }
 }
 
-- (void)selectFirstShoppable {
-    if ([self.collectionView numberOfItemsInSection:0] > 0) {
-        [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-        
-    } else {
-        _needsToSelectFirstShoppable = YES;
-    }
-}
-
-- (NSInteger)selectedShoppableIndex {
-    return [self.collectionView.indexPathsForSelectedItems firstObject].item;
-}
-
 
 #pragma mark - Collection View
 
@@ -126,8 +89,8 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     if ([collectionView indexPathsForVisibleItems].count == 0 && [collectionView numberOfItemsInSection:0] > 0 && indexPath.item == 0) {
-        if (_needsToSelectFirstShoppable) {
-            _needsToSelectFirstShoppable = NO;
+        if (self.needsToSelectFirstShoppable) {
+            self.needsToSelectFirstShoppable = NO;
             [self selectFirstShoppable];
             
             // selectItemAtIndexPath: should auto select the cell however
