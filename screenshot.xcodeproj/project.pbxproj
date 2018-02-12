@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3130FF7D2030709C00AA881A /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF7C2030709C00AA881A /* ShoppablesToolbar.swift */; };
+		3130FF7F203154EE00AA881A /* ShoppablesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF7E203154EE00AA881A /* ShoppablesCollectionView.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -53,7 +54,6 @@
 		C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */; };
 		C540881A1FE90C8E00198955 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087D41FE90C8D00198955 /* WebView.swift */; };
 		C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */; };
-		C540881C1FE90C8E00198955 /* ShoppablesToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087D91FE90C8D00198955 /* ShoppablesToolbar.m */; };
 		C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DB1FE90C8D00198955 /* CurrencyViewController.swift */; };
 		C540881E1FE90C8E00198955 /* InviteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DD1FE90C8D00198955 /* InviteViewController.swift */; };
 		C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */; };
@@ -128,6 +128,7 @@
 
 /* Begin PBXFileReference section */
 		3130FF7C2030709C00AA881A /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
+		3130FF7E203154EE00AA881A /* ShoppablesCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppablesCollectionView.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -175,9 +176,7 @@
 		C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideView.swift; sourceTree = "<group>"; };
 		C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		C54087D41FE90C8D00198955 /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
-		C54087D71FE90C8D00198955 /* ShoppablesToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppablesToolbar.h; sourceTree = "<group>"; };
 		C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppableCollectionViewCell.swift; sourceTree = "<group>"; };
-		C54087D91FE90C8D00198955 /* ShoppablesToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppablesToolbar.m; sourceTree = "<group>"; };
 		C54087DB1FE90C8D00198955 /* CurrencyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrencyViewController.swift; sourceTree = "<group>"; };
 		C54087DD1FE90C8D00198955 /* InviteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InviteViewController.swift; sourceTree = "<group>"; };
 		C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -451,9 +450,8 @@
 			isa = PBXGroup;
 			children = (
 				C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */,
+				3130FF7E203154EE00AA881A /* ShoppablesCollectionView.swift */,
 				3130FF7C2030709C00AA881A /* ShoppablesToolbar.swift */,
-				C54087D71FE90C8D00198955 /* ShoppablesToolbar.h */,
-				C54087D91FE90C8D00198955 /* ShoppablesToolbar.m */,
 			);
 			path = Shoppable;
 			sourceTree = "<group>";
@@ -985,6 +983,7 @@
 				C51D363F2010B66400943257 /* ProductsTooltipCollectionViewCell.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C54088551FE90E2200198955 /* ClipView.swift in Sources */,
+				3130FF7F203154EE00AA881A /* ShoppablesCollectionView.swift in Sources */,
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
@@ -1060,7 +1059,6 @@
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
 				C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */,
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
-				C540881C1FE90C8E00198955 /* ShoppablesToolbar.m in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
