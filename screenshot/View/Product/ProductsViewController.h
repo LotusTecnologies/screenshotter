@@ -36,6 +36,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 
 //private
+- (void)presentProductsRateNegativeFeedbackAlert ;
+-(void) presentPersonalSylist;
 - (BOOL)shouldHideToolbar;
 - (CGPoint)collectionViewMinimumSpacing;
 @property (nonatomic, strong) Loader *loader;

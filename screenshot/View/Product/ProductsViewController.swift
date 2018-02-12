@@ -73,4 +73,58 @@ extension ProductsViewController {
 //            return view;
 //        }()
     }
+    
+    @objc func presentProductsRateNegativeAlert() {
+        if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
+            InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
+        }
+        let alertController = UIAlertController.init(title: "negativeFeedback.title".localized, message: "negativeFeedback.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.sendFeedback".localized, style: .default, handler: { (a) in
+            self.presentProductsRateNegativeFeedbackAlert()
+
+        }))
+        alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.fashionHelp".localized, style: .default, handler: { (a) in
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                self.presentPersonalSylist()
+            }else{
+                if InAppPurchaseManager.sharedInstance.canPurchase() {
+                   let alertController = UIAlertController.init(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
+                    let action = UIAlertAction.init(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
+                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
+                                self.presentPersonalSylist()
+                            }, failure: { (error) in
+                                //no reason to present alert - Apple does it for us
+                            })
+                        }
+                    })
+                    
+                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                        action.isEnabled = true;
+                        alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                    }else{
+                        action.isEnabled = false;
+                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
+                            action.isEnabled = true;
+                            alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                        }, failure: { (error) in
+                            alertController.message = String.init(format: "personalSytlistPopup.error".localized, error.localizedDescription)
+                        })
+                        
+                    }
+                    alertController.addAction(action)
+                    alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                }else{
+                    let errorMessage = "personalSytlistPopup.errorCannotPurchaseOnDevice".localized
+                    let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                    
+                }
+            }
+        }))
+        alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
+        self.present(alertController, animated: true, completion: nil)
+    }
 }
