@@ -539,13 +539,10 @@ extension SettingsViewController : UITableViewDelegate {
             }else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
                     
-                    let loadingMessage = "Unlocking a personal stylist requires a one time in-app purchase. \n Connecting to appstore...."
-                    let canContinueMessageFormat = "Unlocking a personal stylist requires a one time in-app purchase for %@"
-                    let cantGetProductMessageFormat = "Unlocking a personal stylist requires a one time in-app purchase. \n Unable to connect to the appstore at this time: \n %@"
-                    let alertController = UIAlertController.init(title: nil, message: loadingMessage, preferredStyle: .alert)
+                    let alertController = UIAlertController.init(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
                     
                     
-                    let action = UIAlertAction.init(title: "Continue", style: .default, handler: { (action) in
+                    let action = UIAlertAction.init(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
                             IntercomHelper.sharedInstance.presentMessagingUI()
@@ -558,14 +555,14 @@ extension SettingsViewController : UITableViewDelegate {
                     
                     if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                         action.isEnabled = true;
-                        alertController.message = String.init(format: canContinueMessageFormat, product.localizedPriceString())
+                        alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
                     }else{
                         action.isEnabled = false;
                         InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
                             action.isEnabled = true;
-                            alertController.message = String.init(format: canContinueMessageFormat, product.localizedPriceString())
+                            alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
                         }, failure: { (error) in
-                            alertController.message = String.init(format: cantGetProductMessageFormat, error.localizedDescription)
+                            alertController.message = String.init(format: "personalSytlistPopup.error".localized, error.localizedDescription)
                         })
                     
                     }
@@ -573,8 +570,8 @@ extension SettingsViewController : UITableViewDelegate {
                     alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                 }else{
-                    let errorMessge = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases."
-                    let alertController = UIAlertController.init(title: nil, message: errorMessge, preferredStyle: .alert)
+                    let errorMessage = "personalSytlistPopup.errorCannotPurchaseOnDevice".localized
+                    let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                     
