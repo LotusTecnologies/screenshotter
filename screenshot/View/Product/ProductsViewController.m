@@ -557,7 +557,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 #pragma mark - Product Cell
 
-- (void)productCollectionViewCellDidTapFavorite:(ProductCollectionViewCell *)cell {
+- (void)productCollectionViewCellDidTapFavoriteWithCell:(ProductCollectionViewCell *)cell {
     BOOL isFavorited = [cell.favoriteButton isSelected];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
