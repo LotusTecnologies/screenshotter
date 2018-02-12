@@ -29,7 +29,38 @@ extension ProductsViewController {
             return toolbar;
         }()
     }
-    
+    @objc func setupCollectionView(){
+        self.collectionView = {
+            let minimumSpacing = self.collectionViewMinimumSpacing()
+            
+            let layout = UICollectionViewFlowLayout()
+            layout.minimumInteritemSpacing = minimumSpacing.x;
+            layout.minimumLineSpacing = minimumSpacing.y;
+            
+            let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
+
+            collectionView.translatesAutoresizingMaskIntoConstraints = false
+            collectionView.delegate = self;
+            collectionView.dataSource = self;
+            collectionView.contentInset = UIEdgeInsets.init(top: self.shoppablesToolbar.bounds.size.height, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
+            collectionView.scrollIndicatorInsets = UIEdgeInsets.init(top: self.shoppablesToolbar.bounds.size.height, left: 0.0, bottom: 0.0, right: 0.0)
+            
+            collectionView.backgroundColor = self.view.backgroundColor;
+            // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
+            // Then test why the control view (products options view) jumps before being dragged away.
+            collectionView.keyboardDismissMode = .onDrag;
+            collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip");
+            collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell");
+
+
+            self.view.insertSubview(collectionView, at: 0)
+            collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+            collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+            collectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
+            collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+            return collectionView
+        }()
+    }
     @objc func setupRatingView(){
 //        self.rateView = {
 //            let view = ProductsRateView.init()

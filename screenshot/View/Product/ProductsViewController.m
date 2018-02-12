@@ -51,34 +51,8 @@
     
     [self setupShoppableToolbar];
     
-    self.collectionView = ({
-        CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
-        
-        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumInteritemSpacing = minimumSpacing.x;
-        layout.minimumLineSpacing = minimumSpacing.y;
-        
-        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
-        collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-        collectionView.delegate = self;
-        collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, minimumSpacing.y, 0.f);
-        collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(self.shoppablesToolbar.bounds.size.height, 0.f, 0.f, 0.f);
-        collectionView.backgroundColor = self.view.backgroundColor;
-        // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
-        // Then test why the control view (products options view) jumps before being dragged away.
-        collectionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
-        
-        [collectionView registerClass:[ProductsTooltipCollectionViewCell class] forCellWithReuseIdentifier:@"tooltip"];
-        [collectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-        
-        [self.view insertSubview:collectionView atIndex:0];
-        [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        [collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
-        [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        collectionView;
-    });
+    [self setupCollectionView];
+    
     
     self.rateView = ({
         ProductsRateView *view = [[ProductsRateView alloc] init];
