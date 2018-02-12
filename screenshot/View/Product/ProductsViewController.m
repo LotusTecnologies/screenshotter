@@ -13,7 +13,7 @@
 @import FBSDKCoreKit.FBSDKAppEvents;
 
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
+@interface ProductsViewController () 
 
 @end
 
@@ -49,23 +49,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.shoppablesToolbar = ({
-        CGFloat margin = 8.5f; // Anything other then 8 will display horizontal margin
-        CGFloat shoppableHeight = 60.f;
-        
-        ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
-        toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-        toolbar.delegate = self;
-        toolbar.shoppableToolbarDelegate = self;
-        toolbar.barTintColor = [UIColor whiteColor];
-        toolbar.hidden = [self shouldHideToolbar];
-        [self.view addSubview:toolbar];
-        [toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
-        [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        [toolbar.heightAnchor constraintEqualToConstant:toolbar.bounds.size.height].active = YES;
-        toolbar;
-    });
+    [self setupShoppableToolbar];
     
     self.collectionView = ({
         CGPoint minimumSpacing = [self collectionViewMinimumSpacing];
