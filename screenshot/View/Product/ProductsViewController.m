@@ -694,58 +694,6 @@
 }
 
 
-#pragma mark - Helper View
-
-- (void)showNoItemsHelperView {
-    CGFloat verPadding = [Geometry extendedPadding];
-    CGFloat horPadding = [Geometry padding];
-    CGFloat topOffset = [self.shoppablesToolbar isHidden] ? 0.f : self.shoppablesToolbar.bounds.size.height;
-    
-    HelperView *helperView = [[HelperView alloc] init];
-    helperView.translatesAutoresizingMaskIntoConstraints = NO;
-    helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
-    helperView.titleLabel.text = @"No Items Found";
-    helperView.subtitleLabel.text = @"No visually similar products were detected";
-    helperView.contentImage = [UIImage imageNamed:@"ProductsEmptyListGraphic"];
-    [self.view addSubview:helperView];
-    [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:topOffset].active = YES;
-    [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [helperView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-    [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-    self.noItemsHelperView = helperView;
-    
-    if (self.state == ProductsViewControllerStateRetry) {
-        MainButton *retryButton = [MainButton buttonWithType:UIButtonTypeCustom];
-        retryButton.translatesAutoresizingMaskIntoConstraints = NO;
-        retryButton.backgroundColor = [UIColor crazeGreen];
-        [retryButton setTitle:@"Try Again" forState:UIControlStateNormal];
-        [retryButton addTarget:self action:@selector(noItemsRetryAction) forControlEvents:UIControlEventTouchUpInside];
-        [helperView.controlView addSubview:retryButton];
-        [retryButton.topAnchor constraintEqualToAnchor:helperView.controlView.topAnchor].active = YES;
-        [retryButton.bottomAnchor constraintEqualToAnchor:helperView.controlView.bottomAnchor].active = YES;
-        [retryButton.centerXAnchor constraintEqualToAnchor:helperView.contentView.centerXAnchor].active = YES;
-    }
-}
-
-- (void)hideNoItemsHelperView {
-    [self.noItemsHelperView removeFromSuperview];
-    self.noItemsHelperView = nil;
-}
-
-- (void)noItemsRetryAction {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Try again as" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Fashion" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self.shoppablesController refetchShoppablesAsFashion];
-        self.state = ProductsViewControllerStateLoading;
-    }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Furniture" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self.shoppablesController refetchShoppablesAsFurniture];
-        self.state = ProductsViewControllerStateLoading;
-    }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
 
 #pragma mark - Web View Controller
 

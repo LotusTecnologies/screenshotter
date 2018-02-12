@@ -43,7 +43,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (BOOL)shouldHideToolbar;
 - (CGPoint)collectionViewMinimumSpacing;
 @property (nonatomic, strong) Loader *loader;
-@property (nonatomic, strong) HelperView *noItemsHelperView;
+@property (nonatomic, strong, nullable) HelperView *noItemsHelperView;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) ShoppablesToolbar *shoppablesToolbar;
 @property (nonatomic, strong) ProductsOptions *productsOptions;

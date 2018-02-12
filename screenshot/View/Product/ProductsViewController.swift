@@ -162,3 +162,61 @@ extension ProductsViewController {
     }
 
 }
+
+//no products
+extension ProductsViewController{
+    @objc func showNoItemsHelperView() {
+        
+        let verPadding = Geometry.extendedPadding
+        let horPadding = Geometry.padding
+        let topOffset:CGFloat = self.shoppablesToolbar.isHidden ? 0.0 : self.shoppablesToolbar.bounds.size.height
+        
+        let helperView = HelperView.init()
+        helperView.translatesAutoresizingMaskIntoConstraints = false
+        helperView.layoutMargins = UIEdgeInsets.init(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
+        helperView.titleLabel.text = "No Items Found"
+        helperView.subtitleLabel.text = "No visually similar products were detected"
+        helperView.contentImage = UIImage.init(named: "ProductsEmptyListGraphic")
+        self.view.addSubview(helperView)
+        
+        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:topOffset).isActive = true
+        helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        self.noItemsHelperView = helperView
+        if self.state == .retry {
+            
+            let retryButton = MainButton.init()
+            retryButton.translatesAutoresizingMaskIntoConstraints = false
+            retryButton.backgroundColor = .crazeGreen
+            retryButton.setTitle("Try Again", for: .normal)
+            retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
+            helperView.controlView.addSubview(retryButton)
+            
+            retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
+            retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
+            retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        }
+    }
+    
+    @objc func hideNoItemsHelperView(){
+        self.noItemsHelperView?.removeFromSuperview()
+        self.noItemsHelperView = nil
+    }
+    
+    @objc func noItemsRetryAction() {
+        let alert = UIAlertController.init(title: "Try again as", message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction.init(title: "Fashion", style: .default, handler: { (a) in
+            self.shoppablesController.refetchShoppablesAsFashion()
+            self.state = .loading;
+
+        }))
+        alert.addAction(UIAlertAction.init(title: "Furniture", style: .default, handler: { (a) in
+                            self.shoppablesController.refetchShoppablesAsFurniture()
+            self.state = .loading;
+
+        }))
+        alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+}
