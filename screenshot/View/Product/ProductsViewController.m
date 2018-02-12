@@ -585,57 +585,6 @@
 
 #pragma mark - Rate View
 
-- (void)productsRatePositiveAction {
-    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setRatingWithPositive:YES];
-}
-
-- (void)productsRateNegativeAction {
-    Shoppable *shoppable = [self.shoppablesController shoppableAt:[self.shoppablesToolbar selectedShoppableIndex]];
-    [shoppable setRatingWithPositive:NO];
-    
-    [self presentProductsRateNegativeAlert];    
-}
-- (void)talkToYourStylistAction {
-    [IntercomHelper.sharedInstance presentMessagingUI];
-}
-
--(void) presentPersonalSylist{
-    [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
-    NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
-    [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
-}
-
-- (void)presentProductsRateNegativeFeedbackAlert {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"What’s Wrong Here?" message:@"What were you expecting to see and what did you see instead?" preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.delegate = self;
-        textField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
-        textField.enablesReturnKeyAutomatically = YES;
-        textField.tintColor = [UIColor crazeGreen];
-        self.productsRateNegativeFeedbackTextField = textField;
-    }];
-    
-    self.productsRateNegativeFeedbackSubmitAction = [UIAlertAction actionWithTitle:@"Submit" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        // Even though we're using `enablesReturnKeyAutomatically` custom keyboards might not support this.
-        NSString *trimmedText = [self.productsRateNegativeFeedbackTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        
-        if (trimmedText.length > 0) {
-            [AnalyticsTrackers.segment track:@"Shoppable Feedback Negative" properties:@{@"text": trimmedText}];
-        }
-    }];
-    self.productsRateNegativeFeedbackSubmitAction.enabled = NO;
-    [alertController addAction:self.productsRateNegativeFeedbackSubmitAction];
-    alertController.preferredAction = self.productsRateNegativeFeedbackSubmitAction;
-    
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    [self presentViewController:alertController animated:YES completion:nil];
-}
-
-
-#pragma mark - Text Field
-
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *text = [textField.text stringByReplacingCharactersInRange:range withString:string];
     NSString *trimmedText = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];

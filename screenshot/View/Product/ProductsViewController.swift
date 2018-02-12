@@ -73,7 +73,11 @@ extension ProductsViewController {
 //            return view;
 //        }()
     }
-    
+}
+
+
+private typealias ProductsViewControllerRatings = ProductsViewController
+extension ProductsViewControllerRatings {
     @objc func presentProductsRateNegativeAlert() {
         if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
             InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
@@ -127,8 +131,68 @@ extension ProductsViewController {
         alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
+    @objc func productsRatePositiveAction(){
+        let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
+        shoppable.setRating(positive: true)
+    }
     
+    @objc func productsRateNegativeAction(){
+        let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
+        shoppable.setRating(positive: false)
+        self.presentProductsRateNegativeAlert()
+    }
+    @objc func talkToYourStylistAction(){
+        IntercomHelper.sharedInstance.presentMessagingUI()
+    }
     
+    @objc func presentPersonalSylist() {
+        let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
+        AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
+        let prefiledMessageTemplate = "I need help finding this outfit... %@"
+        let prefilledMessage = String.init(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL  ?? "null"))
+        IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
+    }
+    @objc func presentProductsRateNegativeFeedbackAlert() {
+        let alertController = UIAlertController.init(title: "What’s Wrong Here?", message: "What were you expecting to see and what did you see instead?", preferredStyle: .alert)
+        alertController.addTextField { (textField) in
+            textField.delegate = self;
+            textField.autocapitalizationType = .sentences
+            textField.enablesReturnKeyAutomatically = true
+            textField.tintColor = .crazeGreen
+            self.productsRateNegativeFeedbackTextField = textField;
+        }
+        
+        self.productsRateNegativeFeedbackSubmitAction = UIAlertAction.init(title: "Submit", style: .default, handler: { (action) in
+            if let trimmedText = self.productsRateNegativeFeedbackTextField.text?.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines) {
+            
+                if (trimmedText.lengthOfBytes(using: .utf8) > 0) {
+                    AnalyticsTrackers.segment.track("Shoppable Feedback Negative", properties:["text": trimmedText])
+                }
+            }
+        })
+        
+        self.productsRateNegativeFeedbackSubmitAction.isEnabled = false
+        alertController.addAction(self.productsRateNegativeFeedbackSubmitAction)
+
+        alertController.preferredAction = self.productsRateNegativeFeedbackSubmitAction;
+        alertController.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+//    @objc public func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+//        if let text = textField.text,
+//            let textRange = Range(range, in: text) {
+//            let updatedText = text.replacingCharacters(in: textRange, with: string)
+//            let trimmedText = updatedText.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+//
+//            self.productsRateNegativeFeedbackSubmitAction.isEnabled = (trimmedText.lengthOfBytes(using: .utf8) > 0)
+//        }
+//
+//        return true
+//    }
+}
+
+extension ProductsViewController {
     @objc func syncScreenshotRelatedObjects() {
         if let data = self.screenshot.imageData {
             self.image = UIImage.init(data: data as Data)
@@ -163,8 +227,8 @@ extension ProductsViewController {
 
 }
 
-//no products
-extension ProductsViewController{
+private typealias ProductsViewControllerNoItemsHelperView = ProductsViewController
+extension ProductsViewControllerNoItemsHelperView{
     @objc func showNoItemsHelperView() {
         
         let verPadding = Geometry.extendedPadding
