@@ -222,32 +222,6 @@
     }
 }
 
-- (void)syncScreenshotRelatedObjects {
-    self.image = [UIImage imageWithData:self.screenshot.imageData];
-    
-    self.navigationItem.rightBarButtonItem = ({
-        CGFloat buttonSize = 32.f;
-        
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(0.f, 0.f, buttonSize, buttonSize);
-        button.imageView.contentMode = UIViewContentModeScaleAspectFill;
-        [button setImage:self.image forState:UIControlStateNormal];
-        [button addTarget:self action:@selector(displayScreenshotAction) forControlEvents:UIControlEventTouchUpInside];
-        button.layer.borderColor = [UIColor crazeGreen].CGColor;
-        button.layer.borderWidth = 1.f;
-        
-        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
-        
-        [button.widthAnchor constraintEqualToConstant:button.bounds.size.width].active = YES;
-        [button.heightAnchor constraintEqualToConstant:button.bounds.size.height].active = YES;
-        
-        barButtonItem;
-    });
-    
-    self.shoppablesToolbar.shoppablesController = self.shoppablesController;
-    self.shoppablesToolbar.screenshotImage = self.image;
-}
-
 - (void)displayScreenshotAction {
     ScreenshotDisplayNavigationController *navigationController = [[ScreenshotDisplayNavigationController alloc] init];
     navigationController.screenshotDisplayViewController.image = self.image;

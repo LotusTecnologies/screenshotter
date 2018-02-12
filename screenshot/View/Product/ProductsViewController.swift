@@ -127,4 +127,38 @@ extension ProductsViewController {
         alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
+    
+    
+    @objc func syncScreenshotRelatedObjects() {
+        if let data = self.screenshot.imageData {
+            self.image = UIImage.init(data: data as Data)
+        }else{
+            self.image = UIImage.init()
+        }
+        
+        self.navigationItem.rightBarButtonItem = {
+            let buttonSize:CGFloat = 32
+            
+            let button = UIButton.init(type: UIButtonType.custom)
+            button.frame = CGRect.init(x: 0, y: 0, width: buttonSize, height: buttonSize)
+            button.imageView?.contentMode = .scaleAspectFill;
+            button.setImage(self.image, for: .normal)
+            
+            button.addTarget(self, action: #selector(displayScreenshotAction), for: .touchUpInside)
+            
+            button.layer.borderColor = UIColor.crazeGreen.cgColor
+            button.layer.borderWidth = 1
+            
+            let barButtonItem = UIBarButtonItem.init(customView: button)
+            button.widthAnchor.constraint(equalToConstant: button.bounds.size.width).isActive = true
+            button.heightAnchor.constraint(equalToConstant: button.bounds.size.height).isActive = true
+            
+            
+            return barButtonItem;
+        }()
+        
+        self.shoppablesToolbar.shoppablesController = self.shoppablesController;
+        self.shoppablesToolbar.screenshotImage = self.image;
+    }
+
 }

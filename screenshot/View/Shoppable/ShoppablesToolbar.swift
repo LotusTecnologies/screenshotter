@@ -27,7 +27,7 @@ import Foundation
             }
         }
     }
-    var shoppablesController:ShoppablesController? {
+    public var shoppablesController:ShoppablesController? {
         didSet{
             if  shoppablesController != nil {
                 shoppablesController?.collectionView = self.collectionView

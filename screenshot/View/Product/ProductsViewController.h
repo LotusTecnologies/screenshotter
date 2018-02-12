@@ -20,7 +20,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     ProductsViewControllerStateEmpty
 };
 
-@class ProductsViewController;
+@class ProductsViewController, ShoppablesController;
 @class Screenshot, Product, HelperView, Loader, ShoppablesToolbar, ProductsOptions, ScrollRevealController, ProductsRateView;
 @protocol ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesControllerDelegate, ProductsOptionsDelegate, WebViewControllerDelegate, ShoppablesToolbarDelegate;
 
@@ -32,12 +32,14 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 - (NSInteger)indexForProduct:(Product *)product;
 
 - (void)reloadProductCellAtIndex:(NSInteger)index;
+@property(nonatomic, strong)   ShoppablesController* shoppablesController;
 
 
 
 //private
 - (void)presentProductsRateNegativeFeedbackAlert ;
 -(void) presentPersonalSylist;
+- (void)displayScreenshotAction;
 - (BOOL)shouldHideToolbar;
 - (CGPoint)collectionViewMinimumSpacing;
 @property (nonatomic, strong) Loader *loader;
