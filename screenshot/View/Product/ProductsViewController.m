@@ -7,14 +7,13 @@
 //
 
 #import "ProductsViewController.h"
-#import "ShoppablesToolbar.h"
 #import "screenshot-Swift.h"
 #import <PromiseKit/PromiseKit.h>
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
 
-@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
+@interface ProductsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
 
 @end
 
@@ -57,6 +56,7 @@
         ShoppablesToolbar *toolbar = [[ShoppablesToolbar alloc] initWithFrame:CGRectMake(0.f, 0.f, 0.f, margin * 2 + shoppableHeight)];
         toolbar.translatesAutoresizingMaskIntoConstraints = NO;
         toolbar.delegate = self;
+        toolbar.shoppableToolbarDelegate = self;
         toolbar.barTintColor = [UIColor whiteColor];
         toolbar.hidden = [self shouldHideToolbar];
         [self.view addSubview:toolbar];
@@ -190,6 +190,7 @@
 
 - (void)dealloc {
     self.shoppablesToolbar.delegate = nil;
+    self.shoppablesToolbar.shoppableToolbarDelegate = nil;
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     self.shoppablesController.delegate = nil;
@@ -774,13 +775,14 @@
     return UIBarPositionTopAttached;
 }
 
-- (void)shoppablesToolbarDidChange:(ShoppablesToolbar *)toolbar {
+-(void) shoppablesToolbarDidChangeWithToolbar:(ShoppablesToolbar *)toolbar{
     if (self.products.count == 0 && [self isViewLoaded]) {
         [self reloadProductsForShoppableAtIndex:0];
     }
 }
 
-- (void)shoppablesToolbar:(ShoppablesToolbar *)toolbar didSelectShoppableAtIndex:(NSUInteger)index {
+    
+-(void) shoppablesToolbarDidSelectShoppableWithToolbar:(ShoppablesToolbar *)toolbar index:(NSInteger)index {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys productCompletedTooltip]];
     
     [self reloadProductsForShoppableAtIndex:index];
