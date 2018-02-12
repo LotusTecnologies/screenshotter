@@ -77,9 +77,6 @@ import Foundation
         }
     }
     
-    
-    
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.shoppablesController?.shoppableCount() ?? 0
     }
