@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FBSDKCoreKit
 
 @objc enum ProductsSection : Int {
     case tooltip = 0
@@ -164,11 +165,52 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         } else {
             return .zero;
         }
-        
-
     }
     
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if (indexPath.section == ProductsSection.product.rawValue) {
+            if let webVC = self.navigationController?.topViewController as? WebViewController {
+                // Somehow the user was able to tap twice
+                // do nothing
+
+            }else{
+                ProductWebViewController.shared.product = self.productAtIndex(indexPath.item)
+                
+                if var urlString = ProductWebViewController.shared.product?.offer {
+                    if (urlString.hasPrefix("//")) {
+                        urlString = "https:".appending(urlString)
+                    }
+                    if let url = URL.init(string: urlString){
+                        ProductWebViewController.shared.rebaseURL(url)
+                        self.navigationController?.pushViewController(ProductWebViewController.shared, animated:true)
+                    }
+                }
+            }
+            
+            let product = self.productAtIndex(indexPath.item)
+            AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Products")
+            
+            
+            let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+            
+            if (email?.lengthOfBytes(using: .utf8) ?? 0 > 0) {
+                let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
+                AnalyticsTrackers.standard.track("Product for email", properties:["screenshot": self.screenshot.uploadedImageURL ?? "",
+                                                                                  "merchant": product.merchant ?? "",
+                                                                                  "brand": product.brand ?? "",
+                                                                                  "title": product.displayTitle ?? "",
+                                                                                  "url": product.offer ?? "",
+                                                                                  "imageUrl": product.imageURL ?? "",
+                                                                                  "price": product.price ?? "",
+                                                                                  "email": email ?? "",
+                                                                                  "name": name ?? ""])
+            }
+            AnalyticsTrackers.branch.track("Tapped on product")
+            FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL])
+        }
+    }
 }
+
 private typealias ProductsViewControllerOptionsView = ProductsViewController
 extension ProductsViewControllerOptionsView {
     @objc func updateOptionsView() {

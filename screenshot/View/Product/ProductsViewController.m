@@ -229,49 +229,6 @@
 
 
 
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ProductsSectionProduct) {
-        // Somehow users were able to tap twice, this condition will prevent that.
-        if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
-            [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
-            NSString *urlString = [ProductWebViewController shared].product.offer;
-            if ([urlString hasPrefix:@"//"]) {
-                urlString = [@"https:" stringByAppendingString:urlString];
-            }
-            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:urlString]];
-            [self.navigationController pushViewController:[ProductWebViewController shared] animated:YES];
-        }
-        
-        Product *product = [self productAtIndex:indexPath.item];
-        
-        [AnalyticsTrackerObjCBridge trackTappedOnProductWithTracker:AnalyticsTrackers.standard
-                                                            product:product
-                                                             onPage:@"Products"];
-        
-        NSString *email = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys email]];
-        
-        if (email.length) {
-            NSString *name = [[NSUserDefaults standardUserDefaults] stringForKey:[UserDefaultsKeys name]] ?: @"";
-            
-            [AnalyticsTrackers.standard track:@"Product for email" properties:@{@"screenshot": self.screenshot.uploadedImageURL,
-                                                                                @"merchant": product.merchant,
-                                                                                @"brand": product.brand,
-                                                                                @"title": product.displayTitle,
-                                                                                @"url": product.offer,
-                                                                                @"imageUrl": product.imageURL,
-                                                                                @"price": product.price,
-                                                                                @"email": email,
-                                                                                @"name": name
-                                                                                }];
-        }
-        
-        [AnalyticsTrackers.branch track:@"Tapped on product" properties:nil];
-        
-        [FBSDKAppEvents logEvent:FBSDKAppEventNameViewedContent parameters:@{FBSDKAppEventParameterNameContentID: product.imageURL}];
-    }
-}
-
-
 #pragma mark - Product Cell
 
 -(void) productCollectionViewCellDidTapFavoriteWithCell:(ProductCollectionViewCell *)cell {
