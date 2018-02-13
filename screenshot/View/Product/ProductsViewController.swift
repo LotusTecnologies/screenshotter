@@ -8,6 +8,11 @@
 
 import Foundation
 
+@objc enum ProductsSection : Int {
+    case tooltip = 0
+    case product = 1
+}
+
 extension ProductsViewController {
     @objc func setupShoppableToolbar() {
         self.shoppablesToolbar = {
@@ -74,8 +79,75 @@ extension ProductsViewController {
 //        }()
     }
 }
+
+private typealias ProductsViewControllerShoppables = ProductsViewController
+extension ProductsViewControllerShoppables {
+    @objc func hasShoppables() -> Bool {
+        return self.shoppablesController.shoppableCount() > 0
+    }
+    
+    @objc func shoppablesControllerIsEmpty(_ controller:ShoppablesController){
+        if (self.noItemsHelperView == nil) {
+            self.state = .retry
+        }
+    }
+    
+    @objc func shoppablesControllerDidReload(_ controller:ShoppablesController){
+        self.reloadProductsForShoppableAtIndex(self.shoppablesToolbar.selectedShoppableIndex());
+
+    }
+
+}
 private typealias ProductsViewControllerProducts = ProductsViewController
 extension ProductsViewControllerProducts{
+    @objc func productAtIndex(_ index:Int) -> Product{
+        return self.products[index]
+    }
+    
+    @objc func indexForProduct(_ product:Product )-> Int {
+        return self.products.index(of: product) ?? NSNotFound
+    }
+    
+    @objc func reloadProductsForShoppableAtIndex(_ index:Int){
+        
+        self.products = [];
+        self.productsUnfilteredCount = 0;
+        
+        if self.hasShoppables() {
+            self.scrollRevealController.resetViewOffset()
+            
+            let shoppable = self.shoppablesController.shoppable(at: index)
+            
+            if (shoppable.productFilterCount == -1) {
+                self.state = .retry;
+                
+            } else {
+                self.products = self.productsForShoppable(shoppable)
+                
+                if (shoppable.productFilterCount == 0 && self.productsUnfilteredCount == 0) {
+                    self.state = .loading;
+                    
+                } else {
+                    self.state = (self.products.count == 0) ? .empty : .products;
+                }
+            }
+            
+            self.collectionView.reloadData()
+            self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
+            
+            if self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.rawValue) > 0 {
+                self.collectionView.scrollToItem(at: IndexPath.init(item: 0, section: ProductsSection.tooltip.rawValue), at: .top, animated: false)
+                
+            } else if self.collectionView.numberOfItems(inSection: ProductsSection.product.rawValue) > 0 {
+                self.collectionView.scrollToItem(at: IndexPath.init(item: 0, section: ProductsSection.product.rawValue), at: .top, animated: false)
+            }
+            
+        } else {
+            self.state = .loading;
+            self.collectionView.reloadData()
+        }
+    }
+        
     @objc func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
         let descriptors:[NSSortDescriptor] = {
             switch self.productsOptions.sort {

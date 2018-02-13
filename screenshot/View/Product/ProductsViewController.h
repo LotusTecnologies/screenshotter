@@ -8,10 +8,6 @@
 
 #import "BaseViewController.h"
 
-typedef NS_ENUM(NSUInteger, ProductsSection) {
-    ProductsSectionTooltip,
-    ProductsSectionProduct
-};
 
 typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     ProductsViewControllerStateLoading,
@@ -28,13 +24,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 @property (nonatomic, strong) Screenshot *screenshot;
 
-- (Product *)productAtIndex:(NSInteger)index;
-- (NSInteger)indexForProduct:(Product *)product;
-
 - (void)reloadProductCellAtIndex:(NSInteger)index;
 @property(nonatomic, strong)   ShoppablesController* shoppablesController;
-
-
 
 //private
 - (void)displayScreenshotAction;
