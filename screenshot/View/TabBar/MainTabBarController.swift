@@ -211,8 +211,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     func refreshTabBarSettingsBadge() {
-        let hasPhotoPermissions = PermissionsManager.shared._hasPhotoPermission()
-        let hasPushPermissions = PermissionsManager.shared._hasPushPermission()
+        let hasPhotoPermissions = PermissionsManager.shared.hasPermission(for: .photo)
+        let hasPushPermissions = PermissionsManager.shared.hasPermission(for: .push)
         
         if !hasPhotoPermissions || !hasPushPermissions {
             self.presentTabBarSettingsBadge()
