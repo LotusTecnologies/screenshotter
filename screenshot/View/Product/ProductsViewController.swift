@@ -80,6 +80,64 @@ extension ProductsViewController {
     }
 }
 
+private typealias ProductsViewControllerOptionsView = ProductsViewController
+extension ProductsViewControllerOptionsView {
+    @objc func updateOptionsView() {
+        if self.hasShoppables() {
+            if (self.navigationItem.titleView == nil) {
+                self.navigationItem.titleView = { () -> UIView in
+                    let label = UILabel()
+                    label.adjustsFontSizeToFitWidth = true
+                    label.minimumScaleFactor = 0.7
+                    
+                    var attributes = UINavigationBar.appearance().titleTextAttributes
+                    attributes?[NSForegroundColorAttributeName] = UIColor.crazeGreen
+
+                    let attributedString = NSMutableAttributedString.init(string: "Sort & Filter", attributes: attributes)
+                    
+                    let offset:CGFloat = 3
+                    attributes?[NSBaselineOffsetAttributeName] = offset
+
+                    let arrowString = NSAttributedString.init(string: "⌄", attributes: attributes)
+                    attributedString.append(arrowString)
+                    
+                    
+                    label.attributedText = attributedString;
+                    label.sizeToFit()
+                    
+                    var rect = label.frame;
+                    rect.origin.y -= offset;
+                    label.frame = rect;
+                    
+                    let container = ProductsViewControllerControl.init(frame:label.bounds)
+                    container.addTarget(self, action: #selector(presentOptions(_:)), for: .touchUpInside)
+                    container.addSubview(label)
+                    return container;
+                }()
+            }
+        }else{
+            self.navigationItem.titleView = nil;
+        }
+    }
+    
+    @objc func presentOptions(_ control:ProductsViewControllerControl){
+        
+        if control.isFirstResponder {
+            control.resignFirstResponder()
+        } else {
+            AnalyticsTrackers.standard.track("Opened Filters View", properties:nil)
+            let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
+            self.productsOptions.syncOptions(withMask: shoppable.getLast() )
+            
+            control.customInputView = self.productsOptions.view
+            control.becomeFirstResponder()
+        }
+    }
+    @objc func dismissOptions(){
+        self.navigationItem.titleView?.endEditing(true)
+    }
+}
+
 private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables {
     @objc func hasShoppables() -> Bool {
