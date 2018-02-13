@@ -58,7 +58,6 @@
 		C540881E1FE90C8E00198955 /* InviteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DD1FE90C8D00198955 /* InviteViewController.swift */; };
 		C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */; };
 		C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087E01FE90C8D00198955 /* ScreenshotPickerViewController.swift */; };
-		C54088211FE90C8E00198955 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087E21FE90C8D00198955 /* MainTabBarController.m */; };
 		C54088231FE90C8E00198955 /* ScreenshotDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087E81FE90C8D00198955 /* ScreenshotDisplayViewController.m */; };
 		C54088251FE90C8E00198955 /* ProductsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C54087ED1FE90C8E00198955 /* ProductsViewController.m */; };
 		C54088261FE90C8E00198955 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087EE1FE90C8E00198955 /* ProductsOptions.swift */; };
@@ -116,6 +115,7 @@
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
+		E4351D702031957800193657 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4351D6F2031957800193657 /* MainTabBarController.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E492CE3C2011051100060FB2 /* MatchstickModel.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
@@ -181,8 +181,6 @@
 		C54087DD1FE90C8D00198955 /* InviteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InviteViewController.swift; sourceTree = "<group>"; };
 		C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		C54087E01FE90C8D00198955 /* ScreenshotPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotPickerViewController.swift; sourceTree = "<group>"; };
-		C54087E21FE90C8D00198955 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
-		C54087E31FE90C8D00198955 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
 		C54087E81FE90C8D00198955 /* ScreenshotDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotDisplayViewController.m; sourceTree = "<group>"; };
 		C54087EB1FE90C8D00198955 /* ScreenshotDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotDisplayViewController.h; sourceTree = "<group>"; };
 		C54087ED1FE90C8E00198955 /* ProductsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductsViewController.m; sourceTree = "<group>"; };
@@ -251,6 +249,7 @@
 		E41D98791FE26114006EB79E /* Model 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 6.xcdatamodel"; sourceTree = "<group>"; };
 		E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotActivityItemProvider.swift; sourceTree = "<group>"; };
 		E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
+		E4351D6F2031957800193657 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 7.xcdatamodel"; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -482,8 +481,7 @@
 		C54087E11FE90C8D00198955 /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
-				C54087E31FE90C8D00198955 /* MainTabBarController.h */,
-				C54087E21FE90C8D00198955 /* MainTabBarController.m */,
+				E4351D6F2031957800193657 /* MainTabBarController.swift */,
 			);
 			path = TabBar;
 			sourceTree = "<group>";
@@ -999,7 +997,6 @@
 				C54088171FE90C8E00198955 /* TutorialTrySlideView.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
-				C54088211FE90C8E00198955 /* MainTabBarController.m in Sources */,
 				C540881E1FE90C8E00198955 /* InviteViewController.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
@@ -1011,6 +1008,7 @@
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
+				E4351D702031957800193657 /* MainTabBarController.swift in Sources */,
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
