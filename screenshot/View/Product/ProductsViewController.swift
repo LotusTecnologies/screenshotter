@@ -14,6 +14,13 @@ import FBSDKCoreKit
     case product = 1
 }
 
+@objc enum ProductsViewControllerState : Int {
+    case loading
+    case products
+    case retry
+    case empty
+}
+
 extension ProductsViewController {
     @objc func setupShoppableToolbar() {
         self.shoppablesToolbar = {
