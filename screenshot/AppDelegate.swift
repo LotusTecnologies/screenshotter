@@ -313,8 +313,6 @@ extension AppDelegate : ViewControllerLifeCycle {
 
 extension AppDelegate : FrameworkSetupControllerDelegate {
     func frameworkSetupControllerImmediate(_ controller: FrameworkSetupController) {
-        // Takes a long time to intialize; start early.
-        ClarifaiModel.setup()
     }
     
     func frameworkSetupControllerInitialViewDidAppear(_ controller: FrameworkSetupController) {
@@ -365,17 +363,14 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
     
     func frameworkSetupControllerRootViewDidAppear(_ controller: FrameworkSetupController) {
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            // FIXME: Creating a 1 second delay prevents an indefinite block on the main thread.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions: controller.launchOptions)
-                
-                RatingFlow.sharedInstance.start()
-                
-                IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
-                
-                FirebaseApp.configure()
-                GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
-            }
+            FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions: controller.launchOptions)
+            
+            RatingFlow.sharedInstance.start()
+            
+            IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
+            
+            FirebaseApp.configure()
+            GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         }
     }
 }
