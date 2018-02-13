@@ -17,12 +17,6 @@
 
 @end
 
-@interface ProductsViewControllerControl : UIControl
-
-@property (nonatomic, strong) UIView *customInputView;
-
-@end
-
 @implementation ProductsViewController
 @synthesize shoppablesController = _shoppablesController;
 
@@ -533,14 +527,3 @@
 
 @end
 
-@implementation ProductsViewControllerControl
-
-- (BOOL)canBecomeFirstResponder {
-    return YES;
-}
-
-- (UIView *)inputView {
-    return self.customInputView;
-}
-
-@end

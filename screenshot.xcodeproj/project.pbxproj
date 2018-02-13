@@ -11,6 +11,7 @@
 		3130FF732030564600AA881A /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF722030564600AA881A /* ProductsViewController.swift */; };
 		3130FF822031749200AA881A /* ShoppablesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF802031749100AA881A /* ShoppablesCollectionView.swift */; };
 		3130FF832031749200AA881A /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF812031749100AA881A /* ShoppablesToolbar.swift */; };
+		3151863D2032E440001BD8D6 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863C2032E440001BD8D6 /* ProductsViewControllerControl.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -132,6 +133,7 @@
 		3130FF722030564600AA881A /* ProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		3130FF802031749100AA881A /* ShoppablesCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesCollectionView.swift; sourceTree = "<group>"; };
 		3130FF812031749100AA881A /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
+		3151863C2032E440001BD8D6 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -511,6 +513,7 @@
 				3130FF722030564600AA881A /* ProductsViewController.swift */,
 				C54087F01FE90C8E00198955 /* ProductsViewController.h */,
 				C54087ED1FE90C8E00198955 /* ProductsViewController.m */,
+				3151863C2032E440001BD8D6 /* ProductsViewControllerControl.swift */,
 			);
 			path = Product;
 			sourceTree = "<group>";
@@ -1057,6 +1060,7 @@
 				C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
+				3151863D2032E440001BD8D6 /* ProductsViewControllerControl.swift in Sources */,
 				C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
