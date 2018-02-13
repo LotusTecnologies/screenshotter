@@ -74,7 +74,34 @@ extension ProductsViewController {
 //        }()
     }
 }
+private typealias ProductsViewControllerProducts = ProductsViewController
+extension ProductsViewControllerProducts{
+    @objc func productsForShoppable(shoppable:Shoppable) -> [Product] {
+        let descriptors:[NSSortDescriptor] = {
+            switch self.productsOptions.sort {
+            case .similar :
+                return [NSSortDescriptor.init(key: "order", ascending: true)]
+            case .priceAsc :
+                return [NSSortDescriptor.init(key: "floatPrice", ascending: true)]
+            case .priceDes :
+                return [NSSortDescriptor.init(key: "floatPrice", ascending: false)]
+            case .brands :
+                return [NSSortDescriptor.init(key: "displayTitle", ascending: true, selector:#selector(NSString.localizedCaseInsensitiveCompare(_:) ) ), NSSortDescriptor.init(key: "order", ascending: true)]
+            }
+            return []
+        }()
+        if let mask = shoppable.getLast()?.rawValue , var products:Set = shoppable.products?.filtered(using: NSPredicate.init(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
+            self.productsUnfilteredCount = UInt(products.count)
+            if self.productsOptions.sale == .sale {
+                products = products.filter({ (p) -> Bool in  return p.floatPrice < p.floatOriginalPrice})
+            }
+            return  (((products as NSSet).allObjects as NSArray).sortedArray(using: descriptors) as? [Product]) ?? []
+            
+        }
+        return []
 
+    }
+}
 
 private typealias ProductsViewControllerRatings = ProductsViewController
 extension ProductsViewControllerRatings {

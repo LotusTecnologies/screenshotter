@@ -249,38 +249,6 @@
 
 #pragma mark - Products
 
-- (NSArray<Product *> *)productsForShoppable:(Shoppable *)shoppable {
-    NSArray<NSSortDescriptor *> *descriptors;
-    
-    switch ([self.productsOptions _sort]) {
-        case 1: // == .similar
-            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
-            break;
-            
-        case 2: // == .priceAsc
-            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:YES]];
-            break;
-            
-        case 3: // == .priceDes
-            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"floatPrice" ascending:NO]];
-            break;
-            
-        case 4: // == .brands
-            descriptors = @[[[NSSortDescriptor alloc] initWithKey:@"displayTitle" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)],
-                            [[NSSortDescriptor alloc] initWithKey:@"order" ascending:YES]];
-            break;
-    }
-    
-    NSInteger mask = [[shoppable getLast] rawValue];
-    NSSet<Product *> *products = [shoppable.products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"(optionsMask & %d) == %d", mask, mask]];
-    self.productsUnfilteredCount = products.count;
-    
-    if ([self.productsOptions _sale] == 1) { // == .sale
-        products = [products filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"floatPrice < floatOriginalPrice"]];
-    }
-    
-    return [products sortedArrayUsingDescriptors:descriptors];
-}
 
 - (Product *)productAtIndex:(NSInteger)index {
     return self.products[index];
