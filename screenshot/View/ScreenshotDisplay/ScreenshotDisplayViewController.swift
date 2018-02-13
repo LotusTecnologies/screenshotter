@@ -96,7 +96,7 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
 
     @objc func insertShoppableFrames() {
         guard let image = image else {
-            print("GMK insertShoppableFrames empty image")
+            print("insertShoppableFrames empty image")
             return
         }
         self.screenshotImageFrameView?.removeFromSuperview()
@@ -127,7 +127,7 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
     // MARK: - Gesture Recognizer
 
     @objc func handleLongPressGesture(gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .began else {
+        guard gestureRecognizer.state == .recognized else {
             return
         }
         let longPressPoint = gestureRecognizer.location(in: self.screenshotImageView)
@@ -153,7 +153,7 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
             print("b0:\(self.b0)  longPressPoint:\(longPressPoint)  in size:\(self.screenshotImageView.bounds.size)")
         } else {
             let b1 = normalizedPressPoint
-            print("b1:\(b1)  longPressPoint:%\(longPressPoint)  in size:\(self.screenshotImageView.bounds.size)")
+            print("b1:\(b1)  longPressPoint:\(longPressPoint)  in size:\(self.screenshotImageView.bounds.size)")
             let viewWidth = self.screenshotImageView.bounds.size.width
             let viewHeight = self.screenshotImageView.bounds.size.height
             let frame = CGRect(x: self.b0.x * viewWidth, y: self.b0.y * viewHeight, width: (b1.x - self.b0.x) * viewWidth, height: (b1.y - self.b0.y) * viewHeight)
