@@ -348,8 +348,12 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
                 self.showScreenshotListTop()
             }
             
-            if let channel = params["channel"] as? String {
+            if let channel = params["~channel"] as? String {
                 UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
+            }
+            
+            if let campaign = params["~campaign"] as? String {
+                UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
             
             // "discoverURL" will be the discover URL that should be used during this session.

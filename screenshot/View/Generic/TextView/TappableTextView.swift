@@ -8,9 +8,13 @@
 
 import Foundation
 
-class TappableTextView : UITextView, TappableTextProtocol {
-    weak var tappableTextDelegate: TappableTextDelegate?
-    private var tappableIndexes: [UInt]?
+fileprivate struct TappableLink {
+    let range: NSRange
+    let url: URL
+}
+
+class TappableTextView : UITextView {
+    private var tappableLinks: [TappableLink] = []
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -23,7 +27,7 @@ class TappableTextView : UITextView, TappableTextProtocol {
     }
     
     @objc private func tapGestureRecognizerAction(_ tapGesture: UITapGestureRecognizer) {
-        guard let tappableIndexes = tappableIndexes, let tappableTextDelegate = tappableTextDelegate else {
+        guard tappableLinks.count > 0 else {
             return
         }
         
@@ -34,42 +38,59 @@ class TappableTextView : UITextView, TappableTextProtocol {
         let characterIndex = layoutManager.characterIndex(for: location, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
         
         if textStorage.length > characterIndex {
-            for tappableIndex in tappableIndexes {
-                if attributedText.attribute("\(tappableIndex)", at: characterIndex, effectiveRange: nil) != nil {
-                    tappableTextDelegate.tappableText(view: self, tappedTextAt: tappableIndex)
+            for tappableLink in tappableLinks {
+                let range = tappableLink.range
+                
+                if range.location <= characterIndex && range.location + range.length > characterIndex {
+                    let shouldOpen = delegate?.textView!(self, shouldInteractWith: tappableLink.url, in: range, interaction: .invokeDefaultAction)
+                    
+                    if shouldOpen == true {
+                        openURL(tappableLink.url)
+                    }
                     break
                 }
             }
         }
     }
     
-    func applyTappableText(_ texts: [[String : Bool]], with attributes: [String : AnyObject]? = nil) {
-        var tappableIndexes: [UInt] = []
-        let attributedString = NSMutableAttributedString()
-        
-        texts.enumerated().forEach { (index: Int, dictionary: [String : Bool]) in
-            if let text = dictionary.keys.first, let isTappable = dictionary.values.first {
-                var fragmentAttributes: [String : Any]?
-                
-                if isTappable {
-                    tappableIndexes.append(UInt(index))
-                    fragmentAttributes = [
-                        "\(index)": isTappable,
-                        NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-                        NSUnderlineColorAttributeName: UIColor.gray7
-                    ]
+    override var attributedText: NSAttributedString! {
+        didSet {
+            let range = NSRange(location: 0, length: attributedText.length)
+            tappableLinks.removeAll()
+            
+            attributedText.enumerateAttribute(NSLinkAttributeName, in: range, options: .longestEffectiveRangeNotRequired) { value, range, stop in
+                guard let value = value else {
+                    return
                 }
                 
-                let fragmentAttributedString = NSAttributedString(string: text, attributes: fragmentAttributes)
-                attributedString.append(fragmentAttributedString)
+                let link: URL?
+                
+                if let string = value as? NSString {
+                    link = URL(string: string as String)
+                }
+                else if let string = value as? String {
+                    link = URL(string: string)
+                }
+                else if let url = value as? NSURL {
+                    link = url as URL
+                }
+                else if let url = value as? URL {
+                    link = url
+                }
+                else {
+                    link = nil
+                }
+                
+                if let link = link {
+                    self.tappableLinks.append(TappableLink(range: range, url: link))
+                }
             }
         }
-        
-        if let attributes = attributes {
-            attributedString.addAttributes(attributes, range: NSRange(location: 0, length: attributedString.length))
+    }
+    
+    fileprivate func openURL(_ url: URL) {
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
-        
-        self.tappableIndexes = tappableIndexes
-        attributedText = attributedString
     }
 }

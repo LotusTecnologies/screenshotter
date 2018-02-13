@@ -10,12 +10,12 @@
 #import "ProductsViewController.h"
 #import "screenshot-Swift.h"
 
-#import <FBSDKCoreKit/FBSDKCoreKit.h>
 
 @interface ScreenshotsNavigationController () <UIStateRestoring, ViewControllerLifeCycle, ScreenshotsViewControllerDelegate, NetworkingIndicatorProtocol>
 
 @property (nonatomic, strong) ScreenshotPickerNavigationController *pickerNavigationController;
 @property (nonatomic, strong) ClipView *clipView;
+@property (nonatomic, strong) UIBarButtonItem *activityBarButtonItem;
 
 @property (nonatomic, strong, nullable) Class previousDidAppearViewControllerClass;
 
@@ -38,6 +38,7 @@
             ScreenshotsViewController *viewController = [[ScreenshotsViewController alloc] init];
             viewController.delegate = self;
             viewController.lifeCycleDelegate = self;
+            viewController.navigationItem.leftBarButtonItem = viewController.editButtonItem;
             viewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"NavigationBarAddPhotos"] style:UIBarButtonItemStylePlain target:self action:@selector(presentPickerViewController)];
             viewController.navigationItem.rightBarButtonItem.tintColor = [UIColor crazeRed];
             viewController;
@@ -213,22 +214,24 @@
 #pragma mark - Networking Indicator
 
 - (void)networkingIndicatorDidStartWithType:(enum NetworkingIndicatorType)type {
-    if (!self.screenshotsViewController.navigationItem.leftBarButtonItem) {
+    if (!self.activityBarButtonItem) {
         UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         activityView.color = [UIColor crazeRed];
         [activityView startAnimating];
+        self.activityBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activityView];
         
-        self.screenshotsViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activityView];
+        self.screenshotsViewController.navigationItem.leftBarButtonItems = @[self.screenshotsViewController.navigationItem.leftBarButtonItems.firstObject, self.activityBarButtonItem];
     }
     
-    self.screenshotsViewController.navigationItem.leftBarButtonItem.tag += 1;
+    self.activityBarButtonItem.tag += 1;
 }
 
 - (void)networkingIndicatorDidCompleteWithType:(enum NetworkingIndicatorType)type {
-    self.screenshotsViewController.navigationItem.leftBarButtonItem.tag -= 1;
+    self.activityBarButtonItem.tag -= 1;
     
-    if (self.screenshotsViewController.navigationItem.leftBarButtonItem.tag == 0) {
-        self.screenshotsViewController.navigationItem.leftBarButtonItem = nil;
+    if (self.activityBarButtonItem.tag == 0) {
+        self.screenshotsViewController.navigationItem.leftBarButtonItems = @[self.screenshotsViewController.navigationItem.leftBarButtonItems.firstObject];
+        self.activityBarButtonItem = nil;
     }
 }
 

@@ -1,19 +1,4 @@
 PODS:
-  - AFNetworking (3.2.0):
-    - AFNetworking/NSURLSession (= 3.2.0)
-    - AFNetworking/Reachability (= 3.2.0)
-    - AFNetworking/Security (= 3.2.0)
-    - AFNetworking/Serialization (= 3.2.0)
-    - AFNetworking/UIKit (= 3.2.0)
-  - AFNetworking/NSURLSession (3.2.0):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/Reachability (3.2.0)
-  - AFNetworking/Security (3.2.0)
-  - AFNetworking/Serialization (3.2.0)
-  - AFNetworking/UIKit (3.2.0):
-    - AFNetworking/NSURLSession
   - Amplitude-iOS (4.0.4)
   - Analytics (3.6.9)
   - Appsee (2.3.6)
@@ -122,6 +107,8 @@ PODS:
   - PromiseKit/CorePromise (4.5.2)
   - PromiseKit/Foundation (4.5.2):
     - PromiseKit/CorePromise
+  - PromiseKit/StoreKit (4.5.2):
+    - PromiseKit/CorePromise
   - Protobuf (3.5.0)
   - RateView (1.2)
   - SDWebImage (4.3.0):
@@ -132,7 +119,6 @@ PODS:
     - Analytics (~> 3.6)
 
 DEPENDENCIES:
-  - AFNetworking
   - Analytics (~> 3.0)
   - Appsee
   - Branch
@@ -147,7 +133,8 @@ DEPENDENCIES:
   - GoogleSignIn
   - Intercom
   - lottie-ios
-  - PromiseKit/Foundation
+  - PromiseKit/Foundation (= 4.5.2)
+  - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
 
@@ -162,7 +149,6 @@ CHECKOUT OPTIONS:
     :git: https://github.com/jacobrelkin/EGGRating.git
 
 SPEC CHECKSUMS:
-  AFNetworking: 8ac6017b94ea105479f7776e5288e48ae9c59bb4
   Amplitude-iOS: 2ad4d7270c99186236c1272a3a9425463b1ae1a7
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
@@ -195,6 +181,6 @@ SPEC CHECKSUMS:
   SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: 3637b1862745e74d5f2afcbdd548ea05f4733373
+PODFILE CHECKSUM: b43a8096531234e6b9abebf6e2a829d005f9f209
 
 COCOAPODS: 1.4.0

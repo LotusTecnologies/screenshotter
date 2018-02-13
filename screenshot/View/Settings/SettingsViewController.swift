@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageUI
+import PromiseKit
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -41,6 +42,9 @@ class SettingsViewController : BaseViewController {
         case followFacebook
         case followInstagram
         case partners
+        case restoreInAppPurchase
+        case talkToStylist
+
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -52,6 +56,7 @@ class SettingsViewController : BaseViewController {
     
     fileprivate var nameTextField: UITextField?
     fileprivate var emailTextField: UITextField?
+    fileprivate var isRestoring = false
     fileprivate lazy var previousTexts = {
         return [
             UserDefaultsKeys.name: self.cellText(for: .name),
@@ -239,6 +244,8 @@ class SettingsViewController : BaseViewController {
             .tutorialVideo,
             .contactUs,
             .bug,
+            .restoreInAppPurchase,
+            .talkToStylist,
             .usageStreak,
             .coins,
             .version,
@@ -406,6 +413,11 @@ extension SettingsViewController : UITableViewDataSource {
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
+        if row == .restoreInAppPurchase && self.isRestoring {
+            cell.textLabel?.textColor = .gray
+        }else{
+            cell.textLabel?.textColor = .black
+        }
         cell.detailTextLabel?.text = cellDetailedText(for: row)
         return cell
     }
@@ -487,7 +499,89 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
-            
+        case .restoreInAppPurchase:
+            if self.isRestoring == false {
+                self.isRestoring = true
+                tableView.reloadRows(at: [indexPath], with: .none)
+                InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on:.main, execute: { (array) -> Promise<Bool>  in
+                    self.isRestoring = false
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                    var message = "settings.InAppPurchase.Restore".localized
+                    if array.count == 0 {
+                        message = "settings.InAppPurchase.RestoreNone".localized
+                    }
+                    let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (close) in
+                        
+                    }))
+                    if (self.isViewLoaded && self.view.window != nil) {
+                        self.present(alert, animated: true, completion: {
+                            
+                        })
+                    }
+                    return Promise(value: true)
+                }).catch(on: .main, execute: { (error) in
+                    self.isRestoring = false
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                    let alert = UIAlertController.init(title: "settings.InAppPurchase.RestoreError".localized, message: error.localizedDescription, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (close) in
+                    }))
+                    if (self.isViewLoaded && self.view.window != nil) {
+                        self.present(alert, animated: true, completion: {
+                            
+                        })
+                    }
+                })
+            }
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                IntercomHelper.sharedInstance.presentMessagingUI()
+            }else {
+                if InAppPurchaseManager.sharedInstance.canPurchase() {
+                    
+                    let loadingMessage = "Unlocking a personal stylist requires a one time in-app purchase. \n Connecting to appstore...."
+                    let canContinueMessageFormat = "Unlocking a personal stylist requires a one time in-app purchase for %@"
+                    let cantGetProductMessageFormat = "Unlocking a personal stylist requires a one time in-app purchase. \n Unable to connect to the appstore at this time: \n %@"
+                    let alertController = UIAlertController.init(title: nil, message: loadingMessage, preferredStyle: .alert)
+                    
+                    
+                    let action = UIAlertAction.init(title: "Continue", style: .default, handler: { (action) in
+                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
+                            IntercomHelper.sharedInstance.presentMessagingUI()
+                        }, failure: { (error) in
+                            //no reason to present alert - Apple does it for us
+                        })
+                        }
+                    })
+                    
+                    
+                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                        action.isEnabled = true;
+                        alertController.message = String.init(format: canContinueMessageFormat, product.localizedPriceString())
+                    }else{
+                        action.isEnabled = false;
+                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
+                            action.isEnabled = true;
+                            alertController.message = String.init(format: canContinueMessageFormat, product.localizedPriceString())
+                        }, failure: { (error) in
+                            alertController.message = String.init(format: cantGetProductMessageFormat, error.localizedDescription)
+                        })
+                    
+                    }
+                    alertController.addAction(action)
+                    alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                }else{
+                    let errorMessge = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases."
+                    let alertController = UIAlertController.init(title: nil, message: errorMessge, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                    
+                }
+            }
+           
+          
         default:
             break
         }
@@ -559,7 +653,20 @@ fileprivate extension SettingsViewController {
             return "settings.row.facebook.title".localized
         case .partners:
             return "settings.row.partners.title".localized
+        case .restoreInAppPurchase:
+            if self.isRestoring {
+                return "settings.row.restoreInAppPurchase.restoring".localized
+            }else{
+                return "settings.row.restoreInAppPurchase".localized
+            }
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                return "settings.row.talkToStylist".localized
+            }else{
+                return "settings.row.talkToStylist.locked".localized
+            }
         }
+        
     }
     
     func cellDetailedText(for row: SettingsViewController.Row) -> String? {
@@ -786,22 +893,53 @@ extension SettingsViewController : TutorialVideoViewControllerDelegate {
 // MARK: - Mail
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
+    func googleMailUrl(to:String?, body:String?, subject:String? ) -> URL? {
+        var components = URLComponents(string: "googlegmail://co")
+        components?.scheme = "googlegmail"
+        
+        var queryItems: [URLQueryItem] = []
+        
+        if let to = to {
+            queryItems.append(URLQueryItem(name: "to", value:to))
+        }
+        
+        if let subject = subject{
+            queryItems.append(URLQueryItem(name: "subject", value:subject))
+        }
+        
+        if let body = body{
+            queryItems.append(URLQueryItem(name: "body", value:body))
+        }
+        
+        if queryItems.isEmpty == false {
+            components?.queryItems = queryItems
+        }
+        
+        return components?.url
+    }
+    
     func presentMailComposer() {
+        let message = [
+            "\n\n\n",
+            "-----------------",
+            "Don't edit below.\n",
+            "version: \(Bundle.displayVersionBuild)"
+        ].joined(separator: "\n")
+        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
+        let subject = "Bug Report"
+        let recipient = "support@screenshopit.com"
+        
         if MFMailComposeViewController.canSendMail() {
-            let message = [
-                "\n\n\n",
-                "-----------------",
-                "Don't edit below.\n",
-                "version: \(Bundle.displayVersionBuild)"
-            ]
-
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
-            mail.setSubject("Bug Report")
-            mail.setMessageBody(message.joined(separator: "\n"), isHTML: false)
-            mail.setToRecipients(["support@screenshopit.com"])
+            mail.setSubject(subject)
+            mail.setMessageBody(message, isHTML: false)
+            mail.setToRecipients([recipient])
             present(mail, animated: true, completion: nil)
-
+            
+        } else if let url = googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            
         } else {
             let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))

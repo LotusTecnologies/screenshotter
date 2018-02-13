@@ -432,29 +432,27 @@ extension DataModel {
         return nil
     }
     
-    func deleteScreenshots(managedObjectContext: NSManagedObjectContext, assetIds: Set<String>) {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
-        fetchRequest.predicate = NSPredicate(format: "assetId IN %@", assetIds)
-        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
-        fetchRequest.includesSubentities = false
-        fetchRequest.resultType = .managedObjectIDResultType
-        fetchRequest.includesPendingChanges = false
-        fetchRequest.propertiesToFetch = nil
-        fetchRequest.includesPropertyValues = false
-        fetchRequest.shouldRefreshRefetchedObjects = true
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            guard let managedObjectIds = results as? [NSManagedObjectID] else {
-                return
+    public func hide(screenshotOIDArray: [NSManagedObjectID]) {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                screenshotOIDArray.forEach { screenshotOID in
+                    if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
+                        do{
+                            try screenshot.validateForUpdate()
+                            screenshot.isHidden = true
+                            screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                        } catch{
+                            
+                        }
+                        
+                        
+                    }
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("hide screenshotOIDArray catch error:\(error)")
             }
-            for managedObjectId in managedObjectIds {
-                let managedObject = managedObjectContext.object(with: managedObjectId)
-                managedObjectContext.delete(managedObject)
-            }
-            try managedObjectContext.save()
-        } catch {
-            print("deleteScreenshots results with error:\(error)")
+            
         }
     }
     
@@ -581,6 +579,7 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             for matchstick in results {
                 matchstick.imageData = imageData as NSData
+                matchstick.receivedAt = NSDate()
             }
             try managedObjectContext.save()
         } catch {
@@ -728,7 +727,7 @@ extension DataModel {
     }
     
     func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
-        let lowWatermark = 10
+        let lowWatermark = 20
         return matchstickCount <= lowWatermark
     }
     
@@ -1337,4 +1336,12 @@ extension Matchstick {
         }
     }
     
+}
+
+extension NSFetchedResultsController {
+    var fetchedObjectsCount:Int {
+        get {
+            return sections?.reduce(0, {$0 + $1.numberOfObjects}) ?? 0
+        }
+    }
 }

@@ -10,6 +10,7 @@
 #import "ProductCollectionViewCell.h"
 #import "ShoppablesToolbar.h"
 #import "screenshot-Swift.h"
+#import <PromiseKit/PromiseKit.h>
 
 @import FBSDKCoreKit.FBSDKAppEvents;
 
@@ -129,6 +130,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         view.translatesAutoresizingMaskIntoConstraints = NO;
         [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
         [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
+        [view.talkToYourStylistButton addTarget:self action:@selector(talkToYourStylistAction) forControlEvents:UIControlEventTouchUpInside];
+
         view;
     });
     
@@ -689,17 +692,66 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     
     [self presentProductsRateNegativeAlert];    
 }
+- (void)talkToYourStylistAction {
+    [IntercomHelper.sharedInstance presentMessagingUI];
+}
 
+-(void) presentPersonalSylist{
+    [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
+    NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
+    [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
+}
 - (void)presentProductsRateNegativeAlert {
+
+    if ( ![InAppPurchaseManager.sharedInstance didPurchaseWith_inAppPurchaseProduct:InAppPurchaseProductPersonalStylist] ){
+        [InAppPurchaseManager.sharedInstance loadProductInfoIfNeeded];
+    }
+
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry To Hear That!" message:@"We hear you loud and clear and we’re going to look into this. How else can we help?" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [AnalyticsTrackers.standard track:@"Requested Custom Stylist" properties:@{ @"screenshotImageURL" : self.screenshot.shortenedUploadedImageURL }];
-        
-        NSString *prefilledMessage = [NSString stringWithFormat:@"I need help finding this outfit... %@", self.screenshot.shortenedUploadedImageURL ?: @"null"];
-        [IntercomHelper.sharedInstance presentMessageComposerWithInitialMessage:prefilledMessage];
+        if ( [InAppPurchaseManager.sharedInstance didPurchaseWith_inAppPurchaseProduct:InAppPurchaseProductPersonalStylist] ){
+            [self presentPersonalSylist];
+        } else {
+            if ([InAppPurchaseManager.sharedInstance canPurchase]){
+                NSString* loadingMessage = @"Unlocking a personal stylist requires a one time in-app purchase. \n Connecting to appstore....";
+                NSString* canContinueMessageFormat = @"Unlocking a personal stylist requires a one time in-app purchase for %@";
+                NSString* cantGetProductMessageFormat = @"Unlocking a personal stylist requires a one time in-app purchase. \n Unable to connect to the appstore at this time: \n %@";
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:loadingMessage preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *action = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    [InAppPurchaseManager.sharedInstance buyWithProduct:[InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist] success:^{
+                        [self presentPersonalSylist];
+                    } failure:^(NSError *error) {
+                       //no reason to present alert - Apple does it for us
+                    }];
+                }];
+                SKProduct *product = [InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist];
+                if (product){
+                    action.enabled = true;
+                    alertController.message = [NSString stringWithFormat:canContinueMessageFormat, product.localizedPriceString];
+                }else{
+                    action.enabled = false;
+                    [InAppPurchaseManager.sharedInstance loadWithProduct:InAppPurchaseProductPersonalStylist success:^(SKProduct * product) {
+                        action.enabled = true;
+                        alertController.message = [NSString stringWithFormat:canContinueMessageFormat, product.localizedPriceString];
+                    } failure:^(NSError* error){
+                        alertController.message = [NSString stringWithFormat:cantGetProductMessageFormat, error.localizedDescription];
+                    }];
+                }
+                
+                [alertController addAction:action];
+                
+                [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }else{
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases." preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alertController animated:YES completion:nil];
+                
+            }
+        }
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];

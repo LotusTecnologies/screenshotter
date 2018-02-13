@@ -119,7 +119,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         coreDataPreparationController.viewDidLoad()
         
-        if matchstickFrc?.fetchedObjects?.count ?? 0 > 0 {
+        if matchstickFrc?.fetchedObjectsCount ?? 0 > 0 {
             isListEmpty = false
         }
     }
@@ -146,7 +146,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var pseudoMatchsticksCount = 0
     
     fileprivate func updateMatchsticksCount() {
-        pseudoMatchsticksCount = matchstickFrc?.fetchedObjects?.count ?? 0
+        pseudoMatchsticksCount = matchstickFrc?.fetchedObjectsCount ?? 0
         
         if isListEmpty && pseudoMatchsticksCount > 0 {
             isListEmpty = false
@@ -269,7 +269,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc?.fetchedObjects?.count == 1 {
+                if self.matchstickFrc?.fetchedObjectsCount == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }
@@ -281,9 +281,26 @@ class DiscoverScreenshotViewController : BaseViewController {
             }
             
             let decisionValueThreshold = self.decisionValueThreshold(percent)
-            
-            if abs(decisionValueThreshold) >= 1 {
+            let velocity = panGesture.velocity(in: self.view)
+            let velocityIsNegative = (velocity.x < 0)
+            let positionIsNegative = (decisionValueThreshold < 0)
+            let velocityAndPositionIsInSameDirection = (decisionValueThreshold == 0 || velocityIsNegative == positionIsNegative)
+            let velocityOrPositionPassedThreshhold = (abs(velocity.x) > 700 || abs(decisionValueThreshold) >= 1)
+
+            let direction:Int = {
                 if decisionValueThreshold > 0 {
+                    return 1
+                }else if decisionValueThreshold < 0 {
+                    return -1
+                }else if velocity.x > 0 {
+                    return 1
+                }else {
+                    return -1
+                }
+            }()
+            
+            if velocityAndPositionIsInSameDirection && velocityOrPositionPassedThreshhold {
+                if direction == 1 {
                     AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
                         "by": "swipe",
                         "url": currentMatchstick?.imageUrl ?? ""

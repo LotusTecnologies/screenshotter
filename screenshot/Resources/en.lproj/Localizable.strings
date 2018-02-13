@@ -28,12 +28,12 @@
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
 "discover.screenshot.helper.title" = "Discover Fashion";
-"discover.screenshot.helper.swipe_left.detail" = "\nto pass";
-"discover.screenshot.helper.swipe_left.title" = "Swipe Left";
-"discover.screenshot.helper.swipe_right.detail" = "\nto add to your collection";
-"discover.screenshot.helper.swipe_right.title" = "Swipe Right";
-"discover.screenshot.helper.tap.detail" = " to shop";
-"discover.screenshot.helper.tap.title" = "Tap";
+"discover.screenshot.helper.swipe_left.0" = "Swipe Left";
+"discover.screenshot.helper.swipe_left.1" = "\nto pass";
+"discover.screenshot.helper.swipe_right.0" = "Swipe Right";
+"discover.screenshot.helper.swipe_right.1" = "\nto add to your collection";
+"discover.screenshot.helper.tap.0" = "Tap";
+"discover.screenshot.helper.tap.1" = " to shop";
 "discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
 
@@ -112,6 +112,7 @@
 "products.options.sort.title" = "Sort by";
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.unrated" = "Are these results relevant?";
+"products.rate.backToConverstationWithStylist" = "Talk to your stylist";
 "products.tooltip.title" = "Tap to shop different types of products";
 
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
@@ -123,6 +124,10 @@
 "screenshot.permission.allow" = "Allow Access";
 "screenshot.permission.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.title" = "Shop With Screenshop";
+
+"screenshots.delete.placeholder" = "Delete Screenshots";
+"screenshots.delete.single" = "Delete %d Screenshot";
+"screenshots.delete.plural" = "Delete %d Screenshots";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
@@ -144,6 +149,11 @@
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.version.title" = "App Version";
+"settings.row.restoreInAppPurchase" = "Restore Purchases";
+"settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
+"settings.row.talkToStylist" = "Talk to your stylist";
+"settings.row.talkToStylist.locked" = "🔒 Talk to your stylist";
+
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
 "settings.section.about" = "About";
@@ -152,16 +162,19 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+"settings.InAppPurchase.Restore" = "In app purchases have been restored successfully";
+"settings.InAppPurchase.RestoreError" = "Error Restoring purchase";
+"settings.InAppPurchase.RestoreNone" = "You have no purchases to restore";
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";
+"tutorial.email.legal.0" = "By tapping \"Submit\" above, you agree to our ";
+"tutorial.email.legal.1" = "Terms of Service";
+"tutorial.email.legal.2" = " and ";
+"tutorial.email.legal.3" = "Privacy Policy";
+"tutorial.email.legal.4" = " ";
 "tutorial.email.name" = "Name";
 "tutorial.email.title" = "Sign Up";
-"tutorial.email.legal.start" = "By tapping \"Submit\" above, you agree to our ";
-"tutorial.email.legal.tos" = "Terms of Service";
-"tutorial.email.legal.middle" = " and ";
-"tutorial.email.legal.pp" = "Privacy Policy";
-"tutorial.email.legal.end" = " ";
 
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";
