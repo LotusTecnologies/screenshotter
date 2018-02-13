@@ -20,7 +20,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 @class Screenshot, Product, HelperView, Loader, ShoppablesToolbar, ProductsOptions, ScrollRevealController, ProductsRateView;
 @protocol ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, ShoppablesControllerDelegate, ProductsOptionsDelegate, WebViewControllerDelegate, ShoppablesToolbarDelegate;
 
-@interface ProductsViewController : BaseViewController <UICollectionViewDataSource, UICollectionViewDelegate, UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
+@interface ProductsViewController : BaseViewController < UITextFieldDelegate, ProductCollectionViewCellDelegate, ShoppablesControllerProtocol, ShoppablesControllerDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate, ProductsOptionsDelegate, ViewControllerLifeCycle, WebViewControllerDelegate>
 
 @property (nonatomic, strong) Screenshot *screenshot;
 
@@ -30,7 +30,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 //private
 - (void)displayScreenshotAction;
 - (BOOL)shouldHideToolbar;
-- (CGPoint)collectionViewMinimumSpacing;
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong, nullable) HelperView *noItemsHelperView;
 @property (nonatomic, strong) UICollectionView *collectionView;

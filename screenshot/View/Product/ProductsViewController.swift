@@ -80,6 +80,95 @@ extension ProductsViewController {
     }
 }
 
+private typealias ProductsViewControllerCollectionView = ProductsViewController
+extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLayout, UICollectionViewDataSource{
+    func numberOfCollectionViewProductColumns() ->Int {
+        return 2
+    }
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
+        if (section == ProductsSection.tooltip.rawValue) {
+            let shouldPresentTooldtip = !UserDefaults.standard.bool(forKey: UserDefaultsKeys.productCompletedTooltip)
+            let hasProducts = (self.products.count > 0)
+            return (shouldPresentTooldtip && hasProducts) ? 1 : 0;
+            
+        } else if (section == ProductsSection.product.rawValue) {
+            return self.products.count;
+            
+        } else {
+            return 0;
+        }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        var size:CGSize = .zero
+        let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
+        let padding = Geometry.padding - shadowInsets.left - shadowInsets.right;
+        
+        if (indexPath.section == ProductsSection.tooltip.rawValue) {
+            size.width = collectionView.bounds.size.width;
+            size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
+            
+        } else if (indexPath.section == ProductsSection.product.rawValue) {
+            let columns = CGFloat(self.numberOfCollectionViewProductColumns())
+            size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
+            size.height = size.width + ProductCollectionViewCell.labelsHeight
+        }
+        
+        return size;
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        if (indexPath.section == ProductsSection.tooltip.rawValue) {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
+            return cell;
+        } else if (indexPath.section == ProductsSection.product.rawValue) {
+            let product = self.productAtIndex(indexPath.item)
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
+                cell.delegate = self;
+                cell.contentView.backgroundColor = collectionView.backgroundColor;
+                cell.title = product.displayTitle;
+                cell.price = product.price;
+                cell.originalPrice = product.originalPrice;
+                cell.imageUrl = product.imageURL;
+                cell.isSale = product.isSale()
+                cell.favoriteButton?.isSelected = product.isFavorite;
+                return cell;
+            }
+            
+        }
+        return UICollectionViewCell();
+        
+    }
+
+    
+    public func collectionViewMinimumSpacing() -> CGPoint {
+        let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
+        let p = Geometry.padding
+        return CGPoint.init(x: p - shadowInsets.left - shadowInsets.right, y: p - shadowInsets.top - shadowInsets.bottom)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
+        return indexPath.section != ProductsSection.tooltip.rawValue
+    }
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        
+        if section ==  ProductsSection.product.rawValue {
+            let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
+            
+            return UIEdgeInsets.init(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
+        } else {
+            return .zero;
+        }
+        
+
+    }
+    
+}
 private typealias ProductsViewControllerOptionsView = ProductsViewController
 extension ProductsViewControllerOptionsView {
     @objc func updateOptionsView() {
