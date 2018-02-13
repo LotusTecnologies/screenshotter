@@ -169,7 +169,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if (indexPath.section == ProductsSection.product.rawValue) {
-            if let webVC = self.navigationController?.topViewController as? WebViewController {
+            if let _ = self.navigationController?.topViewController as? WebViewController {
                 // Somehow the user was able to tap twice
                 // do nothing
 
@@ -206,8 +206,29 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                                                                                   "name": name ?? ""])
             }
             AnalyticsTrackers.branch.track("Tapped on product")
-            FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL])
+            FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
         }
+    }
+}
+
+private typealias ProductsViewControllerScrollRevealController = ProductsViewController
+extension ProductsViewControllerScrollRevealController
+{
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.dismissOptions()
+        self.scrollRevealController.scrollViewWillBeginDragging(scrollView)
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.scrollRevealController.scrollViewDidScroll(scrollView)
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.scrollRevealController.scrollViewDidEndDragging(scrollView, will: decelerate)
+    }
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.scrollRevealController.scrollViewDidEndDecelerating(scrollView)
     }
 }
 
@@ -592,5 +613,27 @@ extension ProductsViewControllerNoItemsHelperView{
         }))
         alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
+    }
+}
+private typealias ProductsViewControllerToolbar = ProductsViewController
+extension ProductsViewControllerToolbar : ShoppablesToolbarDelegate, UIToolbarDelegate {
+    public func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .topAttached
+    }
+    
+    func shoppablesToolbarDidChange(toolbar:ShoppablesToolbar) {
+        if self.products.count == 0 && self.isViewLoaded {
+            self.reloadProductsForShoppableAtIndex(0)
+        }
+    }
+    
+    func shoppablesToolbarDidSelectShoppable(toolbar:ShoppablesToolbar, index:Int) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
+        self.reloadProductsForShoppableAtIndex(index)
+        AnalyticsTrackers.standard.track("Tapped on shoppable")
+    }
+    
+    func shouldHideToolbar() -> Bool {
+        return !self.hasShoppables()
     }
 }

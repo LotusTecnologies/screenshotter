@@ -248,26 +248,6 @@
 }
 
 
-#pragma mark - Scroll View
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [self dismissOptions];
-    [self.scrollRevealController scrollViewWillBeginDragging:scrollView];
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    [self.scrollRevealController scrollViewDidScroll:scrollView];
-}
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    [self.scrollRevealController scrollViewDidEndDragging:scrollView will:decelerate];
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [self.scrollRevealController scrollViewDidEndDecelerating:scrollView];
-}
-
-
 #pragma mark - Fetched Results Controller
 
 - (NSIndexPath *)collectionViewToShoppablesFrcIndexPath:(NSInteger)index {
@@ -307,29 +287,6 @@
 
 
 #pragma mark - Toolbar
-
-- (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar {
-    return UIBarPositionTopAttached;
-}
-
--(void) shoppablesToolbarDidChangeWithToolbar:(ShoppablesToolbar *)toolbar{
-    if (self.products.count == 0 && [self isViewLoaded]) {
-        [self reloadProductsForShoppableAtIndex:0];
-    }
-}
-
-    
--(void) shoppablesToolbarDidSelectShoppableWithToolbar:(ShoppablesToolbar *)toolbar index:(NSInteger)index {
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[UserDefaultsKeys productCompletedTooltip]];
-    
-    [self reloadProductsForShoppableAtIndex:index];
-    
-    [AnalyticsTrackers.standard track:@"Tapped on shoppable" properties:nil];
-}
-
-- (BOOL)shouldHideToolbar {
-    return ![self hasShoppables];
-}
 
 
 
