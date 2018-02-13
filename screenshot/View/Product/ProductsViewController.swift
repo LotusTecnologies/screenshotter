@@ -76,7 +76,7 @@ extension ProductsViewController {
 }
 private typealias ProductsViewControllerProducts = ProductsViewController
 extension ProductsViewControllerProducts{
-    @objc func productsForShoppable(shoppable:Shoppable) -> [Product] {
+    @objc func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
         let descriptors:[NSSortDescriptor] = {
             switch self.productsOptions.sort {
             case .similar :
@@ -88,12 +88,12 @@ extension ProductsViewControllerProducts{
             case .brands :
                 return [NSSortDescriptor.init(key: "displayTitle", ascending: true, selector:#selector(NSString.localizedCaseInsensitiveCompare(_:) ) ), NSSortDescriptor.init(key: "order", ascending: true)]
             }
-            return []
         }()
         if let mask = shoppable.getLast()?.rawValue , var products:Set = shoppable.products?.filtered(using: NSPredicate.init(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
             self.productsUnfilteredCount = UInt(products.count)
             if self.productsOptions.sale == .sale {
-                products = products.filter({ (p) -> Bool in  return p.floatPrice < p.floatOriginalPrice})
+                let filtered = (products as NSSet).filtered(using: NSPredicate.init(format: "floatPrice < floatOriginalPrice"))
+                products = filtered as! Set<Product>
             }
             return  (((products as NSSet).allObjects as NSArray).sortedArray(using: descriptors) as? [Product]) ?? []
             
@@ -101,6 +101,28 @@ extension ProductsViewControllerProducts{
         return []
 
     }
+}
+private typealias ProductsViewControllerLoader = ProductsViewController
+
+extension ProductsViewControllerLoader {
+    @objc func startAndAddLoader(){
+        if self.loader == nil {
+            self.loader = Loader()
+            self.loader.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(self.loader)
+            self.loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+            self.loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        }
+        self.loader.startAnimation()
+    }
+    @objc func stopAndRemoveLoader(){
+        if self.loader != nil {
+            self.loader.stopAnimation()
+            self.loader .removeFromSuperview()
+            self.loader = nil
+        }
+    }
+
 }
 
 private typealias ProductsViewControllerRatings = ProductsViewController

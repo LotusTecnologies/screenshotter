@@ -169,7 +169,7 @@
         case ProductsViewControllerStateLoading:
             [self hideNoItemsHelperView];
             self.rateView.hidden = YES;
-            [self.loader startAnimation];
+            [self startAndAddLoader];
             break;
             
         case ProductsViewControllerStateProducts:
@@ -588,27 +588,6 @@
     return ![self hasShoppables];
 }
 
-
-#pragma mark - Loader
-
-- (Loader *)loader {
-    if (!_loader) {
-        _loader = [[Loader alloc] init];
-        _loader.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.view addSubview:_loader];
-        [_loader.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-        [_loader.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
-    }
-    return _loader;
-}
-
-- (void)stopAndRemoveLoader {
-    if (_loader) {
-        [self.loader stopAnimation];
-        [self.loader removeFromSuperview];
-        _loader = nil;
-    }
-}
 
 
 
