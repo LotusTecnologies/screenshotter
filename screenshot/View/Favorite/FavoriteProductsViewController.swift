@@ -93,7 +93,7 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
             cell.title = product.productDescription
             cell.price = product.price
             cell.imageUrl = product.imageURL
-            cell.favoriteButton.isSelected = product.isFavorite
+            cell.favoriteButton?.isSelected = product.isFavorite
         }
         
         return cell
@@ -131,18 +131,18 @@ extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
         
         var size = CGSize.zero
         size.width = (collectionView.bounds.size.width - ((columns + 1) * .padding)) / columns
-        size.height = size.width + ProductCollectionViewCell.labelsHeight()
+        size.height = size.width + ProductCollectionViewCell.labelsHeight
         return size
     }
 }
 
 extension FavoriteProductsViewController : ProductCollectionViewCellDelegate {
-    func productCollectionViewCellDidTapFavorite(_ cell: ProductCollectionViewCell!) {
+    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell), let product = products?[indexPath.item] else {
             return
         }
         
-        let isFavorited = cell.favoriteButton.isSelected
+        let isFavorited = cell.favoriteButton?.isSelected ?? false
         
         if isFavorited {
             if let index = unfavoriteProducts.index(of: product) {
