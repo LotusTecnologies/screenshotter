@@ -9,6 +9,12 @@
 #import "BaseViewController.h"
 
 
+typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
+    ProductsViewControllerStateLoading,
+    ProductsViewControllerStateProducts,
+    ProductsViewControllerStateRetry,
+    ProductsViewControllerStateEmpty
+};
 
 @class ProductsViewController, ShoppablesController;
 @class Screenshot, Product, HelperView, Loader, ShoppablesToolbar, ProductsOptions, ScrollRevealController, ProductsRateView;
@@ -23,6 +29,7 @@
 
 //private
 - (void)displayScreenshotAction;
+- (BOOL)shouldHideToolbar;
 @property (nonatomic, strong) Loader *loader;
 @property (nonatomic, strong, nullable) HelperView *noItemsHelperView;
 @property (nonatomic, strong) UICollectionView *collectionView;

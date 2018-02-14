@@ -18,10 +18,6 @@ class ClarifaiModel: NSObject {
     
     public static let sharedInstance = ClarifaiModel()
     
-    public static func setup() {
-        let _ = ClarifaiModel.sharedInstance
-    }
-
     var isModelDownloaded = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isModelDownloaded)
 
     

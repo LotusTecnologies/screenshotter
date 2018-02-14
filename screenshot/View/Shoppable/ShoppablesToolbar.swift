@@ -27,7 +27,7 @@ import Foundation
             }
         }
     }
-    public var shoppablesController:ShoppablesController? {
+    var shoppablesController:ShoppablesController? {
         didSet{
             if  shoppablesController != nil {
                 shoppablesController?.collectionView = self.collectionView
@@ -37,7 +37,6 @@ import Foundation
             }else{
                 shoppablesController?.collectionView = nil
             }
-            
         }
     }
     override init(frame: CGRect) {
@@ -49,12 +48,12 @@ import Foundation
         super.init(coder:aDecoder)
         self.collectionView = self.createCollectionView()
     }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-            self.bringSubview(toFront: self.collectionView)
-
+        self.bringSubview(toFront: self.collectionView)
     }
-   
+    
     func repositionShoppables() {
         let shoppablesCount = self.shoppablesController?.shoppableCount() ?? 0
         
@@ -81,10 +80,10 @@ import Foundation
         return self.shoppablesController?.shoppableCount() ?? 0
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return self.shoppableSize()
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ShoppableCollectionViewCell
         if let screenshotImage = self.screenshotImage {
@@ -94,6 +93,7 @@ import Foundation
         }
         return cell ?? UICollectionViewCell.init()
     }
+    
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if collectionView.indexPathsForVisibleItems.count == 0 && collectionView.numberOfItems(inSection: 0) > 0 && indexPath.item == 0 {
             if self.needsToSelectFirstShoppable {
@@ -107,44 +107,42 @@ import Foundation
             self.shoppableToolbarDelegate?.shoppablesToolbarDidChange(toolbar: self)
         }
     }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.shoppableToolbarDelegate?.shoppablesToolbarDidSelectShoppable(toolbar: self, index: indexPath.item)
     }
     
     func createCollectionView() -> ShoppablesCollectionView {
-            let p:CGFloat = Geometry.padding
-            let layout = UICollectionViewFlowLayout.init()
-            layout.minimumInteritemSpacing = p
-            layout.minimumLineSpacing = p
-            layout.scrollDirection = .horizontal
-            let collectionView = ShoppablesCollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
-            collectionView.translatesAutoresizingMaskIntoConstraints = false
-            collectionView.delegate = self;
-            collectionView.shoppableDelegate = self
-            collectionView.dataSource = self;
-            collectionView.backgroundColor = .clear
-            collectionView.scrollsToTop = false;
-            collectionView.contentInset = ShoppablesToolbar.preservedCollectionViewContentInset()
-            collectionView.showsHorizontalScrollIndicator = false;
-            collectionView.register(ShoppableCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-            self.addSubview(collectionView)
-            collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-            collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-            collectionView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
-            collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-            
-            return collectionView
-    
+        let p:CGFloat = Geometry.padding
+        let layout = UICollectionViewFlowLayout.init()
+        layout.minimumInteritemSpacing = p
+        layout.minimumLineSpacing = p
+        layout.scrollDirection = .horizontal
+        let collectionView = ShoppablesCollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.delegate = self;
+        collectionView.shoppableDelegate = self
+        collectionView.dataSource = self;
+        collectionView.backgroundColor = .clear
+        collectionView.scrollsToTop = false;
+        collectionView.contentInset = ShoppablesToolbar.preservedCollectionViewContentInset()
+        collectionView.showsHorizontalScrollIndicator = false;
+        collectionView.register(ShoppableCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        self.addSubview(collectionView)
+        collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        return collectionView
     }
+    
     @objc func shoppableSize() -> CGSize {
-        
         var size = CGSize.zero
         size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
         size.width = size.height * 0.8
         return size
     }
     
-  
     @objc func selectFirstShoppable() {
         if self.collectionView.numberOfItems(inSection: 0) > 0{
             self.collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
@@ -153,7 +151,6 @@ import Foundation
         }
     }
     
-
     @objc func selectedShoppableIndex() -> Int {
         return self.collectionView.indexPathsForSelectedItems?.first?.item ?? 0
     }

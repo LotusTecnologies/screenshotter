@@ -14,13 +14,6 @@ import FBSDKCoreKit
     case product = 1
 }
 
-@objc enum ProductsViewControllerState : Int {
-    case loading
-    case products
-    case retry
-    case empty
-}
-
 extension ProductsViewController {
     @objc func setupShoppableToolbar() {
         self.shoppablesToolbar = {
@@ -73,18 +66,6 @@ extension ProductsViewController {
             collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
             return collectionView
         }()
-    }
-    @objc func setupRatingView(){
-//        self.rateView = {
-//            let view = ProductsRateView.init()
-//            view.translatesAutoresizingMaskIntoConstraints = false
-//            view.voteUpButton.add
-//            [view.voteUpButton addTarget:self action:@selector(productsRatePositiveAction) forControlEvents:UIControlEventTouchUpInside];
-//            [view.voteDownButton addTarget:self action:@selector(productsRateNegativeAction) forControlEvents:UIControlEventTouchUpInside];
-//            [view.talkToYourStylistButton addTarget:self action:@selector(talkToYourStylistAction) forControlEvents:UIControlEventTouchUpInside];
-//            
-//            return view;
-//        }()
     }
 }
 
@@ -215,27 +196,6 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             AnalyticsTrackers.branch.track("Tapped on product")
             FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
         }
-    }
-}
-
-private typealias ProductsViewControllerScrollRevealController = ProductsViewController
-extension ProductsViewControllerScrollRevealController
-{
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.dismissOptions()
-        self.scrollRevealController.scrollViewWillBeginDragging(scrollView)
-    }
-    
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.scrollRevealController.scrollViewDidScroll(scrollView)
-    }
-    
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.scrollRevealController.scrollViewDidEndDragging(scrollView, will: decelerate)
-    }
-    
-    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.scrollRevealController.scrollViewDidEndDecelerating(scrollView)
     }
 }
 
@@ -434,7 +394,7 @@ extension ProductsViewControllerRatings {
                     let action = UIAlertAction.init(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
-                                self.presentPersonalSylist()
+                                //don't present anything -  if the user stayed on the same page the bottom bar changed to 'talk to your stylist' otherwise don't do anything
                             }, failure: { (error) in
                                 //no reason to present alert - Apple does it for us
                             })
@@ -622,25 +582,4 @@ extension ProductsViewControllerNoItemsHelperView{
         self.present(alert, animated: true, completion: nil)
     }
 }
-private typealias ProductsViewControllerToolbar = ProductsViewController
-extension ProductsViewControllerToolbar : ShoppablesToolbarDelegate, UIToolbarDelegate {
-    public func position(for bar: UIBarPositioning) -> UIBarPosition {
-        return .topAttached
-    }
-    
-    func shoppablesToolbarDidChange(toolbar:ShoppablesToolbar) {
-        if self.products.count == 0 && self.isViewLoaded {
-            self.reloadProductsForShoppableAtIndex(0)
-        }
-    }
-    
-    func shoppablesToolbarDidSelectShoppable(toolbar:ShoppablesToolbar, index:Int) {
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
-        self.reloadProductsForShoppableAtIndex(index)
-        AnalyticsTrackers.standard.track("Tapped on shoppable")
-    }
-    
-    func shouldHideToolbar() -> Bool {
-        return !self.hasShoppables()
-    }
-}
+

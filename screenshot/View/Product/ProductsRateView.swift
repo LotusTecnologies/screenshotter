@@ -79,8 +79,16 @@ class ProductsRateView : UIView {
         talkToYourStylistButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         talkToYourStylistButton.backgroundColor = .clear
         talkToYourStylistButton.isUserInteractionEnabled = false
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil, queue: .main) { (notification) in
+                let rating  = self.rating
+                self.setRating(rating)
+        }
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
         size.height = 49 // Same height as tab bar
@@ -90,7 +98,9 @@ class ProductsRateView : UIView {
     // MARK: Content
     
     func syncBackgroundColor() {
-        if hasRating {
+        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+            backgroundColor = .crazeGreen
+        } else if hasRating {
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
                 backgroundColor = .crazeGreen
             }else{
@@ -99,17 +109,22 @@ class ProductsRateView : UIView {
         }else{
              backgroundColor = .white
         }
-        backgroundColor = hasRating ? .crazeGreen : .white
     }
     
     private func syncLabel() {
-        if hasRating {
+        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+            label.textColor = .white
+            label.text = "Connecting to Appstore..."
+            label.textAlignment = .center
+            talkToYourStylistButton.isUserInteractionEnabled = false
+            
+        }else if hasRating {
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
                 label.textColor = .white
                 label.text = "products.rate.backToConverstationWithStylist".localized
                 label.textAlignment = .center
                 talkToYourStylistButton.isUserInteractionEnabled = true
-
+                
             }else{
                 label.textColor = .white
                 label.text = "products.rate.rated".localized
@@ -161,8 +176,15 @@ class ProductsRateView : UIView {
     
     func setRating(_ rating: UInt, animated: Bool = false) {
         self.rating = rating
-        
-        if animated && hasRating {
+        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+            voteUpButton.isSelected = false
+            voteDownButton.isSelected = false
+            voteUpButton.alpha = 0
+            voteDownButton.alpha = 0
+            labelTrailingConstraint.isActive = true
+            syncLabel()
+            syncBackgroundColor()
+        }else if animated && hasRating {
             let duration = Constants.defaultAnimationDuration
             
             UIView.animate(withDuration: duration, animations: {

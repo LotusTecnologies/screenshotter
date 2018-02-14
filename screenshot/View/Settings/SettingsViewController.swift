@@ -87,6 +87,8 @@ class SettingsViewController : BaseViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadChangeableIndexPaths), name: .InAppPurchaseManagerDidUpdate, object: nil)
+
         addNavigationItemLogo()
     }
     
@@ -413,7 +415,8 @@ extension SettingsViewController : UITableViewDataSource {
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
-        if row == .restoreInAppPurchase && self.isRestoring {
+        if (row == .restoreInAppPurchase && self.isRestoring) ||
+            (row == .talkToStylist && InAppPurchaseManager.sharedInstance.isInProcessOfBuying()){
             cell.textLabel?.textColor = .gray
         }else{
             cell.textLabel?.textColor = .black
@@ -534,7 +537,9 @@ extension SettingsViewController : UITableViewDelegate {
                 })
             }
         case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+                // do nothing
+            }else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
                 IntercomHelper.sharedInstance.presentMessagingUI()
             }else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
@@ -545,7 +550,8 @@ extension SettingsViewController : UITableViewDelegate {
                     let action = UIAlertAction.init(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
-                            IntercomHelper.sharedInstance.presentMessagingUI()
+//                            IntercomHelper.sharedInstance.presentMessagingUI()
+                                //If on the page the user will see cell change to 'talk to your stylist' with the lock.  If not on the page it can be jarring
                         }, failure: { (error) in
                             //no reason to present alert - Apple does it for us
                         })
@@ -577,8 +583,7 @@ extension SettingsViewController : UITableViewDelegate {
                     
                 }
             }
-           
-          
+ 
         default:
             break
         }
@@ -657,7 +662,9 @@ fileprivate extension SettingsViewController {
                 return "settings.row.restoreInAppPurchase".localized
             }
         case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+                return "settings.row.talkToStylist.isInProcessOfBuying".localized
+            }else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
                 return "settings.row.talkToStylist".localized
             }else{
                 return "settings.row.talkToStylist.locked".localized
@@ -786,7 +793,7 @@ fileprivate extension SettingsViewController {
         return rect
     }
     
-    func reloadChangeableIndexPaths() {
+    @objc func reloadChangeableIndexPaths() {
         func append(section: SettingsViewController.Section, row: SettingsViewController.Row, to indexPaths: inout [IndexPath]) {
             if let indexPath = indexPath(for: row, in: section) {
                 indexPaths.append(indexPath)
@@ -806,7 +813,9 @@ fileprivate extension SettingsViewController {
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
         append(section: .about, row: .coins, to: &indexPaths)
-        
+        append(section: .about, row: .talkToStylist, to: &indexPaths)
+        append(section: .about, row: .restoreInAppPurchase, to: &indexPaths)
+
         tableView.reloadRows(at: indexPaths, with: .none)
     }
 }

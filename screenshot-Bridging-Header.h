@@ -6,8 +6,7 @@
 #define screenshot_Bridging_Header_h
 
 
-#import "MainTabBarController.h"
 #import "ProductsViewController.h"
-#import "ScreenshotDisplayViewController.h"
+#import "ScreenshotsNavigationController.h"
 
 #endif /* screenshot_Bridging_Header_h */

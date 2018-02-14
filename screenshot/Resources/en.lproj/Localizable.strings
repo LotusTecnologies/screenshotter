@@ -94,6 +94,9 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 
+"products.cell.SALE" = "SALE";
+"products.cell.BUY" = "BUY";
+
 "products.options.category.auto" = "Auto";
 "products.options.category.fashion" = "Fashion";
 "products.options.category.furniture" = "Furniture";
@@ -113,7 +116,10 @@
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.unrated" = "Are these results relevant?";
 "products.rate.backToConverstationWithStylist" = "Talk to your stylist";
+"products.rate.connectingToAppStore" = "Connecting to App Store...";
+
 "products.tooltip.title" = "Tap to shop different types of products";
+
 
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
 "screenshot.empty.title" = "No Screenshots Yet";
@@ -153,6 +159,7 @@
 "settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
 "settings.row.talkToStylist" = "Talk to your stylist";
 "settings.row.talkToStylist.locked" = "🔒 Talk to your stylist";
+"settings.row.talkToStylist.isInProcessOfBuying" = "🔒 Talk to your stylist (connecting...)";
 
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";

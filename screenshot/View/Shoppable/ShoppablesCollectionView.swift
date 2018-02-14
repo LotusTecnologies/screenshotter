@@ -12,11 +12,10 @@ public protocol ShoppablesCollectionViewDelegate : UICollectionViewDelegate {
     func repositionShoppables()
 }
 
-
 class ShoppablesCollectionView: UICollectionView {
-
+    
     var shoppableDelegate: ShoppablesCollectionViewDelegate?
-
+    
     override var contentSize: CGSize {
         didSet{
             if self.shoppableDelegate?.didViewControllerAppear == true && self.numberOfItems(inSection: 0) > 0 {
@@ -25,7 +24,7 @@ class ShoppablesCollectionView: UICollectionView {
                     // is needed to prevent undesired animations
                     self.shoppableDelegate?.repositionShoppables()
                 } else {
-                self.layoutIfNeeded()
+                    self.layoutIfNeeded()
                     UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
                         self.shoppableDelegate?.repositionShoppables()
                     })
@@ -35,6 +34,5 @@ class ShoppablesCollectionView: UICollectionView {
             }
         }
     }
-
 }
 
