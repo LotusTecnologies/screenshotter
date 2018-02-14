@@ -515,18 +515,16 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ProductsSectionProduct) {
-        // Somehow users were able to tap twice, this condition will prevent that.
-        if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
-            [ProductWebViewController shared].product = [self productAtIndex:indexPath.item];
-            NSString *urlString = [ProductWebViewController shared].product.offer;
-            if ([urlString hasPrefix:@"//"]) {
-                urlString = [@"https:" stringByAppendingString:urlString];
-            }
-            [[ProductWebViewController shared] rebaseURL:[NSURL URLWithString:urlString]];
-            [self.navigationController pushViewController:[ProductWebViewController shared] animated:YES];
-        }
-        
         Product *product = [self productAtIndex:indexPath.item];
+        
+        // Somehow users were able to tap twice, this condition will prevent that.
+//        if (![self.navigationController.topViewController isKindOfClass:[WebViewController class]]) {
+        NSString *urlString = product.offer;
+        if ([urlString hasPrefix:@"//"]) {
+            urlString = [@"https:" stringByAppendingString:urlString];
+        }
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString] options:@{} completionHandler:nil];
+//        }
         
         [AnalyticsTrackerObjCBridge trackTappedOnProductWithTracker:AnalyticsTrackers.standard
                                                             product:product
