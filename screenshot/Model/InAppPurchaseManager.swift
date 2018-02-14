@@ -17,7 +17,11 @@ import PromiseKit
     func productIdentifier() -> String{
         switch self {
         case .personalStylist:
-            return "com.crazeapp.nonconsumable.stylisthelp2"
+            #if DEV
+                return "com.crazeapp.stylisthelp"
+            #else
+                return "com.crazeapp.nonconsumable.stylisthelp2"
+            #endif
         }
     }
     static let allProductIdentifiers:Set = [personalStylist.productIdentifier()]
