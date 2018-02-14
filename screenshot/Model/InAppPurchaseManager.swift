@@ -64,15 +64,18 @@ fileprivate class RestoreObserver: NSObject, SKPaymentTransactionObserver {
     }
     
 }
-
+extension Notification.Name {
+    
+    static let InAppPurchaseManagerDidUpdate = Notification.Name("com.screenshopit.InAppPurchaseManagerDidUpdate")
+}
 class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
     
     public static let sharedInstance:InAppPurchaseManager = InAppPurchaseManager.init()
     private var productRequest:Promise<SKProductsResponse>?
-    private var buyRequest:Promise<SKProductsResponse>?
+    private var buyRequest:Promise<SKPaymentTransaction>?
     private var restoreRequest:Promise<[String]>?
     private var productResponse:SKProductsResponse?
-
+    
 
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for t in transactions {
@@ -86,8 +89,22 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
                 }else{
                     UserDefaults.standard.setValue([productIdentifier], forKey: UserDefaultsKeys.purchasedProductIdentifier)
                 }
+                NotificationCenter.default.post(name: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil)
+
             }
         }
+    }
+    
+    override init() {
+        super.init()
+        SKPaymentQueue.default().add(self)
+    }
+    deinit {
+        SKPaymentQueue.default().remove(self)
+    }
+    
+    func isInProcessOfBuying() -> Bool {
+        return self.buyRequest?.isPending ?? false
     }
     
     @objc public func didPurchase(_inAppPurchaseProduct:InAppPurchaseProduct) -> Bool {
@@ -135,12 +152,19 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
     }
 
     @objc func buy ( product:SKProduct, success:@escaping (()->Void), failure:@escaping((Error)->Void)){
-        SKPayment.init(product: product).promise().then(on:.main)  { (transaction) -> Promise<Bool> in
+        let buyRequest = SKPayment.init(product: product).promise()
+        self.buyRequest = buyRequest
+        buyRequest.then(on:.main)  { (transaction) -> Promise<Bool> in
             success()
+            NotificationCenter.default.post(name: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil)
             return Promise(value:true)
         }.catch(on: .main) { (error) in
             failure(error)
+            NotificationCenter.default.post(name: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil)
+
         }
+        NotificationCenter.default.post(name: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil)
+
     }
     
     @objc func load(product:InAppPurchaseProduct, success:@escaping ((SKProduct)->Void), failure:@escaping((Error)->Void) ){

@@ -707,10 +707,12 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [InAppPurchaseManager.sharedInstance loadProductInfoIfNeeded];
     }
 
+    NSString *screenshopId = [self.screenshot.assetId copy];
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry To Hear That!" message:@"We hear you loud and clear and we’re going to look into this. How else can we help?" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
+    
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         if ( [InAppPurchaseManager.sharedInstance didPurchaseWith_inAppPurchaseProduct:InAppPurchaseProductPersonalStylist] ){
             [self presentPersonalSylist];
@@ -722,7 +724,10 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:loadingMessage preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction *action = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     [InAppPurchaseManager.sharedInstance buyWithProduct:[InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist] success:^{
-                        [self presentPersonalSylist];
+                        if ( self.isViewLoaded && self.view.window && [screenshopId isEqual:self.screenshot.assetId]){
+                            [self presentPersonalSylist];
+                        }
+                        
                     } failure:^(NSError *error) {
                        //no reason to present alert - Apple does it for us
                     }];
