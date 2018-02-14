@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ScreenshotCollectionViewCellSelectedState : Int {
+@objc enum ScreenshotCollectionViewCellSelectedState : Int {
     case none
     case checked
     case disabled
@@ -145,7 +145,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     fileprivate func resetSelectedState() {
         imageView.alpha = 1
         badge.alpha = 1
-        toolbar.alpha = 1
+        toolbar.alpha = isEditing ? 0 : 1
         checkImageView.alpha = 0
         isUserInteractionEnabled = true
     }
@@ -177,10 +177,6 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
-    // TODO: only needed for objc
-    func _setSelectedState(_ state: Int) {
-        selectedState = ScreenshotCollectionViewCellSelectedState(rawValue: state) ?? .none
-    }
     
     override var isSelected: Bool {
         didSet {

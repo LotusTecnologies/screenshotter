@@ -294,10 +294,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     };
     
     if (animated) {
+        
         [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
             cellEditing();
-        } completion:^(BOOL finished) {
+            
+            ///     putting `removeDeleteButton` here instead of in the completion
+            //      prevents animation on the button fading away,
+            //      but ALSO fixes a bug where if you take edit cancel
+            //      edit cancel very fast you can get into a state
+            //      where there no delete button in edit mode
             removeDeleteButton();
+        } completion:^(BOOL finished) {
         }];
     }
     else {
@@ -642,7 +649,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [self.collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
             
             [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
-                [cell _setSelectedState:2];
+                [cell setSelectedState:ScreenshotCollectionViewCellSelectedStateDisabled];
             }];
             
             [AnalyticsTrackers.standard track:@"Removed screenshot" properties:nil];
@@ -653,13 +660,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (void)syncScreenshotCollectionViewCellSelectedState:(ScreenshotCollectionViewCell *)cell {
     if ([self isEditing]) {
-        [cell _setSelectedState:1];
+        [cell setSelectedState:ScreenshotCollectionViewCellSelectedStateChecked];
     }
     else if ([cell isSelected] && self.deleteScreenshotObjectIDs.count > 0) {
-        [cell _setSelectedState:2];
+        [cell setSelectedState:ScreenshotCollectionViewCellSelectedStateDisabled];
     }
     else {
-        [cell _setSelectedState:0];
+        [cell setSelectedState:ScreenshotCollectionViewCellSelectedStateNone];
     }
 }
 
