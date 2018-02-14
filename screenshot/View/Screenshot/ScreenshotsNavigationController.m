@@ -239,7 +239,7 @@
 #pragma mark - Clip View
 
 - (void)presentPickerClipView {
-    if (!self.clipView) {
+    if (!self.clipView && !self.screenshotsViewController.isEditing) {
         UIView *rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem.targetView;
         CGRect rect = [rightBarButtonView.superview convertRect:rightBarButtonView.frame toView:self.view];
         CGFloat radius = MIN(rect.size.height / 2.f, rect.size.width / 2.f);
