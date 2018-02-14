@@ -43,7 +43,7 @@ class TutorialVideoOverlayView : UIView {
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.alpha = 0
         doneButton.contentEdgeInsets = UIEdgeInsetsMake(8, 12, 8, 12)
-        doneButton.setTitle("tuturial.skipButton".localized, for: .normal)
+        doneButton.setTitle("generic.done".localized, for: .normal)
         doneButton.layer.borderColor = UIColor.white.cgColor
         doneButton.layer.borderWidth = 1
         doneButton.layer.masksToBounds = true

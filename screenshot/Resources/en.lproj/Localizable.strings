@@ -39,7 +39,6 @@
 
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.title" = "Setup Email";
-"tuturial.skipButton" = "Start Shoppping";
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
