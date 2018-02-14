@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-    
+    var shouldLoadDiscoverNextLoad = false
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
@@ -395,8 +395,8 @@ extension AppDelegate {
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
             
             viewController = mainTabBarController
-            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingDidSkipTakingScreenShot) {
-                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.onboardingDidSkipTakingScreenShot)
+            if self.shouldLoadDiscoverNextLoad {
+                self.shouldLoadDiscoverNextLoad = false
                 if let mainTabBarController = viewController as? MainTabBarController {
                     if let viewControllers = mainTabBarController.viewControllers {
                         var discoverViewController:UIViewController?

@@ -30,7 +30,6 @@ class UserDefaultsKeys : NSObject {
     
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
-    static let onboardingDidSkipTakingScreenShot = "OnboardingDidSkipTakingScreenShot"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
