@@ -83,7 +83,8 @@ extension ProductsTooltipCollectionViewCell {
         let constraintRect = CGSize(width: contentWidth, height: .greatestFiniteMagnitude)
         
         let boundingBox = text.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
-        
-        return contentInset.top + (arrowImage?.size.height ?? 0) + imageToLabelPadding + ceil(boundingBox.height) + contentInset.bottom
+        let arrowImageHeight = (arrowImage?.size.height ?? 0)
+        let toReturn = contentInset.top + arrowImageHeight + imageToLabelPadding + ceil(boundingBox.height) + contentInset.bottom
+        return toReturn
     }
 }

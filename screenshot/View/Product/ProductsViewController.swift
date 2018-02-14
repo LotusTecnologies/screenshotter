@@ -70,7 +70,7 @@ extension ProductsViewController {
     @objc func setupViews(){
         
         self.scrollRevealController = ScrollRevealController.init(edge: .top)
-        self.scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController.navigationBar.frame.maxY, left: 0, bottom: 0, right: 0)
+        self.scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
         self.scrollRevealController.insertAbove(self.collectionView)
         
         
@@ -85,15 +85,15 @@ extension ProductsViewController {
         var height = self.rateView.intrinsicContentSize.height
 
         if #available(iOS 11.0, *) {
-            height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom
+            height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
         }
         self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
-        if (!self.shoppablesController) {
+        if (self.shoppablesController == nil) {
             self.state = .loading;
         } else {
             self.syncScreenshotRelatedObjects()
 
-            if self.shoppablesController.shoppableCount == -1  {
+            if self.shoppablesController.shoppableCount() == -1  {
                 // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
                 // rateView and scrollRevealController can all be lazy loaded. They dont
                 // need to exist if this condition is true.
@@ -213,21 +213,30 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             
             
             AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Products")
-            
-            
-            let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
-            
-            if (email?.lengthOfBytes(using: .utf8) ?? 0 > 0) {
-                let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
-                AnalyticsTrackers.standard.track("Product for email", properties:["screenshot": self.screenshot.uploadedImageURL ?? "",
-                                                                                  "merchant": product.merchant ?? "",
-                                                                                  "brand": product.brand ?? "",
-                                                                                  "title": product.displayTitle ?? "",
-                                                                                  "url": product.offer ?? "",
-                                                                                  "imageUrl": product.imageURL ?? "",
-                                                                                  "price": product.price ?? "",
-                                                                                  "email": email ?? "",
-                                                                                  "name": name ?? ""])
+
+
+            let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
+
+            if (email.lengthOfBytes(using: .utf8) > 0) {
+                let uploadedImageURL = self.screenshot.uploadedImageURL ?? ""
+                let merchant = product.merchant ?? ""
+                let brand = product.brand ?? ""
+                let displayTitle = product.displayTitle ?? ""
+                let offer = product.offer ?? ""
+                let imageURL = product.imageURL ?? ""
+                let price = product.price ?? ""
+                let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
+
+                let properties = ["screenshot": uploadedImageURL,
+                                  "merchant": merchant,
+                                  "brand": brand,
+                                  "title": displayTitle,
+                                  "url": offer,
+                                  "imageUrl": imageURL,
+                                  "price": price,
+                                  "email": email,
+                                  "name": name ]
+                AnalyticsTrackers.standard.track("Product for email", properties:properties)
             }
             AnalyticsTrackers.branch.track("Tapped on product")
             FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
