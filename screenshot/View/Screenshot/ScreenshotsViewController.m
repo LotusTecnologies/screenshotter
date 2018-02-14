@@ -326,6 +326,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (ScreenshotsDeleteButton *)deleteButton {
     if (!_deleteButton) {
         ScreenshotsDeleteButton *deleteButton = [ScreenshotsDeleteButton buttonWithType:UIButtonTypeCustom];
+        deleteButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         deleteButton.translatesAutoresizingMaskIntoConstraints = YES;
         [deleteButton addTarget:self action:@selector(deleteButtonAction) forControlEvents:UIControlEventTouchUpInside];
         _deleteButton = deleteButton;
