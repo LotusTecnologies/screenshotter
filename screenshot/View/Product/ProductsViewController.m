@@ -707,7 +707,6 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
         [InAppPurchaseManager.sharedInstance loadProductInfoIfNeeded];
     }
 
-    NSString *screenshopId = [self.screenshot.assetId copy];
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Sorry To Hear That!" message:@"We hear you loud and clear and we’re going to look into this. How else can we help?" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self presentProductsRateNegativeFeedbackAlert];
@@ -724,9 +723,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:loadingMessage preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction *action = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     [InAppPurchaseManager.sharedInstance buyWithProduct:[InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist] success:^{
-                        if ( self.isViewLoaded && self.view.window && [screenshopId isEqual:self.screenshot.assetId]){
-                            [self presentPersonalSylist];
-                        }
+                        //don't present anything -  if the user stayed on the same page the bottom bar changed to 'talk to your stylist' otherwise don't do anything
                         
                     } failure:^(NSError *error) {
                        //no reason to present alert - Apple does it for us
