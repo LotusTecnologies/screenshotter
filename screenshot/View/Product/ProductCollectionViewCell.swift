@@ -213,6 +213,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
         
         do { // buy "button
             let roundedCornerClippingView = UIView()
+            roundedCornerClippingView.isUserInteractionEnabled = false
             productView.addSubview(roundedCornerClippingView)
             
             roundedCornerClippingView.translatesAutoresizingMaskIntoConstraints = false;
