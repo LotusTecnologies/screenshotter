@@ -264,11 +264,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         
         self.deleteButton.alpha = 0.f;
         self.deleteButton.contentEdgeInsets = UIEdgeInsetsMake(0.f, 0.f, bottom, 0.f);
+        self.deleteButton.frame = self.tabBarController.tabBar.bounds;
         [self.tabBarController.tabBar addSubview:self.deleteButton];
-        [self.deleteButton.topAnchor constraintEqualToAnchor:self.tabBarController.tabBar.topAnchor].active = YES;
-        [self.deleteButton.leadingAnchor constraintEqualToAnchor:self.tabBarController.tabBar.leadingAnchor].active = YES;
-        [self.deleteButton.bottomAnchor constraintEqualToAnchor:self.tabBarController.tabBar.bottomAnchor].active = YES;
-        [self.deleteButton.trailingAnchor constraintEqualToAnchor:self.tabBarController.tabBar.trailingAnchor].active = YES;
+
     }
     
     dispatch_block_t removeDeleteButton = ^{
@@ -328,7 +326,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (ScreenshotsDeleteButton *)deleteButton {
     if (!_deleteButton) {
         ScreenshotsDeleteButton *deleteButton = [ScreenshotsDeleteButton buttonWithType:UIButtonTypeCustom];
-        deleteButton.translatesAutoresizingMaskIntoConstraints = NO;
+        deleteButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        deleteButton.translatesAutoresizingMaskIntoConstraints = YES;
         [deleteButton addTarget:self action:@selector(deleteButtonAction) forControlEvents:UIControlEventTouchUpInside];
         _deleteButton = deleteButton;
     }
