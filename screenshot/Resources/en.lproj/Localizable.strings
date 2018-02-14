@@ -39,7 +39,7 @@
 
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.title" = "Setup Email";
-
+"tuturial.skipButton" = "Start Shoppping";
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
@@ -187,7 +187,7 @@
 "tutorial.try.detail.x.1" = " on your phone";
 "tutorial.try.detail.x.2" = " to take a screenshot";
 
-"tutorial.try.skip" = "Skip";
+"tutorial.try.skip" = "Start Shopping";
 "tutorial.try.title" = "Try It Out";
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";

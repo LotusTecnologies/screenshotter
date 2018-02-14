@@ -243,6 +243,8 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         tutorialTrySlideViewDidComplete(slideView)
         
         AnalyticsTrackers.standard.track("Skipped Tutorial")
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingDidSkipTakingScreenShot)
+
     }
     
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {

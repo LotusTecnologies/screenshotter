@@ -393,7 +393,23 @@ extension AppDelegate {
         let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+            
             viewController = mainTabBarController
+            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingDidSkipTakingScreenShot) {
+                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.onboardingDidSkipTakingScreenShot)
+                if let mainTabBarController = viewController as? MainTabBarController {
+                    if let viewControllers = mainTabBarController.viewControllers {
+                        var discoverViewController:UIViewController?
+                        
+                        for vc in viewControllers {
+                            if let vc = vc as? DiscoverNavigationController {
+                                discoverViewController = vc
+                            }
+                        }
+                        mainTabBarController.selectedViewController = discoverViewController
+                    }
+                }
+            }
         }
         else {
             let tutorialViewController = TutorialViewController()
