@@ -124,11 +124,15 @@ extension ScrollRevealController {
     }
     
     fileprivate var scrollViewExpectedContentOffsetY: CGFloat {
-        return (scrollView?.contentOffset.y ?? 0) + scrollViewAdjustedContentInset.top
+        let scrollViewContentOffsetY = scrollView?.contentOffset.y ?? 0
+        return scrollViewContentOffsetY + scrollViewAdjustedContentInset.top
+        
     }
     
     fileprivate var scrollViewExpectedContentSizeHeight: CGFloat {
-        return (scrollView?.contentOffset.y ?? 0) + (scrollView?.bounds.size.height ?? 0) - scrollViewAdjustedContentInset.bottom
+        let scrollViewContentOffsetY = scrollView?.contentOffset.y ?? 0
+        let scrollViewHeight = scrollView?.bounds.size.height ?? 0
+        return scrollViewContentOffsetY + scrollViewHeight - scrollViewAdjustedContentInset.bottom
     }
     
     fileprivate var minOffset: CGFloat {
