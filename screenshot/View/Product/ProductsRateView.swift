@@ -118,27 +118,25 @@ class ProductsRateView : UIView {
             label.textAlignment = .center
             talkToYourStylistButton.isUserInteractionEnabled = false
             
-        }else{
-            if hasRating {
-                if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
-                    label.textColor = .white
-                    label.text = "products.rate.backToConverstationWithStylist".localized
-                    label.textAlignment = .center
-                    talkToYourStylistButton.isUserInteractionEnabled = true
-                    
-                }else{
-                    label.textColor = .white
-                    label.text = "products.rate.rated".localized
-                    label.textAlignment = .center
-                    talkToYourStylistButton.isUserInteractionEnabled = false
-                }
+        }else if hasRating {
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
+                label.textColor = .white
+                label.text = "products.rate.backToConverstationWithStylist".localized
+                label.textAlignment = .center
+                talkToYourStylistButton.isUserInteractionEnabled = true
                 
-            } else {
-                label.textColor = .gray3
-                label.text = "products.rate.unrated".localized
-                label.textAlignment = .natural
+            }else{
+                label.textColor = .white
+                label.text = "products.rate.rated".localized
+                label.textAlignment = .center
                 talkToYourStylistButton.isUserInteractionEnabled = false
             }
+            
+        } else {
+            label.textColor = .gray3
+            label.text = "products.rate.unrated".localized
+            label.textAlignment = .natural
+            talkToYourStylistButton.isUserInteractionEnabled = false
         }
     }
     
