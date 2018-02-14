@@ -67,6 +67,44 @@ extension ProductsViewController {
             return collectionView
         }()
     }
+    @objc func setupViews(){
+        
+        self.scrollRevealController = ScrollRevealController.init(edge: .top)
+        self.scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController.navigationBar.frame.maxY, left: 0, bottom: 0, right: 0)
+        self.scrollRevealController.insertAbove(self.collectionView)
+        
+        
+        self.scrollRevealController.view.addSubview(self.rateView)
+        
+        self.rateView.topAnchor.constraint(equalTo:self.scrollRevealController.view.topAnchor).isActive = true
+        self.rateView.leadingAnchor.constraint(equalTo:self.scrollRevealController.view.leadingAnchor).isActive = true
+        self.rateView.bottomAnchor.constraint(equalTo:self.scrollRevealController.view.bottomAnchor).isActive = true
+        self.rateView.trailingAnchor.constraint(equalTo:self.scrollRevealController.view.trailingAnchor).isActive = true
+
+
+        var height = self.rateView.intrinsicContentSize.height
+
+        if #available(iOS 11.0, *) {
+            height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom
+        }
+        self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
+        if (!self.shoppablesController) {
+            self.state = .loading;
+        } else {
+            self.syncScreenshotRelatedObjects()
+
+            if self.shoppablesController.shoppableCount == -1  {
+                // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
+                // rateView and scrollRevealController can all be lazy loaded. They dont
+                // need to exist if this condition is true.
+                self.state = .retry;
+                AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
+            }
+            else {
+                self.reloadProductsForShoppableAtIndex(0);
+            }
+        }
+    }
 }
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController

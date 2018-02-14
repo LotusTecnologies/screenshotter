@@ -57,42 +57,8 @@
 
         view;
     });
+    [self setupViews];
     
-    self.scrollRevealController = [[ScrollRevealController alloc] initWithEdge:1];
-    self.scrollRevealController.adjustedContentInset = UIEdgeInsetsMake(CGRectGetMaxY(self.navigationController.navigationBar.frame), 0.f, 0.f, 0.f);
-    [self.scrollRevealController insertAbove:self.collectionView];
-    
-    [self.scrollRevealController.view addSubview:self.rateView];
-    [self.rateView.topAnchor constraintEqualToAnchor:self.scrollRevealController.view.topAnchor].active = YES;
-    [self.rateView.leadingAnchor constraintEqualToAnchor:self.scrollRevealController.view.leadingAnchor].active = YES;
-    [self.rateView.bottomAnchor constraintEqualToAnchor:self.scrollRevealController.view.bottomAnchor].active = YES;
-    [self.rateView.trailingAnchor constraintEqualToAnchor:self.scrollRevealController.view.trailingAnchor].active = YES;
-    
-    CGFloat height = self.rateView.intrinsicContentSize.height;
-    
-    if (@available(iOS 11.0, *)) {
-        height += [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
-    }
-    
-    [self.rateView.heightAnchor constraintEqualToConstant:height].active = YES;
-    
-    if (!self.shoppablesController) {
-        self.state = ProductsViewControllerStateLoading;
-    }
-    else {
-        [self syncScreenshotRelatedObjects];
-        
-        if ([self.shoppablesController shoppableCount] == -1) {
-            // TODO: When porting this to swift, the shoppablesToolbar, collectionView,
-            // rateView and scrollRevealController can all be lazy loaded. They dont
-            // need to exist if this condition is true.
-            self.state = ProductsViewControllerStateRetry;
-            [AnalyticsTrackers.standard track:@"Screenshot Opened Without Shoppables" properties:nil];
-        }
-        else {
-            [self reloadProductsForShoppableAtIndex:0];
-        }
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -222,11 +188,6 @@
     navigationController.screenshotDisplayViewController.shoppables = [self.shoppablesController shoppables];
     [self presentViewController:navigationController animated:YES completion:nil];
 }
-
-
-
-
-
 
 #pragma mark - Product Cell
 
