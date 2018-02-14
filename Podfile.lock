@@ -104,10 +104,10 @@ PODS:
     - nanopb/encode (= 0.3.8)
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
-  - PromiseKit/CorePromise (4.5.2)
-  - PromiseKit/Foundation (4.5.2):
+  - PromiseKit/CorePromise (6.0.1)
+  - PromiseKit/Foundation (6.0.1):
     - PromiseKit/CorePromise
-  - PromiseKit/StoreKit (4.5.2):
+  - PromiseKit/StoreKit (6.0.1):
     - PromiseKit/CorePromise
   - Protobuf (3.5.0)
   - RateView (1.2)
@@ -133,8 +133,8 @@ DEPENDENCIES:
   - GoogleSignIn
   - Intercom
   - lottie-ios
-  - PromiseKit/Foundation (= 4.5.2)
-  - PromiseKit/StoreKit (~> 4.0)
+  - PromiseKit/Foundation
+  - PromiseKit/StoreKit
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
 
@@ -175,12 +175,12 @@ SPEC CHECKSUMS:
   Intercom: c69c28474ffc9bf99cce5a7c25f515aad3796944
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
-  PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
+  PromiseKit: 18fcba8db2b15c3887ba8acb3e9a328702be3f93
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: b43a8096531234e6b9abebf6e2a829d005f9f209
+PODFILE CHECKSUM: 23e506330f8dbdb487a5e160069ffa0a630612fd
 
 COCOAPODS: 1.4.0
