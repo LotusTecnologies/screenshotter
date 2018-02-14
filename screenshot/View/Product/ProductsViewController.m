@@ -711,6 +711,7 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
     [alertController addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self presentProductsRateNegativeFeedbackAlert];
     }]];
+    
     [alertController addAction:[UIAlertAction actionWithTitle:@"Get Fashion Help" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         if ( [InAppPurchaseManager.sharedInstance didPurchaseWith_inAppPurchaseProduct:InAppPurchaseProductPersonalStylist] ){
             [self presentPersonalSylist];
@@ -722,7 +723,8 @@ typedef NS_ENUM(NSUInteger, ProductsViewControllerState) {
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:loadingMessage preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction *action = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     [InAppPurchaseManager.sharedInstance buyWithProduct:[InAppPurchaseManager.sharedInstance productIfAvailableWithProduct:InAppPurchaseProductPersonalStylist] success:^{
-                        [self presentPersonalSylist];
+                        //don't present anything -  if the user stayed on the same page the bottom bar changed to 'talk to your stylist' otherwise don't do anything
+                        
                     } failure:^(NSError *error) {
                        //no reason to present alert - Apple does it for us
                     }];
