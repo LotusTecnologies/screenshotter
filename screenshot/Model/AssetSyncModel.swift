@@ -487,7 +487,7 @@ class AssetSyncModel: NSObject {
                 }
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
             }
-            AnalyticsTrackers.standard.track("received products from Syte", properties: ["productCount" : productsArray.count])
+            AnalyticsTrackers.standard.track("received products from Syte", properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
         }
             
         NetworkingPromise.downloadProductsWithRetry(url: url)
