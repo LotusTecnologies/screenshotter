@@ -63,8 +63,10 @@ class FavoritesTableViewCell : UITableViewCell {
         screenshotView.centerXAnchor.constraint(equalTo: screenshotContainerView.centerXAnchor).isActive = true
         screenshotView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
         screenshotImageViewWidthConstraint = screenshotView.widthAnchor.constraint(equalToConstant: 0)
+        screenshotImageViewWidthConstraint.priority = UILayoutPriorityDefaultHigh
         screenshotImageViewWidthConstraint.isActive = true
         screenshotImageViewHeightConstraint = screenshotView.heightAnchor.constraint(equalToConstant: 0)
+        screenshotImageViewHeightConstraint.priority = UILayoutPriorityDefaultHigh
         screenshotImageViewHeightConstraint.isActive = true
         
         heartView.translatesAutoresizingMaskIntoConstraints = false
