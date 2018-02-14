@@ -243,9 +243,7 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         tutorialTrySlideViewDidComplete(slideView)
         
         AnalyticsTrackers.standard.track("Skipped Tutorial")
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-            appDelegate.shouldLoadDiscoverNextLoad = true
-        }
+        AppDelegate.shared.shouldLoadDiscoverNextLoad = true
     }
     
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {
