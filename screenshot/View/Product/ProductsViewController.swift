@@ -157,25 +157,23 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if (indexPath.section == ProductsSection.product.rawValue) {
-            if let _ = self.navigationController?.topViewController as? WebViewController {
-                // Somehow the user was able to tap twice
-                // do nothing
-
-            }else{
-                ProductWebViewController.shared.product = self.productAtIndex(indexPath.item)
-                
-                if var urlString = ProductWebViewController.shared.product?.offer {
-                    if (urlString.hasPrefix("//")) {
-                        urlString = "https:".appending(urlString)
-                    }
-                    if let url = URL.init(string: urlString){
-                        ProductWebViewController.shared.rebaseURL(url)
-                        self.navigationController?.pushViewController(ProductWebViewController.shared, animated:true)
+            let product = self.productAtIndex(indexPath.item)
+            
+            
+            if var urlString = product.offer {
+                if (urlString.hasPrefix("//")) {
+                    urlString = "https:".appending(urlString)
+                }
+                if let url = URL.init(string: urlString){
+                    if UIApplication.shared.canOpenURL(url){
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        AnalyticsTrackers.standard.track("Can't open url", properties: ["url":urlString])
                     }
                 }
             }
             
-            let product = self.productAtIndex(indexPath.item)
+            
             AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Products")
             
             

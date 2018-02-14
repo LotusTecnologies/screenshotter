@@ -487,7 +487,7 @@ class AssetSyncModel: NSObject {
                 }
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
             }
-            AnalyticsTrackers.standard.track("received products from Syte", properties: ["productCount" : productsArray.count])
+            AnalyticsTrackers.standard.track("received products from Syte", properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
         }
             
         NetworkingPromise.downloadProductsWithRetry(url: url)
@@ -903,8 +903,7 @@ class AssetSyncModel: NSObject {
     }
     
     @objc public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
-        guard screenshot.shoppablesCount < 0,
-          let assetId = screenshot.assetId,
+        guard let assetId = screenshot.assetId,
           addToSelected(assetId: assetId) else {
                 return
         }
@@ -913,6 +912,14 @@ class AssetSyncModel: NSObject {
         dataModel.performBackgroundTask { (managedObjectContext) in
             let backgroundScreenshot = managedObjectContext.object(with: oid) as? Screenshot
             backgroundScreenshot?.syteJson = classificationString
+            backgroundScreenshot?.shoppables?.forEach { shoppable in
+                if let shoppableManagedObject = shoppable as? NSManagedObject {
+                    managedObjectContext.delete(shoppableManagedObject)
+                } else {
+                    print("WTF? Cannot cast as NSManagedObject:\(shoppable)")
+                }
+            }
+            backgroundScreenshot?.shoppablesCount = 0
             dataModel.saveMoc(managedObjectContext: managedObjectContext)
             self.syncPhotos()
         }
