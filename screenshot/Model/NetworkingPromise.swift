@@ -171,7 +171,7 @@ class NetworkingPromise: NSObject {
     
     static func downloadProducts(url: URL) -> Promise<[String : Any]> {
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
+        sessionConfiguration.timeoutIntervalForResource = 45
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
