@@ -28,6 +28,8 @@ class UserDefaultsKeys : NSObject {
     static let productCurrency = "ProductCurrency"
     static let productCategory = "ProductCategory"
     
+    static let openProductPageInSetting = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
+    
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"

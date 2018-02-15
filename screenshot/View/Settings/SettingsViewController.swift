@@ -44,6 +44,7 @@ class SettingsViewController : BaseViewController {
         case partners
         case restoreInAppPurchase
         case talkToStylist
+        case openIn
 
     }
     
@@ -259,7 +260,8 @@ class SettingsViewController : BaseViewController {
         ],
         .product: [
             .productGender,
-            .productSize
+            .productSize,
+            .openIn
         ]
     ]
     
@@ -479,6 +481,18 @@ extension SettingsViewController : UITableViewDelegate {
                     }
                 })
             }
+        case .openIn:
+            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            let options:[OpenProductPageInSetting] = [.embededSafari, .safari, .chrome]
+            options.forEach({ (setting) in
+                alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
+                    setting.saveToUserDefaults()
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                }))
+            })
+            self.present(alert, animated: true, completion: nil)
+            
             
         case .currency:
             let viewController = CurrencyViewController()
@@ -647,6 +661,8 @@ fileprivate extension SettingsViewController {
             return "settings.row.gender.title".localized
         case .productSize:
             return "settings.row.size.title".localized
+        case .openIn:
+            return "settings.row.openIn.title".localized
         case .currency:
             return "settings.row.currency.title".localized
         case .followInstagram:
@@ -677,6 +693,8 @@ fileprivate extension SettingsViewController {
         switch (row) {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
+        case .openIn:
+            return OpenProductPageInSetting.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {

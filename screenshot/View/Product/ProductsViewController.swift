@@ -8,7 +8,7 @@
 
 import Foundation
 import FBSDKCoreKit
-
+import SafariServices
 enum ProductsSection : Int {
     case tooltip = 0
     case product = 1
@@ -24,6 +24,33 @@ enum ProductsViewControllerState : Int {
     case products
     case retry
     case empty
+}
+
+enum OpenProductPageInSetting : String {
+    case embededSafari
+    case safari
+    case chrome
+    
+    func localizedDisplayString() -> String{
+        switch self {
+        case .embededSafari:
+            return "settings.openIn.option.embeded".localized
+        case .safari:
+            return "settings.openIn.option.safari".localized
+        case .chrome:
+            return "settings.openIn.option.chrome".localized
+        }
+    }
+    
+    static func fromSystemInfo() -> OpenProductPageInSetting{
+        let defaultValue:OpenProductPageInSetting = .embededSafari
+        let stringValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.openProductPageInSetting) as? String ?? defaultValue.rawValue
+        return OpenProductPageInSetting(rawValue: stringValue) ?? defaultValue
+    }
+    
+    func saveToUserDefaults() {
+        UserDefaults.standard.set(self.rawValue, forKey: UserDefaultsKeys.openProductPageInSetting)
+    }
 }
 
 
@@ -410,7 +437,16 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return .zero
         }
     }
-    
+    func canOpenLink(with setting:OpenProductPageInSetting, url:URL) -> Bool{
+        switch setting {
+        case .embededSafari:
+            return true;
+        case .safari:
+           return UIApplication.shared.canOpenURL(url)
+        case .chrome:
+           return  UIApplication.shared.canOpenInChrome(url: url)
+        }
+    }
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let sectionType = productSectionType(forSection: indexPath.section)
 
@@ -421,11 +457,25 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 if urlString.hasPrefix("//") {
                     urlString = "https:".appending(urlString)
                 }
-                if let url = URL(string: urlString) {
-                    if UIApplication.shared.canOpenURL(url) {
+                if let url = URL(string: urlString){
+                    var openInSetting = OpenProductPageInSetting.fromSystemInfo()
+
+                    if !self.canOpenLink(with: openInSetting, url: url){
+                        openInSetting = .embededSafari
+                    }
+
+                    switch openInSetting {
+                    case .embededSafari:
+                        let svc = SFSafariViewController(url: url)
+                        if #available(iOS 11.0, *) {
+                            svc.dismissButtonStyle = .done
+                        }
+                        self.present(svc, animated: true, completion: nil)
+                    case .safari:
                         UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        AnalyticsTrackers.standard.track("Can't open url", properties: ["url":urlString])
+                    case .chrome:
+                       UIApplication.shared.openInChrome(url: url) //returns success
+                        
                     }
                 }
             }

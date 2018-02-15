@@ -157,11 +157,15 @@
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.version.title" = "App Version";
+"settings.row.openIn.title" = "Open products in...";
 "settings.row.restoreInAppPurchase" = "Restore Purchases";
 "settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
 "settings.row.talkToStylist" = "Talk to your stylist";
 "settings.row.talkToStylist.locked" = "🔒 Talk to your stylist";
 "settings.row.talkToStylist.isInProcessOfBuying" = "🔒 Talk to your stylist (connecting...)";
+"settings.openIn.option.embeded" = "ScreenShop";
+"settings.openIn.option.safari" = "Safari";
+"settings.openIn.option.chrome" = "Chrome";
 
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
