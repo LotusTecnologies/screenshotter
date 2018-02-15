@@ -9,7 +9,7 @@
 import Foundation
 import FBSDKCoreKit
 
-@objc enum ProductsSection : Int {
+enum ProductsSection : Int {
     case tooltip = 0
     case product = 1
 }
@@ -236,7 +236,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
 
 
 extension ProductsViewController {
-    @objc func setupShoppableToolbar() {
+    func setupShoppableToolbar() {
         self.shoppablesToolbar = {
             let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
             let shoppableHeight:CGFloat = 60
@@ -256,7 +256,7 @@ extension ProductsViewController {
             return toolbar;
         }()
     }
-    @objc func setupCollectionView(){
+    func setupCollectionView(){
         self.collectionView = {
             let minimumSpacing = self.collectionViewMinimumSpacing()
             
@@ -288,7 +288,7 @@ extension ProductsViewController {
             return collectionView
         }()
     }
-    @objc func setupViews(){
+    func setupViews(){
         let scrollRevealController:ScrollRevealController = {
             let scrollRevealController = ScrollRevealController.init(edge: .bottom)
             scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
@@ -479,7 +479,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
 private typealias ProductsViewControllerOptionsView = ProductsViewController
 extension ProductsViewControllerOptionsView {
-    @objc func updateOptionsView() {
+    func updateOptionsView() {
         if self.hasShoppables() {
             if (self.navigationItem.titleView == nil) {
                 self.navigationItem.titleView = { () -> UIView in
@@ -517,7 +517,7 @@ extension ProductsViewControllerOptionsView {
         }
     }
     
-    @objc func presentOptions(_ control:ProductsViewControllerControl){
+    func presentOptions(_ control:ProductsViewControllerControl){
         
         if control.isFirstResponder {
             control.resignFirstResponder()
@@ -530,24 +530,24 @@ extension ProductsViewControllerOptionsView {
             control.becomeFirstResponder()
         }
     }
-    @objc func dismissOptions(){
+    func dismissOptions(){
         self.navigationItem.titleView?.endEditing(true)
     }
 }
 
 private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables {
-    @objc func hasShoppables() -> Bool {
+    func hasShoppables() -> Bool {
         return self.shoppablesController.shoppableCount() > 0
     }
     
-    @objc func shoppablesControllerIsEmpty(_ controller:ShoppablesController){
+    func shoppablesControllerIsEmpty(_ controller:ShoppablesController){
         if (self.noItemsHelperView == nil) {
             self.state = .retry
         }
     }
     
-    @objc func shoppablesControllerDidReload(_ controller:ShoppablesController){
+    func shoppablesControllerDidReload(_ controller:ShoppablesController){
         self.reloadProductsForShoppableAtIndex(self.shoppablesToolbar.selectedShoppableIndex());
 
     }
@@ -555,15 +555,15 @@ extension ProductsViewControllerShoppables {
 }
 private typealias ProductsViewControllerProducts = ProductsViewController
 extension ProductsViewControllerProducts{
-    @objc func productAtIndex(_ index:Int) -> Product{
+    func productAtIndex(_ index:Int) -> Product{
         return self.products[index]
     }
     
-    @objc func indexForProduct(_ product:Product )-> Int {
+    func indexForProduct(_ product:Product )-> Int {
         return self.products.index(of: product) ?? NSNotFound
     }
     
-    @objc func reloadProductsForShoppableAtIndex(_ index:Int){
+    func reloadProductsForShoppableAtIndex(_ index:Int){
         
         self.products = [];
         self.productsUnfilteredCount = 0;
@@ -603,7 +603,7 @@ extension ProductsViewControllerProducts{
         }
     }
         
-    @objc func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
+    func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
         let descriptors:[NSSortDescriptor] = {
             switch self.productsOptions.sort {
             case .similar :
@@ -632,7 +632,7 @@ extension ProductsViewControllerProducts{
 private typealias ProductsViewControllerLoader = ProductsViewController
 
 extension ProductsViewControllerLoader {
-    @objc func startAndAddLoader(){
+    func startAndAddLoader(){
         if self.loader == nil {
             self.loader = Loader()
             self.loader.translatesAutoresizingMaskIntoConstraints = false
@@ -642,7 +642,7 @@ extension ProductsViewControllerLoader {
         }
         self.loader.startAnimation()
     }
-    @objc func stopAndRemoveLoader(){
+    func stopAndRemoveLoader(){
         if self.loader != nil {
             self.loader.stopAnimation()
             self.loader .removeFromSuperview()
@@ -654,7 +654,7 @@ extension ProductsViewControllerLoader {
 
 private typealias ProductsViewControllerRatings = ProductsViewController
 extension ProductsViewControllerRatings {
-    @objc func presentProductsRateNegativeAlert() {
+    func presentProductsRateNegativeAlert() {
         if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
             InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
         }
@@ -707,28 +707,28 @@ extension ProductsViewControllerRatings {
         alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
-    @objc func productsRatePositiveAction(){
+    func productsRatePositiveAction(){
         let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
         shoppable.setRating(positive: true)
     }
     
-    @objc func productsRateNegativeAction(){
+    func productsRateNegativeAction(){
         let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
         shoppable.setRating(positive: false)
         self.presentProductsRateNegativeAlert()
     }
-    @objc func talkToYourStylistAction(){
+    func talkToYourStylistAction(){
         IntercomHelper.sharedInstance.presentMessagingUI()
     }
     
-    @objc func presentPersonalSylist() {
+    func presentPersonalSylist() {
         let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
         AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
         let prefiledMessageTemplate = "I need help finding this outfit... %@"
         let prefilledMessage = String.init(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL  ?? "null"))
         IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
     }
-    @objc func presentProductsRateNegativeFeedbackAlert() {
+    func presentProductsRateNegativeFeedbackAlert() {
         let alertController = UIAlertController.init(title: "What’s Wrong Here?", message: "What were you expecting to see and what did you see instead?", preferredStyle: .alert)
         alertController.addTextField { (textField) in
             textField.delegate = self;
@@ -755,7 +755,7 @@ extension ProductsViewControllerRatings {
         self.present(alertController, animated: true, completion: nil)
     }
     
-//    @objc public func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+//    public func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
 //        if let text = textField.text,
 //            let textRange = Range(range, in: text) {
 //            let updatedText = text.replacingCharacters(in: textRange, with: string)
@@ -770,7 +770,7 @@ extension ProductsViewControllerRatings {
 
 extension ProductsViewController {
     
-    @objc func syncViewsAfterStateChange(){
+    func syncViewsAfterStateChange(){
         self.updateOptionsView()
         self.shoppablesToolbar.isHidden = self.shouldHideToolbar()
         
@@ -816,7 +816,7 @@ extension ProductsViewController {
         }
     }
     
-    @objc func syncScreenshotRelatedObjects() {
+    func syncScreenshotRelatedObjects() {
         if let data = self.screenshot.imageData, let i = UIImage.init(data: data as Data) {
             self.image = i
         }else{
@@ -852,7 +852,7 @@ extension ProductsViewController {
 
 private typealias ProductsViewControllerNoItemsHelperView = ProductsViewController
 extension ProductsViewControllerNoItemsHelperView{
-    @objc func showNoItemsHelperView() {
+    func showNoItemsHelperView() {
         
         let verPadding = Geometry.extendedPadding
         let horPadding = Geometry.padding
@@ -886,12 +886,12 @@ extension ProductsViewControllerNoItemsHelperView{
         }
     }
     
-    @objc func hideNoItemsHelperView(){
+    func hideNoItemsHelperView(){
         self.noItemsHelperView?.removeFromSuperview()
         self.noItemsHelperView = nil
     }
     
-    @objc func noItemsRetryAction() {
+    func noItemsRetryAction() {
         let alert = UIAlertController.init(title: "Try again as", message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction.init(title: "Fashion", style: .default, handler: { (a) in
             self.shoppablesController.refetchShoppablesAsFashion()
