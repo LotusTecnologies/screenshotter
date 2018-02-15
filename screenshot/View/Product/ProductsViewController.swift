@@ -290,7 +290,7 @@ extension ProductsViewController {
     }
     @objc func setupViews(){
         let scrollRevealController:ScrollRevealController = {
-            let scrollRevealController = ScrollRevealController.init(edge: .top)
+            let scrollRevealController = ScrollRevealController.init(edge: .bottom)
             scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
             scrollRevealController.insertAbove(self.collectionView)
             
