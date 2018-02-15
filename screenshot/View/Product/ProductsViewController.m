@@ -190,14 +190,6 @@
 
 #pragma mark - Fetched Results Controller
 
-- (NSIndexPath *)collectionViewToShoppablesFrcIndexPath:(NSInteger)index {
-    return [NSIndexPath indexPathForItem:index inSection:0];
-}
-
-- (NSIndexPath *)shoppablesFrcToCollectionViewIndexPath:(NSInteger)index {
-    return [NSIndexPath indexPathForItem:index inSection:ProductsSectionProduct];
-}
-
 
 #pragma mark - Products Options
 

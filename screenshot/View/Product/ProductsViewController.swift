@@ -112,6 +112,16 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     func numberOfCollectionViewProductColumns() ->Int {
         return 2
     }
+    
+    
+    func collectionViewToShoppablesFrcIndexPath(_ index:Int) ->IndexPath {
+        return IndexPath.init(item: index, section: 0)
+    }
+    
+    func shoppablesFrcToCollectionViewIndexPath(_ index:Int) -> IndexPath{
+        return IndexPath.init(item: index, section: ProductsSection.product.rawValue)
+    }
+
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
