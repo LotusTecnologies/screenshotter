@@ -157,7 +157,7 @@
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.version.title" = "App Version";
-"settings.row.openIn.title" = "Open products in..."
+"settings.row.openIn.title" = "Open products in...";
 "settings.row.restoreInAppPurchase" = "Restore Purchases";
 "settings.row.restoreInAppPurchase.restoring" = "Restoring Purchases...";
 "settings.row.talkToStylist" = "Talk to your stylist";
