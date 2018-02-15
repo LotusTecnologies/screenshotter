@@ -536,6 +536,53 @@ extension ProductsViewControllerRatings {
 }
 
 extension ProductsViewController {
+    
+    @objc func syncViewsAfterStateChange(){
+        self.updateOptionsView()
+        self.shoppablesToolbar.isHidden = self.shouldHideToolbar()
+        
+        switch (state) {
+        case .loading:
+            self.hideNoItemsHelperView()
+            self.rateView.isHidden = true
+            self.startAndAddLoader()
+            
+        case .products:
+            if #available(iOS 11.0, *) {
+                //Do nothing
+            } else {
+                if (!self.automaticallyAdjustsScrollViewInsets) {
+                    // Setting back to YES doesn't update. Need to manually adjust.
+                    var scrollInsets = self.collectionView.scrollIndicatorInsets;
+                    scrollInsets.top = self.shoppablesToolbar.bounds.size.height + (self.navigationController?.navigationBar.frame.maxY ?? 0)
+                    self.collectionView.scrollIndicatorInsets = scrollInsets;
+                    
+                    var insets = self.collectionView.contentInset;
+                    insets.top = scrollInsets.top;
+                    self.collectionView.contentInset = insets;
+                }
+            }
+            
+            self.stopAndRemoveLoader()
+            self.hideNoItemsHelperView()
+            self.rateView.isHidden = false
+            
+            
+        case .retry, .empty:
+        
+            if #available(iOS 11.0, *) {
+                //do nothing
+            } else {
+                self.automaticallyAdjustsScrollViewInsets = false
+            }
+            
+            self.stopAndRemoveLoader()
+            self.rateView.isHidden = true
+            self.hideNoItemsHelperView()
+            self.showNoItemsHelperView()
+        }
+    }
+    
     @objc func syncScreenshotRelatedObjects() {
         if let data = self.screenshot.imageData {
             self.image = UIImage.init(data: data as Data)

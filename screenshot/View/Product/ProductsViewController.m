@@ -121,48 +121,8 @@
 
 - (void)setState:(ProductsViewControllerState)state {
     _state = state;
+    [self syncViewsAfterStateChange];
     
-    [self updateOptionsView];
-    self.shoppablesToolbar.hidden = [self shouldHideToolbar];
-    
-    switch (state) {
-        case ProductsViewControllerStateLoading:
-            [self hideNoItemsHelperView];
-            self.rateView.hidden = YES;
-            [self startAndAddLoader];
-            break;
-            
-        case ProductsViewControllerStateProducts:
-            if (@available(iOS 11.0, *)) {} else {
-                if (!self.automaticallyAdjustsScrollViewInsets) {
-                    // Setting back to YES doesn't update. Need to manually adjust.
-                    UIEdgeInsets scrollInsets = self.collectionView.scrollIndicatorInsets;
-                    scrollInsets.top = self.shoppablesToolbar.bounds.size.height + CGRectGetMaxY(self.navigationController.navigationBar.frame);
-                    self.collectionView.scrollIndicatorInsets = scrollInsets;
-                    
-                    UIEdgeInsets insets = self.collectionView.contentInset;
-                    insets.top = scrollInsets.top;
-                    self.collectionView.contentInset = insets;
-                }
-            }
-            
-            [self stopAndRemoveLoader];
-            [self hideNoItemsHelperView];
-            self.rateView.hidden = NO;
-            break;
-            
-        case ProductsViewControllerStateRetry:
-        case ProductsViewControllerStateEmpty:
-            if (@available(iOS 11.0, *)) {} else {
-                self.automaticallyAdjustsScrollViewInsets = NO;
-            }
-            
-            [self stopAndRemoveLoader];
-            self.rateView.hidden = YES;
-            [self hideNoItemsHelperView];
-            [self showNoItemsHelperView];
-            break;
-    }
 }
 
 
