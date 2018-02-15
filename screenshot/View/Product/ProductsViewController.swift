@@ -13,6 +13,227 @@ import FBSDKCoreKit
     case tooltip = 0
     case product = 1
 }
+enum ProductsViewControllerState : Int {
+    case loading
+    case products
+    case retry
+    case empty
+}
+
+
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewControllerLifeCycle, ShoppablesControllerDelegate, ProductCollectionViewCellDelegate, UITextFieldDelegate , UIToolbarDelegate, ShoppablesToolbarDelegate {
+    var screenshot:Screenshot! {
+        didSet {
+            if  screenshot != nil {
+                self.shoppablesController = ShoppablesController.init(screenshot: screenshot)
+            }else{
+                self.shoppablesController = nil
+            }
+            self.shoppablesController.delegate = self;
+            
+            if self.isViewLoaded {
+                self.syncScreenshotRelatedObjects()
+                self.reloadProductsForShoppableAtIndex(0)
+            }
+        }
+    }
+    var shoppablesController:ShoppablesController!
+    var loader:Loader!
+    var noItemsHelperView:HelperView?
+    var collectionView:UICollectionView!
+    var shoppablesToolbar:ShoppablesToolbar!
+    var productsOptions:ProductsOptions = ProductsOptions()
+    var scrollRevealController:ScrollRevealController?
+    var rateView:ProductsRateView!
+    var productsRateNegativeFeedbackSubmitAction:UIAlertAction!
+    var productsRateNegativeFeedbackTextField:UITextField!
+
+    var products:[Product] = []
+    var productsUnfilteredCount:Int = 0
+    var image:UIImage!
+    var state:ProductsViewControllerState = .loading {
+        didSet {
+            self.syncViewsAfterStateChange()
+        }
+    }
+    
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        self.title = "Products"
+        self.restorationIdentifier = "ProductsViewController"
+        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange), name: .UIContentSizeCategoryDidChange, object: nil)
+        
+        self.productsOptions.delegate = self;
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad()
+    {
+        super.viewDidLoad()
+        self.setupShoppableToolbar()
+        self.setupCollectionView()
+        
+        self.rateView = {
+            let view = ProductsRateView()
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
+            view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
+            view.talkToYourStylistButton.addTarget(self, action: #selector(talkToYourStylistAction), for: .touchUpInside)
+            return view;
+        }()
+        self.setupViews()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.shoppablesToolbar.selectFirstShoppable()
+        if !self.hasShoppables() && self.noItemsHelperView == nil {
+            self.state = .loading
+        }
+        //    [ProductWebViewController shared].lifeCycleDelegate = self;
+//        [ProductWebViewController shared].delegate = self;
+
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.shoppablesToolbar.didViewControllerAppear = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.dismissOptions()
+    }
+
+    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
+        
+//        if (viewController == [ProductWebViewController shared] && [self.navigationController.topViewController isKindOfClass:[ProductsViewController class]]) {
+//            ProductsViewController *productsViewController = (ProductsViewController *)self.navigationController.topViewController;
+//            NSInteger index = [productsViewController indexForProduct:[ProductWebViewController shared].product];
+//            [productsViewController reloadProductCellAtIndex:index];
+//        }
+    }
+    func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {
+        
+//        if (viewController == [ProductWebViewController shared] && ![self.navigationController.viewControllers containsObject:viewController]) {
+//            [ProductWebViewController shared].product = nil;
+//        }
+    }
+    func contentSizeCategoryDidChange(notification:Notification){
+        if self.view.window != nil && self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.rawValue) > 0 {
+            self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ProductsSection.tooltip.rawValue)])
+        }
+    }
+    
+    deinit {
+        
+        self.shoppablesToolbar.delegate = nil;
+        self.shoppablesToolbar.shoppableToolbarDelegate = nil;
+        self.collectionView.delegate = nil;
+        self.collectionView.dataSource = nil;
+        self.shoppablesController.delegate = nil;
+        NotificationCenter.default.removeObserver(self)
+        
+    }
+    
+    
+    
+    func displayScreenshotAction() {
+        let navigationController = ScreenshotDisplayNavigationController.init(nibName: nil, bundle: nil)
+        navigationController.screenshotDisplayViewController.image = self.image;
+        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesController.shoppables()
+        self.present(navigationController, animated: true, completion: nil)
+    }
+    
+    
+    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
+        
+        guard let isFavorited = cell.favoriteButton?.isSelected else{
+            return
+        }
+        guard let indexPath = self.collectionView.indexPath(for: cell) else{
+            return
+        }
+        let product = self.productAtIndex(indexPath.item)
+        product.setFavorited(toFavorited: isFavorited)
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
+    }
+    func reloadProductCell(index:Int){
+//        if [self.collectionView.numberOfItemsInSection(ProductsSection.product.rawValue) > index {
+//            self.collectionView.reloadItemsAtIndexPaths(self.shoppablesFrcToCollectionViewIndexPath(index))
+//        }
+    }
+    
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.dismissOptions()
+        self.scrollRevealController?.scrollViewWillBeginDragging(scrollView)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.scrollRevealController?.scrollViewDidScroll(scrollView)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.scrollRevealController?.scrollViewDidEndDragging(scrollView, will: decelerate)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.scrollRevealController?.scrollViewDidEndDecelerating(scrollView)
+    }
+    
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
+        
+        if changed {
+            let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
+            shoppable.set(productsOptions: productsOptions, callback: {
+                self.reloadProductsForShoppableAtIndex(self.shoppablesToolbar.selectedShoppableIndex())
+            })
+            
+        }
+        self.dismissOptions()
+    }
+    
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let text = textField.text,
+            let textRange = Range(range, in: text){
+            
+            let updatedText = text.replacingCharacters(in: textRange,  with: string)
+            let trimmedText = updatedText.trimmingCharacters(in: CharacterSet.whitespaces)
+
+            self.productsRateNegativeFeedbackSubmitAction.isEnabled = (trimmedText != nil && trimmedText != "")
+        }
+        return true;
+
+
+    }
+    
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .topAttached;
+    }
+    
+    func shoppablesToolbarDidChange(toolbar: ShoppablesToolbar) {
+        if self.products.count == 0 && self.isViewLoaded {
+            self.reloadProductsForShoppableAtIndex(0)
+        }
+    }
+    func shoppablesToolbarDidSelectShoppable(toolbar: ShoppablesToolbar, index: Int) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
+        self.reloadProductsForShoppableAtIndex(index)
+        AnalyticsTrackers.standard.track("Tapped on shoppable")
+    }
+    func shouldHideToolbar()->Bool{
+        return !self.hasShoppables()
+    }
+    
+}
+
 
 extension ProductsViewController {
     @objc func setupShoppableToolbar() {
@@ -68,18 +289,20 @@ extension ProductsViewController {
         }()
     }
     @objc func setupViews(){
-        
-        self.scrollRevealController = ScrollRevealController.init(edge: .top)
-        self.scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
-        self.scrollRevealController.insertAbove(self.collectionView)
-        
-        
-        self.scrollRevealController.view.addSubview(self.rateView)
-        
-        self.rateView.topAnchor.constraint(equalTo:self.scrollRevealController.view.topAnchor).isActive = true
-        self.rateView.leadingAnchor.constraint(equalTo:self.scrollRevealController.view.leadingAnchor).isActive = true
-        self.rateView.bottomAnchor.constraint(equalTo:self.scrollRevealController.view.bottomAnchor).isActive = true
-        self.rateView.trailingAnchor.constraint(equalTo:self.scrollRevealController.view.trailingAnchor).isActive = true
+        let scrollRevealController:ScrollRevealController = {
+            let scrollRevealController = ScrollRevealController.init(edge: .top)
+            scrollRevealController.adjustedContentInset = UIEdgeInsets.init(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+            scrollRevealController.insertAbove(self.collectionView)
+            
+            
+            scrollRevealController.view.addSubview(self.rateView)
+            return scrollRevealController
+        }()
+       self.scrollRevealController = scrollRevealController
+        self.rateView.topAnchor.constraint(equalTo:scrollRevealController.view.topAnchor).isActive = true
+        self.rateView.leadingAnchor.constraint(equalTo:scrollRevealController.view.leadingAnchor).isActive = true
+        self.rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
+        self.rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
 
 
         var height = self.rateView.intrinsicContentSize.height
@@ -346,7 +569,7 @@ extension ProductsViewControllerProducts{
         self.productsUnfilteredCount = 0;
         
         if self.hasShoppables() {
-            self.scrollRevealController.resetViewOffset()
+            self.scrollRevealController?.resetViewOffset()
             
             let shoppable = self.shoppablesController.shoppable(at: index)
             
@@ -394,7 +617,7 @@ extension ProductsViewControllerProducts{
             }
         }()
         if let mask = shoppable.getLast()?.rawValue , var products:Set = shoppable.products?.filtered(using: NSPredicate.init(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
-            self.productsUnfilteredCount = UInt(products.count)
+            self.productsUnfilteredCount = products.count
             if self.productsOptions.sale == .sale {
                 let filtered = (products as NSSet).filtered(using: NSPredicate.init(format: "floatPrice < floatOriginalPrice"))
                 products = filtered as! Set<Product>
@@ -594,8 +817,8 @@ extension ProductsViewController {
     }
     
     @objc func syncScreenshotRelatedObjects() {
-        if let data = self.screenshot.imageData {
-            self.image = UIImage.init(data: data as Data)
+        if let data = self.screenshot.imageData, let i = UIImage.init(data: data as Data) {
+            self.image = i
         }else{
             self.image = UIImage.init()
         }
