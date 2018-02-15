@@ -13,6 +13,11 @@ enum ProductsSection : Int {
     case tooltip = 0
     case product = 1
     
+    var section:Int {
+        get{
+            return self.rawValue
+        }
+    }
 }
 enum ProductsViewControllerState : Int {
     case loading
@@ -39,7 +44,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         }
     }
     var shoppablesController:ShoppablesController!
-    var loader:Loader!
+    var loader:Loader?
     var noItemsHelperView:HelperView?
     var collectionView:UICollectionView!
     var shoppablesToolbar:ShoppablesToolbar!
@@ -125,8 +130,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         //        }
     }
     func contentSizeCategoryDidChange(notification:Notification){
-        if self.view.window != nil && self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.rawValue) > 0 {
-            self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ProductsSection.tooltip.rawValue)])
+        if self.view.window != nil && self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.section) > 0 {
+            self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ProductsSection.tooltip.section)])
         }
     }
     
@@ -321,19 +326,19 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     func shoppablesFrcToCollectionViewIndexPath(_ index:Int) -> IndexPath{
-        return IndexPath.init(item: index, section: ProductsSection.product.rawValue)
+        return IndexPath.init(item: index, section: ProductsSection.product.section)
     }
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
-        if (section == ProductsSection.tooltip.rawValue) {
+        if (section == ProductsSection.tooltip.section) {
             let shouldPresentTooldtip = !UserDefaults.standard.bool(forKey: UserDefaultsKeys.productCompletedTooltip)
             let hasProducts = (self.products.count > 0)
             return (shouldPresentTooldtip && hasProducts) ? 1 : 0
             
-        } else if (section == ProductsSection.product.rawValue) {
+        } else if (section == ProductsSection.product.section) {
             return self.products.count
             
         } else {
@@ -347,11 +352,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
         let padding = Geometry.padding - shadowInsets.left - shadowInsets.right
         
-        if (indexPath.section == ProductsSection.tooltip.rawValue) {
+        if (indexPath.section == ProductsSection.tooltip.section) {
             size.width = collectionView.bounds.size.width
             size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
             
-        } else if (indexPath.section == ProductsSection.product.rawValue) {
+        } else if (indexPath.section == ProductsSection.product.section) {
             let columns = CGFloat(self.numberOfCollectionViewProductColumns())
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
             size.height = size.width + ProductCollectionViewCell.labelsHeight
@@ -362,10 +367,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if (indexPath.section == ProductsSection.tooltip.rawValue) {
+        if (indexPath.section == ProductsSection.tooltip.section) {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
             return cell
-        } else if (indexPath.section == ProductsSection.product.rawValue) {
+        } else if (indexPath.section == ProductsSection.product.section) {
             let product = self.productAtIndex(indexPath.item)
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
                 cell.delegate = self
@@ -391,11 +396,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return indexPath.section != ProductsSection.tooltip.rawValue
+        return indexPath.section != ProductsSection.tooltip.section
     }
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         
-        if section ==  ProductsSection.product.rawValue {
+        if section ==  ProductsSection.product.section {
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
             return UIEdgeInsets.init(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
         } else {
@@ -404,7 +409,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if (indexPath.section == ProductsSection.product.rawValue) {
+        if (indexPath.section == ProductsSection.product.section) {
             let product = self.productAtIndex(indexPath.item)
             
             if var urlString = product.offer {
@@ -564,11 +569,11 @@ extension ProductsViewControllerProducts{
             self.collectionView.reloadData()
             self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
             
-            if self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.rawValue) > 0 {
-                self.collectionView.scrollToItem(at: IndexPath.init(item: 0, section: ProductsSection.tooltip.rawValue), at: .top, animated: false)
+            if self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.section) > 0 {
+                self.collectionView.scrollToItem(at: IndexPath.init(item: 0, section: ProductsSection.tooltip.section), at: .top, animated: false)
                 
-            } else if self.collectionView.numberOfItems(inSection: ProductsSection.product.rawValue) > 0 {
-                self.collectionView.scrollToItem(at: IndexPath.init(item: 0, section: ProductsSection.product.rawValue), at: .top, animated: false)
+            } else if self.collectionView.numberOfItems(inSection: ProductsSection.product.section) > 0 {
+                self.collectionView.scrollToItem(at: IndexPath.init(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
             }
             
         } else {
@@ -605,22 +610,24 @@ extension ProductsViewControllerProducts{
     }
 }
 private typealias ProductsViewControllerLoader = ProductsViewController
-
 extension ProductsViewControllerLoader {
     func startAndAddLoader(){
-        if self.loader == nil {
-            self.loader = Loader()
-            self.loader.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addSubview(self.loader)
-            self.loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-            self.loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-        }
-        self.loader.startAnimation()
+        let loader = self.loader ?? ( {
+            let loader = Loader()
+            loader.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(loader)
+            loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+            loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+            return loader
+        }())
+        self.loader = loader
+        loader.startAnimation()
     }
+    
     func stopAndRemoveLoader(){
-        if self.loader != nil {
-            self.loader.stopAnimation()
-            self.loader .removeFromSuperview()
+        if let loader = self.loader{
+            loader.stopAnimation()
+            loader.removeFromSuperview()
             self.loader = nil
         }
     }
@@ -636,7 +643,6 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         let alertController = UIAlertController.init(title: "negativeFeedback.title".localized, message: "negativeFeedback.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.sendFeedback".localized, style: .default, handler: { (a) in
             self.presentProductsRateNegativeFeedbackAlert()
-            
         }))
         alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.fashionHelp".localized, style: .default, handler: { (a) in
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
@@ -682,6 +688,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         alertController.addAction(UIAlertAction.init(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
+    
     func productsRatePositiveAction(){
         let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
         shoppable.setRating(positive: true)
@@ -692,6 +699,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         shoppable.setRating(positive: false)
         self.presentProductsRateNegativeAlert()
     }
+    
     func talkToYourStylistAction(){
         IntercomHelper.sharedInstance.presentMessagingUI()
     }
@@ -699,13 +707,13 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     func presentPersonalSylist() {
         let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
         AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
-        let prefiledMessageTemplate = "I need help finding this outfit... %@"
+        let prefiledMessageTemplate = "products.rate.negative.prefiledMessageTemplate".localized
         let prefilledMessage = String.init(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL  ?? "null"))
         IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
     }
     
     func presentProductsRateNegativeFeedbackAlert() {
-        let alertController = UIAlertController.init(title: "What’s Wrong Here?", message: "What were you expecting to see and what did you see instead?", preferredStyle: .alert)
+        let alertController = UIAlertController.init(title: "products.rate.negative.popup.title".localized, message: "products.rate.negative.popup.message".localized, preferredStyle: .alert)
         alertController.addTextField { (textField) in
             textField.delegate = self
             textField.autocapitalizationType = .sentences
@@ -727,19 +735,24 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         alertController.addAction(self.productsRateNegativeFeedbackSubmitAction)
         
         alertController.preferredAction = self.productsRateNegativeFeedbackSubmitAction
-        alertController.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        var isEnabled = false
         if let text = textField.text,
             let textRange = Range(range, in: text){
-            
             let updatedText = text.replacingCharacters(in: textRange,  with: string)
             let trimmedText = updatedText.trimmingCharacters(in: CharacterSet.whitespaces)
             
-            self.productsRateNegativeFeedbackSubmitAction.isEnabled = (trimmedText != nil && trimmedText != "")
+            if trimmedText.lengthOfBytes(using:.utf8) > 0 {
+                isEnabled = true
+            }
         }
+        
+    self.productsRateNegativeFeedbackSubmitAction.isEnabled = isEnabled
+
         return true
     }
 }

@@ -116,6 +116,9 @@
 "products.rate.unrated" = "Are these results relevant?";
 "products.rate.backToConverstationWithStylist" = "Talk to your stylist";
 "products.rate.connectingToAppStore" = "Connecting to App Store...";
+"products.rate.negative.prefiledMessageTemplate" = "I need help finding this outfit... %@";
+"products.rate.negative.popup.title" =  "What’s Wrong Here?";
+"products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 
 "products.tooltip.title" = "Tap to shop different types of products";
 
