@@ -321,6 +321,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         return 2
     }
     
+    func productSectionType(forSection:Int) -> ProductsSection{
+        return ProductsSection.init(rawValue: forSection) ?? .tooltip
+    }
+    
     func collectionViewToShoppablesFrcIndexPath(_ index:Int) ->IndexPath {
         return IndexPath.init(item: index, section: 0)
     }
@@ -333,12 +337,13 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         return 2
     }
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
-        if (section == ProductsSection.tooltip.section) {
+        let sectionType = productSectionType(forSection: section)
+        if (sectionType == .tooltip) {
             let shouldPresentTooldtip = !UserDefaults.standard.bool(forKey: UserDefaultsKeys.productCompletedTooltip)
             let hasProducts = (self.products.count > 0)
             return (shouldPresentTooldtip && hasProducts) ? 1 : 0
             
-        } else if (section == ProductsSection.product.section) {
+        } else if (sectionType == .product) {
             return self.products.count
             
         } else {
@@ -351,12 +356,13 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         var size:CGSize = .zero
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
         let padding = Geometry.padding - shadowInsets.left - shadowInsets.right
-        
-        if (indexPath.section == ProductsSection.tooltip.section) {
+        let sectionType = productSectionType(forSection: indexPath.section)
+
+        if (sectionType == .tooltip) {
             size.width = collectionView.bounds.size.width
             size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
             
-        } else if (indexPath.section == ProductsSection.product.section) {
+        } else if (sectionType == .product) {
             let columns = CGFloat(self.numberOfCollectionViewProductColumns())
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
             size.height = size.width + ProductCollectionViewCell.labelsHeight
@@ -366,11 +372,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        if (indexPath.section == ProductsSection.tooltip.section) {
+        let sectionType = productSectionType(forSection: indexPath.section)
+
+        if (sectionType == .tooltip) {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
             return cell
-        } else if (indexPath.section == ProductsSection.product.section) {
+        } else if (sectionType == .product) {
             let product = self.productAtIndex(indexPath.item)
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
                 cell.delegate = self
@@ -396,11 +403,13 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return indexPath.section != ProductsSection.tooltip.section
+        let sectionType = productSectionType(forSection: indexPath.section)
+        return sectionType != .tooltip
     }
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        
-        if section ==  ProductsSection.product.section {
+        let sectionType = productSectionType(forSection: section)
+
+        if sectionType == .product {
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
             return UIEdgeInsets.init(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
         } else {
@@ -409,7 +418,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if (indexPath.section == ProductsSection.product.section) {
+        let sectionType = productSectionType(forSection: indexPath.section)
+
+        if (sectionType == .product) {
             let product = self.productAtIndex(indexPath.item)
             
             if var urlString = product.offer {
