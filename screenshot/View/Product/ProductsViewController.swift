@@ -12,6 +12,7 @@ import FBSDKCoreKit
 enum ProductsSection : Int {
     case tooltip = 0
     case product = 1
+    
 }
 enum ProductsViewControllerState : Int {
     case loading
@@ -21,7 +22,7 @@ enum ProductsViewControllerState : Int {
 }
 
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewControllerLifeCycle, ShoppablesControllerDelegate, ProductCollectionViewCellDelegate, UITextFieldDelegate , UIToolbarDelegate, ShoppablesToolbarDelegate {
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewControllerLifeCycle, ShoppablesControllerDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot! {
         didSet {
             if  screenshot != nil {
@@ -33,7 +34,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
             
             if self.isViewLoaded {
                 self.syncScreenshotRelatedObjects()
-                self.reloadProductsForShoppableAtIndex(0)
+                self.reloadProductsForShoppable(at: 0)
             }
         }
     }
@@ -62,7 +63,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         super.init(nibName: nil, bundle: nil)
         self.title = "Products"
         self.restorationIdentifier = "ProductsViewController"
-        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange), name: .UIContentSizeCategoryDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(notification:)), name: .UIContentSizeCategoryDidChange, object: nil)
         
         self.productsOptions.delegate = self
     }
@@ -80,13 +81,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         self.rateView = {
             let view = ProductsRateView()
             view.translatesAutoresizingMaskIntoConstraints = false
-            view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
+            view.voteUpButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
             view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
             view.talkToYourStylistButton.addTarget(self, action: #selector(talkToYourStylistAction), for: .touchUpInside)
             return view
         }()
         self.setupViews()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,17 +131,13 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
     }
     
     deinit {
-        
         self.shoppablesToolbar.delegate = nil
         self.shoppablesToolbar.shoppableToolbarDelegate = nil
         self.collectionView.delegate = nil
         self.collectionView.dataSource = nil
         self.shoppablesController.delegate = nil
         NotificationCenter.default.removeObserver(self)
-        
     }
-    
-    
     
     func displayScreenshotAction() {
         let navigationController = ScreenshotDisplayNavigationController.init(nibName: nil, bundle: nil)
@@ -163,12 +159,11 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         product.setFavorited(toFavorited: isFavorited)
         AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
     }
-    func reloadProductCell(index:Int){
-        //        if [self.collectionView.numberOfItemsInSection(ProductsSection.product.rawValue) > index {
-        //            self.collectionView.reloadItemsAtIndexPaths(self.shoppablesFrcToCollectionViewIndexPath(index))
-        //        }
-    }
     
+}
+private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
+
+extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.dismissOptions()
@@ -186,32 +181,20 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         self.scrollRevealController?.scrollViewDidEndDecelerating(scrollView)
     }
+}
+
+extension ProductsViewController{
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
         
         if changed {
             let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
             shoppable.set(productsOptions: productsOptions, callback: {
-                self.reloadProductsForShoppableAtIndex(self.shoppablesToolbar.selectedShoppableIndex())
+                self.reloadProductsForShoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
             })
             
         }
         self.dismissOptions()
-    }
-    
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let text = textField.text,
-            let textRange = Range(range, in: text){
-            
-            let updatedText = text.replacingCharacters(in: textRange,  with: string)
-            let trimmedText = updatedText.trimmingCharacters(in: CharacterSet.whitespaces)
-            
-            self.productsRateNegativeFeedbackSubmitAction.isEnabled = (trimmedText != nil && trimmedText != "")
-        }
-        return true
-        
-        
     }
     
     func position(for bar: UIBarPositioning) -> UIBarPosition {
@@ -220,12 +203,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
     
     func shoppablesToolbarDidChange(toolbar: ShoppablesToolbar) {
         if self.products.count == 0 && self.isViewLoaded {
-            self.reloadProductsForShoppableAtIndex(0)
+            self.reloadProductsForShoppable(at: 0)
         }
     }
     func shoppablesToolbarDidSelectShoppable(toolbar: ShoppablesToolbar, index: Int) {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
-        self.reloadProductsForShoppableAtIndex(index)
+        self.reloadProductsForShoppable(at: index)
         AnalyticsTrackers.standard.track("Tapped on shoppable")
     }
     func shouldHideToolbar()->Bool{
@@ -321,7 +304,7 @@ extension ProductsViewController {
                 AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
             }
             else {
-                self.reloadProductsForShoppableAtIndex(0)
+                self.reloadProductsForShoppable(at: 0)
             }
         }
     }
@@ -414,7 +397,6 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
         if section ==  ProductsSection.product.rawValue {
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
-            
             return UIEdgeInsets.init(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
         } else {
             return .zero
@@ -540,7 +522,7 @@ extension ProductsViewControllerShoppables {
     }
     
     func shoppablesControllerDidReload(_ controller:ShoppablesController){
-        self.reloadProductsForShoppableAtIndex(self.shoppablesToolbar.selectedShoppableIndex())
+        self.reloadProductsForShoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
         
     }
     
@@ -555,7 +537,7 @@ extension ProductsViewControllerProducts{
         return self.products.index(of: product) ?? NSNotFound
     }
     
-    func reloadProductsForShoppableAtIndex(_ index:Int){
+    func reloadProductsForShoppable(at index:Int){
         
         self.products = []
         self.productsUnfilteredCount = 0
@@ -646,7 +628,7 @@ extension ProductsViewControllerLoader {
 }
 
 private typealias ProductsViewControllerRatings = ProductsViewController
-extension ProductsViewControllerRatings {
+extension ProductsViewControllerRatings: UITextFieldDelegate {
     func presentProductsRateNegativeAlert() {
         if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
             InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
@@ -721,6 +703,7 @@ extension ProductsViewControllerRatings {
         let prefilledMessage = String.init(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL  ?? "null"))
         IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
     }
+    
     func presentProductsRateNegativeFeedbackAlert() {
         let alertController = UIAlertController.init(title: "What’s Wrong Here?", message: "What were you expecting to see and what did you see instead?", preferredStyle: .alert)
         alertController.addTextField { (textField) in
@@ -746,6 +729,18 @@ extension ProductsViewControllerRatings {
         alertController.preferredAction = self.productsRateNegativeFeedbackSubmitAction
         alertController.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let text = textField.text,
+            let textRange = Range(range, in: text){
+            
+            let updatedText = text.replacingCharacters(in: textRange,  with: string)
+            let trimmedText = updatedText.trimmingCharacters(in: CharacterSet.whitespaces)
+            
+            self.productsRateNegativeFeedbackSubmitAction.isEnabled = (trimmedText != nil && trimmedText != "")
+        }
+        return true
     }
 }
 
