@@ -116,6 +116,9 @@
 "products.rate.unrated" = "Are these results relevant?";
 "products.rate.backToConverstationWithStylist" = "Talk to your stylist";
 "products.rate.connectingToAppStore" = "Connecting to App Store...";
+"products.rate.negative.prefiledMessageTemplate" = "I need help finding this outfit... %@";
+"products.rate.negative.popup.title" =  "What’s Wrong Here?";
+"products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 
 "products.tooltip.title" = "Tap to shop different types of products";
 
@@ -206,3 +209,16 @@
 "webview.invalid.title" = "Well, That's Weird";
 "webview.loading" = "Loading...";
 "webview.product.loading" = "Loading your store...";
+
+
+"negativeFeedback.title" = "Sorry To Hear That!";
+"negativeFeedback.message" = "We hear you loud and clear and we’re going to look into this. How else can we help?";
+"negativeFeedback.options.sendFeedback" = "Send Feedback";
+"negativeFeedback.options.fashionHelp" = "Get Fashion Help";
+"negativeFeedback.options.close" = "Close";
+"personalSytlistPopup.loading" = "Unlocking a personal stylist requires a one time in-app purchase. \n Connecting to appstore....";
+"personalSytlistPopup.canContinue" = "Unlocking a personal stylist requires a one time in-app purchase for %@";
+"personalSytlistPopup.error" = "Unlocking a personal stylist requires a one time in-app purchase. \n Unable to connect to the appstore at this time: \n %@";
+"personalSytlistPopup.option.continue" = "Continue";
+"personalSytlistPopup.errorCannotPurchaseOnDevice" = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases.";
+

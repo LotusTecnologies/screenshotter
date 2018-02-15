@@ -7,7 +7,6 @@
 //
 
 #import "ScreenshotsNavigationController.h"
-#import "ProductsViewController.h"
 #import "screenshot-Swift.h"
 
 
