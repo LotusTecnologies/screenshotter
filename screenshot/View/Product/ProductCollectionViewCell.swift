@@ -98,15 +98,12 @@ class ProductCollectionViewCell : UICollectionViewCell {
     }
     
     func setupViews(){
-        let productView:EmbossedView =  {
-            let pathRect = CGRect.init(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.width)
-            
+        let productView:EmbossedView = {
             let productView = EmbossedView()
             
-            productView.translatesAutoresizingMaskIntoConstraints = false;
-            productView.placeholderImage = UIImage.init(named:"DefaultProduct");
-
-            productView.layer.shadowPath = UIBezierPath.init(roundedRect: _Shadow.pathRect(pathRect), cornerRadius: Geometry.defaultCornerRadius).cgPath
+            productView.translatesAutoresizingMaskIntoConstraints = false
+            productView.placeholderImage = UIImage.init(named:"DefaultProduct")
+            
             self.contentView.addSubview(productView)
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
@@ -114,7 +111,6 @@ class ProductCollectionViewCell : UICollectionViewCell {
             productView.heightAnchor.constraint(equalTo: productView.widthAnchor, constant:ProductCollectionViewCell.buyLabelHeight).isActive = true
             return productView
         }()
-        
         self.productView = productView
         
         let titleLabel: UILabel = {
@@ -136,6 +132,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             return label
         }()
         self.titleLabel = titleLabel
+        
         let priceContainer:UIView = {
             let view = UIView()
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -171,8 +168,8 @@ class ProductCollectionViewCell : UICollectionViewCell {
             
             return label
         }()
-        
         self.priceLabel = priceLabel
+        
         let originalPriceLabel:UILabel = {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false;
@@ -196,7 +193,8 @@ class ProductCollectionViewCell : UICollectionViewCell {
             
             return label;
         }()
-        self.originalPriceLabel = originalPriceLabel;
+        self.originalPriceLabel = originalPriceLabel
+        
         let favoriteButton : FavoriteButton = {
             let button = FavoriteButton.init()
             
@@ -211,35 +209,23 @@ class ProductCollectionViewCell : UICollectionViewCell {
         }()
         self.favoriteButton = favoriteButton
         
-        do { // buy "button
-            let roundedCornerClippingView = UIView()
-            roundedCornerClippingView.isUserInteractionEnabled = false
-            productView.addSubview(roundedCornerClippingView)
+        let buyLabel: UILabel = {
+            let label = UILabel()
+            productView.contentView.addSubview(label)
             
-            roundedCornerClippingView.translatesAutoresizingMaskIntoConstraints = false;
-            roundedCornerClippingView.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
-            roundedCornerClippingView.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
-            roundedCornerClippingView.bottomAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
-            roundedCornerClippingView.topAnchor.constraint(equalTo: productView.topAnchor).isActive = true
-            roundedCornerClippingView.backgroundColor = .clear
-            roundedCornerClippingView.layer.masksToBounds = true
-            roundedCornerClippingView.layer.cornerRadius = Geometry.defaultCornerRadius
-            
-            
-            let label = UILabel.init()
-            roundedCornerClippingView.addSubview(label)
-            
-            label.translatesAutoresizingMaskIntoConstraints = false;
+            label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
             label.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
             label.bottomAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
             label.heightAnchor.constraint(equalToConstant: ProductCollectionViewCell.buyLabelHeight).isActive = true
             
-            label.backgroundColor = .crazeGreen
+            label.backgroundColor = .white
             label.text = "products.cell.BUY".localized
-            label.textColor = .white
+            label.textColor = .crazeGreen
             label.textAlignment = .center
-        }
+            label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFontWeightMedium)
+            return label
+        }()
         
         let saleImageView:UIImageView = {
             let padding:CGFloat = 6.0
@@ -254,7 +240,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             self.productView?.addSubview(imageView)
             
             imageView.leadingAnchor.constraint(equalTo:productView.leadingAnchor).isActive = true
-            imageView.bottomAnchor.constraint(equalTo:productView.bottomAnchor, constant:( -padding  - ProductCollectionViewCell.buyLabelHeight)).isActive = true
+            imageView.bottomAnchor.constraint(equalTo: buyLabel.topAnchor, constant: -padding).isActive = true
             
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false;
