@@ -20,7 +20,7 @@ class FavoritesNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        restorationIdentifier = String(describing: type(of: self))
+        restorationIdentifier = "FavoritesNavigationController"
         
         favoritesViewController.delegate = self
         

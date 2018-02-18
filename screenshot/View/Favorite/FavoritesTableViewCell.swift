@@ -111,12 +111,13 @@ class FavoritesTableViewCell : UITableViewCell {
     fileprivate func updateScreenshotImageViewSize() {
         if let imageSize = screenshotView.image?.size, !screenshotContainerView.bounds.isEmpty {
             let rect = imageSize.aspectFitRectInSize(screenshotContainerView.bounds.size)
-            
-            if screenshotImageViewWidthConstraint.constant != rect.size.width {
-                screenshotImageViewWidthConstraint.constant = rect.size.width
+            let width = rect.size.width
+            if screenshotImageViewWidthConstraint.constant != width {
+                screenshotImageViewWidthConstraint.constant = width
             }
-            if screenshotImageViewHeightConstraint.constant != rect.size.height {
-                screenshotImageViewHeightConstraint.constant = rect.size.height
+            let height = rect.size.height
+            if screenshotImageViewHeightConstraint.constant != height {
+                screenshotImageViewHeightConstraint.constant = height
             }
             
         } else {
@@ -161,13 +162,13 @@ class FavoritesTableViewCell : UITableViewCell {
         guard shoppableContainerView.subviews.count == 0, maxProducts.count > 0 else {
             return
         }
-        
-        maxProducts.enumerated().forEach { (i: Int, product: Product) in
+        for (i, product) in maxProducts.enumerated() {
             let productView = EmbossedView()
             
             var layoutMargins = productView.layoutMargins
-            layoutMargins.left = -.padding / 2 + abs(layoutMargins.left)
-            layoutMargins.right = -.padding / 2 + abs(layoutMargins.right)
+            let halfNegativepadding:CGFloat = -CGFloat.padding/2  //putting this as a separate lines make swift compile faster
+            layoutMargins.left = halfNegativepadding + abs(layoutMargins.left)
+            layoutMargins.right = halfNegativepadding + abs(layoutMargins.right)
             productView.layoutMargins = layoutMargins
             
             productView.placeholderImage = UIImage(named: "DefaultProduct")
@@ -187,7 +188,8 @@ class FavoritesTableViewCell : UITableViewCell {
                 shoppableContainerView.layoutMargins = shoppableLayoutMargins
                 
             } else {
-                let previousView = shoppableContainerView.subviews[i - 1]
+                let index = i - 1
+                let previousView = shoppableContainerView.subviews[index]
                 productView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: previousView.layoutMarginsGuide.trailingAnchor).isActive = true
             }
             
