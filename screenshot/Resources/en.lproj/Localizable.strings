@@ -51,6 +51,7 @@
 "game.score" = "My coins: %d";
 "game.start" = "Tap to get more coins";
 
+"generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.disabled" = "Disabled";
 "generic.done" = "Done";
@@ -59,6 +60,7 @@
 "generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
+"generic.sale" = "SALE";
 "generic.setup" = "Setup";
 "generic.submit" = "Submit";
 "generic.update" = "Update";
@@ -93,9 +95,6 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 
-"products.cell.SALE" = "SALE";
-"products.cell.BUY" = "BUY";
-
 "products.options.category.auto" = "Auto";
 "products.options.category.fashion" = "Fashion";
 "products.options.category.furniture" = "Furniture";
@@ -119,9 +118,7 @@
 "products.rate.negative.prefiledMessageTemplate" = "I need help finding this outfit... %@";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
-
 "products.tooltip.title" = "Tap to shop different types of products";
-
 
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
 "screenshot.empty.title" = "No Screenshots Yet";

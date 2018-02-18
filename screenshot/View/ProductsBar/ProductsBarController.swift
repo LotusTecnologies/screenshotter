@@ -19,22 +19,29 @@ class ProductsBarController: NSObject {
             collectionView.delegate = self
         }
     }
+    
+    fileprivate let numberOfProducts = 5
+    
+    var hasProducts: Bool {
+        return numberOfProducts >= 4
+    }
 }
 
 extension ProductsBarController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return numberOfProducts
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProductsBarCollectionView.cellIdentifier, for: indexPath)
         
         if let cell = cell as? ProductsBarCollectionViewCell {
-            var r: CGFloat {
-                return CGFloat(arc4random()) / CGFloat(UInt32.max)
+            if indexPath.item == 1 {
+                cell.isFavorited = true
             }
-            
-            cell.backgroundColor = UIColor(red: r, green: r, blue: r, alpha: 1)
+            if indexPath.item == 2 {
+                cell.isSale = true
+            }
         }
         
         return cell
@@ -43,7 +50,8 @@ extension ProductsBarController: UICollectionViewDataSource {
 
 extension ProductsBarController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.height * 0.75, height: collectionView.bounds.height)
+        let height = collectionView.bounds.height - (.padding * 2)
+        return CGSize(width: height * 0.75, height: height)
     }
 }
 

@@ -20,6 +20,8 @@ class ProductsBarCollectionView: UICollectionView {
         
         register(ProductsBarCollectionViewCell.self, forCellWithReuseIdentifier: ProductsBarCollectionView.cellIdentifier)
         showsHorizontalScrollIndicator = false
+        contentInset = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
+        scrollsToTop = false
     }
 }
 
@@ -32,6 +34,6 @@ class ProductsBarCollectionViewLayout: UICollectionViewFlowLayout {
         super.init()
         
         scrollDirection = .horizontal
-        minimumInteritemSpacing = .padding
+        minimumLineSpacing = .padding
     }
 }

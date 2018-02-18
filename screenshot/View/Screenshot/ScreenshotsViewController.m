@@ -395,7 +395,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ScreenshotsSectionProduct) {
-        return 1;
+        return [self.productsBarController hasProducts];
     }
     else if (section == ScreenshotsSectionNotification) {
         return [self canDisplayNotificationCell];
@@ -430,7 +430,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     
     if (indexPath.section == ScreenshotsSectionProduct) {
         size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right;
-        size.height = 100;
+        size.height = 138;
     }
     else {
         CGPoint minimumSpacing = [self collectionViewInteritemOffset];
