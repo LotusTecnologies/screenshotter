@@ -9,7 +9,7 @@
 import Foundation
 
 class ScreenshotProductBarCollectionViewCell: UICollectionViewCell {
-    fileprivate let collectionView = ProductsBarCollectionView(frame: .zero, collectionViewLayout: ProductsBarCollectionViewLayout())
+    let collectionView = ProductsBarCollectionView(frame: .zero, collectionViewLayout: ProductsBarCollectionViewLayout())
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -19,7 +19,7 @@ class ScreenshotProductBarCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .yellow
+        collectionView.backgroundColor = .white
         contentView.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true

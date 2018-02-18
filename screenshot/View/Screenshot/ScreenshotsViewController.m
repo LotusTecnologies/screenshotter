@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @property (nonatomic, copy) NSString *notificationCellAssetId;
+@property (nonatomic, strong) ProductsBarController *productsBarController;
 
 @end
 
@@ -65,11 +66,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-    CGFloat p = [Geometry padding];
-    CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
-    
     _collectionView = ({
+        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
+        
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = minimumSpacing.x;
         layout.minimumLineSpacing = minimumSpacing.y;
@@ -78,7 +77,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
+        collectionView.contentInset = UIEdgeInsetsMake(0, 0, minimumSpacing.y, 0);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
@@ -411,11 +410,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     UIEdgeInsets insets = UIEdgeInsetsZero;
-    BOOL isShowingProduct = section == ScreenshotsSectionProduct;
-    BOOL isShowingNotification = section == ScreenshotsSectionNotification && [self hasNewScreenshot];
     
-    if (isShowingProduct || isShowingNotification) {
-        insets.bottom = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+    BOOL isShowingNotification = section == ScreenshotsSectionNotification && [self hasNewScreenshot];
+    BOOL isShowingImage = section == ScreenshotsSectionImage;
+    
+    if (isShowingNotification || isShowingImage) {
+        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
+        
+        insets.top = minimumSpacing.y;
+        insets.left = minimumSpacing.x;
+        insets.right = minimumSpacing.x;
     }
     
     return insets;
@@ -429,17 +433,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         size.height = 100;
     }
     else {
-        UIEdgeInsets shadowInsets = [ScreenshotNotificationCollectionViewCell shadowInsets];
-        CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
         
         if (indexPath.section == ScreenshotsSectionNotification) {
-            size.width = floor(collectionView.bounds.size.width - (padding * 2));
+            size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2));
             size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
         }
         else if (indexPath.section == ScreenshotsSectionImage) {
             NSInteger columns = [self numberOfCollectionViewImageColumns];
             
-            size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
+            size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns);
             size.height = ceil(size.width * [Screenshot ratio].height);
         }
     }
@@ -448,7 +451,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)setupScreenshotProductBarCollectionViewCell:(ScreenshotProductBarCollectionViewCell *)cell collectionView:(UICollectionView *)collectionView forItemAtIndexPath:(NSIndexPath *)indexPath {
-    
+    self.productsBarController.collectionView = cell.collectionView;
 }
     
 -(void) setupScreenshotNotificationCollectionViewCell:(ScreenshotNotificationCollectionViewCell*)cell collectionView:(UICollectionView*) collectionView forItemAtIndexPath:(NSIndexPath*) indexPath{
@@ -556,6 +559,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
     }
+}
+
+- (CGPoint)collectionViewInteritemOffset {
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat x = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+    CGFloat y = [Geometry padding] - shadowInsets.top - shadowInsets.bottom;
+    return CGPointMake(x, y);
 }
 
 
@@ -703,6 +713,16 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
             [refreshControl endRefreshing];
         });
     }
+}
+
+
+#pragma mark - Products Bar
+
+- (ProductsBarController *)productsBarController {
+    if (!_productsBarController) {
+        _productsBarController = [[ProductsBarController alloc] init];
+    }
+    return _productsBarController;
 }
 
 

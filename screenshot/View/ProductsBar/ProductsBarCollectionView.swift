@@ -9,6 +9,8 @@
 import Foundation
 
 class ProductsBarCollectionView: UICollectionView {
+    static let cellIdentifier = "productsBarCell"
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -16,9 +18,20 @@ class ProductsBarCollectionView: UICollectionView {
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
         
+        register(ProductsBarCollectionViewCell.self, forCellWithReuseIdentifier: ProductsBarCollectionView.cellIdentifier)
+        showsHorizontalScrollIndicator = false
     }
 }
 
-class ProductsBarCollectionViewLayout: UICollectionViewLayout {
-     
+class ProductsBarCollectionViewLayout: UICollectionViewFlowLayout {
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init() {
+        super.init()
+        
+        scrollDirection = .horizontal
+        minimumInteritemSpacing = .padding
+    }
 }
