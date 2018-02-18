@@ -107,6 +107,9 @@
 		C5D98CCF1FFB65A700CC1A97 /* FavoriteBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCE1FFB65A700CC1A97 /* FavoriteBadgeView.swift */; };
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
+		C5F1C62F2039636700A10416 /* ScreenshotProductBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F1C62E2039636700A10416 /* ScreenshotProductBarCollectionViewCell.swift */; };
+		C5F1C6322039693F00A10416 /* ProductsBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F1C6312039693F00A10416 /* ProductsBarCollectionView.swift */; };
+		C5F1C6342039695200A10416 /* ProductsBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F1C6332039695200A10416 /* ProductsBarCollectionViewCell.swift */; };
 		C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */; };
 		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
 		C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F8D63C1FA05AE40067C26A /* Notification.swift */; };
@@ -235,6 +238,9 @@
 		C5D98CCE1FFB65A700CC1A97 /* FavoriteBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteBadgeView.swift; sourceTree = "<group>"; };
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
+		C5F1C62E2039636700A10416 /* ScreenshotProductBarCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotProductBarCollectionViewCell.swift; sourceTree = "<group>"; };
+		C5F1C6312039693F00A10416 /* ProductsBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionView.swift; sourceTree = "<group>"; };
+		C5F1C6332039695200A10416 /* ProductsBarCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionViewCell.swift; sourceTree = "<group>"; };
 		C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalViewControllerFactory.swift; sourceTree = "<group>"; };
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		C5F8D63C1FA05AE40067C26A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
@@ -392,6 +398,7 @@
 				C54087C11FE90C8D00198955 /* Loading */,
 				C55D89BE2021EF84004A5245 /* Partners */,
 				C54087EC1FE90C8E00198955 /* Product */,
+				C5F1C6302039692700A10416 /* ProductsBar */,
 				C54088051FE90C8E00198955 /* Screenshot */,
 				C54087E71FE90C8D00198955 /* ScreenshotDisplay */,
 				C54087DE1FE90C8D00198955 /* ScreenshotPicker */,
@@ -568,6 +575,7 @@
 				C540880B1FE90C8E00198955 /* ScreenshotsViewController.m */,
 				C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */,
 				C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */,
+				C5F1C62E2039636700A10416 /* ScreenshotProductBarCollectionViewCell.swift */,
 			);
 			path = Screenshot;
 			sourceTree = "<group>";
@@ -658,6 +666,15 @@
 				C5D98CCB1FFA642300CC1A97 /* GameScene.swift */,
 			);
 			path = Game;
+			sourceTree = "<group>";
+		};
+		C5F1C6302039692700A10416 /* ProductsBar */ = {
+			isa = PBXGroup;
+			children = (
+				C5F1C6312039693F00A10416 /* ProductsBarCollectionView.swift */,
+				C5F1C6332039695200A10416 /* ProductsBarCollectionViewCell.swift */,
+			);
+			path = ProductsBar;
 			sourceTree = "<group>";
 		};
 		C5F53D8C2014A57F003A57EC /* Legal */ = {
@@ -972,6 +989,7 @@
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
 				C55D89BB2021C021004A5245 /* CoreDataPreparationController.swift in Sources */,
 				C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */,
+				C5F1C6342039695200A10416 /* ProductsBarCollectionViewCell.swift in Sources */,
 				C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */,
 				C54088281FE90C8E00198955 /* ProductsRateView.swift in Sources */,
 				315186402033FC81001BD8D6 /* ShoppablesCollectionView.swift in Sources */,
@@ -996,6 +1014,7 @@
 				C540882B1FE90C8E00198955 /* DiscoverWebViewController.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
+				C5F1C6322039693F00A10416 /* ProductsBarCollectionView.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
@@ -1005,6 +1024,7 @@
 				C540881E1FE90C8E00198955 /* InviteViewController.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
+				C5F1C62F2039636700A10416 /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
