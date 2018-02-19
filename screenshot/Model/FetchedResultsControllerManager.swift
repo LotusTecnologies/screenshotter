@@ -128,6 +128,9 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.currentChange?.insertedRows.sort(by:  { $0 < $1 } )
         self.currentChange?.deletedRows.sort(by:  { $0 > $1 } )
-        self.delegate?.managerDidChangeContent(self, change: self.currentChange!)
+        if let change = self.currentChange {
+            self.delegate?.managerDidChangeContent(self, change: change)
+        }
+        self.currentChange = nil
     }
 }
