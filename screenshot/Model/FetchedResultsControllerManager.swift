@@ -51,7 +51,7 @@ class FetchedResultsControllerManagerChange: NSObject {
 
     }
     
-    func shifIndexSections(by :Int){
+    func shiftIndexSections(by :Int){
         insertedSections = IndexSet(insertedSections.map { $0 + by })
         deletedSections = IndexSet(deletedSections.map { $0 + by })
         insertedRows = insertedRows.map { IndexPath.init(row: $0.row, section: ($0.section + by) ) }

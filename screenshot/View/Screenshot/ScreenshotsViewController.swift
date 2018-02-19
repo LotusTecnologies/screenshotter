@@ -12,7 +12,7 @@ import CoreData
 //FRC stuff
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        change.shifIndexSections(by: 1)
+        change.shiftIndexSections(by: 1)
         change.applyChanges(collectionView: self.collectionView)
         self.syncHelperViewVisibility()
 
