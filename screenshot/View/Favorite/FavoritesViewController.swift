@@ -245,7 +245,7 @@ extension FavoritesViewController : FetchedResultsControllerManagerDelegate {
         
         for index in change.insertedRows {
             if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
-                if let assetId = screenshot.assetId, screenshotsFavorites[assetId] == nil {
+                if let assetId = screenshot.assetId {
                     screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
                 }
             }
@@ -253,9 +253,7 @@ extension FavoritesViewController : FetchedResultsControllerManagerDelegate {
         for index in change.updatedRows {
             if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
                 if let assetId = screenshot.assetId {
-                    if screenshotsFavorites[assetId] != nil, let screenshot = self.screenshot(withAssetId: assetId) {
-                        screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
-                    }
+                    screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
                 }
             }
         }

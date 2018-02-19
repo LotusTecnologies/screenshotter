@@ -373,7 +373,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     // MARK: Empty View
     
     fileprivate func syncInteractionElements() {
-        let isInteractionEnabled = !isListEmpty && !isMidDecision
+        let isInteractionEnabled = !isListEmpty
         let isButtonEnabled = isInteractionEnabled && cardHelperView == nil
         
         passButton.isDisabled(!isButtonEnabled)
