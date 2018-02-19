@@ -564,7 +564,7 @@ extension ProductsViewControllerOptionsView {
 private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if let collectionView = self.collectionView, let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+        if let _ = self.collectionView, let index = self.shoppablesToolbar?.selectedShoppableIndex() {
             self.reloadProductsForShoppable(at: index)
         }
         

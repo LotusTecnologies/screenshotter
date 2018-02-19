@@ -13,7 +13,7 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath)
 }
 
-class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizerDelegate {
+class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: FetchedResultsControllerManager<Matchstick>?
@@ -168,7 +168,6 @@ class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizer
     // MARK: Decision
     
     fileprivate var isAdding = false
-    fileprivate var isMidDecision = false
     fileprivate var needsToReloadAfterDecision = false
     
     fileprivate let decisionValueMultiplier: CGFloat = 3
@@ -177,19 +176,8 @@ class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizer
         return percent * decisionValueMultiplier
     }
     
-    fileprivate func preDecision() {
-//        isMidDecision = true
-//        syncInteractionElements()
-    }
-    
-    fileprivate func postDecision() {
-//        isMidDecision = false
-//        syncInteractionElements()
-    }
-    
     func decidedToPass() {
         isAdding = false
-        preDecision()
         currentMatchstick?.pass()
     }
     
@@ -197,7 +185,6 @@ class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizer
     
     func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
         isAdding = true
-        preDecision()
         currentMatchstick?.add(callback: callback)
         needsToCompleteDecision = callback != nil
     }
@@ -246,7 +233,6 @@ class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizer
         
         switch panGesture.state {
         case .began:
-            preDecision()
             canPanScreenshot = false
             
         case .changed:
@@ -277,7 +263,6 @@ class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizer
             
         case .ended, .cancelled:
             guard canPanScreenshot else {
-                postDecision()
                 return
             }
             
@@ -321,7 +306,6 @@ class DiscoverScreenshotViewController : BaseViewController, UIGestureRecognizer
             else {
                 UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
                     self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
-                    self.postDecision()
                 })
             }
             
