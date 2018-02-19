@@ -10,7 +10,7 @@ import Foundation
 
 extension CGFloat {
     static let padding = CGFloat(16)
-    static let extendedPadding = CGFloat(UIDevice.is480h ? 20 : 40)
+    static let extendedPadding:CGFloat = CGFloat(UIDevice.is480h ? 20 : 40)
     
     static let halfPoint = CGFloat(UIScreen.main.scale > 1 ? 0.5 : 1)
     
