@@ -190,7 +190,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         self.syncScreenshotRelatedObjects()
         
-        if self.shoppablesController.fetchedResultsController.fetchedObjectsCount == 0  {
+        if self.screenshotController.fetchedResultsController.fetchedObjects?.first?.shoppablesCount == -1  {
             self.state = .retry
             AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
         }
@@ -548,29 +548,21 @@ private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if controller == self.shoppablesController {
-            
+            if let _ = self.collectionView, let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+                self.reloadProductsForShoppable(at: index)
+            }
         }else if controller == self.screenshotController {
             if let screenShot = self.screenshotController.fetchedResultsController.fetchedObjects?.first {
                 if screenShot.shoppablesCount == 0 {
                     
                 }else if screenShot.shoppablesCount == -1 {
-                    self.state = .retry
-                    AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
-                    self.syncScreenshotRelatedObjects()
-                }else {
-                    if self.state == .retry {
-                        
+                    if self.noItemsHelperView == nil {
+                        self.state = .retry
                     }
                 }
-            }else{
-                //WFT screenshot was deleted out from under us?
-                self.state = .empty
-                self.collectionView?.reloadData()
             }
         }
-        if let _ = self.collectionView, let index = self.shoppablesToolbar?.selectedShoppableIndex() {
-            self.reloadProductsForShoppable(at: index)
-        }
+        
         
     }
     func hasShoppables() -> Bool {
