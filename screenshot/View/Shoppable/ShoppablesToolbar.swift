@@ -131,7 +131,14 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        change.applyChanges(collectionView: collectionView)
+        collectionView.performBatchUpdates({
+            collectionView.deleteSections(change.deletedSections)
+            collectionView.deleteItems(at: change.deletedRows)
+            collectionView.insertSections(change.insertedSections)
+            collectionView.insertItems(at: change.insertedRows)
+        }) { (completed) in
+        }
+        // don't do reload - will lose selection state
     }
     
     func shoppableSize() -> CGSize {
