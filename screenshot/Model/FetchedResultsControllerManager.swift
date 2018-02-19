@@ -80,7 +80,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         do {
             try self.fetchedResultsController.performFetch()
         }catch{
-            
+            print("Failed to fetch in fetchedResultsControllerManager from core data:\(error)")
         }
     }
     
