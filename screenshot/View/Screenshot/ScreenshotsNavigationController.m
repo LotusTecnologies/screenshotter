@@ -106,8 +106,10 @@
 - (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
     
-    ProductsViewController *productsViewController = [self createProductsViewController];
-    productsViewController.screenshot = screenshot;
+    
+    ProductsViewController *productsViewController = [[ProductsViewController alloc] initWithScreenshot:screenshot];
+    productsViewController.lifeCycleDelegate = self;
+    productsViewController.hidesBottomBarWhenPushed = YES;
     [self pushViewController:productsViewController animated:YES];
     
     if (screenshot.isNew) {
@@ -127,15 +129,6 @@
     [self presentPickerViewController];
 }
 
-
-#pragma mark - Products
-
-- (ProductsViewController *)createProductsViewController {
-    ProductsViewController *viewController = [[ProductsViewController alloc] init];
-    viewController.lifeCycleDelegate = self;
-    viewController.hidesBottomBarWhenPushed = YES;
-    return viewController;
-}
 
 
 #pragma mark - Screenshot Picker

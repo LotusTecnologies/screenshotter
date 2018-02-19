@@ -10,6 +10,7 @@
 
 @class ScreenshotsViewController;
 @class Screenshot;
+@class FetchedResultsControllerManager;
 
 @protocol ScreenshotsViewControllerDelegate <NSObject>
 @required
@@ -31,5 +32,10 @@
 
 - (void)presentNotificationCellWithAssetId:(NSString *)assetId;
 - (void)dismissNotificationCell;
+
+//Made public so it can be used by swift
+@property (nonatomic, strong) id screenshotFrcManager;
+- (void)syncHelperViewVisibility;
+@property (nonatomic, strong) UICollectionView *collectionView;
 
 @end

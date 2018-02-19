@@ -107,14 +107,16 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         screenshotImageFrameView.isUserInteractionEnabled = false
         self.screenshotImageView.addSubview(screenshotImageFrameView)
         self.screenshotImageFrameView = screenshotImageFrameView
-        
-        self.shoppables?.forEach { shoppable in
-            let frame = shoppable.frame(size: screenshotImageFrameView.bounds.size)
-            
-            let frameView = UIView(frame: frame)
-            frameView.layer.borderColor = UIColor.white.withAlphaComponent(0.7).cgColor
-            frameView.layer.borderWidth = 2
-            screenshotImageFrameView.addSubview(frameView)
+
+        if let shoppables = self.shoppables {
+            for shoppable in shoppables {
+                let frame = shoppable.frame(size: screenshotImageFrameView.bounds.size)
+                
+                let frameView = UIView(frame: frame)
+                frameView.layer.borderColor = UIColor.white.withAlphaComponent(0.7).cgColor
+                frameView.layer.borderWidth = 2
+                screenshotImageFrameView.addSubview(frameView)
+            }
         }
     }
     
