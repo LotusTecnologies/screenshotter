@@ -138,7 +138,7 @@ class FavoritesViewController : BaseViewController {
     fileprivate func screenshotFavoritesForScreenshot(_ screenshot: Screenshot) -> ScreenshotFavorites {
         let favoritedProducts = screenshot.favoritedProducts
         let products = FavoritesTableViewCell.maxProducts(favoritedProducts)
-        let favoritedEachShoppable = screenshot.shoppablesCount == screenshot.favoritedShoppablesCount
+        let favoritedEachShoppable = (screenshot.shoppablesCount == screenshot.favoritedShoppablesCount)
         
         return ScreenshotFavorites(count: favoritedProducts.count, products: products, favoritedEachShoppable: favoritedEachShoppable)
     }
