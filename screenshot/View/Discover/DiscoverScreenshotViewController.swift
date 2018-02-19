@@ -22,6 +22,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
     fileprivate let emptyView = HelperView()
     
+    var tempDisablePass = false
+    var tempDisableAdd = false
     weak var delegate: DiscoverScreenshotViewControllerDelegate?
     
     override var title: String? {
@@ -118,10 +120,6 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         coreDataPreparationController.viewDidLoad()
-        
-        if matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 > 0 {
-            isListEmpty = false
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -141,17 +139,6 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.delegate = nil
     }
     
-    // MARK: Matchstick
-    
-    fileprivate var pseudoMatchsticksCount = 0
-    
-    fileprivate func updateMatchsticksCount() {
-        pseudoMatchsticksCount = matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
-        
-        if isListEmpty && pseudoMatchsticksCount > 0 {
-            isListEmpty = false
-        }
-    }
     
     fileprivate var currentIndexPath: IndexPath {
         return IndexPath(item: 0, section: 0)
@@ -315,9 +302,12 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func passButtonAction() {
-        self.passButton.isDisabled(true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.passButton.isDisabled(false)
+        
+        self.tempDisablePass = true
+        syncInteractionElements()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.tempDisablePass = false
+            self.syncInteractionElements()
         }
         
         AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
@@ -329,9 +319,11 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func addButtonAction() {
-        self.addButton.isDisabled(true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.addButton.isDisabled(false)
+        self.tempDisableAdd = true
+        syncInteractionElements()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.tempDisableAdd = true
+            self.syncInteractionElements()
         }
         AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
             "by": "tap",
@@ -376,8 +368,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         let isInteractionEnabled = !isListEmpty
         let isButtonEnabled = isInteractionEnabled && cardHelperView == nil
         
-        passButton.isDisabled(!isButtonEnabled)
-        addButton.isDisabled(!isButtonEnabled)
+        passButton.isDisabled(!isButtonEnabled || tempDisablePass)
+        addButton.isDisabled(!isButtonEnabled || tempDisableAdd)
         collectionView.isUserInteractionEnabled = isInteractionEnabled
     }
     
@@ -386,13 +378,14 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncInteractionElements()
     }
     
-    fileprivate var isListEmpty = true {
-        didSet {
-            syncEmptyListViews()
+    fileprivate var isListEmpty:Bool  {
+        get {
             
-            if isListEmpty {
-                AnalyticsTrackers.standard.track("Matchsticks Empty")
+            if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 > 0  {
+                return false
             }
+            
+            return true
         }
     }
     
@@ -496,6 +489,7 @@ extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelega
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
 
         matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
+        self.collectionView.reloadData()
     }
     
     func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
@@ -515,6 +509,7 @@ extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelega
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         change.applyChanges(collectionView: collectionView)
+        syncEmptyListViews()
     }
     
 }

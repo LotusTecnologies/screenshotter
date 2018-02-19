@@ -285,6 +285,7 @@
 - (void)decodeRestorableStateWithCoder:(NSCoder *)coder {
     self.restoredScreenshotNumber = @([coder decodeIntegerForKey:@"screenshotIndex"]);
     
+    
     [super decodeRestorableStateWithCoder:coder];
 }
 
