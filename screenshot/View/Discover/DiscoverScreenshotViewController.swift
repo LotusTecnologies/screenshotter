@@ -322,7 +322,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         self.tempDisableAdd = true
         syncInteractionElements()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            self.tempDisableAdd = true
+            self.tempDisableAdd = false
             self.syncInteractionElements()
         }
         AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
