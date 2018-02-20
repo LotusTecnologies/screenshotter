@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import FBSDKCoreKit
-import SafariServices
+
+
 enum ProductsSection : Int {
     case tooltip = 0
     case product = 1
@@ -26,44 +26,6 @@ enum ProductsViewControllerState : Int {
     case empty
 }
 
-enum OpenProductPageInSetting : String {
-    case embededSafari
-    case safari
-    case chrome
-    
-    func localizedDisplayString() -> String{
-        switch self {
-        case .embededSafari:
-            return "settings.openIn.option.embeded".localized
-        case .safari:
-            return "settings.openIn.option.safari".localized
-        case .chrome:
-            return "settings.openIn.option.chrome".localized
-        }
-    }
-    
-    static func fromSystemInfo() -> OpenProductPageInSetting{
-        let defaultValue:OpenProductPageInSetting = .embededSafari
-        let stringValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.openProductPageInSetting) as? String ?? defaultValue.rawValue
-        return OpenProductPageInSetting(rawValue: stringValue) ?? defaultValue
-    }
-    
-    func saveToUserDefaults() {
-        UserDefaults.standard.set(self.rawValue, forKey: UserDefaultsKeys.openProductPageInSetting)
-    }
-    
-    func canOpen(url:URL) -> Bool{
-            switch self {
-            case .embededSafari:
-                return true;
-            case .safari:
-                return UIApplication.shared.canOpenURL(url)
-            case .chrome:
-                return  UIApplication.shared.canOpenInChrome(url: url)
-            }
-    
-    }
-}
 
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
@@ -430,62 +392,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            
-            if var urlString = product.offer {
-                if urlString.hasPrefix("//") {
-                    urlString = "https:".appending(urlString)
-                }
-                if let url = URL(string: urlString){
-                    var openInSetting = OpenProductPageInSetting.fromSystemInfo()
-
-                    if !openInSetting.canOpen(url: url) {
-                        openInSetting = .embededSafari
-                    }
-
-                    switch openInSetting {
-                    case .embededSafari:
-                        let svc = SFSafariViewController(url: url)
-                        if #available(iOS 11.0, *) {
-                            svc.dismissButtonStyle = .done
-                        }
-                        self.present(svc, animated: true, completion: nil)
-                    case .safari:
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    case .chrome:
-                       UIApplication.shared.openInChrome(url: url) //returns success
-                        
-                    }
-                }
-            }
-            
-            AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Products")
-            
-            let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-            
-            if email.lengthOfBytes(using: .utf8) > 0 {
-                let uploadedImageURL = self.screenshot.uploadedImageURL ?? ""
-                let merchant = product.merchant ?? ""
-                let brand = product.brand ?? ""
-                let displayTitle = product.displayTitle ?? ""
-                let offer = product.offer ?? ""
-                let imageURL = product.imageURL ?? ""
-                let price = product.price ?? ""
-                let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
-                
-                let properties = ["screenshot": uploadedImageURL,
-                                  "merchant": merchant,
-                                  "brand": brand,
-                                  "title": displayTitle,
-                                  "url": offer,
-                                  "imageUrl": imageURL,
-                                  "price": price,
-                                  "email": email,
-                                  "name": name ]
-                AnalyticsTrackers.standard.track("Product for email", properties:properties)
-            }
-            product.recordViewedProduct()
-            AnalyticsTrackers.branch.track("Tapped on product")
-            FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
+            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Products")
         }
     }
 }
