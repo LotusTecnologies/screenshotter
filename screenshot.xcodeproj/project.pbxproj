@@ -13,6 +13,8 @@
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
 		31518645203477DB001BD8D6 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
+		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
+		31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110320396194000156EE /* ScreenshotsViewController.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -93,7 +95,6 @@
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
-		C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A30471F655F1C00463338 /* ShoppablesController.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
 		C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E641FFA2D2600F491C0 /* Size.swift */; };
@@ -135,6 +136,8 @@
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
+		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
+		31CE110320396194000156EE /* ScreenshotsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsViewController.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -221,7 +224,6 @@
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
-		C59A30471F655F1C00463338 /* ShoppablesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesController.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		C5AC7E641FFA2D2600F491C0 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
@@ -340,6 +342,7 @@
 				C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */,
 				E492CE3C2011051100060FB2 /* MatchstickModel.swift */,
 				31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */,
+				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -361,7 +364,6 @@
 			children = (
 				523C11381F5C195D001BD969 /* RatingFlow.swift */,
 				E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */,
-				C59A30471F655F1C00463338 /* ShoppablesController.swift */,
 				52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */,
 				524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */,
 				524DB5391FC6F69800BD408F /* UsageStreak.swift */,
@@ -566,6 +568,7 @@
 				C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */,
 				C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */,
 				C540880B1FE90C8E00198955 /* ScreenshotsViewController.m */,
+				31CE110320396194000156EE /* ScreenshotsViewController.swift */,
 				C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */,
 				C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */,
 			);
@@ -988,6 +991,7 @@
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
+				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
@@ -1041,7 +1045,6 @@
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
-				C59A30481F655F1C00463338 /* ShoppablesController.swift in Sources */,
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
@@ -1055,6 +1058,7 @@
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */,
 				31518645203477DB001BD8D6 /* ProductsViewControllerControl.swift in Sources */,
+				31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
 				C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */,
@@ -1234,6 +1238,7 @@
 				CURRENT_PROJECT_VERSION = 102;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;

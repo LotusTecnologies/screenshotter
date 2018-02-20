@@ -54,34 +54,23 @@ enum OpenProductPageInSetting : String {
 }
 
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewControllerLifeCycle, ShoppablesControllerDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
-    var screenshot:Screenshot! {
-        didSet {
-            if  screenshot != nil {
-                self.shoppablesController = ShoppablesController(screenshot: screenshot)
-            }else{
-                self.shoppablesController = nil
-            }
-            self.shoppablesController.delegate = self
-            
-            if self.isViewLoaded {
-                self.syncScreenshotRelatedObjects()
-                self.reloadProductsForShoppable(at: 0)
-            }
-        }
-    }
-    var shoppablesController:ShoppablesController!
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
+    var screenshot:Screenshot
+    var shoppablesController: FetchedResultsControllerManager<Shoppable>
+    var screenshotController: FetchedResultsControllerManager<Screenshot>
+    
+    var products:[Product] = []
+    
     var loader:Loader?
     var noItemsHelperView:HelperView?
-    var collectionView:UICollectionView!
-    var shoppablesToolbar:ShoppablesToolbar!
+    var collectionView:UICollectionView?
+    var shoppablesToolbar:ShoppablesToolbar?
     var productsOptions:ProductsOptions = ProductsOptions()
     var scrollRevealController:ScrollRevealController?
     var rateView:ProductsRateView!
-    var productsRateNegativeFeedbackSubmitAction:UIAlertAction!
-    var productsRateNegativeFeedbackTextField:UITextField!
+    var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
+    var productsRateNegativeFeedbackTextField:UITextField?
     
-    var products:[Product] = []
     var productsUnfilteredCount:Int = 0
     var image:UIImage!
     var state:ProductsViewControllerState = .loading {
@@ -91,8 +80,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
     }
     
     
-    init() {
+    init( screenshot  s:Screenshot) {
+        screenshot = s
+        shoppablesController = DataModel.sharedInstance.shoppableFrc(delegate: nil, screenshot: screenshot)
+        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
+
         super.init(nibName: nil, bundle: nil)
+        shoppablesController.delegate = self
+        screenshotController.delegate = self
         self.title = "Products"
         self.restorationIdentifier = "ProductsViewController"
         NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
@@ -107,33 +102,114 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        self.setupShoppableToolbar()
-        self.setupCollectionView()
         
-        let view = ProductsRateView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.voteUpButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
-        view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
-        view.talkToYourStylistButton.addTarget(self, action: #selector(talkToYourStylistAction), for: .touchUpInside)
-        self.rateView = view
+        let toolbar:ShoppablesToolbar = {
+            let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
+            let shoppableHeight:CGFloat = 60
+            
+            let toolbar = ShoppablesToolbar.init(screenshot: self.screenshot)
+            toolbar.frame = CGRect(x: 0, y: 0, width: 0, height: margin*2+shoppableHeight)
+            toolbar.translatesAutoresizingMaskIntoConstraints = false
+            toolbar.delegate = self
+            toolbar.shoppableToolbarDelegate = self
+            toolbar.barTintColor = .white
+            toolbar.isHidden = self.shouldHideToolbar()
+            self.view.addSubview(toolbar)
+            
+            toolbar.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
+            toolbar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+            toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+            toolbar.heightAnchor.constraint(equalToConstant: toolbar.bounds.size.height).isActive = true
+            return toolbar
+        }()
         
-        self.setupViews()
+        self.shoppablesToolbar = toolbar
+        
+        let collectionView:UICollectionView = {
+            let minimumSpacing = self.collectionViewMinimumSpacing()
+            
+            let layout = UICollectionViewFlowLayout()
+            layout.minimumInteritemSpacing = minimumSpacing.x
+            layout.minimumLineSpacing = minimumSpacing.y
+            
+            let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
+            
+            collectionView.translatesAutoresizingMaskIntoConstraints = false
+            collectionView.delegate = self
+            collectionView.dataSource = self
+            collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbar?.bounds.size.height ?? 0, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
+            collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbar?.bounds.size.height ?? 0, left: 0.0, bottom: 0.0, right: 0.0)
+            
+            collectionView.backgroundColor = self.view.backgroundColor
+            // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
+            // Then test why the control view (products options view) jumps before being dragged away.
+            collectionView.keyboardDismissMode = .onDrag
+            collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip")
+            collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+            
+            
+            self.view.insertSubview(collectionView, at: 0)
+            collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+            collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+            collectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
+            collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+            return collectionView
+            
+        }()
+        self.collectionView = collectionView
+        
+        let rateView:ProductsRateView = {
+            let view = ProductsRateView()
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.voteUpButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
+            view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
+            view.talkToYourStylistButton.addTarget(self, action: #selector(talkToYourStylistAction), for: .touchUpInside)
+            return view
+        }()
+        self.rateView = rateView
+        
+        let scrollRevealController = ScrollRevealController(edge: .bottom)
+        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+        scrollRevealController.insertAbove(collectionView)
+
+        scrollRevealController.view.addSubview(self.rateView)
+        self.scrollRevealController = scrollRevealController
+        
+        self.rateView.topAnchor.constraint(equalTo:scrollRevealController.view.topAnchor).isActive = true
+        self.rateView.leadingAnchor.constraint(equalTo:scrollRevealController.view.leadingAnchor).isActive = true
+        self.rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
+        self.rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
+        
+        
+        var height = self.rateView.intrinsicContentSize.height
+        
+        if #available(iOS 11.0, *) {
+            height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+        }
+        self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
+        
+        self.syncScreenshotRelatedObjects()
+        
+        if self.screenshotController.fetchedResultsController.fetchedObjects?.first?.shoppablesCount == -1  {
+            self.state = .retry
+            AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
+        }
+        else {
+            self.reloadProductsForShoppable(at: 0)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.shoppablesToolbar.selectFirstShoppable()
+        self.shoppablesToolbar?.selectFirstShoppable()
         if !self.hasShoppables() && self.noItemsHelperView == nil {
             self.state = .loading
         }
-        //    [ProductWebViewController shared].lifeCycleDelegate = self
-        //        [ProductWebViewController shared].delegate = self
-        
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.shoppablesToolbar.didViewControllerAppear = true
+        self.shoppablesToolbar?.didViewControllerAppear = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -141,39 +217,22 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         self.dismissOptions()
     }
     
-    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
-        
-        //        if (viewController == [ProductWebViewController shared] && [self.navigationController.topViewController isKindOfClass:[ProductsViewController class]]) {
-        //            ProductsViewController *productsViewController = (ProductsViewController *)self.navigationController.topViewController
-        //            NSInteger index = [productsViewController indexForProduct:[ProductWebViewController shared].product]
-        //            [productsViewController reloadProductCellAtIndex:index]
-        //        }
-    }
-    func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {
-        
-        //        if (viewController == [ProductWebViewController shared] && ![self.navigationController.viewControllers containsObject:viewController]) {
-        //            [ProductWebViewController shared].product = nil
-        //        }
-    }
     func contentSizeCategoryDidChange(_ notification: Notification) {
-        if self.view.window != nil && self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.section) > 0 {
-            self.collectionView.reloadItems(at: [IndexPath(item: 0, section: ProductsSection.tooltip.section)])
+        if self.view.window != nil && self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
+            self.collectionView?.reloadItems(at: [IndexPath(item: 0, section: ProductsSection.tooltip.section)])
         }
     }
     
     deinit {
-        self.shoppablesToolbar.delegate = nil
-        self.shoppablesToolbar.shoppableToolbarDelegate = nil
-        self.collectionView.delegate = nil
-        self.collectionView.dataSource = nil
-        self.shoppablesController.delegate = nil
+        self.shoppablesToolbar?.delegate = nil
+        self.shoppablesToolbar?.shoppableToolbarDelegate = nil
         NotificationCenter.default.removeObserver(self)
     }
     
     func displayScreenshotAction() {
         let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
         navigationController.screenshotDisplayViewController.image = self.image
-        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesController.shoppables()
+        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesController.fetchedResultsController.fetchedObjects
         self.present(navigationController, animated: true, completion: nil)
     }
     
@@ -183,7 +242,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ViewC
         guard let isFavorited = cell.favoriteButton?.isSelected else{
             return
         }
-        guard let indexPath = self.collectionView.indexPath(for: cell) else{
+        guard let indexPath = self.collectionView?.indexPath(for: cell) else{
             return
         }
         let product = self.productAtIndex(indexPath.item)
@@ -219,10 +278,14 @@ extension ProductsViewController {
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
         
         if changed {
-            let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
-            shoppable.set(productsOptions: productsOptions, callback: {
-                self.reloadProductsForShoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
-            })
+            if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+                let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+                shoppable.set(productsOptions: productsOptions, callback:  {
+                    if let index = self.shoppablesToolbar?.selectedShoppableIndex(){
+                        self.reloadProductsForShoppable(at:index)
+                    }
+                })
+            }
             
         }
         self.dismissOptions()
@@ -246,94 +309,6 @@ extension ProductsViewController {
         return !self.hasShoppables()
     }
     
-}
-
-
-extension ProductsViewController {
-    
-    func setupShoppableToolbar() {
-        let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
-        let shoppableHeight:CGFloat = 60
-        
-        let toolbar = ShoppablesToolbar(frame: CGRect(x: 0, y: 0, width: 0, height: margin*2+shoppableHeight))
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
-        toolbar.delegate = self
-        toolbar.shoppableToolbarDelegate = self
-        toolbar.barTintColor = .white
-        toolbar.isHidden = self.shouldHideToolbar()
-        self.view.addSubview(toolbar)
-        
-        toolbar.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
-        toolbar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        toolbar.heightAnchor.constraint(equalToConstant: toolbar.bounds.size.height).isActive = true
-        self.shoppablesToolbar = toolbar
-    }
-    
-    func setupCollectionView() {
-        let minimumSpacing = self.collectionViewMinimumSpacing()
-        
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = minimumSpacing.x
-        layout.minimumLineSpacing = minimumSpacing.y
-        
-        let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
-        
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbar.bounds.size.height, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
-        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbar.bounds.size.height, left: 0.0, bottom: 0.0, right: 0.0)
-        
-        collectionView.backgroundColor = self.view.backgroundColor
-        // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
-        // Then test why the control view (products options view) jumps before being dragged away.
-        collectionView.keyboardDismissMode = .onDrag
-        collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip")
-        collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        
-        
-        self.view.insertSubview(collectionView, at: 0)
-        collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
-        collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        self.collectionView = collectionView
-    }
-    
-    func setupViews() {
-        let scrollRevealController = ScrollRevealController(edge: .bottom)
-        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
-        scrollRevealController.insertAbove(self.collectionView)
-        scrollRevealController.view.addSubview(self.rateView)
-        self.scrollRevealController = scrollRevealController
-        
-        self.rateView.topAnchor.constraint(equalTo:scrollRevealController.view.topAnchor).isActive = true
-        self.rateView.leadingAnchor.constraint(equalTo:scrollRevealController.view.leadingAnchor).isActive = true
-        self.rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
-        self.rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
-        
-        
-        var height = self.rateView.intrinsicContentSize.height
-        
-        if #available(iOS 11.0, *) {
-            height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
-        }
-        self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
-        if self.shoppablesController == nil {
-            self.state = .loading
-        } else {
-            self.syncScreenshotRelatedObjects()
-            
-            if self.shoppablesController.shoppableCount() == -1  {
-                self.state = .retry
-                AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
-            }
-            else {
-                self.reloadProductsForShoppable(at: 0)
-            }
-        }
-    }
 }
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
@@ -524,7 +499,7 @@ extension ProductsViewControllerOptionsView {
                 var attributes = UINavigationBar.appearance().titleTextAttributes
                 attributes?[NSForegroundColorAttributeName] = UIColor.crazeGreen
                 
-                let attributedString = NSMutableAttributedString(string: "Sort & Filter", attributes: attributes)
+                let attributedString = NSMutableAttributedString(string: "products.options.title".localized, attributes: attributes)
                 
                 let offset:CGFloat = 3
                 attributes?[NSBaselineOffsetAttributeName] = offset
@@ -556,9 +531,10 @@ extension ProductsViewControllerOptionsView {
             control.resignFirstResponder()
         } else {
             AnalyticsTrackers.standard.track("Opened Filters View", properties:nil)
-            let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
-            self.productsOptions.syncOptions(withMask: shoppable.getLast())
-            
+            if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+                let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+                self.productsOptions.syncOptions(withMask: shoppable.getLast())
+            }
             control.customInputView = self.productsOptions.view
             control.becomeFirstResponder()
         }
@@ -569,21 +545,30 @@ extension ProductsViewControllerOptionsView {
 }
 
 private typealias ProductsViewControllerShoppables = ProductsViewController
-extension ProductsViewControllerShoppables {
-    func hasShoppables() -> Bool {
-        return self.shoppablesController.shoppableCount() > 0
-    }
-    
-    func shoppablesControllerIsEmpty(_ controller: ShoppablesController) {
-        if self.noItemsHelperView == nil {
-            self.state = .retry
+extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        if controller == self.shoppablesController {
+            if let _ = self.collectionView, let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+                self.reloadProductsForShoppable(at: index)
+            }
+        }else if controller == self.screenshotController {
+            if let screenShot = self.screenshotController.fetchedResultsController.fetchedObjects?.first {
+                if screenShot.shoppablesCount == 0 {
+                    
+                }else if screenShot.shoppablesCount == -1 {
+                    if self.noItemsHelperView == nil {
+                        self.state = .retry
+                    }
+                }
+            }
         }
-    }
-    
-    func shoppablesControllerDidReload(_ controller: ShoppablesController) {
-        self.reloadProductsForShoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
+        
         
     }
+    func hasShoppables() -> Bool {
+        return self.shoppablesController.fetchedResultsController.fetchedObjectsCount > 0
+    }
+    
     
 }
 private typealias ProductsViewControllerProducts = ProductsViewController
@@ -592,8 +577,8 @@ extension ProductsViewControllerProducts{
         return self.products[index]
     }
     
-    func indexForProduct(_ product: Product) -> Int {
-        return self.products.index(of: product) ?? NSNotFound
+    func indexForProduct(_ product: Product) -> Int? {
+        return self.products.index(of: product)
     }
     
     func reloadProductsForShoppable(at index: Int) {
@@ -604,35 +589,33 @@ extension ProductsViewControllerProducts{
         if self.hasShoppables() {
             self.scrollRevealController?.resetViewOffset()
             
-            let shoppable = self.shoppablesController.shoppable(at: index)
+            let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
             
             if shoppable.productFilterCount == -1 {
                 self.state = .retry
-                
             } else {
                 self.products = self.productsForShoppable(shoppable)
                 
                 if shoppable.productFilterCount == 0 && self.productsUnfilteredCount == 0 {
                     self.state = .loading
-                    
                 } else {
                     self.state = (self.products.count == 0) ? .empty : .products
                 }
             }
             
-            self.collectionView.reloadData()
+            self.collectionView?.reloadData()
             self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
             
-            if self.collectionView.numberOfItems(inSection: ProductsSection.tooltip.section) > 0 {
-                self.collectionView.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.tooltip.section), at: .top, animated: false)
+            if self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
+                self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.tooltip.section), at: .top, animated: false)
                 
-            } else if self.collectionView.numberOfItems(inSection: ProductsSection.product.section) > 0 {
-                self.collectionView.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
+            } else if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
+                self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
             }
             
         } else {
             self.state = .loading
-            self.collectionView.reloadData()
+            self.collectionView?.reloadData()
         }
     }
     
@@ -747,14 +730,18 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     }
     
     func productsRatePositiveAction() {
-        let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
-        shoppable.setRating(positive: true)
+        if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+            let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+            shoppable.setRating(positive: true)
+        }
     }
     
     func productsRateNegativeAction() {
-        let shoppable = self.shoppablesController.shoppable(at: self.shoppablesToolbar.selectedShoppableIndex())
-        shoppable.setRating(positive: false)
-        self.presentProductsRateNegativeAlert()
+        if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
+            let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+            shoppable.setRating(positive: false)
+            self.presentProductsRateNegativeAlert()
+        }
     }
     
     func talkToYourStylistAction() {
@@ -779,8 +766,8 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             self.productsRateNegativeFeedbackTextField = textField
         }
         
-        self.productsRateNegativeFeedbackSubmitAction = UIAlertAction(title: "Submit", style: .default, handler: { (action) in
-            if let trimmedText = self.productsRateNegativeFeedbackTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
+        let productsRateNegativeFeedbackSubmitAction = UIAlertAction(title: "Submit", style: .default, handler: { (action) in
+            if let trimmedText = self.productsRateNegativeFeedbackTextField?.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
                 
                 if trimmedText.lengthOfBytes(using: .utf8) > 0 {
                     AnalyticsTrackers.segment.track("Shoppable Feedback Negative", properties:["text": trimmedText])
@@ -788,9 +775,9 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             }
         })
         
-        self.productsRateNegativeFeedbackSubmitAction.isEnabled = false
-        alertController.addAction(self.productsRateNegativeFeedbackSubmitAction)
-        
+        productsRateNegativeFeedbackSubmitAction.isEnabled = false
+        alertController.addAction(productsRateNegativeFeedbackSubmitAction)
+        self.productsRateNegativeFeedbackSubmitAction = productsRateNegativeFeedbackSubmitAction
         alertController.preferredAction = self.productsRateNegativeFeedbackSubmitAction
         alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
@@ -808,7 +795,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             }
         }
         
-        self.productsRateNegativeFeedbackSubmitAction.isEnabled = isEnabled
+        self.productsRateNegativeFeedbackSubmitAction?.isEnabled = isEnabled
         
         return true
     }
@@ -818,7 +805,7 @@ extension ProductsViewController {
     
     func syncViewsAfterStateChange() {
         self.updateOptionsView()
-        self.shoppablesToolbar.isHidden = self.shouldHideToolbar()
+        self.shoppablesToolbar?.isHidden = self.shouldHideToolbar()
         
         switch (state) {
         case .loading:
@@ -832,13 +819,15 @@ extension ProductsViewController {
             } else {
                 if !self.automaticallyAdjustsScrollViewInsets {
                     // Setting back to YES doesn't update. Need to manually adjust.
-                    var scrollInsets = self.collectionView.scrollIndicatorInsets
-                    scrollInsets.top = self.shoppablesToolbar.bounds.size.height + (self.navigationController?.navigationBar.frame.maxY ?? 0)
-                    self.collectionView.scrollIndicatorInsets = scrollInsets
-                    
-                    var insets = self.collectionView.contentInset
-                    insets.top = scrollInsets.top
-                    self.collectionView.contentInset = insets
+                    if let collectionView = collectionView, let shoppablesToolbar = self.shoppablesToolbar {
+                        var scrollInsets = collectionView.scrollIndicatorInsets
+                        scrollInsets.top = shoppablesToolbar.bounds.size.height + (self.navigationController?.navigationBar.frame.maxY ?? 0)
+                        collectionView.scrollIndicatorInsets = scrollInsets
+                        
+                        var insets = collectionView.contentInset
+                        insets.top = scrollInsets.top
+                        collectionView.contentInset = insets
+                    }
                 }
             }
             
@@ -890,9 +879,6 @@ extension ProductsViewController {
             
             return barButtonItem
         }()
-        
-        self.shoppablesToolbar.shoppablesController = self.shoppablesController
-        self.shoppablesToolbar.screenshotImage = self.image
     }
     
 }
@@ -904,7 +890,12 @@ extension ProductsViewControllerNoItemsHelperView{
         
         let verPadding = Geometry.extendedPadding
         let horPadding = Geometry.padding
-        let topOffset:CGFloat = self.shoppablesToolbar.isHidden ? 0.0 : self.shoppablesToolbar.bounds.size.height
+        var topOffset:CGFloat = 0
+        if let shoppablesToolbar = self.shoppablesToolbar {
+            if shoppablesToolbar.isHidden == false {
+                topOffset = shoppablesToolbar.bounds.size.height
+            }
+        }
         
         let helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
@@ -941,12 +932,12 @@ extension ProductsViewControllerNoItemsHelperView{
     func noItemsRetryAction() {
         let alert = UIAlertController(title: "Try again as", message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Fashion", style: .default, handler: { (a) in
-            self.shoppablesController.refetchShoppablesAsFashion()
+            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
             self.state = .loading
             
         }))
         alert.addAction(UIAlertAction(title: "Furniture", style: .default, handler: { (a) in
-            self.shoppablesController.refetchShoppablesAsFurniture()
+            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
             self.state = .loading
             
         }))

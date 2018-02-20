@@ -10,26 +10,6 @@ import UIKit
 import CoreData
 import PromiseKit
 
-@objc public protocol FrcDelegateProtocol : class {
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath)
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath)
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath)
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath)
-    func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>)
-}
-
-enum CZChangeKind {
-    case none, singleAdd, singleDelete, singleUpdate, singleMove, multiple
-}
-
-
-class ShoppableFrc: NSFetchedResultsController<Shoppable> {
-    public let hasShoppablesFrc: NSFetchedResultsController<Screenshot>
-    init(fetchRequest: NSFetchRequest<Shoppable>, managedObjectContext: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName: String?, hasShoppablesFrc: NSFetchedResultsController<Screenshot>) {
-        self.hasShoppablesFrc = hasShoppablesFrc
-        super.init(fetchRequest: fetchRequest, managedObjectContext: managedObjectContext, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
-    }
-}
 
 class DataModel: NSObject {
     
@@ -83,233 +63,55 @@ class DataModel: NSObject {
     
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
     let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
+}
 
-    // MARK: - FRC
-
-    public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
+extension DataModel {
+    func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
         request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch screenshots from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
-    }()
-    weak open var screenshotFrcDelegate: FrcDelegateProtocol?
+    }
     
-    fileprivate var screenshotChangeIndexPath: IndexPath?
-    fileprivate var screenshotChangeKind: CZChangeKind = .none
+    func singleScreenshotFrc(delegate:FetchedResultsControllerManagerDelegate?, screenshot:Screenshot) -> FetchedResultsControllerManager<Screenshot>  {
+        let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
+        request.predicate = NSPredicate(format: "SELF == %@", screenshot.objectID)
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
     
-    
-    public func setupShoppableFrc(screenshot: Screenshot) -> ShoppableFrc {
-        let hasShoppablesRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-        hasShoppablesRequest.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
-        hasShoppablesRequest.predicate = NSPredicate(format: "SELF == %@", screenshot.objectID)
-        let hasShoppablesFetchedResultsController = NSFetchedResultsController(fetchRequest: hasShoppablesRequest, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        hasShoppablesFrc = hasShoppablesFetchedResultsController
-        hasShoppablesFrc?.delegate = self
-        
+    func shoppableFrc(delegate:FetchedResultsControllerManagerDelegate?, screenshot:Screenshot) -> FetchedResultsControllerManager<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "b0x", ascending: true), NSSortDescriptor(key: "b0y", ascending: true), NSSortDescriptor(key: "b1x", ascending: true), NSSortDescriptor(key: "b1y", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
         request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
-        let fetchedResultsController = ShoppableFrc(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil, hasShoppablesFrc: hasShoppablesFrc!)
-        shoppableFrc = fetchedResultsController as NSFetchedResultsController<Shoppable>
-        shoppableFrc?.delegate = self
-        
-        do {
-            try fetchedResultsController.performFetch()
-            try hasShoppablesFetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch shoppables from core data:\(error)")
-        }
-        return fetchedResultsController
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Shoppable>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController;
     }
     
-    public func clearShoppableFrc() {
-        shoppableFrc?.delegate = nil
-        shoppableFrc = nil
-        hasShoppablesFrc?.delegate = nil
-        hasShoppablesFrc = nil
-    }
     
-    weak open var shoppableFrcDelegate: FrcDelegateProtocol?
-    
-    fileprivate var shoppableFrc: NSFetchedResultsController<Shoppable>?
-    fileprivate var shoppableChangeIndexPath: IndexPath?
-    fileprivate var shoppableChangeKind: CZChangeKind = .none
-    fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>?
-    fileprivate var hasShoppablesChangeIndexPath: IndexPath?
-    fileprivate var hasShoppablesChangeKind: CZChangeKind = .none
-
-    
-    public lazy var favoriteFrc: NSFetchedResultsController<Screenshot> = {
-        let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+    func favoriteFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
+        let request: NSFetchRequest = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
         request.predicate = NSPredicate(format: "lastFavorited != nil")
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch _favoriteFrc from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
-    }()
-    weak open var favoriteFrcDelegate: FrcDelegateProtocol?
+    }
     
-    fileprivate var favoriteChangeIndexPath: IndexPath?
-    fileprivate var favoriteChangeKind: CZChangeKind = .none
-    
-    
-    public lazy var matchstickFrc: NSFetchedResultsController<Matchstick> = {
-        let request: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+    func matchstickFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Matchstick> {
+        let request: NSFetchRequest = Matchstick.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
         request.predicate = NSPredicate(format: "imageData != nil")
-        request.fetchBatchSize = 3
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch matchsticks from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Matchstick> = FetchedResultsControllerManager<Matchstick>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate:delegate)
+        
         return fetchedResultsController
-    }()
-    weak open var matchstickFrcDelegate: FrcDelegateProtocol?
-    
-    fileprivate var matchstickChangeIndexPath: IndexPath?
-    fileprivate var matchstickChangeKind: CZChangeKind = .none
-    
-}
-
-extension DataModel: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
-        let hasShoppablesFrcStandIn = hasShoppablesFrc == nil ? NSFetchedResultsController() : hasShoppablesFrc!
-        switch controller {
-        case screenshotFrc:
-            screenshotChangeKind = .none
-            screenshotChangeIndexPath = nil
-        case shoppableFrcStandIn:
-            shoppableChangeKind = .none
-            shoppableChangeIndexPath = nil
-        case hasShoppablesFrcStandIn:
-            hasShoppablesChangeKind = .none
-            hasShoppablesChangeIndexPath = nil
-        case favoriteFrc:
-            favoriteChangeKind = .none
-            favoriteChangeIndexPath = nil
-        case matchstickFrc:
-            matchstickChangeKind = .none
-            matchstickChangeIndexPath = nil
-        default:
-            print("Unknown controller:\(controller) in controllerWillChangeContent")
-        }
     }
-    
-    func didChange(changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, type: NSFetchedResultsChangeType, indexPath: IndexPath?, newIndexPath: IndexPath?) {
-        if changeKind != .none || changeIndexPath != nil {
-            changeKind = .multiple
-        } else {
-            switch type {
-            case .insert:
-                changeKind = .singleAdd
-                changeIndexPath = newIndexPath
-            case .delete:
-                changeKind = .singleDelete
-                changeIndexPath = indexPath
-            case .update:
-                changeKind = .singleUpdate
-                changeIndexPath = indexPath
-            case .move:
-                changeKind = .singleMove
-                changeIndexPath = newIndexPath
-            }
-        }
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
-        let hasShoppablesFrcStandIn = hasShoppablesFrc == nil ? NSFetchedResultsController() : hasShoppablesFrc!
-        switch controller {
-        case screenshotFrc:
-            didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case shoppableFrcStandIn:
-            didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case hasShoppablesFrcStandIn:
-            didChange(changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case favoriteFrc:
-            didChange(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case matchstickFrc:
-            didChange(changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        default:
-            print("Unknown controller:\(controller) in controller didChange")
-        }
-    }
-    
-    func didChangeContent(frc: NSFetchedResultsController<NSFetchRequestResult>, changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, frcDelegate: FrcDelegateProtocol?) {
-        switch changeKind {
-        case .none:
-            print("DataModel didChangeContent no change. Weird")
-        case .singleAdd:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneAddedAt: changeIndexPath)
-            } else {
-                print("Error DataModel singleAdd changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .singleDelete:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneDeletedAt: changeIndexPath)
-            } else {
-                print("Error DataModel singleDelete changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .singleUpdate:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneUpdatedAt: changeIndexPath)
-            } else {
-                print("Error DataModel singleAdd changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .singleMove:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneMovedTo: changeIndexPath)
-            } else {
-                print("Error DataModel singleMove changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .multiple:
-            frcDelegate?.frcReloadData(frc)
-        }
-        changeKind = .none
-        changeIndexPath = nil
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
-        let hasShoppablesFrcStandIn = hasShoppablesFrc == nil ? NSFetchedResultsController() : hasShoppablesFrc!
-        switch controller {
-        case screenshotFrc:
-            didChangeContent(frc: controller, changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
-        case shoppableFrcStandIn:
-            didChangeContent(frc: controller, changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
-        case hasShoppablesFrcStandIn:
-            didChangeContent(frc: controller, changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, frcDelegate: shoppableFrcDelegate)
-        case favoriteFrc:
-            didChangeContent(frc: controller, changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
-        case matchstickFrc:
-            didChangeContent(frc: controller, changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, frcDelegate: matchstickFrcDelegate)
-        default:
-            print("Unknown controller:\(controller) in controllerDidChangeContent")
-        }
-    }
-    
 }
 
 extension DataModel {

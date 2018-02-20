@@ -27,6 +27,4 @@
 - (ScreenshotPickerNavigationController *)createScreenshotPickerNavigationController;
 - (void)presentPickerViewController;
 
-- (ProductsViewController *)createProductsViewController;
-
 @end

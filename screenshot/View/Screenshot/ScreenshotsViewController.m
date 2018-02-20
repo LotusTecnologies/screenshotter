@@ -9,19 +9,16 @@
 
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
-
 typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     ScreenshotsSectionNotification,
     ScreenshotsSectionImage
 };
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, FrcDelegateProtocol, CoreDataPreparationControllerDelegate>
+@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, CoreDataPreparationControllerDelegate>
 
 @property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
 
-@property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
-@property (nonatomic, strong) NSFetchedResultsController *screenshotFrc;
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
 
 @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
@@ -172,7 +169,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     self.collectionView.delegate = nil;
     self.collectionView.dataSource = nil;
     
-    [DataModel sharedInstance].screenshotFrcDelegate = nil;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -522,11 +518,11 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (Screenshot *)screenshotAtIndex:(NSInteger)index {
-    return [self.screenshotFrc objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
+    return [[self screenshotFrc] objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
 }
 
 - (NSInteger)indexForScreenshot:(Screenshot *)screenshot {
-    return [self.screenshotFrc indexPathForObject:screenshot].item;
+    return [[self screenshotFrc] indexPathForObject:screenshot].item;
 }
 
 - (void)scrollToTop {
@@ -686,8 +682,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 #pragma mark - Core Data Preparation
 
 - (void)coreDataPreparationControllerSetup:(CoreDataPreparationController *)controller {
-    [DataModel sharedInstance].screenshotFrcDelegate = self;
-    self.screenshotFrc = [DataModel sharedInstance].screenshotFrc;
+
+    [self setupFetchedResultsController];
     
     if ([DataModel sharedInstance].isCoreDataStackReady) {
         [self.collectionView reloadData];
@@ -711,80 +707,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 #pragma mark - Fetch Results Controller
 
-- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneAddedAt:(NSIndexPath *)indexPath {
-    if (frc == self.screenshotFrc) {
-        NSIndexPath *collectionViewIndexPath = [self screenshotFrcToCollectionViewIndexPath:indexPath.item];
-        
-        [self.collectionView insertItemsAtIndexPaths:@[collectionViewIndexPath]];
-        [self.collectionView scrollToItemAtIndexPath:collectionViewIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
-        [self syncHelperViewVisibility];
-    }
-}
-
-- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneDeletedAt:(NSIndexPath *)indexPath {
-    if (frc == self.screenshotFrc) {
-        [self.collectionView deleteItemsAtIndexPaths:@[[self screenshotFrcToCollectionViewIndexPath:indexPath.item]]];
-        [self syncHelperViewVisibility];
-
-        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 0) {
-            [self.delegate screenshotsViewControllerDeletedLastScreenshot:self];
-        }
-    }
-}
-
-- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneUpdatedAt:(NSIndexPath *)indexPath {
-    if (frc == self.screenshotFrc) {
-        NSIndexPath* celIndexPath = [self screenshotFrcToCollectionViewIndexPath:indexPath.item];
-        ScreenshotCollectionViewCell* cell = (ScreenshotCollectionViewCell*)[self.collectionView cellForItemAtIndexPath:celIndexPath];
-        if (cell && [cell isKindOfClass:[ScreenshotCollectionViewCell class]]){
-            [self setupScreenshotCollectionViewCell:cell collectionView:self.collectionView forItemAtIndexPath:indexPath];
-        }
-    }
-}
-
-- (void)frc:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc oneMovedTo:(NSIndexPath *)indexPath {
-    if (frc == self.screenshotFrc) {
-        NSIndexPath *collectionViewIndexPath = [self screenshotFrcToCollectionViewIndexPath:indexPath.item];
-        
-        [self.collectionView reloadData];
-        [self.collectionView scrollToItemAtIndexPath:collectionViewIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
-    }
-}
-
-- (void)frcReloadData:(NSFetchedResultsController<id<NSFetchRequestResult>> *)frc {
-    if (frc == self.screenshotFrc) {
-        [self.collectionView reloadData];
-        [self syncHelperViewVisibility];
-        
-        
-        // TODO: reset the deleted screenshot array and enable the edit button
-        // take into account the only multiple deletes will come here, deleting
-        // a single item will goto the oneDeletedAt
-        
-        // Below is not tested. also include for one delete at
-        if (self.deleteScreenshotObjectIDs.count > 0) {
-            if (self.screenshotFrc.fetchedObjects.count > 0) {
-                BOOL didDeleteScreenshots = YES;
-                
-                for (Screenshot *screenshot in self.screenshotFrc.fetchedObjects) {
-                    // Not sure which is correct...
-//                    [self.deleteScreenshotObjectIDs.firstObject isEqual:screenshot.objectID]
-                    if (self.deleteScreenshotObjectIDs.firstObject == screenshot.objectID) {
-                        didDeleteScreenshots = NO;
-                        break;
-                    }
-                }
-                
-                if (didDeleteScreenshots) {
-                    [self deselectDeletedScreenshots];
-                }
-            }
-            else {
-                [self deselectDeletedScreenshots];
-            }
-        }
-    }
-}
 
 - (NSIndexPath *)collectionViewToScreenshotFrcIndexPath:(NSInteger)index {
     return [NSIndexPath indexPathForItem:index inSection:0];

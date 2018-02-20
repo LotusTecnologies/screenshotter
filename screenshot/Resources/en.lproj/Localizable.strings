@@ -96,6 +96,7 @@
 "products.cell.SALE" = "SALE";
 "products.cell.BUY" = "BUY";
 
+"products.options.title" = "Sort & Filter";
 "products.options.category.auto" = "Auto";
 "products.options.category.fashion" = "Fashion";
 "products.options.category.furniture" = "Furniture";
