@@ -14,7 +14,7 @@ class FavoritesTableViewCell : UITableViewCell {
     private var screenshotImageViewWidthConstraint: NSLayoutConstraint!
     private var screenshotImageViewHeightConstraint: NSLayoutConstraint!
     fileprivate let shoppableContainerView = UIView()
-    fileprivate let heartView = FavoriteBadgeView()
+    let activityBadgeView = ActivityBadgeView()
     
     var imageData: NSData? {
         didSet {
@@ -69,10 +69,10 @@ class FavoritesTableViewCell : UITableViewCell {
         screenshotImageViewHeightConstraint.priority = UILayoutPriorityDefaultHigh
         screenshotImageViewHeightConstraint.isActive = true
         
-        heartView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(heartView)
-        heartView.centerXAnchor.constraint(equalTo: screenshotContainerView.leadingAnchor).isActive = true
-        heartView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
+        activityBadgeView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(activityBadgeView)
+        activityBadgeView.centerXAnchor.constraint(equalTo: screenshotContainerView.leadingAnchor).isActive = true
+        activityBadgeView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
         
         let centerView = UIView()
         centerView.translatesAutoresizingMaskIntoConstraints = false
@@ -102,7 +102,7 @@ class FavoritesTableViewCell : UITableViewCell {
     
     override var backgroundColor: UIColor? {
         didSet {
-            heartView.backgroundColor = backgroundColor
+            activityBadgeView.backgroundColor = backgroundColor
         }
     }
     
@@ -208,14 +208,6 @@ class FavoritesTableViewCell : UITableViewCell {
             if let productView = shoppableContainerView.subviews[i] as? EmbossedView {
                 productView.setImage(withURLString: product.imageURL)
             }
-        }
-    }
-    
-    // MARK: Heart
-    
-    var hasGoldHeart: Bool = false {
-        didSet {
-            heartView.tintColor = hasGoldHeart ? heartView.clearColor : .crazeRed
         }
     }
 }

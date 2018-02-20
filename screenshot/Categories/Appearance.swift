@@ -66,9 +66,9 @@ extension UIContentSizeCategory {
 }
 
 struct Shadow {
-    private(set) var radius: CGFloat;
-    private(set) var offset: CGSize;
-    private(set) var color: UIColor;
+    private(set) var radius: CGFloat
+    private(set) var offset: CGSize
+    private(set) var color: UIColor
     
     var insets: UIEdgeInsets {
         let inset = radius * 2

@@ -104,8 +104,9 @@ extension DataModel {
     
     func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
-        request.predicate = NSCompoundPredicate.init(orPredicateWithSubpredicates: [NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")])
+        request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
+        let date = NSDate.init(timeIntervalSinceNow:  -60*60*24*7)
+        request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
         
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
@@ -242,15 +243,14 @@ extension DataModel {
         }
         return nil
     }
-    @objc public func unfavoriteAndUnview(productObjectIDs: [NSManagedObjectID]) {
+    @objc public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
         performBackgroundTask { (managedObjectContext) in
             do {
                 productObjectIDs.forEach { productObjectId in
                     if let product = managedObjectContext.object(with: productObjectId) as? Product {
                         do{
                             try product.validateForUpdate()
-                            product.setFavorited(toFavorited: false)
-                            product.dateViewed = nil
+                            product.hideFromProductBar = true
                         } catch{
                             
                         }
@@ -260,7 +260,7 @@ extension DataModel {
                 }
                 try managedObjectContext.save()
             } catch {
-                print("unfavoriteAndUnview productObjectIDs catch error:\(error)")
+                print("hideFromProductBar productObjectIDs catch error:\(error)")
             }
         }
     }
@@ -1032,22 +1032,21 @@ extension Shoppable {
 
 extension Product {
     
-    var sortDateForProductBar:Date {
-        get {
-            var date = Date.distantPast
-            
-            if self.isFavorite, let dateFavorited = self.dateFavorited as Date?{
-                date = dateFavorited
-            }
-            
-            if  let dateViewed = self.dateViewed as Date?{
-                if dateViewed.compare(date) == .orderedDescending {
-                    date = dateViewed
-                }
-            }
-            
-            return date
+    func getSortDateForProductBar() -> Date {
+        
+        var date = Date.distantPast
+        
+        if self.isFavorite, let dateFavorited = self.dateFavorited as Date?{
+            date = dateFavorited
         }
+        
+        if  let dateViewed = self.dateViewed as Date?{
+            if dateViewed.compare(date) == .orderedDescending {
+                date = dateViewed
+            }
+        }
+        
+        return date
     }
     
     public func recordViewedProduct(){
@@ -1062,6 +1061,8 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.dateViewed = now
+                    product.dateSortProductBar = product.getSortDateForProductBar() as NSDate
+                    product.hideFromProductBar = false
                 }
                 try managedObjectContext.save()
             } catch {
@@ -1088,6 +1089,8 @@ extension Product {
                     if toFavorited {
                         let now = NSDate()
                         product.dateFavorited = now
+                        product.dateSortProductBar = product.getSortDateForProductBar() as NSDate
+                        product.hideFromProductBar = false
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.addToFavorites(product)
                             if let favoritesCount = screenshot.favorites?.count {
