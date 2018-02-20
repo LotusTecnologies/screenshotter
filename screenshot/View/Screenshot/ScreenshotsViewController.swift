@@ -59,3 +59,68 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
         }
     }
 }
+
+//Helper view
+extension ScreenshotsViewController {
+    @objc func insertScreenshotHelperView() {
+        
+        let hasPresented = UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
+        if !hasPresented && self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) == 1{
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
+            if let layout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+                let backgroundView = UIView()
+                
+                self.collectionView.backgroundView = backgroundView;
+                
+                let contentView = UIView()
+                contentView.translatesAutoresizingMaskIntoConstraints = false
+                backgroundView.addSubview(contentView)
+                
+                contentView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:layout.minimumLineSpacing).isActive = true
+                contentView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant:-layout.minimumInteritemSpacing).isActive = true
+                contentView.widthAnchor.constraint(equalTo: backgroundView.widthAnchor,multiplier:0.5, constant:-layout.minimumInteritemSpacing * 1.5).isActive = true
+                contentView.heightAnchor.constraint(equalTo: backgroundView.widthAnchor,multiplier:Screenshot.ratio.height, constant:0).isActive = true
+                
+                
+                let titleLabel = UILabel()
+                titleLabel.translatesAutoresizingMaskIntoConstraints = false
+                titleLabel.text = "screenshots.helperView.title".localized
+                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightSemibold)
+                titleLabel.numberOfLines = 0
+                contentView.addSubview(titleLabel)
+                titleLabel.topAnchor.constraint(equalTo:contentView.topAnchor).isActive = true
+                titleLabel.leadingAnchor.constraint(equalTo:contentView.leadingAnchor).isActive = true
+                titleLabel.trailingAnchor.constraint(equalTo:contentView.trailingAnchor).isActive = true
+                
+                
+                let descriptionLabel = UILabel()
+                descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+                descriptionLabel.text = "screenshots.helperView.byline".localized
+                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
+                
+                descriptionLabel.numberOfLines = 0
+                contentView.addSubview(descriptionLabel)
+                descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Geometry.padding).isActive = true
+                descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+                descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+                
+                
+                let imageView = UIImageView.init(image: UIImage.init(named: "TutorialReadyArrow"))
+                imageView.translatesAutoresizingMaskIntoConstraints = false
+                imageView.contentMode = .scaleAspectFit
+                contentView.addSubview(imageView)
+                imageView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor).isActive = true
+                imageView.leadingAnchor.constraint(equalTo: descriptionLabel.leadingAnchor).isActive = true
+                imageView.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
+                imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor).isActive = true
+            }
+        }
+    }
+    
+    @objc func removeScreenshotHelperView(){
+        if self.collectionView.backgroundView != nil {
+           self.collectionView.backgroundView?.removeFromSuperview()
+            self.collectionView.backgroundView = nil
+        }
+    }
+}

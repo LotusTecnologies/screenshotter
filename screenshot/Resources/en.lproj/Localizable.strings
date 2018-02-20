@@ -135,6 +135,8 @@
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.single" = "Delete %d Item";
 "screenshots.delete.plural" = "Delete %d Items";
+"screenshots.helperView.title" = "Ready To Shop";
+"screenshots.helperView.byline" = "Here’s your screenshot!\nTap on it to see the products in the photo";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
