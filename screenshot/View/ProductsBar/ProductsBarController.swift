@@ -13,20 +13,11 @@ import Foundation
     func productBar(_ controller:ProductsBarController, didTap product:Product)
 }
 class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
-    @objc var toUnfavoriteAndUnViewProductObjectIDs:[NSManagedObjectID] = [] {
-        didSet{
-            if let collectionView = self.collectionView {
-                for index in collectionView.indexPathsForVisibleItems {
-                    if let cell = collectionView.cellForItem(at: index) as? ProductsBarCollectionViewCell {
-                        let product = self.products[index.row]
-                        cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
-                    }
-                }
-            }
-        }
-    }
+  
     @objc weak var delegate:ProductsBarControllerDelegate?
     var productsFrc: FetchedResultsControllerManager<Product>?
+    
+    
     
     private var isNotHidden:Bool?
     var collectionView: ProductsBarCollectionView? {
@@ -39,35 +30,56 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
             collectionView.reloadData()
         }
     }
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(significantTimeChange(_:)), name: Notification.Name.UIApplicationSignificantTimeChange, object: nil)
+    }
     
-    fileprivate var products:[Product] = []
+    @objc func significantTimeChange(_ notificaiton:Notification){
+        self.setup()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc var toUnfavoriteAndUnViewProductObjectIDs:[NSManagedObjectID] = [] {
+        didSet{
+            if let collectionView = self.collectionView {
+                for indexPath in collectionView.indexPathsForVisibleItems {
+                    if let cell = collectionView.cellForItem(at: indexPath) as? ProductsBarCollectionViewCell {
+                        if let product =  self.productsFrc?.fetchedResultsController.object(at: indexPath) {
+                            cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+  
+
     
     func setup(){
         self.productsFrc = DataModel.sharedInstance.productBarFrc(delegate: self)
-        self.setupProductList()
+
         self.isNotHidden = self.hasProducts
         if self.hasProducts {
             self.delegate?.productBarShouldShow(self)
         }else{
             self.delegate?.productBarShouldHide(self)
         }
-    }
-    func setupProductList(){
-        if let recentsProducts = self.productsFrc?.fetchedResultsController.fetchedObjects {
-            let oneWeekAgo = Date.init(timeIntervalSinceNow: -60*60*24*7)
-            self.products = recentsProducts.filter({ (p) -> Bool in
-                return p.isFavorite || p.sortDateForProductBar > oneWeekAgo
-            }).sorted { $0.sortDateForProductBar > $1.sortDateForProductBar }
-            
-        }
+        self.collectionView?.reloadData()
     }
     
+    
     var hasProducts: Bool {
-        return products.count >= 4
+        return self.productsFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 >= 4
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        setupProductList()
+
         if self.isNotHidden != self.hasProducts {
             self.isNotHidden = self.hasProducts
             
@@ -76,13 +88,12 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
             }else{
                 self.delegate?.productBarShouldHide(self)
             }
-            self.collectionView?.reloadData()
             if let collectionView = self.collectionView {
                 collectionView.contentOffset = CGPoint.init(x: -1 * collectionView.contentInset.left, y: 0)
             }
-        }else{
-            //just updates but remain hidden or unhidden
-            self.collectionView?.reloadData()
+        }
+        if let collectionView = self.collectionView {
+            change.applyChanges(collectionView: collectionView)
         }
 
     }
@@ -91,23 +102,25 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
 
 extension ProductsBarController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.products.count
+        return self.productsFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProductsBarCollectionView.cellIdentifier, for: indexPath)
-        let product = self.products[indexPath.item]
+        
         
         if let cell = cell as? ProductsBarCollectionViewCell {
-            cell.isFavorited = product.isFavorite
-            cell.isSale = product.isSale()
-            
-            if let urlString = product.imageURL, let url = URL.init(string: urlString) {
-                cell.imageView.sd_setImage(with: url, placeholderImage: nil, options: [.retryFailed, .highPriority], completed: nil)
-            }else{
-                cell.imageView.image = nil
+            if let product =  self.productsFrc?.fetchedResultsController.object(at: indexPath) {
+                cell.isFavorited = product.isFavorite
+                cell.isSale = product.isSale()
+                
+                if let urlString = product.imageURL, let url = URL.init(string: urlString) {
+                    cell.imageView.sd_setImage(with: url, placeholderImage: nil, options: [.retryFailed, .highPriority], completed: nil)
+                }else{
+                    cell.imageView.image = nil
+                }
+                cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
             }
-            cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
             
         }
         
@@ -124,7 +137,8 @@ extension ProductsBarController: UICollectionViewDelegateFlowLayout {
 
 extension ProductsBarController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let product = self.products[indexPath.item]
-        self.delegate?.productBar(self, didTap: product)
+        if let product =  self.productsFrc?.fetchedResultsController.object(at: indexPath) {
+            self.delegate?.productBar(self, didTap: product)
+        }
     }
 }

@@ -345,13 +345,12 @@
 
 - (void)deleteButtonAction {
     [self setEditing:NO animated:YES];
-    self.editButtonItem.enabled = NO;
+    self.editButtonItem.enabled = true;
     
-    // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
     
     if (self.deleteScreenshotObjectIDs.count + self.toUnfavoriteAndUnViewProductObjectIDs.count > 0) {
         [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
-        [[DataModel sharedInstance] unfavoriteAndUnviewWithProductObjectIDs:self.toUnfavoriteAndUnViewProductObjectIDs];
+        [[DataModel sharedInstance] hideFromProductBar:self.toUnfavoriteAndUnViewProductObjectIDs];
 
     }
 }
