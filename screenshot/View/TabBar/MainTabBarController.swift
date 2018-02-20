@@ -15,50 +15,54 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 
     var isObservingSettingsBadgeFont = false
 
-    let favoritesNavigationController: FavoritesNavigationController
-    let screenshotsNavigationController: ScreenshotsNavigationController
-    let discoverNavigationController: DiscoverNavigationController
-    let settingsNavigationController: SettingsNavigationController
+    let favoritesNavigationController = FavoritesNavigationController()
+    let screenshotsNavigationController = ScreenshotsNavigationController()
+    let discoverNavigationController = DiscoverNavigationController()
+    let settingsNavigationController = SettingsNavigationController()
+    let cartNavigationController = CartNavigationController()
     var settingsTabBarItem: UITabBarItem
     var updatePromptHandler: UpdatePromptHandler?
-    let discoverTabTag = 2
+    let discoverTabTag = 1
 
     let TabBarBadgeFontKey = "view.badge.label.font"
 
     // MARK: - Lifecycle
     
-    init() {
-        screenshotsNavigationController = ScreenshotsNavigationController()
-        favoritesNavigationController = FavoritesNavigationController(nibName: nil, bundle: nil)
-        discoverNavigationController = DiscoverNavigationController(nibName: nil, bundle: nil)
-        settingsNavigationController = SettingsNavigationController(nibName: nil, bundle: nil)
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         settingsTabBarItem = settingsNavigationController.tabBarItem
-
-        super.init(nibName: nil, bundle: nil)
+        
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
+        favoritesNavigationController.tabBarItem = tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: 0)
+        
+        discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
+        discoverNavigationController.tabBarItem = tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: discoverTabTag)
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
         screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = self.tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: 0)
-        
-        favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
-        favoritesNavigationController.tabBarItem = self.tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: 1)
-        
-        discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
-        discoverNavigationController.tabBarItem = self.tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: discoverTabTag)
+        screenshotsNavigationController.tabBarItem = tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: 2)
         
         settingsNavigationController.settingsViewController.delegate = self
         settingsNavigationController.title = settingsNavigationController.settingsViewController.title
-        settingsNavigationController.tabBarItem = self.tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: 3)
-        settingsNavigationController.tabBarItem.badgeColor = UIColor.crazeRed
+        settingsNavigationController.tabBarItem = tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: 3)
+        settingsNavigationController.tabBarItem.badgeColor = .crazeRed
         settingsTabBarItem = settingsNavigationController.tabBarItem
-
+        
+        cartNavigationController.title = cartNavigationController.cartViewController.title
+        cartNavigationController.tabBarItem = tabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: 4)
+        
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
         
-        self.viewControllers = [self.screenshotsNavigationController,
-                                self.favoritesNavigationController,
-                                self.discoverNavigationController,
-                                self.settingsNavigationController]
+        viewControllers = [
+            favoritesNavigationController,
+            discoverNavigationController,
+            screenshotsNavigationController,
+            settingsNavigationController,
+            cartNavigationController
+        ]
+        selectedIndex = viewControllers?.index(of: screenshotsNavigationController) ?? 0
         
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)

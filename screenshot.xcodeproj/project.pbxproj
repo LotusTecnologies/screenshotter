@@ -36,6 +36,9 @@
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
+		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
+		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
+		C5336D1F203AD4B800A7B4B0 /* CartTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1E203AD4B800A7B4B0 /* CartTableViewCell.swift */; };
 		C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C537F39D2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift */; };
 		C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */; };
 		C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C53B15BC1FDD638C00658A78 /* Localizable.strings */; };
@@ -161,6 +164,9 @@
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
+		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
+		C5336D1E203AD4B800A7B4B0 /* CartTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartTableViewCell.swift; sourceTree = "<group>"; };
 		C537F39D2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotCollectionViewCell.swift; sourceTree = "<group>"; };
 		C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = FavoriteHeart.json; sourceTree = "<group>"; };
 		C53B15BB1FDD638C00658A78 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -371,6 +377,16 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
+		C5336D19203AC9AB00A7B4B0 /* Cart */ = {
+			isa = PBXGroup;
+			children = (
+				C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */,
+				C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */,
+				C5336D1E203AD4B800A7B4B0 /* CartTableViewCell.swift */,
+			);
+			path = Cart;
+			sourceTree = "<group>";
+		};
 		C53B46541FBC399900A8C886 /* Structs */ = {
 			isa = PBXGroup;
 			children = (
@@ -382,6 +398,7 @@
 		C54087461FE90C3A00198955 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C5336D19203AC9AB00A7B4B0 /* Cart */,
 				C54087DA1FE90C8D00198955 /* Currency */,
 				C54087F61FE90C8E00198955 /* Discover */,
 				C54087F31FE90C8E00198955 /* Favorite */,
@@ -1017,8 +1034,10 @@
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
+				C5336D1F203AD4B800A7B4B0 /* CartTableViewCell.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
+				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,
 				C554B177202706F00099622C /* FrameworkSetupController.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
@@ -1045,6 +1064,7 @@
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
+				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C54088391FE90C8E00198955 /* ScreenshotsViewController.m in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,

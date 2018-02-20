@@ -1,15 +1,15 @@
 //
-//  SettingsNavigationController.swift
+//  CartNavigationController.swift
 //  screenshot
 //
-//  Created by Corey Werner on 1/31/18.
+//  Created by Corey Werner on 2/19/18.
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 
-class SettingsNavigationController : UINavigationController {
-    let settingsViewController = SettingsViewController()
+class CartNavigationController: UINavigationController {
+    let cartViewController = CartViewController()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -24,7 +24,7 @@ class SettingsNavigationController : UINavigationController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        viewControllers = [settingsViewController]
+        viewControllers = [cartViewController]
     }
     
     override func viewDidLoad() {

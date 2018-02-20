@@ -47,7 +47,7 @@ extension UIColor {
 
 extension UIContentSizeCategory {
     var isAccessibilityCategory: Bool {
-        var isAccessibility: Bool
+        let isAccessibility: Bool
         
         switch self {
         case .accessibilityMedium,
@@ -56,7 +56,7 @@ extension UIContentSizeCategory {
              .accessibilityExtraExtraLarge,
              .accessibilityExtraExtraExtraLarge:
             isAccessibility = true
-            break
+            
         default:
             isAccessibility = false
         }
