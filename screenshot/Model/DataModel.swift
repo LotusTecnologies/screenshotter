@@ -93,13 +93,23 @@ extension DataModel {
         return fetchedResultsController;
     }
     
-    
     func favoriteFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
         let request: NSFetchRequest = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
         request.predicate = NSPredicate(format: "lastFavorited != nil")
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
+    func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
+        let date = NSDate.init(timeIntervalSinceNow:  -60*60*24*7)
+        request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
+        
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
     
@@ -233,7 +243,28 @@ extension DataModel {
         }
         return nil
     }
-    
+    @objc public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                productObjectIDs.forEach { productObjectId in
+                    if let product = managedObjectContext.object(with: productObjectId) as? Product {
+                        do{
+                            try product.validateForUpdate()
+                            product.hideFromProductBar = true
+                        } catch{
+                            
+                        }
+                        
+                        
+                    }
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("hideFromProductBar productObjectIDs catch error:\(error)")
+            }
+        }
+    }
+
     public func hide(screenshotOIDArray: [NSManagedObjectID]) {
         performBackgroundTask { (managedObjectContext) in
             do {
@@ -357,6 +388,7 @@ extension DataModel {
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.optionsMask = optionsMask
+        productToSave.dateRetrieved = NSDate()
         return productToSave
     }
     
@@ -1000,6 +1032,46 @@ extension Shoppable {
 
 extension Product {
     
+    func getSortDateForProductBar() -> Date {
+        
+        var date = Date.distantPast
+        
+        if self.isFavorite, let dateFavorited = self.dateFavorited as Date?{
+            date = dateFavorited
+        }
+        
+        if  let dateViewed = self.dateViewed as Date?{
+            if dateViewed.compare(date) == .orderedDescending {
+                date = dateViewed
+            }
+        }
+        
+        return date
+    }
+    
+    public func recordViewedProduct(){
+        let now = NSDate()
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for product in results {
+                    product.dateViewed = now
+                    product.dateSortProductBar = product.getSortDateForProductBar() as NSDate
+                    product.hideFromProductBar = false
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("recordViewedProduct objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
+    
     @objc public func setFavorited(toFavorited: Bool) {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
@@ -1011,9 +1083,14 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
+                    if toFavorited == false {
+                        product.dateViewed  = nil
+                    }
                     if toFavorited {
                         let now = NSDate()
                         product.dateFavorited = now
+                        product.dateSortProductBar = product.getSortDateForProductBar() as NSDate
+                        product.hideFromProductBar = false
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.addToFavorites(product)
                             if let favoritesCount = screenshot.favorites?.count {

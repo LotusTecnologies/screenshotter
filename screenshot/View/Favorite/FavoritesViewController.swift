@@ -193,7 +193,7 @@ extension FavoritesViewController : UITableViewDataSource {
             cell.backgroundColor = view.backgroundColor
             cell.imageData = screenshot.imageData
             cell.setProducts(screenshotFavorites.products)
-            cell.hasGoldHeart = screenshotFavorites.favoritedEachShoppable
+            cell.activityBadgeView.badge = screenshotFavorites.favoritedEachShoppable ? .goldHeart : .heart
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .none
             
@@ -218,9 +218,9 @@ extension FavoritesViewController : UITableViewDelegate {
 extension FavoritesViewController : CoreDataPreparationControllerDelegate {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
         favoriteFrc = DataModel.sharedInstance.favoriteFrc(delegate: self)
-        
+        tableView.reloadData()
+
         if DataModel.sharedInstance.isCoreDataStackReady {
-            tableView.reloadData()
             syncHelperViewVisibility()
             syncScreenshotAssetIds()
         }
@@ -242,22 +242,23 @@ extension FavoritesViewController : CoreDataPreparationControllerDelegate {
 
 extension FavoritesViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        
-        for index in change.insertedRows {
-            if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
-                if let assetId = screenshot.assetId {
-                    screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
+        if self.isViewLoaded {
+            for index in change.insertedRows {
+                if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
+                    if let assetId = screenshot.assetId {
+                        screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
+                    }
                 }
             }
-        }
-        for index in change.updatedRows {
-            if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
-                if let assetId = screenshot.assetId {
-                    screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
+            for index in change.updatedRows {
+                if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
+                    if let assetId = screenshot.assetId {
+                        screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
+                    }
                 }
             }
+            change.applyChanges(tableView: tableView)
         }
-        change.applyChanges(tableView: tableView)
     }
 }
 

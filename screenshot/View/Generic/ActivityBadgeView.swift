@@ -1,5 +1,5 @@
 //
-//  FavoriteBadgeView.swift
+//  ActivityBadgeView.swift
 //  screenshot
 //
 //  Created by Corey Werner on 1/2/18.
@@ -8,10 +8,15 @@
 
 import Foundation
 
-class FavoriteBadgeView : UIView {
+enum ActivityBadge {
+    case heart
+    case goldHeart
+    case clock
+}
+
+class ActivityBadgeView: UIView {
     fileprivate let imageView = UIImageView()
-    fileprivate let image = UIImage(named: "FavoriteGoldHeart")
-    private let padding = CGFloat(10)
+    private let padding: CGFloat = 10
     
     // MARK: Life Cycle
     
@@ -27,10 +32,11 @@ class FavoriteBadgeView : UIView {
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
-        imageView.image = syncedImage()
         addSubview(imageView)
         imageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         imageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: padding * 0.1).isActive = true
+        
+        syncBadgeImage()
     }
     
     override func layoutSubviews() {
@@ -46,25 +52,24 @@ class FavoriteBadgeView : UIView {
         return size
     }
     
-    // Clear color will not be comparable with the setting,
-    // Accessibility -> Increase Contrast -> Reduce Transparency
-    // turned on. Create a non UIKit defined clear color to
-    // avoid this issue.
-    let clearColor = UIColor(white: 1, alpha: 0)
+    // MARK: Badge
     
-    override var tintColor: UIColor! {
+    var badge: ActivityBadge = .heart {
         didSet {
-            imageView.tintColor = tintColor
-            imageView.image = syncedImage()
+            syncBadgeImage()
         }
     }
     
-    private func syncedImage() -> UIImage? {
-        if tintColor == clearColor {
-            return image
+    fileprivate func syncBadgeImage() {
+        switch badge {
+        case .heart:
+            imageView.image = UIImage(named: "ActivityBadgeHeart")
             
-        } else {
-            return image?.withRenderingMode(.alwaysTemplate)
+        case .goldHeart:
+            imageView.image = UIImage(named: "ActivityBadgeGoldHeart")
+            
+        case .clock:
+            imageView.image = UIImage(named: "ActivityBadgeClock")
         }
     }
 }

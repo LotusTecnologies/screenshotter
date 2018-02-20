@@ -9,10 +9,7 @@
 
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
-typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
-    ScreenshotsSectionNotification,
-    ScreenshotsSectionImage
-};
+
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, CoreDataPreparationControllerDelegate>
 
@@ -27,6 +24,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @property (nonatomic, copy) NSString *notificationCellAssetId;
+@property (nonatomic, strong) ProductsBarController *productsBarController;
 
 @end
 
@@ -61,11 +59,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-    CGFloat p = [Geometry padding];
-    CGPoint minimumSpacing = CGPointMake(p - shadowInsets.left - shadowInsets.right, p - shadowInsets.top - shadowInsets.bottom);
-    
     _collectionView = ({
+        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
+        
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.minimumInteritemSpacing = minimumSpacing.x;
         layout.minimumLineSpacing = minimumSpacing.y;
@@ -74,12 +70,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         collectionView.translatesAutoresizingMaskIntoConstraints = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(minimumSpacing.y, minimumSpacing.x, minimumSpacing.y, minimumSpacing.x);
+        collectionView.contentInset = UIEdgeInsetsMake(0, 0, minimumSpacing.y, 0);
         collectionView.backgroundColor = self.view.backgroundColor;
         collectionView.alwaysBounceVertical = YES;
         collectionView.scrollEnabled = NO;
         collectionView.allowsMultipleSelection = YES;
         
+        [collectionView registerClass:[ScreenshotProductBarCollectionViewCell class] forCellWithReuseIdentifier:@"product"];
         [collectionView registerClass:[ScreenshotNotificationCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
         [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
         
@@ -314,6 +311,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         self.editButtonItem.title = @"Cancel";
         
         self.deleteScreenshotObjectIDs = [NSMutableArray array];
+        self.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
+    }else {
+        self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
     }
 }
 
@@ -324,6 +324,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     [self.collectionView selectItemAtIndexPath:nil animated:YES scrollPosition:UICollectionViewScrollPositionNone];
     
     self.deleteScreenshotObjectIDs = nil;
+    self.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
+    self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = self.toUnfavoriteAndUnViewProductObjectIDs;
 }
 
 - (ScreenshotsDeleteButton *)deleteButton {
@@ -338,17 +340,18 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (void)updateDeleteButtonCount {
-    self.deleteButton.deleteCount = self.collectionView.indexPathsForSelectedItems.count;
+    self.deleteButton.deleteCount = self.toUnfavoriteAndUnViewProductObjectIDs.count + self.deleteScreenshotObjectIDs.count;
 }
 
 - (void)deleteButtonAction {
     [self setEditing:NO animated:YES];
-    self.editButtonItem.enabled = NO;
+    self.editButtonItem.enabled = true;
     
-    // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
     
-    if (self.deleteScreenshotObjectIDs.count > 0) {
+    if (self.deleteScreenshotObjectIDs.count + self.toUnfavoriteAndUnViewProductObjectIDs.count > 0) {
         [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
+        [[DataModel sharedInstance] hideFromProductBar:self.toUnfavoriteAndUnViewProductObjectIDs];
+
     }
 }
 
@@ -385,17 +388,20 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 2;
+    return 3;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (section == ScreenshotsSectionNotification) {
+    if (section == ScreenshotsSectionProduct) {
+        return [self.productsBarController hasProducts] ? 1 : 0;
+    }
+    else if (section == ScreenshotsSectionNotification) {
         return [self canDisplayNotificationCell];
-        
-    } else if (section == ScreenshotsSectionImage) {
-        return self.screenshotFrc.fetchedObjectsCount;
-        
-    } else {
+    }
+    else if (section == ScreenshotsSectionImage) {
+        return [self screenshotFrc].fetchedObjectsCount;
+    }
+    else {
         return 0;
     }
 }
@@ -403,8 +409,15 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     UIEdgeInsets insets = UIEdgeInsetsZero;
     
-    if (section == ScreenshotsSectionNotification && [self hasNewScreenshot]) {
-        insets.bottom = ((UICollectionViewFlowLayout *)collectionView.collectionViewLayout).minimumLineSpacing;
+    BOOL isShowingNotification = section == ScreenshotsSectionNotification && [self hasNewScreenshot];
+    BOOL isShowingImage = section == ScreenshotsSectionImage;
+    
+    if (isShowingNotification || isShowingImage) {
+        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
+        
+        insets.top = minimumSpacing.y;
+        insets.left = minimumSpacing.x;
+        insets.right = minimumSpacing.x;
     }
     
     return insets;
@@ -412,21 +425,31 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGSize size = CGSizeZero;
-    UIEdgeInsets shadowInsets = [ScreenshotNotificationCollectionViewCell shadowInsets];
-    CGFloat padding = [Geometry padding] - shadowInsets.left - shadowInsets.right;
     
-    if (indexPath.section == ScreenshotsSectionNotification) {
-        size.width = floor(collectionView.bounds.size.width - (padding * 2));
-        size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+    if (indexPath.section == ScreenshotsSectionProduct) {
+        size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right;
+        size.height = 138;
     }
-    else if (indexPath.section == ScreenshotsSectionImage) {
-        NSInteger columns = [self numberOfCollectionViewImageColumns];
+    else {
+        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
         
-        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns);
-        size.height = ceil(size.width * [Screenshot ratio].height);
+        if (indexPath.section == ScreenshotsSectionNotification) {
+            size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2));
+            size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
+        }
+        else if (indexPath.section == ScreenshotsSectionImage) {
+            NSInteger columns = [self numberOfCollectionViewImageColumns];
+            
+            size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns);
+            size.height = ceil(size.width * [Screenshot ratio].height);
+        }
     }
     
     return size;
+}
+
+- (void)setupScreenshotProductBarCollectionViewCell:(ScreenshotProductBarCollectionViewCell *)cell collectionView:(UICollectionView *)collectionView forItemAtIndexPath:(NSIndexPath *)indexPath {
+    self.productsBarController.collectionView = cell.collectionView;
 }
     
 -(void) setupScreenshotNotificationCollectionViewCell:(ScreenshotNotificationCollectionViewCell*)cell collectionView:(UICollectionView*) collectionView forItemAtIndexPath:(NSIndexPath*) indexPath{
@@ -453,12 +476,17 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
     
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionNotification) {
+    if (indexPath.section == ScreenshotsSectionProduct) {
+        ScreenshotProductBarCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"product" forIndexPath:indexPath];
+        [self setupScreenshotProductBarCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
+        return cell;
+    }
+    else if (indexPath.section == ScreenshotsSectionNotification) {
         ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
         [self setupScreenshotNotificationCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
         return cell;
-    } else if (indexPath.section == ScreenshotsSectionImage) {
-        
+    }
+    else if (indexPath.section == ScreenshotsSectionImage) {
         ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
         [self setupScreenshotCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
         return cell;
@@ -490,8 +518,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         if ([self isEditing]) {
-            [self updateDeleteButtonCount];
             [self.deleteScreenshotObjectIDs addObject:screenshot.objectID];
+            [self updateDeleteButtonCount];
         }
         else {
             if (self.deleteScreenshotObjectIDs.count > 0 && [self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
@@ -511,9 +539,8 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImage && [self isEditing]) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
-        
-        [self updateDeleteButtonCount];
         [self.deleteScreenshotObjectIDs removeObject:screenshot.objectID];
+        [self updateDeleteButtonCount];
     }
 }
 
@@ -529,6 +556,13 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
     if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionImage]) {
         [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
     }
+}
+
+- (CGPoint)collectionViewInteritemOffset {
+    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
+    CGFloat x = [Geometry padding] - shadowInsets.left - shadowInsets.right;
+    CGFloat y = [Geometry padding] - shadowInsets.top - shadowInsets.bottom;
+    return CGPointMake(x, y);
 }
 
 
@@ -679,12 +713,24 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 }
 
 
+#pragma mark - Products Bar
+
+- (ProductsBarController *)productsBarController {
+    if (!_productsBarController) {
+        _productsBarController = [[ProductsBarController alloc] init];
+    }
+    return _productsBarController;
+}
+
+
 #pragma mark - Core Data Preparation
 
 - (void)coreDataPreparationControllerSetup:(CoreDataPreparationController *)controller {
 
     [self setupFetchedResultsController];
-    
+    [self.productsBarController setup];
+    self.productsBarController.delegate = self;
+
     if ([DataModel sharedInstance].isCoreDataStackReady) {
         [self.collectionView reloadData];
         [self syncHelperViewVisibility];
@@ -703,9 +749,6 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)coreDataPreparationController:(CoreDataPreparationController *)controller dismissLoader:(UIView *)loader {
     [loader removeFromSuperview];
 }
-
-
-#pragma mark - Fetch Results Controller
 
 
 - (NSIndexPath *)collectionViewToScreenshotFrcIndexPath:(NSInteger)index {

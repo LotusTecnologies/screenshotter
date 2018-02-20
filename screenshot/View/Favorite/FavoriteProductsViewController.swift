@@ -102,26 +102,11 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
 
 extension FavoriteProductsViewController : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let topViewController = navigationController?.topViewController,
-            !topViewController.isKind(of: WebViewController.self) else
-        {
-            return
-        }
-        
-        guard let product = products?[indexPath.item], let offer = product.offer else {
+        guard let product = products?[indexPath.item] else {
             return
         }
 
-        // TODO: use shared web view like screenshots navigation controller
-        let webViewController = WebViewController()
-        webViewController.addNavigationItemLogo()
-        webViewController.hidesBottomBarWhenPushed = true
-        webViewController.rebaseURL(URL(string: offer))
-
-        navigationController?.pushViewController(webViewController, animated: true)
-
-        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: "Favorites")
-        AnalyticsTrackers.branch.track("Tapped on product")
+        OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Favorites")
     }
 }
 

@@ -8,11 +8,13 @@
 
 import Foundation
 import CoreData
+import SafariServices
+import FBSDKCoreKit
 
-//FRC stuff
+
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        change.shiftIndexSections(by: 1)
+        change.shiftIndexSections(by: 2)
         change.applyChanges(collectionView: self.collectionView)
         self.syncHelperViewVisibility()
 
@@ -25,5 +27,35 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     @objc func screenshotFrc() -> NSFetchedResultsController<Screenshot>? {
         return (self.screenshotFrcManager as? FetchedResultsControllerManager<Screenshot>)?.fetchedResultsController
         
+    }
+}
+
+extension ScreenshotsViewController : ProductsBarControllerDelegate {
+    func productBarShouldHide(_ controller: ProductsBarController) {
+        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
+            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+        }
+    }
+    
+    func productBarShouldShow(_ controller: ProductsBarController) {
+        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
+            self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+        }
+    }
+    
+    func productBar(_ controller: ProductsBarController, didTap product: Product) {
+        if !self.isEditing {
+            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "ProductBar")
+        }else{
+            if self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID){
+                self.toUnfavoriteAndUnViewProductObjectIDs.remove(product.objectID)
+            }else{
+                self.toUnfavoriteAndUnViewProductObjectIDs.add(product.objectID)
+            }
+            if let a = self.toUnfavoriteAndUnViewProductObjectIDs as? [NSManagedObjectID] {
+                controller.toUnfavoriteAndUnViewProductObjectIDs = a
+            }
+            self.updateDeleteButtonCount()
+        }
     }
 }

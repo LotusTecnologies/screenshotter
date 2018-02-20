@@ -484,7 +484,7 @@ extension SettingsViewController : UITableViewDelegate {
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            let options:[OpenProductPageInSetting] = [.embededSafari, .safari, .chrome]
+            let options:[OpenProductPage] = [.embededSafari, .safari, .chrome]
             options.forEach({ (setting) in
                 alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
                     setting.saveToUserDefaults()
@@ -694,7 +694,7 @@ fileprivate extension SettingsViewController {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
         case .openIn:
-            return OpenProductPageInSetting.fromSystemInfo().localizedDisplayString()
+            return OpenProductPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
