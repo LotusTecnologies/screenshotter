@@ -171,65 +171,6 @@
 }
 
 
-#pragma mark - Layout
-
-- (void)insertScreenshotHelperView {
-    BOOL hasPresented = [[NSUserDefaults standardUserDefaults] boolForKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
-    
-    if (!hasPresented && [self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] == 1) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:UserDefaultsKeys.onboardingPresentedScreenshotHelper];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
-        
-        UIView *backgroundView = [[UIView alloc] init];
-        self.collectionView.backgroundView = backgroundView;
-        
-        UIView *contentView = [[UIView alloc] init];
-        contentView.translatesAutoresizingMaskIntoConstraints = NO;
-        [backgroundView addSubview:contentView];
-        [contentView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:layout.minimumLineSpacing].active = YES;
-        [contentView.trailingAnchor constraintEqualToAnchor:backgroundView.trailingAnchor constant:-layout.minimumInteritemSpacing].active = YES;
-        [contentView.widthAnchor constraintEqualToAnchor:backgroundView.widthAnchor multiplier:.5f constant:-layout.minimumInteritemSpacing * 1.5f].active = YES;
-        [contentView.heightAnchor constraintEqualToAnchor:contentView.widthAnchor multiplier:[Screenshot ratio].height].active = YES;
-        
-        UILabel *titleLabel = [[UILabel alloc] init];
-        titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        titleLabel.text = @"Ready To Shop";
-        titleLabel.font = [UIFont systemFontOfSize:22.f weight:UIFontWeightSemibold];
-        titleLabel.numberOfLines = 0;
-        [contentView addSubview:titleLabel];
-        [titleLabel.topAnchor constraintEqualToAnchor:contentView.topAnchor].active = YES;
-        [titleLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
-        [titleLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
-        
-        UILabel *descriptionLabel = [[UILabel alloc] init];
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        descriptionLabel.text = @"Here’s your screenshot!\nTap on it to see the products in the photo.";
-        descriptionLabel.font = [UIFont systemFontOfSize:22.f weight:UIFontWeightLight];
-        descriptionLabel.numberOfLines = 0;
-        [contentView addSubview:descriptionLabel];
-        [descriptionLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:[Geometry padding]].active = YES;
-        [descriptionLabel.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
-        [descriptionLabel.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor].active = YES;
-        
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TutorialReadyArrow"]];
-        imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [contentView addSubview:imageView];
-        [imageView.topAnchor constraintEqualToAnchor:descriptionLabel.bottomAnchor].active = YES;
-        [imageView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor].active = YES;
-        [imageView.trailingAnchor constraintLessThanOrEqualToAnchor:contentView.trailingAnchor].active = YES;
-        [imageView.bottomAnchor constraintLessThanOrEqualToAnchor:contentView.bottomAnchor].active = YES;
-    }
-}
-
-- (void)removeScreenshotHelperView {
-    if (self.collectionView.backgroundView) {
-        [self.collectionView.backgroundView removeFromSuperview];
-        self.collectionView.backgroundView = nil;
-    }
-}
 
 
 #pragma mark - Editing
