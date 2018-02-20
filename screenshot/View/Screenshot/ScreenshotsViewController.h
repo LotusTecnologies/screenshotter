@@ -34,7 +34,6 @@
 
 //Made public so it can be used by swift
 @property (nonatomic, strong) id screenshotFrcManager;
-- (void)syncHelperViewVisibility;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *toUnfavoriteAndUnViewProductObjectIDs;
 @property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *deleteScreenshotObjectIDs;

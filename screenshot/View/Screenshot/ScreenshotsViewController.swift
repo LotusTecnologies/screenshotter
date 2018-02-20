@@ -413,3 +413,21 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         }
     }
 }
+extension ScreenshotsViewController {
+    @objc func syncHelperViewVisibility() {
+        if PermissionsManager.shared.hasPermission(for: .photo) {
+            if self.helperView.type != .screenshot {
+                self.helperView.type = .screenshot
+            }
+        } else {
+            if self.helperView.type != .permission {
+                self.helperView.type = .permission
+            }
+        }
+        let hasScreenshots = (self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0)
+        
+        self.helperView.isHidden = (hasScreenshots || self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0)
+        self.collectionView.isScrollEnabled = self.helperView.isHidden && (self.collectionView.backgroundView == nil)
+        self.editButtonItem.isEnabled = hasScreenshots;
+    }
+}

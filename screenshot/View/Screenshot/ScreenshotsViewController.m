@@ -438,23 +438,5 @@
 
 #pragma mark - Helper View
 
-- (void)syncHelperViewVisibility {
-    if ([[PermissionsManager shared] _hasPhotoPermission]) {
-        if (self.helperView.type != ScreenshotsHelperViewTypeScreenshot) {
-            self.helperView.type = ScreenshotsHelperViewTypeScreenshot;
-        }
-        
-    } else {
-        if (self.helperView.type != ScreenshotsHelperViewTypePermission) {
-            self.helperView.type = ScreenshotsHelperViewTypePermission;
-        }
-    }
-    
-    BOOL hasScreenshots = [self.collectionView numberOfItemsInSection:ScreenshotsSectionImage] > 0;
-    
-    self.helperView.hidden = (hasScreenshots || [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0);
-    self.collectionView.scrollEnabled = self.helperView.hidden && !self.collectionView.backgroundView;
-    self.editButtonItem.enabled = hasScreenshots;
-}
 
 @end
