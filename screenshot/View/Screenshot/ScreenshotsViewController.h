@@ -40,7 +40,6 @@
     @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
     @property (nonatomic, strong) UIRefreshControl *refreshControl;
     @property (nonatomic, strong) ScreenshotsHelperView *helperView;
-- (CGPoint)collectionViewInteritemOffset ;
     @property (nonatomic, assign) BOOL hasNewScreenshot;
 
     @property (nonatomic, strong) NSDate *lastVisited;

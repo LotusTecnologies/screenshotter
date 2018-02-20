@@ -515,3 +515,55 @@ extension ScreenshotsViewController {
         }
     }
 }
+
+extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
+    func numberOfCollectionViewImageColumns() -> Int {
+        return 2
+    }
+    
+    
+    @objc func collectionViewInteritemOffset() -> CGPoint {
+        let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
+        let x = Geometry.padding - shadowInsets.left - shadowInsets.right
+        let y = Geometry.padding - shadowInsets.top - shadowInsets.bottom
+        return CGPoint.init(x: x, y: y)
+    }
+    
+    @objc func notificationContentText() -> ScreenshotNotificationCollectionViewCellContentText {
+        let count = self.newScreenshotsCount()
+        
+        if (count == 1) {
+            return .importSingleScreenshot;
+            
+        } else if (count > 1) {
+            return .importMultipleScreenshots;
+            
+        } else {
+            return .none;
+        }
+    }
+
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var size = CGSize.zero
+        
+        if (indexPath.section == ScreenshotsSection.product.rawValue) {
+            size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right;
+            size.height = 138;
+        }
+        else {
+            let minimumSpacing = self.collectionViewInteritemOffset()
+            
+            if (indexPath.section == ScreenshotsSection.notification.rawValue) {
+                size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2));
+                size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
+            } else if (indexPath.section == ScreenshotsSection.image.rawValue) {
+                let columns = CGFloat(self.numberOfCollectionViewImageColumns())
+                
+                size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns);
+                size.height = ceil(size.width * Screenshot.ratio.height);
+            }
+        }
+        
+        return size;
+    }
+ }

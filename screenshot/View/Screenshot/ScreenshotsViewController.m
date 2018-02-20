@@ -130,9 +130,6 @@
 
 #pragma mark - Collection View
 
-- (NSInteger)numberOfCollectionViewImageColumns {
-    return 2;
-}
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 3;
@@ -170,30 +167,6 @@
     return insets;
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CGSize size = CGSizeZero;
-    
-    if (indexPath.section == ScreenshotsSectionProduct) {
-        size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right;
-        size.height = 138;
-    }
-    else {
-        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
-        
-        if (indexPath.section == ScreenshotsSectionNotification) {
-            size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2));
-            size.height = [ScreenshotNotificationCollectionViewCell heightWithCellWidth:size.width contentText:[self notificationContentText] contentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
-        }
-        else if (indexPath.section == ScreenshotsSectionImage) {
-            NSInteger columns = [self numberOfCollectionViewImageColumns];
-            
-            size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns);
-            size.height = ceil(size.width * [Screenshot ratio].height);
-        }
-    }
-    
-    return size;
-}
 
 - (void)setupScreenshotProductBarCollectionViewCell:(ScreenshotProductBarCollectionViewCell *)cell collectionView:(UICollectionView *)collectionView forItemAtIndexPath:(NSIndexPath *)indexPath {
     self.productsBarController.collectionView = cell.collectionView;
@@ -305,12 +278,6 @@
     }
 }
 
-- (CGPoint)collectionViewInteritemOffset {
-    UIEdgeInsets shadowInsets = [ScreenshotCollectionViewCell shadowInsets];
-    CGFloat x = [Geometry padding] - shadowInsets.left - shadowInsets.right;
-    CGFloat y = [Geometry padding] - shadowInsets.top - shadowInsets.bottom;
-    return CGPointMake(x, y);
-}
 
 
 #pragma mark - Notification Cell
