@@ -13,10 +13,10 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
     let imageView = UIImageView()
     fileprivate let saleView = SaleView()
     fileprivate let buyLabel = UILabel()
+    fileprivate let activityBadgeView = ActivityBadgeView()
+    fileprivate let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
     
     fileprivate let borderWidth: CGFloat = 1
-    private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
-
     
     var isSale = false {
         didSet {
@@ -24,11 +24,10 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var isChecked = false{
+    var isChecked = false {
         didSet {
             checkImageView.alpha = isChecked ? 1.0 : 0.0
             mainView.alpha = isChecked ? 0.5 : 1.0
-
         }
     }
     
@@ -76,6 +75,12 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
         saleView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
         saleView.bottomAnchor.constraint(equalTo: buyLabel.topAnchor, constant: -6).isActive = true
         
+        activityBadgeView.translatesAutoresizingMaskIntoConstraints = false
+        activityBadgeView.backgroundColor = .white
+        mainView.addSubview(activityBadgeView)
+        activityBadgeView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: -4).isActive = true
+        activityBadgeView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: 4).isActive = true
+        
         // iOS 10 masking happens in the layoutSubviews
         if #available(iOS 11.0, *) {
             buyLabel.layer.borderColor = UIColor.crazeGreen.cgColor
@@ -89,7 +94,6 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
             imageView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         
-        
         checkImageView.translatesAutoresizingMaskIntoConstraints = false
         checkImageView.alpha = 0
         checkImageView.contentMode = .scaleAspectFit
@@ -97,8 +101,7 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
         checkImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 6).isActive = true
         checkImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -6).isActive = true
         
-        
-        
+        syncActivityBadge()
     }
     
     override func layoutSubviews() {
@@ -143,32 +146,17 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    // MARK: Favorite
+    // MARK: Activity Badge
     
     var isFavorited = false {
         didSet {
-            guard isFavorited || hasHeartView else {
-                return
-            }
-            
-            heartView.isHidden = !isFavorited
+            syncActivityBadge()
         }
     }
     
-    private var hasHeartView = false
-    
-    fileprivate lazy var heartView: FavoriteBadgeView = {
-        self.hasHeartView = true
-        
-        let view = FavoriteBadgeView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.tintColor = .crazeRed
-        self.mainView.insertSubview(view, aboveSubview: self.imageView)
-        view.topAnchor.constraint(equalTo: self.mainView.topAnchor, constant: -4).isActive = true
-        view.trailingAnchor.constraint(equalTo: self.mainView.trailingAnchor, constant: 4).isActive = true
-        return view
-    }()
+    fileprivate func syncActivityBadge() {
+        activityBadgeView.badge = isFavorited ? .heart : .clock
+    }
 }
 
 fileprivate struct ProductsBarCollectionViewCellBorder {

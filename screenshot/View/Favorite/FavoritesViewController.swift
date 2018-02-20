@@ -193,7 +193,7 @@ extension FavoritesViewController : UITableViewDataSource {
             cell.backgroundColor = view.backgroundColor
             cell.imageData = screenshot.imageData
             cell.setProducts(screenshotFavorites.products)
-            cell.hasGoldHeart = screenshotFavorites.favoritedEachShoppable
+            cell.activityBadgeView.badge = screenshotFavorites.favoritedEachShoppable ? .goldHeart : .heart
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .none
             
