@@ -89,7 +89,7 @@ class ClarifaiModel: NSObject {
         return localClarifaiOutputs(image: image).then { outputs -> Promise<(ImageClassification, UIImage)> in
             let conceptNamesArray = outputs.flatMap({$0.dataAsset.concepts}).flatMap({$0}).flatMap({$0.name})
             let conceptNames = Set<String>(conceptNamesArray)
-            print("classify conceptNames:\(conceptNames.joined(separator: ", "))")
+
             if !conceptNames.isDisjoint(with: ["woman", "man", "child"]) {
                 return Promise(value: (.human, image))
             } else if !conceptNames.isDisjoint(with: ["furniture", "chair", "table", "desk", "sofa", "couch", "rug", "drapes", "bookshelf"]) {
