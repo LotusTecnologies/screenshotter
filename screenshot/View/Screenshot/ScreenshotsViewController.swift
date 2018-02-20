@@ -101,7 +101,7 @@ extension ScreenshotsViewController {
 
 }
 
-extension ScreenshotsViewController : FetchedResultsControllerManagerbgate {
+extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         change.shiftIndexSections(by: 2)
         change.applyChanges(collectionView: self.collectionView)
@@ -329,7 +329,7 @@ extension ScreenshotsViewController {
         self.editButtonItem.isEnabled = true
         if (self.deleteScreenshotObjectIDs.count + self.toUnfavoriteAndUnViewProductObjectIDs.count > 0) {
             DataModel.sharedInstance.hide(screenshotOIDArray: self.deleteScreenshotObjectIDs as! [NSManagedObjectID])
-            DataModel.sharedInstance.unfavoriteAndUnview(productObjectIDs: self.toUnfavoriteAndUnViewProductObjectIDs as! [NSManagedObjectID])
+            DataModel.sharedInstance.hideFromProductBar( self.toUnfavoriteAndUnViewProductObjectIDs as! [NSManagedObjectID])
             
         }
     }
