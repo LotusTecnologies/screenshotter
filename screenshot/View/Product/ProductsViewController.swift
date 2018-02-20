@@ -505,6 +505,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                                   "name": name ]
                 AnalyticsTrackers.standard.track("Product for email", properties:properties)
             }
+            product.recordViewedProduct()
             AnalyticsTrackers.branch.track("Tapped on product")
             FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
         }

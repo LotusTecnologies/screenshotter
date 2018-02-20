@@ -9,6 +9,8 @@
 import Foundation
 
 class ProductsBarController: NSObject {
+    
+    
     var collectionView: ProductsBarCollectionView? {
         didSet {
             guard let collectionView = collectionView else {

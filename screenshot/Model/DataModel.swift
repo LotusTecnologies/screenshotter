@@ -555,6 +555,7 @@ extension DataModel {
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.optionsMask = optionsMask
+        productToSave.dateRetrieved = NSDate()
         return productToSave
     }
     
@@ -1197,6 +1198,27 @@ extension Shoppable {
 }
 
 extension Product {
+    
+    public func recordViewedProduct(){
+        let now = NSDate()
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for product in results {
+                    product.dateViewed = now
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("recordViewedProduct objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
     
     @objc public func setFavorited(toFavorited: Bool) {
         let managedObjectID = self.objectID
