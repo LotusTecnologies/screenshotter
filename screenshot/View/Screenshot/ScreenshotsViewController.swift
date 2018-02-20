@@ -44,6 +44,18 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
     }
     
     func productBar(_ controller: ProductsBarController, didTap product: Product) {
-        OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "ProductBar")
+        if !self.isEditing {
+            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "ProductBar")
+        }else{
+            if self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID){
+                self.toUnfavoriteAndUnViewProductObjectIDs.remove(product.objectID)
+            }else{
+                self.toUnfavoriteAndUnViewProductObjectIDs.add(product.objectID)
+            }
+            if let a = self.toUnfavoriteAndUnViewProductObjectIDs as? [NSManagedObjectID] {
+                controller.toUnfavoriteAndUnViewProductObjectIDs = a
+            }
+            self.updateDeleteButtonCount()
+        }
     }
 }

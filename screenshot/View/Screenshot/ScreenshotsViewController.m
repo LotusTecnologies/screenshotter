@@ -311,6 +311,9 @@
         self.editButtonItem.title = @"Cancel";
         
         self.deleteScreenshotObjectIDs = [NSMutableArray array];
+        self.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
+    }else {
+        self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
     }
 }
 
@@ -321,6 +324,8 @@
     [self.collectionView selectItemAtIndexPath:nil animated:YES scrollPosition:UICollectionViewScrollPositionNone];
     
     self.deleteScreenshotObjectIDs = nil;
+    self.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
+    self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = self.toUnfavoriteAndUnViewProductObjectIDs;
 }
 
 - (ScreenshotsDeleteButton *)deleteButton {
@@ -335,7 +340,7 @@
 }
 
 - (void)updateDeleteButtonCount {
-    self.deleteButton.deleteCount = self.collectionView.indexPathsForSelectedItems.count;
+    self.deleteButton.deleteCount = self.toUnfavoriteAndUnViewProductObjectIDs.count + self.deleteScreenshotObjectIDs.count;
 }
 
 - (void)deleteButtonAction {
@@ -344,8 +349,10 @@
     
     // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
     
-    if (self.deleteScreenshotObjectIDs.count > 0) {
+    if (self.deleteScreenshotObjectIDs.count + self.toUnfavoriteAndUnViewProductObjectIDs.count > 0) {
         [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
+        [[DataModel sharedInstance] unfavoriteAndUnviewWithProductObjectIDs:self.toUnfavoriteAndUnViewProductObjectIDs];
+
     }
 }
 
@@ -512,8 +519,8 @@
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
         
         if ([self isEditing]) {
-            [self updateDeleteButtonCount];
             [self.deleteScreenshotObjectIDs addObject:screenshot.objectID];
+            [self updateDeleteButtonCount];
         }
         else {
             if (self.deleteScreenshotObjectIDs.count > 0 && [self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
@@ -533,9 +540,8 @@
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImage && [self isEditing]) {
         Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
-        
-        [self updateDeleteButtonCount];
         [self.deleteScreenshotObjectIDs removeObject:screenshot.objectID];
+        [self updateDeleteButtonCount];
     }
 }
 

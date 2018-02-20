@@ -15,11 +15,20 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
     fileprivate let buyLabel = UILabel()
     
     fileprivate let borderWidth: CGFloat = 1
-    
+    private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
+
     
     var isSale = false {
         didSet {
             saleView.isHidden = !isSale
+        }
+    }
+    
+    var isChecked = false{
+        didSet {
+            checkImageView.alpha = isChecked ? 1.0 : 0.0
+            mainView.alpha = isChecked ? 0.5 : 1.0
+
         }
     }
     
@@ -80,9 +89,16 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
             imageView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         
-        // !!!: DEBUG
-        var r: CGFloat { return CGFloat(arc4random()) / CGFloat(UInt32.max) }
-        imageView.backgroundColor = UIColor(red: r, green: r, blue: r, alpha: 0.2)
+        
+        checkImageView.translatesAutoresizingMaskIntoConstraints = false
+        checkImageView.alpha = 0
+        checkImageView.contentMode = .scaleAspectFit
+        contentView.addSubview(checkImageView)
+        checkImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 6).isActive = true
+        checkImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -6).isActive = true
+        
+        
+        
     }
     
     override func layoutSubviews() {
@@ -148,7 +164,7 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .white
         view.tintColor = .crazeRed
-        self.contentView.addSubview(view)
+        self.mainView.insertSubview(view, aboveSubview: self.imageView)
         view.topAnchor.constraint(equalTo: self.mainView.topAnchor, constant: -4).isActive = true
         view.trailingAnchor.constraint(equalTo: self.mainView.trailingAnchor, constant: 4).isActive = true
         return view

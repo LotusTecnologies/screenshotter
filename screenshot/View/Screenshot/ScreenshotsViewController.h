@@ -5,7 +5,7 @@
 //  Created by Corey Werner on 8/7/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
-
+#import <CoreData/CoreData.h>
 #import "BaseViewController.h"
 typedef NS_ENUM(NSInteger, ScreenshotsSection) {
     ScreenshotsSectionProduct,
@@ -41,5 +41,6 @@ typedef NS_ENUM(NSInteger, ScreenshotsSection) {
 @property (nonatomic, strong) id screenshotFrcManager;
 - (void)syncHelperViewVisibility;
 @property (nonatomic, strong) UICollectionView *collectionView;
-
+@property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *toUnfavoriteAndUnViewProductObjectIDs;
+- (void)updateDeleteButtonCount;
 @end

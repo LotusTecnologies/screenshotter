@@ -590,10 +590,10 @@
 			children = (
 				31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */,
 				C54088061FE90C8E00198955 /* ScreenshotsNavigationController.h */,
-				C54088071FE90C8E00198955 /* ScreenshotsViewController.h */,
 				C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */,
 				C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */,
 				C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */,
+				C54088071FE90C8E00198955 /* ScreenshotsViewController.h */,
 				C540880B1FE90C8E00198955 /* ScreenshotsViewController.m */,
 				31CE110320396194000156EE /* ScreenshotsViewController.swift */,
 				C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */,

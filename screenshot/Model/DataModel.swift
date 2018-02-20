@@ -242,7 +242,29 @@ extension DataModel {
         }
         return nil
     }
-    
+    @objc public func unfavoriteAndUnview(productObjectIDs: [NSManagedObjectID]) {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                productObjectIDs.forEach { productObjectId in
+                    if let product = managedObjectContext.object(with: productObjectId) as? Product {
+                        do{
+                            try product.validateForUpdate()
+                            product.setFavorited(toFavorited: false)
+                            product.dateViewed = nil
+                        } catch{
+                            
+                        }
+                        
+                        
+                    }
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("unfavoriteAndUnview productObjectIDs catch error:\(error)")
+            }
+        }
+    }
+
     public func hide(screenshotOIDArray: [NSManagedObjectID]) {
         performBackgroundTask { (managedObjectContext) in
             do {

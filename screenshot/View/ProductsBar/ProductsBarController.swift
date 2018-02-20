@@ -13,7 +13,18 @@ import Foundation
     func productBar(_ controller:ProductsBarController, didTap product:Product)
 }
 class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
-    
+    @objc var toUnfavoriteAndUnViewProductObjectIDs:[NSManagedObjectID] = [] {
+        didSet{
+            if let collectionView = self.collectionView {
+                for index in collectionView.indexPathsForVisibleItems {
+                    if let cell = collectionView.cellForItem(at: index) as? ProductsBarCollectionViewCell {
+                        let product = self.products[index.row]
+                        cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
+                    }
+                }
+            }
+        }
+    }
     @objc weak var delegate:ProductsBarControllerDelegate?
     var productsFrc: FetchedResultsControllerManager<Product>?
     
@@ -61,13 +72,13 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
             self.isNotHidden = self.hasProducts
             
             if self.hasProducts {
-                self.collectionView?.reloadData()
-                self.collectionView?.contentOffset = .zero
                 self.delegate?.productBarShouldShow(self)
             }else{
                 self.delegate?.productBarShouldHide(self)
-                self.collectionView?.reloadData()
-                self.collectionView?.contentOffset = .zero
+            }
+            self.collectionView?.reloadData()
+            if let collectionView = self.collectionView {
+                collectionView.contentOffset = CGPoint.init(x: -1 * collectionView.contentInset.left, y: 0)
             }
         }else{
             //just updates but remain hidden or unhidden
@@ -96,6 +107,7 @@ extension ProductsBarController: UICollectionViewDataSource {
             }else{
                 cell.imageView.image = nil
             }
+            cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
             
         }
         
