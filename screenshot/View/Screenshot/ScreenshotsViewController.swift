@@ -273,8 +273,7 @@ extension ScreenshotsViewController {
             
             
             if (self.hasNewScreenshot()) {
-                //                TODO: fix this
-                self.collectionView.reloadSections(IndexSet.init(integer: 1))
+                self.collectionView.reloadSections(IndexSet.init(integer: ScreenshotsSection.notification.rawValue))
             }
             
             self.deleteButton.alpha = editing ? 1.0: 0.0
