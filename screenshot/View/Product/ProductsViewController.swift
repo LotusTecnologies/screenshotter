@@ -51,6 +51,18 @@ enum OpenProductPageInSetting : String {
     func saveToUserDefaults() {
         UserDefaults.standard.set(self.rawValue, forKey: UserDefaultsKeys.openProductPageInSetting)
     }
+    
+    func canOpen(url:URL) -> Bool{
+            switch self {
+            case .embededSafari:
+                return true;
+            case .safari:
+                return UIApplication.shared.canOpenURL(url)
+            case .chrome:
+                return  UIApplication.shared.canOpenInChrome(url: url)
+            }
+    
+    }
 }
 
 
@@ -412,16 +424,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return .zero
         }
     }
-    func canOpenLink(with setting:OpenProductPageInSetting, url:URL) -> Bool{
-        switch setting {
-        case .embededSafari:
-            return true;
-        case .safari:
-           return UIApplication.shared.canOpenURL(url)
-        case .chrome:
-           return  UIApplication.shared.canOpenInChrome(url: url)
-        }
-    }
+   
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let sectionType = productSectionType(forSection: indexPath.section)
 
@@ -435,7 +438,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 if let url = URL(string: urlString){
                     var openInSetting = OpenProductPageInSetting.fromSystemInfo()
 
-                    if !self.canOpenLink(with: openInSetting, url: url){
+                    if !openInSetting.canOpen(url: url) {
                         openInSetting = .embededSafari
                     }
 

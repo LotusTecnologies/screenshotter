@@ -7,7 +7,11 @@
 //
 
 #import "BaseViewController.h"
-
+typedef NS_ENUM(NSInteger, ScreenshotsSection) {
+    ScreenshotsSectionProduct,
+    ScreenshotsSectionNotification,
+    ScreenshotsSectionImage
+};
 @class ScreenshotsViewController;
 @class Screenshot;
 @class FetchedResultsControllerManager;

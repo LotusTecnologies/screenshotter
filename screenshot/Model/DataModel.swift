@@ -94,12 +94,21 @@ extension DataModel {
     }
     
     
-    func favoriteFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
+    func favoriteScreenshotsFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
         let request: NSFetchRequest = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
         request.predicate = NSPredicate(format: "lastFavorited != nil")
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSCompoundPredicate.init(orPredicateWithSubpredicates: [NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")])
+        
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
     
@@ -1001,6 +1010,24 @@ extension Shoppable {
 
 extension Product {
     
+    var sortDateForProductBar:Date {
+        get {
+            var date = Date.distantPast
+            
+            if self.isFavorite, let dateFavorited = self.dateFavorited as Date?{
+                date = dateFavorited
+            }
+            
+            if  let dateViewed = self.dateViewed as Date?{
+                if dateViewed.compare(date) == .orderedDescending {
+                    date = dateViewed
+                }
+            }
+            
+            return date
+        }
+    }
+    
     public func recordViewedProduct(){
         let now = NSDate()
         let managedObjectID = self.objectID
@@ -1033,6 +1060,9 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
+                    if toFavorited == false {
+                        product.dateViewed  = nil
+                    }
                     if toFavorited {
                         let now = NSDate()
                         product.dateFavorited = now

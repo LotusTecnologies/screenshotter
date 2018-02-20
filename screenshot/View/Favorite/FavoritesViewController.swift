@@ -217,7 +217,7 @@ extension FavoritesViewController : UITableViewDelegate {
 
 extension FavoritesViewController : CoreDataPreparationControllerDelegate {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
-        favoriteFrc = DataModel.sharedInstance.favoriteFrc(delegate: self)
+        favoriteFrc = DataModel.sharedInstance.favoriteScreenshotsFrc(delegate: self)
         
         if DataModel.sharedInstance.isCoreDataStackReady {
             tableView.reloadData()

@@ -10,20 +10,12 @@ import Foundation
 
 class ProductsBarCollectionViewCell: UICollectionViewCell {
     let mainView = UIView()
-    fileprivate let imageView = UIImageView()
+    let imageView = UIImageView()
     fileprivate let saleView = SaleView()
     fileprivate let buyLabel = UILabel()
     
     fileprivate let borderWidth: CGFloat = 1
     
-    var image: UIImage? {
-        set {
-            imageView.image = newValue
-        }
-        get {
-            return imageView.image
-        }
-    }
     
     var isSale = false {
         didSet {

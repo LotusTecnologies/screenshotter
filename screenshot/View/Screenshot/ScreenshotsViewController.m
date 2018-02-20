@@ -9,11 +9,7 @@
 
 #import "ScreenshotsViewController.h"
 #import "screenshot-Swift.h"
-typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
-    ScreenshotsSectionProduct,
-    ScreenshotsSectionNotification,
-    ScreenshotsSectionImage
-};
+
 
 @interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, CoreDataPreparationControllerDelegate>
 
@@ -391,7 +387,7 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == ScreenshotsSectionProduct) {
-        return [self.productsBarController hasProducts];
+        return [self.productsBarController hasProducts] ? 1 : 0;
     }
     else if (section == ScreenshotsSectionNotification) {
         return [self canDisplayNotificationCell];
@@ -727,7 +723,9 @@ typedef NS_ENUM(NSUInteger, ScreenshotsSection) {
 - (void)coreDataPreparationControllerSetup:(CoreDataPreparationController *)controller {
 
     [self setupFetchedResultsController];
-    
+    [self.productsBarController setup];
+    self.productsBarController.delegate = self;
+
     if ([DataModel sharedInstance].isCoreDataStackReady) {
         [self.collectionView reloadData];
         [self syncHelperViewVisibility];
