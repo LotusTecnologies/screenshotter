@@ -566,4 +566,43 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         
         return size;
     }
+    public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
+        if (indexPath.section == ScreenshotsSection.notification.rawValue && self.isEditing) {
+            return false
+        }
+        else {
+            return true
+        }
+    }
+    public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        
+        if (indexPath.section == ScreenshotsSection.image.rawValue && self.isEditing) {
+            if let screenshot = self.screenshot(at: indexPath.item) {
+                self.deleteScreenshotObjectIDs.remove(screenshot.objectID)
+                self.updateDeleteButtonCount()
+            }
+        }
+        
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if indexPath.section == ScreenshotsSection.image.rawValue {
+            if let screenshot = self.screenshot(at: indexPath.item) {
+                if (self.isEditing) {
+                    self.deleteScreenshotObjectIDs.add(screenshot.objectID)
+                    self.updateDeleteButtonCount()
+                } else {
+                    if (self.deleteScreenshotObjectIDs.count > 0 && self.deleteScreenshotObjectIDs.contains(screenshot.objectID)) {
+                        return
+                    }
+                    collectionView.deselectItem(at: indexPath, animated: false)
+                    self.delegate.screenshotsViewController(self, didSelectItemAt: indexPath)
+                    
+                    if let uploadedImageURL = screenshot.uploadedImageURL {
+                        AnalyticsTrackers.standard.track("Tapped on screenshot", properties: ["screenshot":uploadedImageURL])
+                    }
+                }
+            }
+        }
+    }
  }

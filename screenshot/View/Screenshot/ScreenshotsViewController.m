@@ -47,8 +47,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    
     [self setupViews];
     
     [self.coreDataPreparationController viewDidLoad];
@@ -104,28 +102,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-
-
-
-#pragma mark - Editing
-
-
-#pragma mark - Collection View Sections
-
-
-- (ScreenshotNotificationCollectionViewCellContentText)notificationContentText {
-    NSUInteger count = [self newScreenshotsCount];
-    
-    if (count == 1) {
-        return ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot;
-        
-    } else if (count > 1) {
-        return ScreenshotNotificationCollectionViewCellContentTextImportMultipleScreenshots;
-        
-    } else {
-        return ScreenshotNotificationCollectionViewCellContentTextNone;
-    }
-}
 
 
 #pragma mark - Collection View
@@ -224,45 +200,6 @@
     }
 }
 
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionNotification && [self isEditing]) {
-        return NO;
-    }
-    else {
-        return YES;
-    }
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImage) {
-        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
-        
-        if ([self isEditing]) {
-            [self.deleteScreenshotObjectIDs addObject:screenshot.objectID];
-            [self updateDeleteButtonCount];
-        }
-        else {
-            if (self.deleteScreenshotObjectIDs.count > 0 && [self.deleteScreenshotObjectIDs containsObject:screenshot.objectID]) {
-                return;
-            }
-            
-            [collectionView deselectItemAtIndexPath:indexPath animated:NO];
-            [self.delegate screenshotsViewController:self didSelectItemAtIndexPath:indexPath];
-            
-            if (screenshot.uploadedImageURL) {
-                [AnalyticsTrackers.standard track:@"Tapped on screenshot" properties:@{@"screenshot": screenshot.uploadedImageURL}];
-            }
-        }
-    }
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImage && [self isEditing]) {
-        Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
-        [self.deleteScreenshotObjectIDs removeObject:screenshot.objectID];
-        [self updateDeleteButtonCount];
-    }
-}
 
 - (Screenshot *)screenshotAtIndex:(NSInteger)index {
     return [[self screenshotFrc] objectAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
@@ -277,11 +214,5 @@
         [self.collectionView setContentOffset:CGPointMake(-self.collectionView.contentInset.left, -self.collectionView.contentInset.top)];
     }
 }
-
-
-
-#pragma mark - Notification Cell
-
-
-
+    
 @end
