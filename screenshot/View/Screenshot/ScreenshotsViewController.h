@@ -14,7 +14,7 @@ typedef NS_ENUM(NSInteger, ScreenshotsSection) {
 };
 @class ScreenshotsViewController;
 @class Screenshot;
-@class FetchedResultsControllerManager;
+@class FetchedResultsControllerManager, ProductsBarController, ScreenshotsDeleteButton, ScreenshotCollectionViewCell;
 
 @protocol ScreenshotsViewControllerDelegate <NSObject>
 @required
@@ -42,5 +42,10 @@ typedef NS_ENUM(NSInteger, ScreenshotsSection) {
 - (void)syncHelperViewVisibility;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *toUnfavoriteAndUnViewProductObjectIDs;
-- (void)updateDeleteButtonCount;
+@property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *deleteScreenshotObjectIDs;
+
+    @property (nonatomic, strong) ProductsBarController *productsBarController;
+    @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
+- (BOOL)hasNewScreenshot ;
+    - (void)syncScreenshotCollectionViewCellSelectedState:(ScreenshotCollectionViewCell *)cell ;
 @end

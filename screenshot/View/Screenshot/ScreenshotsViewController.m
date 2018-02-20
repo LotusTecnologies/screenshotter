@@ -18,13 +18,10 @@
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) ScreenshotsHelperView *helperView;
 
-@property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
-@property (nonatomic, strong) NSMutableArray<NSManagedObjectID *> *deleteScreenshotObjectIDs;
 
 @property (nonatomic, strong) NSDate *lastVisited;
 
 @property (nonatomic, copy) NSString *notificationCellAssetId;
-@property (nonatomic, strong) ProductsBarController *productsBarController;
 
 @end
 
@@ -174,128 +171,6 @@
 
 
 #pragma mark - Editing
-
-- (void)editButtonAction {
-    BOOL isEditing = ![self isEditing];
-    
-    if (!isEditing) {
-        // Needs to be before setEditing
-        [self deselectDeletedScreenshots];
-    }
-    
-    [self setEditing:isEditing animated:YES];
-}
-
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    [super setEditing:editing animated:animated];
-    
-    if (self.tabBarController && editing) {
-        CGFloat bottom = 0.f;
-        
-        if (@available(iOS 11.0, *)) {
-            bottom = [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom / 2.f;
-        }
-        
-        self.deleteButton.alpha = 0.f;
-        self.deleteButton.contentEdgeInsets = UIEdgeInsetsMake(0.f, 0.f, bottom, 0.f);
-        self.deleteButton.frame = self.tabBarController.tabBar.bounds;
-        [self.tabBarController.tabBar addSubview:self.deleteButton];
-
-    }
-    
-    dispatch_block_t removeDeleteButton = ^{
-        if (self.tabBarController && !editing) {
-            [self.deleteButton removeFromSuperview];
-            [self updateDeleteButtonCount];
-        }
-    };
-    
-    dispatch_block_t cellEditing = ^{
-        for (NSIndexPath *indexPath in self.collectionView.indexPathsForVisibleItems) {
-            ScreenshotCollectionViewCell *cell = (ScreenshotCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-            
-            if ([cell isKindOfClass:[ScreenshotCollectionViewCell class]]) {
-                cell.isEditing = editing;
-                [self syncScreenshotCollectionViewCellSelectedState:cell];
-            }
-        }
-        
-        if ([self hasNewScreenshot]) {
-            [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:ScreenshotsSectionNotification]];
-        }
-        
-        self.deleteButton.alpha = editing;
-    };
-    
-    if (animated) {
-        
-        [UIView animateWithDuration:[Constants defaultAnimationDuration] animations:^{
-            cellEditing();
-            
-            ///     putting `removeDeleteButton` here instead of in the completion
-            //      prevents animation on the button fading away,
-            //      but ALSO fixes a bug where if you take edit cancel
-            //      edit cancel very fast you can get into a state
-            //      where there no delete button in edit mode
-            removeDeleteButton();
-        } completion:^(BOOL finished) {
-        }];
-    }
-    else {
-        cellEditing();
-        removeDeleteButton();
-    }
-    
-    self.navigationItem.rightBarButtonItem.enabled = !editing;
-    
-    if (editing) {
-        self.editButtonItem.title = @"Cancel";
-        
-        self.deleteScreenshotObjectIDs = [NSMutableArray array];
-        self.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
-    }else {
-        self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
-    }
-}
-
-- (void)deselectDeletedScreenshots {
-    // TODO: call this in cleanup from frc callback
-    
-    // Deselect all cells
-    [self.collectionView selectItemAtIndexPath:nil animated:YES scrollPosition:UICollectionViewScrollPositionNone];
-    
-    self.deleteScreenshotObjectIDs = nil;
-    self.toUnfavoriteAndUnViewProductObjectIDs = [NSMutableArray array];
-    self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = self.toUnfavoriteAndUnViewProductObjectIDs;
-}
-
-- (ScreenshotsDeleteButton *)deleteButton {
-    if (!_deleteButton) {
-        ScreenshotsDeleteButton *deleteButton = [ScreenshotsDeleteButton buttonWithType:UIButtonTypeCustom];
-        deleteButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        deleteButton.translatesAutoresizingMaskIntoConstraints = YES;
-        [deleteButton addTarget:self action:@selector(deleteButtonAction) forControlEvents:UIControlEventTouchUpInside];
-        _deleteButton = deleteButton;
-    }
-    return _deleteButton;
-}
-
-- (void)updateDeleteButtonCount {
-    self.deleteButton.deleteCount = self.toUnfavoriteAndUnViewProductObjectIDs.count + self.deleteScreenshotObjectIDs.count;
-}
-
-- (void)deleteButtonAction {
-    [self setEditing:NO animated:YES];
-    self.editButtonItem.enabled = NO;
-    
-    // TODO: make sure the screenshots enter a disabled state and cant be deleted a second time if the database is taking long
-    
-    if (self.deleteScreenshotObjectIDs.count + self.toUnfavoriteAndUnViewProductObjectIDs.count > 0) {
-        [[DataModel sharedInstance] hideWithScreenshotOIDArray:self.deleteScreenshotObjectIDs];
-        [[DataModel sharedInstance] unfavoriteAndUnviewWithProductObjectIDs:self.toUnfavoriteAndUnViewProductObjectIDs];
-
-    }
-}
 
 
 #pragma mark - Collection View Sections

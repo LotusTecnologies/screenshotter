@@ -124,3 +124,126 @@ extension ScreenshotsViewController {
         }
     }
 }
+
+
+//Edit actions
+extension ScreenshotsViewController {
+    @objc func editButtonAction() {
+        
+        let isEditing = !self.isEditing
+        
+        if !isEditing {
+            // Needs to be before setEditing
+            self.deselectDeletedScreenshots()
+        }
+        self.setEditing(isEditing, animated: true)
+        
+    }
+    @objc open override func setEditing(_ editing: Bool, animated: Bool) {
+        
+        super.setEditing(editing, animated: animated)
+        
+        if (self.tabBarController != nil && editing) {
+            var bottom:CGFloat = 0.0
+            
+            if #available(iOS 11.0, *) {
+                if let safeAreaInsetsBottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom {
+                    bottom = safeAreaInsetsBottom / 2.0
+                }
+            }
+            if self.deleteButton == nil {
+                 let deleteButton = ScreenshotsDeleteButton.init()
+                deleteButton.autoresizingMask = [.flexibleWidth,.flexibleHeight]
+                deleteButton.translatesAutoresizingMaskIntoConstraints = true
+                deleteButton.addTarget(self, action: #selector(deleteButtonAction), for: .touchUpInside)
+                self.deleteButton = deleteButton
+            }
+            
+            self.deleteButton.alpha = 0
+            self.deleteButton.contentEdgeInsets = UIEdgeInsets.init(top: 0, left: 0, bottom: bottom, right: 0)
+            
+            self.deleteButton.frame = self.tabBarController!.tabBar.bounds;
+            self.tabBarController?.tabBar.addSubview(self.deleteButton)
+            
+        }
+        let removeDeleteButton = {
+            if (self.tabBarController != nil && !editing) {
+                self.deleteButton.removeFromSuperview()
+                self.updateDeleteButtonCount()
+            }
+        }
+        
+        let cellEditing = {
+            for index in self.collectionView.indexPathsForVisibleItems {
+                if let cell = self.collectionView.cellForItem(at: index) as? ScreenshotCollectionViewCell {
+                    cell.isEditing = editing;
+                    self.syncScreenshotCollectionViewCellSelectedState(cell)
+
+                }
+            }
+            
+            
+            if (self.hasNewScreenshot()) {
+                //                TODO: fix this
+                self.collectionView.reloadSections(IndexSet.init(integer: 1))
+            }
+            
+            self.deleteButton.alpha = editing ? 1.0: 0.0
+        }
+        
+        if (animated) {
+            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                
+                cellEditing();
+                ///     putting `removeDeleteButton` here instead of in the completion
+                //      prevents animation on the button fading away,
+                //      but ALSO fixes a bug where if you take edit cancel
+                //      edit cancel very fast you can get into a state
+                //      where there no delete button in edit mode
+                removeDeleteButton();
+            })
+        }
+        else {
+            cellEditing();
+            removeDeleteButton();
+        }
+        
+        self.navigationItem.rightBarButtonItem?.isEnabled = !editing;
+        
+        if (editing) {
+            self.editButtonItem.title = "generic.cancel".localized
+            
+            self.deleteScreenshotObjectIDs = []
+            self.toUnfavoriteAndUnViewProductObjectIDs = []
+        }else {
+            self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = []
+        }
+    }
+    
+    @objc func deselectDeletedScreenshots() {
+        
+        // Deselect all cells
+        self.collectionView.selectItem(at: nil, animated: true, scrollPosition: [])
+        
+        
+        self.deleteScreenshotObjectIDs = []
+        self.toUnfavoriteAndUnViewProductObjectIDs = []
+        self.productsBarController.toUnfavoriteAndUnViewProductObjectIDs = self.toUnfavoriteAndUnViewProductObjectIDs as! [NSManagedObjectID];
+    }
+    
+    @objc func updateDeleteButtonCount () {
+
+        self.deleteButton.deleteCount = self.toUnfavoriteAndUnViewProductObjectIDs.count + self.deleteScreenshotObjectIDs.count;
+    }
+    
+    @objc func deleteButtonAction(){
+        self.setEditing(false, animated: true)
+        self.editButtonItem.isEnabled = false
+        if (self.deleteScreenshotObjectIDs.count + self.toUnfavoriteAndUnViewProductObjectIDs.count > 0) {
+            DataModel.sharedInstance.hide(screenshotOIDArray: self.deleteScreenshotObjectIDs as! [NSManagedObjectID])
+            DataModel.sharedInstance.unfavoriteAndUnview(productObjectIDs: self.toUnfavoriteAndUnViewProductObjectIDs as! [NSManagedObjectID])
+            
+        }
+    }
+
+}
