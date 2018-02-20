@@ -15,10 +15,6 @@
 
 @property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
 
-@property (nonatomic, strong) NSDate *lastVisited;
-
-@property (nonatomic, copy) NSString *notificationCellAssetId;
-
 @end
 
 @implementation ScreenshotsViewController
@@ -116,13 +112,6 @@
 
 #pragma mark - Collection View Sections
 
-- (NSUInteger)newScreenshotsCount {
-    return [[AccumulatorModel sharedInstance] getNewScreenshotsCount];
-}
-
-- (BOOL)hasNewScreenshot {
-    return [self newScreenshotsCount] > 0;
-}
 
 - (ScreenshotNotificationCollectionViewCellContentText)notificationContentText {
     NSUInteger count = [self newScreenshotsCount];
@@ -303,7 +292,7 @@
 }
 
 - (Screenshot *)screenshotAtIndex:(NSInteger)index {
-    return [[self screenshotFrc] objectAtIndexPath:[self collectionViewToScreenshotFrcIndexPath:index]];
+    return [[self screenshotFrc] objectAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
 }
 
 - (NSInteger)indexForScreenshot:(Screenshot *)screenshot {
@@ -326,74 +315,6 @@
 
 #pragma mark - Notification Cell
 
-- (BOOL)canDisplayNotificationCell {
-    return [self hasNewScreenshot] && ![self isEditing];
-}
-
-- (void)screenshotNotificationCollectionViewCellDidTapReject:(ScreenshotNotificationCollectionViewCell *)cell {
-    NSUInteger screenshotsCount = [self newScreenshotsCount];
-    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
-    
-    [self dismissNotificationCell];
-    [self syncHelperViewVisibility];
-    
-    [AnalyticsTrackers.standard track:@"Screenshot notification cancelled" properties:@{@"Screenshot count": @(screenshotsCount)}];
-}
-
-- (void)screenshotNotificationCollectionViewCellDidTapConfirm:(ScreenshotNotificationCollectionViewCell *)cell {
-    NSUInteger screenshotsCount = [self newScreenshotsCount];
-    [[AccumulatorModel sharedInstance] resetNewScreenshotsCount];
-    
-    if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportSingleScreenshot) {
-        [[AssetSyncModel sharedInstance] refetchLastScreenshot];
-        
-    } else if (cell.contentText == ScreenshotNotificationCollectionViewCellContentTextImportMultipleScreenshots) {
-        [self.delegate screenshotsViewControllerWantsToPresentPicker:self];
-    }
-    
-    [self dismissNotificationCell];
-    [self syncHelperViewVisibility];
-    
-    [AnalyticsTrackers.standard track:@"Screenshot notification accepted" properties:@{@"Screenshot count": @(screenshotsCount)}];
-}
-
-- (void)presentNotificationCellWithAssetId:(NSString *)assetId {
-    if ([self canDisplayNotificationCell]) {
-        self.notificationCellAssetId = assetId;
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification];
-        
-        if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] == 0) {
-            [self.collectionView insertItemsAtIndexPaths:@[indexPath]];
-            [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
-            
-        } else {
-            [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-        }
-        
-        [self syncHelperViewVisibility];
-    }
-}
-
-- (void)dismissNotificationCell {
-    if ([self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
-        [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
-    }
-}
-    
-#pragma mark - Core Data Preparation
-
-
-- (NSIndexPath *)collectionViewToScreenshotFrcIndexPath:(NSInteger)index {
-    return [NSIndexPath indexPathForItem:index inSection:0];
-}
-
-- (NSIndexPath *)screenshotFrcToCollectionViewIndexPath:(NSInteger)index {
-    return [NSIndexPath indexPathForItem:index inSection:ScreenshotsSectionImage];
-}
-
-
-
-#pragma mark - Helper View
 
 
 @end

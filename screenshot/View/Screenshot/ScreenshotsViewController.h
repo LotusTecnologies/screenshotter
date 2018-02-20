@@ -29,8 +29,6 @@
 
 - (void)scrollToTop;
 
-- (void)presentNotificationCellWithAssetId:(NSString *)assetId;
-- (void)dismissNotificationCell;
 
 //Made public so it can be used by swift
 @property (nonatomic, strong) id screenshotFrcManager;
@@ -40,8 +38,13 @@
 
     @property (nonatomic, strong) ProductsBarController *productsBarController;
     @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
-- (BOOL)hasNewScreenshot ;
     @property (nonatomic, strong) UIRefreshControl *refreshControl;
     @property (nonatomic, strong) ScreenshotsHelperView *helperView;
 - (CGPoint)collectionViewInteritemOffset ;
+    @property (nonatomic, assign) BOOL hasNewScreenshot;
+
+    @property (nonatomic, strong) NSDate *lastVisited;
+    
+    @property (nonatomic, copy) NSString *notificationCellAssetId;
+
 @end

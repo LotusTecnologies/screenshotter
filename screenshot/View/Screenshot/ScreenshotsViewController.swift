@@ -272,7 +272,7 @@ extension ScreenshotsViewController {
             }
             
             
-            if (self.hasNewScreenshot()) {
+            if (self.hasNewScreenshot) {
                 self.collectionView.reloadSections(IndexSet.init(integer: ScreenshotsSection.notification.rawValue))
             }
             
@@ -457,4 +457,61 @@ extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
 
     }
 
+}
+//Notification cell
+extension ScreenshotsViewController {
+    @objc func newScreenshotsCount() -> Int {
+        return AccumulatorModel.sharedInstance.getNewScreenshotsCount()
+    }
+    
+    @objc func canDisplayNotificationCell() -> Bool {
+        return self.hasNewScreenshot && !self.isEditing
+    }
+    
+    @objc func screenshotNotificationCollectionViewCellDidTapReject(_ cell: ScreenshotNotificationCollectionViewCell){
+        let screenshotsCount = self.newScreenshotsCount()
+        AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
+        self.dismissNotificationCell()
+        self.syncHelperViewVisibility()
+        AnalyticsTrackers.standard.track("Screenshot notification cancelled", properties: ["Screenshot count": screenshotsCount])
+        
+    }
+    @objc func screenshotNotificationCollectionViewCellDidTapConfirm(_ cell: ScreenshotNotificationCollectionViewCell){
+        let screenshotsCount = self.newScreenshotsCount()
+        AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
+
+        if (cell.contentText == .importSingleScreenshot) {
+            AssetSyncModel.sharedInstance.refetchLastScreenshot()
+            
+        } else if (cell.contentText == .importMultipleScreenshots) {
+            self.delegate.screenshotsViewControllerWants(toPresentPicker: self)
+        }
+        self.dismissNotificationCell()
+        self.syncHelperViewVisibility()
+        AnalyticsTrackers.standard.track("Screenshot notification accepted", properties: ["Screenshot count": screenshotsCount])
+    }
+    
+    @objc func presentNotificationCell(assetId:String){
+        if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
+            self.hasNewScreenshot = true
+            self.notificationCellAssetId = assetId
+            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
+            
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 0{
+                self.collectionView.insertItems(at: [indexPath])
+                self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+            } else {
+                self.collectionView.reloadItems(at: [indexPath])
+            }
+            
+            self.syncHelperViewVisibility()
+        }
+    }
+    
+    @objc func dismissNotificationCell(){
+        self.hasNewScreenshot = false
+        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0{
+            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)])
+        }
+    }
 }
