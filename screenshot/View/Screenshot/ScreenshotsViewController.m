@@ -379,51 +379,8 @@
         [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
     }
 }
-
-
-#pragma mark - Screenshot Cell
-
-
-#pragma mark - Refresh Control
-
-
-
-#pragma mark - Products Bar
-
-- (ProductsBarController *)productsBarController {
-    if (!_productsBarController) {
-        _productsBarController = [[ProductsBarController alloc] init];
-    }
-    return _productsBarController;
-}
-
-
+    
 #pragma mark - Core Data Preparation
-
-- (void)coreDataPreparationControllerSetup:(CoreDataPreparationController *)controller {
-
-    [self setupFetchedResultsController];
-    [self.productsBarController setup];
-    self.productsBarController.delegate = self;
-
-    if ([DataModel sharedInstance].isCoreDataStackReady) {
-        [self.collectionView reloadData];
-        [self syncHelperViewVisibility];
-    }
-}
-
-- (void)coreDataPreparationController:(CoreDataPreparationController *)controller presentLoader:(UIView *)loader {
-    loader.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:loader];
-    [loader.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-    [loader.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [loader.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-    [loader.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-}
-
-- (void)coreDataPreparationController:(CoreDataPreparationController *)controller dismissLoader:(UIView *)loader {
-    [loader removeFromSuperview];
-}
 
 
 - (NSIndexPath *)collectionViewToScreenshotFrcIndexPath:(NSInteger)index {

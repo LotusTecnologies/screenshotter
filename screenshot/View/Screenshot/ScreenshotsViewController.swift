@@ -430,3 +430,31 @@ extension ScreenshotsViewController {
         self.editButtonItem.isEnabled = hasScreenshots;
     }
 }
+
+extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
+    
+    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
+        self.setupFetchedResultsController()
+        self.productsBarController = ProductsBarController()
+        self.productsBarController.setup()
+        self.productsBarController.delegate = self
+        if DataModel.sharedInstance.isCoreDataStackReady {
+            self.collectionView.reloadData()
+            self.syncHelperViewVisibility()
+        }
+    }
+    
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView){
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(loader)
+        loader.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        loader.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        loader.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        loader.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+    }
+    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
+        loader.removeFromSuperview()
+
+    }
+
+}
