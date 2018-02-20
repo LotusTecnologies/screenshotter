@@ -17,10 +17,6 @@ class FetchedResultsControllerManagerChange: NSObject {
     var deletedRows:[IndexPath] = []
     var updatedRows:[IndexPath] = []
     
-    var insertedObjectId:[NSManagedObjectID] = []
-    var deletedObjectId:[NSManagedObjectID] = []
-    var updatedObjectId:[NSManagedObjectID] = []
-    
     func applyChanges(tableView:UITableView){
         if #available(iOS 11.0, *) {
             tableView.performBatchUpdates({
@@ -109,37 +105,22 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         case .insert:
             if let i = newIndexPath {
                 self.currentChange?.insertedRows.append(i)
-                if let obj = anObject as? NSManagedObject {
-                    self.currentChange?.insertedObjectId.append(obj.objectID)
-                }
             }
         case .delete:
             if let i = indexPath {
                 self.currentChange?.deletedRows.append(i)
-                if let obj = anObject as? NSManagedObject {
-                    self.currentChange?.deletedObjectId.append(obj.objectID)
-                }
             }
         case .update:
             if let i = newIndexPath {
                 self.currentChange?.updatedRows.append(i)
-                if let obj = anObject as? NSManagedObject {
-                    self.currentChange?.updatedObjectId.append(obj.objectID)
-                }
             }
             
         case .move:
             if let i = indexPath {
                 self.currentChange?.deletedRows.append(i)
-                if let obj = anObject as? NSManagedObject {
-                    self.currentChange?.deletedObjectId.append(obj.objectID)
-                }
             }
             if let i = newIndexPath {
                 self.currentChange?.insertedRows.append(i)
-                if let obj = anObject as? NSManagedObject {
-                    self.currentChange?.insertedObjectId.append(obj.objectID)
-                }
             }
         }
     }
