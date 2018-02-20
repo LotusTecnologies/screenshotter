@@ -18,6 +18,12 @@ class ScreenshotProductBarCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        layer.shadowColor = Shadow.basic.color.cgColor
+        layer.shadowOffset = Shadow.basic.offset
+        layer.shadowRadius = Shadow.basic.radius
+        layer.shadowOpacity = 1
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
+        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .white
         contentView.addSubview(collectionView)
