@@ -245,5 +245,82 @@ extension ScreenshotsViewController {
             
         }
     }
+}
 
+//Screenshot cell
+extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
+    func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
+        if let indexPath = self.collectionView.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
+            let introductoryText = "screenshots.share.introductoryText".localized
+            
+            if screenshot.shoppablesCount <= 0 {
+                //TODO: fix this when there is a better indciator of failure to load
+                let alertController = UIAlertController.init(title: "screenshots.share.error.title".localized, message: "screenshots.share.error.message".localized, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction.init(title: "generic.ok", style: .default, handler: nil))
+                self.present(alertController, animated: true, completion: nil)
+                return;
+            }
+            var items:[Any]? = nil
+            let space = " "
+            if let shareLink = screenshot.shareLink, let shareURL = URL.init(string: shareLink) {
+                items = [introductoryText, space, shareURL]
+            }else{
+                if let url = URL.init(string: "https://getscreenshop.com/") {
+                    let screenshotActivityItemProvider = ScreenshotActivityItemProvider.init(screenshot: screenshot, placeholderURL:url)
+                    items = [introductoryText, space, screenshotActivityItemProvider];
+                }
+            }
+            if let items =  items {
+                
+                let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: nil)
+                activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
+                    if (completed) {
+                        AnalyticsTrackers.standard.track("Share completed")
+                        AnalyticsTrackers.branch.track("Share completed")
+                    } else {
+                        AnalyticsTrackers.standard.track("Share incomplete")
+                    }
+                };
+                activityViewController.popoverPresentationController?.sourceView = self.view; // so iPads don't crash
+                self.present(activityViewController, animated: true, completion: nil)
+                AnalyticsTrackers.standard.track("Shared screenshot")
+            }
+        }
+    }
+    
+    func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell) {
+        if let indexPath = self.collectionView.indexPath(for: cell), let screenshot = self.screenshot(at: indexPath.item) {
+            let objectId = screenshot.objectID
+        let alertController = UIAlertController.init(title: "Delete Screenshot", message: nil, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        
+        alertController.addAction(UIAlertAction.init(title: "Delete", style: .destructive, handler: { (a) in
+            if let screenshot = self.screenshot(at: indexPath.item) {
+                if screenshot.objectID.isEqual(objectId) {
+                    screenshot.setHide()
+                    self.removeScreenshotHelperView()
+                    self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                        cell.selectedState = .disabled
+                    })
+                    AnalyticsTrackers.standard.track("Removed screenshot")
+                    
+                }else{
+                    print("collectionView update when trying to delete item")
+                }
+            }
+        }))
+        self.present(alertController, animated: true, completion: nil)
+        
+        }
+    }
+    @objc func syncScreenshotCollectionViewCellSelectedState(_ cell:ScreenshotCollectionViewCell) {
+        if self.isEditing {
+            cell.selectedState = .checked
+        }else if cell.isSelected && self.deleteScreenshotObjectIDs.count > 0 {
+            cell.selectedState = .disabled
+        }else{
+            cell.selectedState = .none
+        }
+    }
 }

@@ -47,5 +47,4 @@ typedef NS_ENUM(NSInteger, ScreenshotsSection) {
     @property (nonatomic, strong) ProductsBarController *productsBarController;
     @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
 - (BOOL)hasNewScreenshot ;
-    - (void)syncScreenshotCollectionViewCellSelectedState:(ScreenshotCollectionViewCell *)cell ;
 @end

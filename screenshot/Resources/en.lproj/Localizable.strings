@@ -137,6 +137,9 @@
 "screenshots.delete.plural" = "Delete %d Items";
 "screenshots.helperView.title" = "Ready To Shop";
 "screenshots.helperView.byline" = "Here’s your screenshot!\nTap on it to see the products in the photo";
+"screenshots.share.introductoryText" = "Check out this look on SCREENSHOP!";
+"screenshots.share.error.title" = "Sorry";
+"screenshots.share.error.message" = "We could not find similar items to share.";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.row.bug.title" = "Submit a Bug";
