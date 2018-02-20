@@ -10,7 +10,96 @@ import Foundation
 import CoreData
 import SafariServices
 import FBSDKCoreKit
+@objc enum ScreenshotsSection : Int {
+    case product
+    case notification
+    case image
+}
 
+//Setup view
+extension ScreenshotsViewController {
+    @objc func setupViews() {
+        let collectionView: UICollectionView = {
+            let minimumSpacing = self.collectionViewInteritemOffset()
+            
+            let layout = UICollectionViewFlowLayout()
+            layout.minimumInteritemSpacing = minimumSpacing.x
+            layout.minimumLineSpacing = minimumSpacing.y
+            
+            let collectionView = UICollectionView.init(frame: self.view.bounds, collectionViewLayout: layout)
+            collectionView.translatesAutoresizingMaskIntoConstraints = false
+            collectionView.delegate = self
+            collectionView.dataSource = self
+            collectionView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: minimumSpacing.y, right: 0)
+            collectionView.backgroundColor = self.view.backgroundColor;
+            collectionView.alwaysBounceVertical = true
+            collectionView.isScrollEnabled = false
+            collectionView.allowsMultipleSelection = true
+            
+            collectionView.register(ScreenshotProductBarCollectionViewCell.self, forCellWithReuseIdentifier: "product")
+            collectionView.register(ScreenshotNotificationCollectionViewCell.self, forCellWithReuseIdentifier: "notification")
+            collectionView.register(ScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+
+            self.view.addSubview(collectionView)
+            collectionView.topAnchor.constraint( equalTo: self.view.topAnchor).isActive = true
+            collectionView.bottomAnchor.constraint( equalTo: self.view.bottomAnchor).isActive = true
+            collectionView.leftAnchor.constraint( equalTo: self.view.leftAnchor).isActive = true
+            collectionView.trailingAnchor.constraint( equalTo: self.view.trailingAnchor).isActive = true
+
+            return collectionView;
+        }()
+        self.collectionView = collectionView
+        
+        let refreshControl:UIRefreshControl = {
+            let refreshControl = UIRefreshControl()
+            refreshControl.tintColor = .crazeRed
+            refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for:.valueChanged)
+
+            collectionView.addSubview(refreshControl)
+            
+            // Recenter view
+            var rect = refreshControl.subviews[0].frame;
+            rect.origin.x = -collectionView.contentInset.left / 2.0
+            refreshControl.subviews[0].frame = rect
+            return refreshControl;
+        }()
+        self.refreshControl = refreshControl
+        
+        let helperView:ScreenshotsHelperView = {
+            let verPadding = Geometry.extendedPadding
+            let horPadding = Geometry.padding
+            
+            let helperView = ScreenshotsHelperView()
+            helperView.translatesAutoresizingMaskIntoConstraints = false
+            helperView.layoutMargins = UIEdgeInsets.init(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
+            refreshControl.addTarget(self, action: #selector(helperViewAllowAccessAction), for:.touchUpInside)
+            self.view.addSubview(helperView)
+            helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
+            helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+            helperView.bottomAnchor.constraint(equalTo: self.bottomLayoutGuide.topAnchor).isActive = true
+            helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
+            return helperView;
+        }()
+        self.helperView = helperView
+        
+    }
+    @objc func refreshControlAction(_ refreshControl:UIRefreshControl){
+        
+        if (refreshControl.isRefreshing) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                refreshControl.endRefreshing()
+            }
+        }
+    }
+    
+    @objc func helperViewAllowAccessAction() {
+        PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
+            self.syncHelperViewVisibility()
+        }
+    }
+
+}
 
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {

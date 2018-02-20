@@ -7,14 +7,9 @@
 //
 #import <CoreData/CoreData.h>
 #import "BaseViewController.h"
-typedef NS_ENUM(NSInteger, ScreenshotsSection) {
-    ScreenshotsSectionProduct,
-    ScreenshotsSectionNotification,
-    ScreenshotsSectionImage
-};
 @class ScreenshotsViewController;
 @class Screenshot;
-@class FetchedResultsControllerManager, ProductsBarController, ScreenshotsDeleteButton, ScreenshotCollectionViewCell;
+@class FetchedResultsControllerManager, ProductsBarController, ScreenshotsDeleteButton, ScreenshotCollectionViewCell,ScreenshotsHelperView;
 
 @protocol ScreenshotsViewControllerDelegate <NSObject>
 @required
@@ -25,7 +20,7 @@ typedef NS_ENUM(NSInteger, ScreenshotsSection) {
 
 @end
 
-@interface ScreenshotsViewController : BaseViewController
+@interface ScreenshotsViewController : BaseViewController <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (nonatomic, weak) id<ScreenshotsViewControllerDelegate> delegate;
 
@@ -47,4 +42,7 @@ typedef NS_ENUM(NSInteger, ScreenshotsSection) {
     @property (nonatomic, strong) ProductsBarController *productsBarController;
     @property (nonatomic, strong) ScreenshotsDeleteButton *deleteButton;
 - (BOOL)hasNewScreenshot ;
+    @property (nonatomic, strong) UIRefreshControl *refreshControl;
+    @property (nonatomic, strong) ScreenshotsHelperView *helperView;
+- (CGPoint)collectionViewInteritemOffset ;
 @end

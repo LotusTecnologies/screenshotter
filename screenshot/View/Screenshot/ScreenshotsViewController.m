@@ -11,13 +11,9 @@
 #import "screenshot-Swift.h"
 
 
-@interface ScreenshotsViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, CoreDataPreparationControllerDelegate>
+@interface ScreenshotsViewController () < ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, CoreDataPreparationControllerDelegate>
 
 @property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
-
-@property (nonatomic, strong) UIRefreshControl *refreshControl;
-@property (nonatomic, strong) ScreenshotsHelperView *helperView;
-
 
 @property (nonatomic, strong) NSDate *lastVisited;
 
@@ -56,63 +52,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _collectionView = ({
-        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
-        
-        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumInteritemSpacing = minimumSpacing.x;
-        layout.minimumLineSpacing = minimumSpacing.y;
-        
-        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:layout];
-        collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-        collectionView.delegate = self;
-        collectionView.dataSource = self;
-        collectionView.contentInset = UIEdgeInsetsMake(0, 0, minimumSpacing.y, 0);
-        collectionView.backgroundColor = self.view.backgroundColor;
-        collectionView.alwaysBounceVertical = YES;
-        collectionView.scrollEnabled = NO;
-        collectionView.allowsMultipleSelection = YES;
-        
-        [collectionView registerClass:[ScreenshotProductBarCollectionViewCell class] forCellWithReuseIdentifier:@"product"];
-        [collectionView registerClass:[ScreenshotNotificationCollectionViewCell class] forCellWithReuseIdentifier:@"notification"];
-        [collectionView registerClass:[ScreenshotCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
-        
-        [self.view addSubview:collectionView];
-        [collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        [collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        [collectionView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
-        [collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        collectionView;
-    });
     
-    _refreshControl = ({
-        UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-        refreshControl.tintColor = [UIColor crazeRed];
-        [refreshControl addTarget:self action:@selector(refreshControlAction:) forControlEvents:UIControlEventValueChanged];
-        [self.collectionView addSubview:refreshControl];
-        
-        // Recenter view
-        CGRect rect = refreshControl.subviews[0].frame;
-        rect.origin.x = -self.collectionView.contentInset.left / 2.f;
-        refreshControl.subviews[0].frame = rect;
-        refreshControl;
-    });
-    
-    _helperView = ({
-        CGFloat verPadding = [Geometry extendedPadding];
-        CGFloat horPadding = [Geometry padding];
-        
-        ScreenshotsHelperView *helperView = [[ScreenshotsHelperView alloc] init];
-        helperView.translatesAutoresizingMaskIntoConstraints = NO;
-        helperView.layoutMargins = UIEdgeInsetsMake(verPadding, horPadding, verPadding, horPadding);
-        [helperView.button addTarget:self action:@selector(helperViewAllowAccessAction) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:helperView];
-        [helperView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
-        [helperView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-        [helperView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
-        [helperView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-        helperView;
-    });
+    [self setupViews];
     
     [self.coreDataPreparationController viewDidLoad];
 }
@@ -445,14 +386,6 @@
 
 #pragma mark - Refresh Control
 
-- (void)refreshControlAction:(UIRefreshControl *)refreshControl {
-    if ([refreshControl isRefreshing]) {
-        // This is for show.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [refreshControl endRefreshing];
-        });
-    }
-}
 
 
 #pragma mark - Products Bar
@@ -501,11 +434,6 @@
     return [NSIndexPath indexPathForItem:index inSection:ScreenshotsSectionImage];
 }
 
-- (void)helperViewAllowAccessAction {
-    [[PermissionsManager shared] _requestPhotoPermissionWithOpenSettingsIfNeeded:YES response:^(BOOL granted) {
-        [self syncHelperViewVisibility];
-    }];
-}
 
 
 #pragma mark - Helper View
