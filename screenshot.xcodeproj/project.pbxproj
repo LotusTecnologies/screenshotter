@@ -25,7 +25,6 @@
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
-		524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */; };
 		525691881FD5DD51008D728D /* UsageStreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524DB5391FC6F69800BD408F /* UsageStreak.swift */; };
 		5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
@@ -76,7 +75,6 @@
 		C54088281FE90C8E00198955 /* ProductsRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087F21FE90C8E00198955 /* ProductsRateView.swift */; };
 		C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087F41FE90C8E00198955 /* FavoritesViewController.swift */; };
 		C540882A1FE90C8E00198955 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087F51FE90C8E00198955 /* FavoriteButton.swift */; };
-		C540882B1FE90C8E00198955 /* DiscoverWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087F71FE90C8E00198955 /* DiscoverWebViewController.swift */; };
 		C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */; };
 		C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */; };
 		C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */; };
@@ -158,7 +156,6 @@
 		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		524DB5391FC6F69800BD408F /* UsageStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStreak.swift; sourceTree = "<group>"; };
-		524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverDeepLinkHandler.swift; sourceTree = "<group>"; };
 		5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangelogAlert.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		527F17491FA21CA6008082BC /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
@@ -209,7 +206,6 @@
 		C54087F21FE90C8E00198955 /* ProductsRateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsRateView.swift; sourceTree = "<group>"; };
 		C54087F41FE90C8E00198955 /* FavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
 		C54087F51FE90C8E00198955 /* FavoriteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
-		C54087F71FE90C8E00198955 /* DiscoverWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverWebViewController.swift; sourceTree = "<group>"; };
 		C54088061FE90C8E00198955 /* ScreenshotsNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsNavigationController.h; sourceTree = "<group>"; };
 		C54088071FE90C8E00198955 /* ScreenshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsViewController.h; sourceTree = "<group>"; };
 		C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -388,7 +384,6 @@
 				523C11381F5C195D001BD969 /* RatingFlow.swift */,
 				E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */,
 				52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */,
-				524E4C641FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift */,
 				524DB5391FC6F69800BD408F /* UsageStreak.swift */,
 				5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */,
 				C554B176202706F00099622C /* FrameworkSetupController.swift */,
@@ -558,7 +553,6 @@
 				C5FF413D200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift */,
 				C5FF413F200BA23900342DEC /* DiscoverScreenshotHelperView.swift */,
 				C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */,
-				C54087F71FE90C8E00198955 /* DiscoverWebViewController.swift */,
 			);
 			path = Discover;
 			sourceTree = "<group>";
@@ -879,7 +873,6 @@
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/Branch/Branch.framework",
 				"${PODS_ROOT}/Clarifai-Apple-SDK/Clarifai_Apple_SDK.framework",
-				"${BUILT_PRODUCTS_DIR}/DeepLinkKit/DeepLinkKit.framework",
 				"${BUILT_PRODUCTS_DIR}/EggRating/EggRating.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -903,7 +896,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Branch.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Clarifai_Apple_SDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DeepLinkKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EggRating.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -1025,7 +1017,6 @@
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C540880D1FE90C8E00198955 /* Loader.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
-				C540882B1FE90C8E00198955 /* DiscoverWebViewController.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
@@ -1078,7 +1069,6 @@
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
-				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
 				C54088391FE90C8E00198955 /* ScreenshotsViewController.m in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,

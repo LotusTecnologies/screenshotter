@@ -20,7 +20,6 @@ def shared_pods
     pod 'Firebase/Invites'
     pod 'Firebase/Auth'
     pod 'GoogleSignIn'
-    pod 'DeepLinkKit'
     pod 'lottie-ios'
     pod 'Segment-Amplitude'
 end

@@ -15,7 +15,6 @@ import Branch
 import Firebase
 import GoogleSignIn
 import PromiseKit
-import DeepLinkKit
 import Segment_Amplitude
 
 @UIApplicationMain
@@ -23,7 +22,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // We are purposely iniitalizing this immediately since it observes for app launch notifications.
     private let usageStreakManager = UsageStreakManager()
     
-    var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var shouldLoadDiscoverNextLoad = false
@@ -129,15 +127,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        var handled = router?.handle(url) { (handled, error) in
-            if let error = error {
-                AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
-            }
-        } ?? false
-        
-        if !handled {
-            handled = Branch.getInstance().application(app, open: url, options:options)
-        }
+        var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
@@ -150,42 +140,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
-        if !handled {
-            // Facebook
-//            let parsedURL = BFURL(inboundURL: url, sourceApplication: sourceApplication)
-//
-//            if parsedURL?.appLinkData != nil {
-//                // this is an applink url, handle it here
-//                let alert = UIAlertController(title: "Received link:", message: parsedURL?.targetURL.absoluteString, preferredStyle: .alert)
-//                window?.rootViewController?.present(alert, animated: true, completion: nil)
-//
-//                return true
-//            }
-            
-            // Google
-//            if let invite = Invites.handle(url, sourceApplication: sourceApplication, annotation: annotation) as? ReceivedInvite {
-//                let matchType = (invite.matchType == .weak) ? "Weak" : "Strong"
-//
-//                print("||| Invite received from: \(sourceApplication ?? "") Deeplink: \(invite.deepLink), Id: \(invite.inviteId), Type: \(matchType)")
-//
-//                return true
-//            }
-        }
-        
         return handled
-    }
-    
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
-        // pass the url to the handle deep link call
-        if Branch.getInstance().continue(userActivity) == false {
-            return router?.handle(userActivity) { (handled, error) in
-                if let error = error {
-                    AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
-                }
-            } ?? false
-        }
-        
-        return true
     }
     
     // MARK: State Restoration
@@ -328,8 +283,6 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
         SEGAnalytics.setup(with: configuration)
         
-        setupRouter()
-        
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
         }
@@ -434,13 +387,6 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
-    }
-    
-    // MARK: Deep Link Router
-    
-    func setupRouter() {
-        router = DPLDeepLinkRouter()
-        router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 
