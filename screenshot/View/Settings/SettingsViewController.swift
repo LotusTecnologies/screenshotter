@@ -44,7 +44,6 @@ class SettingsViewController : BaseViewController {
         case restoreInAppPurchase
         case talkToStylist
         case openIn
-
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -220,6 +219,10 @@ class SettingsViewController : BaseViewController {
             updateScreenshotsCount()
             reloadChangeableIndexPaths()
         }
+    }
+    
+    @objc fileprivate func dismissViewController() {
+        presentedViewController?.dismiss(animated: true, completion: nil)
     }
     
     deinit {
@@ -433,14 +436,17 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .email, .coins, .productGender, .productSize, .usageStreak:
+        case .version, .email, .productGender, .productSize, .usageStreak:
             return false
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 return true
-            } else {
+            }
+            else {
                 return false
             }
+            
         default:
             return true
         }
@@ -465,6 +471,13 @@ extension SettingsViewController : UITableViewDelegate {
         case .contactUs:
             IntercomHelper.sharedInstance.presentMessagingUI()
             
+        case .coins:
+            let gameViewController = GameViewController()
+            gameViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissViewController))
+            
+            let navigationController = UINavigationController(rootViewController: gameViewController)
+            present(navigationController, animated: true, completion: nil)
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
@@ -474,6 +487,7 @@ extension SettingsViewController : UITableViewDelegate {
                     }
                 })
             }
+            
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -484,8 +498,10 @@ extension SettingsViewController : UITableViewDelegate {
                     tableView.reloadRows(at: [indexPath], with: .none)
                 }))
             })
-            self.present(alert, animated: true, completion: nil)
             
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            
+            present(alert, animated: true, completion: nil)
             
         case .currency:
             let viewController = CurrencyViewController()
@@ -509,6 +525,7 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
+            
         case .restoreInAppPurchase:
             if self.isRestoring == false {
                 self.isRestoring = true
@@ -517,7 +534,7 @@ extension SettingsViewController : UITableViewDelegate {
                     self.isRestoring = false
                     tableView.reloadRows(at: [indexPath], with: .none)
                     var message = "settings.InAppPurchase.Restore".localized
-                    if array.count == 0 {
+                    if array.isEmpty {
                         message = "settings.InAppPurchase.RestoreNone".localized
                     }
                     let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
@@ -543,6 +560,7 @@ extension SettingsViewController : UITableViewDelegate {
                     }
                 })
             }
+            
         case .talkToStylist:
             if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
                 // do nothing
@@ -550,7 +568,6 @@ extension SettingsViewController : UITableViewDelegate {
                 IntercomHelper.sharedInstance.presentMessagingUI()
             }else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    
                     let alertController = UIAlertController.init(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
                     
                     

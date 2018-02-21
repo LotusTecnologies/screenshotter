@@ -17,7 +17,7 @@ import Segment_Amplitude
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    // We are purposely iniitalizing this immediately since it observes for app launch notifications.
+    // We are purposely initalizing this immediately since it observes for app launch notifications.
     private let usageStreakManager = UsageStreakManager()
     
     var window: UIWindow?
