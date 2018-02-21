@@ -12,7 +12,6 @@ PODS:
     - Branch/Core (= 0.22.5)
   - Branch/Core (0.22.5)
   - Clarifai-Apple-SDK (3.0.0-beta14)
-  - DeepLinkKit (1.4.0)
   - EggRating (0.1.2):
     - RateView
   - FBSDKCoreKit (4.30.0):
@@ -123,7 +122,6 @@ DEPENDENCIES:
   - Appsee
   - Branch
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
-  - DeepLinkKit
   - EggRating (from `https://github.com/jacobrelkin/EGGRating.git`, branch `jacobrelkin/ios-11-support`)
   - FBSDKCoreKit
   - FBSDKLoginKit
@@ -155,7 +153,6 @@ SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 4f0482418d99e77d15b0e6065ef216c10e24797b
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
-  DeepLinkKit: bffd3b5e51549222f974d631b4e0e7484600b9d8
   EggRating: ac37ed4dad156c9912a384464a25f554bd4198c8
   FBSDKCoreKit: 7c4bba2877781a131ab5d54c0a78c405d4307b62
   FBSDKLoginKit: fe7a7e82373dc5daad92e1623219e86224ab1fb1
@@ -181,6 +178,6 @@ SPEC CHECKSUMS:
   SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: b43a8096531234e6b9abebf6e2a829d005f9f209
+PODFILE CHECKSUM: bd6ca45fc11b09d3a0c431ab357b946c601c6ef9
 
 COCOAPODS: 1.4.0
