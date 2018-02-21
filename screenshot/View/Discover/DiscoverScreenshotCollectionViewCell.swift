@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class DiscoverScreenshotCollectionViewCell : ShadowCollectionViewCell {
     fileprivate let imageView = UIImageView()

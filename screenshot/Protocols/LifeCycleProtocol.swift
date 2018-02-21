@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc protocol ViewControllerLifeCycle: NSObjectProtocol {
     @objc optional func viewController(_ viewController: UIViewController, willAppear animated: Bool)

@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 protocol FavoritesViewControllerDelegate : NSObjectProtocol {
     func favoritesViewController(_ viewController: FavoritesViewController, didSelectItemAt indexPath: IndexPath)

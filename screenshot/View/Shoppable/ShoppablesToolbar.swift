@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 protocol ShoppablesToolbarDelegate : UIToolbarDelegate {
     func shoppablesToolbarDidChange(toolbar:ShoppablesToolbar)

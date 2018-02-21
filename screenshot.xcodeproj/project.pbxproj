@@ -12,6 +12,8 @@
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
 		31518645203477DB001BD8D6 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */; };
+		31A33748203D774800FFD2F2 /* ScreenshotsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A33747203D774800FFD2F2 /* ScreenshotsNavigationController.swift */; };
+		31A3374A203D7B3600FFD2F2 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A33749203D7B3600FFD2F2 /* BaseViewController.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
 		31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110320396194000156EE /* ScreenshotsViewController.swift */; };
@@ -79,7 +81,6 @@
 		C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */; };
 		C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */; };
 		C54088511FE90E2200198955 /* NotifyChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540883E1FE90E2100198955 /* NotifyChangeView.swift */; };
-		C54088521FE90E2200198955 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540883F1FE90E2200198955 /* BaseViewController.m */; };
 		C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */; };
 		C54088551FE90E2200198955 /* ClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088461FE90E2200198955 /* ClipView.swift */; };
 		C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088481FE90E2200198955 /* ImageCollectionViewCell.swift */; };
@@ -137,6 +138,8 @@
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
+		31A33747203D774800FFD2F2 /* ScreenshotsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsNavigationController.swift; sourceTree = "<group>"; };
+		31A33749203D7B3600FFD2F2 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110320396194000156EE /* ScreenshotsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsViewController.swift; sourceTree = "<group>"; };
@@ -209,8 +212,6 @@
 		C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
 		C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
 		C540883E1FE90E2100198955 /* NotifyChangeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifyChangeView.swift; sourceTree = "<group>"; };
-		C540883F1FE90E2200198955 /* BaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewController.m; sourceTree = "<group>"; };
-		C54088401FE90E2200198955 /* BaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseViewController.h; sourceTree = "<group>"; };
 		C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
 		C54088461FE90E2200198955 /* ClipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipView.swift; sourceTree = "<group>"; };
 		C54088481FE90E2200198955 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -548,8 +549,6 @@
 			children = (
 				C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */,
 				31CE1106203BEF36000156EE /* SaleView.swift */,
-				C54088401FE90E2200198955 /* BaseViewController.h */,
-				C540883F1FE90E2200198955 /* BaseViewController.m */,
 				C540884D1FE90E2200198955 /* Button */,
 				C54088461FE90E2200198955 /* ClipView.swift */,
 				C54088471FE90E2200198955 /* CollectionViewCell */,
@@ -558,6 +557,7 @@
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
+				31A33749203D7B3600FFD2F2 /* BaseViewController.swift */,
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C540884A1FE90E2200198955 /* TextView */,
@@ -569,6 +569,7 @@
 			isa = PBXGroup;
 			children = (
 				31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */,
+				31A33747203D774800FFD2F2 /* ScreenshotsNavigationController.swift */,
 				C54088061FE90C8E00198955 /* ScreenshotsNavigationController.h */,
 				C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */,
 				C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */,
@@ -956,6 +957,7 @@
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
+				31A33748203D774800FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
 				C55D89BB2021C021004A5245 /* CoreDataPreparationController.swift in Sources */,
@@ -1008,6 +1010,7 @@
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
+				31A3374A203D7B3600FFD2F2 /* BaseViewController.swift in Sources */,
 				C554B177202706F00099622C /* FrameworkSetupController.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
@@ -1028,7 +1031,6 @@
 				C54088591FE90E2200198955 /* MainButton.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				31CE1107203BEF36000156EE /* SaleView.swift in Sources */,
-				C54088521FE90E2200198955 /* BaseViewController.m in Sources */,
 				31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,

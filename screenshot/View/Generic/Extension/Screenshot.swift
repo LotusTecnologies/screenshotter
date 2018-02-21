@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension Screenshot {
     private class func createRatio(width: CGFloat, height: CGFloat) -> CGSize {

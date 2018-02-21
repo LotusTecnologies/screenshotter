@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol FrameworkSetupControllerDelegate : NSObjectProtocol {
     /// Called when the application first launches.

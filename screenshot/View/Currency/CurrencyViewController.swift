@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class CurrencyViewController : BaseViewController {
     var selectedCurrencyCode: String?

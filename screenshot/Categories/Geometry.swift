@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension CGFloat {
     static let padding = CGFloat(16)

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+/*
 @class ScreenshotsNavigationController;
 @class ScreenshotPickerNavigationController;
 @class ProductsViewController, ScreenshotsViewController;
@@ -27,3 +27,4 @@
 - (void)presentPickerViewController;
 
 @end
+*/

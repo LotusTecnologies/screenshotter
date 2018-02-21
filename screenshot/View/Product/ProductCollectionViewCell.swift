@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc protocol ProductCollectionViewCellDelegate : NSObjectProtocol {
     func productCollectionViewCellDidTapFavorite(cell:ProductCollectionViewCell)

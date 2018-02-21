@@ -5,7 +5,7 @@
 //  Created by Corey Werner on 8/8/17.
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
-
+/*
 #import "ScreenshotsNavigationController.h"
 #import "screenshot-Swift.h"
 
@@ -88,10 +88,10 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self presentPickerClipView];
             });
-
+            
             // Go back into Products before presenting the next view
             self.previousDidAppearViewControllerClass = nil;
-
+            
         } else if ([self needsToPresentPushAlert]) {
             [self presentPushAlert];
         }
@@ -294,3 +294,4 @@
 }
 
 @end
+*/

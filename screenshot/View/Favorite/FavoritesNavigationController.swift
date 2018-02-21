@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class FavoritesNavigationController : UINavigationController {
     let favoritesViewController = FavoritesViewController()

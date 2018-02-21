@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ScreenshotsDeleteButton : UIButton {
     required init?(coder aDecoder: NSCoder) {

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 fileprivate extension DateComponents {
     func value(for component: Calendar.Component) -> Int? {
