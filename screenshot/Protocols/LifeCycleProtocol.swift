@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 @objc protocol ViewControllerLifeCycle: NSObjectProtocol {
+    @objc optional func viewControllerDidLoad(_ viewController: UIViewController)
     @objc optional func viewController(_ viewController: UIViewController, willAppear animated: Bool)
     @objc optional func viewController(_ viewController: UIViewController, didAppear animated: Bool)
     @objc optional func viewController(_ viewController: UIViewController, willDisappear animated: Bool)

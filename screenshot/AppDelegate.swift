@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
-    fileprivate let frameworkSetupController = FrameworkSetupController()
+    fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
         let viewController = MainTabBarController()
@@ -41,11 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     override init() {
         settings = AppSettings(withSetter: self.settingsSetter)
         super.init()
-        frameworkSetupController.delegate = self
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-        frameworkSetupController.application(application, willFinishLaunchingWithOptions: launchOptions)
         
         UNUserNotificationCenter.current().delegate = self
         
@@ -70,8 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
         
+        frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
+
         PermissionsManager.shared.fetchPushPermissionStatus()
-        
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
         if application.applicationState == .background,
@@ -253,18 +252,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate : ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, didAppear animated: Bool) {
-        frameworkSetupController.viewController(viewController, didAppear: animated)
+    func viewControllerDidLoad(_ viewController: UIViewController) {
+        frameworkSetupMainViewDidLoad()
     }
 }
 
-extension AppDelegate : FrameworkSetupControllerDelegate {
-    func frameworkSetupControllerImmediate(_ controller: FrameworkSetupController) {
-    }
-    
-    func frameworkSetupControllerInitialViewDidAppear(_ controller: FrameworkSetupController) {
+// MARK: - Framework Setup
+
+extension AppDelegate {
+    fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
+        frameworkSetupLaunchOptions = launchOptions
+        
         Appsee.start(Constants.appSeeApiKey)
-        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
+        Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
@@ -278,7 +278,7 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
             Branch.setUseTestBranchKey(true)
         }
         
-        Branch.getInstance()?.initSession(launchOptions: controller.launchOptions) { params, error in
+        Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
             guard error == nil, let params = params as? [String : AnyObject] else {
@@ -304,22 +304,22 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
                 self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
             }
         }
+        
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    func frameworkSetupControllerRootViewDidAppear(_ controller: FrameworkSetupController) {
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions: controller.launchOptions)
-            
-            RatingFlow.sharedInstance.start()
-            
-            IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
-        }
+    fileprivate func frameworkSetupMainViewDidLoad() {
+        RatingFlow.sharedInstance.start()
+        
+        IntercomHelper.sharedInstance.start(withLaunchOptions: frameworkSetupLaunchOptions ?? [:])
+        
+        frameworkSetupLaunchOptions = nil
     }
 }
 
 extension AppDelegate {
     
-    // MARK: - Helper
+    // MARK: Helper
     
     func showScreenshotListTop() {
         if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
@@ -329,7 +329,7 @@ extension AppDelegate {
         }
     }
     
-    // MARK: - View Controllers
+    // MARK: View Controllers
     
     func nextViewController() -> UIViewController {
         let viewController: UIViewController
@@ -352,8 +352,6 @@ extension AppDelegate {
             tutorialViewController.lifeCycleDelegate = self
             viewController = tutorialViewController
         }
-        
-        frameworkSetupController.setIsWaitingForRootViewController()
         
         return viewController
     }
