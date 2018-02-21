@@ -9,7 +9,7 @@
 #import "BaseViewController.h"
 @class ScreenshotsViewController;
 @class Screenshot;
-@class FetchedResultsControllerManager, ProductsBarController, ScreenshotsDeleteButton, ScreenshotCollectionViewCell,ScreenshotsHelperView;
+@class FetchedResultsControllerManager, ProductsBarController, ScreenshotsDeleteButton, ScreenshotCollectionViewCell,ScreenshotsHelperView, CoreDataPreparationController;
 
 @protocol ScreenshotsViewControllerDelegate <NSObject>
 @required
@@ -45,5 +45,6 @@
     @property (nonatomic, strong) NSDate *lastVisited;
     
     @property (nonatomic, copy) NSString *notificationCellAssetId;
+    @property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
 
 @end

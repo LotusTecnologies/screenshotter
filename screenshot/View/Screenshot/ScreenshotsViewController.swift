@@ -16,6 +16,47 @@ import FBSDKCoreKit
     case image
 }
 
+
+extension ScreenshotsViewController {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        self.setupViews()
+//        self.coreDataPreparationController.viewDidLoad()
+    }
+    override open func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.syncHelperViewVisibility()
+    }
+    override open func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.removeScreenshotHelperView()
+        if self.isEditing {
+            self.setEditing(false, animated: animated)
+        }
+    }
+    override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        self.collectionView.collectionViewLayout.invalidateLayout()
+    }
+    @objc func applicationDidEnterBackground(_ notification:Notification){
+        if self.isViewLoaded && self.view.window != nil {
+            self.removeScreenshotHelperView()
+        }
+    }
+    @objc func applicationWillEnterForeground(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            self.syncHelperViewVisibility()
+        }
+    }
+    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
+                self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ScreenshotsSection.notification.rawValue)])
+            }
+        }
+    }
+
+}
 //Setup view
 extension ScreenshotsViewController {
     @objc func setupViews() {

@@ -13,7 +13,6 @@
 
 @interface ScreenshotsViewController () < ScreenshotCollectionViewCellDelegate, ScreenshotNotificationCollectionViewCellDelegate, CoreDataPreparationControllerDelegate>
 
-@property (nonatomic, strong) CoreDataPreparationController *coreDataPreparationController;
 
 @end
 
@@ -44,66 +43,16 @@
     }
     return self;
 }
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self setupViews];
-    
-    [self.coreDataPreparationController viewDidLoad];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [self syncHelperViewVisibility];
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    
-    [self removeScreenshotHelperView];
-    
-    if ([self isEditing]) {
-        // Incase the app somehow changed view controllers while editing, cancel it.
-        [self setEditing:NO animated:animated];
+ 
+    - (void)dealloc {
+        self.coreDataPreparationController.delegate = nil;
+        self.collectionView.delegate = nil;
+        self.collectionView.dataSource = nil;
+        
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
-}
-
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
-    [self.collectionView.collectionViewLayout invalidateLayout];
-}
-
-- (void)applicationDidEnterBackground:(NSNotification *)notification {
-    if (self.view.window) {
-        [self removeScreenshotHelperView];
-    }
-}
-
-- (void)applicationWillEnterForeground:(NSNotification *)notification {
-    if (self.view.window) {
-        [self syncHelperViewVisibility];
-    }
-}
-
-- (void)contentSizeCategoryDidChange:(NSNotification *)notification {
-    if (self.view.window && [self.collectionView numberOfItemsInSection:ScreenshotsSectionNotification] > 0) {
-        [self.collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:0 inSection:ScreenshotsSectionNotification]]];
-    }
-}
-
-- (void)dealloc {
-    self.coreDataPreparationController.delegate = nil;
-    self.collectionView.delegate = nil;
-    self.collectionView.dataSource = nil;
-    
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-
-
 #pragma mark - Collection View
 
 
