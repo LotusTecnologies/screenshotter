@@ -364,7 +364,7 @@ extension SettingsViewController : UITableViewDataSource {
         
         cell.accessoryType = cellAccessoryType(for: row)
         cell.accessoryView = cellAccessoryView(for: row)
-        return cell;
+        return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -567,12 +567,12 @@ extension SettingsViewController : UITableViewDelegate {
                     
                     
                     if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                        action.isEnabled = true;
+                        action.isEnabled = true
                         alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
                     }else{
-                        action.isEnabled = false;
+                        action.isEnabled = false
                         InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
-                            action.isEnabled = true;
+                            action.isEnabled = true
                             alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
                         }, failure: { (error) in
                             alertController.message = String.init(format: "personalSytlistPopup.error".localized, error.localizedDescription)
@@ -852,8 +852,8 @@ extension SettingsViewController : UITextFieldDelegate {
             }
             
             if (canContinue) {
-                self.previousTexts[key] = trimmedText;
-                textField.text = trimmedText;
+                self.previousTexts[key] = trimmedText
+                textField.text = trimmedText
                 
                 UserDefaults.standard.set(trimmedText, forKey: key)
                 UserDefaults.standard.synchronize()
@@ -861,17 +861,17 @@ extension SettingsViewController : UITextFieldDelegate {
                 reidentify()
                 
             } else {
-                textField.text = self.previousTexts[key];
+                textField.text = self.previousTexts[key]
             }
         }
     }
     
     fileprivate func userDefaultsKey(for textField: UITextField) -> String? {
         if textField == self.emailTextField {
-            return UserDefaultsKeys.email;
+            return UserDefaultsKeys.email
             
         } else if textField == self.nameTextField {
-            return UserDefaultsKeys.name;
+            return UserDefaultsKeys.name
         }
         
         return nil

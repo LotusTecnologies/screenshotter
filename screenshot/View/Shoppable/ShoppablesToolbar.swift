@@ -59,13 +59,13 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
             let  lineSpacing = (self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.minimumLineSpacing ?? 0
             let spacingsWidth:CGFloat = lineSpacing * CGFloat(shoppablesCount - 1)
             let shoppablesWidth:CGFloat = self.shoppableSize().width * CGFloat(shoppablesCount)
-            let contentWidth:CGFloat = round(spacingsWidth + shoppablesWidth);
-            let width:CGFloat = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
+            let contentWidth:CGFloat = round(spacingsWidth + shoppablesWidth)
+            let width:CGFloat = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right
             
             if (width != contentWidth) {
                 let maxHorizontalInset:CGFloat = ShoppablesToolbar.preservedCollectionViewContentInset().left
                 
-                var insets = self.collectionView.contentInset;
+                var insets = self.collectionView.contentInset
                 let i = CGFloat.maximum(maxHorizontalInset, floor( (self.collectionView.bounds.size.width - contentWidth) / 2.0) )
                 insets.left = i
                 insets.right = i
@@ -114,18 +114,18 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         layout.scrollDirection = .horizontal
         let collectionView = ShoppablesCollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.delegate = self;
+        collectionView.delegate = self
         collectionView.shoppableDelegate = self
-        collectionView.dataSource = self;
+        collectionView.dataSource = self
         collectionView.backgroundColor = .clear
-        collectionView.scrollsToTop = false;
+        collectionView.scrollsToTop = false
         collectionView.contentInset = ShoppablesToolbar.preservedCollectionViewContentInset()
-        collectionView.showsHorizontalScrollIndicator = false;
+        collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(ShoppableCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         self.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         return collectionView
     }
@@ -143,7 +143,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func shoppableSize() -> CGSize {
         var size = CGSize.zero
-        size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom;
+        size.height = self.collectionView.bounds.size.height - self.collectionView.contentInset.top - self.collectionView.contentInset.bottom
         size.width = size.height * 0.8
         return size
     }
@@ -162,7 +162,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     static func preservedCollectionViewContentInset() -> UIEdgeInsets{
         let p = Geometry.padding
-        let p2 = p * 0.5;
+        let p2 = p * 0.5
         return UIEdgeInsets.init(top: p2, left: p, bottom: p2, right: p)
     }
 }
