@@ -95,7 +95,6 @@
 		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
-		C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
@@ -225,7 +224,6 @@
 		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
-		C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
@@ -716,7 +714,6 @@
 			children = (
 				E42AC3931F6144060035A07C /* dev */,
 				E42AC3941F61442C0035A07C /* prd */,
-				C57B2EC51FA757DB00AF0205 /* GoogleService-Info.plist */,
 				E4D495D11F49834900312614 /* upload_symbols.sh */,
 			);
 			name = "Supporting Files";
@@ -830,7 +827,6 @@
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
-				C57B2EC61FA757DB00AF0205 /* GoogleService-Info.plist in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
