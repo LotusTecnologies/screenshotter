@@ -68,10 +68,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
         
+        frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
+
         PermissionsManager.shared.fetchPushPermissionStatus()
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
-        
-        frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
