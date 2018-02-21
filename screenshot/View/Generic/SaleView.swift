@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class SaleView: UIImageView {
     required init?(coder aDecoder: NSCoder) {

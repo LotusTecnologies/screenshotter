@@ -7,16 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
 class Loader: UIView {
     private let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     
     private let activityTransform = CGAffineTransform(scaleX: 1.5, y: 1.5)
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -33,6 +30,9 @@ class Loader: UIView {
         activityView.heightAnchor.constraint(equalToConstant: intrinsicContentSize.height).isActive = true
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     override var intrinsicContentSize: CGSize {
         return activityView.intrinsicContentSize.applying(activityTransform)
     }

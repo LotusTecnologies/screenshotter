@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class DiscoverNavigationController : UINavigationController, ViewControllerLifeCycle {
     let discoverScreenshotViewController = DiscoverScreenshotViewController()

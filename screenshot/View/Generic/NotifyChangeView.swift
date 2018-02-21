@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class NotifyChangeView : UIView {
     private var previousSize = CGSize()

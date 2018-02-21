@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ScreenshotProductBarCollectionViewCell: UICollectionViewCell {
     let collectionView = ProductsBarCollectionView(frame: .zero, collectionViewLayout: ProductsBarCollectionViewLayout())

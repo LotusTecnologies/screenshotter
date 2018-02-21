@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 enum ProductsSection : Int {
     case tooltip = 0
@@ -125,7 +125,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             self.view.insertSubview(collectionView, at: 0)
             collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
             collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-            collectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
+            collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
             return collectionView
             
@@ -133,7 +133,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         self.collectionView = collectionView
         
         let rateView:ProductsRateView = {
-            let view = ProductsRateView()
+            let view = ProductsRateView.init(frame: .zero)
             view.translatesAutoresizingMaskIntoConstraints = false
             view.voteUpButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
             view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
@@ -146,13 +146,13 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         scrollRevealController.adjustedContentInset = UIEdgeInsets(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
         scrollRevealController.insertAbove(collectionView)
 
-        scrollRevealController.view.addSubview(self.rateView)
+        scrollRevealController.view.addSubview(rateView)
         self.scrollRevealController = scrollRevealController
         
-        self.rateView.topAnchor.constraint(equalTo:scrollRevealController.view.topAnchor).isActive = true
-        self.rateView.leadingAnchor.constraint(equalTo:scrollRevealController.view.leadingAnchor).isActive = true
-        self.rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
-        self.rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
+        rateView.topAnchor.constraint(equalTo:scrollRevealController.view.topAnchor).isActive = true
+        rateView.leadingAnchor.constraint(equalTo:scrollRevealController.view.leadingAnchor).isActive = true
+        rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
+        rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
         
         
         var height = self.rateView.intrinsicContentSize.height

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 private enum NotificationAnimation {
     case none

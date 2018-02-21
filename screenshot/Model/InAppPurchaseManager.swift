@@ -11,7 +11,7 @@ import StoreKit
 import PromiseKit
 
 
-@objc enum InAppPurchaseProduct : Int  {
+enum InAppPurchaseProduct : Int  {
     case personalStylist
     
     func productIdentifier() -> String{
@@ -107,7 +107,7 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         return self.buyRequest?.isPending ?? false
     }
     
-    @objc public func didPurchase(_inAppPurchaseProduct:InAppPurchaseProduct) -> Bool {
+    public func didPurchase(_inAppPurchaseProduct:InAppPurchaseProduct) -> Bool {
         let array = UserDefaults.standard.object(forKey: UserDefaultsKeys.purchasedProductIdentifier) as? Array<String>
         if let array = array {
             return array.contains(_inAppPurchaseProduct.productIdentifier())
@@ -115,11 +115,11 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         return false
     }
     
-    @objc func loadProductInfoIfNeeded() {
+    func loadProductInfoIfNeeded() {
         _ = loadProductInfo()
     }
     
-    @objc func productIfAvailable(product:InAppPurchaseProduct) -> SKProduct? {
+    func productIfAvailable(product:InAppPurchaseProduct) -> SKProduct? {
         if let response  = self.productResponse {
             if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == product.productIdentifier() }) {
                 return product
@@ -147,11 +147,11 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         return request
     }
     
-    @objc func canPurchase()  -> Bool{
+    func canPurchase()  -> Bool{
         return SKPaymentQueue.canMakePayments()
     }
 
-    @objc func buy ( product:SKProduct, success:@escaping (()->Void), failure:@escaping((Error)->Void)){
+    func buy ( product:SKProduct, success:@escaping (()->Void), failure:@escaping((Error)->Void)){
         let buyRequest = SKPayment.init(product: product).promise()
         self.buyRequest = buyRequest
         buyRequest.then(on:.main)  { (transaction) -> Promise<Bool> in
@@ -167,7 +167,7 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
 
     }
     
-    @objc func load(product:InAppPurchaseProduct, success:@escaping ((SKProduct)->Void), failure:@escaping((Error)->Void) ){
+    func load(product:InAppPurchaseProduct, success:@escaping ((SKProduct)->Void), failure:@escaping((Error)->Void) ){
         self.loadProductInfo().then( on:.main) { (response) -> Promise<Bool> in
             if let product = response.products.first(where: { (p) -> Bool in p.productIdentifier == product.productIdentifier() }) {
                success(product)
@@ -184,7 +184,7 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
 
 
 extension SKProduct {
-    @objc func localizedPriceString() -> String {
+    func localizedPriceString() -> String {
         let numberFormatter = NumberFormatter()
         numberFormatter.formatterBehavior = .behavior10_4
         numberFormatter.numberStyle = .currency
