@@ -221,6 +221,30 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
     }
     
+    func screenshotsTabPulseAnimation() {
+        guard let tabView = screenshotsNavigationController.tabBarItem.targetView else {
+            return
+        }
+        
+        UIView.animateKeyframes(withDuration: 0.8, delay: 0, options: .allowUserInteraction, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.2, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.2, relativeDuration: 0.4, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.4, relativeDuration: 0.6, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.6, relativeDuration: 0.8, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.8, relativeDuration: 1, animations: {
+                tabView.transform = CGAffineTransform.identity
+            })
+        })
+    }
+    
     // MARK: - Screenshots
     
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController) {

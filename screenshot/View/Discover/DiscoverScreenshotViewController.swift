@@ -156,7 +156,6 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isAdding = false
     fileprivate var needsToReloadAfterDecision = false
-    
     fileprivate let decisionValueMultiplier: CGFloat = 3
     
     fileprivate func decisionValueThreshold(_ percent: CGFloat) -> CGFloat {
@@ -302,9 +301,9 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func passButtonAction() {
-        
         self.tempDisablePass = true
         syncInteractionElements()
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.tempDisablePass = false
             self.syncInteractionElements()
@@ -321,10 +320,12 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func addButtonAction() {
         self.tempDisableAdd = true
         syncInteractionElements()
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.tempDisableAdd = false
             self.syncInteractionElements()
         }
+        
         AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
             "by": "tap",
             "url": currentMatchstick?.imageUrl ?? ""
@@ -378,10 +379,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncInteractionElements()
     }
     
-    fileprivate var isListEmpty:Bool  {
+    fileprivate var isListEmpty:Bool {
         get {
-            
-            if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 > 0  {
+            if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 > 0 {
                 return false
             }
             
@@ -487,7 +487,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 
 extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelegate {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
-
         matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
         self.collectionView.reloadData()
     }
@@ -508,10 +507,18 @@ extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelega
 
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        change.applyChanges(collectionView: collectionView)
+        if !change.deletedRows.isEmpty && isAdding {
+            if let tabBarController = tabBarController as? MainTabBarController {
+                tabBarController.screenshotsTabPulseAnimation()
+            }
+        }
+        
+        if isViewLoaded {
+            change.applyChanges(collectionView: collectionView)
+        }
+        
         syncEmptyListViews()
     }
-    
 }
 
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
