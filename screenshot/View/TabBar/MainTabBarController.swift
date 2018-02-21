@@ -269,7 +269,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     func backgroundScreenshotsWereTaken(assetIds: Set<String>) {
         if let assetId = assetIds.first {
-            self.screenshotsNavigationController.screenshotsViewController.presentNotificationCell(withAssetId: assetId)
+            self.screenshotsNavigationController.screenshotsViewController.presentNotificationCell(assetId: assetId)
         }
     }
     
