@@ -30,7 +30,6 @@ class SettingsViewController : BaseViewController {
         case email
         case name
         case tutorialVideo
-        case tellFriend
         case usageStreak
         case contactUs
         case bug
@@ -243,7 +242,6 @@ class SettingsViewController : BaseViewController {
             .currency
         ],
         .about: [
-            .tellFriend,
             .tutorialVideo,
             .contactUs,
             .bug,
@@ -457,11 +455,6 @@ extension SettingsViewController : UITableViewDelegate {
         case .bug:
             presentMailComposer()
             
-        case .tellFriend:
-            let viewController = InviteViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(viewController, animated: true)
-        
         case .tutorialVideo:
             let viewController = TutorialVideoViewController()
             viewController.showsReplayButtonUponFinishing = false
@@ -639,8 +632,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.usage_streak.title".localized
         case .bug:
             return "settings.row.bug.title".localized
-        case .tellFriend:
-            return "settings.row.tell_friend.title".localized
         case .contactUs:
             return "settings.row.contact.title".localized
         case .tutorialVideo:
@@ -732,7 +723,7 @@ fileprivate extension SettingsViewController {
     
     func cellAccessoryType(for row: SettingsViewController.Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .tellFriend, .currency, .partners:
+        case .currency, .partners:
             return .disclosureIndicator
         default:
             return .none

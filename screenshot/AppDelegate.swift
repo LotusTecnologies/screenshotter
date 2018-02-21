@@ -12,8 +12,6 @@ import Analytics
 import Appsee
 import FBSDKLoginKit
 import Branch
-import Firebase
-import GoogleSignIn
 import PromiseKit
 import Segment_Amplitude
 
@@ -131,13 +129,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
-        }
-        
-        if !handled {
-            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-            let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
-            
-            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
         }
         
         return handled
@@ -322,9 +313,6 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
             RatingFlow.sharedInstance.start()
             
             IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
-            
-            FirebaseApp.configure()
-            GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         }
     }
 }
