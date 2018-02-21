@@ -7,11 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ScreenshotsViewController.h"
 
 @class ScreenshotsNavigationController;
 @class ScreenshotPickerNavigationController;
-@class ProductsViewController;
+@class ProductsViewController, ScreenshotsViewController;
 
 @protocol ScreenshotsNavigationControllerDelegate
 

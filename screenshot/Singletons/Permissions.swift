@@ -170,9 +170,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
         }
     }
     
-    func _requestPhotoPermission(openSettingsIfNeeded open: Bool, response: PermissionBlock?) {
-        requestPermission(for: .photo, openSettingsIfNeeded: open, response: response)
-    }
+   
     
     func _requestPushPermission(response: PermissionBlock?) {
         requestPermission(for: .push, response: response)

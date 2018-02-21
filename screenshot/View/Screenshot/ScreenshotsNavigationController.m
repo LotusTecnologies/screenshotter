@@ -63,7 +63,7 @@
             ProductsViewController *productsViewController = (ProductsViewController *)self.topViewController;
             
             if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
-                productsViewController.screenshot = [self.screenshotsViewController screenshotAtIndex:self.restoredScreenshotNumber.integerValue];
+                productsViewController.screenshot = [self.screenshotsViewController screenshotAt:self.restoredScreenshotNumber.integerValue];
                 self.restoredScreenshotNumber = nil;
             }
         });
@@ -103,8 +103,8 @@
 
 #pragma mark - Screenshots
 
-- (void)screenshotsViewController:(ScreenshotsViewController *)viewController didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    Screenshot *screenshot = [viewController screenshotAtIndex:indexPath.item];
+- (void)screenshotsViewController:(ScreenshotsViewController * _Nonnull)viewController didSelectItemAt:(NSIndexPath * _Nonnull)indexPath {
+    Screenshot *screenshot = [viewController screenshotAt:indexPath.item];
     
     
     ProductsViewController *productsViewController = [[ProductsViewController alloc] initWithScreenshot:screenshot];
@@ -128,6 +128,8 @@
 - (void)screenshotsViewControllerWantsToPresentPicker:(ScreenshotsViewController *)viewController {
     [self presentPickerViewController];
 }
+
+
 
 
 
@@ -275,8 +277,10 @@
     
     if ([productsViewController isKindOfClass:[ProductsViewController class]]) {
         // TODO: its possible for the index to change across sessions. use the screenshot id.
-        NSInteger index = [self.screenshotsViewController indexForScreenshot:productsViewController.screenshot];
-        [coder encodeInteger:index forKey:@"screenshotIndex"];
+        NSInteger index = [self.screenshotsViewController indexOfScreenshot:productsViewController.screenshot];
+        if (index != NSNotFound) {
+            [coder encodeInteger:index forKey:@"screenshotIndex"];
+        }
     }
     
     [super encodeRestorableStateWithCoder:coder];
