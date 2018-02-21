@@ -102,7 +102,7 @@ class _ProductsOptionsMask : NSObject {
     }
 }
 
-@objc protocol ProductsOptionsDelegate : NSObjectProtocol {
+protocol ProductsOptionsDelegate : NSObjectProtocol {
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool)
 }
 

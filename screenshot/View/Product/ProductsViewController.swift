@@ -125,7 +125,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             self.view.insertSubview(collectionView, at: 0)
             collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
             collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-            collectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
+            collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
             return collectionView
             

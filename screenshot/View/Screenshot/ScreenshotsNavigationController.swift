@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
-    func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController);
+    func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController)
 }
 
 class ScreenshotsNavigationController: UINavigationController {
@@ -24,18 +24,18 @@ class ScreenshotsNavigationController: UINavigationController {
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        screenshotsViewController.navigationItem.leftBarButtonItem = screenshotsViewController.editButtonItem;
+        screenshotsViewController.navigationItem.leftBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.navigationItem.rightBarButtonItem?.tintColor = .crazeRed
         screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(presentPickerViewController))
-        screenshotsViewController.delegate = self;
-        screenshotsViewController.lifeCycleDelegate = self;
+        screenshotsViewController.delegate = self
+        screenshotsViewController.lifeCycleDelegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
         NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: .coreDataStackCompleted, object: nil)
         
-        self.viewControllers = [self.screenshotsViewController];
+        self.viewControllers = [self.screenshotsViewController]
         
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self;
+        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -43,7 +43,7 @@ class ScreenshotsNavigationController: UINavigationController {
     }
     
     deinit {
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self;
+        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
         NotificationCenter.default.removeObserver(self)
     }
     override func viewDidLoad(){
@@ -56,11 +56,11 @@ class ScreenshotsNavigationController: UINavigationController {
 extension ScreenshotsNavigationController {
     func createScreenshotPickerNavigationController()->ScreenshotPickerNavigationController{
         let navigationController = ScreenshotPickerNavigationController.init(nibName: nil, bundle: nil)
-        navigationController.cancelButton.target = self;
-        navigationController.cancelButton.action = #selector(pickerViewControllerDidCancel);
-        navigationController.doneButton.target = self;
-        navigationController.doneButton.action = #selector(pickerViewControllerDidFinish);
-        return navigationController;
+        navigationController.cancelButton.target = self
+        navigationController.cancelButton.action = #selector(pickerViewControllerDidCancel)
+        navigationController.doneButton.target = self
+        navigationController.doneButton.action = #selector(pickerViewControllerDidFinish)
+        return navigationController
     }
     
     func needsToPresentPickerViewController() -> Bool {
@@ -71,7 +71,7 @@ extension ScreenshotsNavigationController {
         self.dismissPickerClipView()
         
         let picker = self.createScreenshotPickerNavigationController()
-        self.pickerNavigationController = picker; // ???: is this needed?
+        self.pickerNavigationController = picker // ???: is this needed?
         self.present(picker, animated: true, completion: nil)
         
         UserDefaults.standard.setValue(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
@@ -103,7 +103,7 @@ extension ScreenshotsNavigationController {
                     }
                 }
             }
-            self.restoredScreenshotNumber = nil;
+            self.restoredScreenshotNumber = nil
         }
     }
 }
@@ -202,22 +202,22 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
             self.activityBarButtonItem = barButtonItem
             
             if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem, barButtonItem];
+                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem, barButtonItem]
             }
         }
         
-        self.activityBarButtonItem?.tag += 1;
+        self.activityBarButtonItem?.tag += 1
     }
     
     func networkingIndicatorDidComplete(type: NetworkingIndicatorType) {
-        self.activityBarButtonItem?.tag -= 1;
+        self.activityBarButtonItem?.tag -= 1
         
         if (self.activityBarButtonItem?.tag == 0) {
             if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem];
+                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem]
             }
             
-            self.activityBarButtonItem = nil;
+            self.activityBarButtonItem = nil
         }
     }
     
@@ -238,14 +238,14 @@ extension ScreenshotsNavigationController {
                     
                     let clipView = ClipView()
                     clipView.translatesAutoresizingMaskIntoConstraints = false
-                    clipView.clippings = [croppedPath];
+                    clipView.clippings = [croppedPath]
                     clipView.alpha = 0.0
                     tabBarView.addSubview(clipView)
                     clipView.topAnchor.constraint(equalTo: tabBarView.topAnchor).isActive = true
                     clipView.leadingAnchor.constraint(equalTo: tabBarView.leadingAnchor).isActive = true
                     clipView.bottomAnchor.constraint(equalTo: tabBarView.bottomAnchor).isActive = true
                     clipView.trailingAnchor.constraint(equalTo: tabBarView.trailingAnchor).isActive = true
-                    self.clipView = clipView;
+                    self.clipView = clipView
                     UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
                         self.clipView?.alpha = 1.0
                     })

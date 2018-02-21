@@ -9,13 +9,13 @@
 import Foundation
 import UIKit
 
-@objc enum ScreenshotCollectionViewCellSelectedState : Int {
+enum ScreenshotCollectionViewCellSelectedState {
     case none
     case checked
     case disabled
 }
 
-@objc protocol ScreenshotCollectionViewCellDelegate: NSObjectProtocol {
+protocol ScreenshotCollectionViewCellDelegate: NSObjectProtocol {
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell)
     func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell)
 }

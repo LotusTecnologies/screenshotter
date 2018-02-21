@@ -128,6 +128,9 @@
 "screenshot.pushPermission.title" = "Start Screenshotting";
 "screenshot.pushPermission.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 
+"screenshot.deletePopup.title" = "Delete Screenshot";
+"screenshot.deletePopup.button" = "Delete";
+
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.single" = "Delete %d Item";
 "screenshots.delete.plural" = "Delete %d Items";

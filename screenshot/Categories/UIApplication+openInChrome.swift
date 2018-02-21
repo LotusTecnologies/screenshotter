@@ -25,9 +25,9 @@ extension UIApplication {
         
         var chromeScheme:String?
         if (scheme == "http") {
-            chromeScheme = UIApplication.kGoogleChromeHTTPScheme;
+            chromeScheme = UIApplication.kGoogleChromeHTTPScheme
         } else if (scheme == "https") {
-            chromeScheme = UIApplication.kGoogleChromeHTTPSScheme;
+            chromeScheme = UIApplication.kGoogleChromeHTTPSScheme
         }
         
         if let chromeScheme = chromeScheme {
