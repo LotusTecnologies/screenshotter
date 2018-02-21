@@ -459,7 +459,7 @@ extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
 
 }
 //Notification cell
-extension ScreenshotsViewController {
+extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDelegate {
     @objc func newScreenshotsCount() -> Int {
         return AccumulatorModel.sharedInstance.getNewScreenshotsCount()
     }
@@ -606,3 +606,77 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         }
     }
  }
+
+extension ScreenshotsViewController: UICollectionViewDataSource {
+    func setupScreenshotProductBar(cell:ScreenshotProductBarCollectionViewCell){
+        self.productsBarController.collectionView = cell.collectionView
+    }
+    func setupScreenshotNotification(cell:ScreenshotNotificationCollectionViewCell, collectionView:UICollectionView, indexPath:IndexPath){
+        
+        cell.delegate = self
+        cell.contentView.backgroundColor = collectionView.backgroundColor
+        cell.contentText = self.notificationContentText()
+        cell.setContentType(.labelWithButtons)
+        
+        cell.iconImage = nil;
+        AssetSyncModel.sharedInstance.image(assetId: self.notificationCellAssetId) { (image, info) in
+            cell.iconImage = image ?? UIImage.init(named:"NotificationSnapshot")
+        }
+        
+    }
+    func setupScreenshot(cell:ScreenshotCollectionViewCell, collectionView:UICollectionView, indexPath:IndexPath){
+        let screenshot = self.screenshot(at: indexPath.item)
+        cell.delegate = self
+        cell.contentView.backgroundColor = collectionView.backgroundColor;
+        cell.screenshot = screenshot
+        cell.isBadgeEnabled = screenshot?.isNew ?? false
+        cell.isEditing = self.isEditing
+        self.syncScreenshotCollectionViewCellSelectedState(cell)
+        
+    }
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
+            switch sectionType {
+            case .product:
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "product", for: indexPath) as? ScreenshotProductBarCollectionViewCell {
+                    self.setupScreenshotProductBar(cell: cell)
+                    return cell
+                }
+            case .notification:
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "notification", for: indexPath) as? ScreenshotNotificationCollectionViewCell{
+                    self.setupScreenshotNotification(cell: cell, collectionView: collectionView, indexPath: indexPath)
+                    
+                    return cell;
+                }
+            case .image:
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ScreenshotCollectionViewCell{
+                    self.setupScreenshot(cell: cell, collectionView: collectionView, indexPath: indexPath)
+                    return cell
+                }
+                
+                
+            }
+        }
+        return UICollectionViewCell()
+    }
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 3
+    }
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let sectionType = ScreenshotsSection.init(rawValue: section) {
+            switch sectionType {
+            case .product:
+                if self.productsBarController?.hasProducts == true {
+                    return 1
+                }else{
+                    return 0
+                }
+            case .notification:
+                return self.canDisplayNotificationCell() ? 1 :0 ;
+            case .image:
+                return self.screenshotFrc()?.fetchedObjectsCount ?? 0;
+            }
+        }
+        return 0
+    }
+}

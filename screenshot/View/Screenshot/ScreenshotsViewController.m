@@ -107,24 +107,6 @@
 #pragma mark - Collection View
 
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 3;
-}
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (section == ScreenshotsSectionProduct) {
-        return [self.productsBarController hasProducts] ? 1 : 0;
-    }
-    else if (section == ScreenshotsSectionNotification) {
-        return [self canDisplayNotificationCell];
-    }
-    else if (section == ScreenshotsSectionImage) {
-        return [self screenshotFrc].fetchedObjectsCount;
-    }
-    else {
-        return 0;
-    }
-}
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     UIEdgeInsets insets = UIEdgeInsetsZero;
@@ -143,54 +125,6 @@
     return insets;
 }
 
-
-- (void)setupScreenshotProductBarCollectionViewCell:(ScreenshotProductBarCollectionViewCell *)cell collectionView:(UICollectionView *)collectionView forItemAtIndexPath:(NSIndexPath *)indexPath {
-    self.productsBarController.collectionView = cell.collectionView;
-}
-    
--(void) setupScreenshotNotificationCollectionViewCell:(ScreenshotNotificationCollectionViewCell*)cell collectionView:(UICollectionView*) collectionView forItemAtIndexPath:(NSIndexPath*) indexPath{
-    cell.delegate = self;
-    cell.contentView.backgroundColor = collectionView.backgroundColor;
-    cell.contentText = [self notificationContentText];
-    [cell setContentType:ScreenshotNotificationCollectionViewCellContentTypeLabelWithButtons];
-    cell.iconImage = nil;
-    
-    [[AssetSyncModel sharedInstance] imageWithAssetId:self.notificationCellAssetId callback:^(UIImage *image, NSDictionary *info) {
-        cell.iconImage = image ?: [UIImage imageNamed:@"NotificationSnapshot"];
-    }];
-    
-}
-    
--(void) setupScreenshotCollectionViewCell:(ScreenshotCollectionViewCell*)cell collectionView:(UICollectionView*) collectionView forItemAtIndexPath:(NSIndexPath*) indexPath{
-    Screenshot *screenshot = [self screenshotAtIndex:indexPath.item];
-    cell.delegate = self;
-    cell.contentView.backgroundColor = collectionView.backgroundColor;
-    cell.screenshot = screenshot;
-    cell.isBadgeEnabled = screenshot.isNew;
-    cell.isEditing = [self isEditing];
-    [self syncScreenshotCollectionViewCellSelectedState:cell];
-}
-    
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionProduct) {
-        ScreenshotProductBarCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"product" forIndexPath:indexPath];
-        [self setupScreenshotProductBarCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
-        return cell;
-    }
-    else if (indexPath.section == ScreenshotsSectionNotification) {
-        ScreenshotNotificationCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"notification" forIndexPath:indexPath];
-        [self setupScreenshotNotificationCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
-        return cell;
-    }
-    else if (indexPath.section == ScreenshotsSectionImage) {
-        ScreenshotCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-        [self setupScreenshotCollectionViewCell:cell collectionView:collectionView forItemAtIndexPath:indexPath];
-        return cell;
-    }
-    else {
-        return nil;
-    }
-}
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == ScreenshotsSectionImage) {

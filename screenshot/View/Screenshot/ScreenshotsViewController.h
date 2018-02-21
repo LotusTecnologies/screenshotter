@@ -20,7 +20,7 @@
 
 @end
 
-@interface ScreenshotsViewController : BaseViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface ScreenshotsViewController : BaseViewController 
 
 @property (nonatomic, weak) id<ScreenshotsViewControllerDelegate> delegate;
 
