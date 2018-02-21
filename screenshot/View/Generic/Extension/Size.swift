@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension CGSize {
     func aspectFitRectInSize(_ size: CGSize) -> CGRect {

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsBarCollectionView: UICollectionView {
     static let cellIdentifier = "productsBarCell"

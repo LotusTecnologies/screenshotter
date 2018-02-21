@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath)

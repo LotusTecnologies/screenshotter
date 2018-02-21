@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 @objc protocol ProductsBarControllerDelegate : NSObjectProtocol {
     func productBarShouldHide(_ controller:ProductsBarController)

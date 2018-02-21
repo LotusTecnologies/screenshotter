@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 fileprivate struct TappableLink {
     let range: NSRange

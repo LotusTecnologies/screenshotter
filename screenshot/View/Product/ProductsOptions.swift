@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsOptionsMask : NSObject {
     let rawValue: Int

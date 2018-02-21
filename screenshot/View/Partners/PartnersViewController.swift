@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class PartnersViewController : BaseViewController {
     override var title: String? {

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc protocol CoreDataPreparationControllerDelegate : NSObjectProtocol {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController)
@@ -22,7 +23,7 @@ class CoreDataPreparationController : NSObject {
     override init() {
         super.init()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: NSNotification.Name(NotificationCenterKeys.coreDataStackCompleted), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: .coreDataStackCompleted, object: nil)
     }
     
     /// Call at the end of the viewController.viewDidLoad()

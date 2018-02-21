@@ -41,7 +41,7 @@ class DataModel: NSObject {
                     // Must async, or lazy eval closure called infinitely. Might as well async to main, as most handlers are there.
                     // See https://medium.com/@soapyfrog/dont-forget-that-none-of-this-is-thread-safe-so-it-is-actually-possible-for-the-lazy-eval-closure-add1c9b1dd95
                     DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["error" : error])
+                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["error" : error])
                     }
                 } else {
                     self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
@@ -53,7 +53,7 @@ class DataModel: NSObject {
                     }
                     // See above about lazy eval closure called infinitely if notification not asynced.
                     DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["success" : true])
+                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["success" : true])
                     }
                     MatchstickModel.shared.prepareMatchsticks()
                 }

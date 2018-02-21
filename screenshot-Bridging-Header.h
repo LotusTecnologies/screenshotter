@@ -5,7 +5,4 @@
 #ifndef screenshot_Bridging_Header_h
 #define screenshot_Bridging_Header_h
 
-#import "BaseViewController.h"
-#import "ScreenshotsNavigationController.h"
-
 #endif /* screenshot_Bridging_Header_h */

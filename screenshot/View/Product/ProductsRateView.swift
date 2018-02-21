@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsRateView : UIView {
     fileprivate let contentView = UIView()
@@ -17,11 +18,6 @@ class ProductsRateView : UIView {
     fileprivate let label = UILabel()
     fileprivate var labelTrailingConstraint: NSLayoutConstraint!
     
-    // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -84,6 +80,10 @@ class ProductsRateView : UIView {
                 let rating  = self.rating
                 self.setRating(rating)
         }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     deinit {

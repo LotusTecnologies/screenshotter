@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc enum ScreenshotCollectionViewCellSelectedState : Int {
     case none
