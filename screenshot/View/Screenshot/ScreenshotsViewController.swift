@@ -543,29 +543,68 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         }
     }
 
+    
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let minimumSpacing = self.collectionViewInteritemOffset()
+
+        let defaultInset = UIEdgeInsets.init(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0, right: minimumSpacing.x)
+        
+        if let sectionType = ScreenshotsSection.init(rawValue: section) {
+            switch sectionType {
+            case .product:
+                return .zero
+            case .notification:
+                if self.hasNewScreenshot {
+                    return defaultInset
+                }
+                
+            case .image:
+                return defaultInset
+            }
+        }
+        return .zero
+    }
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
+            switch sectionType {
+            case .product:
+                break;
+            case .notification:
+                break;
+            case .image:
+                if indexPath.item == 0 {
+                    self.insertScreenshotHelperView()
+                }
+            }
+        }
+    }
+    
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var size = CGSize.zero
         
-        if (indexPath.section == ScreenshotsSection.product.rawValue) {
-            size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right;
-            size.height = 138;
-        }
-        else {
-            let minimumSpacing = self.collectionViewInteritemOffset()
-            
-            if (indexPath.section == ScreenshotsSection.notification.rawValue) {
-                size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2));
-                size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
-            } else if (indexPath.section == ScreenshotsSection.image.rawValue) {
-                let columns = CGFloat(self.numberOfCollectionViewImageColumns())
+        if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
+            switch sectionType {
+            case .product:
+                size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right;
+                size.height = 138;
+            case .notification, .image:
+                let minimumSpacing = self.collectionViewInteritemOffset()
                 
-                size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns);
-                size.height = ceil(size.width * Screenshot.ratio.height);
+                if (indexPath.section == ScreenshotsSection.notification.rawValue) {
+                    size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2));
+                    size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
+                } else if (indexPath.section == ScreenshotsSection.image.rawValue) {
+                    let columns = CGFloat(self.numberOfCollectionViewImageColumns())
+                    
+                    size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns);
+                    size.height = ceil(size.width * Screenshot.ratio.height);
+                }
             }
         }
-        
         return size;
     }
+    
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
         if (indexPath.section == ScreenshotsSection.notification.rawValue && self.isEditing) {
             return false

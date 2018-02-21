@@ -108,33 +108,6 @@
 
 
 
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    
-    BOOL isShowingNotification = section == ScreenshotsSectionNotification && [self hasNewScreenshot];
-    BOOL isShowingImage = section == ScreenshotsSectionImage;
-    
-    if (isShowingNotification || isShowingImage) {
-        CGPoint minimumSpacing = [self collectionViewInteritemOffset];
-        
-        insets.top = minimumSpacing.y;
-        insets.left = minimumSpacing.x;
-        insets.right = minimumSpacing.x;
-    }
-    
-    return insets;
-}
-
-
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == ScreenshotsSectionImage) {
-        if (indexPath.item == 0) {
-            [self insertScreenshotHelperView];
-        }
-    }
-}
-
-
 - (Screenshot *)screenshotAtIndex:(NSInteger)index {
     return [[self screenshotFrc] objectAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
 }
