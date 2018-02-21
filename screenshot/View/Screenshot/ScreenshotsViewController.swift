@@ -21,7 +21,7 @@ extension ScreenshotsViewController {
     override open func viewDidLoad() {
         super.viewDidLoad()
         self.setupViews()
-//        self.coreDataPreparationController.viewDidLoad()
+        self.coreDataPreparationController.viewDidLoad()
     }
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
