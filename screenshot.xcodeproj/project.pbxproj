@@ -79,7 +79,6 @@
 		C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */; };
 		C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */; };
 		C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */; };
-		C54088391FE90C8E00198955 /* ScreenshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540880B1FE90C8E00198955 /* ScreenshotsViewController.m */; };
 		C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */; };
 		C54088511FE90E2200198955 /* NotifyChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540883E1FE90E2100198955 /* NotifyChangeView.swift */; };
 		C54088521FE90E2200198955 /* BaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540883F1FE90E2200198955 /* BaseViewController.m */; };
@@ -210,11 +209,9 @@
 		C54087F51FE90C8E00198955 /* FavoriteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
 		C54087F71FE90C8E00198955 /* DiscoverWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverWebViewController.swift; sourceTree = "<group>"; };
 		C54088061FE90C8E00198955 /* ScreenshotsNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsNavigationController.h; sourceTree = "<group>"; };
-		C54088071FE90C8E00198955 /* ScreenshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenshotsViewController.h; sourceTree = "<group>"; };
 		C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotCollectionViewCell.swift; sourceTree = "<group>"; };
 		C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotNotificationCollectionViewCell.swift; sourceTree = "<group>"; };
 		C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsNavigationController.m; sourceTree = "<group>"; };
-		C540880B1FE90C8E00198955 /* ScreenshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenshotsViewController.m; sourceTree = "<group>"; };
 		C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
 		C540883E1FE90E2100198955 /* NotifyChangeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifyChangeView.swift; sourceTree = "<group>"; };
 		C540883F1FE90E2200198955 /* BaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseViewController.m; sourceTree = "<group>"; };
@@ -593,8 +590,6 @@
 				C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */,
 				C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */,
 				C540880A1FE90C8E00198955 /* ScreenshotsNavigationController.m */,
-				C54088071FE90C8E00198955 /* ScreenshotsViewController.h */,
-				C540880B1FE90C8E00198955 /* ScreenshotsViewController.m */,
 				31CE110320396194000156EE /* ScreenshotsViewController.swift */,
 				C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */,
 				C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */,
@@ -1080,7 +1075,6 @@
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				524E4C651FC6CEB300C3C3E6 /* DiscoverDeepLinkHandler.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
-				C54088391FE90C8E00198955 /* ScreenshotsViewController.m in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,

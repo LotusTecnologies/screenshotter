@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import CoreData
+
 @objc protocol ProductsBarControllerDelegate : NSObjectProtocol {
     func productBarShouldHide(_ controller:ProductsBarController)
     func productBarShouldShow(_ controller:ProductsBarController)
@@ -56,10 +58,6 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
             }
         }
     }
-    
-    
-  
-
     
     func setup(){
         self.productsFrc = DataModel.sharedInstance.productBarFrc(delegate: self)
