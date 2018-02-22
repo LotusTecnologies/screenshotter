@@ -121,7 +121,7 @@ class ProductsRateView : UIView {
         }else if hasRating {
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
                 label.textColor = .white
-                label.text = "products.rate.backToConverstationWithStylist".localized
+                label.text = "products.rate.talk_to_stylist".localized
                 label.textAlignment = .center
                 talkToYourStylistButton.isUserInteractionEnabled = true
                 

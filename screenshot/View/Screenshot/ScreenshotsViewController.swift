@@ -285,7 +285,7 @@ extension ScreenshotsViewController {
                 
                 let titleLabel = UILabel()
                 titleLabel.translatesAutoresizingMaskIntoConstraints = false
-                titleLabel.text = "screenshots.helperView.title".localized
+                titleLabel.text = "screenshots.helper.title".localized
                 titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightSemibold)
                 titleLabel.numberOfLines = 0
                 contentView.addSubview(titleLabel)
@@ -296,7 +296,7 @@ extension ScreenshotsViewController {
                 
                 let descriptionLabel = UILabel()
                 descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-                descriptionLabel.text = "screenshots.helperView.byline".localized
+                descriptionLabel.text = "screenshots.helper.byline".localized
                 descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
                 
                 descriptionLabel.numberOfLines = 0
@@ -452,7 +452,7 @@ extension ScreenshotsViewController {
 extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            let introductoryText = "screenshots.share.introductoryText".localized
+            let introductoryText = "screenshots.share.title".localized
             
             if screenshot.shoppablesCount <= 0 {
                 //TODO: fix this when there is a better indciator of failure to load
@@ -462,10 +462,10 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 return
             }
             var items:[Any]? = nil
-            // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
             
-
+            // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
             let space = " "
+            
             if let shareLink = screenshot.shareLink, let shareURL = URL.init(string: shareLink) {
                 items = [introductoryText, space, shareURL]
             }else{
@@ -495,9 +495,9 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
     func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell), let screenshot = self.screenshot(at: indexPath.item) {
             let objectId = screenshot.objectID
-        let alertController = UIAlertController.init(title: "screenshot.deletePopup.title".localized, message: nil, preferredStyle: .alert)
+        let alertController = UIAlertController.init(title: "screenshot.delete.title".localized, message: nil, preferredStyle: .alert)
         alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
-        alertController.addAction(UIAlertAction.init(title: "screenshot.deletePopup.button".localized, style: .destructive, handler: { (a) in
+        alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
             if let screenshot = self.screenshot(at: indexPath.item) {
                 if screenshot.objectID.isEqual(objectId) {
                     screenshot.setHide()

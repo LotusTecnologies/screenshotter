@@ -591,17 +591,17 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
             InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
         }
-        let alertController = UIAlertController(title: "negativeFeedback.title".localized, message: "negativeFeedback.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "negativeFeedback.options.sendFeedback".localized, style: .default, handler: { (a) in
+        let alertController = UIAlertController(title: "negative_feedback.title".localized, message: "negative_feedback.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "negative_feedback.options.send".localized, style: .default, handler: { (a) in
             self.presentProductsRateNegativeFeedbackAlert()
         }))
-        alertController.addAction(UIAlertAction(title: "negativeFeedback.options.fashionHelp".localized, style: .default, handler: { (a) in
+        alertController.addAction(UIAlertAction(title: "negative_feedback.options.help".localized, style: .default, handler: { (a) in
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
                 self.presentPersonalSylist()
             } else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    let alertController = UIAlertController(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
-                    let action = UIAlertAction(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
+                    let alertController = UIAlertController(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
+                    let action = UIAlertAction(title: "generic.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
                                 //don't present anything -  if the user stayed on the same page the bottom bar changed to 'talk to your stylist' otherwise don't do anything
@@ -613,14 +613,14 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                     
                     if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                         action.isEnabled = true
-                        alertController.message = String(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                        alertController.message = String(format: "personal_stylist.unlock".localized, product.localizedPriceString())
                     } else {
                         action.isEnabled = false
                         InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
                             action.isEnabled = true
-                            alertController.message = String(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                            alertController.message = String(format: "personal_stylist.unlock".localized, product.localizedPriceString())
                         }, failure: { (error) in
-                            alertController.message = String(format: "personalSytlistPopup.error".localized, error.localizedDescription)
+                            alertController.message = String(format: "personal_stylist.error".localized, error.localizedDescription)
                         })
                         
                     }
@@ -628,7 +628,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                     alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                 }else{
-                    let errorMessage = "personalSytlistPopup.errorCannotPurchaseOnDevice".localized
+                    let errorMessage = "personal_stylist.error.invalid_device".localized
                     let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
@@ -636,7 +636,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                 }
             }
         }))
-        alertController.addAction(UIAlertAction(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -662,7 +662,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     func presentPersonalSylist() {
         let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
         AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
-        let prefiledMessageTemplate = "products.rate.negative.prefiledMessageTemplate".localized
+        let prefiledMessageTemplate = "products.rate.negative.help_finding_outfit".localized
         let prefilledMessage = String(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL ?? "null"))
         IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
     }

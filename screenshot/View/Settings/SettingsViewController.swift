@@ -531,16 +531,13 @@ extension SettingsViewController : UITableViewDelegate {
                 self.isRestoring = true
                 tableView.reloadRows(at: [indexPath], with: .none)
                 
-                // TODO: block UI interaction.
-                // its possible to click another row while waiting for the alert to be presented. blocking the ui will fix bugs that come from this.
-                
                 InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on: .main, execute: { (array) -> Promise<Bool>  in
                     self.isRestoring = false
                     tableView.reloadRows(at: [indexPath], with: .none)
-                    var message = "settings.InAppPurchase.Restore".localized
+                    var message = "settings.in_app_purchase.restore".localized
                     
                     if array.isEmpty {
-                        message = "settings.InAppPurchase.RestoreNone".localized
+                        message = "settings.in_app_purchase.restore.none".localized
                     }
                     
                     let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
@@ -555,7 +552,7 @@ extension SettingsViewController : UITableViewDelegate {
                     self.isRestoring = false
                     tableView.reloadRows(at: [indexPath], with: .none)
                     
-                    let alert = UIAlertController.init(title: "settings.InAppPurchase.RestoreError".localized, message: error.localizedDescription, preferredStyle: .alert)
+                    let alert = UIAlertController.init(title: "settings.in_app_purchase.restore.error".localized, message: error.localizedDescription, preferredStyle: .alert)
                     alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
                     
                     if self.isViewLoaded && self.view.window != nil {
@@ -571,9 +568,9 @@ extension SettingsViewController : UITableViewDelegate {
                 IntercomHelper.sharedInstance.presentMessagingUI()
             } else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    let alertController = UIAlertController.init(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
+                    let alertController = UIAlertController.init(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
                     
-                    let action = UIAlertAction.init(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
+                    let action = UIAlertAction.init(title: "generic.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
 //                                IntercomHelper.sharedInstance.presentMessagingUI()
@@ -586,14 +583,14 @@ extension SettingsViewController : UITableViewDelegate {
                     
                     if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                         action.isEnabled = true
-                        alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                        alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
                     } else {
                         action.isEnabled = false
                         InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
                             action.isEnabled = true
-                            alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                            alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
                         }, failure: { (error) in
-                            alertController.message = String.init(format: "personalSytlistPopup.error".localized, error.localizedDescription)
+                            alertController.message = String.init(format: "personal_stylist.error".localized, error.localizedDescription)
                         })
                     }
                     
@@ -603,7 +600,7 @@ extension SettingsViewController : UITableViewDelegate {
                     self.present(alertController, animated: true, completion: nil)
                     
                 }else{
-                    let errorMessage = "personalSytlistPopup.errorCannotPurchaseOnDevice".localized
+                    let errorMessage = "personal_stylist.error.invalid_device".localized
                     let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
@@ -672,7 +669,7 @@ fileprivate extension SettingsViewController {
         case .productSize:
             return "settings.row.size.title".localized
         case .openIn:
-            return "settings.row.openIn.title".localized
+            return "settings.row.open_in.title".localized
         case .currency:
             return "settings.row.currency.title".localized
         case .followInstagram:

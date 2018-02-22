@@ -168,16 +168,15 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController){
         self.presentPickerViewController()
     }
-    
 }
+
 extension ScreenshotsNavigationController { //push permission
-    
     func needsToPresentPushAlert() -> Bool {
         return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo)
     }
     
     func presentPushAlert(){
-        let alertController = UIAlertController.init(title: "screenshot.pushPermission.title".localized, message: "screenshot.pushPermission.message".localized, preferredStyle: .alert)
+        let alertController = UIAlertController.init(title: "screenshot.permission.push.title".localized, message: "screenshot.permission.push.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
             PermissionsManager.shared.requestPermission(for: .push, response: { (granted) in
                 if (granted) {
@@ -192,6 +191,7 @@ extension ScreenshotsNavigationController { //push permission
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
     }
 }
+
 extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     func networkingIndicatorDidStart(type: NetworkingIndicatorType) {
         if (self.activityBarButtonItem == nil) {
