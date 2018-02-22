@@ -551,13 +551,6 @@ extension SettingsViewController : UITableViewDelegate {
                 }).catch(on: .main, execute: { (error) in
                     self.isRestoring = false
                     tableView.reloadRows(at: [indexPath], with: .none)
-                    
-                    let alert = UIAlertController.init(title: "settings.in_app_purchase.restore.error".localized, message: error.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
-                    
-                    if self.isViewLoaded && self.view.window != nil {
-                        self.present(alert, animated: true, completion: nil)
-                    }
                 })
             }
             

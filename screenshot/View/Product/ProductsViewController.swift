@@ -135,7 +135,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         let rateView:ProductsRateView = {
             let view = ProductsRateView.init(frame: .zero)
             view.translatesAutoresizingMaskIntoConstraints = false
-            view.voteUpButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
+            view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
             view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
             view.talkToYourStylistButton.addTarget(self, action: #selector(talkToYourStylistAction), for: .touchUpInside)
             return view

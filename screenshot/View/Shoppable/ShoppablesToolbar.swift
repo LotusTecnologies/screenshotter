@@ -84,7 +84,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ShoppableCollectionViewCell
-        cell?.image = self.shoppablesController.fetchedResultsController.object(at: indexPath).cropped(image: screenshotImage)
+        cell?.image = self.shoppablesController.fetchedResultsController.object(at: indexPath).cropped(image: screenshotImage, thumbSize: self.shoppableSize())
         return cell ?? UICollectionViewCell.init()
     }
     

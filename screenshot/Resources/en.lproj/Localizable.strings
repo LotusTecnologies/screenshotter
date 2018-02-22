@@ -175,7 +175,6 @@
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.version.title" = "App Version";
 "settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
-"settings.in_app_purchase.restore.error" = "Error Restoring purchase";
 "settings.in_app_purchase.restore.none" = "You have no purchases to restore";
 "settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
