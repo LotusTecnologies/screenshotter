@@ -860,13 +860,18 @@ extension Shoppable {
         return frame
     }
     
-    public func cropped(image: UIImage) -> UIImage? {
+    public func cropped(image: UIImage, thumbSize:CGSize) -> UIImage? {
         let cropFrame = self.frame(size: image.size)
-        guard let imageRef = image.cgImage?.cropping(to: cropFrame) else {
+        let imageFrame = CGRect.init(origin: .zero, size: image.size)
+        let thumbFrame = CGRect.init(origin: .zero, size: thumbSize)
+        let cropFrameWithoutWhiteBars = thumbFrame.aspectFit(around:cropFrame).intersection(imageFrame)
+        
+        if let imageRef = image.cgImage?.cropping(to: cropFrameWithoutWhiteBars) {
+            let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
+            return croppedImage
+        }else{
             return nil
         }
-        let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
-        return croppedImage
     }
     
     private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {
