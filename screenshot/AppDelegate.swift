@@ -324,6 +324,10 @@ extension AppDelegate {
     
     func showScreenshotListTop() {
         if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+            if mainTabBarController.screenshotsNavigationController.topViewController?.presentedViewController != nil {
+                mainTabBarController.screenshotsNavigationController.topViewController?.dismiss(animated: false, completion: nil)
+            }
+            
             mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
             mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollToTop()
             mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController
