@@ -102,10 +102,12 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func createCollectionView() -> ShoppablesCollectionView {
-        let p:CGFloat = Geometry.padding
-        let layout = UICollectionViewFlowLayout.init()
+        let p: CGFloat = .padding
+        
+        let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = p
         layout.minimumLineSpacing = p
+        
         layout.scrollDirection = .horizontal
         let collectionView = ShoppablesCollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -155,7 +157,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     static func preservedCollectionViewContentInset() -> UIEdgeInsets{
-        let p = Geometry.padding
+        let p: CGFloat = .padding
         let p2 = p * 0.5
         return UIEdgeInsets.init(top: p2, left: p, bottom: p2, right: p)
     }

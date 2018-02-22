@@ -22,12 +22,12 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let p:CGFloat = Geometry.padding
+        let p: CGFloat = .padding
         let statusBarHeight:CGFloat = UIApplication.shared.statusBarFrame.size.height
         
         let backgroundView = UIView.init()
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
-        backgroundView.backgroundColor = UIColor.init(white: 97/255, alpha: 1)
+        backgroundView.backgroundColor = .gray4
         self.view.addSubview(backgroundView)
         backgroundView.topAnchor.constraint(equalTo:self.view.topAnchor, constant:statusBarHeight).isActive = true
         backgroundView.leadingAnchor.constraint(equalTo:self.view.leadingAnchor).isActive = true

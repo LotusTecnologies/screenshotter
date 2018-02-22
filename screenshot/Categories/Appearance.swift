@@ -57,7 +57,7 @@ extension UIContentSizeCategory {
              .accessibilityExtraExtraLarge,
              .accessibilityExtraExtraExtraLarge:
             isAccessibility = true
-            break
+            
         default:
             isAccessibility = false
         }
@@ -98,18 +98,6 @@ struct Shadow {
     }
     
     static let basic = Shadow(radius: 1, offset: CGSize(width: 0, height: 1), color: UIColor.black.withAlphaComponent(0.3))
-}
-
-// TODO: objc can access struct. remove this class one files are converted to swift
-class _Shadow: NSObject {
-    static let radius = Shadow.basic.radius
-    static let offset = Shadow.basic.offset
-    static let color = Shadow.basic.color
-    static let insets = Shadow.basic.insets
-    static let layoutMargins = Shadow.basic.layoutMargins
-    static func pathRect(_ bounds: CGRect) -> CGRect {
-        return Shadow.basic.pathRect(bounds)
-    }
 }
 
 extension UIApplication {

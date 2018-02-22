@@ -179,8 +179,8 @@ extension ScreenshotsViewController {
         self.refreshControl = refreshControl
         
         let helperView:ScreenshotsHelperView = {
-            let verPadding = Geometry.extendedPadding
-            let horPadding = Geometry.padding
+            let verPadding: CGFloat = .extendedPadding
+            let horPadding: CGFloat = .padding
             
             let helperView = ScreenshotsHelperView()
             helperView.translatesAutoresizingMaskIntoConstraints = false
@@ -302,7 +302,7 @@ extension ScreenshotsViewController {
                 
                 descriptionLabel.numberOfLines = 0
                 contentView.addSubview(descriptionLabel)
-                descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Geometry.padding).isActive = true
+                descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
                 descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
                 descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
                 
@@ -640,11 +640,10 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         return 2
     }
     
-    
     func collectionViewInteritemOffset() -> CGPoint {
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let x = Geometry.padding - shadowInsets.left - shadowInsets.right
-        let y = Geometry.padding - shadowInsets.top - shadowInsets.bottom
+        let x: CGFloat = .padding - shadowInsets.left - shadowInsets.right
+        let y: CGFloat = .padding - shadowInsets.top - shadowInsets.bottom
         return CGPoint.init(x: x, y: y)
     }
     

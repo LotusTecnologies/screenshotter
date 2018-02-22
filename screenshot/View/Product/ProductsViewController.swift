@@ -323,7 +323,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
         var size:CGSize = .zero
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let padding = Geometry.padding - shadowInsets.left - shadowInsets.right
+        let padding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
         let sectionType = productSectionType(forSection: indexPath.section)
 
         if sectionType == .tooltip {
@@ -366,7 +366,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     public func collectionViewMinimumSpacing() -> CGPoint {
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let p = Geometry.padding
+        let p: CGFloat = .padding
         return CGPoint(x: p - shadowInsets.left - shadowInsets.right, y: p - shadowInsets.top - shadowInsets.bottom)
     }
     
@@ -788,14 +788,12 @@ private typealias ProductsViewControllerNoItemsHelperView = ProductsViewControll
 extension ProductsViewControllerNoItemsHelperView{
     
     func showNoItemsHelperView() {
+        let verPadding: CGFloat = .extendedPadding
+        let horPadding: CGFloat = .padding
+        var topOffset: CGFloat = 0
         
-        let verPadding = Geometry.extendedPadding
-        let horPadding = Geometry.padding
-        var topOffset:CGFloat = 0
-        if let shoppablesToolbar = self.shoppablesToolbar {
-            if shoppablesToolbar.isHidden == false {
-                topOffset = shoppablesToolbar.bounds.size.height
-            }
+        if let shoppablesToolbar = self.shoppablesToolbar, !shoppablesToolbar.isHidden {
+            topOffset = shoppablesToolbar.bounds.size.height
         }
         
         let helperView = HelperView()
