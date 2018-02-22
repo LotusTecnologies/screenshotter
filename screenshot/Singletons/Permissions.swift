@@ -114,14 +114,6 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
         return permissionStatus(for: type) == .authorized
     }
     
-    func _hasPhotoPermission() -> Bool {
-        return hasPermission(for: .photo)
-    }
-    
-    func _hasPushPermission() -> Bool {
-        return hasPermission(for: .push)
-    }
-    
     // MARK: Request
     
     func requestPermission(for type: PermissionType, response: PermissionBlock? = nil) {

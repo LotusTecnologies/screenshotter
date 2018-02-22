@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension UIColor {
     static let background = UIColor(white: 244.0/255.0, alpha: 1)

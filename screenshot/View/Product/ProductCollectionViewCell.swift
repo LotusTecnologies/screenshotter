@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc protocol ProductCollectionViewCellDelegate : NSObjectProtocol {
     func productCollectionViewCellDidTapFavorite(cell:ProductCollectionViewCell)
@@ -44,7 +45,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
                 self.originalPriceLabel?.attributedText = NSAttributedString.init(string: newString, attributes: attributes)
                 
             }else{
-                self.originalPriceLabel?.attributedText = nil;
+                self.originalPriceLabel?.attributedText = nil
                 
             }
         }
@@ -57,10 +58,10 @@ class ProductCollectionViewCell : UICollectionViewCell {
     }
     var isSale:Bool = false {
         didSet {
-            self.saleView?.isHidden = !isSale;
-            self.originalPriceLabel?.isHidden = !isSale;
-            self.originalPriceLabelWidthConstraint?.isActive = !isSale;
-            self.priceLabel?.layoutMargins = isSale ?  ProductCollectionViewCell.priceLabelLayoutMargins : .zero;
+            self.saleView?.isHidden = !isSale
+            self.originalPriceLabel?.isHidden = !isSale
+            self.originalPriceLabelWidthConstraint?.isActive = !isSale
+            self.priceLabel?.layoutMargins = isSale ?  ProductCollectionViewCell.priceLabelLayoutMargins : .zero
         }
     }
     var favoriteButton:FavoriteButton?
@@ -144,7 +145,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             view.trailingAnchor.constraint(lessThanOrEqualTo: titleLabel.trailingAnchor).isActive = true
             view.centerXAnchor.constraint(equalTo: titleLabel.centerXAnchor).isActive = true
             
-            return view;
+            return view
         }()
         
         
@@ -172,13 +173,13 @@ class ProductCollectionViewCell : UICollectionViewCell {
         
         let originalPriceLabel:UILabel = {
             let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false;
-            label.textAlignment = .center;
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.textAlignment = .center
             label.font = ProductCollectionViewCell.labelFont
             label.textColor = .gray7
             label.minimumScaleFactor = 0.7
-            label.adjustsFontSizeToFitWidth = true;
-            label.isHidden = true;
+            label.adjustsFontSizeToFitWidth = true
+            label.isHidden = true
             self.contentView.addSubview(label)
             
             label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem:nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductCollectionViewCell.priceLabelHeight))
@@ -191,14 +192,14 @@ class ProductCollectionViewCell : UICollectionViewCell {
             
             self.originalPriceLabelWidthConstraint = label.widthAnchor.constraint(equalToConstant: 0.0)
             
-            return label;
+            return label
         }()
         self.originalPriceLabel = originalPriceLabel
         
         let favoriteButton : FavoriteButton = {
             let button = FavoriteButton.init()
             
-            button.translatesAutoresizingMaskIntoConstraints = false;
+            button.translatesAutoresizingMaskIntoConstraints = false
             button.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
             self.contentView.addSubview(button)
             
@@ -234,7 +235,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             productView.addSubview(view)
             view.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
             view.bottomAnchor.constraint(equalTo: buyLabel.topAnchor, constant: -6).isActive = true
-            return view;
+            return view
         }()
         self.saleView = saleView
     }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsTooltipCollectionViewCell : UICollectionViewCell {
     fileprivate let label = UILabel()

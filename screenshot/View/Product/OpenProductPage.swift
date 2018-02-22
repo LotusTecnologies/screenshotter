@@ -40,7 +40,7 @@ enum OpenProductPage : String {
     func canOpen(url:URL) -> Bool{
         switch self {
         case .embededSafari:
-            return true;
+            return true
         case .safari:
             return UIApplication.shared.canOpenURL(url)
         case .chrome:

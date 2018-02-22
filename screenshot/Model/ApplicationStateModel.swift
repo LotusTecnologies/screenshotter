@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 // The reason for being of this model, is so background threads can query whether the app is
 // active in the foreground, or in the background, without triggering a scary warning on iOS 11.

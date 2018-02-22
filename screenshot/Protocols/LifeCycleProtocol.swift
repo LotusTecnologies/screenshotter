@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc protocol ViewControllerLifeCycle: NSObjectProtocol {
     @objc optional func viewControllerDidLoad(_ viewController: UIViewController)

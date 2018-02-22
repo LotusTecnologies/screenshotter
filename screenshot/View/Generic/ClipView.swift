@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ClipView: UIView {
     // MARK: Life Cycle

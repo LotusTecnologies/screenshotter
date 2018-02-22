@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
-@objc enum ScreenshotNotificationCollectionViewCellContentType: UInt {
+enum ScreenshotNotificationCollectionViewCellContentType {
     case labelWithButtons
 }
 
-@objc enum ScreenshotNotificationCollectionViewCellContentText: UInt {
+enum ScreenshotNotificationCollectionViewCellContentText {
     case none
     case importSingleScreenshot
     case importMultipleScreenshots
