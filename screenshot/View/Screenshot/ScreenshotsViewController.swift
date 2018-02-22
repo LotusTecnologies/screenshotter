@@ -10,6 +10,7 @@ import Foundation
 import CoreData
 import SafariServices
 import FBSDKCoreKit
+
 enum ScreenshotsSection : Int {
     case product
     case notification
@@ -20,8 +21,8 @@ protocol ScreenshotsViewControllerDelegate : NSObjectProtocol{
     func screenshotsViewController(_  viewController:ScreenshotsViewController, didSelectItemAt:IndexPath)
     func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController)
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController)
-
 }
+
 class ScreenshotsViewController: BaseViewController {
     weak var delegate:ScreenshotsViewControllerDelegate?
     
@@ -396,6 +397,7 @@ extension ScreenshotsViewController {
             UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
                 
                 cellEditing()
+                // TODO:
                 ///     putting `removeDeleteButton` here instead of in the completion
                 //      prevents animation on the button fading away,
                 //      but ALSO fixes a bug where if you take edit cancel
@@ -659,8 +661,6 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             return .none
         }
     }
-
-    
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let minimumSpacing = self.collectionViewInteritemOffset()
@@ -705,6 +705,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .product:
                 size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right
                 size.height = 138
+                
             case .notification, .image:
                 let minimumSpacing = self.collectionViewInteritemOffset()
                 
@@ -813,15 +814,16 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                     self.setupScreenshot(cell: cell, collectionView: collectionView, indexPath: indexPath)
                     return cell
                 }
-                
-                
             }
         }
+        
         return UICollectionViewCell()
     }
+    
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 3
     }
+    
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let sectionType = ScreenshotsSection.init(rawValue: section) {
             switch sectionType {

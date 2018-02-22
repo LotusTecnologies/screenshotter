@@ -16,8 +16,6 @@ protocol ShoppablesToolbarDelegate : UIToolbarDelegate {
 
 class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, ShoppablesCollectionViewDelegate, FetchedResultsControllerManagerDelegate {
     
-    
-    
     weak var shoppableToolbarDelegate:ShoppablesToolbarDelegate?
     var didViewControllerAppear:Bool = false
     var needsToSelectFirstShoppable:Bool = false
@@ -38,14 +36,11 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         shoppablesController.delegate = self
         
         self.collectionView = self.createCollectionView()
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -136,8 +131,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
             collectionView.deleteItems(at: change.deletedRows)
             collectionView.insertSections(change.insertedSections)
             collectionView.insertItems(at: change.insertedRows)
-        }) { (completed) in
-        }
+        })
         // don't do reload - will lose selection state
     }
     

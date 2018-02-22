@@ -102,10 +102,9 @@ enum OpenProductPage : String {
                               "name": name ]
             AnalyticsTrackers.standard.track("Product for email", properties:properties)
         }
+        
         product.recordViewedProduct()
         AnalyticsTrackers.branch.track("Tapped on product - \(analyticsKey)")
         FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
-
     }
-    
 }
