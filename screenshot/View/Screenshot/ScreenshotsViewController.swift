@@ -216,19 +216,19 @@ extension ScreenshotsViewController {
 
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        change.shiftIndexSections(by: 2)
-        change.applyChanges(collectionView: self.collectionView)
-        self.syncHelperViewVisibility()
-
+        if isViewLoaded {
+            change.shiftIndexSections(by: 2)
+            change.applyChanges(collectionView: collectionView)
+            syncHelperViewVisibility()
+        }
     }
     
-    func setupFetchedResultsController(){
+    func setupFetchedResultsController() {
         self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
-        
     }
+    
     func screenshotFrc() -> NSFetchedResultsController<Screenshot>? {
         return self.screenshotFrcManager?.fetchedResultsController
-        
     }
 }
 

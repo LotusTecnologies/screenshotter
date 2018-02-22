@@ -78,7 +78,6 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-
         if self.isNotHidden != self.hasProducts {
             self.isNotHidden = self.hasProducts
             
@@ -91,10 +90,10 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
                 collectionView.contentOffset = CGPoint.init(x: -1 * collectionView.contentInset.left, y: 0)
             }
         }
+        
         if let collectionView = self.collectionView {
             change.applyChanges(collectionView: collectionView)
         }
-
     }
     
 }
