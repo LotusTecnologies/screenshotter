@@ -299,11 +299,6 @@ extension AppDelegate {
             if let campaign = params["~campaign"] as? String {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
-            
-            // "discoverURL" will be the discover URL that should be used during this session.
-            if let discoverURLString = params["discoverURL"] as? String {
-                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
-            }
         }
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -440,7 +435,6 @@ extension AppDelegate {
             return Promise(value: FetchedAppSettings(data))
             
         }.then(on: .main) { fetchedAppSettings -> Void in
-            self.settingsSetter.setDiscoverURLs(withURLPaths: fetchedAppSettings.discoverURLPaths)
             self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
             self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
             
