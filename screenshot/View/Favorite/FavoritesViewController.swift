@@ -18,7 +18,7 @@ class FavoritesViewController : BaseViewController {
     weak var delegate: FavoritesViewControllerDelegate?
     
     fileprivate let coreDataPreparationController = CoreDataPreparationController()
-    fileprivate let tableView = UITableView()
+    fileprivate let tableView = TableView()
     private let helperView = HelperView()
     
     fileprivate var favoriteFrc: FetchedResultsControllerManager<Screenshot>?
@@ -64,6 +64,13 @@ class FavoritesViewController : BaseViewController {
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let v = UIView()
+        v.backgroundColor = .red
+        tableView.emptyView = v
+        tableView.layoutMargins = .zero
+        
+        helperView.isHidden = true
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.backgroundColor = view.backgroundColor
@@ -156,7 +163,7 @@ class FavoritesViewController : BaseViewController {
     // MARK: Helper View
     
     fileprivate func syncHelperViewVisibility() {
-        helperView.isHidden = (tableView.numberOfRows(inSection: 0) > 0)
+//        helperView.isHidden = (tableView.numberOfRows(inSection: 0) > 0)
     }
 }
 

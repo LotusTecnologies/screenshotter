@@ -542,8 +542,9 @@ extension ScreenshotsViewController {
                 }
             }
             let hasScreenshots = (self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0)
+            let hasNotification = (self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0)
             
-            helperView.isHidden = (hasScreenshots || self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0)
+            helperView.isHidden = hasScreenshots || hasNotification
             self.collectionView?.isScrollEnabled = helperView.isHidden && (self.collectionView.backgroundView == nil)
             self.editButtonItem.isEnabled = hasScreenshots
         }

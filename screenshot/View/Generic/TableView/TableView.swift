@@ -8,11 +8,27 @@
 
 import UIKit
 
-protocol TableViewLifeCycle: NSObjectProtocol {
-    func viewControllerDidLoad(_ viewController: UIViewController)
-}
-
-
-class TableView: UITableView {
+class TableView: UITableView, EmptyListProtocol {
+    private let emptyListController = EmptyListController()
     
+    var emptyView: UIView? {
+        willSet(newEmptyView) {
+            emptyListController.willSetEmptyView(newEmptyView, oldEmptyView: emptyView)
+        }
+        didSet {
+            emptyListController.didSetEmptyView(emptyView, scrollView: self)
+        }
+    }
+    
+    override var contentSize: CGSize {
+        didSet {
+            emptyListController.didSetContentSize(scrollView: self, emptyView: emptyView)
+        }
+    }
+    
+    override var contentInset: UIEdgeInsets {
+        didSet {
+            emptyListController.didSetContentInset(scrollView: self)
+        }
+    }
 }
