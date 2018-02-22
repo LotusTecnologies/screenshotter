@@ -44,6 +44,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        // Needs to be called very early.
+        PermissionsManager.shared.fetchPushPermissionStatus()
         
         UNUserNotificationCenter.current().delegate = self
         
@@ -69,8 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.applicationIconBadgeNumber = 0
         
         frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
-
-        PermissionsManager.shared.fetchPushPermissionStatus()
+        
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
         if application.applicationState == .background,
