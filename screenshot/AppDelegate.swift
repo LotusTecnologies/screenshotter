@@ -29,8 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
-        let viewController = MainTabBarController()
-        viewController.lifeCycleDelegate = self
+        let viewController = MainTabBarController(delegate:self)
         return viewController
     }()
     
