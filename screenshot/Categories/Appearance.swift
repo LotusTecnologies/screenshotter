@@ -33,7 +33,7 @@ extension UIColor {
         return adjust(by: -1 * abs(percentage))
     }
     
-    func adjust(by percentage: CGFloat = 8) -> UIColor? {
+    private func adjust(by percentage: CGFloat = 8) -> UIColor? {
         var r = CGFloat(), g = CGFloat(), b = CGFloat(), a = CGFloat()
         
         if getRed(&r, green: &g, blue: &b, alpha: &a) {
