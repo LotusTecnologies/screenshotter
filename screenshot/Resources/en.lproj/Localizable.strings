@@ -123,7 +123,18 @@
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.unrated" = "Are these results relevant?";
+"products.title" = "Products";
 "products.tooltip.title" = "Tap to shop different types of products";
+
+
+"products.helper.message" = "No visually similar products were detected";
+"products.helper.title" = "No Items Found";
+"products.helper.retry" = "Try Again";
+"products.helper.retry.fashion" = "Fashion";
+"products.helper.retry.furniture" = "Furniture";
+"products.helper.retry.title" = "Try again as";
+
+
 
 "screenshot.delete.title" = "Delete Screenshot";
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";

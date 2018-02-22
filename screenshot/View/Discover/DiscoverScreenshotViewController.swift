@@ -516,9 +516,8 @@ extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDele
         
         if isViewLoaded {
             change.applyChanges(collectionView: collectionView)
+            syncEmptyListViews()
         }
-        
-        syncEmptyListViews()
     }
 }
 
