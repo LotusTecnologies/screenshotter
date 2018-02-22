@@ -702,14 +702,8 @@ fileprivate extension SettingsViewController {
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
             return CurrencyViewController.currentCurrency
-        case .restoreInAppPurchase:
-            // TODO: make this into a spinner
-            return isRestoring ? "settings.row.restore_in_app_purchase.restoring".localized : nil
         case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-                return "settings.row.talk_to_stylist.buying".localized
-            }
-            else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() || InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
                 return nil
             }
             else {
@@ -797,8 +791,27 @@ fileprivate extension SettingsViewController {
             
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
             productsOptionsControls.sync()
-            
             return control
+            
+        case .restoreInAppPurchase:
+            if isRestoring {
+                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+                activityView.startAnimating()
+                return activityView
+            }
+            else {
+                return nil
+            }
+            
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+                activityView.startAnimating()
+                return activityView
+            }
+            else {
+                return nil
+            }
             
         default:
             return nil

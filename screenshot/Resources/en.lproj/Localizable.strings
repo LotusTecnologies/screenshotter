@@ -164,10 +164,8 @@
 "settings.row.partners.title" = "Our Technology";
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
-"settings.row.restore_in_app_purchase.restoring" = "restoring...";
 "settings.row.restore_in_app_purchase.title" = "Restore Purchases";
 "settings.row.size.title" = "Size";
-"settings.row.talk_to_stylist.buying" = "connecting...";
 "settings.row.talk_to_stylist.title" = "Talk to Your Stylist";
 "settings.row.tutorial.title" = "Replay Tutorial";
 "settings.row.usage_streak.title" = "Daily Streak";
