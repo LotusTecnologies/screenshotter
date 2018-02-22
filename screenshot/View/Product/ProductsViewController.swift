@@ -19,14 +19,13 @@ enum ProductsSection : Int {
         }
     }
 }
+
 enum ProductsViewControllerState : Int {
     case loading
     case products
     case retry
     case empty
 }
-
-
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
@@ -597,7 +596,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         }))
         alertController.addAction(UIAlertAction(title: "negative_feedback.options.help".localized, style: .default, handler: { (a) in
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                self.presentPersonalSylist()
+                self.presentPersonalStylist()
             } else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
                     let alertController = UIAlertController(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
@@ -659,7 +658,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         IntercomHelper.sharedInstance.presentMessagingUI()
     }
     
-    func presentPersonalSylist() {
+    func presentPersonalStylist() {
         let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
         AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
         let prefiledMessageTemplate = "products.rate.negative.help_finding_outfit".localized
