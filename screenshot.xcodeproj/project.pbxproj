@@ -121,6 +121,7 @@
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E4351D702031957800193657 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4351D6F2031957800193657 /* MainTabBarController.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
+		E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */; };
 		E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4859E18203044E100A26985 /* ScreenshotDisplayViewController.swift */; };
 		E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E492CE3C2011051100060FB2 /* MatchstickModel.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
@@ -257,6 +258,7 @@
 		E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
 		E4351D6F2031957800193657 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
+		E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCartModel.swift; sourceTree = "<group>"; };
 		E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 7.xcdatamodel"; sourceTree = "<group>"; };
 		E47BC8101F39F32B0025056C /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		E4859E18203044E100A26985 /* ScreenshotDisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayViewController.swift; sourceTree = "<group>"; };
@@ -355,6 +357,7 @@
 				E492CE3C2011051100060FB2 /* MatchstickModel.swift */,
 				31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */,
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
+				E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1045,6 +1048,7 @@
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
 				C54088381FE90C8E00198955 /* ScreenshotsNavigationController.m in Sources */,
+				E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */,
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,

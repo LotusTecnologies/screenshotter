@@ -373,6 +373,8 @@ extension DataModel {
                      offer: String?,
                      imageURL: String?,
                      merchant: String?,
+                     partNumber: String?,
+                     retailPrice: Float,
                      optionsMask: Int32) -> Product {
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
@@ -387,9 +389,32 @@ extension DataModel {
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
+        productToSave.partNumber = partNumber
+        productToSave.retailPrice = retailPrice
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = NSDate()
         return productToSave
+    }
+    
+    // Save a new Variant to Core Data.
+    func saveVariant(managedObjectContext: NSManagedObjectContext,
+                     product: Product,
+                     color: String?,
+                     size: String?,
+                     retailPrice: Float,
+                     sku: String?,
+                     upc: String?,
+                     imageURLs: String?) -> Variant {
+        let variantToSave = Variant(context: managedObjectContext)
+        variantToSave.product = product
+        variantToSave.color = color
+        variantToSave.size = size
+        variantToSave.retailPrice = retailPrice
+        variantToSave.sku = sku
+        variantToSave.upc = upc
+        variantToSave.imageURLs = imageURLs
+        variantToSave.dateModified = NSDate()
+        return variantToSave
     }
     
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,

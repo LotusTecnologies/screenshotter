@@ -425,6 +425,10 @@ class AssetSyncModel: NSObject {
                      prod: [String : Any],
                      optionsMask: Int32) {
         let extractedCategories = prod["categories"] as? [String]
+        let originalData = prod["original_data"] as? [String : Any]
+        guard let _ = originalData?["part_number"] as? String else {
+            return
+        }
         let _ = DataModel.sharedInstance.saveProduct(managedObjectContext: managedObjectContext,
                                                      shoppable: shoppable,
                                                      order: productOrder,
@@ -438,6 +442,8 @@ class AssetSyncModel: NSObject {
                                                      offer: prod["offer"] as? String,
                                                      imageURL: prod["imageUrl"] as? String,
                                                      merchant: prod["merchant"] as? String,
+                                                     partNumber: originalData?["part_number"] as? String,
+                                                     retailPrice: originalData?["retail_price"] as? Float ?? 0,
                                                      optionsMask: optionsMask)
     }
     

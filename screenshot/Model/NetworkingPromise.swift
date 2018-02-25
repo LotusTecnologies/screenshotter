@@ -18,7 +18,7 @@ class NetworkingPromise: NSObject {
                 return Promise(error: emptyError)
         }
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=default&payload_type=image_bin"
+            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=shoppable_nordstrom&payload_type=image_bin"
             : "https://homedecor.syteapi.com/offers/bb?account_id=6722&sig=G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=&feed=craze_home&payload_type=image_bin"
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -243,6 +243,19 @@ class NetworkingPromise: NSObject {
             }
             return Promise(value: data)
         }
+    }
+    
+    static func getAvailableVariants(partNumber: String) -> Promise<NSDictionary> {
+        guard let url = URL(string: Constants.shoppableDomain + "/product/" + partNumber) else {
+            let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+        return promise
     }
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud

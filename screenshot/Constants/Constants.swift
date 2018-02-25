@@ -42,6 +42,8 @@ class Constants: NSObject {
     static let buildEnvironmentSuffix = "d"
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
+    static let shoppableDomain = "https://api.shoppable.co/v3"
+    static let shoppableToken = "gD1GV3cVFGC9hk8W5927b13e5e"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
@@ -51,6 +53,8 @@ class Constants: NSObject {
     static let buildEnvironmentSuffix = ""
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-api.com/static/whatsnew"
+    static let shoppableDomain = "https://api.shoppable.com/v3"
+    static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52"
 #endif
 
 }
