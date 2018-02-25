@@ -17,7 +17,7 @@ import Segment_Amplitude
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    // We are purposely iniitalizing this immediately since it observes for app launch notifications.
+    // We are purposely initalizing this immediately since it observes for app launch notifications.
     private let usageStreakManager = UsageStreakManager()
     
     var window: UIWindow?
@@ -47,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: .coreDataStackCompleted, object: nil)
         
         // Sets up Core Data stack on a background queue.
         DataModel.setup()
@@ -439,8 +439,7 @@ extension AppDelegate {
             self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
             self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
             
-            let name = Notification.Name(NotificationCenterKeys.fetchedAppSettings)
-            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
+            NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
         }
     }
 }

@@ -63,7 +63,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: NSNotification.Name(rawValue: NotificationCenterKeys.fetchedAppSettings), object: nil)
+        notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name:.fetchedAppSettings, object: nil)
         
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
     }

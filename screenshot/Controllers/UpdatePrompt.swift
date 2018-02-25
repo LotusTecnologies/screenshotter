@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class UpdatePromptHandler : NSObject {
     private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!

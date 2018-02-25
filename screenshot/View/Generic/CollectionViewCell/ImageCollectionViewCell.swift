@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc class ImageCollectionViewCell: UICollectionViewCell {
     private(set) public var imageView: UIImageView!

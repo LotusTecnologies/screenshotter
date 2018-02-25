@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ShoppableCollectionViewCell : UICollectionViewCell {
     private let imageView = UIImageView()
@@ -45,7 +46,7 @@ class ShoppableCollectionViewCell : UICollectionViewCell {
     
     override var isSelected: Bool {
         didSet {
-            layer.borderColor = isSelected ? UIColor.crazeRed.cgColor : borderColor.cgColor;
+            layer.borderColor = isSelected ? UIColor.crazeRed.cgColor : borderColor.cgColor
         }
     }
 }

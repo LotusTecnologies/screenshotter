@@ -46,6 +46,7 @@ class NetworkingPromise: NSObject {
                         print("Syte no segments. responseObject:\(dict)")
                         return Promise(error: emptyError)
                 }
+                print("uploadToSyte segments:\(segments)")
                 return Promise(value: (uploadedURLString, segments))
         }
     }
@@ -175,6 +176,7 @@ class NetworkingPromise: NSObject {
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    print("downloadProducts productsArray:\(productsArray)")
                     return Promise(value: productsDict)
                 } else {
                     let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class FavoriteProductsViewController : BaseViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())

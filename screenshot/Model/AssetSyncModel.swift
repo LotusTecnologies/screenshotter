@@ -20,11 +20,11 @@ class AccumulatorModel: NSObject {
     
     private var newScreenshotsCount: Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.newScreenshotsCount)
     
-    @objc public func getNewScreenshotsCount() -> Int {
+     public func getNewScreenshotsCount() -> Int {
         return newScreenshotsCount
     }
     
-    @objc public func resetNewScreenshotsCount() {
+     public func resetNewScreenshotsCount() {
         newScreenshotsCount = 0
         UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
     }
@@ -65,7 +65,7 @@ class AssetSyncModel: NSObject {
     var screenshotsToProcess: Int = 0
     var shoppablesToProcess: Int = 0
     
-    let imageMediaType = kUTTypeImage as String;
+    let imageMediaType = kUTTypeImage as String
     
     override init() {
         super.init()
@@ -86,7 +86,7 @@ class AssetSyncModel: NSObject {
         isRegistered = true
     }
     
-    @objc func applicationUserDidTakeScreenshot() {
+     func applicationUserDidTakeScreenshot() {
         print("AssetSyncModel applicationUserDidTakeScreenshot")
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
@@ -592,7 +592,7 @@ class AssetSyncModel: NSObject {
         }
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 1;
+        fetchOptions.fetchLimit = 1
         
         let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: fetchOptions)
         
@@ -765,7 +765,7 @@ class AssetSyncModel: NSObject {
         return tuple.inserted
     }
     
-    @objc public func syncPhotos() {
+     public func syncPhotos() {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
             guard PermissionsManager.shared.hasPermission(for: .photo),
@@ -848,17 +848,17 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    @objc public func syncPhotosUponForeground() {
+     public func syncPhotosUponForeground() {
         isRecentlyForeground = true
         syncPhotos()
     }
 
-    @objc public func syncSelectedPhotos(assets: [PHAsset]) {
+     public func syncSelectedPhotos(assets: [PHAsset]) {
         self.selectedScreenshotAssets.formUnion(assets)
         syncPhotos()
     }
     
-    @objc public func syncTutorialPhoto(image: UIImage) {
+     public func syncTutorialPhoto(image: UIImage) {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
             guard dataModel.isCoreDataStackReady,
@@ -918,7 +918,7 @@ class AssetSyncModel: NSObject {
         syncPhotos()
     }
     
-    @objc public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
+     public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
         guard let assetId = screenshot.assetId,
           addToSelected(assetId: assetId) else {
                 return
@@ -942,7 +942,7 @@ class AssetSyncModel: NSObject {
     }
 
     // Called from UI thread.
-    @objc public func refetchLastScreenshot() {
+     public func refetchLastScreenshot() {
         let dataModel = DataModel.sharedInstance
         guard let lastScreenshotAssetId = dataModel.retrieveLastScreenshotAssetId(managedObjectContext: dataModel.mainMoc()),
           addToSelected(assetId: lastScreenshotAssetId) else {
@@ -1032,7 +1032,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    @objc public func handleDynamicLink(shareId: String) {
+     public func handleDynamicLink(shareId: String) {
         incomingDynamicLinks.append(shareId)
         syncPhotos()
     }
@@ -1077,7 +1077,7 @@ extension Screenshot {
         }
     }
     
-    @objc public func shareViaLink() -> AnyPromise {
+     public func shareViaLink() -> AnyPromise {
         return AnyPromise(share())
     }
     

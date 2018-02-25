@@ -44,7 +44,6 @@ class SettingsViewController : BaseViewController {
         case restoreInAppPurchase
         case talkToStylist
         case openIn
-
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -222,6 +221,10 @@ class SettingsViewController : BaseViewController {
         }
     }
     
+    @objc fileprivate func dismissViewController() {
+        presentedViewController?.dismiss(animated: true, completion: nil)
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
         
@@ -364,7 +367,7 @@ extension SettingsViewController : UITableViewDataSource {
         
         cell.accessoryType = cellAccessoryType(for: row)
         cell.accessoryView = cellAccessoryView(for: row)
-        return cell;
+        return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -433,14 +436,17 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .email, .coins, .productGender, .productSize, .usageStreak:
+        case .version, .email, .productGender, .productSize, .usageStreak:
             return false
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 return true
-            } else {
+            }
+            else {
                 return false
             }
+            
         default:
             return true
         }
@@ -465,6 +471,13 @@ extension SettingsViewController : UITableViewDelegate {
         case .contactUs:
             IntercomHelper.sharedInstance.presentMessagingUI()
             
+        case .coins:
+            let gameViewController = GameViewController()
+            gameViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissViewController))
+            
+            let navigationController = UINavigationController(rootViewController: gameViewController)
+            present(navigationController, animated: true, completion: nil)
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
@@ -474,6 +487,7 @@ extension SettingsViewController : UITableViewDelegate {
                     }
                 })
             }
+            
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -484,8 +498,10 @@ extension SettingsViewController : UITableViewDelegate {
                     tableView.reloadRows(at: [indexPath], with: .none)
                 }))
             })
-            self.present(alert, animated: true, completion: nil)
             
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            
+            present(alert, animated: true, completion: nil)
             
         case .currency:
             let viewController = CurrencyViewController()
@@ -509,85 +525,82 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
+            
         case .restoreInAppPurchase:
             if self.isRestoring == false {
                 self.isRestoring = true
                 tableView.reloadRows(at: [indexPath], with: .none)
-                InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on:.main, execute: { (array) -> Promise<Bool>  in
+                
+                // TODO: block UI interaction.
+                // its possible to click another row while waiting for the alert to be presented. blocking the ui will fix bugs that come from this.
+                
+                InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on: .main, execute: { (array) -> Promise<Bool>  in
                     self.isRestoring = false
                     tableView.reloadRows(at: [indexPath], with: .none)
                     var message = "settings.InAppPurchase.Restore".localized
-                    if array.count == 0 {
+                    
+                    if array.isEmpty {
                         message = "settings.InAppPurchase.RestoreNone".localized
                     }
+                    
                     let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (close) in
-                        
-                    }))
+                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
+                    
                     if (self.isViewLoaded && self.view.window != nil) {
-                        self.present(alert, animated: true, completion: {
-                            
-                        })
+                        self.present(alert, animated: true, completion: nil)
                     }
                     return Promise(value: true)
+                    
                 }).catch(on: .main, execute: { (error) in
                     self.isRestoring = false
                     tableView.reloadRows(at: [indexPath], with: .none)
-                    let alert = UIAlertController.init(title: "settings.InAppPurchase.RestoreError".localized, message: error.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (close) in
-                    }))
-                    if (self.isViewLoaded && self.view.window != nil) {
-                        self.present(alert, animated: true, completion: {
-                            
-                        })
-                    }
+                    
                 })
             }
+            
         case .talkToStylist:
             if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
                 // do nothing
-            }else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+            } else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
                 IntercomHelper.sharedInstance.presentMessagingUI()
-            }else {
+            } else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    
                     let alertController = UIAlertController.init(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
-                    
                     
                     let action = UIAlertAction.init(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
-//                            IntercomHelper.sharedInstance.presentMessagingUI()
+//                                IntercomHelper.sharedInstance.presentMessagingUI()
                                 //If on the page the user will see cell change to 'talk to your stylist' with the lock.  If not on the page it can be jarring
-                        }, failure: { (error) in
-                            //no reason to present alert - Apple does it for us
-                        })
+                            }, failure: { (error) in
+                                //no reason to present alert - Apple does it for us
+                            })
                         }
                     })
                     
-                    
                     if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                        action.isEnabled = true;
+                        action.isEnabled = true
                         alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
-                    }else{
-                        action.isEnabled = false;
+                    } else {
+                        action.isEnabled = false
                         InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
-                            action.isEnabled = true;
+                            action.isEnabled = true
                             alertController.message = String.init(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
                         }, failure: { (error) in
                             alertController.message = String.init(format: "personalSytlistPopup.error".localized, error.localizedDescription)
                         })
-                    
                     }
+                    
                     alertController.addAction(action)
                     alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    alertController.preferredAction = action
                     self.present(alertController, animated: true, completion: nil)
+                    
                 }else{
                     let errorMessage = "personalSytlistPopup.errorCannotPurchaseOnDevice".localized
                     let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
-                    
                 }
             }
  
@@ -663,21 +676,10 @@ fileprivate extension SettingsViewController {
         case .partners:
             return "settings.row.partners.title".localized
         case .restoreInAppPurchase:
-            if self.isRestoring {
-                return "settings.row.restoreInAppPurchase.restoring".localized
-            }else{
-                return "settings.row.restoreInAppPurchase".localized
-            }
+            return "settings.row.restore_in_app_purchase.title".localized
         case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-                return "settings.row.talkToStylist.isInProcessOfBuying".localized
-            }else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                return "settings.row.talkToStylist".localized
-            }else{
-                return "settings.row.talkToStylist.locked".localized
-            }
+            return "settings.row.talk_to_stylist.title".localized
         }
-        
     }
     
     func cellDetailedText(for row: SettingsViewController.Row) -> String? {
@@ -690,7 +692,8 @@ fileprivate extension SettingsViewController {
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
                 return "settings.row.usage_streak.detail.single".localized(withFormat: streak)
-            } else {
+            }
+            else {
                 return "settings.row.usage_streak.detail.plural".localized(withFormat: streak)
             }
         case .version:
@@ -703,6 +706,19 @@ fileprivate extension SettingsViewController {
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
             return CurrencyViewController.currentCurrency
+        case .restoreInAppPurchase:
+            // TODO: make this into a spinner
+            return isRestoring ? "settings.row.restore_in_app_purchase.restoring".localized : nil
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+                return "settings.row.talk_to_stylist.buying".localized
+            }
+            else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                return nil
+            }
+            else {
+                return "🔒"
+            }
         default:
             return nil
         }
@@ -715,8 +731,8 @@ fileprivate extension SettingsViewController {
         
         if PermissionsManager.shared.hasPermission(for: permissionType) {
             return "generic.enabled".localized
-            
-        } else {
+        }
+        else {
             return "generic.disabled".localized
         }
     }
@@ -852,8 +868,8 @@ extension SettingsViewController : UITextFieldDelegate {
             }
             
             if (canContinue) {
-                self.previousTexts[key] = trimmedText;
-                textField.text = trimmedText;
+                self.previousTexts[key] = trimmedText
+                textField.text = trimmedText
                 
                 UserDefaults.standard.set(trimmedText, forKey: key)
                 UserDefaults.standard.synchronize()
@@ -861,17 +877,17 @@ extension SettingsViewController : UITextFieldDelegate {
                 reidentify()
                 
             } else {
-                textField.text = self.previousTexts[key];
+                textField.text = self.previousTexts[key]
             }
         }
     }
     
     fileprivate func userDefaultsKey(for textField: UITextField) -> String? {
         if textField == self.emailTextField {
-            return UserDefaultsKeys.email;
+            return UserDefaultsKeys.email
             
         } else if textField == self.nameTextField {
-            return UserDefaultsKeys.name;
+            return UserDefaultsKeys.name
         }
         
         return nil
