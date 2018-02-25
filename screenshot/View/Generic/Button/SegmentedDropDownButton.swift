@@ -6,7 +6,7 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String]
