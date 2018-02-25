@@ -9,7 +9,17 @@
 import UIKit
 import SDWebImage
 
+class ProductView: UIView {
+    
+}
+
 class ProductViewController : BaseViewController {
+    enum State {
+        case loading
+        case product
+        case empty
+    }
+    
     fileprivate let scrollView = UIScrollView()
     
     fileprivate let galleryScrollView = UIScrollView()
@@ -22,6 +32,8 @@ class ProductViewController : BaseViewController {
     
     fileprivate var selectionButton: SegmentedDropDownButton!
     fileprivate let websiteButton = UIButton()
+    
+    fileprivate var state: ProductViewController.State = .loading
     
     // MARK: Life Cycle
     
@@ -78,8 +90,6 @@ class ProductViewController : BaseViewController {
         pageControl.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
         pageControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
         pageControl.centerXAnchor.constraint(equalTo: galleryScrollView.centerXAnchor).isActive = true
-        
-//        setImages([ UIImage(), UIImage(), UIImage(), UIImage() ])
         
         let labelContainerView = UIView()
         labelContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -250,7 +260,7 @@ class ProductViewController : BaseViewController {
     }
     
     @objc private func pageControlDidChange() {
-        var point = CGPoint.zero
+        var point: CGPoint = .zero
         point.x = galleryScrollView.bounds.width * CGFloat(pageControl.currentPage)
         galleryScrollView.setContentOffset(point, animated: true)
     }

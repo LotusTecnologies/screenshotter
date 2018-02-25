@@ -515,13 +515,13 @@
 		C54087EC1FE90C8E00198955 /* Product */ = {
 			isa = PBXGroup;
 			children = (
+				31CE1116203C170D000156EE /* OpenProductPage.swift */,
 				3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */,
 				C54087EE1FE90C8E00198955 /* ProductsOptions.swift */,
 				C54087F21FE90C8E00198955 /* ProductsRateView.swift */,
 				C51D363E2010B66400943257 /* ProductsTooltipCollectionViewCell.swift */,
 				C565333A2019D81C00F022D4 /* ProductViewController.swift */,
 				31518642203477DB001BD8D6 /* ProductsViewController.swift */,
-				31CE1116203C170D000156EE /* OpenProductPage.swift */,
 				31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */,
 			);
 			path = Product;

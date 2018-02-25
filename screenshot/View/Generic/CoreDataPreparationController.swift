@@ -6,10 +6,9 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-@objc protocol CoreDataPreparationControllerDelegate : NSObjectProtocol {
+protocol CoreDataPreparationControllerDelegate : NSObjectProtocol {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController)
     func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView)
     func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView)
