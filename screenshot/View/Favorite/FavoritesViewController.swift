@@ -81,15 +81,6 @@ class FavoritesViewController : BaseViewController {
         if screenshotAssetIds.count == 0 {
             syncScreenshotAssetIds()
         }
-        
-        syncHelperViewVisibility()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        // Resync since it's possible for a race condition to occur.
-        syncHelperViewVisibility()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -146,12 +137,6 @@ class FavoritesViewController : BaseViewController {
         } else {
             return screenshotFavoritesForScreenshot(screenshot)
         }
-    }
-    
-    // MARK: Helper View
-    
-    fileprivate func syncHelperViewVisibility() {
-//        helperView.isHidden = (tableView.numberOfRows(inSection: 0) > 0)
     }
 }
 
@@ -217,7 +202,6 @@ extension FavoritesViewController : CoreDataPreparationControllerDelegate {
         tableView.reloadData()
 
         if DataModel.sharedInstance.isCoreDataStackReady {
-            syncHelperViewVisibility()
             syncScreenshotAssetIds()
         }
     }
