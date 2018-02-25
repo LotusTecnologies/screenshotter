@@ -396,12 +396,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 ShoppingCartModel.shared.populateVariants(productOID: product.objectID, partNumber: partNumber)
                 
                 let productViewController = ProductViewController()
-//                product.altImageURLs
-                
-                productViewController.setImages(urls: <#T##[URL]#>)
-//                productViewController.merchantName
-//                productViewController.originalPrice
-//                productViewController.price
+                productViewController.headline = ""
+                productViewController.setImages(urls: product.imageURLs())
+                productViewController.merchantName = product.merchant
+                productViewController.originalPrice = product.originalPrice
+                productViewController.price = product.price
                 navigationController?.pushViewController(productViewController, animated: true)
             }
             else {
