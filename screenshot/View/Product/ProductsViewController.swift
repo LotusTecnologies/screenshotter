@@ -395,7 +395,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 // TODO: clean this up
                 ShoppingCartModel.shared.populateVariants(productOID: product.objectID, partNumber: partNumber)
                 
-                let productViewController = ProductViewController()
+                let productViewController = ProductViewController(productOID: product.objectID)
                 productViewController.headline = ""
                 productViewController.setImages(urls: product.imageURLs())
                 productViewController.merchantName = product.merchant

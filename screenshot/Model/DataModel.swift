@@ -122,6 +122,16 @@ extension DataModel {
         
         return fetchedResultsController
     }
+    
+    func productFrc(delegate:FetchedResultsControllerManagerDelegate?, productOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateRetrieved", ascending: true)] // Need something, why not dateRetrieved.
+        request.predicate = NSPredicate(format: "SELF = %@", productOID)
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate:delegate)
+        
+        return fetchedResultsController
+    }
 }
 
 extension DataModel {
