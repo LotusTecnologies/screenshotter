@@ -7,20 +7,17 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsRateView : UIView {
     fileprivate let contentView = UIView()
     let voteUpButton = UIButton()
     let voteDownButton = UIButton()
-    
+    let talkToYourStylistButton = UIButton()
+
     fileprivate let label = UILabel()
     fileprivate var labelTrailingConstraint: NSLayoutConstraint!
     
-    // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -69,8 +66,29 @@ class ProductsRateView : UIView {
         borderView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        
+        contentView.addSubview(talkToYourStylistButton)
+        talkToYourStylistButton.translatesAutoresizingMaskIntoConstraints = false
+        talkToYourStylistButton.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        talkToYourStylistButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        talkToYourStylistButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        talkToYourStylistButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        talkToYourStylistButton.backgroundColor = .clear
+        talkToYourStylistButton.isUserInteractionEnabled = false
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil, queue: .main) { (notification) in
+                let rating  = self.rating
+                self.setRating(rating)
+        }
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
         size.height = 49 // Same height as tab bar
@@ -80,19 +98,45 @@ class ProductsRateView : UIView {
     // MARK: Content
     
     func syncBackgroundColor() {
-        backgroundColor = hasRating ? .crazeGreen : .white
+        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+            backgroundColor = .crazeGreen
+        } else if hasRating {
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
+                backgroundColor = .crazeGreen
+            }else{
+                 backgroundColor = .crazeGreen
+            }
+        }else{
+             backgroundColor = .white
+        }
     }
     
     private func syncLabel() {
-        if hasRating {
+        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
             label.textColor = .white
-            label.text = "products.rate.rated".localized
+            label.text = "Connecting to Appstore..."
             label.textAlignment = .center
+            talkToYourStylistButton.isUserInteractionEnabled = false
+            
+        }else if hasRating {
+            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
+                label.textColor = .white
+                label.text = "products.rate.talk_to_stylist".localized
+                label.textAlignment = .center
+                talkToYourStylistButton.isUserInteractionEnabled = true
+                
+            }else{
+                label.textColor = .white
+                label.text = "products.rate.rated".localized
+                label.textAlignment = .center
+                talkToYourStylistButton.isUserInteractionEnabled = false
+            }
             
         } else {
             label.textColor = .gray3
             label.text = "products.rate.unrated".localized
             label.textAlignment = .natural
+            talkToYourStylistButton.isUserInteractionEnabled = false
         }
     }
     
@@ -132,8 +176,15 @@ class ProductsRateView : UIView {
     
     func setRating(_ rating: UInt, animated: Bool = false) {
         self.rating = rating
-        
-        if animated && hasRating {
+        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+            voteUpButton.isSelected = false
+            voteDownButton.isSelected = false
+            voteUpButton.alpha = 0
+            voteDownButton.alpha = 0
+            labelTrailingConstraint.isActive = true
+            syncLabel()
+            syncBackgroundColor()
+        }else if animated && hasRating {
             let duration = Constants.defaultAnimationDuration
             
             UIView.animate(withDuration: duration, animations: {

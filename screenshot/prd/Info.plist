@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.1</string>
+	<string>3.4</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -54,7 +54,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>96</string>
+	<string>104</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
@@ -66,6 +66,9 @@
 		<string>snapchat</string>
 		<string>fb</string>
 		<string>fbauth2</string>
+		<string>googlegmail</string>
+		<string>googlechromes</string>
+		<string>googlechrome</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -80,6 +83,10 @@
 	<string>This allows you to invite friends from your address book.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Hind 700.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -109,9 +116,5 @@
 		<key>test</key>
 		<string>key_test_nhuLfd9jmgzQdyMXBQwnzfinzyh6aPfx</string>
 	</dict>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Hind 700.ttf</string>
-	</array>
 </dict>
 </plist>

@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
-@objc enum ScreenshotNotificationCollectionViewCellContentType: UInt {
+enum ScreenshotNotificationCollectionViewCellContentType {
     case labelWithButtons
 }
 
-@objc enum ScreenshotNotificationCollectionViewCellContentText: UInt {
+enum ScreenshotNotificationCollectionViewCellContentText {
     case none
     case importSingleScreenshot
     case importMultipleScreenshots
@@ -64,7 +65,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         tempContentViewToIconConstraint = tempContentView.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: mainView.layoutMargins.left)
     }
     
-    fileprivate static let mainViewLayoutMargins = UIEdgeInsets(top: Geometry.padding, left: Geometry.padding, bottom: Geometry.padding, right: Geometry.padding)
+    fileprivate static let mainViewLayoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
     // MARK: Content Type
     

@@ -11,6 +11,7 @@ import SDWebImage
 
 class EmbossedView : UIView {
     fileprivate let imageView = UIImageView()
+    let contentView = UIView()
     var placeholderImage: UIImage?
     
     // MARK: Life Cycle
@@ -28,12 +29,19 @@ class EmbossedView : UIView {
         layer.shadowRadius = Shadow.basic.radius
         layer.shadowOpacity = 1
         
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.layer.cornerRadius = .defaultCornerRadius
+        contentView.layer.masksToBounds = true
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        contentView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.backgroundColor = .white
         imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = .defaultCornerRadius
-        addSubview(imageView)
+        contentView.addSubview(imageView)
         imageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
@@ -47,7 +55,7 @@ class EmbossedView : UIView {
             let shadowPathSize = layer.shadowPath?.boundingBox.size
             
             if shadowPathSize == nil || !bounds.size.equalTo(shadowPathSize!) {
-                layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: imageView.layer.cornerRadius).cgPath
+                layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: contentView.layer.cornerRadius).cgPath
             }
         }
     }

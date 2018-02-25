@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc enum ScreenshotsHelperViewType: Int {
     case permission
@@ -30,7 +31,7 @@ class ScreenshotsHelperView: HelperView {
         super.init(frame: frame)
         
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("screenshot.permission.allow".localized, for: .normal)
+        button.setTitle("screenshot.permission.photo.allow".localized, for: .normal)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
@@ -42,8 +43,8 @@ class ScreenshotsHelperView: HelperView {
     
     private func syncType() {
         if (type == .permission) {
-            titleLabel.text = "screenshot.permission.title".localized
-            subtitleLabel.text = "screenshot.permission.detail".localized
+            titleLabel.text = "screenshot.permission.photo.title".localized
+            subtitleLabel.text = "screenshot.permission.photo.detail".localized
             contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
             button.isHidden = false
             buttonHeightConstraint.isActive = false

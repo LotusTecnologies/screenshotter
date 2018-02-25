@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class DiscoverNavigationController : UINavigationController, ViewControllerLifeCycle {
     let discoverScreenshotViewController = DiscoverScreenshotViewController()
@@ -43,9 +44,8 @@ class DiscoverNavigationController : UINavigationController, ViewControllerLifeC
 extension DiscoverNavigationController : DiscoverScreenshotViewControllerDelegate {
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath) {
         discoverScreenshotViewController.decidedToAdd { screenshot in
-            let productsViewController = ProductsViewController()
+            let productsViewController = ProductsViewController.init(screenshot: screenshot)
             productsViewController.lifeCycleDelegate = self
-            productsViewController.screenshot = screenshot
             productsViewController.hidesBottomBarWhenPushed = true
             
             self.pushViewController(productsViewController, animated: true)

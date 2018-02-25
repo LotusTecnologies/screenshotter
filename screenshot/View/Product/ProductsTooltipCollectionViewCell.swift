@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsTooltipCollectionViewCell : UICollectionViewCell {
     fileprivate let label = UILabel()
@@ -83,7 +84,7 @@ extension ProductsTooltipCollectionViewCell {
         let constraintRect = CGSize(width: contentWidth, height: .greatestFiniteMagnitude)
         
         let boundingBox = text.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
-        
-        return contentInset.top + (arrowImage?.size.height ?? 0) + imageToLabelPadding + ceil(boundingBox.height) + contentInset.bottom
+        let arrowImageHeight = (arrowImage?.size.height ?? 0)
+        return contentInset.top + arrowImageHeight + imageToLabelPadding + ceil(boundingBox.height) + contentInset.bottom
     }
 }

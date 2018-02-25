@@ -29,7 +29,8 @@ class NetworkingPromise: NSObject {
         request.httpMethod = "POST"
         request.httpBody = imageData
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 30
+//        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
+        sessionConfiguration.timeoutIntervalForRequest = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
         return promise
     }
@@ -169,7 +170,9 @@ class NetworkingPromise: NSObject {
     }
     
     static func downloadProducts(url: URL) -> Promise<[String : Any]> {
-        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 45
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
                     return Promise(value: productsDict)
@@ -218,7 +221,7 @@ class NetworkingPromise: NSObject {
             return Promise(error: error)
         }
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 30
+        sessionConfiguration.timeoutIntervalForRequest = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
         return promise
     }
@@ -228,7 +231,9 @@ class NetworkingPromise: NSObject {
             let error = NSError(domain: "Craze", code: 25, userInfo: [NSLocalizedDescriptionKey: "Cannot form image url:\(urlString)"])
             return Promise(error: error)
         }
-        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<Data> in
             guard let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode >= 200,
                 httpResponse.statusCode <  300 else {
@@ -370,4 +375,46 @@ class NetworkingPromise: NSObject {
             task.resume()
         }
     }
+    
+    static func shorten(url: URL, completion: @escaping (URL?) -> Void) {
+        guard let shortenerUrl = URL(string: "https://craz.me/shortener") else {
+            completion(nil)
+            return
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
+        let dateNow = dateFormatter.string(from: Date())
+        
+        let postDict = ["type": "long", "long": url.absoluteString, "datePicker": dateNow]
+        
+        let postData = try? JSONSerialization.data(withJSONObject: postDict, options: [])
+        let postLength = "\(postData == nil ? 0 : postData!.count)"
+        
+        var request = URLRequest(url: shortenerUrl)
+        request.httpMethod = "POST"
+        request.addValue(postLength, forHTTPHeaderField: "Content-Length")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = postData
+
+        let session = URLSession.shared
+        let completionHandler = { (data: Data?, response: URLResponse?, error: Error?) in
+            var url: URL? = nil
+            do {
+                if let data = data,
+                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                    let shortString = json["short"] as? String {
+                    url = URL(string: shortString)
+                }
+            } catch {
+                print("NetworkingPromise shorten catch on JSONSerialization data:\(String(describing: data))")
+            }
+            DispatchQueue.main.async {
+                completion(url)
+            }
+        }
+        let dataTask = session.dataTask(with: request, completionHandler: completionHandler)
+        dataTask.resume()
+    }
+
 }

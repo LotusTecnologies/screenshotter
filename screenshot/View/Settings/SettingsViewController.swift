@@ -8,6 +8,7 @@
 
 import Foundation
 import MessageUI
+import PromiseKit
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -29,7 +30,6 @@ class SettingsViewController : BaseViewController {
         case email
         case name
         case tutorialVideo
-        case tellFriend
         case usageStreak
         case contactUs
         case bug
@@ -41,6 +41,9 @@ class SettingsViewController : BaseViewController {
         case followFacebook
         case followInstagram
         case partners
+        case restoreInAppPurchase
+        case talkToStylist
+        case openIn
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -52,6 +55,7 @@ class SettingsViewController : BaseViewController {
     
     fileprivate var nameTextField: UITextField?
     fileprivate var emailTextField: UITextField?
+    fileprivate var isRestoring = false
     fileprivate lazy var previousTexts = {
         return [
             UserDefaultsKeys.name: self.cellText(for: .name),
@@ -77,11 +81,13 @@ class SettingsViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        restorationIdentifier = String(describing: type(of: self))
+        self.restorationIdentifier = String(describing: type(of: self))
         
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadChangeableIndexPaths), name: .InAppPurchaseManagerDidUpdate, object: nil)
+
         addNavigationItemLogo()
     }
     
@@ -215,6 +221,10 @@ class SettingsViewController : BaseViewController {
         }
     }
     
+    @objc fileprivate func dismissViewController() {
+        presentedViewController?.dismiss(animated: true, completion: nil)
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
         
@@ -235,10 +245,11 @@ class SettingsViewController : BaseViewController {
             .currency
         ],
         .about: [
-            .tellFriend,
             .tutorialVideo,
             .contactUs,
             .bug,
+            .restoreInAppPurchase,
+            .talkToStylist,
             .usageStreak,
             .coins,
             .version,
@@ -250,7 +261,8 @@ class SettingsViewController : BaseViewController {
         ],
         .product: [
             .productGender,
-            .productSize
+            .productSize,
+            .openIn
         ]
     ]
     
@@ -355,7 +367,7 @@ extension SettingsViewController : UITableViewDataSource {
         
         cell.accessoryType = cellAccessoryType(for: row)
         cell.accessoryView = cellAccessoryView(for: row)
-        return cell;
+        return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -406,6 +418,12 @@ extension SettingsViewController : UITableViewDataSource {
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
+        if (row == .restoreInAppPurchase && self.isRestoring) ||
+            (row == .talkToStylist && InAppPurchaseManager.sharedInstance.isInProcessOfBuying()){
+            cell.textLabel?.textColor = .gray
+        }else{
+            cell.textLabel?.textColor = .black
+        }
         cell.detailTextLabel?.text = cellDetailedText(for: row)
         return cell
     }
@@ -418,14 +436,17 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .email, .coins, .productGender, .productSize, .usageStreak:
+        case .version, .email, .productGender, .productSize, .usageStreak:
             return false
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 return true
-            } else {
+            }
+            else {
                 return false
             }
+            
         default:
             return true
         }
@@ -440,11 +461,6 @@ extension SettingsViewController : UITableViewDelegate {
         case .bug:
             presentMailComposer()
             
-        case .tellFriend:
-            let viewController = InviteViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(viewController, animated: true)
-        
         case .tutorialVideo:
             let viewController = TutorialVideoViewController()
             viewController.showsReplayButtonUponFinishing = false
@@ -455,6 +471,13 @@ extension SettingsViewController : UITableViewDelegate {
         case .contactUs:
             IntercomHelper.sharedInstance.presentMessagingUI()
             
+        case .coins:
+            let gameViewController = GameViewController()
+            gameViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissViewController))
+            
+            let navigationController = UINavigationController(rootViewController: gameViewController)
+            present(navigationController, animated: true, completion: nil)
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
@@ -464,6 +487,21 @@ extension SettingsViewController : UITableViewDelegate {
                     }
                 })
             }
+            
+        case .openIn:
+            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            let options:[OpenProductPage] = [.embededSafari, .safari, .chrome]
+            options.forEach({ (setting) in
+                alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
+                    setting.saveToUserDefaults()
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                }))
+            })
+            
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            
+            present(alert, animated: true, completion: nil)
             
         case .currency:
             let viewController = CurrencyViewController()
@@ -488,6 +526,80 @@ extension SettingsViewController : UITableViewDelegate {
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
             
+        case .restoreInAppPurchase:
+            if self.isRestoring == false {
+                self.isRestoring = true
+                tableView.reloadRows(at: [indexPath], with: .none)
+                
+                InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on: .main, execute: { (array) -> Promise<Bool>  in
+                    self.isRestoring = false
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                    var message = "settings.in_app_purchase.restore".localized
+                    
+                    if array.isEmpty {
+                        message = "settings.in_app_purchase.restore.none".localized
+                    }
+                    
+                    let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
+                    
+                    if (self.isViewLoaded && self.view.window != nil) {
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                    return Promise(value: true)
+                    
+                }).catch(on: .main, execute: { (error) in
+                    self.isRestoring = false
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                })
+            }
+            
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+                // do nothing
+            } else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                IntercomHelper.sharedInstance.presentMessagingUI()
+            } else {
+                if InAppPurchaseManager.sharedInstance.canPurchase() {
+                    let alertController = UIAlertController.init(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
+                    
+                    let action = UIAlertAction.init(title: "generic.continue".localized, style: .default, handler: { (action) in
+                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
+//                                IntercomHelper.sharedInstance.presentMessagingUI()
+                                //If on the page the user will see cell change to 'talk to your stylist' with the lock.  If not on the page it can be jarring
+                            }, failure: { (error) in
+                                //no reason to present alert - Apple does it for us
+                            })
+                        }
+                    })
+                    
+                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
+                        action.isEnabled = true
+                        alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
+                    } else {
+                        action.isEnabled = false
+                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
+                            action.isEnabled = true
+                            alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
+                        }, failure: { (error) in
+                            alertController.message = String.init(format: "personal_stylist.error".localized, error.localizedDescription)
+                        })
+                    }
+                    
+                    alertController.addAction(action)
+                    alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    alertController.preferredAction = action
+                    self.present(alertController, animated: true, completion: nil)
+                    
+                }else{
+                    let errorMessage = "personal_stylist.error.invalid_device".localized
+                    let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }
+ 
         default:
             break
         }
@@ -529,8 +641,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.usage_streak.title".localized
         case .bug:
             return "settings.row.bug.title".localized
-        case .tellFriend:
-            return "settings.row.tell_friend.title".localized
         case .contactUs:
             return "settings.row.contact.title".localized
         case .tutorialVideo:
@@ -551,6 +661,8 @@ fileprivate extension SettingsViewController {
             return "settings.row.gender.title".localized
         case .productSize:
             return "settings.row.size.title".localized
+        case .openIn:
+            return "settings.row.open_in.title".localized
         case .currency:
             return "settings.row.currency.title".localized
         case .followInstagram:
@@ -559,6 +671,10 @@ fileprivate extension SettingsViewController {
             return "settings.row.facebook.title".localized
         case .partners:
             return "settings.row.partners.title".localized
+        case .restoreInAppPurchase:
+            return "settings.row.restore_in_app_purchase.title".localized
+        case .talkToStylist:
+            return "settings.row.talk_to_stylist.title".localized
         }
     }
     
@@ -566,11 +682,14 @@ fileprivate extension SettingsViewController {
         switch (row) {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
+        case .openIn:
+            return OpenProductPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
                 return "settings.row.usage_streak.detail.single".localized(withFormat: streak)
-            } else {
+            }
+            else {
                 return "settings.row.usage_streak.detail.plural".localized(withFormat: streak)
             }
         case .version:
@@ -583,6 +702,13 @@ fileprivate extension SettingsViewController {
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
             return CurrencyViewController.currentCurrency
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() || InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+                return nil
+            }
+            else {
+                return "🔒"
+            }
         default:
             return nil
         }
@@ -595,15 +721,15 @@ fileprivate extension SettingsViewController {
         
         if PermissionsManager.shared.hasPermission(for: permissionType) {
             return "generic.enabled".localized
-            
-        } else {
+        }
+        else {
             return "generic.disabled".localized
         }
     }
     
     func cellAccessoryType(for row: SettingsViewController.Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .tellFriend, .currency, .partners:
+        case .currency, .partners:
             return .disclosureIndicator
         default:
             return .none
@@ -665,8 +791,27 @@ fileprivate extension SettingsViewController {
             
             control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
             productsOptionsControls.sync()
-            
             return control
+            
+        case .restoreInAppPurchase:
+            if isRestoring {
+                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+                activityView.startAnimating()
+                return activityView
+            }
+            else {
+                return nil
+            }
+            
+        case .talkToStylist:
+            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+                activityView.startAnimating()
+                return activityView
+            }
+            else {
+                return nil
+            }
             
         default:
             return nil
@@ -682,7 +827,7 @@ fileprivate extension SettingsViewController {
         return rect
     }
     
-    func reloadChangeableIndexPaths() {
+    @objc func reloadChangeableIndexPaths() {
         func append(section: SettingsViewController.Section, row: SettingsViewController.Row, to indexPaths: inout [IndexPath]) {
             if let indexPath = indexPath(for: row, in: section) {
                 indexPaths.append(indexPath)
@@ -702,7 +847,9 @@ fileprivate extension SettingsViewController {
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
         append(section: .about, row: .coins, to: &indexPaths)
-        
+        append(section: .about, row: .talkToStylist, to: &indexPaths)
+        append(section: .about, row: .restoreInAppPurchase, to: &indexPaths)
+
         tableView.reloadRows(at: indexPaths, with: .none)
     }
 }
@@ -730,8 +877,8 @@ extension SettingsViewController : UITextFieldDelegate {
             }
             
             if (canContinue) {
-                self.previousTexts[key] = trimmedText;
-                textField.text = trimmedText;
+                self.previousTexts[key] = trimmedText
+                textField.text = trimmedText
                 
                 UserDefaults.standard.set(trimmedText, forKey: key)
                 UserDefaults.standard.synchronize()
@@ -739,17 +886,17 @@ extension SettingsViewController : UITextFieldDelegate {
                 reidentify()
                 
             } else {
-                textField.text = self.previousTexts[key];
+                textField.text = self.previousTexts[key]
             }
         }
     }
     
     fileprivate func userDefaultsKey(for textField: UITextField) -> String? {
         if textField == self.emailTextField {
-            return UserDefaultsKeys.email;
+            return UserDefaultsKeys.email
             
         } else if textField == self.nameTextField {
-            return UserDefaultsKeys.name;
+            return UserDefaultsKeys.name
         }
         
         return nil
@@ -786,22 +933,53 @@ extension SettingsViewController : TutorialVideoViewControllerDelegate {
 // MARK: - Mail
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
+    func googleMailUrl(to:String?, body:String?, subject:String? ) -> URL? {
+        var components = URLComponents(string: "googlegmail://co")
+        components?.scheme = "googlegmail"
+        
+        var queryItems: [URLQueryItem] = []
+        
+        if let to = to {
+            queryItems.append(URLQueryItem(name: "to", value:to))
+        }
+        
+        if let subject = subject{
+            queryItems.append(URLQueryItem(name: "subject", value:subject))
+        }
+        
+        if let body = body{
+            queryItems.append(URLQueryItem(name: "body", value:body))
+        }
+        
+        if queryItems.isEmpty == false {
+            components?.queryItems = queryItems
+        }
+        
+        return components?.url
+    }
+    
     func presentMailComposer() {
+        let message = [
+            "\n\n\n",
+            "-----------------",
+            "Don't edit below.\n",
+            "version: \(Bundle.displayVersionBuild)"
+        ].joined(separator: "\n")
+        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
+        let subject = "Bug Report"
+        let recipient = "support@screenshopit.com"
+        
         if MFMailComposeViewController.canSendMail() {
-            let message = [
-                "\n\n\n",
-                "-----------------",
-                "Don't edit below.\n",
-                "version: \(Bundle.displayVersionBuild)"
-            ]
-
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
-            mail.setSubject("Bug Report")
-            mail.setMessageBody(message.joined(separator: "\n"), isHTML: false)
-            mail.setToRecipients(["support@screenshopit.com"])
+            mail.setSubject(subject)
+            mail.setMessageBody(message, isHTML: false)
+            mail.setToRecipients([recipient])
             present(mail, animated: true, completion: nil)
-
+            
+        } else if let url = googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            
         } else {
             let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class PickerCollectionViewCell: ImageCollectionViewCell {
     private var checkImageView: UIImageView!
@@ -18,7 +19,7 @@ class PickerCollectionViewCell: ImageCollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        checkImageView = UIImageView.init(image: UIImage.init(named: "PickerCheck"))
+        checkImageView = UIImageView.init(image: UIImage.init(named: "PickerCheckGreen"))
         checkImageView.translatesAutoresizingMaskIntoConstraints = false
         checkImageView.contentMode = .scaleAspectFit
         checkImageView.isHidden = true

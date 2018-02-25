@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class UserDefaultsKeys : NSObject {
     // User
@@ -27,6 +28,8 @@ class UserDefaultsKeys : NSObject {
     static let productSort = "ProductSort"
     static let productCurrency = "ProductCurrency"
     static let productCategory = "ProductCategory"
+    
+    static let openProductPageInSetting = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
@@ -63,6 +66,9 @@ class UserDefaultsKeys : NSObject {
     
     // Matchsticks
     static let matchsticksSyncToken = "MatchsticksSyncToken"
+    
+    //In app Purchase
+    static let purchasedProductIdentifier = "PurchasedProductIdentifier"
 }
 
 extension UIApplication {

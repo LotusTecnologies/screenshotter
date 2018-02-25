@@ -209,13 +209,19 @@ extension AnalyticsTracker {
     }
     
     func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
+        let uploadedImageURL = product.shoppable?.screenshot?.uploadedImageURL ?? ""
+        let merchant = product.merchant ?? ""
+        let brand = product.brand ?? ""
+        let offer = product.offer ?? ""
+        let imageURL = product.imageURL ?? ""
+        let price = product.price ?? "0"
         let properties = [
-            "screenshot" : product.shoppable?.screenshot?.uploadedImageURL ?? "",
-            "merchant": product.merchant ?? "",
-            "brand": product.brand ?? "",
-            "url": product.offer ?? "",
-            "imageUrl": product.imageURL ?? "",
-            "price": product.price ?? "0",
+            "screenshot" : uploadedImageURL,
+            "merchant": merchant,
+            "brand": brand,
+            "url": offer,
+            "imageUrl": imageURL,
+            "price": price,
             "page": page
         ]
         if favorited {
@@ -223,29 +229,35 @@ extension AnalyticsTracker {
         } else {
             track("Product unfavorited", properties: properties)
         }
-        
-        let value = favorited ? FBSDKAppEventParameterValueYes : FBSDKAppEventParameterValueNo
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: value])
+        if favorited {
+            FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: FBSDKAppEventParameterValueYes])
+        } else {
+            FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: FBSDKAppEventParameterValueNo])
+        }
     }
     
     func trackTappedOnProduct(_ product: Product, onPage page: String) {
+        let merchant = product.merchant ?? ""
+        let brand = product.brand?.lowercased() ?? ""
+        let offer = product.offer ?? ""
+        let imageURL = product.imageURL ?? ""
+        let sale = product.isSale()
+
         track("Tapped on product", properties: [
-            "merchant": product.merchant ?? "",
-            "brand": product.brand ?? "",
-            "url": product.offer ?? "",
-            "imageUrl": product.imageURL ?? "",
-            "sale": product.isSale(),
-            "page": page
+            "merchant" : merchant,
+            "brand" : brand,
+            "url" : offer,
+            "imageUrl" : imageURL,
+            "sale" : sale,
+            "page" : page
         ])
         
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
-        
-        guard let brand = product.brand?.lowercased(), marketingBrands.contains(brand) else {
-            return
-        }
+        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID : imageURL])
         
         // Need to use properties: [:] to clarify which track function we want to call
-        track("Tapped on \(brand) product", properties: [:])
+        if marketingBrands.contains(brand) {
+            track("Tapped on \(brand) product", properties: [:])
+        }
     }
 }
 

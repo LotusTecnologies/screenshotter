@@ -12,29 +12,24 @@ import Analytics
 import Appsee
 import FBSDKLoginKit
 import Branch
-import Firebase
-import GoogleSignIn
 import PromiseKit
-import DeepLinkKit
 import Segment_Amplitude
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    // We are purposely iniitalizing this immediately since it observes for app launch notifications.
+    // We are purposely initalizing this immediately since it observes for app launch notifications.
     private let usageStreakManager = UsageStreakManager()
     
-    var router: DPLDeepLinkRouter?
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-    
+    var shouldLoadDiscoverNextLoad = false
     let settings: AppSettings
     fileprivate let settingsSetter = AppSettingsSetter()
     
-    fileprivate let frameworkSetupController = FrameworkSetupController()
+    fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
-        let viewController = MainTabBarController()
-        viewController.lifeCycleDelegate = self
+        let viewController = MainTabBarController(delegate:self)
         return viewController
     }()
     
@@ -45,15 +40,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     override init() {
         settings = AppSettings(withSetter: self.settingsSetter)
         super.init()
-        frameworkSetupController.delegate = self
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-        frameworkSetupController.application(application, willFinishLaunchingWithOptions: launchOptions)
+        // Needs to be called very early.
+        PermissionsManager.shared.fetchPushPermissionStatus()
         
         UNUserNotificationCenter.current().delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: .coreDataStackCompleted, object: nil)
         
         // Sets up Core Data stack on a background queue.
         DataModel.setup()
@@ -74,7 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         application.applicationIconBadgeNumber = 0
         
-        PermissionsManager.shared.fetchPushPermissionStatus()
+        frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
@@ -129,63 +124,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        var handled = router?.handle(url) { (handled, error) in
-            if let error = error {
-                AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
-            }
-        } ?? false
-        
-        if !handled {
-            handled = Branch.getInstance().application(app, open: url, options:options)
-        }
+        var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
-        if !handled {
-            let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
-            let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
-            
-            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
-        }
-        
-        if !handled {
-            // Facebook
-//            let parsedURL = BFURL(inboundURL: url, sourceApplication: sourceApplication)
-//
-//            if parsedURL?.appLinkData != nil {
-//                // this is an applink url, handle it here
-//                let alert = UIAlertController(title: "Received link:", message: parsedURL?.targetURL.absoluteString, preferredStyle: .alert)
-//                window?.rootViewController?.present(alert, animated: true, completion: nil)
-//
-//                return true
-//            }
-            
-            // Google
-//            if let invite = Invites.handle(url, sourceApplication: sourceApplication, annotation: annotation) as? ReceivedInvite {
-//                let matchType = (invite.matchType == .weak) ? "Weak" : "Strong"
-//
-//                print("||| Invite received from: \(sourceApplication ?? "") Deeplink: \(invite.deepLink), Id: \(invite.inviteId), Type: \(matchType)")
-//
-//                return true
-//            }
-        }
-        
         return handled
-    }
-    
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
-        // pass the url to the handle deep link call
-        if Branch.getInstance().continue(userActivity) == false {
-            return router?.handle(userActivity) { (handled, error) in
-                if let error = error {
-                    AnalyticsTrackers.segment.error(withDescription: error.localizedDescription)
-                }
-            } ?? false
-        }
-        
-        return true
     }
     
     // MARK: State Restoration
@@ -234,8 +179,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
                 return nil
             }
-            
-            viewController = navigationController.createProductsViewController()
+            //TODO:
+//            This isn't working because the productViewController can only be created by giving it a screenshot, but we don't have one yet
+            viewController = navigationController
             
         case s(ScreenshotPickerNavigationController.self):
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
@@ -306,20 +252,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate : ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, didAppear animated: Bool) {
-        frameworkSetupController.viewController(viewController, didAppear: animated)
+    func viewControllerDidLoad(_ viewController: UIViewController) {
+        frameworkSetupMainViewDidLoad()
     }
 }
 
-extension AppDelegate : FrameworkSetupControllerDelegate {
-    func frameworkSetupControllerImmediate(_ controller: FrameworkSetupController) {
-        // Takes a long time to intialize; start early.
-        ClarifaiModel.setup()
-    }
-    
-    func frameworkSetupControllerInitialViewDidAppear(_ controller: FrameworkSetupController) {
+// MARK: - Framework Setup
+
+extension AppDelegate {
+    fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
+        frameworkSetupLaunchOptions = launchOptions
+        
         Appsee.start(Constants.appSeeApiKey)
-        Appsee.addEvent("App Launched", withProperties: ["version" : Bundle.displayVersionBuild])
+        Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
         let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
         configuration.trackApplicationLifecycleEvents = true
@@ -329,13 +274,11 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
         SEGAnalytics.setup(with: configuration)
         
-        setupRouter()
-        
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
         }
         
-        Branch.getInstance()?.initSession(launchOptions: controller.launchOptions) { params, error in
+        Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
             guard error == nil, let params = params as? [String : AnyObject] else {
@@ -355,50 +298,52 @@ extension AppDelegate : FrameworkSetupControllerDelegate {
             if let campaign = params["~campaign"] as? String {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
-            
-            // "discoverURL" will be the discover URL that should be used during this session.
-            if let discoverURLString = params["discoverURL"] as? String {
-                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
-            }
         }
+        
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    func frameworkSetupControllerRootViewDidAppear(_ controller: FrameworkSetupController) {
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            // FIXME: Creating a 1 second delay prevents an indefinite block on the main thread.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                FBSDKApplicationDelegate.sharedInstance().application(UIApplication.shared, didFinishLaunchingWithOptions: controller.launchOptions)
-                
-                RatingFlow.sharedInstance.start()
-                
-                IntercomHelper.sharedInstance.start(withLaunchOptions: controller.launchOptions ?? [:])
-                
-                FirebaseApp.configure()
-                GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
-            }
-        }
+    fileprivate func frameworkSetupMainViewDidLoad() {
+        RatingFlow.sharedInstance.start()
+        
+        IntercomHelper.sharedInstance.start(withLaunchOptions: frameworkSetupLaunchOptions ?? [:])
+        
+        frameworkSetupLaunchOptions = nil
     }
 }
 
 extension AppDelegate {
     
-    // MARK: - Helper
+    // MARK: Helper
     
     func showScreenshotListTop() {
         if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+            if mainTabBarController.screenshotsNavigationController.topViewController?.presentedViewController != nil {
+                mainTabBarController.screenshotsNavigationController.topViewController?.dismiss(animated: false, completion: nil)
+            }
+            
             mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
             mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollToTop()
             mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController
         }
     }
     
-    // MARK: - View Controllers
+    // MARK: View Controllers
     
     func nextViewController() -> UIViewController {
         let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+            
             viewController = mainTabBarController
+            if self.shouldLoadDiscoverNextLoad {
+                self.shouldLoadDiscoverNextLoad = false
+                if let mainTabBarController = viewController as? MainTabBarController {
+                    if let vc = mainTabBarController.viewControllers?.first(where: {($0 as? DiscoverNavigationController) != nil}) {
+                        mainTabBarController.selectedViewController = vc
+                    }
+                }
+            }
         }
         else {
             let tutorialViewController = TutorialViewController()
@@ -406,8 +351,6 @@ extension AppDelegate {
             tutorialViewController.lifeCycleDelegate = self
             viewController = tutorialViewController
         }
-        
-        frameworkSetupController.setIsWaitingForRootViewController()
         
         return viewController
     }
@@ -429,13 +372,6 @@ extension AppDelegate {
                 self.window?.rootViewController = toViewController
             })
         }
-    }
-    
-    // MARK: Deep Link Router
-    
-    func setupRouter() {
-        router = DPLDeepLinkRouter()
-        router?.registerHandlerClass(DiscoverDeepLinkHandler.self, forRoute: "discover")
     }
 }
 
@@ -498,12 +434,10 @@ extension AppDelegate {
             return Promise(value: FetchedAppSettings(data))
             
         }.then(on: .main) { fetchedAppSettings -> Void in
-            self.settingsSetter.setDiscoverURLs(withURLPaths: fetchedAppSettings.discoverURLPaths)
             self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
             self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
             
-            let name = Notification.Name(NotificationCenterKeys.fetchedAppSettings)
-            NotificationCenter.default.post(name: name, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
+            NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
         }
     }
 }
