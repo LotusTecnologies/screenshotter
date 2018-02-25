@@ -379,8 +379,6 @@ extension ScreenshotsViewController {
             self.deleteButton?.alpha = editing ? 1.0: 0.0
         }
         
-//        updateDeleteButtonCount()
-        
         if (animated) {
             UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
                 cellEditing()

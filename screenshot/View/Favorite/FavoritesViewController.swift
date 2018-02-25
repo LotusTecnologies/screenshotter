@@ -83,10 +83,6 @@ class FavoritesViewController : BaseViewController {
         }
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-    }
-    
     deinit {
         coreDataPreparationController.delegate = nil
         tableView.delegate = nil
@@ -120,7 +116,6 @@ class FavoritesViewController : BaseViewController {
     // MARK: Products
     
     fileprivate var screenshotsFavorites: [String : ScreenshotFavorites] = [:]
-
     
     fileprivate func screenshotFavoritesForScreenshot(_ screenshot: Screenshot) -> ScreenshotFavorites {
         let favoritedProducts = screenshot.favoritedProducts
@@ -155,7 +150,6 @@ extension FavoritesViewController : UITableViewDataSource {
             return UITableViewCell()
         }
         
-
         let screenshotFavorites = cachedScreenshotFavoritesForScreenshot(screenshot)
         let identifier: String
         
