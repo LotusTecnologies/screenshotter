@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ProductViewController : BaseViewController {
     fileprivate let scrollView = UIScrollView()
@@ -78,7 +79,7 @@ class ProductViewController : BaseViewController {
         pageControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
         pageControl.centerXAnchor.constraint(equalTo: galleryScrollView.centerXAnchor).isActive = true
         
-        setImages([ UIImage(), UIImage(), UIImage(), UIImage() ])
+//        setImages([ UIImage(), UIImage(), UIImage(), UIImage() ])
         
         let labelContainerView = UIView()
         labelContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -207,7 +208,7 @@ class ProductViewController : BaseViewController {
     
     // MARK: Gallery
     
-    func setImages(_ images: [UIImage]) {
+    func setImages(urls: [URL]) {
         galleryScrollContentView.subviews.forEach { subview in
             subview.removeFromSuperview()
         }
@@ -216,10 +217,10 @@ class ProductViewController : BaseViewController {
             return CGFloat(arc4random()) / CGFloat(UInt32.max)
         }
         
-        pageControl.numberOfPages = images.count
+        pageControl.numberOfPages = urls.count
         pageControl.currentPage = 0
         
-        images.enumerated().forEach { (index: Int, image: UIImage) in
+        urls.enumerated().forEach { (index: Int, url: URL) in
             let previousImageView = galleryScrollContentView.subviews.last
             
             let imageView = UIImageView()
@@ -227,10 +228,9 @@ class ProductViewController : BaseViewController {
             imageView.contentMode = .scaleAspectFit
             imageView.backgroundColor = UIColor(red: rand, green: rand, blue: rand, alpha: 1)
             galleryScrollContentView.addSubview(imageView)
-            
             imageView.topAnchor.constraint(equalTo: galleryScrollContentView.topAnchor).isActive = true
             imageView.bottomAnchor.constraint(equalTo: galleryScrollContentView.bottomAnchor).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: self.view.bounds.width).isActive = true
+            imageView.widthAnchor.constraint(equalToConstant: view.bounds.width).isActive = true
             
             if index == 0 {
                 imageView.leadingAnchor.constraint(equalTo: galleryScrollContentView.leadingAnchor).isActive = true
@@ -241,9 +241,11 @@ class ProductViewController : BaseViewController {
                 }
             }
             
-            if index == images.count - 1 {
+            if index == urls.count - 1 {
                 imageView.trailingAnchor.constraint(equalTo: galleryScrollContentView.trailingAnchor).isActive = true
             }
+            
+            imageView.sd_setImage(with: url, completed: nil)
         }
     }
     

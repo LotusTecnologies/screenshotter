@@ -390,7 +390,23 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Products")
+            
+            if let partNumber = product.partNumber {
+                // TODO: clean this up
+                ShoppingCartModel.shared.populateVariants(productOID: product.objectID, partNumber: partNumber)
+                
+                let productViewController = ProductViewController()
+//                product.altImageURLs
+                
+                productViewController.setImages(urls: <#T##[URL]#>)
+//                productViewController.merchantName
+//                productViewController.originalPrice
+//                productViewController.price
+                navigationController?.pushViewController(productViewController, animated: true)
+            }
+            else {
+                OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Products")
+            }
         }
     }
 }
