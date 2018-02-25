@@ -29,8 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
-        let viewController = MainTabBarController()
-        viewController.lifeCycleDelegate = self
+        let viewController = MainTabBarController(delegate:self)
         return viewController
     }()
     
@@ -299,11 +298,6 @@ extension AppDelegate {
             if let campaign = params["~campaign"] as? String {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
-            
-            // "discoverURL" will be the discover URL that should be used during this session.
-            if let discoverURLString = params["discoverURL"] as? String {
-                self.settingsSetter.setForcedDiscoverURL(withURLPath: discoverURLString)
-            }
         }
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -324,6 +318,10 @@ extension AppDelegate {
     
     func showScreenshotListTop() {
         if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+            if mainTabBarController.screenshotsNavigationController.topViewController?.presentedViewController != nil {
+                mainTabBarController.screenshotsNavigationController.topViewController?.dismiss(animated: false, completion: nil)
+            }
+            
             mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
             mainTabBarController.screenshotsNavigationController.screenshotsViewController.scrollToTop()
             mainTabBarController.selectedViewController = mainTabBarController.screenshotsNavigationController
@@ -436,7 +434,6 @@ extension AppDelegate {
             return Promise(value: FetchedAppSettings(data))
             
         }.then(on: .main) { fetchedAppSettings -> Void in
-            self.settingsSetter.setDiscoverURLs(withURLPaths: fetchedAppSettings.discoverURLPaths)
             self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
             self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
             
