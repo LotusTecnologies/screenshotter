@@ -27,7 +27,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 
     // MARK: - Lifecycle
     
-    init() {
+    init(delegate:ViewControllerLifeCycle) {
+        
+        lifeCycleDelegate = delegate
         screenshotsNavigationController = ScreenshotsNavigationController()
         favoritesNavigationController = FavoritesNavigationController(nibName: nil, bundle: nil)
         discoverNavigationController = DiscoverNavigationController(nibName: nil, bundle: nil)
