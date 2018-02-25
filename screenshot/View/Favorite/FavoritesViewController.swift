@@ -59,7 +59,6 @@ class FavoritesViewController : BaseViewController {
         tableView.rowHeight = 170
         tableView.tableFooterView = UIView() // Remove empty cells
         tableView.separatorInset = .zero
-        tableView.layoutMargins = .zero
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
