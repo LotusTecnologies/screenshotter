@@ -8,6 +8,7 @@
 
 import UIKit
 import SDWebImage
+import CoreData // NSManagedObjectID
 
 class ProductViewController : BaseViewController {
     fileprivate let scrollView = UIScrollView()
@@ -23,14 +24,19 @@ class ProductViewController : BaseViewController {
     fileprivate var selectionButton: SegmentedDropDownButton!
     fileprivate let websiteButton = UIButton()
     
+    fileprivate let productOID: NSManagedObjectID
+    fileprivate var productFrc: FetchedResultsControllerManager<Product>?
+    
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
+        self.productOID = NSManagedObjectID()
         super.init(coder: aDecoder)
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    init(productOID: NSManagedObjectID) {
+        self.productOID = productOID
+        super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
     }
@@ -191,6 +197,8 @@ class ProductViewController : BaseViewController {
         contentTextView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
+        
+        productFrc = DataModel.sharedInstance.productFrc(delegate: self, productOID: productOID)
     }
     
     @objc fileprivate func keyboardDidHide(_ notification: Notification) {
@@ -398,4 +406,13 @@ extension ProductViewController : UIScrollViewDelegate {
             pageControl.currentPage = currentPage
         }
     }
+}
+
+
+extension ProductViewController : FetchedResultsControllerManagerDelegate {
+    
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        // TODO: Update the viewController.
+    }
+    
 }
