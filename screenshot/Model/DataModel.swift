@@ -1177,6 +1177,10 @@ extension Product {
         return floatPrice < floatOriginalPrice
     }
     
+    public func imageURLs() -> [URL] {
+        return altImageURLs?.components(separatedBy: ",").flatMap {URL(string: $0)} ?? []
+    }
+    
 }
 
 extension Matchstick {
