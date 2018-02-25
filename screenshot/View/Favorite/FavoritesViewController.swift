@@ -19,7 +19,7 @@ class FavoritesViewController : BaseViewController {
     
     fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let tableView = TableView()
-    private let helperView = HelperView()
+    private let emptyListView = HelperView()
     
     fileprivate var favoriteFrc: FetchedResultsControllerManager<Screenshot>?
     
@@ -59,30 +59,18 @@ class FavoritesViewController : BaseViewController {
         tableView.rowHeight = 170
         tableView.tableFooterView = UIView() // Remove empty cells
         tableView.separatorInset = .zero
+        tableView.layoutMargins = .zero
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let v = UIView()
-        v.backgroundColor = .red
-        tableView.emptyView = v
-        tableView.layoutMargins = .zero
-        
-        helperView.isHidden = true
-        
-        helperView.translatesAutoresizingMaskIntoConstraints = false
-        helperView.backgroundColor = view.backgroundColor
-        helperView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
-        helperView.titleLabel.text = "favorites.empty.title".localized
-        helperView.subtitleLabel.text = "favorites.empty.detail".localized
-        helperView.contentImage = UIImage(named: "FavoriteEmptyListGraphic")
-        view.addSubview(helperView)
-        helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-        helperView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        helperView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
-        helperView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        emptyListView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
+        emptyListView.titleLabel.text = "favorites.empty.title".localized
+        emptyListView.subtitleLabel.text = "favorites.empty.detail".localized
+        emptyListView.contentImage = UIImage(named: "FavoriteEmptyListGraphic")
+        tableView.emptyView = emptyListView
         
         coreDataPreparationController.viewDidLoad()
     }

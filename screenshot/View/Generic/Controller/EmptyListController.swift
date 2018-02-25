@@ -15,11 +15,6 @@ protocol EmptyListProtocol: NSObjectProtocol {
 class EmptyListController: NSObject {
     private var isEmptyViewHidden = false
     
-    private func setIsEmptyViewHidden(_ isHidden: Bool, emptyView: UIView?) {
-        isEmptyViewHidden = isHidden
-        emptyView?.isHidden = isHidden
-    }
-    
     func willSetEmptyView(_ newEmptyView: UIView?, oldEmptyView: UIView?) {
         if newEmptyView == nil, let oldEmptyView = oldEmptyView {
             oldEmptyView.removeFromSuperview()
@@ -53,19 +48,22 @@ class EmptyListController: NSObject {
     private var previousContentHeight: CGFloat = 0
     
     func didSetContentSize(scrollView: UIScrollView, emptyView: UIView?) {
-        let height = Int(scrollView.contentSize.height)
-        let previousHeight = Int(previousContentHeight)
+        let height = scrollView.contentSize.height - scrollView.contentInset.top - scrollView.contentInset.bottom
         
-        if height != previousHeight {
-            if height == 0 && previousHeight > 0 {
-                setIsEmptyViewHidden(false, emptyView: emptyView)
+        if height != previousContentHeight {
+            if Int(height) == 0 && previousContentHeight > 0 {
+                isEmptyViewHidden = false
+                emptyView?.isHidden = false
+                scrollView.isScrollEnabled = false
             }
-            else if height > 0 && previousHeight == 0 {
-                setIsEmptyViewHidden(true, emptyView: emptyView)
+            else if height > 0 && Int(previousContentHeight) == 0 {
+                isEmptyViewHidden = true
+                emptyView?.isHidden = true
+                scrollView.isScrollEnabled = true
             }
         }
         
-        previousContentHeight = scrollView.contentSize.height
+        previousContentHeight = height
     }
     
     func didSetContentInset(scrollView: UIScrollView) {
