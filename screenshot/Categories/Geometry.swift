@@ -18,19 +18,7 @@ extension CGFloat {
     static let defaultCornerRadius = CGFloat(6)
 }
 
-// TODO: remove legacy code after all files are .swift
-public class Geometry : NSObject {
-    static let padding = CGFloat.padding
-    static let extendedPadding = CGFloat.extendedPadding
-    
-    static let halfPoint = CGFloat.halfPoint
-    
-    static let defaultCornerRadius = CGFloat.defaultCornerRadius
-}
-
-
 extension CGRect {
-    
     func scaleToAspectFit(in rtarget: CGRect) -> CGFloat {
         // first try to match width
         let s = rtarget.width / self.width;

@@ -6,20 +6,14 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-@objc enum ScreenshotsHelperViewType: Int {
+enum ScreenshotsHelperViewType: Int {
     case permission
     case screenshot
 }
 
 class ScreenshotsHelperView: HelperView {
-    public var type: ScreenshotsHelperViewType = .permission {
-        didSet {
-            syncType()
-        }
-    }
     private(set) var button = MainButton()
     private var buttonHeightConstraint: NSLayoutConstraint!
     
@@ -31,7 +25,7 @@ class ScreenshotsHelperView: HelperView {
         super.init(frame: frame)
         
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("screenshot.permission.allow".localized, for: .normal)
+        button.setTitle("screenshot.permission.photo.allow".localized, for: .normal)
         controlView.addSubview(button)
         button.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
@@ -41,15 +35,22 @@ class ScreenshotsHelperView: HelperView {
         syncType()
     }
     
+    var type: ScreenshotsHelperViewType = .permission {
+        didSet {
+            syncType()
+        }
+    }
+    
     private func syncType() {
-        if (type == .permission) {
-            titleLabel.text = "screenshot.permission.title".localized
-            subtitleLabel.text = "screenshot.permission.detail".localized
+        switch type {
+        case .permission:
+            titleLabel.text = "screenshot.permission.photo.title".localized
+            subtitleLabel.text = "screenshot.permission.photo.detail".localized
             contentImage = UIImage(named: "ScreenshotsNoPermissionGraphic")
             button.isHidden = false
             buttonHeightConstraint.isActive = false
             
-        } else if (type == .screenshot) {
+        case .screenshot:
             titleLabel.text = "screenshot.empty.title".localized
             subtitleLabel.text = "screenshot.empty.detail".localized
             contentImage = UIImage(named: "ScreenshotsEmptyListGraphic")

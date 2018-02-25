@@ -9,43 +9,43 @@
 import UIKit
 
 class BaseViewController: UIViewController {
-    
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
     var isStatusBarHidden = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.background
+        
+        view.backgroundColor = .background
+        lifeCycleDelegate?.viewControllerDidLoad(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        lifeCycleDelegate?.viewController?(self, willAppear: animated)
+        lifeCycleDelegate?.viewController(self, willAppear: animated)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        lifeCycleDelegate?.viewController?(self, didAppear: animated)
+        lifeCycleDelegate?.viewController(self, didAppear: animated)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        lifeCycleDelegate?.viewController?(self, willDisappear: animated)
+        lifeCycleDelegate?.viewController(self, willDisappear: animated)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        lifeCycleDelegate?.viewController?(self, didDisappear: animated)
+        lifeCycleDelegate?.viewController(self, didDisappear: animated)
     }
     
     // MARK: - Status Bar
     
-    
-
     func showStatusBar() {
         self.isStatusBarHidden = false
         self.setNeedsStatusBarAppearanceUpdate()
     }
+    
     func hideStatusBar() {
         self.isStatusBarHidden = true
         self.setNeedsStatusBarAppearanceUpdate()
@@ -57,9 +57,7 @@ class BaseViewController: UIViewController {
     
     // MARK: - Extra
     
-    @objc func addNavigationItemLogo() {
+    func addNavigationItemLogo() {
         self.navigationItem.titleView = UIImageView(image: UIImage(named: "Logo20h"))
     }
-    
 }
-

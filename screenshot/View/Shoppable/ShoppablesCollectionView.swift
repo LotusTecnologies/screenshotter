@@ -7,13 +7,13 @@
 //
 
 import UIKit
+
 public protocol ShoppablesCollectionViewDelegate : UICollectionViewDelegate {
     var didViewControllerAppear:Bool {get}
     func repositionShoppables()
 }
 
 class ShoppablesCollectionView: UICollectionView {
-    
     var shoppableDelegate: ShoppablesCollectionViewDelegate?
     
     override var contentSize: CGSize {

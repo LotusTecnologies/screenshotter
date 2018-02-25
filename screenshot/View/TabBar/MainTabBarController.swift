@@ -27,7 +27,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 
     // MARK: - Lifecycle
     
-    init() {
+    init(delegate:ViewControllerLifeCycle) {
+        
+        lifeCycleDelegate = delegate
         screenshotsNavigationController = ScreenshotsNavigationController()
         favoritesNavigationController = FavoritesNavigationController(nibName: nil, bundle: nil)
         discoverNavigationController = DiscoverNavigationController(nibName: nil, bundle: nil)
@@ -75,13 +77,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        lifeCycleDelegate?.viewControllerDidLoad?(self)
+        lifeCycleDelegate?.viewControllerDidLoad(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, willAppear: animated)
+        self.lifeCycleDelegate?.viewController(self, willAppear: animated)
         
         self.refreshTabBarSettingsBadge()
     }
@@ -89,7 +91,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, didAppear: animated)
+        self.lifeCycleDelegate?.viewController(self, didAppear: animated)
         
         self.presentUpdatePromptIfNeeded()
         self.presentChangelogAlertIfNeeded()
@@ -98,13 +100,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, willDisappear: animated)
+        self.lifeCycleDelegate?.viewController(self, willDisappear: animated)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, didDisappear: animated)
+        self.lifeCycleDelegate?.viewController(self, didDisappear: animated)
     }
 
     @available(iOS, introduced: 11.0)

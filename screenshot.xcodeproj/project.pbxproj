@@ -105,6 +105,9 @@
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
+		C5D57933203EDD7A00A076FE /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D57932203EDD7A00A076FE /* TableView.swift */; };
+		C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D57935203F044B00A076FE /* EmptyListController.swift */; };
+		C5D579382042897300A076FE /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D579372042897300A076FE /* CollectionView.swift */; };
 		C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5D98CCA1FFA642300CC1A97 /* GameScene.sks */; };
 		C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCB1FFA642300CC1A97 /* GameScene.swift */; };
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
@@ -234,6 +237,9 @@
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
+		C5D57932203EDD7A00A076FE /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
+		C5D57935203F044B00A076FE /* EmptyListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyListController.swift; sourceTree = "<group>"; };
+		C5D579372042897300A076FE /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		C5D98CCA1FFA642300CC1A97 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C5D98CCB1FFA642300CC1A97 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
@@ -548,13 +554,16 @@
 				31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */,
 				C540884D1FE90E2200198955 /* Button */,
 				C54088461FE90E2200198955 /* ClipView.swift */,
+				C5D57931203EDD6200A076FE /* CollectionView */,
 				C54088471FE90E2200198955 /* CollectionViewCell */,
+				C5D57934203F043200A076FE /* Controller */,
 				C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */,
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
+				C5D57930203EDD6200A076FE /* TableView */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C540884A1FE90E2200198955 /* TextView */,
 			);
@@ -652,6 +661,30 @@
 				52E547431FE2487B00627D6D /* ScreenshotHelper.swift */,
 			);
 			path = Categories;
+			sourceTree = "<group>";
+		};
+		C5D57930203EDD6200A076FE /* TableView */ = {
+			isa = PBXGroup;
+			children = (
+				C5D57932203EDD7A00A076FE /* TableView.swift */,
+			);
+			path = TableView;
+			sourceTree = "<group>";
+		};
+		C5D57931203EDD6200A076FE /* CollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				C5D579372042897300A076FE /* CollectionView.swift */,
+			);
+			path = CollectionView;
+			sourceTree = "<group>";
+		};
+		C5D57934203F043200A076FE /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				C5D57935203F044B00A076FE /* EmptyListController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 		C5D98CC91FFA642300CC1A97 /* Game */ = {
@@ -946,6 +979,7 @@
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
+				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
@@ -985,6 +1019,7 @@
 				C54088171FE90C8E00198955 /* TutorialTrySlideView.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
+				C5D57933203EDD7A00A076FE /* TableView.swift in Sources */,
 				C5336D23203D553400A7B4B0 /* BarItem.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
@@ -1034,6 +1069,7 @@
 				C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */,
 				C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
+				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */,
@@ -1187,7 +1223,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 104;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1215,7 +1251,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 104;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1299,7 +1335,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 104;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1378,7 +1414,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 103;
+				CURRENT_PROJECT_VERSION = 104;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

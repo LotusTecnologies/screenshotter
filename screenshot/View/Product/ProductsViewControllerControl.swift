@@ -9,8 +9,13 @@
 import UIKit
 
 class ProductsViewControllerControl: UIControl {
-    var customInputView:UIView?
-    override var canBecomeFirstResponder: Bool { return true }
-    override var inputView: UIView { return self.customInputView ?? UIView.init() }
+    var customInputView: UIView?
     
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override var inputView: UIView {
+        return self.customInputView ?? UIView.init()
+    }
 }

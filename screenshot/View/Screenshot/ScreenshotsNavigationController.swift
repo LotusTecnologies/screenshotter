@@ -46,6 +46,7 @@ class ScreenshotsNavigationController: UINavigationController {
         AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
         NotificationCenter.default.removeObserver(self)
     }
+    
     override func viewDidLoad(){
         super.viewDidLoad()
         self.view.backgroundColor = .clear
@@ -108,10 +109,6 @@ extension ScreenshotsNavigationController {
     }
 }
 extension ScreenshotsNavigationController : ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, willAppear animated: Bool){
-        
-    }
-    
     func viewController(_ viewController: UIViewController, didAppear animated: Bool){
         if (viewController == self.screenshotsViewController &&
             self.previousDidAppearViewControllerWasProductViewController)
@@ -129,21 +126,15 @@ extension ScreenshotsNavigationController : ViewControllerLifeCycle {
                 self.presentPushAlert()
             }
         }
+        
         if let _ = viewController as? ProductsViewController {
             self.previousDidAppearViewControllerWasProductViewController = true
         }else{
             self.previousDidAppearViewControllerWasProductViewController = false
         }
-        
     }
-    func viewController(_ viewController: UIViewController, willDisappear animated: Bool){
-        
-    }
-    func viewController(_ viewController: UIViewController, didDisappear animated: Bool){
-        
-    }
-    
 }
+
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_  viewController:ScreenshotsViewController, didSelectItemAt:IndexPath){
         if let screenshot = viewController.screenshot(at: didSelectItemAt.item){
@@ -168,16 +159,15 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController){
         self.presentPickerViewController()
     }
-    
 }
+
 extension ScreenshotsNavigationController { //push permission
-    
     func needsToPresentPushAlert() -> Bool {
         return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo)
     }
     
     func presentPushAlert(){
-        let alertController = UIAlertController.init(title: "screenshot.pushPermission.title".localized, message: "screenshot.pushPermission.message".localized, preferredStyle: .alert)
+        let alertController = UIAlertController.init(title: "screenshot.permission.push.title".localized, message: "screenshot.permission.push.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
             PermissionsManager.shared.requestPermission(for: .push, response: { (granted) in
                 if (granted) {
@@ -192,6 +182,7 @@ extension ScreenshotsNavigationController { //push permission
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
     }
 }
+
 extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     func networkingIndicatorDidStart(type: NetworkingIndicatorType) {
         if (self.activityBarButtonItem == nil) {
@@ -220,9 +211,8 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
             self.activityBarButtonItem = nil
         }
     }
-    
-    
 }
+
 //clipview
 extension ScreenshotsNavigationController {
     func presentPickerClipView() {
@@ -265,8 +255,8 @@ extension ScreenshotsNavigationController {
             })
         }
     }
-    
 }
+
 extension ScreenshotsNavigationController  {
     override func encodeRestorableState(with coder: NSCoder){
         
@@ -284,7 +274,6 @@ extension ScreenshotsNavigationController  {
         if coder.containsValue(forKey: "screenshotIndex") {
             self.restoredScreenshotNumber = coder.decodeInteger(forKey: "screenshotIndex")
         }
-        
         
         super.decodeRestorableState(with: coder)
     }

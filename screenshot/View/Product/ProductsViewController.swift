@@ -13,20 +13,17 @@ enum ProductsSection : Int {
     case tooltip = 0
     case product = 1
     
-    var section:Int {
-        get{
-            return self.rawValue
-        }
+    var section: Int {
+        return self.rawValue
     }
 }
+
 enum ProductsViewControllerState : Int {
     case loading
     case products
     case retry
     case empty
 }
-
-
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
@@ -54,7 +51,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     }
     
     
-    init( screenshot  s:Screenshot) {
+    init( screenshot s:Screenshot) {
         screenshot = s
         shoppablesController = DataModel.sharedInstance.shoppableFrc(delegate: nil, screenshot: screenshot)
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
@@ -62,8 +59,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         super.init(nibName: nil, bundle: nil)
         shoppablesController.delegate = self
         screenshotController.delegate = self
-        self.title = "Products"
+        
+        self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
+        
         NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
         
         self.productsOptions.delegate = self
@@ -73,8 +72,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad()
-    {
+    override func viewDidLoad() {
         super.viewDidLoad()
         
         let toolbar:ShoppablesToolbar = {
@@ -181,6 +179,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             self.state = .loading
         }
     }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.shoppablesToolbar?.didViewControllerAppear = true
@@ -210,7 +209,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         self.present(navigationController, animated: true, completion: nil)
     }
     
-    
     func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
         
         guard let isFavorited = cell.favoriteButton?.isSelected else{
@@ -223,10 +221,9 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         product.setFavorited(toFavorited: isFavorited)
         AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
     }
-    
 }
-private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
 
+private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
 extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -306,6 +303,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
+    
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionType = productSectionType(forSection: section)
         if sectionType == .tooltip {
@@ -325,7 +323,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
         var size:CGSize = .zero
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let padding = Geometry.padding - shadowInsets.left - shadowInsets.right
+        let padding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
         let sectionType = productSectionType(forSection: indexPath.section)
 
         if sectionType == .tooltip {
@@ -347,6 +345,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .tooltip {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
             return cell
+            
         } else if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
@@ -365,10 +364,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         return UICollectionViewCell()
     }
     
-    
     public func collectionViewMinimumSpacing() -> CGPoint {
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let p = Geometry.padding
+        let p: CGFloat = .padding
         return CGPoint(x: p - shadowInsets.left - shadowInsets.right, y: p - shadowInsets.top - shadowInsets.bottom)
     }
     
@@ -418,7 +416,6 @@ extension ProductsViewControllerOptionsView {
                 let arrowString = NSAttributedString(string: "⌄", attributes: attributes)
                 attributedString.append(arrowString)
                 
-                
                 label.attributedText = attributedString
                 label.sizeToFit()
                 
@@ -431,7 +428,8 @@ extension ProductsViewControllerOptionsView {
                 container.addSubview(label)
                 self.navigationItem.titleView = container
             }
-        } else {
+        }
+        else {
             self.navigationItem.titleView = nil
         }
     }
@@ -440,7 +438,8 @@ extension ProductsViewControllerOptionsView {
         
         if control.isFirstResponder {
             control.resignFirstResponder()
-        } else {
+        }
+        else {
             AnalyticsTrackers.standard.track("Opened Filters View", properties:nil)
             if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
                 let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
@@ -450,6 +449,7 @@ extension ProductsViewControllerOptionsView {
             control.becomeFirstResponder()
         }
     }
+    
     func dismissOptions() {
         self.navigationItem.titleView?.endEditing(true)
     }
@@ -473,15 +473,13 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
                 }
             }
         }
-        
-        
     }
+    
     func hasShoppables() -> Bool {
         return self.shoppablesController.fetchedResultsController.fetchedObjectsCount > 0
     }
-    
-    
 }
+
 private typealias ProductsViewControllerProducts = ProductsViewController
 extension ProductsViewControllerProducts{
     func productAtIndex(_ index: Int) -> Product {
@@ -551,10 +549,9 @@ extension ProductsViewControllerProducts{
                 products = filtered as! Set<Product>
             }
             return  (((products as NSSet).allObjects as NSArray).sortedArray(using: descriptors) as? [Product]) ?? []
-            
         }
-        return []
         
+        return []
     }
 }
 
@@ -591,17 +588,17 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
             InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
         }
-        let alertController = UIAlertController(title: "negativeFeedback.title".localized, message: "negativeFeedback.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "negativeFeedback.options.sendFeedback".localized, style: .default, handler: { (a) in
+        let alertController = UIAlertController(title: "negative_feedback.title".localized, message: "negative_feedback.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "negative_feedback.options.send".localized, style: .default, handler: { (a) in
             self.presentProductsRateNegativeFeedbackAlert()
         }))
-        alertController.addAction(UIAlertAction(title: "negativeFeedback.options.fashionHelp".localized, style: .default, handler: { (a) in
+        alertController.addAction(UIAlertAction(title: "negative_feedback.options.help".localized, style: .default, handler: { (a) in
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                self.presentPersonalSylist()
+                self.presentPersonalStylist()
             } else {
                 if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    let alertController = UIAlertController(title: nil, message: "personalSytlistPopup.loading".localized, preferredStyle: .alert)
-                    let action = UIAlertAction(title: "personalSytlistPopup.option.continue".localized, style: .default, handler: { (action) in
+                    let alertController = UIAlertController(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
+                    let action = UIAlertAction(title: "generic.continue".localized, style: .default, handler: { (action) in
                         if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                             InAppPurchaseManager.sharedInstance.buy(product: product, success: {
                                 //don't present anything -  if the user stayed on the same page the bottom bar changed to 'talk to your stylist' otherwise don't do anything
@@ -613,14 +610,14 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                     
                     if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
                         action.isEnabled = true
-                        alertController.message = String(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                        alertController.message = String(format: "personal_stylist.unlock".localized, product.localizedPriceString())
                     } else {
                         action.isEnabled = false
                         InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
                             action.isEnabled = true
-                            alertController.message = String(format: "personalSytlistPopup.canContinue".localized, product.localizedPriceString())
+                            alertController.message = String(format: "personal_stylist.unlock".localized, product.localizedPriceString())
                         }, failure: { (error) in
-                            alertController.message = String(format: "personalSytlistPopup.error".localized, error.localizedDescription)
+                            alertController.message = String(format: "personal_stylist.error".localized, error.localizedDescription)
                         })
                         
                     }
@@ -628,7 +625,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                     alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                 }else{
-                    let errorMessage = "personalSytlistPopup.errorCannotPurchaseOnDevice".localized
+                    let errorMessage = "personal_stylist.error.invalid_device".localized
                     let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .alert)
                     alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
@@ -636,7 +633,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                 }
             }
         }))
-        alertController.addAction(UIAlertAction(title: "negativeFeedback.options.close".localized, style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -659,10 +656,10 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         IntercomHelper.sharedInstance.presentMessagingUI()
     }
     
-    func presentPersonalSylist() {
+    func presentPersonalStylist() {
         let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
         AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
-        let prefiledMessageTemplate = "products.rate.negative.prefiledMessageTemplate".localized
+        let prefiledMessageTemplate = "products.rate.negative.help_finding_outfit".localized
         let prefilledMessage = String(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL ?? "null"))
         IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
     }
@@ -677,7 +674,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             self.productsRateNegativeFeedbackTextField = textField
         }
         
-        let productsRateNegativeFeedbackSubmitAction = UIAlertAction(title: "Submit", style: .default, handler: { (action) in
+        let productsRateNegativeFeedbackSubmitAction = UIAlertAction(title: "generic.submit".localized, style: .default, handler: { (action) in
             if let trimmedText = self.productsRateNegativeFeedbackTextField?.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
                 
                 if trimmedText.lengthOfBytes(using: .utf8) > 0 {
@@ -725,9 +722,7 @@ extension ProductsViewController {
             self.startAndAddLoader()
             
         case .products:
-            if #available(iOS 11.0, *) {
-                //Do nothing
-            } else {
+            if #available(iOS 11.0, *) {} else {
                 if !self.automaticallyAdjustsScrollViewInsets {
                     // Setting back to YES doesn't update. Need to manually adjust.
                     if let collectionView = collectionView, let shoppablesToolbar = self.shoppablesToolbar {
@@ -746,12 +741,8 @@ extension ProductsViewController {
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
             
-            
         case .retry, .empty:
-            
-            if #available(iOS 11.0, *) {
-                //do nothing
-            } else {
+            if #available(iOS 11.0, *) {} else {
                 self.automaticallyAdjustsScrollViewInsets = false
             }
             
@@ -763,8 +754,7 @@ extension ProductsViewController {
     }
     
     func syncScreenshotRelatedObjects() {
-        if let data = self.screenshot.imageData,
-          let i = UIImage(data: data as Data) {
+        if let data = self.screenshot.imageData, let i = UIImage(data: data as Data) {
             self.image = i
         } else {
             self.image = UIImage()
@@ -798,21 +788,19 @@ private typealias ProductsViewControllerNoItemsHelperView = ProductsViewControll
 extension ProductsViewControllerNoItemsHelperView{
     
     func showNoItemsHelperView() {
+        let verPadding: CGFloat = .extendedPadding
+        let horPadding: CGFloat = .padding
+        var topOffset: CGFloat = 0
         
-        let verPadding = Geometry.extendedPadding
-        let horPadding = Geometry.padding
-        var topOffset:CGFloat = 0
-        if let shoppablesToolbar = self.shoppablesToolbar {
-            if shoppablesToolbar.isHidden == false {
-                topOffset = shoppablesToolbar.bounds.size.height
-            }
+        if let shoppablesToolbar = self.shoppablesToolbar, !shoppablesToolbar.isHidden {
+            topOffset = shoppablesToolbar.bounds.size.height
         }
         
         let helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.layoutMargins = UIEdgeInsets(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
-        helperView.titleLabel.text = "No Items Found"
-        helperView.subtitleLabel.text = "No visually similar products were detected"
+        helperView.titleLabel.text = "products.helper.title".localized
+        helperView.subtitleLabel.text = "products.helper.message".localized
         helperView.contentImage = UIImage(named: "ProductsEmptyListGraphic")
         self.view.addSubview(helperView)
         
@@ -821,11 +809,12 @@ extension ProductsViewControllerNoItemsHelperView{
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.noItemsHelperView = helperView
+        
         if self.state == .retry {
             let retryButton = MainButton()
             retryButton.translatesAutoresizingMaskIntoConstraints = false
             retryButton.backgroundColor = .crazeGreen
-            retryButton.setTitle("Try Again", for: .normal)
+            retryButton.setTitle("products.helper.retry".localized, for: .normal)
             retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
             helperView.controlView.addSubview(retryButton)
             
@@ -841,19 +830,16 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     func noItemsRetryAction() {
-        let alert = UIAlertController(title: "Try again as", message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Fashion", style: .default, handler: { (a) in
+        let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
             AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
             self.state = .loading
-            
         }))
-        alert.addAction(UIAlertAction(title: "Furniture", style: .default, handler: { (a) in
+        alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
             AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
             self.state = .loading
-            
         }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
 }
-

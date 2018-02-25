@@ -19,11 +19,11 @@ enum OpenProductPage : String {
     func localizedDisplayString() -> String{
         switch self {
         case .embededSafari:
-            return "settings.openIn.option.embeded".localized
+            return "settings.open_in.option.embeded".localized
         case .safari:
-            return "settings.openIn.option.safari".localized
+            return "settings.open_in.option.safari".localized
         case .chrome:
-            return "settings.openIn.option.chrome".localized
+            return "settings.open_in.option.chrome".localized
         }
     }
     
@@ -102,10 +102,9 @@ enum OpenProductPage : String {
                               "name": name ]
             AnalyticsTrackers.standard.track("Product for email", properties:properties)
         }
+        
         product.recordViewedProduct()
         AnalyticsTrackers.branch.track("Tapped on product - \(analyticsKey)")
         FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
-
     }
-    
 }
