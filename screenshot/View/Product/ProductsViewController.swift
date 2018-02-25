@@ -345,9 +345,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .tooltip {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
             return cell
-            
-        } else if sectionType == .product {
+        }
+        else if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
+            
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
                 cell.delegate = self
                 cell.contentView.backgroundColor = collectionView.backgroundColor
@@ -359,8 +360,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.favoriteButton?.isSelected = product.isFavorite
                 return cell
             }
-            
         }
+        
         return UICollectionViewCell()
     }
     
@@ -392,15 +393,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let product = self.productAtIndex(indexPath.item)
             
             if let partNumber = product.partNumber {
-                // TODO: clean this up
                 ShoppingCartModel.shared.populateVariants(productOID: product.objectID, partNumber: partNumber)
                 
                 let productViewController = ProductViewController(productOID: product.objectID)
-                productViewController.headline = ""
-                productViewController.setImages(urls: product.imageURLs())
-                productViewController.merchantName = product.merchant
-                productViewController.originalPrice = product.originalPrice
-                productViewController.price = product.price
                 navigationController?.pushViewController(productViewController, animated: true)
             }
             else {
