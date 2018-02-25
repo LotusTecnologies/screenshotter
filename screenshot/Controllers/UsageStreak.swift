@@ -9,17 +9,6 @@
 import Foundation
 import UIKit
 
-fileprivate extension DateComponents {
-    func value(for component: Calendar.Component) -> Int? {
-        switch component {
-        case .day:
-            return day
-        default:
-            return nil
-        }
-    }
-}
-
 final class UsageStreakManager {
     var observers = [Any]()
     
@@ -33,24 +22,14 @@ final class UsageStreakManager {
         observers.removeAll()
     }
     
-    // MARK: -
-    
-    private var dateLastSession: Date? {
-        return UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastAppSession) as? Date
-    }
-    
-    private var lastStreak: Int {
-        return UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
-    }
-    
-    private var calendar: Calendar {
-        return Calendar.current
-    }
-    
-    // MARK: -
-    
     private func appExit(with notification: Notification) {
-        updateDateOfLastSession()
+        guard UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) else {
+            // Don't record streaks when we haven't completed onboarding.
+            return
+        }
+        
+        updateStreak()
+        
     }
     
     private func appEntry(with notification: Notification) {
@@ -69,46 +48,35 @@ final class UsageStreakManager {
         updateStreak()
     }
     
-    private func streak(for component:Calendar.Component) -> Int? {
-        guard let streakDate = dateLastSession else {
-            return 1
-        }
+    func updateStreakTo(streak:Int) {
+        let now = Date()
         
-        let diff = calendar.dateComponents(Set([component]), from: streakDate, to: Date())
-        
-        guard let value = diff.value(for: component) else {
-            return nil
+        AnalyticsTrackers.standard.track("Daily Streak", properties: ["current": streak])
+        UserDefaults.standard.set(streak, forKey: UserDefaultsKeys.dailyStreak)
+        UserDefaults.standard.set(now, forKey: UserDefaultsKeys.dateLastAppSession)
+
+        if let current = AnalyticsUser.current {
+            // Should never be nil, but let's still be safe
+            AnalyticsTrackers.standard.identify(current)
         }
-        
-        switch value {
-        case 1:
-            return lastStreak + 1
-        case 0:
-            return lastStreak
-        default:
-            return nil
-        }
-    }
-    
-    private func updateDateOfLastSession() {
-        UserDefaults.standard.set(Date(), forKey: UserDefaultsKeys.dateLastAppSession)
     }
     
     private func updateStreak() {
-        if let streak = streak(for: .day) {
-            if lastStreak != streak {
-                AnalyticsTrackers.standard.track("Daily Streak", properties: ["current": streak])
-                UserDefaults.standard.set(streak, forKey: UserDefaultsKeys.dailyStreak)
-                updateDateOfLastSession()
-                
-                if let current = AnalyticsUser.current {
-                    // Should never be nil, but let's still be safe
-                    AnalyticsTrackers.standard.identify(current)
-                }
+        if let streakDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastAppSession) as? Date {
+            if Calendar.current.isDateInToday(streakDate) {
+                //streak not updated
+            }else if Calendar.current.isDateInYesterday(streakDate) {
+                // increaement streak
+                let lastStreak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
+                let updatedStreak = lastStreak + 1
+                updateStreakTo(streak: updatedStreak)
+            }else{
+                //Lost streak
+                updateStreakTo(streak: 1)
             }
-        } else {
-            UserDefaults.standard.set(1, forKey: UserDefaultsKeys.dailyStreak)
-            updateDateOfLastSession()
+        }else{
+            //started streak
+            updateStreakTo(streak: 1)
         }
     }
 }
