@@ -27,13 +27,13 @@ class ScreenshotsViewController: BaseViewController {
     weak var delegate:ScreenshotsViewControllerDelegate?
     
     var screenshotFrcManager:FetchedResultsControllerManager<Screenshot>?
-    var collectionView:UICollectionView!
+    var collectionView:CollectionView!
     var toHideFromProductBarObjectIDs:[NSManagedObjectID] = []
     var deleteScreenshotObjectIDs:[NSManagedObjectID] = []
     var productsBarController:ProductsBarController?
     var deleteButton:ScreenshotsDeleteButton?
     var refreshControl:UIRefreshControl?
-    var helperView:ScreenshotsHelperView?
+    var emptyListView:ScreenshotsHelperView?
     var hasNewScreenshot = false
     
     var notificationCellAssetId:String?
@@ -95,10 +95,12 @@ extension ScreenshotsViewController {
         self.setupViews()
         self.coreDataPreparationController.viewDidLoad()
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.syncHelperViewVisibility()
+        syncEmptyListView()
     }
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.removeScreenshotHelperView()
@@ -106,20 +108,19 @@ extension ScreenshotsViewController {
             self.setEditing(false, animated: animated)
         }
     }
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        self.collectionView.collectionViewLayout.invalidateLayout()
-    }
+    
     func applicationDidEnterBackground(_ notification:Notification){
         if self.isViewLoaded && self.view.window != nil {
             self.removeScreenshotHelperView()
         }
     }
+    
     func applicationWillEnterForeground(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
-            self.syncHelperViewVisibility()
+            syncEmptyListView()
         }
     }
+    
     func contentSizeCategoryDidChange(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
@@ -127,19 +128,19 @@ extension ScreenshotsViewController {
             }
         }
     }
-
 }
+
 //Setup view
 extension ScreenshotsViewController {
     func setupViews() {
-        let collectionView: UICollectionView = {
+        let collectionView: CollectionView = {
             let minimumSpacing = self.collectionViewInteritemOffset()
             
             let layout = UICollectionViewFlowLayout()
             layout.minimumInteritemSpacing = minimumSpacing.x
             layout.minimumLineSpacing = minimumSpacing.y
             
-            let collectionView = UICollectionView.init(frame: self.view.bounds, collectionViewLayout: layout)
+            let collectionView = CollectionView(frame: self.view.bounds, collectionViewLayout: layout)
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
             collectionView.dataSource = self
@@ -167,7 +168,6 @@ extension ScreenshotsViewController {
             let refreshControl = UIRefreshControl()
             refreshControl.tintColor = .crazeRed
             refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for:.valueChanged)
-
             collectionView.addSubview(refreshControl)
             
             // Recenter view
@@ -178,25 +178,17 @@ extension ScreenshotsViewController {
         }()
         self.refreshControl = refreshControl
         
-        let helperView:ScreenshotsHelperView = {
-            let verPadding: CGFloat = .extendedPadding
-            let horPadding: CGFloat = .padding
-            
-            let helperView = ScreenshotsHelperView()
-            helperView.translatesAutoresizingMaskIntoConstraints = false
-            helperView.layoutMargins = UIEdgeInsets.init(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
-            refreshControl.addTarget(self, action: #selector(helperViewAllowAccessAction), for:.touchUpInside)
-            self.view.addSubview(helperView)
-            helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
-            helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            helperView.bottomAnchor.constraint(equalTo: self.bottomLayoutGuide.topAnchor).isActive = true
-            helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-
-            return helperView
+        let emptyListView:ScreenshotsHelperView = {
+            let emptyListView = ScreenshotsHelperView()
+            emptyListView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
+            emptyListView.button.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            collectionView.emptyView = emptyListView
+            return emptyListView
         }()
-        self.helperView = helperView
+        self.emptyListView = emptyListView
         
     }
+    
     func refreshControlAction(_ refreshControl:UIRefreshControl){
         
         if (refreshControl.isRefreshing) {
@@ -206,12 +198,11 @@ extension ScreenshotsViewController {
         }
     }
     
-    func helperViewAllowAccessAction() {
+    func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
-            self.syncHelperViewVisibility()
+            self.syncEmptyListView()
         }
     }
-
 }
 
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
@@ -219,7 +210,7 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
         if isViewLoaded {
             change.shiftIndexSections(by: 2)
             change.applyChanges(collectionView: collectionView)
-            syncHelperViewVisibility()
+            syncEmptyListView()
         }
     }
     
@@ -331,7 +322,6 @@ extension ScreenshotsViewController {
 //Edit actions
 extension ScreenshotsViewController {
     func editButtonAction() {
-        
         let isEditing = !self.isEditing
         
         if !isEditing {
@@ -339,10 +329,9 @@ extension ScreenshotsViewController {
             self.deselectDeletedScreenshots()
         }
         self.setEditing(isEditing, animated: true)
-        
     }
+    
     override func setEditing(_ editing: Bool, animated: Bool) {
-        
         super.setEditing(editing, animated: animated)
         
         if (self.tabBarController != nil && editing) {
@@ -372,7 +361,6 @@ extension ScreenshotsViewController {
         let removeDeleteButton = {
             if (self.tabBarController != nil && !editing) {
                 self.deleteButton?.removeFromSuperview()
-                self.updateDeleteButtonCount()
             }
         }
         
@@ -381,10 +369,8 @@ extension ScreenshotsViewController {
                 if let cell = self.collectionView.cellForItem(at: index) as? ScreenshotCollectionViewCell {
                     cell.isEditing = editing
                     self.syncScreenshotCollectionViewCellSelectedState(cell)
-
                 }
             }
-            
             
             if (self.hasNewScreenshot) {
                 self.collectionView.reloadSections(IndexSet.init(integer: ScreenshotsSection.notification.rawValue))
@@ -395,7 +381,6 @@ extension ScreenshotsViewController {
         
         if (animated) {
             UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                
                 cellEditing()
                 // TODO:
                 ///     putting `removeDeleteButton` here instead of in the completion
@@ -421,31 +406,29 @@ extension ScreenshotsViewController {
         }else {
             self.productsBarController?.toUnfavoriteAndUnViewProductObjectIDs = []
         }
+        
+        updateDeleteButtonCount()
     }
     
     func deselectDeletedScreenshots() {
-        
         // Deselect all cells
         self.collectionView.selectItem(at: nil, animated: true, scrollPosition: [])
-        
         
         self.deleteScreenshotObjectIDs = []
         self.toHideFromProductBarObjectIDs = []
         self.productsBarController?.toUnfavoriteAndUnViewProductObjectIDs = self.toHideFromProductBarObjectIDs
     }
     
-    func updateDeleteButtonCount () {
-
+    func updateDeleteButtonCount() {
         self.deleteButton?.deleteCount = self.toHideFromProductBarObjectIDs.count + self.deleteScreenshotObjectIDs.count
     }
     
-    func deleteButtonAction(){
-        self.setEditing(false, animated: true)
-        self.editButtonItem.isEnabled = true
-        if (self.deleteScreenshotObjectIDs.count + self.toHideFromProductBarObjectIDs.count > 0) {
-            DataModel.sharedInstance.hide(screenshotOIDArray: self.deleteScreenshotObjectIDs)
-            DataModel.sharedInstance.hideFromProductBar( self.toHideFromProductBarObjectIDs)
-            
+    func deleteButtonAction() {
+        setEditing(false, animated: true)
+        
+        if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
+            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs)
+            DataModel.sharedInstance.hideFromProductBar(toHideFromProductBarObjectIDs)
         }
     }
 }
@@ -497,26 +480,26 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
     func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell), let screenshot = self.screenshot(at: indexPath.item) {
             let objectId = screenshot.objectID
-        let alertController = UIAlertController.init(title: "screenshot.delete.title".localized, message: nil, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
-        alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
-            if let screenshot = self.screenshot(at: indexPath.item) {
-                if screenshot.objectID.isEqual(objectId) {
-                    screenshot.setHide()
-                    self.removeScreenshotHelperView()
-                    self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                        cell.selectedState = .disabled
-                    })
-                    AnalyticsTrackers.standard.track("Removed screenshot")
-                    
-                }else{
-                    print("collectionView update when trying to delete item")
+            let alertController = UIAlertController.init(title: "screenshot.delete.title".localized, message: nil, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
+                if let screenshot = self.screenshot(at: indexPath.item) {
+                    if screenshot.objectID.isEqual(objectId) {
+                        screenshot.setHide()
+                        self.removeScreenshotHelperView()
+                        self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                            cell.selectedState = .disabled
+                        })
+                        AnalyticsTrackers.standard.track("Removed screenshot")
+                        
+                    }else{
+                        print("collectionView update when trying to delete item")
+                    }
                 }
-            }
-        }))
-        self.present(alertController, animated: true, completion: nil)
-        
+            }))
+            
+            self.present(alertController, animated: true, completion: nil)
         }
     }
     func syncScreenshotCollectionViewCellSelectedState(_ cell:ScreenshotCollectionViewCell) {
@@ -529,24 +512,27 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         }
     }
 }
+
 extension ScreenshotsViewController {
-    func syncHelperViewVisibility() {
-        if let helperView = self.helperView {
-            if PermissionsManager.shared.hasPermission(for: .photo) {
-                if helperView.type != .screenshot {
-                    helperView.type = .screenshot
-                }
-            } else {
-                if helperView.type != .permission {
-                    helperView.type = .permission
-                }
-            }
-            let hasScreenshots = (self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0)
-            
-            helperView.isHidden = (hasScreenshots || self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0)
-            self.collectionView?.isScrollEnabled = helperView.isHidden && (self.collectionView.backgroundView == nil)
-            self.editButtonItem.isEnabled = hasScreenshots
+    func syncEmptyListView() {
+        guard let emptyListView = emptyListView else {
+            return
         }
+        
+        if PermissionsManager.shared.hasPermission(for: .photo) {
+            if emptyListView.type != .screenshot {
+                emptyListView.type = .screenshot
+            }
+        }
+        else {
+            if emptyListView.type != .permission {
+                emptyListView.type = .permission
+            }
+        }
+        
+        let hasScreenshots = collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0
+        
+        editButtonItem.isEnabled = hasScreenshots || productsBarController?.hasProducts ?? false
     }
 }
 
@@ -557,9 +543,10 @@ extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
         self.productsBarController = ProductsBarController()
         self.productsBarController?.setup()
         self.productsBarController?.delegate = self
+        
         if DataModel.sharedInstance.isCoreDataStackReady {
             self.collectionView.reloadData()
-            self.syncHelperViewVisibility()
+            syncEmptyListView()
         }
     }
     
@@ -590,11 +577,13 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     func screenshotNotificationCollectionViewCellDidTapReject(_ cell: ScreenshotNotificationCollectionViewCell){
         let screenshotsCount = self.newScreenshotsCount()
         AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
-        self.dismissNotificationCell()
-        self.syncHelperViewVisibility()
-        AnalyticsTrackers.standard.track("Screenshot notification cancelled", properties: ["Screenshot count": screenshotsCount])
         
+        self.dismissNotificationCell()
+        syncEmptyListView()
+        
+        AnalyticsTrackers.standard.track("Screenshot notification cancelled", properties: ["Screenshot count": screenshotsCount])
     }
+    
     func screenshotNotificationCollectionViewCellDidTapConfirm(_ cell: ScreenshotNotificationCollectionViewCell){
         let screenshotsCount = self.newScreenshotsCount()
         AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
@@ -605,8 +594,10 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         } else if (cell.contentText == .importMultipleScreenshots) {
             self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
         }
+        
         self.dismissNotificationCell()
-        self.syncHelperViewVisibility()
+        syncEmptyListView()
+        
         AnalyticsTrackers.standard.track("Screenshot notification accepted", properties: ["Screenshot count": screenshotsCount])
     }
     
@@ -623,7 +614,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
                 self.collectionView.reloadItems(at: [indexPath])
             }
             
-            self.syncHelperViewVisibility()
+            syncEmptyListView()
         }
     }
     
