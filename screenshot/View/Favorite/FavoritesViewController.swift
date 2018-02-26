@@ -59,13 +59,13 @@ class FavoritesViewController : BaseViewController {
         tableView.rowHeight = 170
         tableView.tableFooterView = UIView() // Remove empty cells
         tableView.separatorInset = .zero
+        tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        emptyListView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
         emptyListView.titleLabel.text = "favorites.empty.title".localized
         emptyListView.subtitleLabel.text = "favorites.empty.detail".localized
         emptyListView.contentImage = UIImage(named: "FavoriteEmptyListGraphic")
