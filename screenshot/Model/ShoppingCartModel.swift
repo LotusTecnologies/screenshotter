@@ -19,7 +19,7 @@ class ShoppingCartModel {
         return firstly {
             return deleteVariantsIfOld(productOID: productOID)
             }.then { partNumber -> Promise<NSDictionary> in
-                return partNumber.isEmpty ? Promise(value: NSDictionary()) : NetworkingPromise.getAvailableVariants(partNumber: "")
+                return partNumber.isEmpty ? Promise(value: NSDictionary()) : NetworkingPromise.getAvailableVariants(partNumber: partNumber)
             }.then { dict -> Promise<Bool> in
                 print("populateVariants dict:\(dict)")
                 guard dict.count > 0 else {
