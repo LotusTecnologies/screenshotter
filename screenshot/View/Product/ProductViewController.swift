@@ -192,6 +192,8 @@ class ProductViewController : BaseViewController {
     }
     
     fileprivate var productView: ProductView?
+    fileprivate var selectionColorItem: SegmentedDropDownItem?
+    fileprivate var selectionSizeItem: SegmentedDropDownItem?
     fileprivate var loadingView: Loader?
     
     fileprivate var productFrc: FetchedResultsControllerManager<Product>?
@@ -420,11 +422,15 @@ extension ProductViewControllerProductView {
     }
     
     @objc fileprivate func selectionButtonValueChanged() {
-        guard let productView = productView else {
+        guard let productView = productView, let selectedItem = productView.selectionButton.selectedItem else {
             return
         }
         
-        productView.selectionButton.selectedItem?.resetBorderColor()
+        selectedItem.resetBorderColor()
+        
+        if selectedItem == selectionColorItem {
+            selectionSizeItem?.disabledPickerItems = nil
+        }
     }
     
     @objc fileprivate func cartButtonAction() {
@@ -543,9 +549,9 @@ extension ProductViewController : FetchedResultsControllerManagerDelegate {
             return
         }
         
-        let structuredVariants = product.structuredVariants()
+        let structuredProduct = StructuredProduct(product)
         
-        print("||| \(structuredVariants)")
+        print("||| \(structuredProduct)")
         
         
         state = .product
@@ -564,13 +570,78 @@ extension ProductViewController : FetchedResultsControllerManagerDelegate {
             "Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"
             ])
         colorItem.disabledPickerItems = ["Brown", "Yellow"]
+        selectionColorItem = colorItem
         
         let sizeItem = SegmentedDropDownItem(pickerItems: [
             "Medium", "Small", "Large"
             ])
+        selectionSizeItem = sizeItem
         
         productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         
         repositionScrollView()
+    }
+}
+
+extension ProductViewController {
+    fileprivate class StructuredProduct: NSObject {
+        private(set) var variants: [StructuredVariant] = []
+        
+        init(_ product: Product) {
+            super.init()
+            
+            setVariants(product.availableVariants?.allObjects as? [Variant])
+        }
+        
+        private func setVariants(_ variants: [Variant]?) {
+            guard let variants = variants else {
+                return
+            }
+            
+            var placeholders: [String : StructuredVariantPlaceholder] = [:]
+            
+            variants.forEach({ variant in
+                guard let color = variant.color else {
+                    return
+                }
+                
+                let placeholder = placeholders[color] ?? StructuredVariantPlaceholder(color: color)
+                
+                if let size = variant.size {
+                    placeholder.sizes.insert(size)
+                }
+                
+                placeholders[color] = placeholder
+            })
+            
+            let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
+            var structuredVariants: [StructuredVariant] = []
+            
+            placeholders.forEach { (color: String, placeholder: StructuredVariantPlaceholder) in
+                let color = placeholder.color
+                let sizes = placeholder.sizes.sorted(by: { (a, b) -> Bool in
+                    // TODO: test that a value not in the sortedSizes goes to the end
+                    return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
+                })
+                structuredVariants.append(StructuredVariant(color: color, sizes: sizes))
+            }
+            
+            self.variants = structuredVariants
+        }
+    }
+    
+    private class StructuredVariantPlaceholder: NSObject {
+        let color: String
+        var sizes: Set<String> = Set()
+        
+        init(color: String) {
+            self.color = color
+            super.init()
+        }
+    }
+    
+    fileprivate struct StructuredVariant {
+        let color: String
+        let sizes: [String]
     }
 }
