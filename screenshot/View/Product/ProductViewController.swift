@@ -185,7 +185,7 @@ class ProductViewController : BaseViewController {
     fileprivate var productView: ProductView?
     fileprivate var loadingView: Loader?
     
-    fileprivate var productFrc: FetchedResultsControllerManager<Product>?
+    fileprivate var product: Product?
     
     // MARK: Life Cycle
     
@@ -197,8 +197,16 @@ class ProductViewController : BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
-        
-        productFrc = DataModel.sharedInstance.productFrc(delegate: self, productOID: productOID)
+        state = .loading
+        ShoppingCartModel.shared.populateVariants(productOID: productOID).then { product -> Void in
+            self.product = product
+            self.state = .product
+            self.syncState()
+            }.catch { error in
+                print("ProductViewController init populateVariants catch error:\(error)")
+                self.state = .empty
+                self.syncState()
+        }
     }
     
     override func viewDidLoad() {
@@ -510,7 +518,7 @@ extension ProductViewController : UIScrollViewDelegate {
 
 extension ProductViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        guard let product = productFrc?.fetchedResultsController.fetchedObjects?.first else {
+        guard let product = self.product else {
             state = .empty
             return
         }

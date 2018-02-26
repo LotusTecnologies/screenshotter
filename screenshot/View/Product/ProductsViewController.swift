@@ -392,9 +392,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
             
-            if let partNumber = product.partNumber {
-                ShoppingCartModel.shared.populateVariants(productOID: product.objectID, partNumber: partNumber)
-                
+            if let _ = product.partNumber {                
                 let productViewController = ProductViewController(productOID: product.objectID)
                 navigationController?.pushViewController(productViewController, animated: true)
             }
