@@ -35,7 +35,7 @@ class ScreenshotsViewController: BaseViewController {
     var refreshControl:UIRefreshControl?
     var emptyListView:ScreenshotsHelperView?
     var hasNewScreenshot = false
-    
+    var hasProductBar = false
     var notificationCellAssetId:String?
     var coreDataPreparationController:CoreDataPreparationController
     
@@ -94,11 +94,29 @@ extension ScreenshotsViewController {
         super.viewDidLoad()
         self.setupViews()
         self.coreDataPreparationController.viewDidLoad()
+        self.hasProductBar = (self.productsBarController?.count ?? 0 >= 4)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         syncEmptyListView()
+        
+        let count = self.productsBarController?.count ?? 0
+        if self.hasProductBar {
+            if count <= 4 {
+                self.hasProductBar = false
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
+                    self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+                }
+            }
+        }else{
+            if count >= 4 {
+                self.hasProductBar = true
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
+                    self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+                }
+            }
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -224,15 +242,22 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
 }
 
 extension ScreenshotsViewController : ProductsBarControllerDelegate {
-    func productBarShouldHide(_ controller: ProductsBarController) {
-        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
-            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
-        }
-    }
     
-    func productBarShouldShow(_ controller: ProductsBarController) {
-        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
-            self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+    func productBarCountChanged(_ controller:ProductsBarController) {
+        if self.hasProductBar {
+            if controller.count == 0 {
+                self.hasProductBar = false
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
+                    self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+                }
+            }
+        }else{
+            if controller.count >= 4 {
+                self.hasProductBar = true
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
+                    self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+                }
+            }
         }
     }
     
@@ -532,7 +557,7 @@ extension ScreenshotsViewController {
         
         let hasScreenshots = collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0
         
-        editButtonItem.isEnabled = hasScreenshots || productsBarController?.hasProducts ?? false
+        editButtonItem.isEnabled = hasScreenshots || self.hasProductBar
     }
 }
 
@@ -818,7 +843,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         if let sectionType = ScreenshotsSection.init(rawValue: section) {
             switch sectionType {
             case .product:
-                if self.productsBarController?.hasProducts == true {
+                if self.hasProductBar {
                     return 1
                 }else{
                     return 0
