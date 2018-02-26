@@ -33,7 +33,7 @@ class UpdatePromptHandler : NSObject {
             return
         }
         
-        let appSettings = AppDelegate.shared.settings
+        let appSettings = AppDelegate.shared.appSettings
         
         if appSettings.shouldForceUpdate {
             presentForceUpdateAlert()

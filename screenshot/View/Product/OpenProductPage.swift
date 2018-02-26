@@ -28,7 +28,12 @@ enum OpenProductPage : String {
     }
     
     static func fromSystemInfo() -> OpenProductPage{
-        let defaultValue:OpenProductPage = .embededSafari
+        var defaultValue:OpenProductPage = .safari
+
+        if let appSettingsDefaultString = AppDelegate.shared.appSettings.openProductsPageDefault, let appSettingsDefault = OpenProductPage.init(rawValue:appSettingsDefaultString){
+            defaultValue = appSettingsDefault
+        }
+
         let stringValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.openProductPageInSetting) as? String ?? defaultValue.rawValue
         return OpenProductPage(rawValue: stringValue) ?? defaultValue
     }

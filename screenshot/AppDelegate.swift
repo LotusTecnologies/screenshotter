@@ -23,8 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var shouldLoadDiscoverNextLoad = false
-    let settings: AppSettings
-    fileprivate let settingsSetter = AppSettingsSetter()
+    let appSettings: AppSettings = AppSettings()
     
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
@@ -38,7 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     override init() {
-        settings = AppSettings(withSetter: self.settingsSetter)
         super.init()
     }
     
@@ -430,14 +428,9 @@ extension AppDelegate {
 
 extension AppDelegate {
     fileprivate func fetchAppSettings() {
-        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<FetchedAppSettings> in
-            return Promise(value: FetchedAppSettings(data))
-            
-        }.then(on: .main) { fetchedAppSettings -> Void in
-            self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
-            self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
-            
-            NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
+        NetworkingPromise.appSettings().then(on:.main) { data -> Void in
+            self.appSettings.appSettingsDict = data
+            NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo:nil)  //this can cause UI changes and must be on main
         }
     }
 }
