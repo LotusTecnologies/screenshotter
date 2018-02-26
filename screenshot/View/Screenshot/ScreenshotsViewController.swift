@@ -92,29 +92,41 @@ extension ScreenshotsViewController{
 extension ScreenshotsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.syncProductShowOrHideWithoutAnimation()
+
         self.setupViews()
         self.coreDataPreparationController.viewDidLoad()
-        self.hasProductBar = (self.productsBarController?.count ?? 0 >= 4)
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         syncEmptyListView()
         
-        let count = self.productsBarController?.count ?? 0
-        if self.hasProductBar {
-            if count <= 4 {
-                self.hasProductBar = false
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
-                    self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+        
+    }
+    
+    func syncProductShowOrHideWithoutAnimation(){
+        if let controller = self.productsBarController {
+            UIView.performWithoutAnimation {
+                
+                let count = controller.count
+                if self.hasProductBar {
+                    if count < 4 {
+                        self.hasProductBar = false
+                        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
+                            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+                        }
+                    }
+                }else{
+                    if count >= 4 {
+                        self.hasProductBar = true
+                        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
+                            self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+                        }
+                    }
                 }
-            }
-        }else{
-            if count >= 4 {
-                self.hasProductBar = true
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
-                    self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
-                }
+                
             }
         }
     }
@@ -125,6 +137,9 @@ extension ScreenshotsViewController {
         if self.isEditing {
             self.setEditing(false, animated: animated)
         }
+        
+        self.syncProductShowOrHideWithoutAnimation()
+     
     }
     
     func applicationDidEnterBackground(_ notification:Notification){
@@ -572,6 +587,9 @@ extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
         if DataModel.sharedInstance.isCoreDataStackReady {
             self.collectionView.reloadData()
             syncEmptyListView()
+        }
+        if isViewLoaded {
+            self.syncProductShowOrHideWithoutAnimation()
         }
     }
     
