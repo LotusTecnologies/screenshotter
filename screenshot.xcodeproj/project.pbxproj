@@ -88,6 +88,7 @@
 		C54088591FE90E2200198955 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884E1FE90E2200198955 /* MainButton.swift */; };
 		C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884F1FE90E2200198955 /* FloatingActionButton.swift */; };
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
+		C543694E204404E400599134 /* StructuredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694D204404E400599134 /* StructuredVariant.swift */; };
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */; };
@@ -222,6 +223,7 @@
 		C540884E1FE90E2200198955 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
 		C540884F1FE90E2200198955 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
+		C543694D204404E400599134 /* StructuredVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructuredVariant.swift; sourceTree = "<group>"; };
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsDeleteButton.swift; sourceTree = "<group>"; };
@@ -397,6 +399,7 @@
 			isa = PBXGroup;
 			children = (
 				C53B46551FBC39B400A8C886 /* AppSettings.swift */,
+				C543694D204404E400599134 /* StructuredVariant.swift */,
 			);
 			path = Structs;
 			sourceTree = "<group>";
@@ -1086,6 +1089,7 @@
 				31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
+				C543694E204404E400599134 /* StructuredVariant.swift in Sources */,
 				E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */,
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,

@@ -1191,6 +1191,51 @@ extension Product {
         return altImageURLs?.components(separatedBy: ",").flatMap {URL(string: $0)} ?? []
     }
     
+    func structuredVariants() -> [StructuredVariant] {
+        guard let variants = availableVariants?.allObjects as? [Variant] else {
+            return []
+        }
+        
+        var placeholders: [String : StructuredVariantPlaceholder] = [:]
+        
+        variants.forEach({ variant in
+            guard let color = variant.color else {
+                return
+            }
+            
+            let placeholder = placeholders[color] ?? StructuredVariantPlaceholder(color: color)
+            
+            if let size = variant.size {
+                placeholder.sizes.insert(size)
+            }
+            
+            placeholders[color] = placeholder
+        })
+        
+        let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
+        var structuredVariant: [StructuredVariant] = []
+        
+        placeholders.forEach { (color: String, placeholder: StructuredVariantPlaceholder) in
+            let color = placeholder.color
+            let sizes = placeholder.sizes.sorted(by: { (a, b) -> Bool in
+                return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
+            })
+            structuredVariant.append(StructuredVariant(color: color, sizes: sizes))
+        }
+        
+        return structuredVariant
+    }
+    
+    private class StructuredVariantPlaceholder: NSObject {
+        let color: String
+        var sizes: Set<String> = Set()
+        
+        init(color: String) {
+            self.color = color
+            super.init()
+        }
+    }
+    
 }
 
 extension Matchstick {

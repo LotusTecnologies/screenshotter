@@ -11,9 +11,7 @@ import SDWebImage
 import CoreData
 
 
-class ProductView: UIView {
-    let scrollView = UIScrollView()
-    
+class ProductView: UIScrollView {
     let galleryScrollView = UIScrollView()
     let galleryScrollContentView = UIView()
     let pageControl = UIPageControl()
@@ -22,7 +20,7 @@ class ProductView: UIView {
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
     
-    var selectionButton: SegmentedDropDownButton!
+    let selectionButton = SegmentedDropDownButton()
     let cartButton = MainButton()
     let buyButton = MainButton()
     let websiteButton = UIButton()
@@ -34,25 +32,20 @@ class ProductView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.backgroundColor = .white
-        scrollView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-        scrollView.keyboardDismissMode = .onDrag
-        addSubview(scrollView)
-        scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        backgroundColor = .white
+        layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        keyboardDismissMode = .onDrag
         
         galleryScrollView.translatesAutoresizingMaskIntoConstraints = false
         galleryScrollView.scrollsToTop = false
         galleryScrollView.isPagingEnabled = true
         galleryScrollView.showsHorizontalScrollIndicator = false
         galleryScrollView.bounces = false
-        scrollView.addSubview(galleryScrollView)
-        galleryScrollView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        addSubview(galleryScrollView)
+        galleryScrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         galleryScrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         galleryScrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        galleryScrollView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         galleryScrollView.heightAnchor.constraint(equalToConstant: 370).isActive = true
         
         galleryScrollContentView.translatesAutoresizingMaskIntoConstraints = false
@@ -67,7 +60,7 @@ class ProductView: UIView {
         pageControl.hidesForSinglePage = true
         pageControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.5)
         pageControl.currentPageIndicatorTintColor = .crazeGreen
-        scrollView.addSubview(pageControl)
+        addSubview(pageControl)
         pageControl.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .padding).isActive = true
         pageControl.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
         pageControl.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
@@ -75,10 +68,10 @@ class ProductView: UIView {
         
         let labelContainerView = UIView()
         labelContainerView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(labelContainerView)
+        addSubview(labelContainerView)
         labelContainerView.topAnchor.constraint(equalTo: galleryScrollView.bottomAnchor, constant: .padding).isActive = true
-        labelContainerView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        labelContainerView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        labelContainerView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        labelContainerView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.font = UIFont.preferredFont(forTextStyle: .title1)
@@ -112,65 +105,81 @@ class ProductView: UIView {
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: priceLabel.leadingAnchor, constant: -.padding).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: originalPriceLabel.leadingAnchor, constant: -.padding).isActive = true
         
-        let colorItem = SegmentedDropDownItem(pickerItems: [
-            "Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"
-            ])
-        colorItem.placeholderTitle = "product.color.default".localized
-        colorItem.widthRatio = 0.4
-        
-        let sizeItem = SegmentedDropDownItem(pickerItems: [
-            "Medium", "Small", "Large"
-            ])
-        sizeItem.placeholderTitle = "product.size.default".localized
-        sizeItem.widthRatio = 0.4
-        
-        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
-        
-        selectionButton = SegmentedDropDownButton(items: [colorItem, sizeItem, quantityItem])
+        // TODO: how does UI look when all variants are out of stock
         selectionButton.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(selectionButton)
+        addSubview(selectionButton)
         selectionButton.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
-        selectionButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        selectionButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        selectionButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        selectionButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.backgroundColor = .crazeGreen
         cartButton.setTitle("product.add".localized, for: .normal)
         cartButton.setTitleColor(.white, for: .normal)
-        scrollView.addSubview(cartButton)
+        addSubview(cartButton)
         cartButton.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
-        cartButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        cartButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        cartButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        cartButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         buyButton.translatesAutoresizingMaskIntoConstraints = false
         buyButton.backgroundColor = .crazeGreen
         buyButton.setTitle("product.buy".localized, for: .normal)
         buyButton.setTitleColor(.white, for: .normal)
-        scrollView.addSubview(buyButton)
+        addSubview(buyButton)
         buyButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
-        buyButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        buyButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        buyButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        buyButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         websiteButton.translatesAutoresizingMaskIntoConstraints = false
         websiteButton.setTitleColor(.crazeGreen, for: .normal)
         websiteButton.isHidden = true
-        scrollView.addSubview(websiteButton)
+        addSubview(websiteButton)
         websiteButton.topAnchor.constraint(equalTo: buyButton.bottomAnchor, constant: .padding).isActive = true
-        websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        websiteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        websiteButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        websiteButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         let contentTextView = UITextView()
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .green
         contentTextView.isScrollEnabled = false
         contentTextView.scrollsToTop = false
-        scrollView.addSubview(contentTextView)
+        addSubview(contentTextView)
         contentTextView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
-        contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        contentTextView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
-        contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        contentTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        contentTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -.padding).isActive = true
+        contentTextView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
+    }
+    
+    func setSelection(colorItem: SegmentedDropDownItem?, sizeItem: SegmentedDropDownItem?) {
+        let hasColorItem = colorItem != nil
+        let hasSizeItem = sizeItem != nil
+        
+        guard hasColorItem || hasSizeItem else {
+            return
+        }
+        
+        var items: [SegmentedDropDownItem] = []
+        let widthRatio: CGFloat = (hasColorItem && hasSizeItem) ? 0.4 : 0.8
+        
+        if let colorItem = colorItem {
+            colorItem.placeholderTitle = "product.color.default".localized
+            colorItem.widthRatio = widthRatio
+            items.append(colorItem)
+        }
+        
+        if let sizeItem = sizeItem {
+            sizeItem.placeholderTitle = "product.size.default".localized
+            sizeItem.widthRatio = widthRatio
+            items.append(sizeItem)
+        }
+        
+        // TODO: keep this value synced with the CartViewController stepper.maxValue
+        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
+        items.append(quantityItem)
+        
+        selectionButton.items = items
     }
 }
 
@@ -444,18 +453,18 @@ extension ProductViewControllerProductView {
             let adjustedContentInsetTop: CGFloat
             
             if #available(iOS 11.0, *) {
-                adjustedContentInsetTop = productView.scrollView.adjustedContentInset.top
+                adjustedContentInsetTop = productView.adjustedContentInset.top
             }
             else {
                 adjustedContentInsetTop = topLayoutGuide.length
             }
             
-            let currentOffsetY = productView.scrollView.contentOffset.y + adjustedContentInsetTop
+            let currentOffsetY = productView.contentOffset.y + adjustedContentInsetTop
             let minOffsetY = productView.selectionButton.frame.minY
             
             if currentOffsetY > minOffsetY {
                 UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                    productView.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
+                    productView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
                     
                 }, completion: { completed in
                     displayErrorItems()
@@ -506,6 +515,25 @@ extension ProductViewController : UIScrollViewDelegate {
             productView.pageControl.currentPage = currentPage
         }
     }
+    
+    fileprivate func repositionScrollView() {
+        guard let productView = productView else {
+            return
+        }
+        
+        view.layoutIfNeeded()
+        
+        let y: CGFloat = {
+            if #available(iOS 11.0, *) {
+                return productView.adjustedContentInset.top
+            }
+            else {
+                return navigationController?.navigationBar.frame.maxY ?? 0
+            }
+        }()
+        
+        productView.contentOffset = CGPoint(x: 0, y: -y)
+    }
 }
 
 extension ProductViewController : FetchedResultsControllerManagerDelegate {
@@ -515,26 +543,34 @@ extension ProductViewController : FetchedResultsControllerManagerDelegate {
             return
         }
         
+        let structuredVariants = product.structuredVariants()
+        
+        print("||| \(structuredVariants)")
+        
+        
         state = .product
         title = product.displayTitle
         setImages(urls: product.imageURLs())
+        setWebsiteMerchant(product.merchant)
         setProductTitle(product.productDescription)
         setPrice(product.price)
-        product.isSale() ? setOriginalPrice(product.originalPrice) : nil
-        setWebsiteMerchant(product.merchant)
         
-        // Needed for setting content offset
-        view.layoutIfNeeded()
+        if product.isSale() {
+            setOriginalPrice(product.originalPrice)
+        }
         
-        let y: CGFloat = {
-            if #available(iOS 11.0, *) {
-                return productView?.scrollView.adjustedContentInset.top ?? 0
-            }
-            else {
-                return navigationController?.navigationBar.frame.maxY ?? 0
-            }
-        }()
         
-        productView?.scrollView.contentOffset = CGPoint(x: 0, y: -y)
+        let colorItem = SegmentedDropDownItem(pickerItems: [
+            "Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"
+            ])
+        colorItem.disabledPickerItems = ["Brown", "Yellow"]
+        
+        let sizeItem = SegmentedDropDownItem(pickerItems: [
+            "Medium", "Small", "Large"
+            ])
+        
+        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
+        
+        repositionScrollView()
     }
 }
