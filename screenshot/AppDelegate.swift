@@ -430,7 +430,7 @@ extension AppDelegate {
 
 extension AppDelegate {
     fileprivate func fetchAppSettings() {
-        NetworkingPromise.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<FetchedAppSettings> in
+        NetworkingPromise.sharedInstance.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<FetchedAppSettings> in
             return Promise(value: FetchedAppSettings(data))
             
         }.then(on: .main) { fetchedAppSettings -> Void in
