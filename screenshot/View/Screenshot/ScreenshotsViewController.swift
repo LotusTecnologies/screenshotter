@@ -144,7 +144,8 @@ extension ScreenshotsViewController {
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
             collectionView.dataSource = self
-            collectionView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: minimumSpacing.y, right: 0)
+            collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: minimumSpacing.y, right: 0)
+            collectionView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
             collectionView.backgroundColor = self.view.backgroundColor
             collectionView.alwaysBounceVertical = true
             collectionView.isScrollEnabled = false
@@ -180,7 +181,6 @@ extension ScreenshotsViewController {
         
         let emptyListView:ScreenshotsHelperView = {
             let emptyListView = ScreenshotsHelperView()
-            emptyListView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
             emptyListView.button.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
             collectionView.emptyView = emptyListView
             return emptyListView
