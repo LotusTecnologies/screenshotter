@@ -197,6 +197,7 @@ class ProductViewController : BaseViewController {
     fileprivate var loadingView: Loader?
     
     fileprivate var productFrc: FetchedResultsControllerManager<Product>?
+    fileprivate var structuredProduct: StructuredProduct?
     
     // MARK: Life Cycle
     
@@ -429,7 +430,11 @@ extension ProductViewControllerProductView {
         selectedItem.resetBorderColor()
         
         if selectedItem == selectionColorItem {
-            selectionSizeItem?.disabledPickerItems = nil
+            guard let variant = structuredProduct?.variant(forColor: selectedItem.title) else {
+                return
+            }
+            
+            selectionSizeItem?.disabledPickerItems = structuredProduct?.subtractingSizes(of: variant)
         }
     }
     
@@ -550,6 +555,7 @@ extension ProductViewController : FetchedResultsControllerManagerDelegate {
         }
         
         let structuredProduct = StructuredProduct(product)
+        self.structuredProduct = structuredProduct
         
         print("||| \(structuredProduct)")
         
@@ -566,15 +572,11 @@ extension ProductViewController : FetchedResultsControllerManagerDelegate {
         }
         
         
-        let colorItem = SegmentedDropDownItem(pickerItems: [
-            "Brown", "Red", "Blue", "Yellow", "Pink", "Purple", "Green"
-            ])
-        colorItem.disabledPickerItems = ["Brown", "Yellow"]
+        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors)
+//        colorItem.disabledPickerItems = ["Brown", "Yellow"]
         selectionColorItem = colorItem
         
-        let sizeItem = SegmentedDropDownItem(pickerItems: [
-            "Medium", "Small", "Large"
-            ])
+        let sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
         selectionSizeItem = sizeItem
         
         productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
@@ -586,29 +588,31 @@ extension ProductViewController : FetchedResultsControllerManagerDelegate {
 extension ProductViewController {
     fileprivate class StructuredProduct: NSObject {
         private(set) var variants: [StructuredVariant] = []
+        private(set) var colors: [String] = []
+        private(set) var sizes: [String] = []
         
         init(_ product: Product) {
             super.init()
             
-            setVariants(product.availableVariants?.allObjects as? [Variant])
-        }
-        
-        private func setVariants(_ variants: [Variant]?) {
-            guard let variants = variants else {
+            guard let variants = product.availableVariants?.allObjects as? [Variant] else {
                 return
             }
             
             var placeholders: [String : StructuredVariantPlaceholder] = [:]
+            var colors: Set<String> = Set()
+            var sizes: Set<String> = Set()
             
             variants.forEach({ variant in
                 guard let color = variant.color else {
                     return
                 }
                 
+                colors.insert(color)
                 let placeholder = placeholders[color] ?? StructuredVariantPlaceholder(color: color)
                 
                 if let size = variant.size {
                     placeholder.sizes.insert(size)
+                    sizes.insert(size)
                 }
                 
                 placeholders[color] = placeholder
@@ -619,14 +623,25 @@ extension ProductViewController {
             
             placeholders.forEach { (color: String, placeholder: StructuredVariantPlaceholder) in
                 let color = placeholder.color
-                let sizes = placeholder.sizes.sorted(by: { (a, b) -> Bool in
-                    // TODO: test that a value not in the sortedSizes goes to the end
-                    return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
-                })
+                let sizes = Array(placeholder.sizes)
                 structuredVariants.append(StructuredVariant(color: color, sizes: sizes))
             }
             
             self.variants = structuredVariants
+            self.colors = Array(colors)
+            self.sizes = sizes.sorted(by: { (a, b) -> Bool in
+                return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
+            })
+        }
+        
+        func variant(forColor color: String?) -> StructuredVariant? {
+            return variants.first { variant -> Bool in
+                return variant.color == color
+            }
+        }
+        
+        func subtractingSizes(of variant: StructuredVariant) -> [String] {
+            return Array(Set(sizes).subtracting(variant.sizes))
         }
     }
     

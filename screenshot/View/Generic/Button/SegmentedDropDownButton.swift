@@ -10,15 +10,27 @@ import UIKit
 
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String]
-    var disabledPickerItems: [String]?
+    var disabledPickerItems: [String]? {
+        didSet {
+            guard let segment = segment, let items = disabledPickerItems, let title = title else {
+                return
+            }
+            
+            if items.contains(title) {
+                segment.titleLabel.text = placeholderTitle
+            }
+        }
+    }
     var placeholderTitle: String?
-    fileprivate(set) var title: String?
+    var title: String? {
+        return segment?.titleLabel.text
+    }
     
     /// Value from 1 to 0 where 1 takes up the whole segmented button
     /// width. -1 uses auto calculate.
     var widthRatio: CGFloat = -1
     
-    fileprivate var segment: DropDownButton!
+    fileprivate var segment: DropDownButton?
     fileprivate var frameLayer: CAShapeLayer?
     
     init(pickerItems: [String]) {
@@ -31,7 +43,7 @@ class SegmentedDropDownItem : NSObject {
             frameLayer.strokeColor = color.cgColor
         }
         else {
-            segment.layer.borderColor = color.cgColor
+            segment?.layer.borderColor = color.cgColor
         }
     }
     
@@ -46,11 +58,28 @@ class SegmentedDropDownItem : NSObject {
     }
     
     fileprivate func bringToFront() {
+        guard let segment = segment else {
+            return
+        }
+        
         segment.superview?.bringSubview(toFront: segment)
     }
     
     fileprivate func sendToBack() {
+        guard let segment = segment else {
+            return
+        }
+        
         segment.superview?.sendSubview(toBack: segment)
+    }
+    
+    fileprivate var text: String? {
+        if let title = title, !title.isEmpty {
+            return title
+        }
+        else {
+            return placeholderTitle
+        }
     }
 }
 
@@ -71,7 +100,7 @@ class SegmentedDropDownButton : UIControl {
                 segment.translatesAutoresizingMaskIntoConstraints = false
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
-                segment.titleLabel.text = item.placeholderTitle ?? item.pickerItems.first
+                segment.titleLabel.text = item.placeholderTitle
                 segment.titleLabel.textColor = .gray6
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 addSubview(segment)
@@ -121,7 +150,6 @@ class SegmentedDropDownButton : UIControl {
                     }
                 }
                 
-                item.title = segment.titleLabel.text
                 item.segment = segment
             }
         }
@@ -182,13 +210,13 @@ class SegmentedDropDownButton : UIControl {
     
     var highlightedItem: SegmentedDropDownItem? {
         return items.first { item -> Bool in
-            return item.segment.isHighlighted
+            return item.segment?.isHighlighted ?? false
         }
     }
     
     var selectedItem: SegmentedDropDownItem? {
         return items.first { item -> Bool in
-            return item.segment.isSelected
+            return item.segment?.isSelected ?? false
         }
     }
 }
@@ -196,7 +224,11 @@ class SegmentedDropDownButton : UIControl {
 extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate {
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
-            return item.segment.isPickerViewInitialized && item.segment.inputView == pickerView
+            guard let segment = item.segment else {
+                return false
+            }
+            
+            return segment.isPickerViewInitialized && segment.inputView == pickerView
         }!
     }
     
@@ -243,11 +275,10 @@ extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate
             return
         }
         
-        item.title = title
-        item.segment.titleLabel.text = title
+        item.segment?.titleLabel.text = title
         
         sendActions(for: .valueChanged)
-        _ = item.segment.resignFirstResponder()
+        _ = item.segment?.resignFirstResponder()
     }
 }
 
