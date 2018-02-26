@@ -8,16 +8,31 @@
 
 import UIKit
 
+// TODO: when presenting picker, it should have the title as the selected option (not the previously scrolled to item)
+
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String]
+    var disabledPickerItems: [String]? {
+        didSet {
+            guard let segment = segment, let items = disabledPickerItems, let title = title else {
+                return
+            }
+            
+            if items.contains(title) {
+                segment.titleLabel.text = placeholderTitle
+            }
+        }
+    }
     var placeholderTitle: String?
-    fileprivate(set) var title: String?
+    var title: String? {
+        return segment?.titleLabel.text
+    }
     
     /// Value from 1 to 0 where 1 takes up the whole segmented button
     /// width. -1 uses auto calculate.
     var widthRatio: CGFloat = -1
     
-    fileprivate var segment: DropDownButton!
+    fileprivate var segment: DropDownButton?
     fileprivate var frameLayer: CAShapeLayer?
     
     init(pickerItems: [String]) {
@@ -30,7 +45,7 @@ class SegmentedDropDownItem : NSObject {
             frameLayer.strokeColor = color.cgColor
         }
         else {
-            segment.layer.borderColor = color.cgColor
+            segment?.layer.borderColor = color.cgColor
         }
     }
     
@@ -45,92 +60,100 @@ class SegmentedDropDownItem : NSObject {
     }
     
     fileprivate func bringToFront() {
+        guard let segment = segment else {
+            return
+        }
+        
         segment.superview?.bringSubview(toFront: segment)
     }
     
     fileprivate func sendToBack() {
+        guard let segment = segment else {
+            return
+        }
+        
         segment.superview?.sendSubview(toBack: segment)
+    }
+    
+    fileprivate var text: String? {
+        if let title = title, !title.isEmpty {
+            return title
+        }
+        else {
+            return placeholderTitle
+        }
     }
 }
 
 class SegmentedDropDownButton : UIControl {
-    private(set) var items: [SegmentedDropDownItem]!
-    
     fileprivate let borderWidth: CGFloat = 1
     static fileprivate let borderColor: UIColor = .gray8
     static fileprivate let borderErrorColor: UIColor = .crazeRed
     
     // MARK: Life Cycle
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    init(items: [SegmentedDropDownItem]) {
-        self.items = items
-        
-        super.init(frame: .zero)
-        
-        items.enumerated().forEach { (index, item) in
-            let isFirst = index == 0
-            let isLast = index == items.count - 1
-            
-            let segment = DropDownButton()
-            segment.translatesAutoresizingMaskIntoConstraints = false
-            segment.pickerDataSource = self
-            segment.pickerDelegate = self
-            segment.titleLabel.text = item.placeholderTitle ?? item.pickerItems.first
-            segment.titleLabel.textColor = .gray6
-            segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
-            addSubview(segment)
-            segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
-            segment.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-            
-            if isFirst {
-                segment.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-            }
-            else {
-                if let previousSegment = items[index - 1].segment {
-                    segment.leadingAnchor.constraint(equalTo: previousSegment.trailingAnchor, constant: -borderWidth).isActive = true
+    var items: [SegmentedDropDownItem] = [] {
+        didSet {
+            items.enumerated().forEach { (index, item) in
+                let isFirst = index == 0
+                let isLast = index == items.count - 1
+                
+                let segment = DropDownButton()
+                segment.translatesAutoresizingMaskIntoConstraints = false
+                segment.pickerDataSource = self
+                segment.pickerDelegate = self
+                segment.titleLabel.text = item.placeholderTitle
+                segment.titleLabel.textColor = .gray6
+                segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
+                addSubview(segment)
+                segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
+                segment.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+                
+                if isFirst {
+                    segment.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
                 }
-            }
-            
-            if isLast {
-                segment.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -borderWidth).isActive = true
-            }
-            
-            if item.widthRatio > -1 {
-                segment.widthAnchor.constraint(equalTo: widthAnchor, multiplier: item.widthRatio).isActive = true
-            }
-            
-            if items.count == 1 {
-                segment.layer.borderColor = type(of: self).borderColor.cgColor
-                segment.layer.borderWidth = borderWidth
-                segment.layer.masksToBounds = true
-                segment.layer.cornerRadius = .defaultCornerRadius
-
-            } else {
-                // iOS 10 masking happens in the layoutSubviews
-                if #available(iOS 11.0, *) {
+                else {
+                    if let previousSegment = items[index - 1].segment {
+                        segment.leadingAnchor.constraint(equalTo: previousSegment.trailingAnchor, constant: -borderWidth).isActive = true
+                    }
+                }
+                
+                if isLast {
+                    segment.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -borderWidth).isActive = true
+                }
+                
+                if item.widthRatio > -1 {
+                    segment.widthAnchor.constraint(equalTo: widthAnchor, multiplier: item.widthRatio).isActive = true
+                }
+                
+                if items.count == 1 {
                     segment.layer.borderColor = type(of: self).borderColor.cgColor
                     segment.layer.borderWidth = borderWidth
-
-                    if isFirst || isLast {
-                        segment.layer.masksToBounds = true
-                        segment.layer.cornerRadius = .defaultCornerRadius
-                    }
-
-                    if isFirst {
-                        segment.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
-                    }
-                    else if isLast {
-                        segment.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+                    segment.layer.masksToBounds = true
+                    segment.layer.cornerRadius = .defaultCornerRadius
+                    
+                } else {
+                    // iOS 10 masking happens in the layoutSubviews
+                    if #available(iOS 11.0, *) {
+                        segment.layer.borderColor = type(of: self).borderColor.cgColor
+                        segment.layer.borderWidth = borderWidth
+                        
+                        if isFirst || isLast {
+                            segment.layer.masksToBounds = true
+                            segment.layer.cornerRadius = .defaultCornerRadius
+                        }
+                        
+                        if isFirst {
+                            segment.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+                        }
+                        else if isLast {
+                            segment.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+                        }
                     }
                 }
+                
+                item.segment = segment
             }
-            
-            item.title = segment.titleLabel.text
-            item.segment = segment
         }
     }
     
@@ -189,13 +212,13 @@ class SegmentedDropDownButton : UIControl {
     
     var highlightedItem: SegmentedDropDownItem? {
         return items.first { item -> Bool in
-            return item.segment.isHighlighted
+            return item.segment?.isHighlighted ?? false
         }
     }
     
     var selectedItem: SegmentedDropDownItem? {
         return items.first { item -> Bool in
-            return item.segment.isSelected
+            return item.segment?.isSelected ?? false
         }
     }
 }
@@ -203,8 +226,21 @@ class SegmentedDropDownButton : UIControl {
 extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate {
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
-            return item.segment.isPickerViewInitialized && item.segment.inputView == pickerView
+            guard let segment = item.segment else {
+                return false
+            }
+            
+            return segment.isPickerViewInitialized && segment.inputView == pickerView
         }!
+    }
+    
+    private func isItemDisabled(_ item: SegmentedDropDownItem, withTitle title: String) -> Bool {
+        if let disabledPickerItems = item.disabledPickerItems, disabledPickerItems.contains(title) {
+            return true
+        }
+        else {
+            return false
+        }
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -215,17 +251,36 @@ extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate
         return items[itemIndex(pickerView: pickerView)].pickerItems.count
     }
     
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return items[itemIndex(pickerView: pickerView)].pickerItems[row]
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        let item = items[itemIndex(pickerView: pickerView)]
+        let title = item.pickerItems[row]
+        var attributes: [String : Any]?
+        
+        if isItemDisabled(item, withTitle: title) {
+            let color: UIColor = .gray5
+            
+            attributes = [
+                NSForegroundColorAttributeName: color,
+                NSStrikethroughColorAttributeName: color,
+                NSStrikethroughStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue
+            ]
+        }
+        
+        return NSAttributedString(string: title, attributes: attributes)
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let item = items[itemIndex(pickerView: pickerView)]
-        item.title = item.pickerItems[row]
-        item.segment.titleLabel.text = item.title
+        let title = item.pickerItems[row]
+        
+        guard !isItemDisabled(item, withTitle: title) else {
+            return
+        }
+        
+        item.segment?.titleLabel.text = title
         
         sendActions(for: .valueChanged)
-        _ = item.segment.resignFirstResponder()
+        _ = item.segment?.resignFirstResponder()
     }
 }
 
