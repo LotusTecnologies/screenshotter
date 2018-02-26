@@ -13,6 +13,8 @@
 
 "changelog.title" = "What's New";
 
+"application.error.noDiskSpace" = "There is not space left on your phone, some features may not work properly"
+
 "currency.auto" = "Automatic";
 
 "discover.screenshot.add" = "Add";

@@ -80,6 +80,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         do {
             try self.fetchedResultsController.performFetch()
         }catch{
+            DataModel.sharedInstance.registerCoreDataError(error: error)
             print("Failed to fetch in fetchedResultsControllerManager from core data:\(error)")
         }
     }
