@@ -8,6 +8,8 @@
 
 import UIKit
 
+// TODO: when presenting picker, it should have the title as the selected option (not the previously scrolled to item)
+
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String]
     var disabledPickerItems: [String]? {
