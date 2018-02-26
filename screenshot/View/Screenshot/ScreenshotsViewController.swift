@@ -92,7 +92,7 @@ extension ScreenshotsViewController{
 extension ScreenshotsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.syncProductShowOrHideWithoutAnimation()
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
         self.coreDataPreparationController.viewDidLoad()
@@ -102,33 +102,6 @@ extension ScreenshotsViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         syncEmptyListView()
-        
-        
-    }
-    
-    func syncProductShowOrHideWithoutAnimation(){
-        if let controller = self.productsBarController {
-            UIView.performWithoutAnimation {
-                
-                let count = controller.count
-                if self.hasProductBar {
-                    if count < 4 {
-                        self.hasProductBar = false
-                        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
-                            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
-                        }
-                    }
-                }else{
-                    if count >= 4 {
-                        self.hasProductBar = true
-                        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
-                            self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
-                        }
-                    }
-                }
-                
-            }
-        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -138,8 +111,7 @@ extension ScreenshotsViewController {
             self.setEditing(false, animated: animated)
         }
         
-        self.syncProductShowOrHideWithoutAnimation()
-     
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
     }
     
     func applicationDidEnterBackground(_ notification:Notification){
@@ -258,21 +230,39 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
 
 extension ScreenshotsViewController : ProductsBarControllerDelegate {
     
-    func productBarCountChanged(_ controller:ProductsBarController) {
-        if self.hasProductBar {
-            if controller.count == 0 {
-                self.hasProductBar = false
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
-                    self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+    func hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation() {
+        if let controller = self.productsBarController {
+            UIView.performWithoutAnimation {
+                let count = controller.count
+                let shouldHaveproductBar = ( count > 4)
+                if self.hasProductBar != shouldHaveproductBar {
+                    self.hasProductBar = shouldHaveproductBar
+                    syncProductShowOrHide()
                 }
+            }
+        }
+    }
+    
+    func syncProductShowOrHide(){
+        if self.hasProductBar {
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
+                self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
             }
         }else{
-            if controller.count >= 4 {
-                self.hasProductBar = true
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
-                    self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
-                }
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
+                self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
             }
+        }
+    }
+    
+    func productBarCountChanged(_ controller:ProductsBarController) {
+        if self.hasProductBar && controller.count == 0 {
+            self.hasProductBar = false
+            self.syncProductShowOrHide()
+            
+        }else if !self.hasProductBar  && controller.count >= 4 {
+            self.hasProductBar = true
+            self.syncProductShowOrHide()
         }
     }
     
@@ -589,7 +579,7 @@ extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
             syncEmptyListView()
         }
         if isViewLoaded {
-            self.syncProductShowOrHideWithoutAnimation()
+            self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
         }
     }
     
