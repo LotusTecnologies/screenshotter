@@ -90,9 +90,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return
             }
         }
+        self.lastPresentedLowDiskSpaceWarning = Date()
         let alert = UIAlertController.init(title: nil, message:"application.error.noDiskSpace".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler:nil))
-        self.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        self.self.window?.rootViewController.present(alert, animated: true, completion: nil)
     }
     
 //    func applicationWillResignActive(_ application: UIApplication) {
