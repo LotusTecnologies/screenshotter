@@ -74,7 +74,6 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         
         if let collectionView = self.collectionView {
-            //collectionView.contentOffset = CGPoint.init(x: -1 * collectionView.contentInset.left, y: 0)
             change.applyChanges(collectionView: collectionView)
         }
         self.delegate?.productBarCountChanged(self)
