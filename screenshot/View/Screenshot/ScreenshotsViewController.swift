@@ -72,10 +72,10 @@ class ScreenshotsViewController: BaseViewController {
 
 extension ScreenshotsViewController{
     public func screenshot(at index:Int) -> Screenshot?{
-        return self.screenshotFrc()?.object(at: IndexPath.init(item: index, section: 0))
+        return self.screenshotFrcManager?.object(at: IndexPath.init(item: index, section: 0))
     }
     public func indexOf(screenshot:Screenshot) -> Int? {
-        return self.screenshotFrc()?.indexPath(forObject: screenshot)?.item
+        return self.screenshotFrcManager?.indexPath(forObject: screenshot)?.item
     }
     
     func scrollToTop(){
@@ -216,10 +216,6 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     
     func setupFetchedResultsController() {
         self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
-    }
-    
-    func screenshotFrc() -> NSFetchedResultsController<Screenshot>? {
-        return self.screenshotFrcManager?.fetchedResultsController
     }
 }
 
@@ -826,7 +822,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
             case .notification:
                 return self.canDisplayNotificationCell() ? 1 :0 
             case .image:
-                return self.screenshotFrc()?.fetchedObjectsCount ?? 0
+                return self.screenshotFrcManager?.fetchedObjectsCount ?? 0
             }
         }
         return 0

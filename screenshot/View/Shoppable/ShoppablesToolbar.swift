@@ -48,7 +48,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func repositionShoppables() {
-        let shoppablesCount = self.shoppablesController.fetchedResultsController.fetchedObjectsCount
+        let shoppablesCount = self.shoppablesController.fetchedObjectsCount
         
         if (shoppablesCount > 0) {
             let  lineSpacing = (self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.minimumLineSpacing ?? 0
@@ -70,7 +70,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.shoppablesController.fetchedResultsController.fetchedObjectsCount
+        return self.shoppablesController.fetchedObjectsCount
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -79,7 +79,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ShoppableCollectionViewCell
-        cell?.image = self.shoppablesController.fetchedResultsController.object(at: indexPath).cropped(image: screenshotImage, thumbSize: self.shoppableSize())
+        cell?.image = self.shoppablesController.object(at: indexPath).cropped(image: screenshotImage, thumbSize: self.shoppableSize())
         return cell ?? UICollectionViewCell.init()
     }
     
