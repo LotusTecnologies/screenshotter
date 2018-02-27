@@ -100,7 +100,7 @@ class SegmentedDropDownButton : UIControl {
                 segment.translatesAutoresizingMaskIntoConstraints = false
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
-                segment.titleLabel.text = item.placeholderTitle
+                segment.titleLabel.text = item.placeholderTitle ?? item.pickerItems.first
                 segment.titleLabel.textColor = .gray6
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 addSubview(segment)

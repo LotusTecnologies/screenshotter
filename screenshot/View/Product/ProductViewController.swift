@@ -152,22 +152,14 @@ class ProductView: UIScrollView {
         contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
     }
     
-    func setSelection(colorItem: SegmentedDropDownItem?, sizeItem: SegmentedDropDownItem?) {
-        let hasColorItem = colorItem != nil
-        let hasSizeItem = sizeItem != nil
-        
-        guard hasColorItem || hasSizeItem else {
-            return
-        }
-        
+    func setSelection(colorItem: SegmentedDropDownItem, sizeItem: SegmentedDropDownItem?) {
         var items: [SegmentedDropDownItem] = []
-        let widthRatio: CGFloat = (hasColorItem && hasSizeItem) ? 0.4 : 0.8
+        let hasSizeItem = sizeItem != nil
+        let widthRatio: CGFloat = hasSizeItem ? 0.4 : 0.8
         
-        if let colorItem = colorItem {
-            colorItem.placeholderTitle = "product.color.default".localized
-            colorItem.widthRatio = widthRatio
-            items.append(colorItem)
-        }
+        colorItem.placeholderTitle = "product.color.default".localized
+        colorItem.widthRatio = widthRatio
+        items.append(colorItem)
         
         if let sizeItem = sizeItem {
             sizeItem.placeholderTitle = "product.size.default".localized
@@ -581,11 +573,15 @@ extension ProductViewController {
         
         
         let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors)
-//        colorItem.disabledPickerItems = ["Brown", "Yellow"]
         selectionColorItem = colorItem
         
-        let sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
-        selectionSizeItem = sizeItem
+        var sizeItem: SegmentedDropDownItem? = nil
+            
+        if !structuredProduct.sizes.isEmpty {
+            sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
+            sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            selectionSizeItem = sizeItem
+        }
         
         productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         
@@ -636,7 +632,7 @@ extension ProductViewController {
             }
             
             self.variants = structuredVariants
-            self.colors = Array(colors)
+            self.colors = colors.sorted()
             self.sizes = sizes.sorted(by: { (a, b) -> Bool in
                 return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
             })
