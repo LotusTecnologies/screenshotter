@@ -145,6 +145,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         do {
             try self.fetchedResultsController.performFetch()
         }catch{
+            DataModel.sharedInstance.registerCoreDataError(error: error)
             print("Failed to fetch in fetchedResultsControllerManager from core data:\(error)")
         }
         self.arrayOfArrays = self.fetchedResultsController.sections?.flatMap({$0.objects as? [ResultType]}).flatMap {Section($0)} ?? []

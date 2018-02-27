@@ -77,6 +77,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    var lastPresentedLowDiskSpaceWarning:Date?
+    func presentLowDiskSpaceWarning(){
+        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*5 else {
+            return
+        }
+        
+        self.lastPresentedLowDiskSpaceWarning = Date()
+        let alert = UIAlertController.init(title: "application.error.no_disk_space.title".localized, message:"application.error.no_disk_space.message".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler:nil))
+        self.window?.rootViewController?.present(alert, animated: true, completion: nil)
+    }
     
 //    func applicationWillResignActive(_ application: UIApplication) {
 //        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
