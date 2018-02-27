@@ -103,6 +103,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
     }
     
     var fetchedObjects:[ResultType] {
+        
         var toReturn:[Any] = []
         for a in arrayOfArrays {
             toReturn.append(a.items)

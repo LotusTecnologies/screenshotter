@@ -35,7 +35,7 @@ class ScreenshotsViewController: BaseViewController {
     var refreshControl:UIRefreshControl?
     var emptyListView:ScreenshotsHelperView?
     var hasNewScreenshot = false
-    
+    var hasProductBar = false
     var notificationCellAssetId:String?
     var coreDataPreparationController:CoreDataPreparationController
     
@@ -92,8 +92,11 @@ extension ScreenshotsViewController{
 extension ScreenshotsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
+
         self.setupViews()
         self.coreDataPreparationController.viewDidLoad()
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -107,6 +110,8 @@ extension ScreenshotsViewController {
         if self.isEditing {
             self.setEditing(false, animated: animated)
         }
+        
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
     }
     
     func applicationDidEnterBackground(_ notification:Notification){
@@ -144,7 +149,8 @@ extension ScreenshotsViewController {
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
             collectionView.dataSource = self
-            collectionView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: minimumSpacing.y, right: 0)
+            collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: minimumSpacing.y, right: 0)
+            collectionView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
             collectionView.backgroundColor = self.view.backgroundColor
             collectionView.alwaysBounceVertical = true
             collectionView.isScrollEnabled = false
@@ -180,7 +186,6 @@ extension ScreenshotsViewController {
         
         let emptyListView:ScreenshotsHelperView = {
             let emptyListView = ScreenshotsHelperView()
-            emptyListView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .padding, bottom: .extendedPadding, right: .padding)
             emptyListView.button.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
             collectionView.emptyView = emptyListView
             return emptyListView
@@ -220,15 +225,40 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
 }
 
 extension ScreenshotsViewController : ProductsBarControllerDelegate {
-    func productBarShouldHide(_ controller: ProductsBarController) {
-        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
-            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+    
+    func hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation() {
+        if let controller = self.productsBarController {
+            UIView.performWithoutAnimation {
+                let count = controller.count
+                let shouldHaveproductBar = ( count > 4)
+                if self.hasProductBar != shouldHaveproductBar {
+                    self.hasProductBar = shouldHaveproductBar
+                    syncProductShowOrHide()
+                }
+            }
         }
     }
     
-    func productBarShouldShow(_ controller: ProductsBarController) {
-        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
-            self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+    func syncProductShowOrHide(){
+        if self.hasProductBar {
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
+                self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+            }
+        }else{
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
+                self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+            }
+        }
+    }
+    
+    func productBarContentChanged(_ controller:ProductsBarController) {
+        if self.hasProductBar && controller.count == 0 {
+            self.hasProductBar = false
+            self.syncProductShowOrHide()
+            
+        }else if !self.hasProductBar  && controller.count >= 4 {
+            self.hasProductBar = true
+            self.syncProductShowOrHide()
         }
     }
     
@@ -528,7 +558,7 @@ extension ScreenshotsViewController {
         
         let hasScreenshots = collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0
         
-        editButtonItem.isEnabled = hasScreenshots || productsBarController?.hasProducts ?? false
+        editButtonItem.isEnabled = hasScreenshots || self.hasProductBar
     }
 }
 
@@ -543,6 +573,9 @@ extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
         if DataModel.sharedInstance.isCoreDataStackReady {
             self.collectionView.reloadData()
             syncEmptyListView()
+        }
+        if isViewLoaded {
+            self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
         }
     }
     
@@ -814,7 +847,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         if let sectionType = ScreenshotsSection.init(rawValue: section) {
             switch sectionType {
             case .product:
-                if self.productsBarController?.hasProducts == true {
+                if self.hasProductBar {
                     return 1
                 }else{
                     return 0
