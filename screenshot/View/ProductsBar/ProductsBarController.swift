@@ -11,7 +11,7 @@ import CoreData
 import UIKit
 
 @objc protocol ProductsBarControllerDelegate : NSObjectProtocol {
-    func productBarCountChanged(_ controller:ProductsBarController)
+    func productBarContentChanged(_ controller:ProductsBarController)
     func productBar(_ controller:ProductsBarController, didTap product:Product)
 }
 class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
@@ -62,7 +62,7 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
     func setup(){
         self.productsFrc = DataModel.sharedInstance.productBarFrc(delegate: self)
 
-        self.delegate?.productBarCountChanged(self)
+        self.delegate?.productBarContentChanged(self)
         
         self.collectionView?.reloadData()
     }
@@ -76,7 +76,8 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
         if let collectionView = self.collectionView {
             change.applyChanges(collectionView: collectionView)
         }
-        self.delegate?.productBarCountChanged(self)
+        
+        self.delegate?.productBarContentChanged(self)
 
     }
     

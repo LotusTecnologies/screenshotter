@@ -255,7 +255,7 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
         }
     }
     
-    func productBarCountChanged(_ controller:ProductsBarController) {
+    func productBarContentChanged(_ controller:ProductsBarController) {
         if self.hasProductBar && controller.count == 0 {
             self.hasProductBar = false
             self.syncProductShowOrHide()
