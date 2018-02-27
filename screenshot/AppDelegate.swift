@@ -85,15 +85,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     var lastPresentedLowDiskSpaceWarning:Date?
     func presentLowDiskSpaceWarning(){
-        if let lastDate = self.lastPresentedLowDiskSpaceWarning {
-            if abs(lastDate.timeIntervalSinceNow) > 60*60*5 {
-                return
-            }
+        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*60*5 else {
+            return
         }
+        
         self.lastPresentedLowDiskSpaceWarning = Date()
-        let alert = UIAlertController.init(title: "application.error.noDiskSpace.title".localized, message:"application.error.noDiskSpace.message".localized, preferredStyle: .alert)
+        let alert = UIAlertController.init(title: "application.error.no_disk_space.title".localized, message:"application.error.no_disk_space.message".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler:nil))
-        self.self.window?.rootViewController?.present(alert, animated: true, completion: nil)
+        self.window?.rootViewController?.present(alert, animated: true, completion: nil)
     }
     
 //    func applicationWillResignActive(_ application: UIApplication) {

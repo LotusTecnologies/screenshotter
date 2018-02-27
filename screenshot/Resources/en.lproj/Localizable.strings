@@ -13,8 +13,8 @@
 
 "changelog.title" = "What's New";
 
-"application.error.noDiskSpace.title" = "Out Of Space!";
-"application.error.noDiskSpace.message" = "Free up some space on your phone for a better Screenshop experience.";
+"application.error.no_disk_space.title" = "Out Of Space!";
+"application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 
 "currency.auto" = "Automatic";
 
