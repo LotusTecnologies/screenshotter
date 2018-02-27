@@ -15,7 +15,7 @@ enum AppSettingKeys : String {
 }
 
 class AppSettings  {
-    var appSettingsDict:[String:Any]?
+    var appSettingsDict:[String:Any]?  //DO NOT change AppSettingKeys.  future json may have more values than are listed in the appsetting keys
     private let currentVersion = Bundle.displayVersion
 
     var updateVersion: String? {
@@ -30,11 +30,10 @@ class AppSettings  {
         return self.appSettingsDict?[AppSettingKeys.openProductsPageDefault.rawValue] as? String
     }
     
-    var previousVersion: String? {
-        return UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
-    }
+    var previousVersion: String? 
     
     init() {
+        previousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
         UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.persistentVersion)
     }
     

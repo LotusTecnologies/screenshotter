@@ -36,10 +36,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
     
-    override init() {
-        super.init()
-    }
-    
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         // Needs to be called very early.
         PermissionsManager.shared.fetchPushPermissionStatus()
