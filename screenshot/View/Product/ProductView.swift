@@ -20,7 +20,7 @@ class ProductView: UIView {
     
     let selectionButton = SegmentedDropDownButton()
     let cartButton = MainButton()
-    let buyButton = MainButton() // TODO: hide for now. for v2
+//    let buyButton = MainButton()
     let websiteButton = UIButton()
     
     required init?(coder aDecoder: NSCoder) {
@@ -116,25 +116,25 @@ class ProductView: UIView {
         selectionButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        websiteButton.translatesAutoresizingMaskIntoConstraints = false
-        websiteButton.setTitleColor(.crazeGreen, for: .normal)
-        websiteButton.isHidden = true
-        scrollView.addSubview(websiteButton)
-        websiteButton.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
-        websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        websiteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
         let contentTextView = UITextView()
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .green
         contentTextView.isScrollEnabled = false
         contentTextView.scrollsToTop = false
         scrollView.addSubview(contentTextView)
-        contentTextView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
+        contentTextView.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        contentTextView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
+        
+        websiteButton.translatesAutoresizingMaskIntoConstraints = false
+        websiteButton.setTitleColor(.crazeGreen, for: .normal)
+        websiteButton.isHidden = true
+        scrollView.addSubview(websiteButton)
+        websiteButton.topAnchor.constraint(equalTo: contentTextView.bottomAnchor, constant: .padding).isActive = true
+        websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        websiteButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
+        websiteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let controlContainerView = UIView()
         controlContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -163,18 +163,18 @@ class ProductView: UIView {
         cartButton.topAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.topAnchor).isActive = true
         cartButton.leadingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.leadingAnchor).isActive = true
         cartButton.bottomAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
-        cartButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: -.padding / 2).isActive = true
-//        cartButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
+//        cartButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: -.padding / 2).isActive = true
+        cartButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        buyButton.translatesAutoresizingMaskIntoConstraints = false
-        buyButton.backgroundColor = .crazeGreen
-        buyButton.setTitle("product.buy".localized, for: .normal)
-        buyButton.setTitleColor(.white, for: .normal)
-        controlContainerView.addSubview(buyButton)
-        buyButton.topAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.topAnchor).isActive = true
-        buyButton.leadingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: .padding / 2).isActive = true
-        buyButton.bottomAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
-        buyButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
+//        buyButton.translatesAutoresizingMaskIntoConstraints = false
+//        buyButton.backgroundColor = .crazeGreen
+//        buyButton.setTitle("product.buy".localized, for: .normal)
+//        buyButton.setTitleColor(.white, for: .normal)
+//        controlContainerView.addSubview(buyButton)
+//        buyButton.topAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.topAnchor).isActive = true
+//        buyButton.leadingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: .padding / 2).isActive = true
+//        buyButton.bottomAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
+//        buyButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
     }
     
     func setSelection(colorItem: SegmentedDropDownItem, sizeItem: SegmentedDropDownItem?) {

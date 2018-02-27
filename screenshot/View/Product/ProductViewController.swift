@@ -132,7 +132,7 @@ class ProductViewController : BaseViewController {
             productView.galleryScrollView.delegate = self
             productView.pageControl.addTarget(self, action: #selector(pageControlDidChange), for: .valueChanged)
             productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
-            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
+//            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
             productView.websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
             view.addSubview(productView)
             productView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
