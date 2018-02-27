@@ -72,7 +72,7 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        
+
         if let collectionView = self.collectionView {
             change.applyChanges(collectionView: collectionView)
         }

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 protocol ShoppablesToolbarDelegate : UIToolbarDelegate {
     func shoppablesToolbarDidChange(toolbar:ShoppablesToolbar)
@@ -15,6 +16,7 @@ protocol ShoppablesToolbarDelegate : UIToolbarDelegate {
 }
 
 class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, ShoppablesCollectionViewDelegate, FetchedResultsControllerManagerDelegate {
+    
     
     weak var shoppableToolbarDelegate:ShoppablesToolbarDelegate?
     var didViewControllerAppear:Bool = false
@@ -129,8 +131,8 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         collectionView.performBatchUpdates({
-            collectionView.deleteSections(change.deletedSections)
             collectionView.deleteItems(at: change.deletedRows)
+            collectionView.deleteSections(change.deletedSections)
             collectionView.insertSections(change.insertedSections)
             collectionView.insertItems(at: change.insertedRows)
         })

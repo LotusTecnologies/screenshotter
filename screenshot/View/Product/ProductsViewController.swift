@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 enum ProductsSection : Int {
     case tooltip = 0
