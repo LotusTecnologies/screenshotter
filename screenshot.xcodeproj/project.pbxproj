@@ -1076,7 +1076,6 @@
 				C543695E20453FE300599134 /* ProductsRateView.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
 				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,
-				C554B177202706F00099622C /* FrameworkSetupController.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
 				C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */,

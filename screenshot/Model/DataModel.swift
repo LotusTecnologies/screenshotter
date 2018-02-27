@@ -420,8 +420,8 @@ extension DataModel {
                      color: String?,
                      size: String?,
                      retailPrice: Float,
-                     sku: String?,
-                     upc: String?,
+                     sku: String,
+                     url: String?,
                      imageURLs: String?) -> Variant {
         let variantToSave = Variant(context: managedObjectContext)
         variantToSave.product = product
@@ -429,7 +429,7 @@ extension DataModel {
         variantToSave.size = size
         variantToSave.retailPrice = retailPrice
         variantToSave.sku = sku
-        variantToSave.upc = upc
+        variantToSave.url = url
         variantToSave.imageURLs = imageURLs
         variantToSave.dateModified = NSDate()
         return variantToSave
