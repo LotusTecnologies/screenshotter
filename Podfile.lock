@@ -28,9 +28,9 @@ PODS:
   - PromiseKit/StoreKit (4.5.2):
     - PromiseKit/CorePromise
   - RateView (1.2)
-  - SDWebImage (4.3.0):
-    - SDWebImage/Core (= 4.3.0)
-  - SDWebImage/Core (4.3.0)
+  - SDWebImage (4.3.1):
+    - SDWebImage/Core (= 4.3.1)
+  - SDWebImage/Core (4.3.1)
   - Segment-Amplitude (2.0.0):
     - Amplitude-iOS (~> 4.0)
     - Analytics (~> 3.6)
@@ -76,7 +76,7 @@ SPEC CHECKSUMS:
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
+  SDWebImage: 09808bac78357b39f8db4ea360c7b5534d785ef4
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
 PODFILE CHECKSUM: 4b8c8a53c82d61f6769e72fd93ac9c139bc8b664

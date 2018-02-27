@@ -8,25 +8,34 @@
 
 import Foundation
 
-final class AppSettings : NSObject {
-    fileprivate(set) var updateVersion: String?
-    fileprivate(set) var forcedUpdateVersion: String?
-    fileprivate(set) var previousVersion: String?
-    
-    private var setter: AppSettingsSetter
-    
-    init(withSetter setter: AppSettingsSetter) {
-        previousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
-        UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.persistentVersion)
-        
-        self.setter = setter
-        super.init()
-        setter.settings = self
+enum AppSettingKeys : String {
+    case updateVersion = "SuggestedUpdateVersion"
+    case forcedUpdateVersion = "ForceUpdateVersion"
+    case openProductsPageDefault = "OpenProductsPageDefault"
+}
+
+class AppSettings  {
+    var appSettingsDict:[String:Any]?  //DO NOT change AppSettingKeys.  future json may have more values than are listed in the appsetting keys
+    private let currentVersion = Bundle.displayVersion
+
+    var updateVersion: String? {
+        return self.appSettingsDict?[AppSettingKeys.updateVersion.rawValue] as? String
     }
     
-    // MARK: Version
+    var forcedUpdateVersion: String? {
+        return self.appSettingsDict?[AppSettingKeys.forcedUpdateVersion.rawValue] as? String
+    }
     
-    private let currentVersion = Bundle.displayVersion
+    var openProductsPageDefault: String? {
+        return self.appSettingsDict?[AppSettingKeys.openProductsPageDefault.rawValue] as? String
+    }
+    
+    var previousVersion: String? 
+    
+    init() {
+        previousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
+        UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.persistentVersion)
+    }
     
     func isCurrentVersion(lessThan version: String?) -> Bool {
         return version?.compare(currentVersion, options: .numeric) == .orderedDescending
@@ -45,24 +54,3 @@ final class AppSettings : NSObject {
     }
 }
 
-final class AppSettingsSetter : NSObject {
-    fileprivate var settings: AppSettings!
-    
-    func setUpdateVersion(_ version: String?) {
-        settings.updateVersion = version
-    }
-    
-    func setForcedUpdateVersion(_ version: String?) {
-        settings.forcedUpdateVersion = version
-    }
-}
-
-struct FetchedAppSettings {
-    let updateVersion: String?
-    let forcedUpdateVersion: String?
-    
-    init(_ settings: [AnyHashable : Any]) {
-        updateVersion = settings["SuggestedUpdateVersion"] as? String
-        forcedUpdateVersion = settings["ForceUpdateVersion"] as? String
-    }
-}

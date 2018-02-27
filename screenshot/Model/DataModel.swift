@@ -64,7 +64,17 @@ class DataModel: NSObject {
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
     let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
 }
-
+extension DataModel {
+    func receivedCoreDataError(error:Error) {
+        let error = error as NSError
+        if error.domain == NSSQLiteErrorDomain && error.code == 13{ // disk full  see https://sqlite.org/c3ref/c_abort.html
+            AnalyticsTrackers.standard.track("Error", properties: ["type":"noHardDriveSpace"])
+            AppDelegate.shared.presentLowDiskSpaceWarning()
+        }else{
+            AnalyticsTrackers.standard.track("Error", properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+        }
+    }
+}
 extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
@@ -155,6 +165,7 @@ extension DataModel {
         do {
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("Failed to saveScreenshot")
         }
         return screenshotToSave
@@ -195,6 +206,7 @@ extension DataModel {
             }
             return assetId
         } catch {
+            self.receivedCoreDataError(error: error)
             print("retrieveAllAssetIds results with error:\(error)")
         }
         return nil
@@ -225,6 +237,7 @@ extension DataModel {
                 }
             }
         } catch {
+            self.receivedCoreDataError(error: error)
             print("retrieveAssetIds results with error:\(error)")
         }
         return assetIdsSet
@@ -240,6 +253,7 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             return results.first
         } catch {
+            self.receivedCoreDataError(error: error)
             print("retrieveScreenshot assetId:\(assetId) results with error:\(error)")
         }
         return nil
@@ -253,7 +267,7 @@ extension DataModel {
                             try product.validateForUpdate()
                             product.hideFromProductBar = true
                         } catch{
-                            
+
                         }
                         
                         
@@ -261,6 +275,7 @@ extension DataModel {
                 }
                 try managedObjectContext.save()
             } catch {
+                self.receivedCoreDataError(error: error)
                 print("hideFromProductBar productObjectIDs catch error:\(error)")
             }
         }
@@ -284,6 +299,7 @@ extension DataModel {
                 }
                 try managedObjectContext.save()
             } catch {
+                self.receivedCoreDataError(error: error)
                 print("hide screenshotOIDArray catch error:\(error)")
             }
             
@@ -355,6 +371,7 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             return results.first
         } catch {
+            self.receivedCoreDataError(error: error)
             print("retrieveShoppable objectId:\(objectId) results with error:\(error)")
         }
         return nil
@@ -443,6 +460,7 @@ extension DataModel {
             }
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("addImageDataToMatchstick imageUrl:\(imageUrl) results with error:\(error)")
         }
     }
@@ -458,6 +476,7 @@ extension DataModel {
                 return imageUrls
             }
         } catch {
+            self.receivedCoreDataError(error: error)
             print("retrieveMatchstickImageUrlsWithNoData results with error:\(error)")
         }
         return []
@@ -513,6 +532,7 @@ extension DataModel {
                 screenshotsToUpdate.forEach {$0.updateLastFavorited()}
                 try managedObjectContext.save()
             } catch {
+                self.receivedCoreDataError(error: error)
                 print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
             }
         }
@@ -532,6 +552,7 @@ extension DataModel {
                 }
                 try managedObjectContext.save()
             } catch {
+                self.receivedCoreDataError(error: error)
                 print("setNoShoppables assetId:\(assetId) results with error:\(error)")
             }
         }
@@ -566,6 +587,7 @@ extension DataModel {
         do {
             count = try managedObjectContext.count(for: fetchRequest)
         } catch {
+            self.receivedCoreDataError(error: error)
             print("countScreenshotWorkhorse results with error:\(error)")
         }
         return count
@@ -581,6 +603,7 @@ extension DataModel {
         do {
             count = try managedObjectContext.count(for: fetchRequest)
         } catch {
+            self.receivedCoreDataError(error: error)
             print("countMatchsticks results with error:\(error)")
         }
         return count
@@ -617,6 +640,7 @@ extension DataModel {
             try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
             isMainPinned = true
         } catch {
+            self.receivedCoreDataError(error: error)
             print("pinMain results with error:\(error)")
         }
     }
@@ -629,6 +653,7 @@ extension DataModel {
             try mainMoc().setQueryGenerationFrom(nil)
             isMainPinned = false
         } catch {
+            self.receivedCoreDataError(error: error)
             print("unpinMain results with error:\(error)")
         }
     }
@@ -637,6 +662,7 @@ extension DataModel {
         do {
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("Updating db results with error:\(error)")
         }
     }
@@ -701,6 +727,7 @@ extension DataModel {
             }
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("initializeFavoritesCounts results with error:\(error)")
         }
     }
@@ -717,6 +744,7 @@ extension DataModel {
             }
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("initializeFavoritesSets results with error:\(error)")
         }
     }
@@ -733,6 +761,7 @@ extension DataModel {
             }
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("cleanDeletedScreenshots results with error:\(error)")
         }
     }
@@ -750,6 +779,7 @@ extension DataModel {
             }
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("fixProductFiltersNoClassification results with error:\(error)")
         }
     }
@@ -767,6 +797,7 @@ extension DataModel {
             }
             try managedObjectContext.save()
         } catch {
+            self.receivedCoreDataError(error: error)
             print("fixProductsNoClassification results with error:\(error)")
         }
     }
@@ -810,6 +841,7 @@ extension Screenshot {
                 screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                 try managedObjectContext.save()
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("setHide objectID:\(managedObjectID) results with error:\(error)")
             }
         }
@@ -829,6 +861,7 @@ extension Screenshot {
                 }
                 try managedObjectContext.save()
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("setViewed objectID:\(managedObjectID) results with error:\(error)")
             }
         }
@@ -912,6 +945,7 @@ extension Shoppable {
                 return productFilter
             }
         } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
             print("productFilter optionsMask:\(optionsMask)  shoppableID:\(shoppableID) results with error:\(error)")
         }
         return nil
@@ -987,6 +1021,7 @@ extension Shoppable {
                 try managedObjectContext.save()
                 DispatchQueue.main.async(execute: callback)
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("shoppable set optionsMask results with error:\(error)")
             }
         }
@@ -1054,6 +1089,7 @@ extension Shoppable {
                 }
                 try managedObjectContext.save()
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("setRating shoppableID:\(shoppableID) results with error:\(error)")
             }
         }
@@ -1097,6 +1133,7 @@ extension Product {
                 }
                 try managedObjectContext.save()
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("recordViewedProduct objectID:\(managedObjectID) results with error:\(error)")
             }
         }
@@ -1159,6 +1196,7 @@ extension Product {
                     UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
                 }
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("setFavorited objectID:\(managedObjectID) results with error:\(error)")
             }
         }
@@ -1229,6 +1267,7 @@ extension Matchstick {
                     print("matchstick add managedObjectID:\(managedObjectID) not found")
                 }
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("matchstick add managedObjectID:\(managedObjectID) results with error:\(error)")
             }
         }
@@ -1249,6 +1288,7 @@ extension Matchstick {
                     print("matchstick pass managedObjectID:\(managedObjectID) not found")
                 }
             } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
                 print("matchstick pass managedObjectID:\(managedObjectID) results with error:\(error)")
             }
         }

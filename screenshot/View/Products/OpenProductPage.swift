@@ -28,7 +28,12 @@ enum OpenProductPage : String {
     }
     
     static func fromSystemInfo() -> OpenProductPage{
-        let defaultValue:OpenProductPage = .embededSafari
+        var defaultValue:OpenProductPage = .safari
+
+        if let appSettingsDefaultString = AppDelegate.shared.appSettings.openProductsPageDefault, let appSettingsDefault = OpenProductPage.init(rawValue:appSettingsDefaultString){
+            defaultValue = appSettingsDefault
+        }
+
         let stringValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.openProductPageInSetting) as? String ?? defaultValue.rawValue
         return OpenProductPage(rawValue: stringValue) ?? defaultValue
     }
@@ -57,8 +62,10 @@ enum OpenProductPage : String {
             if let url = URL(string: urlString){
                 var openInSetting = OpenProductPage.fromSystemInfo()
                 
-                if !openInSetting.canOpen(url: url) {
-                    openInSetting = .embededSafari
+                for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
+                    if !openInSetting.canOpen(url: url) {
+                        openInSetting = fallbackSetting
+                    }
                 }
                 
                 switch openInSetting {
