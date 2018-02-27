@@ -23,25 +23,13 @@ class FetchedResultsControllerManagerChange: NSObject {
     var insertedSections:IndexSet = []
     var deletedSections:IndexSet = []
     var insertedRows:[IndexPath] {
-        var indexPaths:[IndexPath] = []
-        for e in insertedElements {
-            indexPaths.append(e.0)
-        }
-        return indexPaths
+        return insertedElements.map{ $0.index }
     }
     var deletedRows:[IndexPath]{
-        var indexPaths:[IndexPath] = []
-        for e in deletedElements {
-            indexPaths.append(e.0)
-        }
-        return indexPaths
+        return deletedElements.map{ $0.index }
     }
     var updatedRows:[IndexPath] {
-        var indexPaths:[IndexPath] = []
-        for e in updatedElements {
-            indexPaths.append(e.0)
-        }
-        return indexPaths
+        return updatedElements.map{ $0.index }
     }
     
     var insertedElements:[(index:IndexPath, element:Any)] = []
@@ -89,13 +77,14 @@ protocol FetchedResultsControllerManagerDelegate : NSObjectProtocol{
     func managerDidChangeContent(_ controller:NSObject, change:FetchedResultsControllerManagerChange)
 }
 
-class FetchedResultsControllerManagerSection {
-    var items:[NSManagedObject] = []
-    init(_ i:[NSManagedObject]) {
-        items = i
-    }
-}
+
 class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsControllerDelegate  where ResultType : NSFetchRequestResult {
+    class FetchedResultsControllerManagerSection {
+        var items:[ResultType] = []
+        init(_ i:[ResultType]) {
+            items = i
+        }
+    }
     
     private var fetchedResultsController:NSFetchedResultsController<ResultType>
     private var currentChange:FetchedResultsControllerManagerChange?
@@ -107,14 +96,10 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         return arrayOfArrays.count
     }
     var fetchedObjectsCount: Int {
-        var count = 0
-        for a in arrayOfArrays {
-            count = count + a.items.count
-        }
-        return count
+        return self.arrayOfArrays.reduce(0, {$0 + $1.items.count})
     }
     var first: ResultType? {
-        return self.arrayOfArrays.first?.items.first as? ResultType
+        return self.arrayOfArrays.first?.items.first
     }
     
     var fetchedObjects:[ResultType] {
@@ -141,7 +126,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         return self.arrayOfArrays[section].items.count
     }
     func object(at indexPath:IndexPath) -> ResultType {
-        return self.arrayOfArrays[indexPath.section].items[indexPath.row] as! ResultType
+        return self.arrayOfArrays[indexPath.section].items[indexPath.row]
     }
     
     public init(fetchRequest: NSFetchRequest<ResultType>, managedObjectContext context: NSManagedObjectContext, sectionNameKeyPath: String?, delegate:FetchedResultsControllerManagerDelegate?){
@@ -155,8 +140,12 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         }catch{
             print("Failed to fetch in fetchedResultsControllerManager from core data:\(error)")
         }
-        for s in self.fetchedResultsController.sections! {
-            self.arrayOfArrays.append(FetchedResultsControllerManagerSection(s.objects as! [NSManagedObject]))
+        if let sections = self.fetchedResultsController.sections {
+            for s in sections {
+                if let objects = s.objects as? [ResultType] {
+                    self.arrayOfArrays.append(FetchedResultsControllerManagerSection( objects ))
+                }
+            }
         }
     }
     
@@ -202,32 +191,37 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.currentChange?.insertedElements.sort(by:  { $0.index < $1.index } )
-        self.currentChange?.deletedElements.sort(by:  { $0.index > $1.index } )
-        
-        if let change = self.currentChange {
-            change.updatedElements.forEach({ (tuple) in
-                arrayOfArrays[tuple.index.section].items[tuple.index.row] = tuple.element as! NSManagedObject
-            })
-            let updateOnlyChange = FetchedResultsControllerManagerChange()
-            updateOnlyChange.updatedElements = change.updatedElements
-            self.delegate?.managerDidChangeContent(self, change: updateOnlyChange)
-            
-            change.deletedRows.forEach({ (indexPath) in
-                arrayOfArrays[indexPath.section].items.remove(at: indexPath.row)
-            })
-            change.deletedSections.reversed().forEach({ (index) in
-                arrayOfArrays.remove(at: index)
-            })
-            change.insertedSections.forEach({ (index) in
-                arrayOfArrays.insert(FetchedResultsControllerManagerSection([]), at: index)
-            })
-            change.insertedElements.forEach({ (tuple) in
-                arrayOfArrays[tuple.index.section].items.insert((tuple.element as! ResultType as! NSManagedObject), at: tuple.index.row)
-            })
-            change.updatedElements = []
-            self.delegate?.managerDidChangeContent(self, change: change)
+        guard let change = self.currentChange else {
+            return
         }
+        change.insertedElements.sort(by:  { $0.index < $1.index } )
+        change.deletedElements.sort(by:  { $0.index > $1.index } )
+        
+        change.updatedElements.forEach({ (tuple) in
+            if let element = tuple.element as? ResultType {
+                arrayOfArrays[tuple.index.section].items[tuple.index.row] = element
+            }
+        })
+        let updateOnlyChange = FetchedResultsControllerManagerChange()
+        updateOnlyChange.updatedElements = change.updatedElements
+        self.delegate?.managerDidChangeContent(self, change: updateOnlyChange)
+        
+        change.deletedRows.forEach({ (indexPath) in
+            arrayOfArrays[indexPath.section].items.remove(at: indexPath.row)
+        })
+        change.deletedSections.reversed().forEach({ (index) in
+            arrayOfArrays.remove(at: index)
+        })
+        change.insertedSections.forEach({ (index) in
+            arrayOfArrays.insert(FetchedResultsControllerManagerSection([]), at: index)
+        })
+        change.insertedElements.forEach({ (tuple) in
+            if let element = tuple.element as? ResultType {
+                arrayOfArrays[tuple.index.section].items.insert(element, at: tuple.index.row)
+            }
+        })
+        change.updatedElements = []
+        self.delegate?.managerDidChangeContent(self, change: change)
         self.currentChange = nil
     }
 }
