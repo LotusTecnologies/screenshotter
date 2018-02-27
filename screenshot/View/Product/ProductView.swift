@@ -17,6 +17,7 @@ class ProductView: UIView {
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
+    let contentTextView = UITextView()
     
     let selectionButton = SegmentedDropDownButton()
     let cartButton = MainButton()
@@ -116,7 +117,6 @@ class ProductView: UIView {
         selectionButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        let contentTextView = UITextView()
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .green
         contentTextView.isScrollEnabled = false
@@ -125,7 +125,7 @@ class ProductView: UIView {
         contentTextView.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-        contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
+//        contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
         
         websiteButton.translatesAutoresizingMaskIntoConstraints = false
         websiteButton.setTitleColor(.crazeGreen, for: .normal)
