@@ -17,10 +17,6 @@ def shared_pods
     pod 'Branch'
     pod 'EggRating', :git => 'https://github.com/jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/ios-11-support'
     pod 'Intercom'
-    pod 'Firebase/Invites'
-    pod 'Firebase/Auth'
-    pod 'GoogleSignIn'
-    pod 'DeepLinkKit'
     pod 'lottie-ios'
     pod 'Segment-Amplitude'
 end

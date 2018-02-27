@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class SettingsNavigationController : UINavigationController {
     let settingsViewController = SettingsViewController()

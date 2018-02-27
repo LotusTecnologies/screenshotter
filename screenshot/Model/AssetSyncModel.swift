@@ -20,11 +20,11 @@ class AccumulatorModel: NSObject {
     
     private var newScreenshotsCount: Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.newScreenshotsCount)
     
-    @objc public func getNewScreenshotsCount() -> Int {
+     public func getNewScreenshotsCount() -> Int {
         return newScreenshotsCount
     }
     
-    @objc public func resetNewScreenshotsCount() {
+     public func resetNewScreenshotsCount() {
         newScreenshotsCount = 0
         UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
     }
@@ -36,6 +36,15 @@ class AccumulatorModel: NSObject {
     
 }
 
+class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
+    let assetId: String
+    let imageData: Data?
+    init(assetId: String, imageData: Data?) {
+        self.assetId = assetId
+        self.imageData = imageData
+    }
+}
+
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
@@ -44,7 +53,7 @@ class AssetSyncModel: NSObject {
     var futureScreenshotAssets: PHFetchResult<PHAsset>?
     var selectedScreenshotAssets = Set<PHAsset>()
     var foregroundScreenshotAssetIds = Set<String>()
-    var backgroundScreenshotAssetIds = Set<String>()
+    var backgroundScreenshotDataArray: [BackgroundScreenshotData] = []
     var incomingDynamicLinks: [String] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
@@ -56,7 +65,7 @@ class AssetSyncModel: NSObject {
     var screenshotsToProcess: Int = 0
     var shoppablesToProcess: Int = 0
     
-    let imageMediaType = kUTTypeImage as String;
+    let imageMediaType = kUTTypeImage as String
     
     override init() {
         super.init()
@@ -77,7 +86,7 @@ class AssetSyncModel: NSObject {
         isRegistered = true
     }
     
-    @objc func applicationUserDidTakeScreenshot() {
+     func applicationUserDidTakeScreenshot() {
         print("AssetSyncModel applicationUserDidTakeScreenshot")
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
@@ -131,7 +140,7 @@ class AssetSyncModel: NSObject {
                         self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
                     } else { // Screenshot taken while app in background (or killed)
                         AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
-                        self.backgroundScreenshotAssetIds.insert(asset.localIdentifier)
+                        self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
                     }
                 }
             }.always(on: self.serialQ) {
@@ -577,7 +586,7 @@ class AssetSyncModel: NSObject {
         }
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 1;
+        fetchOptions.fetchLimit = 1
         
         let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: fetchOptions)
         
@@ -706,18 +715,19 @@ class AssetSyncModel: NSObject {
     }
     
     func endSync() {
-        let backgroundScreenshotIds = Set<String>(backgroundScreenshotAssetIds)
-        backgroundScreenshotAssetIds.removeAll()
+        let backgroundScreenshotData = backgroundScreenshotDataArray
+        backgroundScreenshotDataArray.removeAll()
         let wasRecentlyForeground = isRecentlyForeground
         isRecentlyForeground = false
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             if wasRecentlyForeground && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
-                self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: backgroundScreenshotIds)
+                let assetIds = Set<String>(backgroundScreenshotData.flatMap { $0.assetId })
+                self.screenshotDetectionDelegate?.backgroundScreenshotsWereTaken(assetIds: assetIds)
             }
         }
-        if backgroundScreenshotIds.count > 0 && ApplicationStateModel.sharedInstance.isBackground() {
-            self.sendScreenshotAddedLocalNotification(assetIds: backgroundScreenshotIds)
+        if backgroundScreenshotData.count > 0 && ApplicationStateModel.sharedInstance.isBackground() {
+            self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: backgroundScreenshotData)
         }
         isSyncing = false
         if shouldSyncAgain {
@@ -749,7 +759,7 @@ class AssetSyncModel: NSObject {
         return tuple.inserted
     }
     
-    @objc public func syncPhotos() {
+     public func syncPhotos() {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
             guard PermissionsManager.shared.hasPermission(for: .photo),
@@ -832,17 +842,17 @@ class AssetSyncModel: NSObject {
         }
     }
     
-    @objc public func syncPhotosUponForeground() {
+     public func syncPhotosUponForeground() {
         isRecentlyForeground = true
         syncPhotos()
     }
 
-    @objc public func syncSelectedPhotos(assets: [PHAsset]) {
+     public func syncSelectedPhotos(assets: [PHAsset]) {
         self.selectedScreenshotAssets.formUnion(assets)
         syncPhotos()
     }
     
-    @objc public func syncTutorialPhoto(image: UIImage) {
+     public func syncTutorialPhoto(image: UIImage) {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
             guard dataModel.isCoreDataStackReady,
@@ -894,7 +904,7 @@ class AssetSyncModel: NSObject {
         guard addToSelected(assetId: assetId) else {
             return
         }
-        backgroundScreenshotAssetIds.remove(assetId)
+        backgroundScreenshotDataArray = backgroundScreenshotDataArray.filter { $0.assetId != assetId }
         let accumulator = AccumulatorModel.sharedInstance
         if accumulator.getNewScreenshotsCount() > 0 {
             accumulator.addToNewScreenshots(count: -1)
@@ -902,7 +912,7 @@ class AssetSyncModel: NSObject {
         syncPhotos()
     }
     
-    @objc public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
+     public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
         guard let assetId = screenshot.assetId,
           addToSelected(assetId: assetId) else {
                 return
@@ -926,7 +936,7 @@ class AssetSyncModel: NSObject {
     }
 
     // Called from UI thread.
-    @objc public func refetchLastScreenshot() {
+     public func refetchLastScreenshot() {
         let dataModel = DataModel.sharedInstance
         guard let lastScreenshotAssetId = dataModel.retrieveLastScreenshotAssetId(managedObjectContext: dataModel.mainMoc()),
           addToSelected(assetId: lastScreenshotAssetId) else {
@@ -939,7 +949,7 @@ class AssetSyncModel: NSObject {
 
 extension AssetSyncModel {
     
-    func sendScreenshotAddedLocalNotification(assetIds: Set<String>) {
+    func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             print("sendScreenshotAddedLocalNotification refused by guard")
             return
@@ -954,16 +964,31 @@ extension AssetSyncModel {
             content.sound = UNNotificationSound.default()
         }
         UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
-        if assetIds.count == 1,
-          let onlyAssetId = assetIds.first {
+        if backgroundScreenshotData.count == 1,
+          let onlyAssetId = backgroundScreenshotData.first?.assetId {
             content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                 Constants.openingAssetIdKey : onlyAssetId]
         } else {
             content.userInfo = [Constants.openingScreenKey : Constants.openingScreenValueScreenshot]
         }
+        var identifier = "CrazeLocal"
+        if let representativeScreenshotData = backgroundScreenshotData.reversed().first(where: { $0.imageData != nil }), // Last taken screenshot that has imageData.
+            let representativeImageData = representativeScreenshotData.imageData {
+            identifier += representativeScreenshotData.assetId.replacingOccurrences(of: "/", with: "-")
+            // Add image url
+            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
+            do {
+                try representativeImageData.write(to: tmpImageFileUrl)
+                let attachment = try UNNotificationAttachment(identifier: identifier,
+                                                              url: tmpImageFileUrl,
+                                                              options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
+                content.attachments = [attachment]
+            } catch {
+                print("Local notification attachment error:\(error)")
+            }
+        }
+        
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        let firstAssetId = assetIds.first ?? ""
-        let identifier = "CrazeLocal" + firstAssetId
         let request = UNNotificationRequest(identifier: identifier,
                                             content: content,
                                             trigger: trigger)
@@ -1001,7 +1026,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    @objc public func handleDynamicLink(shareId: String) {
+     public func handleDynamicLink(shareId: String) {
         incomingDynamicLinks.append(shareId)
         syncPhotos()
     }
@@ -1046,7 +1071,7 @@ extension Screenshot {
         }
     }
     
-    @objc public func shareViaLink() -> AnyPromise {
+     public func shareViaLink() -> AnyPromise {
         return AnyPromise(share())
     }
     

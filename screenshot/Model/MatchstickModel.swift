@@ -55,7 +55,6 @@ class MatchstickModel: NSObject {
                                                                  remoteId: remoteId,
                                                                  imageUrl: imageUrl,
                                                                  syteJson: syteJson)
-                                print("fetchNextIfBelowWatermark saveMatchstick remoteId:\(remoteId)  imageUrl:\(imageUrl)")
                                 self.processingQ.async {
                                     self.fetchImageData(imageUrl: imageUrl)
                                 }
@@ -97,7 +96,6 @@ class MatchstickModel: NSObject {
             .then(on: processingQ) { imageData -> Void in
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     dataModel.addImageDataToMatchstick(managedObjectContext: managedObjectContext, imageUrl: imageUrl, imageData: imageData)
-                    print("fetchImageData addImageDataToMatchstick imageUrl:\(imageUrl)")
                 }
             }.catch(on: processingQ) { error in
                 print("fetchImageData catch error:\(error)")

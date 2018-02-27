@@ -10,11 +10,8 @@ import UIKit
 import Intercom
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
-
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
-
-    var isObservingSettingsBadgeFont = false
-
+    
     let favoritesNavigationController = FavoritesNavigationController()
     let screenshotsNavigationController = ScreenshotsNavigationController()
     let discoverNavigationController = DiscoverNavigationController()
@@ -23,15 +20,21 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     var settingsTabBarItem: UITabBarItem
     var updatePromptHandler: UpdatePromptHandler?
     let discoverTabTag = 1
-
+    
+    var isObservingSettingsBadgeFont = false
     let TabBarBadgeFontKey = "view.badge.label.font"
-
+    
     // MARK: - Lifecycle
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    init(delegate: ViewControllerLifeCycle) {
+        lifeCycleDelegate = delegate
         settingsTabBarItem = settingsNavigationController.tabBarItem
         
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        super.init(nibName: nil, bundle: nil)
         
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
         favoritesNavigationController.tabBarItem = tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: 0)
@@ -67,19 +70,21 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: NSNotification.Name(rawValue: NotificationCenterKeys.fetchedAppSettings), object: nil)
+        notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name:.fetchedAppSettings, object: nil)
         
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        lifeCycleDelegate?.viewControllerDidLoad(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, willAppear: animated)
+        self.lifeCycleDelegate?.viewController(self, willAppear: animated)
         
         self.refreshTabBarSettingsBadge()
     }
@@ -87,7 +92,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, didAppear: animated)
+        self.lifeCycleDelegate?.viewController(self, didAppear: animated)
         
         self.presentUpdatePromptIfNeeded()
         self.presentChangelogAlertIfNeeded()
@@ -96,13 +101,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, willDisappear: animated)
+        self.lifeCycleDelegate?.viewController(self, willDisappear: animated)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        self.lifeCycleDelegate?.viewController?(self, didDisappear: animated)
+        self.lifeCycleDelegate?.viewController(self, didDisappear: animated)
     }
 
     @available(iOS, introduced: 11.0)
@@ -225,6 +230,30 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
     }
     
+    func screenshotsTabPulseAnimation() {
+        guard let tabView = screenshotsNavigationController.tabBarItem.targetView else {
+            return
+        }
+        
+        UIView.animateKeyframes(withDuration: 0.8, delay: 0, options: .allowUserInteraction, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.2, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.2, relativeDuration: 0.4, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.4, relativeDuration: 0.6, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.6, relativeDuration: 0.8, animations: {
+                tabView.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            })
+            UIView.addKeyframe(withRelativeStartTime: 0.8, relativeDuration: 1, animations: {
+                tabView.transform = CGAffineTransform.identity
+            })
+        })
+    }
+    
     // MARK: - Screenshots
     
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController) {
@@ -249,7 +278,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     func backgroundScreenshotsWereTaken(assetIds: Set<String>) {
         if let assetId = assetIds.first {
-            self.screenshotsNavigationController.screenshotsViewController.presentNotificationCell(withAssetId: assetId)
+            self.screenshotsNavigationController.screenshotsViewController.presentNotificationCell(assetId: assetId)
         }
     }
     

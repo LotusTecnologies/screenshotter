@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol DiscoverScreenshotCollectionViewLayoutDelegate : NSObjectProtocol {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool

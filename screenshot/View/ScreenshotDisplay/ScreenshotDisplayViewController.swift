@@ -22,12 +22,12 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let p:CGFloat = Geometry.padding
+        let p: CGFloat = .padding
         let statusBarHeight:CGFloat = UIApplication.shared.statusBarFrame.size.height
         
         let backgroundView = UIView.init()
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
-        backgroundView.backgroundColor = UIColor.init(white: 97/255, alpha: 1)
+        backgroundView.backgroundColor = .gray4
         self.view.addSubview(backgroundView)
         backgroundView.topAnchor.constraint(equalTo:self.view.topAnchor, constant:statusBarHeight).isActive = true
         backgroundView.leadingAnchor.constraint(equalTo:self.view.leadingAnchor).isActive = true
@@ -107,14 +107,16 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         screenshotImageFrameView.isUserInteractionEnabled = false
         self.screenshotImageView.addSubview(screenshotImageFrameView)
         self.screenshotImageFrameView = screenshotImageFrameView
-        
-        self.shoppables?.forEach { shoppable in
-            let frame = shoppable.frame(size: screenshotImageFrameView.bounds.size)
-            
-            let frameView = UIView(frame: frame)
-            frameView.layer.borderColor = UIColor.white.withAlphaComponent(0.7).cgColor
-            frameView.layer.borderWidth = 2
-            screenshotImageFrameView.addSubview(frameView)
+
+        if let shoppables = self.shoppables {
+            for shoppable in shoppables {
+                let frame = shoppable.frame(size: screenshotImageFrameView.bounds.size)
+                
+                let frameView = UIView(frame: frame)
+                frameView.layer.borderColor = UIColor.white.withAlphaComponent(0.7).cgColor
+                frameView.layer.borderWidth = 2
+                screenshotImageFrameView.addSubview(frameView)
+            }
         }
     }
     

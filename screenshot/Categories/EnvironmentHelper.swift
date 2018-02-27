@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension Bundle {
     static let displayName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? ""

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension UIColor {
     static let background = UIColor(white: 244.0/255.0, alpha: 1)
@@ -32,7 +33,7 @@ extension UIColor {
         return adjust(by: -1 * abs(percentage))
     }
     
-    func adjust(by percentage: CGFloat = 8) -> UIColor? {
+    private func adjust(by percentage: CGFloat = 8) -> UIColor? {
         var r = CGFloat(), g = CGFloat(), b = CGFloat(), a = CGFloat()
         
         if getRed(&r, green: &g, blue: &b, alpha: &a) {
@@ -66,9 +67,9 @@ extension UIContentSizeCategory {
 }
 
 struct Shadow {
-    private(set) var radius: CGFloat;
-    private(set) var offset: CGSize;
-    private(set) var color: UIColor;
+    private(set) var radius: CGFloat
+    private(set) var offset: CGSize
+    private(set) var color: UIColor
     
     var insets: UIEdgeInsets {
         let inset = radius * 2
@@ -97,18 +98,6 @@ struct Shadow {
     }
     
     static let basic = Shadow(radius: 1, offset: CGSize(width: 0, height: 1), color: UIColor.black.withAlphaComponent(0.3))
-}
-
-// TODO: objc can access struct. remove this class one files are converted to swift
-class _Shadow: NSObject {
-    static let radius = Shadow.basic.radius
-    static let offset = Shadow.basic.offset
-    static let color = Shadow.basic.color
-    static let insets = Shadow.basic.insets
-    static let layoutMargins = Shadow.basic.layoutMargins
-    static func pathRect(_ bounds: CGRect) -> CGRect {
-        return Shadow.basic.pathRect(bounds)
-    }
 }
 
 extension UIApplication {

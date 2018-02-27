@@ -29,7 +29,7 @@ class ScreenshotPickerNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        restorationIdentifier = String(describing: type(of: self))
+        restorationIdentifier = "ScreenshotPickerNavigationController"
         
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
         doneButton = UIBarButtonItem()
@@ -74,7 +74,7 @@ class ScreenshotPickerViewController : BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        restorationIdentifier = String(describing: type(of: self))
+        restorationIdentifier = "ScreenshotPickerViewController"
         
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
     }
@@ -209,8 +209,11 @@ class ScreenshotPickerViewController : BaseViewController {
     }
     
     private func screenshotsOnlyOrExcludedPredicate() -> NSPredicate {
-        let has = isScreenshotsOnly ? "" : "NOT"
-        return NSPredicate(format: "\(has) ((mediaSubtype & %d) != 0)", PHAssetMediaSubtype.photoScreenshot.rawValue)
+        if isScreenshotsOnly {
+            return NSPredicate(format: "((mediaSubtype & %d) != 0)", PHAssetMediaSubtype.photoScreenshot.rawValue)
+        }else {
+            return NSPredicate(format: "NOT ((mediaSubtype & %d) != 0)", PHAssetMediaSubtype.photoScreenshot.rawValue)
+        }
     }
     
     // MARK: Segment

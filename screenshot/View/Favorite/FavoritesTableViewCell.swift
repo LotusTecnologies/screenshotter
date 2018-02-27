@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class FavoritesTableViewCell : UITableViewCell {
     private let screenshotContainerView = NotifyChangeView()
@@ -14,7 +15,7 @@ class FavoritesTableViewCell : UITableViewCell {
     private var screenshotImageViewWidthConstraint: NSLayoutConstraint!
     private var screenshotImageViewHeightConstraint: NSLayoutConstraint!
     fileprivate let shoppableContainerView = UIView()
-    fileprivate let heartView = FavoriteBadgeView()
+    let activityBadgeView = ActivityBadgeView()
     
     var imageData: NSData? {
         didSet {
@@ -69,10 +70,10 @@ class FavoritesTableViewCell : UITableViewCell {
         screenshotImageViewHeightConstraint.priority = UILayoutPriorityDefaultHigh
         screenshotImageViewHeightConstraint.isActive = true
         
-        heartView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(heartView)
-        heartView.centerXAnchor.constraint(equalTo: screenshotContainerView.leadingAnchor).isActive = true
-        heartView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
+        activityBadgeView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(activityBadgeView)
+        activityBadgeView.centerXAnchor.constraint(equalTo: screenshotContainerView.leadingAnchor).isActive = true
+        activityBadgeView.centerYAnchor.constraint(equalTo: screenshotContainerView.centerYAnchor).isActive = true
         
         let centerView = UIView()
         centerView.translatesAutoresizingMaskIntoConstraints = false
@@ -102,7 +103,7 @@ class FavoritesTableViewCell : UITableViewCell {
     
     override var backgroundColor: UIColor? {
         didSet {
-            heartView.backgroundColor = backgroundColor
+            activityBadgeView.backgroundColor = backgroundColor
         }
     }
     
@@ -111,12 +112,13 @@ class FavoritesTableViewCell : UITableViewCell {
     fileprivate func updateScreenshotImageViewSize() {
         if let imageSize = screenshotView.image?.size, !screenshotContainerView.bounds.isEmpty {
             let rect = imageSize.aspectFitRectInSize(screenshotContainerView.bounds.size)
-            
-            if screenshotImageViewWidthConstraint.constant != rect.size.width {
-                screenshotImageViewWidthConstraint.constant = rect.size.width
+            let width = rect.size.width
+            if screenshotImageViewWidthConstraint.constant != width {
+                screenshotImageViewWidthConstraint.constant = width
             }
-            if screenshotImageViewHeightConstraint.constant != rect.size.height {
-                screenshotImageViewHeightConstraint.constant = rect.size.height
+            let height = rect.size.height
+            if screenshotImageViewHeightConstraint.constant != height {
+                screenshotImageViewHeightConstraint.constant = height
             }
             
         } else {
@@ -161,13 +163,13 @@ class FavoritesTableViewCell : UITableViewCell {
         guard shoppableContainerView.subviews.count == 0, maxProducts.count > 0 else {
             return
         }
-        
-        maxProducts.enumerated().forEach { (i: Int, product: Product) in
+        for (i, product) in maxProducts.enumerated() {
             let productView = EmbossedView()
             
             var layoutMargins = productView.layoutMargins
-            layoutMargins.left = -.padding / 2 + abs(layoutMargins.left)
-            layoutMargins.right = -.padding / 2 + abs(layoutMargins.right)
+            let halfNegativepadding:CGFloat = -CGFloat.padding/2  //putting this as a separate lines make swift compile faster
+            layoutMargins.left = halfNegativepadding + abs(layoutMargins.left)
+            layoutMargins.right = halfNegativepadding + abs(layoutMargins.right)
             productView.layoutMargins = layoutMargins
             
             productView.placeholderImage = UIImage(named: "DefaultProduct")
@@ -187,7 +189,8 @@ class FavoritesTableViewCell : UITableViewCell {
                 shoppableContainerView.layoutMargins = shoppableLayoutMargins
                 
             } else {
-                let previousView = shoppableContainerView.subviews[i - 1]
+                let index = i - 1
+                let previousView = shoppableContainerView.subviews[index]
                 productView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: previousView.layoutMarginsGuide.trailingAnchor).isActive = true
             }
             
@@ -206,14 +209,6 @@ class FavoritesTableViewCell : UITableViewCell {
             if let productView = shoppableContainerView.subviews[i] as? EmbossedView {
                 productView.setImage(withURLString: product.imageURL)
             }
-        }
-    }
-    
-    // MARK: Heart
-    
-    var hasGoldHeart: Bool = false {
-        didSet {
-            heartView.tintColor = hasGoldHeart ? heartView.clearColor : .crazeRed
         }
     }
 }

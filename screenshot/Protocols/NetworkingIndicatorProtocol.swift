@@ -8,12 +8,12 @@
 
 import Foundation
 
-@objc enum NetworkingIndicatorType: Int {
+enum NetworkingIndicatorType: Int {
     case Screenshot
     case Product
 }
 
-@objc protocol NetworkingIndicatorProtocol: NSObjectProtocol {
-    @objc func networkingIndicatorDidStart(type: NetworkingIndicatorType)
-    @objc func networkingIndicatorDidComplete(type: NetworkingIndicatorType)
+protocol NetworkingIndicatorProtocol: NSObjectProtocol {
+    func networkingIndicatorDidStart(type: NetworkingIndicatorType)
+    func networkingIndicatorDidComplete(type: NetworkingIndicatorType)
 }

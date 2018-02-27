@@ -10,26 +10,6 @@ import UIKit
 import CoreData
 import PromiseKit
 
-@objc public protocol FrcDelegateProtocol : class {
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneAddedAt indexPath: IndexPath)
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneDeletedAt indexPath: IndexPath)
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneUpdatedAt indexPath: IndexPath)
-    func frc(_ frc:NSFetchedResultsController<NSFetchRequestResult>, oneMovedTo indexPath: IndexPath)
-    func frcReloadData(_ frc:NSFetchedResultsController<NSFetchRequestResult>)
-}
-
-enum CZChangeKind {
-    case none, singleAdd, singleDelete, singleUpdate, singleMove, multiple
-}
-
-
-class ShoppableFrc: NSFetchedResultsController<Shoppable> {
-    public let hasShoppablesFrc: NSFetchedResultsController<Screenshot>
-    init(fetchRequest: NSFetchRequest<Shoppable>, managedObjectContext: NSManagedObjectContext, sectionNameKeyPath: String?, cacheName: String?, hasShoppablesFrc: NSFetchedResultsController<Screenshot>) {
-        self.hasShoppablesFrc = hasShoppablesFrc
-        super.init(fetchRequest: fetchRequest, managedObjectContext: managedObjectContext, sectionNameKeyPath: sectionNameKeyPath, cacheName: cacheName)
-    }
-}
 
 class DataModel: NSObject {
     
@@ -37,7 +17,7 @@ class DataModel: NSObject {
     public static func setup() {
         let _ = DataModel.sharedInstance
     }
-
+    
     public var isCoreDataStackReady = false
     
     public let persistentContainer = NSPersistentContainer(name: "Model")
@@ -61,7 +41,7 @@ class DataModel: NSObject {
                     // Must async, or lazy eval closure called infinitely. Might as well async to main, as most handlers are there.
                     // See https://medium.com/@soapyfrog/dont-forget-that-none-of-this-is-thread-safe-so-it-is-actually-possible-for-the-lazy-eval-closure-add1c9b1dd95
                     DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["error" : error])
+                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["error" : error])
                     }
                 } else {
                     self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
@@ -73,7 +53,7 @@ class DataModel: NSObject {
                     }
                     // See above about lazy eval closure called infinitely if notification not asynced.
                     DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationCenterKeys.coreDataStackCompleted), object: nil, userInfo: ["success" : true])
+                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["success" : true])
                     }
                     MatchstickModel.shared.prepareMatchsticks()
                 }
@@ -83,233 +63,65 @@ class DataModel: NSObject {
     
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
     let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
+}
 
-    // MARK: - FRC
-
-    public lazy var screenshotFrc: NSFetchedResultsController<Screenshot> = {
+extension DataModel {
+    func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
         request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch screenshots from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
-    }()
-    weak open var screenshotFrcDelegate: FrcDelegateProtocol?
+    }
     
-    fileprivate var screenshotChangeIndexPath: IndexPath?
-    fileprivate var screenshotChangeKind: CZChangeKind = .none
+    func singleScreenshotFrc(delegate:FetchedResultsControllerManagerDelegate?, screenshot:Screenshot) -> FetchedResultsControllerManager<Screenshot>  {
+        let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
+        request.predicate = NSPredicate(format: "SELF == %@", screenshot.objectID)
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
     
-    
-    public func setupShoppableFrc(screenshot: Screenshot) -> ShoppableFrc {
-        let hasShoppablesRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-        hasShoppablesRequest.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
-        hasShoppablesRequest.predicate = NSPredicate(format: "SELF == %@", screenshot.objectID)
-        let hasShoppablesFetchedResultsController = NSFetchedResultsController(fetchRequest: hasShoppablesRequest, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        hasShoppablesFrc = hasShoppablesFetchedResultsController
-        hasShoppablesFrc?.delegate = self
-        
+    func shoppableFrc(delegate:FetchedResultsControllerManagerDelegate?, screenshot:Screenshot) -> FetchedResultsControllerManager<Shoppable> {
         let request: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "b0x", ascending: true), NSSortDescriptor(key: "b0y", ascending: true), NSSortDescriptor(key: "b1x", ascending: true), NSSortDescriptor(key: "b1y", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]
         request.predicate = NSPredicate(format: "screenshot == %@", screenshot)
-        let fetchedResultsController = ShoppableFrc(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil, hasShoppablesFrc: hasShoppablesFrc!)
-        shoppableFrc = fetchedResultsController as NSFetchedResultsController<Shoppable>
-        shoppableFrc?.delegate = self
-        
-        do {
-            try fetchedResultsController.performFetch()
-            try hasShoppablesFetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch shoppables from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Shoppable>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
     
-    public func clearShoppableFrc() {
-        shoppableFrc?.delegate = nil
-        shoppableFrc = nil
-        hasShoppablesFrc?.delegate = nil
-        hasShoppablesFrc = nil
-    }
-    
-    weak open var shoppableFrcDelegate: FrcDelegateProtocol?
-    
-    fileprivate var shoppableFrc: NSFetchedResultsController<Shoppable>?
-    fileprivate var shoppableChangeIndexPath: IndexPath?
-    fileprivate var shoppableChangeKind: CZChangeKind = .none
-    fileprivate var hasShoppablesFrc: NSFetchedResultsController<Screenshot>?
-    fileprivate var hasShoppablesChangeIndexPath: IndexPath?
-    fileprivate var hasShoppablesChangeKind: CZChangeKind = .none
-
-    
-    public lazy var favoriteFrc: NSFetchedResultsController<Screenshot> = {
-        let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+    func favoriteFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
+        let request: NSFetchRequest = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
         request.predicate = NSPredicate(format: "lastFavorited != nil")
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch _favoriteFrc from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
-    }()
-    weak open var favoriteFrcDelegate: FrcDelegateProtocol?
+    }
     
-    fileprivate var favoriteChangeIndexPath: IndexPath?
-    fileprivate var favoriteChangeKind: CZChangeKind = .none
+    func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
+        let date = NSDate.init(timeIntervalSinceNow:  -60*60*24*7)
+        request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
+        
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
     
-    
-    public lazy var matchstickFrc: NSFetchedResultsController<Matchstick> = {
-        let request: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+    func matchstickFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Matchstick> {
+        let request: NSFetchRequest = Matchstick.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
         request.predicate = NSPredicate(format: "imageData != nil")
-        request.fetchBatchSize = 3
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: self.mainMoc(), sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch matchsticks from core data:\(error)")
-        }
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Matchstick> = FetchedResultsControllerManager<Matchstick>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate:delegate)
+        
         return fetchedResultsController
-    }()
-    weak open var matchstickFrcDelegate: FrcDelegateProtocol?
-    
-    fileprivate var matchstickChangeIndexPath: IndexPath?
-    fileprivate var matchstickChangeKind: CZChangeKind = .none
-    
-}
-
-extension DataModel: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
-        let hasShoppablesFrcStandIn = hasShoppablesFrc == nil ? NSFetchedResultsController() : hasShoppablesFrc!
-        switch controller {
-        case screenshotFrc:
-            screenshotChangeKind = .none
-            screenshotChangeIndexPath = nil
-        case shoppableFrcStandIn:
-            shoppableChangeKind = .none
-            shoppableChangeIndexPath = nil
-        case hasShoppablesFrcStandIn:
-            hasShoppablesChangeKind = .none
-            hasShoppablesChangeIndexPath = nil
-        case favoriteFrc:
-            favoriteChangeKind = .none
-            favoriteChangeIndexPath = nil
-        case matchstickFrc:
-            matchstickChangeKind = .none
-            matchstickChangeIndexPath = nil
-        default:
-            print("Unknown controller:\(controller) in controllerWillChangeContent")
-        }
     }
-    
-    func didChange(changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, type: NSFetchedResultsChangeType, indexPath: IndexPath?, newIndexPath: IndexPath?) {
-        if changeKind != .none || changeIndexPath != nil {
-            changeKind = .multiple
-        } else {
-            switch type {
-            case .insert:
-                changeKind = .singleAdd
-                changeIndexPath = newIndexPath
-            case .delete:
-                changeKind = .singleDelete
-                changeIndexPath = indexPath
-            case .update:
-                changeKind = .singleUpdate
-                changeIndexPath = indexPath
-            case .move:
-                changeKind = .singleMove
-                changeIndexPath = newIndexPath
-            }
-        }
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
-        let hasShoppablesFrcStandIn = hasShoppablesFrc == nil ? NSFetchedResultsController() : hasShoppablesFrc!
-        switch controller {
-        case screenshotFrc:
-            didChange(changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case shoppableFrcStandIn:
-            didChange(changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case hasShoppablesFrcStandIn:
-            didChange(changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case favoriteFrc:
-            didChange(changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        case matchstickFrc:
-            didChange(changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, type: type, indexPath: indexPath, newIndexPath: newIndexPath)
-        default:
-            print("Unknown controller:\(controller) in controller didChange")
-        }
-    }
-    
-    func didChangeContent(frc: NSFetchedResultsController<NSFetchRequestResult>, changeKind: inout CZChangeKind, changeIndexPath: inout IndexPath?, frcDelegate: FrcDelegateProtocol?) {
-        switch changeKind {
-        case .none:
-            print("DataModel didChangeContent no change. Weird")
-        case .singleAdd:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneAddedAt: changeIndexPath)
-            } else {
-                print("Error DataModel singleAdd changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .singleDelete:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneDeletedAt: changeIndexPath)
-            } else {
-                print("Error DataModel singleDelete changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .singleUpdate:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneUpdatedAt: changeIndexPath)
-            } else {
-                print("Error DataModel singleAdd changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .singleMove:
-            if let changeIndexPath = changeIndexPath {
-                frcDelegate?.frc(frc, oneMovedTo: changeIndexPath)
-            } else {
-                print("Error DataModel singleMove changeIndexPath nil")
-                frcDelegate?.frcReloadData(frc)
-            }
-        case .multiple:
-            frcDelegate?.frcReloadData(frc)
-        }
-        changeKind = .none
-        changeIndexPath = nil
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let shoppableFrcStandIn = shoppableFrc == nil ? NSFetchedResultsController() : shoppableFrc!
-        let hasShoppablesFrcStandIn = hasShoppablesFrc == nil ? NSFetchedResultsController() : hasShoppablesFrc!
-        switch controller {
-        case screenshotFrc:
-            didChangeContent(frc: controller, changeKind: &screenshotChangeKind, changeIndexPath: &screenshotChangeIndexPath, frcDelegate: screenshotFrcDelegate)
-        case shoppableFrcStandIn:
-            didChangeContent(frc: controller, changeKind: &shoppableChangeKind, changeIndexPath: &shoppableChangeIndexPath, frcDelegate: shoppableFrcDelegate)
-        case hasShoppablesFrcStandIn:
-            didChangeContent(frc: controller, changeKind: &hasShoppablesChangeKind, changeIndexPath: &hasShoppablesChangeIndexPath, frcDelegate: shoppableFrcDelegate)
-        case favoriteFrc:
-            didChangeContent(frc: controller, changeKind: &favoriteChangeKind, changeIndexPath: &favoriteChangeIndexPath, frcDelegate: favoriteFrcDelegate)
-        case matchstickFrc:
-            didChangeContent(frc: controller, changeKind: &matchstickChangeKind, changeIndexPath: &matchstickChangeIndexPath, frcDelegate: matchstickFrcDelegate)
-        default:
-            print("Unknown controller:\(controller) in controllerDidChangeContent")
-        }
-    }
-    
 }
 
 extension DataModel {
@@ -375,10 +187,10 @@ extension DataModel {
         
         do {
             guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]],
-              let result = results.first,
-              let assetId = result["assetId"] else {
-                print("retrieveLastScreenshotAssetId failed to fetch dictionaries")
-                return nil
+                let result = results.first,
+                let assetId = result["assetId"] else {
+                    print("retrieveLastScreenshotAssetId failed to fetch dictionaries")
+                    return nil
             }
             return assetId
         } catch {
@@ -430,6 +242,27 @@ extension DataModel {
             print("retrieveScreenshot assetId:\(assetId) results with error:\(error)")
         }
         return nil
+    }
+    public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                productObjectIDs.forEach { productObjectId in
+                    if let product = managedObjectContext.object(with: productObjectId) as? Product {
+                        do{
+                            try product.validateForUpdate()
+                            product.hideFromProductBar = true
+                        } catch{
+                            
+                        }
+                        
+                        
+                    }
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("hideFromProductBar productObjectIDs catch error:\(error)")
+            }
+        }
     }
     
     public func hide(screenshotOIDArray: [NSManagedObjectID]) {
@@ -496,7 +329,7 @@ extension DataModel {
                            "Cufflings" : "25", "Sunglasses" : "26", "Hats" : "27", "Ties" : "28",
                            "Makeup" : "29", "NonFashion_Suitcases" : "30", "GlovesAndMitten" : "31", "SocksAndTights" : "32",
                            // Not ordered by Molly
-                           "Bodypart" : "33", "NonFashion_PhoneCover" : "34", "NonFashion_HeadPhone" : "35", "Underwear" : "36", "Watches" : "37"]
+            "Bodypart" : "33", "NonFashion_PhoneCover" : "34", "NonFashion_HeadPhone" : "35", "Underwear" : "36", "Watches" : "37"]
         if let label = label, let priorityOrder = priorityMap[label] {
             shoppableToSave.order = priorityOrder
         } else {
@@ -555,6 +388,7 @@ extension DataModel {
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.optionsMask = optionsMask
+        productToSave.dateRetrieved = NSDate()
         return productToSave
     }
     
@@ -569,7 +403,7 @@ extension DataModel {
         matchstickToSave.receivedAt = NSDate()
         return matchstickToSave
     }
-
+    
     func addImageDataToMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String, imageData: Data) {
         let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
@@ -586,7 +420,7 @@ extension DataModel {
             print("addImageDataToMatchstick imageUrl:\(imageUrl) results with error:\(error)")
         }
     }
-
+    
     func retrieveMatchstickImageUrlsWithNoData(managedObjectContext: NSManagedObjectContext) -> [String] {
         let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "imageData == nil")
@@ -642,8 +476,8 @@ extension DataModel {
                         screenshot.removeFromFavorites(product)
                         screenshot.favoritesCount -= 1
                         if let screenshotFavoritedDate = screenshot.lastFavorited,
-                          let productFavoritedDate = product.dateFavorited,
-                          (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
+                            let productFavoritedDate = product.dateFavorited,
+                            (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
                             screenshotsToUpdate.insert(screenshot)
                         }
                     }
@@ -676,21 +510,21 @@ extension DataModel {
             }
         }
     }
-
+    
     // Must be called on main.
-    @objc public func countShared() -> Int {
+    public func countShared() -> Int {
         let predicate = NSPredicate(format: "isFromShare == TRUE AND shoppablesCount > 0")
         return countScreenshotWorkhorse(predicate: predicate)
     }
     
     // Must be called on main.
-    @objc public func countScreenshotted() -> Int {
+    public func countScreenshotted() -> Int {
         let predicate = NSPredicate(format: "isFromShare == FALSE AND shoppablesCount > 0")
         return countScreenshotWorkhorse(predicate: predicate)
     }
     
     // Must be called on main.
-    @objc public func countTotalScreenshots() -> Int {
+    public func countTotalScreenshots() -> Int {
         let predicate = NSPredicate(format: "shoppablesCount > 0")
         return countScreenshotWorkhorse(predicate: predicate)
     }
@@ -772,7 +606,7 @@ extension DataModel {
             print("unpinMain results with error:\(error)")
         }
     }
-
+    
     public func saveMoc(managedObjectContext: NSManagedObjectContext) {
         do {
             try managedObjectContext.save()
@@ -780,9 +614,9 @@ extension DataModel {
             print("Updating db results with error:\(error)")
         }
     }
-
-// MARK: DB Migration
-
+    
+    // MARK: DB Migration
+    
     func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
         let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
         if (from < 9 && to >= 7 && installDate != nil) { // Originally was from < 7, but a bug fixed in 9 should re-run for 7 or 8.
@@ -830,9 +664,9 @@ extension DataModel {
             let results = try managedObjectContext.fetch(request)
             for dict in results {
                 if let favoritesCount = dict["count"] as? Int16,
-                  let lastFavorited = dict["max"] as? NSDate,
-                  let screenshotId = dict["shoppable.screenshot"] as? NSManagedObjectID,
-                  let screenshot = managedObjectContext.object(with: screenshotId) as? Screenshot {
+                    let lastFavorited = dict["max"] as? NSDate,
+                    let screenshotId = dict["shoppable.screenshot"] as? NSManagedObjectID,
+                    let screenshot = managedObjectContext.object(with: screenshotId) as? Screenshot {
                     screenshot.favoritesCount = favoritesCount
                     screenshot.lastFavorited = lastFavorited
                 } else {
@@ -860,7 +694,7 @@ extension DataModel {
             print("initializeFavoritesSets results with error:\(error)")
         }
     }
-
+    
     func cleanDeletedScreenshots(managedObjectContext: NSManagedObjectContext) {
         let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "isHidden == TRUE")
@@ -920,7 +754,7 @@ extension Screenshot {
     // It does not actually hide the screenshot.
     func hideWorkhorse(managedObjectContext: NSManagedObjectContext, deleteImage: Bool = true) {
         if let favoriteSet = favorites as? Set<Product>,
-          favoriteSet.count > 0 {
+            favoriteSet.count > 0 {
             favoriteSet.forEach { $0.shoppable = nil }
         } else if deleteImage {
             if isFromShare {
@@ -938,13 +772,13 @@ extension Screenshot {
         uploadedImageURL = nil
     }
     
-    @objc public func setHide() {
+    public func setHide() {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             do {
                 guard let screenshot = managedObjectContext.object(with: managedObjectID) as? Screenshot,
-                  screenshot.isHidden == false else {
-                    return
+                    screenshot.isHidden == false else {
+                        return
                 }
                 screenshot.isHidden = true
                 screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
@@ -955,7 +789,7 @@ extension Screenshot {
         }
     }
     
-    @objc public func setViewed() {
+    public func setViewed() {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
@@ -974,7 +808,7 @@ extension Screenshot {
         }
     }
     
-    @objc func shoppablesBoundingFrame(in size: CGSize) -> CGRect {
+    func shoppablesBoundingFrame(in size: CGSize) -> CGRect {
         var frame: CGRect = .null
         
         if let shoppables = shoppables {
@@ -987,7 +821,7 @@ extension Screenshot {
         
         return frame
     }
-
+    
     // Typically called after unfavoriting a product, its screenshot's lastFavorited needs to be set to the most recently favorited,
     // so the favoriteFrc correctly orders the screenshots.
     func updateLastFavorited() {
@@ -1019,22 +853,27 @@ extension Screenshot {
 
 extension Shoppable {
     
-    @objc public func frame(size: CGSize) -> CGRect {
+    public func frame(size: CGSize) -> CGRect {
         let viewWidth = Double(size.width)
         let viewHeight = Double(size.height)
         let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
         return frame
     }
     
-    @objc public func cropped(image: UIImage) -> UIImage? {
+    public func cropped(image: UIImage, thumbSize:CGSize) -> UIImage? {
         let cropFrame = self.frame(size: image.size)
-        guard let imageRef = image.cgImage?.cropping(to: cropFrame) else {
+        let imageFrame = CGRect.init(origin: .zero, size: image.size)
+        let thumbFrame = CGRect.init(origin: .zero, size: thumbSize)
+        let cropFrameWithoutWhiteBars = thumbFrame.aspectFit(around:cropFrame).intersection(imageFrame)
+        
+        if let imageRef = image.cgImage?.cropping(to: cropFrameWithoutWhiteBars) {
+            let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
+            return croppedImage
+        }else{
             return nil
         }
-        let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
-        return croppedImage
     }
-
+    
     private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {
         let shoppableID = self.objectID
         let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
@@ -1074,7 +913,7 @@ extension Shoppable {
     }
     
     // Updates all this screenshot's shoppables' productFilters' dateSet.
-    @objc func set(productsOptions: ProductsOptions, callback: @escaping () -> Void) {
+    func set(productsOptions: ProductsOptions, callback: @escaping () -> Void) {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
@@ -1089,7 +928,7 @@ extension Shoppable {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
                     if let lastSetMask = shoppable.getLast(),
-                      lastSetMask.rawValue & 0x01C0 != optionsMaskInt & 0x01C0 { // Category bits
+                        lastSetMask.rawValue & 0x01C0 != optionsMaskInt & 0x01C0 { // Category bits
                         if let screenshot = shoppable.screenshot {
                             screenshot.hideWorkhorse(managedObjectContext: managedObjectContext, deleteImage: false)
                             screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
@@ -1102,7 +941,7 @@ extension Shoppable {
                     if let matchingFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMaskInt)).first as? ProductFilter {
                         matchingFilter.dateSet = NSDate()
                         if matchingFilter.productCount == 0,
-                          let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count {
+                            let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count {
                             matchingFilter.productCount = Int16(actualFilteredProductCount)
                         }
                         shoppable.productFilterCount = matchingFilter.productCount
@@ -1114,7 +953,7 @@ extension Shoppable {
                         continue
                     }
                     if let actualFilteredProductCount = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", optionsMaskInt, optionsMaskInt)).count,
-                      actualFilteredProductCount > 0 {
+                        actualFilteredProductCount > 0 {
                         continue
                     }
                     AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
@@ -1127,21 +966,21 @@ extension Shoppable {
         }
     }
     
-    @objc func getLast() -> ProductsOptionsMask? {
+    func getLast() -> ProductsOptionsMask? {
         if let lastSetFilter = getLastFilter() {
             return ProductsOptionsMask(rawValue: Int(lastSetFilter.optionsMask))
         }
         return nil
     }
-
-    @objc public func getRating() -> Int16 {
+    
+    public func getRating() -> Int16 {
         if let lastSetFilter = getLastFilter() {
             return lastSetFilter.rating
         }
         return 0
     }
     
-    @objc public func setRating(positive: Bool) {
+    public func setRating(positive: Bool) {
         let shoppableID = self.objectID
         let imageUrl = self.screenshot?.uploadedImageURL
         let offersUrl = self.offersURL
@@ -1150,7 +989,7 @@ extension Shoppable {
         let b0y = self.b0y
         let b1x = self.b1x
         let b1y = self.b1y
-
+        
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
@@ -1198,7 +1037,47 @@ extension Shoppable {
 
 extension Product {
     
-    @objc public func setFavorited(toFavorited: Bool) {
+    func getSortDateForProductBar() -> Date {
+        
+        var date = Date.distantPast
+        
+        if self.isFavorite, let dateFavorited = self.dateFavorited as Date?{
+            date = dateFavorited
+        }
+        
+        if  let dateViewed = self.dateViewed as Date?{
+            if dateViewed.compare(date) == .orderedDescending {
+                date = dateViewed
+            }
+        }
+        
+        return date
+    }
+    
+    public func recordViewedProduct(){
+        let now = NSDate()
+        let managedObjectID = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for product in results {
+                    product.dateViewed = now
+                    product.dateSortProductBar = product.getSortDateForProductBar() as NSDate
+                    product.hideFromProductBar = false
+                }
+                try managedObjectContext.save()
+            } catch {
+                print("recordViewedProduct objectID:\(managedObjectID) results with error:\(error)")
+            }
+        }
+    }
+    
+    
+    public func setFavorited(toFavorited: Bool) {
         let managedObjectID = self.objectID
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
@@ -1209,9 +1088,14 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
+                    if toFavorited == false {
+                        product.dateViewed  = nil
+                    }
                     if toFavorited {
                         let now = NSDate()
                         product.dateFavorited = now
+                        product.dateSortProductBar = product.getSortDateForProductBar() as NSDate
+                        product.hideFromProductBar = false
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.addToFavorites(product)
                             if let favoritesCount = screenshot.favorites?.count {
@@ -1264,24 +1148,24 @@ extension Product {
         }
     }
     
-    @objc public func isSale() -> Bool {
+    public func isSale() -> Bool {
         return floatPrice < floatOriginalPrice
     }
     
 }
 
 extension Matchstick {
-
-    @objc public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+    
+    public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
         let managedObjectID = self.objectID
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in
             do {
                 if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick,
-                  let assetId = matchstick.remoteId,
-                  let uploadedImageURL = matchstick.imageUrl,
-                  let syteJson = matchstick.syteJson,
-                  let segments = NetworkingPromise.jsonDestringify(string: syteJson) {
+                    let assetId = matchstick.remoteId,
+                    let uploadedImageURL = matchstick.imageUrl,
+                    let syteJson = matchstick.syteJson,
+                    let segments = NetworkingPromise.jsonDestringify(string: syteJson) {
                     let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                    assetId: assetId,
                                                                    createdAt: Date(),
@@ -1308,7 +1192,7 @@ extension Matchstick {
                         }
                     }
                     if callback == nil,
-                      dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
+                        dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
                         MatchstickModel.shared.fetchNextIfBelowWatermark()
                     }
                 } else {
@@ -1320,7 +1204,7 @@ extension Matchstick {
         }
     }
     
-    @objc public func pass() {
+    public func pass() {
         let managedObjectID = self.objectID
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in

@@ -61,6 +61,12 @@ public class AnalyticsUser : NSObject {
         }
         
         props["userAge"] = "\(userAge())"
+        if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
+            props["personalStylistPurchased"] = "true"
+        }
+        
+        
+
         return props
     }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProductsRateView : UIView {
     fileprivate let contentView = UIView()
@@ -17,11 +18,6 @@ class ProductsRateView : UIView {
     fileprivate let label = UILabel()
     fileprivate var labelTrailingConstraint: NSLayoutConstraint!
     
-    // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -86,6 +82,10 @@ class ProductsRateView : UIView {
         }
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -121,7 +121,7 @@ class ProductsRateView : UIView {
         }else if hasRating {
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
                 label.textColor = .white
-                label.text = "products.rate.backToConverstationWithStylist".localized
+                label.text = "products.rate.talk_to_stylist".localized
                 label.textAlignment = .center
                 talkToYourStylistButton.isUserInteractionEnabled = true
                 
