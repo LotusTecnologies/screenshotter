@@ -20,9 +20,9 @@ class ProductViewController : BaseViewController {
     fileprivate var productView: ProductView?
     fileprivate var selectionColorItem: SegmentedDropDownItem?
     fileprivate var selectionSizeItem: SegmentedDropDownItem?
+    fileprivate var productEmptyView: UIView?
     fileprivate var loadingView: Loader?
     
-    fileprivate var product: Product?
     fileprivate var structuredProduct: StructuredProduct?
     
     // MARK: Life Cycle
@@ -38,9 +38,9 @@ class ProductViewController : BaseViewController {
         
         ShoppingCartModel.shared.populateVariants(productOID: productOID)
             .then { product -> Void in
-                self.product = product
                 self.state = .product
-                self.managerDidChangeContent()
+                self.structuredProduct = StructuredProduct(product)
+                self.applyStructuredProductIfPossible()
             }
             .catch { error in
                 self.state = .empty
@@ -78,7 +78,24 @@ class ProductViewController : BaseViewController {
     fileprivate func syncState() {
         switch state {
         case .empty:
-            break
+            guard self.productEmptyView == nil else {
+                return
+            }
+            
+            loadingView?.removeFromSuperview()
+            loadingView = nil
+            productView?.removeFromSuperview()
+            productView = nil
+            
+            let productEmptyView = UIView()
+            productEmptyView.translatesAutoresizingMaskIntoConstraints = false
+            productEmptyView.backgroundColor = .orange
+            view.addSubview(productEmptyView)
+            productEmptyView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+            productEmptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            productEmptyView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+            productEmptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            self.productEmptyView = productEmptyView
             
         case .loading:
             guard self.loadingView == nil else {
@@ -87,6 +104,8 @@ class ProductViewController : BaseViewController {
             
             productView?.removeFromSuperview()
             productView = nil
+            productEmptyView?.removeFromSuperview()
+            productEmptyView = nil
             
             let loadingView = Loader()
             loadingView.translatesAutoresizingMaskIntoConstraints = false
@@ -103,6 +122,8 @@ class ProductViewController : BaseViewController {
             
             loadingView?.removeFromSuperview()
             loadingView = nil
+            productEmptyView?.removeFromSuperview()
+            productEmptyView = nil
             
             let productView = ProductView()
             productView.translatesAutoresizingMaskIntoConstraints = false
@@ -124,10 +145,10 @@ class ProductViewController : BaseViewController {
 }
 
 typealias ProductViewControllerProductView = ProductViewController
-extension ProductViewControllerProductView {
+fileprivate extension ProductViewControllerProductView {
     // MARK: Gallery
     
-    fileprivate func setImages(urls: [URL]) {
+    func setImages(urls: [URL]) {
         guard let productView = productView else {
             return
         }
@@ -168,7 +189,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    @objc fileprivate func pageControlDidChange() {
+    @objc func pageControlDidChange() {
         guard let productView = productView else {
             return
         }
@@ -178,7 +199,7 @@ extension ProductViewControllerProductView {
         productView.galleryScrollView.setContentOffset(point, animated: true)
     }
     
-    fileprivate var currentPage: Int {
+    var currentPage: Int {
         guard let productView = productView else {
             return 0
         }
@@ -188,7 +209,7 @@ extension ProductViewControllerProductView {
     
     // MARK: Labels
     
-    fileprivate func setProductTitle(_ title: String?) {
+    func setProductTitle(_ title: String?) {
         guard let productView = productView else {
             return
         }
@@ -196,7 +217,7 @@ extension ProductViewControllerProductView {
         productView.titleLabel.text = title
     }
     
-    fileprivate func setPrice(_ price: String?) {
+    func setPrice(_ price: String?) {
         guard let productView = productView else {
             return
         }
@@ -204,7 +225,7 @@ extension ProductViewControllerProductView {
         productView.priceLabel.text = price
     }
     
-    fileprivate func setOriginalPrice(_ price: String?) {
+    func setOriginalPrice(_ price: String?) {
         guard let productView = productView else {
             return
         }
@@ -222,7 +243,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    fileprivate func setWebsiteMerchant(_ merchant: String?) {
+    func setWebsiteMerchant(_ merchant: String?) {
         guard let productView = productView else {
             return
         }
@@ -248,7 +269,7 @@ extension ProductViewControllerProductView {
     
     // MARK: Actions
     
-    @objc fileprivate func selectionButtonTouchUpInside() {
+    @objc func selectionButtonTouchUpInside() {
 //        guard let productView = productView else {
 //            return
 //        }
@@ -256,7 +277,7 @@ extension ProductViewControllerProductView {
         // ???: need analytics here
     }
     
-    @objc fileprivate func selectionButtonValueChanged() {
+    @objc func selectionButtonValueChanged() {
         guard let productView = productView, let selectedItem = productView.selectionButton.selectedItem else {
             return
         }
@@ -272,7 +293,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    @objc fileprivate func cartButtonAction() {
+    @objc func cartButtonAction() {
         guard let productView = productView else {
             return
         }
@@ -321,7 +342,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    @objc fileprivate func buyButtonAction() {
+    @objc func buyButtonAction() {
         //        guard let productView = productView else {
         //            return
         //        }
@@ -329,12 +350,45 @@ extension ProductViewControllerProductView {
         // TODO:
     }
     
-    @objc fileprivate func pushMerchantURL() {
+    @objc func pushMerchantURL() {
         //        guard let productView = productView else {
         //            return
         //        }
         
         // TODO:
+    }
+}
+
+typealias ProductViewControllerStructuredProduct = ProductViewController
+fileprivate extension ProductViewControllerStructuredProduct {
+    func applyStructuredProductIfPossible() {
+        guard let structuredProduct = structuredProduct else {
+            return
+        }
+        
+        setImages(urls: structuredProduct.product.imageURLs())
+        setWebsiteMerchant(structuredProduct.product.merchant)
+        setProductTitle(structuredProduct.title)
+        setPrice(structuredProduct.product.price)
+        
+        if structuredProduct.product.isSale() {
+            setOriginalPrice(structuredProduct.product.originalPrice)
+        }
+        
+        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors)
+        selectionColorItem = colorItem
+        
+        var sizeItem: SegmentedDropDownItem? = nil
+        
+        if !structuredProduct.sizes.isEmpty {
+            sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
+            sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            selectionSizeItem = sizeItem
+        }
+        
+        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
+        
+        repositionScrollView()
     }
 }
 
@@ -382,55 +436,18 @@ extension ProductViewController : UIScrollViewDelegate {
 }
 
 extension ProductViewController {
-    func managerDidChangeContent() {
-        guard let product = product else {
-            state = .empty
-            return
-        }
-        
-        let structuredProduct = StructuredProduct(product)
-        self.structuredProduct = structuredProduct
-        
-        print("||| \(structuredProduct)")
-        
-        
-        state = .product
-        title = product.displayTitle
-        setImages(urls: product.imageURLs())
-        setWebsiteMerchant(product.merchant)
-        setProductTitle(product.productDescription)
-        setPrice(product.price)
-        
-        if product.isSale() {
-            setOriginalPrice(product.originalPrice)
-        }
-        
-        
-        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors)
-        selectionColorItem = colorItem
-        
-        var sizeItem: SegmentedDropDownItem? = nil
-            
-        if !structuredProduct.sizes.isEmpty {
-            sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
-            sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
-            selectionSizeItem = sizeItem
-        }
-        
-        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
-        
-        repositionScrollView()
-    }
-}
-
-extension ProductViewController {
     fileprivate class StructuredProduct: NSObject {
+        let product: Product
+        private(set) var title: String?
         private(set) var variants: [StructuredVariant] = []
         private(set) var colors: [String] = []
         private(set) var sizes: [String] = []
         
         init(_ product: Product) {
+            self.product = product
             super.init()
+            
+            self.title = generateTitle(product)
             
             guard let variants = product.availableVariants?.allObjects as? [Variant] else {
                 return
@@ -468,8 +485,13 @@ extension ProductViewController {
             self.variants = structuredVariants
             self.colors = colors.sorted()
             self.sizes = sizes.sorted(by: { (a, b) -> Bool in
+                // TODO: number size should be sorted
                 return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
             })
+        }
+        
+        func generateTitle(_ product: Product) -> String? {
+            return product.productDescription?.split(separator: ",").dropLast().joined(separator: ",")
         }
         
         func variant(forColor color: String?) -> StructuredVariant? {
