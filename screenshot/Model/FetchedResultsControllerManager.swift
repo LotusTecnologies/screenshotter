@@ -111,9 +111,8 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
     }
     
     var fetchedObjects: [ResultType] {
-        
-        let toReturn: [Any] = arrayOfArrays.flatMap {$0.items}
-        return toReturn as? [ResultType] ?? []
+        let toReturn: [ResultType] = arrayOfArrays.flatMap {$0.items}
+        return toReturn
     }
     
     // TODO: Remove after all uses removed. You should never need to look up an indexPath for an object.
