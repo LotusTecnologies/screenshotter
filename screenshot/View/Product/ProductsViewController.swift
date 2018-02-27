@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 enum ProductsSection : Int {
     case tooltip = 0
@@ -162,7 +163,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         self.syncScreenshotRelatedObjects()
         
-        if self.screenshotController.fetchedResultsController.fetchedObjects?.first?.shoppablesCount == -1  {
+        if self.screenshotController.first?.shoppablesCount == -1  {
             self.state = .retry
             AnalyticsTrackers.standard.track(.screenshotOpenedWithoutShoppables)
         }
@@ -205,7 +206,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     func displayScreenshotAction() {
         let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
         navigationController.screenshotDisplayViewController.image = self.image
-        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesController.fetchedResultsController.fetchedObjects
+        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesController.fetchedObjects
         self.present(navigationController, animated: true, completion: nil)
     }
     
@@ -250,7 +251,7 @@ extension ProductsViewController {
         
         if changed {
             if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
-                let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+                let shoppable = self.shoppablesController.object(at: IndexPath.init(row: index, section: 0))
                 shoppable.set(productsOptions: productsOptions, callback:  {
                     if let index = self.shoppablesToolbar?.selectedShoppableIndex(){
                         self.reloadProductsForShoppable(at:index)
@@ -443,7 +444,7 @@ extension ProductsViewControllerOptionsView {
         else {
             AnalyticsTrackers.standard.track(.openedFiltersView, properties:nil)
             if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
-                let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+                let shoppable = self.shoppablesController.object(at: IndexPath.init(row: index, section: 0))
                 self.productsOptions.syncOptions(withMask: shoppable.getLast())
             }
             control.customInputView = self.productsOptions.view
@@ -464,7 +465,7 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
                 self.reloadProductsForShoppable(at: index)
             }
         }else if controller == self.screenshotController {
-            if let screenShot = self.screenshotController.fetchedResultsController.fetchedObjects?.first {
+            if let screenShot = self.screenshotController.first {
                 if screenShot.shoppablesCount == 0 {
                     
                 }else if screenShot.shoppablesCount == -1 {
@@ -477,7 +478,7 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
     }
     
     func hasShoppables() -> Bool {
-        return self.shoppablesController.fetchedResultsController.fetchedObjectsCount > 0
+        return self.shoppablesController.fetchedObjectsCount > 0
     }
 }
 
@@ -499,7 +500,7 @@ extension ProductsViewControllerProducts{
         if self.hasShoppables() {
             self.scrollRevealController?.resetViewOffset()
             
-            let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+            let shoppable = self.shoppablesController.object(at: IndexPath.init(row: index, section: 0))
             
             if shoppable.productFilterCount == -1 {
                 self.state = .retry
@@ -640,14 +641,14 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     
     func productsRatePositiveAction() {
         if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
-            let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+            let shoppable = self.shoppablesController.object(at: IndexPath.init(row: index, section: 0))
             shoppable.setRating(positive: true)
         }
     }
     
     func productsRateNegativeAction() {
         if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
-            let shoppable = self.shoppablesController.fetchedResultsController.object(at: IndexPath.init(row: index, section: 0))
+            let shoppable = self.shoppablesController.object(at: IndexPath.init(row: index, section: 0))
             shoppable.setRating(positive: false)
             self.presentProductsRateNegativeAlert()
         }
