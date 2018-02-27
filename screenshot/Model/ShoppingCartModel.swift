@@ -36,6 +36,7 @@ class ShoppingCartModel {
                     return Promise(value: product)
                 } else {
                     let error = NSError(domain: "Craze", code: 32, userInfo: [NSLocalizedDescriptionKey : "populateVariants failed to fetch a third time product:\(productOID)"])
+                    print("populateVariants catch error:\(error)")
                     return Promise(error: error)
                 }
         }

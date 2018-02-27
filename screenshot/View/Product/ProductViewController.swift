@@ -35,15 +35,15 @@ class ProductViewController : BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
-        state = .loading
-        ShoppingCartModel.shared.populateVariants(productOID: productOID).then { product -> Void in
-            self.product = product
-            self.state = .product
-            self.managerDidChangeContent()
-            }.catch { error in
-                print("ProductViewController init populateVariants catch error:\(error)")
+        
+        ShoppingCartModel.shared.populateVariants(productOID: productOID)
+            .then { product -> Void in
+                self.product = product
+                self.state = .product
+                self.managerDidChangeContent()
+            }
+            .catch { error in
                 self.state = .empty
-                self.syncState()
         }
     }
     
