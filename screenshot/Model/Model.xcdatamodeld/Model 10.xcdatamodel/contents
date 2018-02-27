@@ -8,10 +8,16 @@
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CartItem" inverseName="cart" inverseEntity="CartItem" syncable="YES"/>
     </entity>
     <entity name="CartItem" representedClassName="CartItem" syncable="YES" codeGenerationType="class">
+        <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="imageURLs" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="quantity" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="size" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sku" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="variantDateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="cart" maxCount="1" deletionRule="Nullify" destinationEntity="Cart" inverseName="items" inverseEntity="Cart" syncable="YES"/>
-        <relationship name="variant" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Variant" inverseName="inItems" inverseEntity="Variant" syncable="YES"/>
+        <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="cartItems" inverseEntity="Product" syncable="YES"/>
     </entity>
     <entity name="Matchstick" representedClassName="Matchstick" syncable="YES" codeGenerationType="class">
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
@@ -45,6 +51,7 @@
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="availableVariants" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Variant" inverseName="product" inverseEntity="Variant" syncable="YES"/>
+        <relationship name="cartItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CartItem" inverseName="product" inverseEntity="CartItem" syncable="YES"/>
         <relationship name="screenshot" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="favorites" inverseEntity="Screenshot" syncable="YES"/>
         <relationship name="shoppable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="products" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
@@ -95,17 +102,16 @@
         <attribute name="size" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sku" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="inItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CartItem" inverseName="variant" inverseEntity="CartItem" syncable="YES"/>
         <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="availableVariants" inverseEntity="Product" syncable="YES"/>
     </entity>
     <elements>
+        <element name="Cart" positionX="369" positionY="-108" width="128" height="118"/>
+        <element name="CartItem" positionX="540" positionY="27" width="128" height="195"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
-        <element name="Product" positionX="-101" positionY="396" width="128" height="435"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="450"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="285"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
-        <element name="Variant" positionX="124" positionY="636" width="128" height="178"/>
-        <element name="Cart" positionX="369" positionY="-108" width="128" height="118"/>
-        <element name="CartItem" positionX="540" positionY="27" width="128" height="103"/>
+        <element name="Variant" positionX="124" positionY="636" width="128" height="165"/>
     </elements>
 </model>
