@@ -68,10 +68,10 @@ extension DataModel {
     func receivedCoreDataError(error:Error) {
         let error = error as NSError
         if error.domain == NSSQLiteErrorDomain && error.code == 13{ // disk full  see https://sqlite.org/c3ref/c_abort.html
-            AnalyticsTrackers.standard.track("Error", properties: ["type":"noHardDriveSpace"])
+            AnalyticsTrackers.standard.track(.error, properties: ["type":"noHardDriveSpace"])
             AppDelegate.shared.presentLowDiskSpaceWarning()
         }else{
-            AnalyticsTrackers.standard.track("Error", properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
         }
     }
 }

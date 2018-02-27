@@ -40,6 +40,7 @@ public enum AnalyticsEvent : String {
     case gameStarted = "Game Started"
     case ignoredRatingInApp = "Ignored rating in app"
     case ignoredRatingOnAppstore = "Ignored rating on AppStore"
+    case inAppPurchase = "InAppPurchase"
     case importedPhotos = "Imported Photos"
     case matchsticksAdd = "Matchsticks Add"
     case matchsticksFlagged = "Matchsticks Flagged"
