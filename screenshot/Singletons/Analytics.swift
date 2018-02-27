@@ -12,6 +12,96 @@ import Appsee
 import Branch
 import FBSDKCoreKit
 
+public enum AnalyticsEvent : String {
+    case submittedEmail = "Submitted email"
+    case submittedBlankEmail = "Submitted blank email"
+    case apnEnabled = "APN Enabled"
+    case apnDisabled = "APN Disabled"
+    case acceptedPushPermissions = "Accepted Push Permissions"
+    case appOpenedFromLocalNotification = "app opened from local notification"
+    case appSentLocalPushNotification = "app sent local push notification"
+    case automaticallyExitedTutorialVideo = "Automatically Exited Tutorial Video"
+    case bypassedClarifai = "bypassed Clarifai"
+    case bypassedClarifaiOnRetry = "bypassed Clarifai on retry"
+    case canceledPhotoCreation = "Canceled Photo Creation"
+    case completedTutorialVideo = "Completed Tutorial Video"
+    case continuedTutorialVideo = "Continued Tutorial Video"
+    case createdPhoto = "Created Photo"
+    case dailyStreak = "Daily Streak"
+    case deniedPushPermissions = "Denied Push Permissions"
+    case errImgHang = "err img hang"
+    case error = "Error"
+    case finishedDownloadingClarifaiModel = "finished downloading Clarifai model"
+    case finishedTutorial = "Finished Tutorial"
+    case gameCollision = "Game Collision"
+    case gameInterrupted = "Game Interrupted"
+    case gameOpened = "Game Opened"
+    case gameRestarted = "Game Restarted"
+    case gameResumed = "Game Resumed"
+    case gameScoreIncreased = "Game Score Increased"
+    case gameStarted = "Game Started"
+    case ignoredRatingInApp = "Ignored rating in app"
+    case ignoredRatingOnAppstore = "Ignored rating on AppStore"
+    case importedPhotos = "Imported Photos"
+    case matchsticksAdd = "Matchsticks Add"
+    case matchsticksFlagged = "Matchsticks Flagged"
+    case matchsticksOpenedScreenshot = "Matchsticks Opened Screenshot"
+    case matchsticksSkip = "Matchsticks Skip"
+    case openedFiltersView = "Opened Filters View"
+    case openedPicker = "Opened Picker"
+    case openedWithRemoteNotification = "Opened with remote notification"
+    case pausedTutorialVideo = "Paused Tutorial Video"
+    case productFavorited = "Product favorited"
+    case productForEmail = "Product for email"
+    case productUnfavorited = "Product unfavorited"
+    case ratedApp = "Rated app"
+    case ratedAppOnAppStore = "Rated app on app store"
+    case receivedProductsFromSyte = "received products from Syte"
+    case receivedRemoteNotification = "Received remote notification"
+    case receivedResponseFromClarifai = "received response from Clarifai"
+    case receivedResponseFromSyte = "received response from Syte"
+    case refreshedWebpage = "Refreshed webpage"
+    case removedScreenshot = "Removed screenshot"
+    case replayedTutorialVideo = "Replayed Tutorial Video"
+    case requestedCustomStylist = "Requested Custom Stylist"
+    case screenshotNotificationAccepted = "Screenshot notification accepted"
+    case screenshotNotificationCancelled = "Screenshot notification cancelled"
+    case screenshotOpenedWithoutShoppables = "Screenshot Opened Without Shoppables"
+    case sentImageToClarifai = "sent image to Clarifai"
+    case sentImageToSyte = "sent image to Syte"
+    case sessionEnded = "sessionEnded"
+    case sessionStarted = "sessionStarted"
+    case shareCompleted = "Share completed"
+    case shareIncomplete = "Share incomplete"
+    case sharedScreenshot = "Shared screenshot"
+    case shoppableFeedbackNegative = "Shoppable Feedback Negative"
+    case shoppableRatingNegative = "Shoppable rating negative"
+    case shoppableRatingPositive = "Shoppable rating positive"
+    case skippedTutorial = "Skipped Tutorial"
+    case startedDownloadingClarifaiModel = "started downloading Clarifai model"
+    case startedTutorial = "Started Tutorial"
+    case startedTutorialVideo = "Started Tutorial Video"
+    case tabBarTapped = "Tab Bar tapped"
+    case tappedOnProduct = "Tapped on product"
+    case tappedOnProductFavorites = "Tapped on product - Favorites"
+    case tappedOnProductProductbar = "Tapped on product - ProductBar"
+    case tappedOnProductProducts = "Tapped on product - Products"
+    case tappedOnScreenshot = "Tapped on screenshot"
+    case tappedOnShoppable = "Tapped on shoppable"
+    case tookScreenshot = "Took Screenshot"
+    case tookScreenshotWhileShowingIntercomWindow = "Took Screenshot While Showing Intercom Window"
+    case userAge = "User Age"
+    case userExitedTutorialVideo = "User Exited Tutorial Video"
+    case userImportedOldScreenshots = "user imported old screenshots"
+    case userImportedScreenshots = "user imported screenshots"
+    case userProperties = "User Properties"
+    case userReceivedSharedScreenshots = "user received shared screenshots"
+    case userRetriedScreenshots = "user retried screenshots"
+    case webviewInvalidUrl = "WebView invalid url"
+    case wokeFromSilentPush = "Woke From Silent Push"
+}
+
+
 public class AnalyticsUser : NSObject {
     static var current: AnalyticsUser? {
         guard let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) else {
@@ -72,11 +162,13 @@ public class AnalyticsUser : NSObject {
 }
 
 @objc public protocol AnalyticsTracker {
-    func track(_ event: String, properties: [AnyHashable : Any]?)
+    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
 }
 
 public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
+   
+    
     private var trackers: [String : AnalyticsTracker] = [:]
     
     init(trackers ts: [AnalyticsTracker] = []) {
@@ -101,8 +193,8 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
     
     // MARK: - AnalyticsTracker
     
-    public func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        trackers.values.forEach { $0.track(event, properties: properties) }
+    public func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
+        trackers.values.forEach { $0.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(event, properties: properties) }
     }
     
     public func identify(_ user: AnalyticsUser) {
@@ -111,7 +203,7 @@ public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
         SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
     }
     
@@ -125,7 +217,7 @@ class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
         // Appsee properties can't exceed 300 bytes.
         // https://www.appsee.com/docs/ios/api?section=events
         
@@ -151,12 +243,12 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
     func identify(_ user: AnalyticsUser) {
         Appsee.setUserID(user.email ?? user.identifier)
         
-        track("User Properties", properties: user.analyticsProperties)
+        track(.userProperties, properties: user.analyticsProperties)
     }
 }
 
 class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
 //        IntercomHelper.sharedInstance.record(event: event, properties: properties)
     }
     
@@ -166,7 +258,7 @@ class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
 }
 
 class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
-    func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
         Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
     }
     
@@ -205,12 +297,16 @@ fileprivate let marketingBrands = [
 ]
 
 extension AnalyticsTracker {
+    public func track(_ event: AnalyticsEvent, properties: [AnyHashable : Any]? = nil) {
+        self.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(event.rawValue, properties: properties)
+    }
+    
     func trackUserAge() {
         guard let current = AnalyticsUser.current else {
             return
         }
         
-        track("User Age", properties: ["age": userAge()])
+        track( .userAge, properties: ["age": userAge()])
         identify(current)
     }
     
@@ -231,9 +327,9 @@ extension AnalyticsTracker {
             "page": page
         ]
         if favorited {
-            track("Product favorited", properties: properties)
+            track(.productFavorited, properties: properties)
         } else {
-            track("Product unfavorited", properties: properties)
+            track(.productUnfavorited, properties: properties)
         }
         if favorited {
             FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: FBSDKAppEventParameterValueYes])
@@ -249,7 +345,7 @@ extension AnalyticsTracker {
         let imageURL = product.imageURL ?? ""
         let sale = product.isSale()
 
-        track("Tapped on product", properties: [
+        track(.tappedOnProduct, properties: [
             "merchant" : merchant,
             "brand" : brand,
             "url" : offer,
@@ -262,7 +358,7 @@ extension AnalyticsTracker {
         
         // Need to use properties: [:] to clarify which track function we want to call
         if marketingBrands.contains(brand) {
-            track("Tapped on \(brand) product", properties: [:])
+            trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped on \(brand) product", properties: [:])
         }
     }
 }

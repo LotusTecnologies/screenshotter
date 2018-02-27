@@ -309,7 +309,7 @@ class SettingsViewController : BaseViewController {
         let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
         let integer = gender.rawValue
         
-        AnalyticsTrackers.standard.track("Set Global Gender Filter to \(gender.stringValue)")
+        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Gender Filter to \(gender.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
@@ -317,7 +317,7 @@ class SettingsViewController : BaseViewController {
         let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
         let integer = size.rawValue
         
-        AnalyticsTrackers.standard.track("Set Global Size Filter to \(size.stringValue)")
+        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Size Filter to \(size.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -926,7 +926,7 @@ extension SettingsViewController : TutorialVideoViewControllerDelegate {
     func tutorialVideoViewControllerDidEnd(_ viewController: TutorialVideoViewController) {
         dismiss(animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track("Automatically Exited Tutorial Video")
+        AnalyticsTrackers.standard.track(.automaticallyExitedTutorialVideo)
     }
 }
 
