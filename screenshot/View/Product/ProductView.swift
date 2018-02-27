@@ -19,7 +19,7 @@ class ProductView: UIScrollView {
     
     let selectionButton = SegmentedDropDownButton()
     let cartButton = MainButton()
-    let buyButton = MainButton()
+    let buyButton = MainButton() // TODO: hide for now. for v2
     let websiteButton = UIButton()
     
     required init?(coder aDecoder: NSCoder) {
