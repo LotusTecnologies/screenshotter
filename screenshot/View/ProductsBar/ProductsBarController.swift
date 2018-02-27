@@ -11,8 +11,7 @@ import CoreData
 import UIKit
 
 @objc protocol ProductsBarControllerDelegate : NSObjectProtocol {
-    func productBarShouldHide(_ controller:ProductsBarController)
-    func productBarShouldShow(_ controller:ProductsBarController)
+    func productBarContentChanged(_ controller:ProductsBarController)
     func productBar(_ controller:ProductsBarController, didTap product:Product)
 }
 class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
@@ -63,37 +62,23 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
     func setup(){
         self.productsFrc = DataModel.sharedInstance.productBarFrc(delegate: self)
 
-        self.isNotHidden = self.hasProducts
-        if self.hasProducts {
-            self.delegate?.productBarShouldShow(self)
-        }else{
-            self.delegate?.productBarShouldHide(self)
-        }
+        self.delegate?.productBarContentChanged(self)
+        
         self.collectionView?.reloadData()
     }
     
-    
-    var hasProducts: Bool {
-        return self.productsFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 >= 4
+    var count : Int {
+        return self.productsFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if self.isNotHidden != self.hasProducts {
-            self.isNotHidden = self.hasProducts
-            
-            if self.hasProducts {
-                self.delegate?.productBarShouldShow(self)
-            }else{
-                self.delegate?.productBarShouldHide(self)
-            }
-            if let collectionView = self.collectionView {
-                collectionView.contentOffset = CGPoint.init(x: -1 * collectionView.contentInset.left, y: 0)
-            }
-        }
         
         if let collectionView = self.collectionView {
             change.applyChanges(collectionView: collectionView)
         }
+        
+        self.delegate?.productBarContentChanged(self)
+
     }
     
 }
