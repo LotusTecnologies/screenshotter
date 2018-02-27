@@ -50,7 +50,7 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
             if let collectionView = self.collectionView {
                 for indexPath in collectionView.indexPathsForVisibleItems {
                     if let cell = collectionView.cellForItem(at: indexPath) as? ProductsBarCollectionViewCell {
-                        if let product =  self.productsFrc?.fetchedResultsController.object(at: indexPath) {
+                        if let product =  self.productsFrc?.object(at: indexPath) {
                             cell.isChecked = self.toUnfavoriteAndUnViewProductObjectIDs.contains(product.objectID)
                         }
                     }
@@ -68,11 +68,11 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
     }
     
     var count : Int {
-        return self.productsFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
+        return self.productsFrc?.fetchedObjectsCount ?? 0
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        
+
         if let collectionView = self.collectionView {
             change.applyChanges(collectionView: collectionView)
         }
@@ -85,7 +85,7 @@ class ProductsBarController: NSObject, FetchedResultsControllerManagerDelegate {
 
 extension ProductsBarController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.productsFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
+        return self.productsFrc?.fetchedObjectsCount ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -93,7 +93,7 @@ extension ProductsBarController: UICollectionViewDataSource {
         
         
         if let cell = cell as? ProductsBarCollectionViewCell {
-            if let product =  self.productsFrc?.fetchedResultsController.object(at: indexPath) {
+            if let product =  self.productsFrc?.object(at: indexPath) {
                 cell.isFavorited = product.isFavorite
                 cell.isSale = product.isSale()
                 
@@ -120,7 +120,7 @@ extension ProductsBarController: UICollectionViewDelegateFlowLayout {
 
 extension ProductsBarController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let product =  self.productsFrc?.fetchedResultsController.object(at: indexPath) {
+        if let product =  self.productsFrc?.object(at: indexPath) {
             self.delegate?.productBar(self, didTap: product)
         }
     }
