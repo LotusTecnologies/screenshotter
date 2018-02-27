@@ -35,6 +35,7 @@ class ScreenshotsViewController: BaseViewController {
     var refreshControl:UIRefreshControl?
     var emptyListView:ScreenshotsHelperView?
     var hasNewScreenshot = false
+    var hasNewScreenshotSection = false
     var hasProductBar = false
     var notificationCellAssetId:String?
     var coreDataPreparationController:CoreDataPreparationController
@@ -402,7 +403,7 @@ extension ScreenshotsViewController {
                 }
             }
             
-            if (self.hasNewScreenshot) {
+            if (self.hasNewScreenshotSection) {
                 self.collectionView.reloadSections(IndexSet.init(integer: ScreenshotsSection.notification.rawValue))
             }
             
@@ -435,6 +436,7 @@ extension ScreenshotsViewController {
             self.toHideFromProductBarObjectIDs = []
         }else {
             self.productsBarController?.toUnfavoriteAndUnViewProductObjectIDs = []
+            self.updateHasNewScreenshot()
         }
         
         updateDeleteButtonCount()
@@ -603,10 +605,6 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         return AccumulatorModel.sharedInstance.getNewScreenshotsCount()
     }
     
-    func canDisplayNotificationCell() -> Bool {
-        return self.hasNewScreenshot && !self.isEditing
-    }
-    
     func screenshotNotificationCollectionViewCellDidTapReject(_ cell: ScreenshotNotificationCollectionViewCell){
         let screenshotsCount = self.newScreenshotsCount()
         AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
@@ -634,18 +632,39 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         AnalyticsTrackers.standard.track("Screenshot notification accepted", properties: ["Screenshot count": screenshotsCount])
     }
     
+    func updateHasNewScreenshot(){
+        let hadSection = self.hasNewScreenshotSection
+        self.hasNewScreenshotSection = self.hasNewScreenshot && !self.isEditing
+        if hadSection != self.hasNewScreenshotSection {
+            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
+            if self.hasNewScreenshotSection {
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 0{
+                    self.collectionView.insertItems(at: [indexPath])
+                    self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+                }
+            }else{
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
+                    self.collectionView.deleteItems(at: [indexPath])
+                }
+            }
+        }
+        
+    }
+    
     func presentNotificationCell(assetId:String){
         if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
             self.hasNewScreenshot = true
             self.notificationCellAssetId = assetId
-            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
             
-            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 0{
-                self.collectionView.insertItems(at: [indexPath])
-                self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-            } else {
-                self.collectionView.reloadItems(at: [indexPath])
+            if self.hasNewScreenshotSection {  //Already has a new screenshot section -  just do an update
+                let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
+                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
+                    self.collectionView.reloadItems(at: [indexPath])
+                }
+            }else{
+                updateHasNewScreenshot()  //time to show it
             }
+           
             
             syncEmptyListView()
         }
@@ -653,9 +672,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     
     func dismissNotificationCell(){
         self.hasNewScreenshot = false
-        if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0{
-            self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)])
-        }
+        updateHasNewScreenshot()
     }
 }
 
@@ -857,7 +874,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                     return 0
                 }
             case .notification:
-                return self.canDisplayNotificationCell() ? 1 :0 
+                return self.hasNewScreenshotSection ? 1 :0 
             case .image:
                 return self.screenshotFrc()?.fetchedObjectsCount ?? 0
             }
