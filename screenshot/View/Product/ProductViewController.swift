@@ -132,7 +132,7 @@ class ProductViewController : BaseViewController {
             productView.galleryScrollView.delegate = self
             productView.pageControl.addTarget(self, action: #selector(pageControlDidChange), for: .valueChanged)
             productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
-            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
+//            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
             productView.websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
             view.addSubview(productView)
             productView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -215,6 +215,14 @@ fileprivate extension ProductViewControllerProductView {
         }
         
         productView.titleLabel.text = title
+    }
+    
+    func setProductDescription(_ description: String?) {
+        guard let productView = productView else {
+            return
+        }
+        
+        productView.contentTextView.text = title
     }
     
     func setPrice(_ price: String?) {
@@ -366,9 +374,12 @@ fileprivate extension ProductViewControllerStructuredProduct {
             return
         }
         
+        print("||| \(structuredProduct.product)")
+        
+        setProductTitle(structuredProduct.title)
+        setProductDescription(structuredProduct.title) // TODO:
         setImages(urls: structuredProduct.product.imageURLs())
         setWebsiteMerchant(structuredProduct.product.merchant)
-        setProductTitle(structuredProduct.title)
         setPrice(structuredProduct.product.price)
         
         if structuredProduct.product.isSale() {
