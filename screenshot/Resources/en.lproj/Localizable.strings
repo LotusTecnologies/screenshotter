@@ -11,10 +11,10 @@
 // https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
-"changelog.title" = "What's New";
-
-"application.error.no_disk_space.title" = "Out Of Space!";
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
+"application.error.no_disk_space.title" = "Out Of Space!";
+
+"changelog.title" = "What's New";
 
 "currency.auto" = "Automatic";
 
@@ -29,23 +29,24 @@
 "discover.screenshot.flag.inappropriate.title" = "Thanks For Letting Us Know!";
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
-"discover.screenshot.helper.title" = "Discover Fashion";
 "discover.screenshot.helper.swipe_left.0" = "Swipe Left";
 "discover.screenshot.helper.swipe_left.1" = "\nto pass";
 "discover.screenshot.helper.swipe_right.0" = "Swipe Right";
 "discover.screenshot.helper.swipe_right.1" = "\nto add to your collection";
 "discover.screenshot.helper.tap.0" = "Tap";
 "discover.screenshot.helper.tap.1" = " to shop";
+"discover.screenshot.helper.title" = "Discover Fashion";
 "discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
 
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.title" = "Setup Email";
+
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
-"favorites.screenshot.title.single" = "%d Favorited Item";
 "favorites.screenshot.title.plural" = "%d Favorited Items";
+"favorites.screenshot.title.single" = "%d Favorited Item";
 "favorites.title" = "Favorites";
 
 "game.enter" = "Get More Coins";
@@ -70,45 +71,45 @@
 "generic.update" = "Update";
 "generic.yes" = "Yes";
 
-"legal.terms_of_service" = "Terms of Service";
 "legal.privacy_policy" = "Privacy Policy";
+"legal.terms_of_service" = "Terms of Service";
 
 "negative_feedback.message" = "We hear you loud and clear and we’re going to look into this. How else can we help?";
-"negative_feedback.options.send" = "Send Feedback";
 "negative_feedback.options.help" = "Get Fashion Help";
+"negative_feedback.options.send" = "Send Feedback";
 "negative_feedback.title" = "Sorry To Hear That!";
 
 "notification.screenshot.latest" = "Tap to import your latest screenshot";
 "notification.screenshot.recent" = "Tap to import your new screenshots";
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 
-"permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
-"permission.photo.denied.title" = "Allow Permissions To Continue";
-
 "partners.content" = "Screenshop makes it easy to turn any app into shopping inspiration. When you take a screenshot on Instagram, Facebook, Snapchat or any other app with photos, we analyze the image for fashion or furniture and then show you products from 400+ brands we’re partnered with.\n\nScreenshop automatically imports screenshots you take that are detected as fashion or furniture related, so you can start shopping immediately. Screenshots you take that aren’t relevant won’t clutter up your collection thanks to our image recognition technology.\n\nWe also programatically determine what categories your photo fits - women’s clothing, men’s clothing, Kids, plus size, furniture, etc, and let you sort manually to fine tune your fashion hunt based on size, price, brands or gender.\n\nOur visual search is powered by our partners, %@";
 "partners.title" = "Our Technology";
 
-"personal_stylist.loading" = "Unlocking a personal stylist requires a one time in-app purchase.\nConnecting to appstore....";
-"personal_stylist.unlock" = "Unlocking a personal stylist requires a one time in-app purchase for %@";
+"permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
+"permission.photo.denied.title" = "Allow Permissions To Continue";
+
 "personal_stylist.error" = "Unlocking a personal stylist requires a one time in-app purchase.\nUnable to connect to the appstore at this time:\n%@";
 "personal_stylist.error.invalid_device" = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases.";
+"personal_stylist.loading" = "Unlocking a personal stylist requires a one time in-app purchase.\nConnecting to appstore....";
+"personal_stylist.unlock" = "Unlocking a personal stylist requires a one time in-app purchase for %@";
 
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
 "picker.list.gallery" = "Gallery";
 "picker.list.screenshot" = "Screenshots";
-"picker.title" = "Add Photos";
 "picker.permission.add" = "Add Photos";
 "picker.permission.message" = "Pick screenshots from your gallery to scan for items to shop!";
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
+"picker.title" = "Add Photos";
 
 "products.helper.message" = "No visually similar products were detected";
-"products.helper.title" = "No Items Found";
 "products.helper.retry" = "Try Again";
 "products.helper.retry.fashion" = "Fashion";
 "products.helper.retry.furniture" = "Furniture";
 "products.helper.retry.title" = "Try again as";
+"products.helper.title" = "No Items Found";
 "products.options.category.auto" = "Auto";
 "products.options.category.fashion" = "Fashion";
 "products.options.category.furniture" = "Furniture";
@@ -126,11 +127,11 @@
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
 "products.options.title" = "Sort & Filter";
-"products.rate.talk_to_stylist" = "Talk to your stylist";
-"products.rate.rated" = "Thanks for your feedback!";
 "products.rate.negative.help_finding_outfit" = "I need help finding this outfit... %@";
-"products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
+"products.rate.negative.popup.title" =  "What’s Wrong Here?";
+"products.rate.rated" = "Thanks for your feedback!";
+"products.rate.talk_to_stylist" = "Talk to your stylist";
 "products.rate.unrated" = "Are these results relevant?";
 "products.title" = "Products";
 "products.tooltip.title" = "Tap to shop different types of products";
@@ -140,27 +141,28 @@
 "screenshot.empty.title" = "No Screenshots Yet";
 "screenshot.import.latest" = "Import your latest screenshot?";
 "screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
-"screenshot.option.share" = "SHARE";
 "screenshot.option.delete" = "DELETE";
+"screenshot.option.share" = "SHARE";
 "screenshot.permission.photo.allow" = "Allow Access";
 "screenshot.permission.photo.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.photo.title" = "Shop With Screenshop";
 "screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 "screenshot.permission.push.title" = "Start Screenshotting";
-
 "screenshots.delete.placeholder" = "Delete Items";
-"screenshots.delete.single" = "Delete %d Item";
 "screenshots.delete.plural" = "Delete %d Items";
-"screenshots.helper.title" = "Ready To Shop";
+"screenshots.delete.single" = "Delete %d Item";
 "screenshots.helper.byline" = "Here’s your screenshot!\nTap on it to see the products in the photo";
-"screenshots.share.error.title" = "Sorry";
+"screenshots.helper.title" = "Ready To Shop";
 "screenshots.share.error.message" = "We could not find similar items to share.";
+"screenshots.share.error.title" = "Sorry";
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
+"settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
+"settings.in_app_purchase.restore.none" = "You have no purchases to restore";
+"settings.open_in.option.chrome" = "Chrome";
 "settings.open_in.option.embeded" = "ScreenShop";
 "settings.open_in.option.safari" = "Safari";
-"settings.open_in.option.chrome" = "Chrome";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
@@ -178,14 +180,12 @@
 "settings.row.size.title" = "Size";
 "settings.row.talk_to_stylist.title" = "Talk to Your Stylist";
 "settings.row.tutorial.title" = "Replay Tutorial";
-"settings.row.usage_streak.title" = "Daily Streak";
-"settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.detail.plural" = "%d days";
+"settings.row.usage_streak.detail.single" = "%d day";
+"settings.row.usage_streak.title" = "Daily Streak";
 "settings.row.version.title" = "App Version";
-"settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
-"settings.in_app_purchase.restore.none" = "You have no purchases to restore";
-"settings.screenshot.single" = "%d screenshot";
 "settings.screenshot.plural" = "%d screenshots";
+"settings.screenshot.single" = "%d screenshot";
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
 "settings.section.info" = "Your Info";
@@ -212,8 +212,8 @@
 "tutorial.try.title" = "Try It Out";
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";
-"tutorial.welcome.start" = "Get Started";
 "tutorial.welcome.detail" = "Any fashion picture you screenshot becomes shoppable in the app";
+"tutorial.welcome.start" = "Get Started";
 "tutorial.welcome.title" = "Welcome to ";
 
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
