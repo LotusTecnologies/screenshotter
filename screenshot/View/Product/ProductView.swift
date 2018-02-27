@@ -8,7 +8,8 @@
 
 import UIKit
 
-class ProductView: UIScrollView {
+class ProductView: UIView {
+    let scrollView = UIScrollView()
     let galleryScrollView = UIScrollView()
     let galleryScrollContentView = UIView()
     let pageControl = UIPageControl()
@@ -29,19 +30,24 @@ class ProductView: UIScrollView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .white
-        layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-        keyboardDismissMode = .onDrag
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.backgroundColor = .white
+        scrollView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        scrollView.keyboardDismissMode = .onDrag
+        addSubview(scrollView)
+        scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         galleryScrollView.translatesAutoresizingMaskIntoConstraints = false
         galleryScrollView.scrollsToTop = false
         galleryScrollView.isPagingEnabled = true
         galleryScrollView.showsHorizontalScrollIndicator = false
         galleryScrollView.bounces = false
-        addSubview(galleryScrollView)
-        galleryScrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        galleryScrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        galleryScrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        scrollView.addSubview(galleryScrollView)
+        galleryScrollView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        galleryScrollView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        galleryScrollView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         galleryScrollView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         galleryScrollView.heightAnchor.constraint(equalToConstant: 370).isActive = true
         
@@ -57,18 +63,18 @@ class ProductView: UIScrollView {
         pageControl.hidesForSinglePage = true
         pageControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.5)
         pageControl.currentPageIndicatorTintColor = .crazeGreen
-        addSubview(pageControl)
-        pageControl.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .padding).isActive = true
+        scrollView.addSubview(pageControl)
+        pageControl.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: .padding).isActive = true
         pageControl.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
-        pageControl.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
+        pageControl.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -.padding).isActive = true
         pageControl.centerXAnchor.constraint(equalTo: galleryScrollView.centerXAnchor).isActive = true
         
         let labelContainerView = UIView()
         labelContainerView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(labelContainerView)
+        scrollView.addSubview(labelContainerView)
         labelContainerView.topAnchor.constraint(equalTo: galleryScrollView.bottomAnchor, constant: .padding).isActive = true
-        labelContainerView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        labelContainerView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        labelContainerView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        labelContainerView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.font = UIFont.preferredFont(forTextStyle: .title1)
@@ -104,49 +110,71 @@ class ProductView: UIScrollView {
         
         // TODO: how does UI look when all variants are out of stock
         selectionButton.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(selectionButton)
+        scrollView.addSubview(selectionButton)
         selectionButton.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
-        selectionButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        selectionButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        selectionButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        selectionButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-        cartButton.translatesAutoresizingMaskIntoConstraints = false
-        cartButton.backgroundColor = .crazeGreen
-        cartButton.setTitle("product.add".localized, for: .normal)
-        cartButton.setTitleColor(.white, for: .normal)
-        addSubview(cartButton)
-        cartButton.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
-        cartButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        cartButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        buyButton.translatesAutoresizingMaskIntoConstraints = false
-        buyButton.backgroundColor = .crazeGreen
-        buyButton.setTitle("product.buy".localized, for: .normal)
-        buyButton.setTitleColor(.white, for: .normal)
-        addSubview(buyButton)
-        buyButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
-        buyButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        buyButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         websiteButton.translatesAutoresizingMaskIntoConstraints = false
         websiteButton.setTitleColor(.crazeGreen, for: .normal)
         websiteButton.isHidden = true
-        addSubview(websiteButton)
-        websiteButton.topAnchor.constraint(equalTo: buyButton.bottomAnchor, constant: .padding).isActive = true
-        websiteButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        websiteButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        scrollView.addSubview(websiteButton)
+        websiteButton.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
+        websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        websiteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let contentTextView = UITextView()
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .green
         contentTextView.isScrollEnabled = false
         contentTextView.scrollsToTop = false
-        addSubview(contentTextView)
+        scrollView.addSubview(contentTextView)
         contentTextView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
-        contentTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        contentTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -.padding).isActive = true
-        contentTextView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        contentTextView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
+        contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
+        
+        let controlContainerView = UIView()
+        controlContainerView.translatesAutoresizingMaskIntoConstraints = false
+        controlContainerView.backgroundColor = .white
+        controlContainerView.layoutMargins = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
+        addSubview(controlContainerView)
+        controlContainerView.topAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        controlContainerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        controlContainerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        controlContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        let controlContainerBorderView = UIView()
+        controlContainerBorderView.translatesAutoresizingMaskIntoConstraints = false
+        controlContainerBorderView.backgroundColor = .border
+        controlContainerView.addSubview(controlContainerBorderView)
+        controlContainerBorderView.topAnchor.constraint(equalTo: controlContainerView.topAnchor).isActive = true
+        controlContainerBorderView.leadingAnchor.constraint(equalTo: controlContainerView.leadingAnchor).isActive = true
+        controlContainerBorderView.trailingAnchor.constraint(equalTo: controlContainerView.trailingAnchor).isActive = true
+        controlContainerBorderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        
+        cartButton.translatesAutoresizingMaskIntoConstraints = false
+        cartButton.backgroundColor = .crazeGreen
+        cartButton.setTitle("product.add".localized, for: .normal)
+        cartButton.setTitleColor(.white, for: .normal)
+        controlContainerView.addSubview(cartButton)
+        cartButton.topAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.topAnchor).isActive = true
+        cartButton.leadingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        cartButton.bottomAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
+        cartButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: -.padding / 2).isActive = true
+//        cartButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        buyButton.translatesAutoresizingMaskIntoConstraints = false
+        buyButton.backgroundColor = .crazeGreen
+        buyButton.setTitle("product.buy".localized, for: .normal)
+        buyButton.setTitleColor(.white, for: .normal)
+        controlContainerView.addSubview(buyButton)
+        buyButton.topAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.topAnchor).isActive = true
+        buyButton.leadingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: .padding / 2).isActive = true
+        buyButton.bottomAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
+        buyButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
     }
     
     func setSelection(colorItem: SegmentedDropDownItem, sizeItem: SegmentedDropDownItem?) {

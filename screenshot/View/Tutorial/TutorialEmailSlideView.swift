@@ -163,7 +163,7 @@ public class TutorialEmailSlideView : HelperView {
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = .gray3
+        borderView.backgroundColor = .border
         textField.addSubview(borderView)
         borderView.leadingAnchor.constraint(equalTo: textField.leadingAnchor).isActive = true
         borderView.bottomAnchor.constraint(equalTo: textField.bottomAnchor).isActive = true

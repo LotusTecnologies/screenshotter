@@ -319,18 +319,18 @@ fileprivate extension ProductViewControllerProductView {
             let adjustedContentInsetTop: CGFloat
             
             if #available(iOS 11.0, *) {
-                adjustedContentInsetTop = productView.adjustedContentInset.top
+                adjustedContentInsetTop = productView.scrollView.adjustedContentInset.top
             }
             else {
                 adjustedContentInsetTop = topLayoutGuide.length
             }
             
-            let currentOffsetY = productView.contentOffset.y + adjustedContentInsetTop
+            let currentOffsetY = productView.scrollView.contentOffset.y + adjustedContentInsetTop
             let minOffsetY = productView.selectionButton.frame.minY
             
             if currentOffsetY > minOffsetY {
                 UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                    productView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
+                    productView.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
                     
                 }, completion: { completed in
                     displayErrorItems()
@@ -424,14 +424,14 @@ extension ProductViewController : UIScrollViewDelegate {
         
         let y: CGFloat = {
             if #available(iOS 11.0, *) {
-                return productView.adjustedContentInset.top
+                return productView.scrollView.adjustedContentInset.top
             }
             else {
                 return navigationController?.navigationBar.frame.maxY ?? 0
             }
         }()
         
-        productView.contentOffset = CGPoint(x: 0, y: -y)
+        productView.scrollView.contentOffset = CGPoint(x: 0, y: -y)
     }
 }
 

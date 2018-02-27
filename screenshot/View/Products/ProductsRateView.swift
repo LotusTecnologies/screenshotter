@@ -60,7 +60,7 @@ class ProductsRateView : UIView {
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+        borderView.backgroundColor = .border
         addSubview(borderView)
         borderView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         borderView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
