@@ -62,8 +62,10 @@ enum OpenProductPage : String {
             if let url = URL(string: urlString){
                 var openInSetting = OpenProductPage.fromSystemInfo()
                 
-                if !openInSetting.canOpen(url: url) {
-                    openInSetting = .embededSafari
+                for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
+                    if !openInSetting.canOpen(url: url) {
+                        openInSetting = fallbackSetting
+                    }
                 }
                 
                 switch openInSetting {
