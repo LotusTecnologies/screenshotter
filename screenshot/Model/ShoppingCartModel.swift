@@ -14,53 +14,109 @@ class ShoppingCartModel {
     
     static let shared = ShoppingCartModel()
     
-    func populateVariants(productOID: NSManagedObjectID, partNumber: String) {
-        firstly {
-            return NetworkingPromise.getAvailableVariants(partNumber: partNumber)
-            }.then { dict -> Void in
+    func populateVariants(productOID: NSManagedObjectID) -> Promise<Product> {
+        let dataModel = DataModel.sharedInstance
+        return firstly {
+            return deleteVariantsIfOld(productOID: productOID)
+            }.then { partNumber -> Promise<NSDictionary> in
+                return partNumber.isEmpty ? Promise(value: NSDictionary()) : NetworkingPromise.getAvailableVariants(partNumber: partNumber)
+            }.then { dict -> Promise<Bool> in
                 print("populateVariants dict:\(dict)")
+                guard dict.count > 0 else {
+                    return Promise(value: false)
+                }
                 if let errorString = dict["error"] as? String {
-                    print("populateVariants error. errorString:\(errorString)")
+                    let error = NSError(domain: "Craze", code: 30, userInfo: [NSLocalizedDescriptionKey : "populateVariants getAvailableVariants returned error:\(errorString)"])
+                    return Promise(error: error)
+                }
+                return self.saveVariantsFromDictionary(productOID: productOID, dict: dict)
+            }.then { didSaveVariants -> Promise<Product> in // Must be on main queue.
+                print("populateVariants final then clause didSaveVariants:\(didSaveVariants)")
+                if let product = dataModel.mainMoc().object(with: productOID) as? Product {
+                    return Promise(value: product)
+                } else {
+                    let error = NSError(domain: "Craze", code: 32, userInfo: [NSLocalizedDescriptionKey : "populateVariants failed to fetch a third time product:\(productOID)"])
+                    return Promise(error: error)
+                }
+        }
+    }
+    
+    // Deletes variants if older than, say, an hour.
+    // Returns the partNumber if new variants should be fetched from Shoppable server.
+    func deleteVariantsIfOld(productOID: NSManagedObjectID) -> Promise<String> {
+        let dataModel = DataModel.sharedInstance
+        return Promise { fulfill, reject in
+            dataModel.performBackgroundTask { managedObjectContext in
+                guard let rootProduct = managedObjectContext.object(with: productOID) as? Product else {
+                    let error = NSError(domain: "Craze", code: 28, userInfo: [NSLocalizedDescriptionKey : "populateVariants failed to fetch product:\(productOID)"])
+                    reject(error)
                     return
                 }
-                let dataModel = DataModel.sharedInstance
-                dataModel.performBackgroundTask { managedObjectContext in
-                    guard let rootProduct = managedObjectContext.object(with: productOID) as? Product else {
-                        print("populateVariants failed to fetch product:\(productOID)")
-                        return
-                    }
-                    rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
-                    print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
-                    guard let colors = dict["colors"] as? [[String : Any]] else {
-                        print("populateVariants failed to extract colors for partNumber:\(partNumber)")
-                        return
-                    }
-                    var hasVariants = false
-                    colors.forEach { color in
-                        let colorString = color["color"] as? String
-                        let colorRetailPrice = color["retail_price"] as? Float
-                        let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-                        print(" partNumber:\(partNumber)  colorString:\(colorString ?? "-")  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
-                        if let sizes = color["sizes"] as? [[String : Any]] {
-                            sizes.forEach { size in
-                                let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
-                                                                    product: rootProduct,
-                                                                    color: colorString,
-                                                                    size: size["size"] as? String,
-                                                                    retailPrice: size["retail_price"] as? Float ?? colorRetailPrice ?? rootProduct.retailPrice,
-                                                                    sku: size["merchant_sku"] as? String,
-                                                                    upc: size["upc"] as? String,
-                                                                    imageURLs: colorImageURLs)
-                                hasVariants = true
-                                print("  partNumber:\(partNumber)  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  upc:\(variant.upc ?? "-")  retailPrice:\(variant.retailPrice)  imageURLs:\(variant.imageURLs ?? "-")")
-                            }
-                        }
-                    }
-                    rootProduct.hasVariants = hasVariants
-                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                guard let partNumber = rootProduct.partNumber else {
+                    let error = NSError(domain: "Craze", code: 29, userInfo: [NSLocalizedDescriptionKey : "populateVariants no partNumber for rootProduct:\(rootProduct)"])
+                    reject(error)
+                    return
                 }
-            }.catch { error in
-                print("populateVariants partNumber:\(partNumber)  error:\(error)")
+                if let variants = rootProduct.availableVariants as? Set<Variant>,
+                  let firstVariant = variants.first {
+                    if let dateModified = firstVariant.dateModified as Date?,
+                        -dateModified.timeIntervalSinceNow <= 60 * 60 {
+                        print("populateVariants variant <= an hour old. variant:\(firstVariant)")
+                        fulfill("")
+                    } else {
+                        // Delete the old variants.
+                        print("populateVariants variant > an hour old. Deleting:\(variants.count)")
+                        variants.forEach {managedObjectContext.delete($0)}
+                        rootProduct.hasVariants = false
+                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    }
+                } else {
+                    print("populateVariants no previous variants")
+                }
+                fulfill(partNumber)
+            }
+        }
+    }
+    
+    // Returns a Bool as to whether new variants were saved.
+    func saveVariantsFromDictionary(productOID: NSManagedObjectID, dict: NSDictionary) -> Promise<Bool> {
+        let dataModel = DataModel.sharedInstance
+        return Promise { fulfill, reject in
+            dataModel.performBackgroundTask { managedObjectContext in
+                guard let rootProduct = managedObjectContext.object(with: productOID) as? Product else {
+                    let error = NSError(domain: "Craze", code: 31, userInfo: [NSLocalizedDescriptionKey : "populateVariants failed to fetch a second time product:\(productOID)"])
+                    reject(error)
+                    return
+                }
+                
+                rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
+                print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
+                
+                var hasVariants = false
+                let colors = dict["colors"] as? [[String : Any]]
+                colors?.forEach { color in
+                    let colorString = color["color"] as? String
+                    let colorRetailPrice = color["retail_price"] as? Float
+                    let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
+                    print(" colorString:\(colorString ?? "-")  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
+                    let sizes = color["sizes"] as? [[String : Any]]
+                    sizes?.forEach { size in
+                        let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
+                                                            product: rootProduct,
+                                                            color: colorString,
+                                                            size: size["size"] as? String,
+                                                            retailPrice: size["retail_price"] as? Float ?? colorRetailPrice ?? rootProduct.retailPrice,
+                                                            sku: size["merchant_sku"] as? String,
+                                                            upc: size["upc"] as? String,
+                                                            imageURLs: colorImageURLs)
+                        hasVariants = true
+                        print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  upc:\(variant.upc ?? "-")  retailPrice:\(variant.retailPrice)  imageURLs:\(variant.imageURLs ?? "-")")
+                    }
+                }
+                rootProduct.hasVariants = hasVariants
+                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                return fulfill(hasVariants)
+            }
         }
     }
     

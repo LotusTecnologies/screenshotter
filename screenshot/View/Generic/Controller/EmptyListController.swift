@@ -48,7 +48,7 @@ class EmptyListController: NSObject {
     private var previousContentHeight: CGFloat = 0
     
     func didSetContentSize(scrollView: UIScrollView, emptyView: UIView?) {
-        let height = scrollView.contentSize.height - scrollView.contentInset.top - scrollView.contentInset.bottom
+        let height = max(0, scrollView.contentSize.height - scrollView.contentInset.top - scrollView.contentInset.bottom)
         
         if height != previousContentHeight {
             if Int(height) == 0 && previousContentHeight > 0 {
