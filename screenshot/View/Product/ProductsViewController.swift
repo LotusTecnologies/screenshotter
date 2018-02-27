@@ -251,6 +251,11 @@ extension ProductsViewController {
                 shoppable.set(productsOptions: productsOptions, callback:  {
                     if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
                         self.reloadProductsFor(shoppable: shoppable)
+                    }else{
+                        self.products = []
+                        self.productsUnfilteredCount = 0
+                        self.state = .loading
+                        self.collectionView?.reloadData()
                     }
                 })
             }
@@ -270,6 +275,11 @@ extension ProductsViewController {
                 }else{
                     self.reloadProductsFor(shoppable: selectedShoppable)
                 }
+            }else{
+                self.products = []
+                self.productsUnfilteredCount = 0
+                self.state = .loading
+                self.collectionView?.reloadData()
             }
         }
     }
