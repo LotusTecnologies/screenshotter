@@ -85,7 +85,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     var lastPresentedLowDiskSpaceWarning:Date?
     func presentLowDiskSpaceWarning(){
-        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*60*5 else {
+        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*5 else {
             return
         }
         
