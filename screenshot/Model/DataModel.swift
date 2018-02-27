@@ -73,7 +73,7 @@ extension DataModel {
                 AppDelegate.shared.presentLowDiskSpaceWarning()
 
         }else{
-            AnalyticsTrackers.standard.track("Error", properties: ["domain":error.domain, "code":error.code])
+            AnalyticsTrackers.standard.track("Error", properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
         }
     }
 }
