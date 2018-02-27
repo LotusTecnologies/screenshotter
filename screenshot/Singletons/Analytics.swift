@@ -13,11 +13,9 @@ import Branch
 import FBSDKCoreKit
 
 public enum AnalyticsEvent : String {
-    case submittedEmail = "Submitted email"
-    case submittedBlankEmail = "Submitted blank email"
-    case apnEnabled = "APN Enabled"
-    case apnDisabled = "APN Disabled"
     case acceptedPushPermissions = "Accepted Push Permissions"
+    case apnDisabled = "APN Disabled"
+    case apnEnabled = "APN Enabled"
     case appOpenedFromLocalNotification = "app opened from local notification"
     case appSentLocalPushNotification = "app sent local push notification"
     case automaticallyExitedTutorialVideo = "Automatically Exited Tutorial Video"
@@ -81,6 +79,8 @@ public enum AnalyticsEvent : String {
     case startedDownloadingClarifaiModel = "started downloading Clarifai model"
     case startedTutorial = "Started Tutorial"
     case startedTutorialVideo = "Started Tutorial Video"
+    case submittedBlankEmail = "Submitted blank email"
+    case submittedEmail = "Submitted email"
     case tabBarTapped = "Tab Bar tapped"
     case tappedOnProduct = "Tapped on product"
     case tappedOnProductFavorites = "Tapped on product - Favorites"
