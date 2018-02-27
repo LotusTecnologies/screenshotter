@@ -101,16 +101,19 @@ class ShoppingCartModel {
                     print(" colorString:\(colorString ?? "-")  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
-                        let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
-                                                            product: rootProduct,
-                                                            color: colorString,
-                                                            size: size["size"] as? String,
-                                                            retailPrice: size["retail_price"] as? Float ?? colorRetailPrice ?? rootProduct.retailPrice,
-                                                            sku: size["merchant_sku"] as? String,
-                                                            upc: size["upc"] as? String,
-                                                            imageURLs: colorImageURLs)
-                        hasVariants = true
-                        print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  upc:\(variant.upc ?? "-")  retailPrice:\(variant.retailPrice)  imageURLs:\(variant.imageURLs ?? "-")")
+                        if let sku = size["merchant_sku"] as? String ?? size["id"] as? String,
+                          !sku.isEmpty {
+                            let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
+                                                                product: rootProduct,
+                                                                color: colorString,
+                                                                size: size["size"] as? String,
+                                                                retailPrice: size["retail_price"] as? Float ?? colorRetailPrice ?? rootProduct.retailPrice,
+                                                                sku: sku,
+                                                                url: size["url"] as? String,
+                                                                imageURLs: colorImageURLs)
+                            hasVariants = true
+                            print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  retailPrice:\(variant.retailPrice)  imageURLs:\(variant.imageURLs ?? "-")")
+                        }
                     }
                 }
                 rootProduct.hasVariants = hasVariants
