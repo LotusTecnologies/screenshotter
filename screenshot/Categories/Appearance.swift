@@ -11,6 +11,7 @@ import UIKit
 
 extension UIColor {
     static let background = UIColor(white: 244.0/255.0, alpha: 1)
+    static let border = UIColor.black.withAlphaComponent(0.3)
     
     static let crazeRed = UIColor(red: 237.0/255.0, green: 20.0/255.0, blue: 90.0/255.0, alpha: 1)
     static let crazeGreen = UIColor(red: 32.0/255.0, green: 200.0/255.0, blue: 163.0/255.0, alpha: 1)
@@ -48,7 +49,7 @@ extension UIColor {
 
 extension UIContentSizeCategory {
     var isAccessibilityCategory: Bool {
-        var isAccessibility: Bool
+        let isAccessibility: Bool
         
         switch self {
         case .accessibilityMedium,

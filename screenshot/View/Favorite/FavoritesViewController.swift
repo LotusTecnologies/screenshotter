@@ -91,15 +91,11 @@ class FavoritesViewController : BaseViewController {
     // MARK: Screenshot
     
     func screenshot(at indexPath: IndexPath) -> Screenshot? {
-        guard let screenshots = favoriteFrc?.fetchedResultsController.fetchedObjects else {
-            return nil
-        }
-        
-        return screenshots[indexPath.row]
+        return favoriteFrc?.object(at: indexPath)
     }
     
     func screenshot(withAssetId assetId: String) -> Screenshot? {
-        return favoriteFrc?.fetchedResultsController.fetchedObjects?.first(where: { screenshot -> Bool in
+        return favoriteFrc?.fetchedObjects.first(where: { screenshot -> Bool in
             return screenshot.assetId == assetId
         })
     }
@@ -107,7 +103,7 @@ class FavoritesViewController : BaseViewController {
     fileprivate var screenshotAssetIds: [String] = []
     
     fileprivate func syncScreenshotAssetIds() {
-        screenshotAssetIds = favoriteFrc?.fetchedResultsController.fetchedObjects?.map { screenshot -> String in
+        screenshotAssetIds = favoriteFrc?.fetchedObjects.map { screenshot -> String in
             return screenshot.assetId ?? ""
         } ?? []
     }
@@ -136,7 +132,7 @@ class FavoritesViewController : BaseViewController {
 
 extension FavoritesViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return favoriteFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
+        return favoriteFrc?.fetchedObjectsCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -217,14 +213,14 @@ extension FavoritesViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if self.isViewLoaded {
             for index in change.insertedRows {
-                if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
+                if let screenshot = favoriteFrc?.object(at: index) {
                     if let assetId = screenshot.assetId {
                         screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
                     }
                 }
             }
             for index in change.updatedRows {
-                if let screenshot = favoriteFrc?.fetchedResultsController.object(at: index) {
+                if let screenshot = favoriteFrc?.object(at: index) {
                     if let assetId = screenshot.assetId {
                         screenshotsFavorites[assetId] = screenshotFavoritesForScreenshot(screenshot)
                     }

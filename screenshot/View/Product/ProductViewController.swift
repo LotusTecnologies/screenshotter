@@ -10,180 +10,6 @@ import UIKit
 import SDWebImage
 import CoreData
 
-
-class ProductView: UIScrollView {
-    let galleryScrollView = UIScrollView()
-    let galleryScrollContentView = UIView()
-    let pageControl = UIPageControl()
-    
-    let titleLabel = UILabel()
-    let priceLabel = UILabel()
-    let originalPriceLabel = UILabel()
-    
-    let selectionButton = SegmentedDropDownButton()
-    let cartButton = MainButton()
-    let buyButton = MainButton()
-    let websiteButton = UIButton()
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        backgroundColor = .white
-        layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-        keyboardDismissMode = .onDrag
-        
-        galleryScrollView.translatesAutoresizingMaskIntoConstraints = false
-        galleryScrollView.scrollsToTop = false
-        galleryScrollView.isPagingEnabled = true
-        galleryScrollView.showsHorizontalScrollIndicator = false
-        galleryScrollView.bounces = false
-        addSubview(galleryScrollView)
-        galleryScrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        galleryScrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        galleryScrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        galleryScrollView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        galleryScrollView.heightAnchor.constraint(equalToConstant: 370).isActive = true
-        
-        galleryScrollContentView.translatesAutoresizingMaskIntoConstraints = false
-        galleryScrollView.addSubview(galleryScrollContentView)
-        galleryScrollContentView.topAnchor.constraint(equalTo: galleryScrollView.topAnchor).isActive = true
-        galleryScrollContentView.leadingAnchor.constraint(equalTo: galleryScrollView.leadingAnchor).isActive = true
-        galleryScrollContentView.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
-        galleryScrollContentView.trailingAnchor.constraint(equalTo: galleryScrollView.trailingAnchor).isActive = true
-        galleryScrollContentView.heightAnchor.constraint(equalTo: galleryScrollView.heightAnchor).isActive = true
-        
-        pageControl.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.hidesForSinglePage = true
-        pageControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.5)
-        pageControl.currentPageIndicatorTintColor = .crazeGreen
-        addSubview(pageControl)
-        pageControl.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .padding).isActive = true
-        pageControl.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
-        pageControl.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
-        pageControl.centerXAnchor.constraint(equalTo: galleryScrollView.centerXAnchor).isActive = true
-        
-        let labelContainerView = UIView()
-        labelContainerView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(labelContainerView)
-        labelContainerView.topAnchor.constraint(equalTo: galleryScrollView.bottomAnchor, constant: .padding).isActive = true
-        labelContainerView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        labelContainerView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        priceLabel.translatesAutoresizingMaskIntoConstraints = false
-        priceLabel.font = UIFont.preferredFont(forTextStyle: .title1)
-        priceLabel.textColor = .gray3
-        priceLabel.adjustsFontForContentSizeCategory = true
-        labelContainerView.addSubview(priceLabel)
-        priceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-        priceLabel.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
-        priceLabel.trailingAnchor.constraint(equalTo: labelContainerView.trailingAnchor).isActive = true
-        
-        originalPriceLabel.translatesAutoresizingMaskIntoConstraints = false
-        originalPriceLabel.font = UIFont.preferredFont(forTextStyle: .title2)
-        originalPriceLabel.textColor = .gray7
-        originalPriceLabel.adjustsFontForContentSizeCategory = true
-        labelContainerView.addSubview(originalPriceLabel)
-        originalPriceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-        originalPriceLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor).isActive = true
-        originalPriceLabel.bottomAnchor.constraint(lessThanOrEqualTo: labelContainerView.bottomAnchor).isActive = true
-        originalPriceLabel.trailingAnchor.constraint(equalTo: labelContainerView.trailingAnchor).isActive = true
-        
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.preferredFont(forTextStyle: .title2)
-        titleLabel.textColor = .gray3
-        titleLabel.numberOfLines = 0
-        titleLabel.adjustsFontForContentSizeCategory = true
-        labelContainerView.addSubview(titleLabel)
-        titleLabel.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
-        titleLabel.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: labelContainerView.leadingAnchor).isActive = true
-        titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: labelContainerView.bottomAnchor).isActive = true
-        titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: priceLabel.leadingAnchor, constant: -.padding).isActive = true
-        titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: originalPriceLabel.leadingAnchor, constant: -.padding).isActive = true
-        
-        // TODO: how does UI look when all variants are out of stock
-        selectionButton.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(selectionButton)
-        selectionButton.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
-        selectionButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        selectionButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-        cartButton.translatesAutoresizingMaskIntoConstraints = false
-        cartButton.backgroundColor = .crazeGreen
-        cartButton.setTitle("product.add".localized, for: .normal)
-        cartButton.setTitleColor(.white, for: .normal)
-        addSubview(cartButton)
-        cartButton.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
-        cartButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        cartButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        buyButton.translatesAutoresizingMaskIntoConstraints = false
-        buyButton.backgroundColor = .crazeGreen
-        buyButton.setTitle("product.buy".localized, for: .normal)
-        buyButton.setTitleColor(.white, for: .normal)
-        addSubview(buyButton)
-        buyButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
-        buyButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        buyButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        websiteButton.translatesAutoresizingMaskIntoConstraints = false
-        websiteButton.setTitleColor(.crazeGreen, for: .normal)
-        websiteButton.isHidden = true
-        addSubview(websiteButton)
-        websiteButton.topAnchor.constraint(equalTo: buyButton.bottomAnchor, constant: .padding).isActive = true
-        websiteButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        websiteButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        let contentTextView = UITextView()
-        contentTextView.translatesAutoresizingMaskIntoConstraints = false
-        contentTextView.backgroundColor = .green
-        contentTextView.isScrollEnabled = false
-        contentTextView.scrollsToTop = false
-        addSubview(contentTextView)
-        contentTextView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
-        contentTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        contentTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -.padding).isActive = true
-        contentTextView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
-    }
-    
-    func setSelection(colorItem: SegmentedDropDownItem?, sizeItem: SegmentedDropDownItem?) {
-        let hasColorItem = colorItem != nil
-        let hasSizeItem = sizeItem != nil
-        
-        guard hasColorItem || hasSizeItem else {
-            return
-        }
-        
-        var items: [SegmentedDropDownItem] = []
-        let widthRatio: CGFloat = (hasColorItem && hasSizeItem) ? 0.4 : 0.8
-        
-        if let colorItem = colorItem {
-            colorItem.placeholderTitle = "product.color.default".localized
-            colorItem.widthRatio = widthRatio
-            items.append(colorItem)
-        }
-        
-        if let sizeItem = sizeItem {
-            sizeItem.placeholderTitle = "product.size.default".localized
-            sizeItem.widthRatio = widthRatio
-            items.append(sizeItem)
-        }
-        
-        // TODO: keep this value synced with the CartViewController stepper.maxValue
-        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
-        items.append(quantityItem)
-        
-        selectionButton.items = items
-    }
-}
-
-
 class ProductViewController : BaseViewController {
     enum State {
         case loading
@@ -194,9 +20,9 @@ class ProductViewController : BaseViewController {
     fileprivate var productView: ProductView?
     fileprivate var selectionColorItem: SegmentedDropDownItem?
     fileprivate var selectionSizeItem: SegmentedDropDownItem?
+    fileprivate var productEmptyView: UIView?
     fileprivate var loadingView: Loader?
     
-    fileprivate var product: Product?
     fileprivate var structuredProduct: StructuredProduct?
     
     // MARK: Life Cycle
@@ -209,15 +35,15 @@ class ProductViewController : BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
-        state = .loading
-        ShoppingCartModel.shared.populateVariants(productOID: productOID).then { product -> Void in
-            self.product = product
-            self.state = .product
-            self.managerDidChangeContent()
-            }.catch { error in
-                print("ProductViewController init populateVariants catch error:\(error)")
+        
+        ShoppingCartModel.shared.populateVariants(productOID: productOID)
+            .then { product -> Void in
+                self.state = .product
+                self.structuredProduct = StructuredProduct(product)
+                self.applyStructuredProductIfPossible()
+            }
+            .catch { error in
                 self.state = .empty
-                self.syncState()
         }
     }
     
@@ -252,7 +78,24 @@ class ProductViewController : BaseViewController {
     fileprivate func syncState() {
         switch state {
         case .empty:
-            break
+            guard self.productEmptyView == nil else {
+                return
+            }
+            
+            loadingView?.removeFromSuperview()
+            loadingView = nil
+            productView?.removeFromSuperview()
+            productView = nil
+            
+            let productEmptyView = UIView()
+            productEmptyView.translatesAutoresizingMaskIntoConstraints = false
+            productEmptyView.backgroundColor = .orange
+            view.addSubview(productEmptyView)
+            productEmptyView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+            productEmptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            productEmptyView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+            productEmptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            self.productEmptyView = productEmptyView
             
         case .loading:
             guard self.loadingView == nil else {
@@ -261,6 +104,8 @@ class ProductViewController : BaseViewController {
             
             productView?.removeFromSuperview()
             productView = nil
+            productEmptyView?.removeFromSuperview()
+            productEmptyView = nil
             
             let loadingView = Loader()
             loadingView.translatesAutoresizingMaskIntoConstraints = false
@@ -277,6 +122,8 @@ class ProductViewController : BaseViewController {
             
             loadingView?.removeFromSuperview()
             loadingView = nil
+            productEmptyView?.removeFromSuperview()
+            productEmptyView = nil
             
             let productView = ProductView()
             productView.translatesAutoresizingMaskIntoConstraints = false
@@ -298,10 +145,10 @@ class ProductViewController : BaseViewController {
 }
 
 typealias ProductViewControllerProductView = ProductViewController
-extension ProductViewControllerProductView {
+fileprivate extension ProductViewControllerProductView {
     // MARK: Gallery
     
-    fileprivate func setImages(urls: [URL]) {
+    func setImages(urls: [URL]) {
         guard let productView = productView else {
             return
         }
@@ -342,7 +189,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    @objc fileprivate func pageControlDidChange() {
+    @objc func pageControlDidChange() {
         guard let productView = productView else {
             return
         }
@@ -352,7 +199,7 @@ extension ProductViewControllerProductView {
         productView.galleryScrollView.setContentOffset(point, animated: true)
     }
     
-    fileprivate var currentPage: Int {
+    var currentPage: Int {
         guard let productView = productView else {
             return 0
         }
@@ -362,7 +209,7 @@ extension ProductViewControllerProductView {
     
     // MARK: Labels
     
-    fileprivate func setProductTitle(_ title: String?) {
+    func setProductTitle(_ title: String?) {
         guard let productView = productView else {
             return
         }
@@ -370,7 +217,7 @@ extension ProductViewControllerProductView {
         productView.titleLabel.text = title
     }
     
-    fileprivate func setPrice(_ price: String?) {
+    func setPrice(_ price: String?) {
         guard let productView = productView else {
             return
         }
@@ -378,7 +225,7 @@ extension ProductViewControllerProductView {
         productView.priceLabel.text = price
     }
     
-    fileprivate func setOriginalPrice(_ price: String?) {
+    func setOriginalPrice(_ price: String?) {
         guard let productView = productView else {
             return
         }
@@ -396,7 +243,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    fileprivate func setWebsiteMerchant(_ merchant: String?) {
+    func setWebsiteMerchant(_ merchant: String?) {
         guard let productView = productView else {
             return
         }
@@ -422,7 +269,7 @@ extension ProductViewControllerProductView {
     
     // MARK: Actions
     
-    @objc fileprivate func selectionButtonTouchUpInside() {
+    @objc func selectionButtonTouchUpInside() {
 //        guard let productView = productView else {
 //            return
 //        }
@@ -430,7 +277,7 @@ extension ProductViewControllerProductView {
         // ???: need analytics here
     }
     
-    @objc fileprivate func selectionButtonValueChanged() {
+    @objc func selectionButtonValueChanged() {
         guard let productView = productView, let selectedItem = productView.selectionButton.selectedItem else {
             return
         }
@@ -446,7 +293,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    @objc fileprivate func cartButtonAction() {
+    @objc func cartButtonAction() {
         guard let productView = productView else {
             return
         }
@@ -472,18 +319,18 @@ extension ProductViewControllerProductView {
             let adjustedContentInsetTop: CGFloat
             
             if #available(iOS 11.0, *) {
-                adjustedContentInsetTop = productView.adjustedContentInset.top
+                adjustedContentInsetTop = productView.scrollView.adjustedContentInset.top
             }
             else {
                 adjustedContentInsetTop = topLayoutGuide.length
             }
             
-            let currentOffsetY = productView.contentOffset.y + adjustedContentInsetTop
+            let currentOffsetY = productView.scrollView.contentOffset.y + adjustedContentInsetTop
             let minOffsetY = productView.selectionButton.frame.minY
             
             if currentOffsetY > minOffsetY {
                 UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                    productView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
+                    productView.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
                     
                 }, completion: { completed in
                     displayErrorItems()
@@ -495,7 +342,7 @@ extension ProductViewControllerProductView {
         }
     }
     
-    @objc fileprivate func buyButtonAction() {
+    @objc func buyButtonAction() {
         //        guard let productView = productView else {
         //            return
         //        }
@@ -503,12 +350,45 @@ extension ProductViewControllerProductView {
         // TODO:
     }
     
-    @objc fileprivate func pushMerchantURL() {
+    @objc func pushMerchantURL() {
         //        guard let productView = productView else {
         //            return
         //        }
         
         // TODO:
+    }
+}
+
+typealias ProductViewControllerStructuredProduct = ProductViewController
+fileprivate extension ProductViewControllerStructuredProduct {
+    func applyStructuredProductIfPossible() {
+        guard let structuredProduct = structuredProduct else {
+            return
+        }
+        
+        setImages(urls: structuredProduct.product.imageURLs())
+        setWebsiteMerchant(structuredProduct.product.merchant)
+        setProductTitle(structuredProduct.title)
+        setPrice(structuredProduct.product.price)
+        
+        if structuredProduct.product.isSale() {
+            setOriginalPrice(structuredProduct.product.originalPrice)
+        }
+        
+        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors)
+        selectionColorItem = colorItem
+        
+        var sizeItem: SegmentedDropDownItem? = nil
+        
+        if !structuredProduct.sizes.isEmpty {
+            sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
+            sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            selectionSizeItem = sizeItem
+        }
+        
+        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
+        
+        repositionScrollView()
     }
 }
 
@@ -544,63 +424,30 @@ extension ProductViewController : UIScrollViewDelegate {
         
         let y: CGFloat = {
             if #available(iOS 11.0, *) {
-                return productView.adjustedContentInset.top
+                return productView.scrollView.adjustedContentInset.top
             }
             else {
                 return navigationController?.navigationBar.frame.maxY ?? 0
             }
         }()
         
-        productView.contentOffset = CGPoint(x: 0, y: -y)
-    }
-}
-
-extension ProductViewController {
-    func managerDidChangeContent() {
-        guard let product = self.product else {
-            state = .empty
-            return
-        }
-        
-        let structuredProduct = StructuredProduct(product)
-        self.structuredProduct = structuredProduct
-        
-        print("||| \(structuredProduct)")
-        
-        
-        state = .product
-        title = product.displayTitle
-        setImages(urls: product.imageURLs())
-        setWebsiteMerchant(product.merchant)
-        setProductTitle(product.productDescription)
-        setPrice(product.price)
-        
-        if product.isSale() {
-            setOriginalPrice(product.originalPrice)
-        }
-        
-        
-        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors)
-//        colorItem.disabledPickerItems = ["Brown", "Yellow"]
-        selectionColorItem = colorItem
-        
-        let sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
-        selectionSizeItem = sizeItem
-        
-        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
-        
-        repositionScrollView()
+        productView.scrollView.contentOffset = CGPoint(x: 0, y: -y)
     }
 }
 
 extension ProductViewController {
     fileprivate class StructuredProduct: NSObject {
+        let product: Product
+        private(set) var title: String?
         private(set) var variants: [StructuredVariant] = []
         private(set) var colors: [String] = []
         private(set) var sizes: [String] = []
         
         init(_ product: Product) {
+            self.product = product
             super.init()
+            
+            self.title = generateTitle(product)
             
             guard let variants = product.availableVariants?.allObjects as? [Variant] else {
                 return
@@ -636,10 +483,15 @@ extension ProductViewController {
             }
             
             self.variants = structuredVariants
-            self.colors = Array(colors)
+            self.colors = colors.sorted()
             self.sizes = sizes.sorted(by: { (a, b) -> Bool in
+                // TODO: number size should be sorted
                 return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
             })
+        }
+        
+        func generateTitle(_ product: Product) -> String? {
+            return product.productDescription?.split(separator: ",").dropLast().joined(separator: ",")
         }
         
         func variant(forColor color: String?) -> StructuredVariant? {

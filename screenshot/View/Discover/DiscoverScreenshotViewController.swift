@@ -150,7 +150,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return matchstickFrc?.fetchedResultsController.object(at: currentIndexPath)
+        return matchstickFrc?.object(at: currentIndexPath)
     }
     
     // MARK: Decision
@@ -243,7 +243,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount == 1 {
+                if self.matchstickFrc?.fetchedObjectsCount == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }
@@ -382,7 +382,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isListEmpty:Bool {
         get {
-            if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 > 0 {
+            if self.matchstickFrc?.fetchedObjectsCount ?? 0 > 0 {
                 return false
             }
             
@@ -443,7 +443,7 @@ class DiscoverScreenshotViewController : BaseViewController {
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
+        return self.matchstickFrc?.fetchedObjectsCount ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -452,7 +452,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
-            let matchstick = matchstickFrc?.fetchedResultsController.object(at: indexPath)
+            let matchstick = matchstickFrc?.object(at: indexPath)
             
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)

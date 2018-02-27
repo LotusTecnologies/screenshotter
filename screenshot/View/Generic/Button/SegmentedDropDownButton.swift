@@ -8,8 +8,6 @@
 
 import UIKit
 
-// TODO: when presenting picker, it should have the title as the selected option (not the previously scrolled to item)
-
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String]
     var disabledPickerItems: [String]? {
@@ -102,7 +100,7 @@ class SegmentedDropDownButton : UIControl {
                 segment.translatesAutoresizingMaskIntoConstraints = false
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
-                segment.titleLabel.text = item.placeholderTitle
+                segment.titleLabel.text = item.placeholderTitle ?? item.pickerItems.first
                 segment.titleLabel.textColor = .gray6
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 addSubview(segment)
@@ -251,6 +249,10 @@ extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate
         return items[itemIndex(pickerView: pickerView)].pickerItems.count
     }
     
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return items[itemIndex(pickerView: pickerView)].pickerItems[row]
+    }
+    
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         let item = items[itemIndex(pickerView: pickerView)]
         let title = item.pickerItems[row]
@@ -368,6 +370,25 @@ fileprivate class DropDownButton : UIControl {
         }
     }
     
+    fileprivate func selectCurrentRow() {
+        guard let dataSource = pickerView.dataSource, let delegate = pickerView.delegate else {
+            return
+        }
+        
+        var row = 0
+        
+        for i in 0 ..< dataSource.pickerView(pickerView, numberOfRowsInComponent: 0) {
+            let title = delegate.pickerView!(pickerView, titleForRow: i, forComponent: 0) ?? ""
+            
+            if !title.isEmpty && title == titleLabel.text {
+                row = i
+                break
+            }
+        }
+        
+        pickerView.selectRow(row, inComponent: 0, animated: false)
+    }
+    
     // MARK: First Responder
     
     override func becomeFirstResponder() -> Bool {
@@ -375,6 +396,7 @@ fileprivate class DropDownButton : UIControl {
         
         if becomeFirstResponder {
             isSelected = true
+            selectCurrentRow()
         }
         
         return becomeFirstResponder
