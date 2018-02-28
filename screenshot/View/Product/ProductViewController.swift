@@ -17,6 +17,7 @@ class ProductViewController : BaseViewController {
         case empty
     }
     
+    fileprivate var cartBarButtonItem: ProductCartBarButtonItem?
     fileprivate var productView: ProductView?
     fileprivate var selectionColorItem: SegmentedDropDownItem?
     fileprivate var selectionSizeItem: SegmentedDropDownItem?
@@ -45,6 +46,10 @@ class ProductViewController : BaseViewController {
             .catch { error in
                 self.state = .empty
         }
+        
+        cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCart))
+        cartBarButtonItem?.count = 0 // TODO: 
+        navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     
     override func viewDidLoad() {
@@ -400,6 +405,13 @@ fileprivate extension ProductViewControllerStructuredProduct {
         productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         
         repositionScrollView()
+    }
+}
+
+typealias ProductViewControllerCart = ProductViewController
+extension ProductViewControllerCart {
+    @objc fileprivate func presentCart() {
+        // TODO:
     }
 }
 
