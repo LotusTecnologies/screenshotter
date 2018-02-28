@@ -244,6 +244,12 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 
 extension ProductsViewController {
     
+    func clearProductListAndStateLoading(){
+        self.products = []
+        self.productsUnfilteredCount = 0
+        self.state = .loading
+        self.collectionView?.reloadData()
+    }
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
         
         if changed {
@@ -252,10 +258,7 @@ extension ProductsViewController {
                     if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
                         self.reloadProductsFor(shoppable: shoppable)
                     }else{
-                        self.products = []
-                        self.productsUnfilteredCount = 0
-                        self.state = .loading
-                        self.collectionView?.reloadData()
+                        self.clearProductListAndStateLoading()
                     }
                 })
             }
@@ -276,10 +279,7 @@ extension ProductsViewController {
                     self.reloadProductsFor(shoppable: selectedShoppable)
                 }
             }else{
-                self.products = []
-                self.productsUnfilteredCount = 0
-                self.state = .loading
-                self.collectionView?.reloadData()
+                clearProductListAndStateLoading()
             }
         }
     }
