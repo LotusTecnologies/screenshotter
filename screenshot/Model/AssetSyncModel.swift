@@ -426,6 +426,7 @@ class AssetSyncModel: NSObject {
                      optionsMask: Int32) {
         let extractedCategories = prod["categories"] as? [String]
         let originalData = prod["original_data"] as? [String : Any]
+        // TODO: GMK remove rejecting product with no partNumber.
         guard let _ = originalData?["part_number"] as? String else {
             return
         }
@@ -443,6 +444,7 @@ class AssetSyncModel: NSObject {
                                                      imageURL: prod["imageUrl"] as? String,
                                                      merchant: prod["merchant"] as? String,
                                                      partNumber: originalData?["part_number"] as? String,
+                                                     color: originalData?["colors/0/color"] as? String,  // "tmp_color_keys/0"
                                                      retailPrice: originalData?["retail_price"] as? Float ?? 0,
                                                      optionsMask: optionsMask)
     }
