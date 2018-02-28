@@ -30,10 +30,12 @@
         <attribute name="altImageURLs" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="categories" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateFavorited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateRetrieved" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateSortProductBar" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateViewed" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="detailedDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="displayTitle" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
         <attribute name="floatOriginalPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="floatPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -50,6 +52,7 @@
         <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="availableVariants" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Variant" inverseName="product" inverseEntity="Variant" syncable="YES"/>
         <relationship name="cartItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CartItem" inverseName="product" inverseEntity="CartItem" syncable="YES"/>
         <relationship name="screenshot" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="favorites" inverseEntity="Screenshot" syncable="YES"/>
@@ -108,7 +111,7 @@
         <element name="Cart" positionX="369" positionY="-108" width="128" height="118"/>
         <element name="CartItem" positionX="540" positionY="27" width="128" height="195"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
-        <element name="Product" positionX="-101" positionY="396" width="128" height="450"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="495"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="285"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>

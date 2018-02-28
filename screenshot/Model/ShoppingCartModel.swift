@@ -139,9 +139,13 @@ class ShoppingCartModel {
 }
 
 
-extension Variant {
+extension Cart {
     
-    public func add(toCart: Cart, quantity: Int16) {
+    public func update(variant: Variant, quantity: Int16) {
+        
+    }
+    
+    public func remove(item: CartItem) {
         
     }
     
