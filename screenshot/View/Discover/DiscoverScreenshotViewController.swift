@@ -431,13 +431,9 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     fileprivate func presentTermsOfServiceViewController() {
-        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
             present(viewController, animated: true, completion: nil)
         }
-    }
-    
-    @objc fileprivate func dismissViewController() {
-        dismiss(animated: true, completion: nil)
     }
 }
 

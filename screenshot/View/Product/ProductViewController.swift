@@ -413,7 +413,8 @@ fileprivate extension ProductViewControllerStructuredProduct {
 typealias ProductViewControllerCart = ProductViewController
 extension ProductViewControllerCart {
     @objc fileprivate func presentCart() {
-        // TODO:
+        let navigationController = ModalNavigationController(rootViewController: CartViewController())
+        present(navigationController, animated: true, completion: nil)
     }
 }
 
