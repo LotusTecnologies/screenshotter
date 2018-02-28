@@ -496,8 +496,14 @@ extension ProductViewController {
             self.variants = structuredVariants
             self.colors = colors.sorted()
             self.sizes = sizes.sorted(by: { (a, b) -> Bool in
-                // TODO: number size should be sorted
-                return (sortedSizes.index(of: a) ?? Int.max) < (sortedSizes.index(of: b) ?? Int.max)
+                let aIndex = (sortedSizes.index(of: a) ?? Int.max)
+                let bIndex = (sortedSizes.index(of: b) ?? Int.max)
+                
+                if aIndex == Int.max && bIndex == Int.max {
+                    return a.localizedStandardCompare(b) == .orderedAscending
+                }
+                
+                return aIndex < bIndex
             })
         }
         
