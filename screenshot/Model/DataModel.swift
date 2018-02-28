@@ -68,10 +68,10 @@ extension DataModel {
     func receivedCoreDataError(error:Error) {
         let error = error as NSError
         if error.domain == NSSQLiteErrorDomain && error.code == 13{ // disk full  see https://sqlite.org/c3ref/c_abort.html
-            AnalyticsTrackers.standard.track("Error", properties: ["type":"noHardDriveSpace"])
+            AnalyticsTrackers.standard.track(.error, properties: ["type":"noHardDriveSpace"])
             AppDelegate.shared.presentLowDiskSpaceWarning()
         }else{
-            AnalyticsTrackers.standard.track("Error", properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
         }
     }
 }
@@ -1057,9 +1057,9 @@ extension Shoppable {
                 let categoryOrDash = category ?? "-"
                 let augmentedOffersUrlOrDash = augmentedOffersUrl ?? "-"
                 if positive {
-                    AnalyticsTrackers.standard.track("Shoppable rating positive", properties: ["Rating" : positiveRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
+                    AnalyticsTrackers.standard.track(.shoppableRatingPositive, properties: ["Rating" : positiveRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
                 } else {
-                    AnalyticsTrackers.standard.track("Shoppable rating negative", properties: ["Rating" : negativeRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
+                    AnalyticsTrackers.standard.track(.shoppableRatingNegative, properties: ["Rating" : negativeRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
                 }
                 try managedObjectContext.save()
             } catch {

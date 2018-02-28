@@ -79,7 +79,7 @@ class WebViewController : BaseViewController {
         super.viewWillDisappear(animated)
         
         if isShowingGame {
-            AnalyticsTrackers.standard.track("Game Interrupted", properties: [
+            AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
                 "From": "User Navigating"
                 ])
         }
@@ -104,7 +104,7 @@ class WebViewController : BaseViewController {
             loader?.stopAnimation()
             
             if isShowingGame {
-                AnalyticsTrackers.standard.track("Game Interrupted", properties: [
+                AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
                     "From": "App Backgrounding"
                     ])
             }
@@ -116,7 +116,7 @@ class WebViewController : BaseViewController {
             loader?.startAnimation()
             
             if isShowingGame {
-                AnalyticsTrackers.standard.track("Game Resumed", properties: [
+                AnalyticsTrackers.standard.track(.gameResumed, properties: [
                     "From": "App Backgrounding"
                     ])
             }
@@ -298,7 +298,7 @@ class WebViewController : BaseViewController {
             webView.reload()
         }
         
-        AnalyticsTrackers.standard.track("Refreshed webpage", properties: [
+        AnalyticsTrackers.standard.track(.refreshedWebpage, properties: [
             "url": url?.absoluteString ?? ""
             ])
     }
@@ -397,7 +397,7 @@ class WebViewController : BaseViewController {
         if isShowingGame {
             isShowingGame = false
             
-            AnalyticsTrackers.standard.track("Game Interrupted", properties: [
+            AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
                 "From": "Page Loading"
                 ])
         }
@@ -446,7 +446,7 @@ extension WebViewController : WKNavigationDelegate {
             }
             else {
                 decisionHandler(.cancel)
-                AnalyticsTrackers.standard.track("WebView invalid url", properties: ["url": url.absoluteString])
+                AnalyticsTrackers.standard.track(.webviewInvalidUrl, properties: ["url": url.absoluteString])
                 self.delegate?.webViewController(self, declinedInvalidURL: url)
             }
         }
