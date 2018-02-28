@@ -106,7 +106,7 @@ extension DataModel {
     func favoriteFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
         let request: NSFetchRequest = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
-        request.predicate = NSPredicate(format: "lastFavorited != nil")
+        request.predicate = NSPredicate(format: "favoritesCount != 0")
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
@@ -488,22 +488,15 @@ extension DataModel {
             fetchRequest.sortDescriptors = nil
             
             do {
-                var screenshotsToUpdate = Set<Screenshot>()
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     if let screenshot = product.screenshot {
                         screenshot.removeFromFavorites(product)
                         screenshot.favoritesCount -= 1
-                        if let screenshotFavoritedDate = screenshot.lastFavorited,
-                            let productFavoritedDate = product.dateFavorited,
-                            (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
-                            screenshotsToUpdate.insert(screenshot)
-                        }
                     }
                     product.isFavorite = false
                     product.dateFavorited = nil
                 }
-                screenshotsToUpdate.forEach {$0.updateLastFavorited()}
                 try managedObjectContext.save()
             } catch {
                 self.receivedCoreDataError(error: error)
@@ -855,17 +848,6 @@ extension Screenshot {
         return frame
     }
     
-    // Typically called after unfavoriting a product, its screenshot's lastFavorited needs to be set to the most recently favorited,
-    // so the favoriteFrc correctly orders the screenshots.
-    func updateLastFavorited() {
-        if let favoritesArray = favorites?.allObjects as? [Product] {
-            let latest = favoritesArray.flatMap({$0.dateFavorited as Date?}).reduce(Date.distantPast, { $0 > $1 ? $0 : $1 })
-            lastFavorited = (latest == Date.distantPast ? nil : latest as NSDate)
-        } else {
-            lastFavorited = nil
-        }
-    }
-    
     var favoritedShoppablesCount: Int {
         if let favoritedShoppablesCount = shoppables?.filtered(using: NSPredicate(format: "ANY products.isFavorite == TRUE")).count {
             return favoritedShoppablesCount
@@ -1143,19 +1125,11 @@ extension Product {
                             screenshot.lastFavorited = now
                         }
                     } else {
-                        let dateFavorited = product.dateFavorited
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.removeFromFavorites(product)
                             if let favorites = screenshot.favorites {
                                 screenshot.favoritesCount = Int16(favorites.count)
-                                if let dateFavorited = dateFavorited,
-                                    let screenshotLastFavorited = screenshot.lastFavorited,
-                                    dateFavorited.compare(screenshotLastFavorited as Date) == .orderedAscending {
-                                    // No need to update the screenshot's lastFavorited.
-                                } else {
-                                    screenshot.updateLastFavorited()
-                                }
                             } else {
                                 screenshot.favoritesCount = 0
                                 screenshot.lastFavorited = nil
