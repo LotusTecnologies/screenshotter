@@ -103,6 +103,9 @@ class ShoppingCartModel {
                 }
                 
                 rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
+                rootProduct.detailedDescription = dict["description"] as? String
+                rootProduct.name = dict["name"] as? String
+                rootProduct.url = dict["url"] as? String
                 print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
                 
                 var hasVariants = false
