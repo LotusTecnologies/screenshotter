@@ -12,7 +12,7 @@ import CoreData
 
 protocol ShoppablesToolbarDelegate : UIToolbarDelegate {
     func shoppablesToolbarDidChange(toolbar:ShoppablesToolbar)
-    func shoppablesToolbarDidSelectShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable)
+    func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable)
 }
 
 class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, ShoppablesCollectionViewDelegate, FetchedResultsControllerManagerDelegate {
@@ -20,7 +20,6 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     weak var shoppableToolbarDelegate:ShoppablesToolbarDelegate?
     var didViewControllerAppear:Bool = false
-//    var needsToSelectFirstShoppable:Bool = false
     var collectionView:ShoppablesCollectionView!
     var screenshotImage:UIImage
     var shoppablesController:FetchedResultsControllerManager<Shoppable>
@@ -87,10 +86,10 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
-        AnalyticsTrackers.standard.track("Tapped on shoppable")
-
+        AnalyticsTrackers.standard.track(.tappedOnShoppable)
+        
         let shopable = self.shoppablesController.object(at: indexPath)
-        self.shoppableToolbarDelegate?.shoppablesToolbarDidSelectShoppable(toolbar: self, shoppable: shopable)
+        self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shopable)
 
     }
     
@@ -143,7 +142,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         if self.collectionView.numberOfItems(inSection: 0) > 0{
             self.collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
             if let shoppable = self.selectedShoppable() {
-                self.shoppableToolbarDelegate?.shoppablesToolbarDidSelectShoppable(toolbar: self, shoppable: shoppable)
+                self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shoppable)
             }
         }
     }

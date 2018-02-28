@@ -283,7 +283,7 @@ extension ProductsViewController {
             }
         }
     }
-    func shoppablesToolbarDidSelectShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
+    func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
 
         self.reloadProductsFor(shoppable: shoppable)
     }
@@ -451,7 +451,7 @@ extension ProductsViewControllerOptionsView {
             control.resignFirstResponder()
         }
         else {
-            AnalyticsTrackers.standard.track("Opened Filters View", properties:nil)
+            AnalyticsTrackers.standard.track(.openedFiltersView, properties:nil)
             if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
                 self.productsOptions.syncOptions(withMask: shoppable.getLast())
             }
