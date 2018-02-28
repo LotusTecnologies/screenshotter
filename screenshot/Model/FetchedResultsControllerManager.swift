@@ -9,83 +9,148 @@
 import UIKit
 import CoreData
 
-
-class FetchedResultsControllerManagerChange: NSObject {
-    var insertedSections:IndexSet = []
-    var deletedSections:IndexSet = []
-    var insertedRows:[IndexPath] = []
-    var deletedRows:[IndexPath] = []
-    var updatedRows:[IndexPath] = []
-    
-    func applyChanges(tableView:UITableView){
-        if #available(iOS 11.0, *) {
-            tableView.performBatchUpdates({
-                tableView.deleteSections(deletedSections, with: .none)
-                tableView.deleteRows(at: deletedRows, with: .none)
-                tableView.insertSections(insertedSections, with: .none)
-                tableView.insertRows(at: insertedRows, with: .none)
-            }) { (completed) in
-                
-            }
-            tableView.reloadRows( at: updatedRows, with: .none)
-        }else{
-            tableView.beginUpdates()
-            tableView.deleteSections(deletedSections, with: .none)
-            tableView.deleteRows(at: deletedRows, with: .none)
-            tableView.insertSections(insertedSections, with: .none)
-            tableView.insertRows(at: insertedRows, with: .none)
-            tableView.endUpdates()
-            tableView.reloadRows( at: updatedRows, with: .none)
-        }
-    }
-    
-    func applyChanges(collectionView:UICollectionView){
-        collectionView.performBatchUpdates({
-            collectionView.deleteSections(deletedSections)
-            collectionView.deleteItems(at: deletedRows)
-            collectionView.insertSections(insertedSections)
-            collectionView.insertItems(at: insertedRows)
-        }) { (completed) in
-        }
-        collectionView.reloadItems(at: self.updatedRows)
-
-    }
-    
-    func shiftIndexSections(by :Int){
-        insertedSections = IndexSet(insertedSections.map { $0 + by })
-        deletedSections = IndexSet(deletedSections.map { $0 + by })
-        insertedRows = insertedRows.map { IndexPath.init(row: $0.row, section: ($0.section + by) ) }
-        deletedRows = deletedRows.map { IndexPath.init(row: $0.row, section: ($0.section + by) ) }
-        updatedRows = updatedRows.map { IndexPath.init(row: $0.row, section: ($0.section + by) ) }
+extension IndexSet {
+    func toArray() -> [Int] {
+        let indexes: [Int] = self.enumerated().map {$0.element}
+        return indexes
     }
 }
 
-protocol FetchedResultsControllerManagerDelegate : NSObjectProtocol{
-    func managerDidChangeContent(_ controller:NSObject, change:FetchedResultsControllerManagerChange)
+protocol FetchedResultsControllerManagerChange {
+    func applyChanges(tableView: UITableView)
+    func applyChanges(collectionView: UICollectionView)
+    func shiftIndexSections(by: Int)
+    var insertedRows: [IndexPath] { get }
+    var deletedRows: [IndexPath] { get }
+    var updatedRows: [IndexPath] { get }
+    var insertedSections: IndexSet { get }
+    var deletedSections: IndexSet { get }
+
+}
+
+protocol FetchedResultsControllerManagerDelegate : class {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange)
 }
 
 class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsControllerDelegate  where ResultType : NSFetchRequestResult {
+    class Section {
+        var items: [ResultType] = []
+        init(_ i: [ResultType]) {
+            items = i
+        }
+    }
+    class Change: NSObject, FetchedResultsControllerManagerChange {
+        var insertedSections: IndexSet = []
+        var deletedSections: IndexSet = []
+        var insertedRows: [IndexPath] {
+            return insertedElements.map{ $0.index }
+        }
+        var deletedRows: [IndexPath] {
+            return deletedElements.map{ $0.index }
+        }
+        var updatedRows: [IndexPath] {
+            return updatedElements.map{ $0.index }
+        }
+        
+        var insertedElements: [(index: IndexPath, element: ResultType)] = []
+        var deletedElements: [(index: IndexPath, element: ResultType)] = []
+        var updatedElements: [(index: IndexPath, element: ResultType)] = []
+        
+        
+        func applyChanges(tableView: UITableView) {
+            tableView.beginUpdates()
+            tableView.deleteRows(at: deletedRows, with: .none)
+            tableView.deleteSections(deletedSections, with: .none)
+            tableView.insertSections(insertedSections, with: .none)
+            tableView.insertRows(at: insertedRows, with: .none)
+            tableView.endUpdates()
+            
+            tableView.reloadRows(at: updatedRows, with: .none)
+            
+        }
+        
+        func applyChanges(collectionView: UICollectionView) {
+            collectionView.performBatchUpdates({
+                collectionView.deleteItems(at: deletedRows)
+                collectionView.deleteSections(deletedSections)
+                collectionView.insertSections(insertedSections)
+                collectionView.insertItems(at: insertedRows)
+            }) { (completed) in
+            }
+            collectionView.reloadItems(at: self.updatedRows)
+            
+            
+        }
+        override var description: String {
+            return "insertedSections:\(insertedSections.toArray()), deletedSections:\(deletedSections.toArray()), insertedRows:\(insertedRows), deletedRows:\(deletedRows), updatedRows:\(updatedRows)"
+        }
+        func shiftIndexSections(by: Int) {
+            insertedSections = IndexSet(insertedSections.map { $0 + by })
+            deletedSections = IndexSet(deletedSections.map { $0 + by })
+            insertedElements = insertedElements.map { (IndexPath(row: $0.row, section: ($0.section + by)), $1 ) }
+            deletedElements = deletedElements.map { (IndexPath(row: $0.row, section: ($0.section + by)), $1 ) }
+            updatedElements = updatedElements.map { (IndexPath(row: $0.row, section: ($0.section + by)), $1 ) }
+        }
+    }
+    
+    
+    private var fetchedResultsController: NSFetchedResultsController<ResultType>
+    private var currentChange: Change?
+    weak var delegate: FetchedResultsControllerManagerDelegate?
+    var arrayOfArrays: [Section] = []
+    
+    
+    func numberOfSections() -> Int {
+        return arrayOfArrays.count
+    }
+    var fetchedObjectsCount: Int {
+        return self.arrayOfArrays.reduce(0, {$0 + $1.items.count})
+    }
+    var first: ResultType? {
+        return self.arrayOfArrays.first?.items.first
+    }
+    
+    var fetchedObjects: [ResultType] {
+        return arrayOfArrays.flatMap {$0.items}
+    }
+    
+    // TODO: Remove after all uses removed. You should never need to look up an indexPath for an object.
+    func indexPath(forObject: ResultType) -> IndexPath? {
+        for (section, sectionInfo) in arrayOfArrays.enumerated() {
+            for (row, object) in sectionInfo.items.enumerated() {
+                if forObject.isEqual(object) {
+                    return IndexPath(row: row, section: section)
+                }
+            }
 
-    var fetchedResultsController:NSFetchedResultsController<ResultType>
-    private var currentChange:FetchedResultsControllerManagerChange?
-    weak var delegate:FetchedResultsControllerManagerDelegate?
+        }
+        return nil
+    }
+    
+    func numberOfItems(in section: Int) -> Int {
+        return self.arrayOfArrays[section].items.count
+    }
+    func object(at indexPath: IndexPath) -> ResultType {
+        return self.arrayOfArrays[indexPath.section].items[indexPath.row]
+    }
     
     public init(fetchRequest: NSFetchRequest<ResultType>, managedObjectContext context: NSManagedObjectContext, sectionNameKeyPath: String?, delegate:FetchedResultsControllerManagerDelegate?){
-        fetchedResultsController = NSFetchedResultsController.init(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
-
-        super.init()
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: sectionNameKeyPath, cacheName: nil)
         
+        super.init()
         fetchedResultsController.delegate = self
         self.delegate = delegate
         do {
             try self.fetchedResultsController.performFetch()
         }catch{
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
             print("Failed to fetch in fetchedResultsControllerManager from core data:\(error)")
         }
+        self.arrayOfArrays = self.fetchedResultsController.sections?.flatMap({$0.objects as? [ResultType]}).flatMap {Section($0)} ?? []
     }
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.currentChange = FetchedResultsControllerManagerChange.init()
+        self.currentChange = Change()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
@@ -96,41 +161,73 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
             self.currentChange?.deletedSections.insert(sectionIndex)
         default:
             //shouldn't happen
+            print("FetchedResultsControllerManager didChange atSectionIndex:\(sectionIndex) unknown type:\(type.rawValue)")
             return
         }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            if let i = newIndexPath {
-                self.currentChange?.insertedRows.append(i)
-            }
-        case .delete:
-            if let i = indexPath {
-                self.currentChange?.deletedRows.append(i)
-            }
-        case .update:
-            if let i = newIndexPath {
-                self.currentChange?.updatedRows.append(i)
-            }
-            
-        case .move:
-            if let i = indexPath {
-                self.currentChange?.deletedRows.append(i)
-            }
-            if let i = newIndexPath {
-                self.currentChange?.insertedRows.append(i)
+        if let anObject = anObject as? ResultType {
+            switch type {
+            case .insert:
+                if let i = newIndexPath {
+                    self.currentChange?.insertedElements.append((i, anObject))
+                }
+            case .delete:
+                if let i = indexPath {
+                    self.currentChange?.deletedElements.append((i, anObject))
+                }
+            case .update:
+                if let i = indexPath {
+                    self.currentChange?.updatedElements.append((i, anObject))
+                }
+                
+            case .move:
+                if let i = indexPath {
+                    self.currentChange?.deletedElements.append((i, anObject))
+                }
+                if let i = newIndexPath {
+                    self.currentChange?.insertedElements.append((i, anObject))
+                }
             }
         }
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.currentChange?.insertedRows.sort(by:  { $0 < $1 } )
-        self.currentChange?.deletedRows.sort(by:  { $0 > $1 } )
-        if let change = self.currentChange {
+        guard let change = self.currentChange else {
+            return
+        }
+        change.insertedElements.sort(by: { $0.index < $1.index })
+        change.deletedElements.sort(by: { $0.index > $1.index })
+        
+        change.updatedElements.forEach { (tuple) in
+            arrayOfArrays[tuple.index.section].items[tuple.index.row] = tuple.element
+        }
+        let updateOnlyChange = Change()
+        updateOnlyChange.updatedElements = change.updatedElements
+        if updateOnlyChange.updatedElements.count > 0 {
+            self.delegate?.managerDidChangeContent(self, change:updateOnlyChange)
+        }
+        
+        change.deletedRows.forEach { (indexPath) in
+            arrayOfArrays[indexPath.section].items.remove(at: indexPath.row)
+        }
+        change.deletedSections.reversed().forEach { (index) in
+            arrayOfArrays.remove(at: index)
+        }
+        change.insertedSections.forEach { (index) in
+            arrayOfArrays.insert(Section([]), at: index)
+        }
+        change.insertedElements.forEach { (tuple) in
+            arrayOfArrays[tuple.index.section].items.insert(tuple.element, at: tuple.index.row)
+        }
+        change.updatedElements = []
+        if change.deletedRows.count + change.deletedSections.count + change.insertedSections.count + change.insertedElements.count > 0 {
             self.delegate?.managerDidChangeContent(self, change: change)
         }
+
         self.currentChange = nil
     }
 }
+
+

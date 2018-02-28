@@ -23,8 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var shouldLoadDiscoverNextLoad = false
-    let settings: AppSettings
-    fileprivate let settingsSetter = AppSettingsSetter()
+    let appSettings: AppSettings = AppSettings()
     
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
@@ -35,11 +34,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
-    }
-    
-    override init() {
-        settings = AppSettings(withSetter: self.settingsSetter)
-        super.init()
     }
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
@@ -78,10 +72,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let aps = remoteNotification["aps"] as? [String : AnyObject],
             let contentAvailable = aps["content-available"] as? NSNumber,
             contentAvailable.intValue == 1 {
-            AnalyticsTrackers.segment.track("Woke From Silent Push")
+            //TODO: why is this only segment
+            AnalyticsTrackers.segment.track(.wokeFromSilentPush)
         }
         
         return true
+    }
+    var lastPresentedLowDiskSpaceWarning:Date?
+    func presentLowDiskSpaceWarning(){
+        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*5 else {
+            return
+        }
+        
+        self.lastPresentedLowDiskSpaceWarning = Date()
+        let alert = UIAlertController.init(title: "application.error.no_disk_space.title".localized, message:"application.error.no_disk_space.message".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler:nil))
+        self.window?.rootViewController?.present(alert, animated: true, completion: nil)
     }
     
 //    func applicationWillResignActive(_ application: UIApplication) {
@@ -94,7 +100,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
         ApplicationStateModel.sharedInstance.applicationState = .background
-        AnalyticsTrackers.standard.track("sessionEnded")
+        AnalyticsTrackers.standard.track(.sessionEnded)
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
@@ -104,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
-        AnalyticsTrackers.standard.track("sessionStarted")
+        AnalyticsTrackers.standard.track(.sessionStarted)
         AssetSyncModel.sharedInstance.syncPhotosUponForeground()
     }
     
@@ -430,14 +436,9 @@ extension AppDelegate {
 
 extension AppDelegate {
     fileprivate func fetchAppSettings() {
-        NetworkingPromise.sharedInstance.appSettings().then(on: DispatchQueue.global(qos: .default)) { data -> Promise<FetchedAppSettings> in
-            return Promise(value: FetchedAppSettings(data))
-            
-        }.then(on: .main) { fetchedAppSettings -> Void in
-            self.settingsSetter.setUpdateVersion(fetchedAppSettings.updateVersion)
-            self.settingsSetter.setForcedUpdateVersion(fetchedAppSettings.forcedUpdateVersion)
-            
-            NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo: ["AppSettings": fetchedAppSettings])
+        NetworkingPromise.sharedInstance.appSettings().then(on:.main) { data -> Void in
+            self.appSettings.appSettingsDict = data
+            NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo:nil)  //this can cause UI changes and must be on main
         }
     }
 }
@@ -454,6 +455,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         completionHandler()
         
-        AnalyticsTrackers.standard.track("app opened from local notification")
+        AnalyticsTrackers.standard.track(.appOpenedFromLocalNotification)
     }
 }

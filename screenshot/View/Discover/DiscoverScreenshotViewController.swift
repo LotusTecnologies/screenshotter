@@ -150,7 +150,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return matchstickFrc?.fetchedResultsController.object(at: currentIndexPath)
+        return matchstickFrc?.object(at: currentIndexPath)
     }
     
     // MARK: Decision
@@ -243,7 +243,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount == 1 {
+                if self.matchstickFrc?.fetchedObjectsCount == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }
@@ -274,7 +274,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             
             if velocityAndPositionIsInSameDirection && velocityOrPositionPassedThreshhold {
                 if direction == 1 {
-                    AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+                    AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
                         "by": "swipe",
                         "url": currentMatchstick?.imageUrl ?? ""
                         ])
@@ -282,7 +282,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     decidedToAdd()
                 }
                 else {
-                    AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
+                    AnalyticsTrackers.standard.track(.matchsticksSkip, properties: [
                         "by": "swipe",
                         "url": currentMatchstick?.imageUrl ?? ""
                         ])
@@ -310,7 +310,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             self.syncInteractionElements()
         }
         
-        AnalyticsTrackers.standard.track("Matchsticks Skip", properties: [
+        AnalyticsTrackers.standard.track(.matchsticksSkip, properties: [
             "by": "tap",
             "url": currentMatchstick?.imageUrl ?? ""
             ])
@@ -327,7 +327,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             self.syncInteractionElements()
         }
         
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+        AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
             "by": "tap",
             "url": currentMatchstick?.imageUrl ?? ""
             ])
@@ -382,7 +382,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isListEmpty:Bool {
         get {
-            if self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0 > 0 {
+            if self.matchstickFrc?.fetchedObjectsCount ?? 0 > 0 {
                 return false
             }
             
@@ -410,7 +410,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track("Matchsticks Flagged", properties: [
+        AnalyticsTrackers.standard.track(.matchsticksFlagged, properties: [
             "url": currentMatchstick?.imageUrl ?? "",
             "why": "Inappropriate"
             ])
@@ -424,7 +424,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track("Matchsticks Flagged", properties: [
+        AnalyticsTrackers.standard.track(.matchsticksFlagged, properties: [
             "url": currentMatchstick?.imageUrl ?? "",
             "why": "Copyright"
             ])
@@ -443,7 +443,7 @@ class DiscoverScreenshotViewController : BaseViewController {
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.matchstickFrc?.fetchedResultsController.fetchedObjectsCount ?? 0
+        return self.matchstickFrc?.fetchedObjectsCount ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -452,7 +452,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
-            let matchstick = matchstickFrc?.fetchedResultsController.object(at: indexPath)
+            let matchstick = matchstickFrc?.object(at: indexPath)
             
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
@@ -476,11 +476,11 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        AnalyticsTrackers.standard.track("Matchsticks Add", properties: [
+        AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
             "by": "open",
             "url": currentMatchstick?.imageUrl ?? ""
             ])
-        AnalyticsTrackers.standard.track("Matchsticks Opened Screenshot")
+        AnalyticsTrackers.standard.track(.matchsticksOpenedScreenshot)
         
         delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
     }

@@ -67,12 +67,19 @@ class IntercomHelper : NSObject {
     
     func handleRemoteNotification(_ userInfo:[AnyHashable : Any], opened:Bool = false) {
         let isIntercomNotification = Intercom.isIntercomPushNotification(userInfo)
-        let trackingPrefix = opened ? "Opened with" : "Received"
-        
-        if isIntercomNotification {
-            AnalyticsTrackers.standard.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": "true"])
+        if opened {
+            if isIntercomNotification {
+                AnalyticsTrackers.standard.track(.openedWithRemoteNotification, properties: ["fromIntercom": "true"])
+            }else{
+                AnalyticsTrackers.standard.track(.openedWithRemoteNotification, properties: ["fromIntercom": "false"])
+            }
+            
         }else{
-            AnalyticsTrackers.standard.track("\(trackingPrefix) remote notification", properties: ["fromIntercom": "false"])
+            if isIntercomNotification {
+                AnalyticsTrackers.standard.track(.receivedRemoteNotification, properties: ["fromIntercom": "true"])
+            }else{
+                AnalyticsTrackers.standard.track(.receivedRemoteNotification, properties: ["fromIntercom": "false"])
+            }
         }
     }
     

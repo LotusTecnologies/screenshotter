@@ -13,6 +13,7 @@ import PromiseKit
 
 enum InAppPurchaseProduct : Int  {
     case personalStylist
+    //when more purchases are added updated the tracking code in buy() which only works for this one purchase
     
     func productIdentifier() -> String{
         switch self {
@@ -157,6 +158,10 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
         buyRequest.then(on:.main)  { (transaction) -> Promise<Bool> in
             success()
             NotificationCenter.default.post(name: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil)
+            
+            
+            AnalyticsTrackers.standard.track(.inAppPurchase, properties: ["purchase":"stylists", "type":"onetime", "price": product.localizedPriceString()])
+            
             return Promise(value:true)
         }.catch(on: .main) { (error) in
             failure(error)

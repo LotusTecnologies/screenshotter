@@ -106,8 +106,8 @@ extension FavoriteProductsViewController : UICollectionViewDelegate {
         guard let product = products?[indexPath.item] else {
             return
         }
-
-        OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Favorites")
+        OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductFavorites, fromPage: "Favorites")
+    
     }
 }
 

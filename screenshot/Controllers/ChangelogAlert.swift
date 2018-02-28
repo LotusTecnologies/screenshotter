@@ -13,7 +13,7 @@ import PromiseKit
 
 public class ChangelogAlertController : NSObject {
     static func presentIfNeeded(inViewController viewController: UIViewController) {
-        let appSettings = AppDelegate.shared.settings
+        let appSettings = AppDelegate.shared.appSettings
         
         if appSettings.isCurrentVersion(greaterThan: appSettings.previousVersion) {
             // Last version was less than this one. Present alert
