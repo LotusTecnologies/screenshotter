@@ -34,7 +34,6 @@ class ScreenshotsViewController: BaseViewController {
     var deleteButton:ScreenshotsDeleteButton?
     var refreshControl:UIRefreshControl?
     var emptyListView:ScreenshotsHelperView?
-    var hasNewScreenshot = false
     var hasNewScreenshotSection = false
     var hasProductBar = false
     var notificationCellAssetId:String?
@@ -103,6 +102,7 @@ extension ScreenshotsViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         syncEmptyListView()
+        self.updateHasNewScreenshot()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -124,6 +124,8 @@ extension ScreenshotsViewController {
     func applicationWillEnterForeground(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             syncEmptyListView()
+            self.updateHasNewScreenshot()
+
         }
     }
     
@@ -631,7 +633,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     
     func updateHasNewScreenshot(){
         let hadSection = self.hasNewScreenshotSection
-        self.hasNewScreenshotSection = self.hasNewScreenshot && !self.isEditing
+        self.hasNewScreenshotSection = (AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) && !self.isEditing
         if hadSection != self.hasNewScreenshotSection {
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
             if self.hasNewScreenshotSection {
@@ -650,7 +652,6 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     
     func presentNotificationCell(assetId:String){
         if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
-            self.hasNewScreenshot = true
             self.notificationCellAssetId = assetId
             
             if self.hasNewScreenshotSection {  //Already has a new screenshot section -  just do an update
@@ -668,7 +669,6 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     }
     
     func dismissNotificationCell(){
-        self.hasNewScreenshot = false
         updateHasNewScreenshot()
     }
 }
@@ -709,7 +709,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .product:
                 return .zero
             case .notification:
-                if self.hasNewScreenshot {
+                if self.hasNewScreenshotSection {
                     return defaultInset
                 }
                 
