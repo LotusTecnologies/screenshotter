@@ -259,7 +259,7 @@ class AssetSyncModel: NSObject {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
             firstly { _ -> Promise<(String, [[String : Any]])> in
-                return NetworkingPromise.uploadToSyte(imageData: imageData, imageClassification: imageClassification)
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, imageClassification: imageClassification)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
                     AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
@@ -311,7 +311,7 @@ class AssetSyncModel: NSObject {
                     return Promise(error: urlError)
             }
             print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
-            return NetworkingPromise.downloadInfo(url: screenshotInfoUrl)
+            return NetworkingPromise.sharedInstance.downloadInfo(url: screenshotInfoUrl)
             }.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
                 guard let share = jsonDict["share"] as? [String : Any],
@@ -321,7 +321,7 @@ class AssetSyncModel: NSObject {
                         let imageURLError = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from jsonDict:\(jsonDict)"])
                         return Promise(error: imageURLError)
                 }
-                return NetworkingPromise.downloadImage(url: imageURL, screenshotDict: screenshotDict)
+                return NetworkingPromise.sharedInstance.downloadImage(url: imageURL, screenshotDict: screenshotDict)
             }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
                 // Save screenshot to db.
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
@@ -337,7 +337,7 @@ class AssetSyncModel: NSObject {
             }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
                 // Save shoppables to db.
                 guard let syteJsonString = screenshotDict["syteJson"] as? String,
-                  let segments = NetworkingPromise.jsonDestringify(string: syteJsonString),
+                  let segments = NetworkingPromise.sharedInstance.jsonDestringify(string: syteJsonString),
                   let imageURLString = screenshotDict["image"] as? String else {
                     let jsonError = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey : "Could not extract syteJson from screenshotDict:\(screenshotDict)"])
                     print(jsonError)
@@ -491,7 +491,7 @@ class AssetSyncModel: NSObject {
                 }
                 screenshot.shoppablesCount += 1
                 if screenshot.shoppablesCount == 1 {
-                    screenshot.syteJson = NetworkingPromise.jsonStringify(object: segments)
+                    screenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: segments)
                     screenshot.uploadedImageURL = uploadedURLString
                 }
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
@@ -499,7 +499,7 @@ class AssetSyncModel: NSObject {
             AnalyticsTrackers.standard.track(.receivedProductsFromSyte, properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
         }
             
-        NetworkingPromise.downloadProductsWithRetry(url: url)
+        NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url)
             .then(on: self.processingQ) { productsDict -> Void in
                 if let adsArray = productsDict["ads"] as? [[String : Any]],
                   adsArray.count > 0 {
@@ -564,7 +564,7 @@ class AssetSyncModel: NSObject {
             updateShoppableWithProducts(shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
             return
         }
-        NetworkingPromise.downloadProductsWithRetry(url: url)
+        NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url)
             .then(on: self.processingQ) { productsDict -> Void in
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
                     self.updateShoppableWithProducts(shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: productsArray)
@@ -1065,9 +1065,9 @@ extension Screenshot {
     private func shareOrReshare() -> Promise<(String, String)> {
         let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
         if self.isFromShare {
-            return NetworkingPromise.reshare(userName: userName, shareId: self.assetId)
+            return NetworkingPromise.sharedInstance.reshare(userName: userName, shareId: self.assetId)
         } else {
-            return NetworkingPromise.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
+            return NetworkingPromise.sharedInstance.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
         }
     }
     

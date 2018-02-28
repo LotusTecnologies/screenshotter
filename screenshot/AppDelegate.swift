@@ -436,7 +436,7 @@ extension AppDelegate {
 
 extension AppDelegate {
     fileprivate func fetchAppSettings() {
-        NetworkingPromise.appSettings().then(on:.main) { data -> Void in
+        NetworkingPromise.sharedInstance.appSettings().then(on:.main) { data -> Void in
             self.appSettings.appSettingsDict = data
             NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo:nil)  //this can cause UI changes and must be on main
         }

@@ -42,7 +42,7 @@ class MatchstickModel: NSObject {
         let dataModel = DataModel.sharedInstance
         dataModel.nextMatchsticksIfNeeded()
             .then(on: processingQ) { matchstickCount -> Promise<NSDictionary> in
-                return NetworkingPromise.nextMatchsticks()
+                return NetworkingPromise.sharedInstance.nextMatchsticks()
             }.then(on: processingQ) { dict -> Void in
                 if let matchsticksArray = dict["screenshots"] as? [[String : Any]] {
                     dataModel.performBackgroundTask { (managedObjectContext) in
@@ -92,7 +92,7 @@ class MatchstickModel: NSObject {
     
     func fetchImageData(imageUrl: String) {
         let dataModel = DataModel.sharedInstance
-        NetworkingPromise.downloadImageData(urlString: imageUrl)
+        NetworkingPromise.sharedInstance.downloadImageData(urlString: imageUrl)
             .then(on: processingQ) { imageData -> Void in
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     dataModel.addImageDataToMatchstick(managedObjectContext: managedObjectContext, imageUrl: imageUrl, imageData: imageData)

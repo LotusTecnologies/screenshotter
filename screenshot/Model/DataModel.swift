@@ -1051,7 +1051,7 @@ extension Shoppable {
                 if let offersUrl = offersUrl {
                     augmentedOffersUrl = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersUrl, optionsMask: optionsMask)?.absoluteString
                 }
-                NetworkingPromise.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
+                NetworkingPromise.sharedInstance.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
                 
                 let imageOrDash = imageUrl ?? "-"
                 let categoryOrDash = category ?? "-"
@@ -1203,7 +1203,7 @@ extension Matchstick {
                     let assetId = matchstick.remoteId,
                     let uploadedImageURL = matchstick.imageUrl,
                     let syteJson = matchstick.syteJson,
-                    let segments = NetworkingPromise.jsonDestringify(string: syteJson) {
+                    let segments = NetworkingPromise.sharedInstance.jsonDestringify(string: syteJson) {
                     let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                    assetId: assetId,
                                                                    createdAt: Date(),
