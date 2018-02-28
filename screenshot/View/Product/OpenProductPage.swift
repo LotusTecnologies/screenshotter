@@ -53,7 +53,7 @@ enum OpenProductPage : String {
         }
     }
     
-    static func present(product:Product, fromViewController:UIViewController, analyticsKey:String){
+    static func present(product:Product, fromViewController:UIViewController, analyticsKey:AnalyticsEvent, fromPage:String ){
         
         if var urlString = product.offer {
             if urlString.hasPrefix("//") {
@@ -84,7 +84,7 @@ enum OpenProductPage : String {
             }
         }
         
-        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: analyticsKey)
+        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: fromPage)
         
         let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
         
@@ -107,11 +107,11 @@ enum OpenProductPage : String {
                               "price": price,
                               "email": email,
                               "name": name ]
-            AnalyticsTrackers.standard.track("Product for email", properties:properties)
+            AnalyticsTrackers.standard.track(.productForEmail, properties:properties)
         }
         
         product.recordViewedProduct()
-        AnalyticsTrackers.branch.track("Tapped on product - \(analyticsKey)")
+        AnalyticsTrackers.branch.track(analyticsKey)
         FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
     }
 }

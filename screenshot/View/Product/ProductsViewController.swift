@@ -165,7 +165,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         if self.screenshotController.first?.shoppablesCount == -1  {
             self.state = .retry
-            AnalyticsTrackers.standard.track("Screenshot Opened Without Shoppables")
+            AnalyticsTrackers.standard.track(.screenshotOpenedWithoutShoppables)
         }
         else {
             self.reloadProductsForShoppable(at: 0)
@@ -275,7 +275,7 @@ extension ProductsViewController {
     func shoppablesToolbarDidSelectShoppable(toolbar: ShoppablesToolbar, index: Int) {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
         self.reloadProductsForShoppable(at: index)
-        AnalyticsTrackers.standard.track("Tapped on shoppable")
+        AnalyticsTrackers.standard.track(.tappedOnShoppable)
     }
     func shouldHideToolbar()->Bool{
         return !self.hasShoppables()
@@ -391,7 +391,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Products")
+            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductProducts, fromPage: "Products")
+
         }
     }
 }
@@ -441,7 +442,7 @@ extension ProductsViewControllerOptionsView {
             control.resignFirstResponder()
         }
         else {
-            AnalyticsTrackers.standard.track("Opened Filters View", properties:nil)
+            AnalyticsTrackers.standard.track(.openedFiltersView, properties:nil)
             if let index = self.shoppablesToolbar?.selectedShoppableIndex() {
                 let shoppable = self.shoppablesController.object(at: IndexPath.init(row: index, section: 0))
                 self.productsOptions.syncOptions(withMask: shoppable.getLast())
@@ -659,7 +660,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     
     func presentPersonalStylist() {
         let shortenedUploadedImageURL = self.screenshot.shortenedUploadedImageURL ?? ""
-        AnalyticsTrackers.standard.track("Requested Custom Stylist", properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
+        AnalyticsTrackers.standard.track(.requestedCustomStylist, properties: ["screenshotImageURL" :  shortenedUploadedImageURL])
         let prefiledMessageTemplate = "products.rate.negative.help_finding_outfit".localized
         let prefilledMessage = String(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL ?? "null"))
         IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
@@ -679,7 +680,8 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             if let trimmedText = self.productsRateNegativeFeedbackTextField?.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
                 
                 if trimmedText.lengthOfBytes(using: .utf8) > 0 {
-                    AnalyticsTrackers.segment.track("Shoppable Feedback Negative", properties:["text": trimmedText])
+                    //TODO: why is this only segment?!?!
+                    AnalyticsTrackers.segment.track(.shoppableFeedbackNegative, properties:["text": trimmedText])
                 }
             }
         })
