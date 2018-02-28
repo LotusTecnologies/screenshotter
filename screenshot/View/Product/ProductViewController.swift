@@ -127,8 +127,8 @@ class ProductViewController : BaseViewController {
             
             let productView = ProductView()
             productView.translatesAutoresizingMaskIntoConstraints = false
-            productView.selectionButton.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
-            productView.selectionButton.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
+            productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
+            productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
             productView.galleryScrollView.delegate = self
             productView.pageControl.addTarget(self, action: #selector(pageControlDidChange), for: .valueChanged)
             productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
@@ -286,7 +286,7 @@ fileprivate extension ProductViewControllerProductView {
     }
     
     @objc func selectionButtonValueChanged() {
-        guard let productView = productView, let selectedItem = productView.selectionButton.selectedItem else {
+        guard let productView = productView, let selectedItem = productView.selectionControl.selectedItem else {
             return
         }
         
@@ -308,7 +308,7 @@ fileprivate extension ProductViewControllerProductView {
         
         var errorItems: [SegmentedDropDownItem] = []
         
-        productView.selectionButton.items.forEach { item in
+        productView.selectionControl.items.forEach { item in
             if item.placeholderTitle == item.title {
                 errorItems.append(item)
             }
@@ -334,7 +334,7 @@ fileprivate extension ProductViewControllerProductView {
             }
             
             let currentOffsetY = productView.scrollView.contentOffset.y + adjustedContentInsetTop
-            let minOffsetY = productView.selectionButton.frame.minY
+            let minOffsetY = productView.selectionControl.frame.minY
             
             if currentOffsetY > minOffsetY {
                 UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {

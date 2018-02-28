@@ -92,6 +92,7 @@
 		C543695D20453FE300599134 /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695620453FE300599134 /* ProductCollectionViewCell.swift */; };
 		C543695E20453FE300599134 /* ProductsRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695720453FE300599134 /* ProductsRateView.swift */; };
 		C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695820453FE300599134 /* ProductsViewControllerControl.swift */; };
+		C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696120468C4100599134 /* SegmentedDropDownControl.swift */; };
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */; };
@@ -103,7 +104,6 @@
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
-		C5A9666A201F023300ABE4D7 /* SegmentedDropDownButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A96669201F023300ABE4D7 /* SegmentedDropDownButton.swift */; };
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
 		C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E641FFA2D2600F491C0 /* Size.swift */; };
 		C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E661FFA363500F491C0 /* EmbossedView.swift */; };
@@ -230,6 +230,7 @@
 		C543695620453FE300599134 /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
 		C543695720453FE300599134 /* ProductsRateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsRateView.swift; sourceTree = "<group>"; };
 		C543695820453FE300599134 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
+		C543696120468C4100599134 /* SegmentedDropDownControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownControl.swift; sourceTree = "<group>"; };
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsDeleteButton.swift; sourceTree = "<group>"; };
@@ -241,7 +242,6 @@
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
-		C5A96669201F023300ABE4D7 /* SegmentedDropDownButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownButton.swift; sourceTree = "<group>"; };
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		C5AC7E641FFA2D2600F491C0 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
 		C5AC7E661FFA363500F491C0 /* EmbossedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbossedView.swift; sourceTree = "<group>"; };
@@ -575,6 +575,7 @@
 				C54088461FE90E2200198955 /* ClipView.swift */,
 				C5D57931203EDD6200A076FE /* CollectionView */,
 				C54088471FE90E2200198955 /* CollectionViewCell */,
+				C543696020468C2F00599134 /* Control */,
 				C5D57934203F043200A076FE /* Controller */,
 				C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */,
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
@@ -633,7 +634,6 @@
 			children = (
 				C540884F1FE90E2200198955 /* FloatingActionButton.swift */,
 				C540884E1FE90E2200198955 /* MainButton.swift */,
-				C5A96669201F023300ABE4D7 /* SegmentedDropDownButton.swift */,
 			);
 			path = Button;
 			sourceTree = "<group>";
@@ -650,6 +650,14 @@
 				C543695820453FE300599134 /* ProductsViewControllerControl.swift */,
 			);
 			path = Products;
+			sourceTree = "<group>";
+		};
+		C543696020468C2F00599134 /* Control */ = {
+			isa = PBXGroup;
+			children = (
+				C543696120468C4100599134 /* SegmentedDropDownControl.swift */,
+			);
+			path = Control;
 			sourceTree = "<group>";
 		};
 		C55184D01F4D5FAB00EE7855 /* Constants */ = {
@@ -1013,7 +1021,6 @@
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
-				C5A9666A201F023300ABE4D7 /* SegmentedDropDownButton.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
@@ -1091,6 +1098,7 @@
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
 				C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */,
 				C54088591FE90E2200198955 /* MainButton.swift in Sources */,
+				C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */,
 				31CE1107203BEF36000156EE /* SaleView.swift in Sources */,

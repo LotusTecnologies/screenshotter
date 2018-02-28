@@ -1,5 +1,5 @@
 //
-//  SegmentedDropDownButton.swift
+//  SegmentedDropDownControl.swift
 //  screenshot
 //
 //  Created by Corey Werner on 1/29/18.
@@ -26,11 +26,11 @@ class SegmentedDropDownItem : NSObject {
         return segment?.titleLabel.text
     }
     
-    /// Value from 1 to 0 where 1 takes up the whole segmented button
+    /// Value from 1 to 0 where 1 takes up the whole segmented control
     /// width. -1 uses auto calculate.
     var widthRatio: CGFloat = -1
     
-    fileprivate var segment: DropDownButton?
+    fileprivate var segment: DropDownControl?
     fileprivate var frameLayer: CAShapeLayer?
     
     init(pickerItems: [String]) {
@@ -48,12 +48,12 @@ class SegmentedDropDownItem : NSObject {
     }
     
     func setBorderErrorColor() {
-        setBorderColor(SegmentedDropDownButton.borderErrorColor)
+        setBorderColor(SegmentedDropDownControl.borderErrorColor)
         bringToFront()
     }
     
     func resetBorderColor() {
-        setBorderColor(SegmentedDropDownButton.borderColor)
+        setBorderColor(SegmentedDropDownControl.borderColor)
         sendToBack()
     }
     
@@ -83,7 +83,7 @@ class SegmentedDropDownItem : NSObject {
     }
 }
 
-class SegmentedDropDownButton : UIControl {
+class SegmentedDropDownControl : UIControl {
     fileprivate let borderWidth: CGFloat = 1
     static fileprivate let borderColor: UIColor = .gray8
     static fileprivate let borderErrorColor: UIColor = .crazeRed
@@ -96,7 +96,7 @@ class SegmentedDropDownButton : UIControl {
                 let isFirst = index == 0
                 let isLast = index == items.count - 1
                 
-                let segment = DropDownButton()
+                let segment = DropDownControl()
                 segment.translatesAutoresizingMaskIntoConstraints = false
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
@@ -197,12 +197,12 @@ class SegmentedDropDownButton : UIControl {
     
     // MARK: Interaction
     
-    @objc fileprivate func touchUpInside(_ button: DropDownButton) {
-        if button.isFirstResponder {
-            _ = button.resignFirstResponder()
+    @objc fileprivate func touchUpInside(_ control: DropDownControl) {
+        if control.isFirstResponder {
+            _ = control.resignFirstResponder()
         }
         else {
-            _ = button.becomeFirstResponder()
+            _ = control.becomeFirstResponder()
         }
         
         sendActions(for: .touchUpInside)
@@ -221,7 +221,7 @@ class SegmentedDropDownButton : UIControl {
     }
 }
 
-extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate {
+extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegate {
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
             guard let segment = item.segment else {
@@ -286,7 +286,7 @@ extension SegmentedDropDownButton : UIPickerViewDataSource, UIPickerViewDelegate
     }
 }
 
-fileprivate class DropDownButton : UIControl {
+fileprivate class DropDownControl : UIControl {
     weak var pickerDataSource: UIPickerViewDataSource?
     weak var pickerDelegate: UIPickerViewDelegate?
     
