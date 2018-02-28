@@ -46,6 +46,8 @@ class ShoppingCartModel {
         let dataModel = DataModel.sharedInstance
         return Promise { fulfill, reject in
             dataModel.performBackgroundTask { managedObjectContext in
+                let error = NSError(domain: "Craze", code: 28, userInfo: [NSLocalizedDescriptionKey : "getAddableCart not implemented yet"])
+                reject(error)
             }
         }
     }
