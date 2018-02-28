@@ -42,6 +42,16 @@ class ShoppingCartModel {
         }
     }
     
+    func getAddableCart() -> Promise<Cart> {
+        let dataModel = DataModel.sharedInstance
+        return Promise { fulfill, reject in
+            dataModel.performBackgroundTask { managedObjectContext in
+            }
+        }
+    }
+    
+    // MARK: Helper
+    
     // Deletes variants if older than, say, an hour.
     // Returns the partNumber if new variants should be fetched from Shoppable server.
     func deleteVariantsIfOld(productOID: NSManagedObjectID) -> Promise<String> {
@@ -122,6 +132,15 @@ class ShoppingCartModel {
                 return fulfill(hasVariants)
             }
         }
+    }
+    
+}
+
+
+extension Variant {
+    
+    public func add(toCart: Cart, quantity: Int16) {
+        
     }
     
 }

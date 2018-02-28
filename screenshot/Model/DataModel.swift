@@ -447,6 +447,29 @@ extension DataModel {
         return matchstickToSave
     }
     
+    func getAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
+        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        fetchRequest.fetchBatchSize = 1
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let mostRecentAddableCart = results.first {
+                return mostRecentAddableCart
+            } else {
+                let cartToSave = Cart(context: managedObjectContext)
+                cartToSave.dateModified = NSDate()
+                try managedObjectContext.save()
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveAddableCart results with error:\(error)")
+        }
+        return nil
+    }
+    
     func addImageDataToMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String, imageData: Data) {
         let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
