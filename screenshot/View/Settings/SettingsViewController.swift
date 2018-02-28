@@ -221,10 +221,6 @@ class SettingsViewController : BaseViewController {
         }
     }
     
-    @objc fileprivate func dismissViewController() {
-        presentedViewController?.dismiss(animated: true, completion: nil)
-    }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
         
@@ -472,10 +468,7 @@ extension SettingsViewController : UITableViewDelegate {
             IntercomHelper.sharedInstance.presentMessagingUI()
             
         case .coins:
-            let gameViewController = GameViewController()
-            gameViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissViewController))
-            
-            let navigationController = UINavigationController(rootViewController: gameViewController)
+            let navigationController = ModalNavigationController(rootViewController: GameViewController())
             present(navigationController, animated: true, completion: nil)
             
         case .pushPermission, .photoPermission:

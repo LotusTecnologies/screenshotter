@@ -193,12 +193,6 @@ class TutorialViewController : BaseViewController {
         
         return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
     }
-    
-    // MARK: - Video
-    
-    @objc fileprivate func dismissViewController() {
-        dismiss(animated: true, completion: nil)
-    }
 }
 
 extension TutorialViewController : UIScrollViewDelegate {
@@ -218,7 +212,7 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
     
     func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
         viewController.delegate = nil
-        dismissViewController()
+        dismiss(animated: true, completion: nil)
         scrollToNextSlide()
     }
     
@@ -228,13 +222,13 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
     }
     
     func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
-        if let viewController = LegalViewControllerFactory.privacyPolicyViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+        if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
             present(viewController, animated: true, completion: nil)
         }
     }
     
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView) {
-        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
             present(viewController, animated: true, completion: nil)
         }
     }
