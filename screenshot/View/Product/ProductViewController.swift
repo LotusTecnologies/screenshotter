@@ -48,7 +48,7 @@ class ProductViewController : BaseViewController {
         }
         
         cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCart))
-        cartBarButtonItem?.count = 0 // TODO: 
+        cartBarButtonItem?.count = 0 // TODO:
         navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     
@@ -356,19 +356,21 @@ fileprivate extension ProductViewControllerProductView {
     }
     
     @objc func buyButtonAction() {
-        //        guard let productView = productView else {
-        //            return
-        //        }
+//        guard let productView = productView else {
+//            return
+//        }
         
         // TODO:
     }
     
     @objc func pushMerchantURL() {
-        //        guard let productView = productView else {
-        //            return
-        //        }
+//        guard let productView = productView, let structuredProduct = structuredProduct else {
+//            return
+//        }
         
         // TODO:
+        
+        
     }
 }
 
@@ -462,7 +464,7 @@ extension ProductViewController {
     fileprivate class StructuredProduct: NSObject {
         let product: Product
         private(set) var title: String?
-        private(set) var variants: [StructuredVariant] = []
+        private(set) var structuredVariants: [StructuredVariant] = []
         private(set) var colors: [String] = []
         private(set) var sizes: [String] = []
         
@@ -470,42 +472,36 @@ extension ProductViewController {
             self.product = product
             super.init()
             
-            self.title = generateTitle(product)
-            
             guard let variants = product.availableVariants?.allObjects as? [Variant] else {
                 return
             }
             
-            var placeholders: [String : StructuredVariantPlaceholder] = [:]
+            title = generateTitle(product)
+            
+            var structuredVariantsDict: [String : StructuredVariant] = [:]
             var colors: Set<String> = Set()
             var sizes: Set<String> = Set()
             
-            variants.forEach({ variant in
+            variants.forEach { variant in
                 guard let color = variant.color else {
                     return
                 }
                 
                 colors.insert(color)
-                let placeholder = placeholders[color] ?? StructuredVariantPlaceholder(color: color)
+                let structuredVariant = structuredVariantsDict[color] ?? StructuredVariant(variant: variant)
                 
                 if let size = variant.size {
-                    placeholder.sizes.insert(size)
                     sizes.insert(size)
+                    structuredVariant.sizeSet.insert(size)
                 }
                 
-                placeholders[color] = placeholder
-            })
-            
-            let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
-            var structuredVariants: [StructuredVariant] = []
-            
-            placeholders.forEach { (color: String, placeholder: StructuredVariantPlaceholder) in
-                let color = placeholder.color
-                let sizes = Array(placeholder.sizes)
-                structuredVariants.append(StructuredVariant(color: color, sizes: sizes))
+                structuredVariantsDict[color] = structuredVariant
             }
             
-            self.variants = structuredVariants
+            structuredVariants = Array(structuredVariantsDict.values)
+            
+            let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
+            
             self.colors = colors.sorted()
             self.sizes = sizes.sorted(by: { (a, b) -> Bool in
                 let aIndex = (sortedSizes.index(of: a) ?? Int.max)
@@ -524,28 +520,29 @@ extension ProductViewController {
         }
         
         func variant(forColor color: String?) -> StructuredVariant? {
-            return variants.first { variant -> Bool in
-                return variant.color == color
+            return structuredVariants.first { structuredVariant -> Bool in
+                return structuredVariant.color == color
             }
         }
         
-        func subtractingSizes(of variant: StructuredVariant) -> [String] {
-            return Array(Set(sizes).subtracting(variant.sizes))
+        func subtractingSizes(of structuredVariant: StructuredVariant) -> [String] {
+            return Array(Set(sizes).subtracting(structuredVariant.sizes))
         }
     }
     
-    private class StructuredVariantPlaceholder: NSObject {
+    fileprivate class StructuredVariant: NSObject {
+        let variant: Variant
         let color: String
-        var sizes: Set<String> = Set()
         
-        init(color: String) {
-            self.color = color
+        fileprivate var sizeSet: Set<String> = Set()
+        var sizes: [String] {
+            return Array(sizeSet)
+        }
+        
+        init(variant: Variant) {
+            self.variant = variant
+            self.color = variant.color ?? ""
             super.init()
         }
-    }
-    
-    fileprivate struct StructuredVariant {
-        let color: String
-        let sizes: [String]
     }
 }
