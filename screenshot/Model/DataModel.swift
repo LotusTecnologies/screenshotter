@@ -437,6 +437,50 @@ extension DataModel {
         return variantToSave
     }
     
+    func retrieveOrCreateAddableCart() -> Promise<NSManagedObjectID> {
+        return Promise { fulfill, reject in
+            performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
+                fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+                fetchRequest.fetchBatchSize = 1
+                fetchRequest.fetchLimit = 1
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if let mostRecentAddableCart = results.first {
+                        fulfill(mostRecentAddableCart.objectID)
+                    } else {
+                        let cartToSave = Cart(context: managedObjectContext)
+                        cartToSave.dateModified = NSDate()
+                        try managedObjectContext.save()
+                        fulfill(cartToSave.objectID)
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveOrCreateAddableCart results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+
+    func add(remoteId: String, toCartOID: NSManagedObjectID) {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                guard let cart = managedObjectContext.object(with: toCartOID) as? Cart,
+                  cart.remoteId == nil else {
+                        return
+                }
+                cart.remoteId = remoteId
+                try managedObjectContext.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                print("add remoteId:\(remoteId) toCartOID:\(toCartOID) results with error:\(error)")
+            }
+        }
+    }
+    
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
@@ -447,29 +491,6 @@ extension DataModel {
         matchstickToSave.syteJson = syteJson
         matchstickToSave.receivedAt = NSDate()
         return matchstickToSave
-    }
-    
-    func getAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
-        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
-        fetchRequest.fetchBatchSize = 1
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            if let mostRecentAddableCart = results.first {
-                return mostRecentAddableCart
-            } else {
-                let cartToSave = Cart(context: managedObjectContext)
-                cartToSave.dateModified = NSDate()
-                try managedObjectContext.save()
-            }
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveAddableCart results with error:\(error)")
-        }
-        return nil
     }
     
     func addImageDataToMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String, imageData: Data) {

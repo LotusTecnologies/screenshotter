@@ -44,11 +44,21 @@ class ShoppingCartModel {
     
     func getAddableCart() -> Promise<Cart> {
         let dataModel = DataModel.sharedInstance
-        return Promise { fulfill, reject in
-            dataModel.performBackgroundTask { managedObjectContext in
-                let error = NSError(domain: "Craze", code: 28, userInfo: [NSLocalizedDescriptionKey : "getAddableCart not implemented yet"])
-                reject(error)
-            }
+        return firstly {
+            return dataModel.retrieveOrCreateAddableCart()
+            }.then { cartOID -> Promise<Cart> in // Must be on main thread.
+                guard let cart = dataModel.mainMoc().object(with: cartOID) as? Cart else {
+                    let error = NSError(domain: "Craze", code: 34, userInfo: [NSLocalizedDescriptionKey : "getAddableCart failed to instantiate cart from objectID:\(cartOID)"])
+                    return Promise(error: error)
+                }
+                if let remoteId = cart.remoteId,
+                  !remoteId.isEmpty {
+                    // Do nothing.
+                } else {
+                    // Return the cart right away, but also kick off networking to request a remoteId.
+                    self.addRemoteId(cartOID: cartOID)
+                }
+                return Promise(value: cart)
         }
     }
     
@@ -136,6 +146,17 @@ class ShoppingCartModel {
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
                 return fulfill(hasVariants)
             }
+        }
+    }
+    
+    func addRemoteId(cartOID: NSManagedObjectID) {
+        NetworkingPromise.createCart().then { dict -> Void in
+            guard let cartInfo = dict["cart"] as? [String : Any],
+              let remoteId = cartInfo["id"] as? String else {
+                print("addRemoteId failed to extract remoteId for cartOID:\(cartOID)")
+                return
+            }
+            DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
         }
     }
     
