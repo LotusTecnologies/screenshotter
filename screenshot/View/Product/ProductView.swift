@@ -19,7 +19,7 @@ class ProductView: UIView {
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
     
-    let selectionButton = SegmentedDropDownButton()
+    let selectionControl = SegmentedDropDownControl()
     let cartButton = MainButton()
 //    let buyButton = MainButton()
     let websiteButton = UIButton()
@@ -110,22 +110,21 @@ class ProductView: UIView {
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: originalPriceLabel.leadingAnchor, constant: -.padding).isActive = true
         
         // TODO: how does UI look when all variants are out of stock
-        selectionButton.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(selectionButton)
-        selectionButton.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
-        selectionButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        selectionButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-        selectionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        selectionControl.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(selectionControl)
+        selectionControl.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
+        selectionControl.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        selectionControl.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        selectionControl.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .green
         contentTextView.isScrollEnabled = false
         contentTextView.scrollsToTop = false
         scrollView.addSubview(contentTextView)
-        contentTextView.topAnchor.constraint(equalTo: selectionButton.bottomAnchor, constant: .padding).isActive = true
+        contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-//        contentTextView.heightAnchor.constraint(equalToConstant: 500).isActive = true
         
         websiteButton.translatesAutoresizingMaskIntoConstraints = false
         websiteButton.setTitleColor(.crazeGreen, for: .normal)
@@ -196,6 +195,6 @@ class ProductView: UIView {
         let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
         items.append(quantityItem)
         
-        selectionButton.items = items
+        selectionControl.items = items
     }
 }
