@@ -12,7 +12,7 @@ import CoreData
 
 protocol ShoppablesToolbarDelegate : UIToolbarDelegate {
     func shoppablesToolbarDidChange(toolbar:ShoppablesToolbar)
-    func shoppablesToolbarDidSelectShoppable(toolbar:ShoppablesToolbar, index:Int)
+    func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable)
 }
 
 class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, ShoppablesCollectionViewDelegate, FetchedResultsControllerManagerDelegate {
@@ -20,7 +20,6 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     weak var shoppableToolbarDelegate:ShoppablesToolbarDelegate?
     var didViewControllerAppear:Bool = false
-    var needsToSelectFirstShoppable:Bool = false
     var collectionView:ShoppablesCollectionView!
     var screenshotImage:UIImage
     var shoppablesController:FetchedResultsControllerManager<Shoppable>
@@ -85,22 +84,13 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         return cell ?? UICollectionViewCell.init()
     }
     
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if collectionView.indexPathsForVisibleItems.count == 0 && collectionView.numberOfItems(inSection: 0) > 0 && indexPath.item == 0 {
-            if self.needsToSelectFirstShoppable {
-                self.needsToSelectFirstShoppable = false
-                self.selectFirstShoppable()
-                // selectItemAtIndexPath: should auto select the cell however
-                // since the cell isnt visible it wont appear selected until
-                // the next layout. Force the selected state.
-                cell.isSelected = true
-            }
-            self.shoppableToolbarDelegate?.shoppablesToolbarDidChange(toolbar: self)
-        }
-    }
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.shoppableToolbarDelegate?.shoppablesToolbarDidSelectShoppable(toolbar: self, index: indexPath.item)
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
+        AnalyticsTrackers.standard.track(.tappedOnShoppable)
+        
+        let shopable = self.shoppablesController.object(at: indexPath)
+        self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shopable)
+
     }
     
     func createCollectionView() -> ShoppablesCollectionView {
@@ -130,13 +120,9 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        collectionView.performBatchUpdates({
-            collectionView.deleteItems(at: change.deletedRows)
-            collectionView.deleteSections(change.deletedSections)
-            collectionView.insertSections(change.insertedSections)
-            collectionView.insertItems(at: change.insertedRows)
-        })
-        // don't do reload - will lose selection state
+        change.applyChanges(collectionView: collectionView)
+        self.shoppableToolbarDelegate?.shoppablesToolbarDidChange(toolbar: self)
+
     }
     
     func shoppableSize() -> CGSize {
@@ -149,13 +135,23 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     func selectFirstShoppable() {
         if self.collectionView.numberOfItems(inSection: 0) > 0{
             self.collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
-        } else {
-            self.needsToSelectFirstShoppable = true
+            if let shoppable = self.selectedShoppable() {
+                self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shoppable)
+            }
         }
     }
     
-    func selectedShoppableIndex() -> Int {
-        return self.collectionView.indexPathsForSelectedItems?.first?.item ?? 0
+    func selectedShoppable() -> Shoppable? {
+        if let index = self.collectionView.indexPathsForSelectedItems?.first?.item {
+            return self.shoppablesController.object(at: IndexPath(item: index, section: 0))
+        }
+        if let firstShoppable = self.shoppablesController.first {
+            if self.collectionView.numberOfSections > 0 && self.collectionView.numberOfItems(inSection: 0) > 0 {
+                self.collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
+                return firstShoppable
+            }
+        }
+        return nil
     }
     
     static func preservedCollectionViewContentInset() -> UIEdgeInsets{
