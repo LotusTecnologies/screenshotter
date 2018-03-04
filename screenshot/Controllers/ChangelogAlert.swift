@@ -11,7 +11,7 @@ import PromiseKit
 
 
 
-public class ChangelogAlertController : NSObject {
+public class ChangelogAlertController  {
     static func presentIfNeeded(inViewController viewController: UIViewController) {
         let appSettings = AppDelegate.shared.appSettings
         

@@ -364,16 +364,6 @@ extension AnalyticsTracker {
     }
 }
 
-class AnalyticsTrackerObjCBridge : NSObject {
-    static func trackFavoritedProduct(tracker: AnalyticsTracker, favorited: Bool, product: Product, onPage page: String) {
-        tracker.trackFavorited(favorited, product: product, onPage: page)
-    }
-    
-    static func trackTappedOnProduct(tracker: AnalyticsTracker, product: Product, onPage page: String) {
-        tracker.trackTappedOnProduct(product, onPage: page)
-    }
-}
-
 // Returns the user's age in days.
 fileprivate func userAge() -> Int {
     guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {

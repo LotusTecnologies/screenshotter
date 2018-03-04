@@ -9,7 +9,7 @@
 import Foundation
 import AudioToolbox
 
-class TapticHelper: NSObject {
+class TapticHelper {
     /// Weak boom
     static func peek() {
         AudioServicesPlaySystemSound(1519)

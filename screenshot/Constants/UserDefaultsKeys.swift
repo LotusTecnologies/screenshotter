@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class UserDefaultsKeys : NSObject {
+class UserDefaultsKeys  {
     // User
     static let email = "Email"
     static let name = "Name"
