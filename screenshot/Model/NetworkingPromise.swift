@@ -82,7 +82,7 @@ class NetworkingPromise: NSObject {
         let urlEncodedImageUrl = imageUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
         let urlEncodedOffersUrl = offersUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
         let coordsObject = ["x0": b0x, "y0": b0y, "x1": b1x, "y1": b1y]
-        let base64EncodedJsonCoords = jsonStringify(object: coordsObject)?.data(using: .utf8)?.base64EncodedString() ?? ""
+        let base64EncodedJsonCoords = jsonDatafy(object: coordsObject)?.base64EncodedString() ?? ""
         let urlString = "https://syteapi.com/et" +
             "?name=\(isPositive ? "positive_feedback" : "negative_feedback")" +
             "&account_id=\(accountId)" +
@@ -109,6 +109,13 @@ class NetworkingPromise: NSObject {
             }
         }
         dataTask.resume()
+    }
+    
+    static func jsonDatafy(object: Any) -> Data? {
+        if let objectData = try? JSONSerialization.data(withJSONObject: object, options: []) {
+            return objectData
+        }
+        return nil
     }
     
     static func jsonStringify(object: Any) -> String? {
@@ -255,7 +262,7 @@ class NetworkingPromise: NSObject {
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
+        sessionConfiguration.timeoutIntervalForResource = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
         return promise
     }
@@ -269,6 +276,35 @@ class NetworkingPromise: NSObject {
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForRequest = 60
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+        return promise
+    }
+    
+    static func checkoutCart(_ cart: Cart) -> Promise<NSDictionary> {
+        guard let remoteId = cart.remoteId else {
+            let error = NSError(domain: "Craze", code: 35, userInfo: [NSLocalizedDescriptionKey: "No remoteId on cart with oid:\(cart.objectID)"])
+            return Promise(error: error)
+        }
+        guard let items = cart.items?.sortedArray(using: []) as? [CartItem],
+          items.count > 0 else {
+            let error = NSError(domain: "Craze", code: 36, userInfo: [NSLocalizedDescriptionKey: "No items in cart with oid:\(cart.objectID)"])
+            return Promise(error: error)
+        }
+        guard let url = URL(string: Constants.shoppableDomain + "/cart/put/bundling") else {
+            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form cart bundle url from shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        // TODO: GMK Handle nil sku.
+        let skuQuantity = items.flatMap({["sku" : $0.sku ?? "", "qty" : $0.quantity]})
+        let jsonObject: [String : Any] = ["id" : remoteId,
+                                          "items" : skuQuantity]
+        request.httpBody = jsonDatafy(object: jsonObject)
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
         return promise
     }

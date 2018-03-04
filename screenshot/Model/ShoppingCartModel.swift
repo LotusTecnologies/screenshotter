@@ -188,11 +188,12 @@ extension Cart {
                 cartItem = CartItem(context: managedObjectContext)
             }
             cartItem.color = variantToCopy.color
-            cartItem.imageURLs = variantToCopy.imageURLs
+            cartItem.imageURL = variantToCopy.imageURLs?.components(separatedBy: ",").first
             cartItem.retailPrice = variantToCopy.retailPrice
             cartItem.size = variantToCopy.size
             cartItem.sku = variantToCopy.sku
             cartItem.url = variantToCopy.url
+            cartItem.productDescription = variantToCopy.product?.productDescription
             cartItem.quantity = quantity
             cartItem.dateModified = NSDate()
             cartItem.cart = cart
