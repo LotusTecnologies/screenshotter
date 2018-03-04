@@ -12,6 +12,7 @@
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
 		31518645203477DB001BD8D6 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */; };
+		318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318FE265204C09C500277DD4 /* AsyncOperation.swift */; };
 		31A3374E203D9A6100FFD2F2 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */; };
 		31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
@@ -139,6 +140,7 @@
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
+		318FE265204C09C500277DD4 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsNavigationController.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
@@ -353,6 +355,7 @@
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
 				E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */,
 				E41449FF1F41890900B1F039 /* ClarifaiModel.swift */,
+				318FE265204C09C500277DD4 /* AsyncOperation.swift */,
 				E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */,
 				C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */,
 				E492CE3C2011051100060FB2 /* MatchstickModel.swift */,
@@ -1009,6 +1012,7 @@
 				C540880D1FE90C8E00198955 /* Loader.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
 				31A3374E203D9A6100FFD2F2 /* BaseViewController.swift in Sources */,
+				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,

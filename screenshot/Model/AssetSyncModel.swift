@@ -67,6 +67,12 @@ class AssetSyncModel: NSObject {
     
     let imageMediaType = kUTTypeImage as String
     
+    lazy var PHAssetToUIImageQueue:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "PHAsset to UIImage Queue"
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
     override init() {
         super.init()
         registerForPhotoChanges()
@@ -618,32 +624,35 @@ class AssetSyncModel: NSObject {
     
     func image(asset: PHAsset) -> Promise<UIImage> {
         return Promise { fulfill, reject in
-            image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                if let imageError = info?[PHImageErrorKey] as? NSError {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
-                    reject(imageError)
-                    return
-                }
-                if let isCancelled = info?[PHImageCancelledKey] as? Bool,
-                    isCancelled == true {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
-                    let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
-                    reject(cancelledError)
-                    return
-                }
-                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
-                    isDegraded == true {
-                    // This callback will be called again with a better quality image.
-                    return
-                }
-                if let image = image {
-                    fulfill(image)
-                } else {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
-                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
-                    reject(emptyError)
-                }
-            })
+            self.PHAssetToUIImageQueue.addOperation(AsyncOperation.init(withBlock: { ( completion) in
+                self.image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
+                    if let imageError = info?[PHImageErrorKey] as? NSError {
+                        AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
+                        reject(imageError)
+                        return
+                    }
+                    if let isCancelled = info?[PHImageCancelledKey] as? Bool,
+                        isCancelled == true {
+                        AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
+                        let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
+                        reject(cancelledError)
+                        return
+                    }
+                    if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
+                        isDegraded == true {
+                        // This callback will be called again with a better quality image.
+                        return
+                    }
+                    if let image = image {
+                        fulfill(image)
+                    } else {
+                        AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
+                        let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
+                        reject(emptyError)
+                    }
+                    completion();
+                })
+            }))
         }
     }
     
