@@ -1,5 +1,5 @@
 //
-//  ClarifaiLocalPredictOperation.swift
+//  AsyncOperation.swift
 //  screenshot
 //
 //  Created by Jonathan Rose on 3/4/18.
@@ -7,9 +7,8 @@
 //
 
 import UIKit
-import Clarifai_Apple_SDK
 
-class ClarifaiLocalPredictOperation: Operation {
+class AsyncOperation: Operation {
     private var _executing = false {
         willSet {
             willChangeValue(forKey: "isExecuting")
@@ -45,12 +44,14 @@ class ClarifaiLocalPredictOperation: Operation {
         _finished = finished
     }
     
-    private let image: UIImage
-    private let completion: ([Output]?, Error?) -> ()
-
-    init(withImage:UIImage, completion:@escaping ([Output]?, Error?) -> Void) {
-        self.image = withImage
-        self.completion = completion
+    private let executionBlock: ((@escaping() -> ()) -> ())
+    init(withBlock:@escaping ((@escaping() -> ()) -> ())) {
+        self.executionBlock = withBlock
+    }
+    
+    private func finishedExecuting(){
+        self.executing(false)
+        self.finish(true)
     }
     
     override func main() {
@@ -60,17 +61,9 @@ class ClarifaiLocalPredictOperation: Operation {
         }
         
         executing(true)
-        let localImage = Image(image: self.image)
-        let dataAsset = DataAsset(image: localImage)
-        let input = Input(dataAsset: dataAsset)
-        let generalModel = Clarifai.sharedInstance().generalModel
-        generalModel.predict([input]) { (outputs, error) in
-            self.completion(outputs, error)
+        self.executionBlock({
             self.executing(false)
             self.finish(true)
-        }
+        })
     }
-    
 }
-
-
