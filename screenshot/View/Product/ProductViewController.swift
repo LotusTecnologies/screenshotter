@@ -34,8 +34,6 @@ class ProductViewController : BaseViewController {
     init(productOID: NSManagedObjectID) {
         super.init(nibName: nil, bundle: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
-        
         ShoppingCartModel.shared.populateVariants(productOID: productOID)
             .then { product -> Void in
                 self.state = .product
@@ -54,19 +52,6 @@ class ProductViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         syncState()
-    }
-    
-    @objc fileprivate func keyboardDidHide(_ notification: Notification) {
-        if view.window != nil {
-            // The scroll views keyboard dismiss mode can hide the input
-            // view without resigning the button. Make sure the buttons
-            // stay synced.
-            view.endEditing(true)
-        }
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: State
@@ -131,6 +116,7 @@ class ProductViewController : BaseViewController {
             
             let productView = ProductView()
             productView.translatesAutoresizingMaskIntoConstraints = false
+            productView.scrollView.delegate = self
             productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
             productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
             productView.galleryScrollView.delegate = self
@@ -444,6 +430,15 @@ extension ProductViewControllerCart {
 }
 
 extension ProductViewController : UIScrollViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if productView?.scrollView.keyboardDismissMode == .onDrag {
+            if productView?.selectionControl.isFirstResponder ?? false {
+                // Dismiss selected state
+                _ = productView?.selectionControl.resignFirstResponder()
+            }
+        }
+    }
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if scrollView == productView?.galleryScrollView {
             if !decelerate {

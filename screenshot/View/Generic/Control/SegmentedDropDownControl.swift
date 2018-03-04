@@ -227,6 +227,29 @@ class SegmentedDropDownControl : UIControl {
             return item.segment?.isSelected ?? false
         }
     }
+    
+    // MARK: First Responder
+    
+    override var isFirstResponder: Bool {
+        var isFirstResponder = false
+        
+        for item in items {
+            if item.segment?.isFirstResponder ?? false {
+                isFirstResponder = true
+                break
+            }
+        }
+        
+        return isFirstResponder
+    }
+    
+    override func resignFirstResponder() -> Bool {
+        items.forEach { item in
+            _ = item.segment?.resignFirstResponder()
+        }
+        
+        return super.resignFirstResponder()
+    }
 }
 
 extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegate {
