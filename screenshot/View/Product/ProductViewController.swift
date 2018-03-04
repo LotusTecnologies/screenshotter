@@ -364,12 +364,6 @@ fileprivate extension ProductViewControllerProductView {
     }
     
     @objc func pushMerchantURL() {
-//        guard let productView = productView, let structuredProduct = structuredProduct else {
-//            return
-//        }
-        
-        // TODO:
-        
         let url: String?
         
         if let color = selectionColorItem?.selectedPickerItem,
