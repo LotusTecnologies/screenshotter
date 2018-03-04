@@ -398,7 +398,11 @@ fileprivate extension ProductViewControllerStructuredProduct {
         
         if !structuredProduct.sizes.isEmpty {
             sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
-            sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            
+            if colorItem.selectedPickerItem == nil {
+                sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            }
+            
             selectionSizeItem = sizeItem
         }
         
