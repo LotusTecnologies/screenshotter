@@ -129,6 +129,7 @@ class ProductView: UIView {
         contentTextView.scrollsToTop = false
         contentTextView.font = .preferredFont(forTextStyle: .body)
         contentTextView.adjustsFontForContentSizeCategory = true
+        contentTextView.isEditable = false
         scrollView.addSubview(contentTextView)
         contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -200,7 +201,7 @@ class ProductView: UIView {
         }
         
         // TODO: keep this value synced with the CartViewController stepper.maxValue
-        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
+        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" }, selectedPickerItem: "1")
         items.append(quantityItem)
         
         selectionControl.items = items
