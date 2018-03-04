@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Constants: NSObject {
+class Constants {
 
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"

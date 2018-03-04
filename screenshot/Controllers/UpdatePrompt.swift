@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class UpdatePromptHandler : NSObject {
+class UpdatePromptHandler  {
     private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
     
     private var rootViewController: UIViewController? {
