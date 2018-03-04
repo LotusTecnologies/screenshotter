@@ -62,16 +62,22 @@ class ClarifaiModel: NSObject {
         }
     }
     
+    
+    lazy var localPredictQueue:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "Clarfia local predict"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
+    
     func localPredict(image: UIImage, completionHandler: @escaping ([Output]?, Error?) -> Void) {
-        let localImage = Image(image: image)
-        let dataAsset = DataAsset(image: localImage)
-        let input = Input(dataAsset: dataAsset)
-        let generalModel = Clarifai.sharedInstance().generalModel
-        generalModel.predict([input], completionHandler: completionHandler)
+        self.localPredictQueue.addOperation(ClarifaiLocalPredictOperation.init(withImage: image, completion: completionHandler))
     }
     
     func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
-        return Promise { fulfill, reject in
+        return
+            
+            Promise { fulfill, reject in
             localPredict(image: image) { (outputs: [Output]?, error: Error?) in
                 if let error = error {
                     reject(error)
