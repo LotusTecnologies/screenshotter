@@ -374,6 +374,16 @@ extension ScreenshotPickerViewController : UICollectionViewDataSource {
 // MARK: - Collection View Delegate
 
 extension ScreenshotPickerViewController : UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if selectedIndexPaths.count < 20 {
+            return true
+        }
+        let alertcontroller = UIAlertController.init(title: nil, message: "picker.limit.alert.message".localized, preferredStyle: .alert)
+        alertcontroller.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+        self.present(alertcontroller, animated: true, completion: nil)
+        return false
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndexPaths.append(indexPath)
         syncDoneEnabledState()
