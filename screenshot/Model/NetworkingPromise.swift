@@ -9,9 +9,54 @@
 import UIKit
 import PromiseKit
 
-class NetworkingPromise: NSObject {
+
+struct ChangelogResponse : Decodable {
+    enum CodingKeys : String, CodingKey {
+        case title = "title"
+        case body = "body"
+    }
     
-    static func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<NSDictionary> {
+    var title: String? = nil
+    let body: String
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        do {
+            title = try container.decode(String.self, forKey: .title)
+        } catch {}
+        
+        body = try container.decode(String.self, forKey: .body)
+    }
+}
+
+class NetworkingPromise : NSObject {
+    
+    public static let sharedInstance = NetworkingPromise()
+    
+    override init() {
+        // do stuff
+        super.init()
+    }
+
+    func changelog(forAppVersion appVersion: String, localeIdentifier: String) -> Promise<ChangelogResponse> {
+        let urlString = [Constants.whatsNewDomain, appVersion, "\(localeIdentifier).json"].joined(separator: "/")
+        guard let url = URL(string: urlString) else {
+            return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Unable to construct changelog URL"]))
+        }
+        
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
+        let promise:URLDataPromise = URLSession.shared.dataTask(with: request)
+        return promise.asDataAndResponse().then { data, response -> Promise<ChangelogResponse> in
+            guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
+                return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid status code received from AWS lambda"]))
+            }
+            
+            return Promise(value: try JSONDecoder().decode(ChangelogResponse.self, from: data))
+        }
+    }
+
+    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<NSDictionary> {
         guard let imageData = imageData,
             imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
@@ -24,7 +69,7 @@ class NetworkingPromise: NSObject {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
             return Promise(error: malformedError)
         }
-        AnalyticsTrackers.standard.track("sent image to Syte")
+        AnalyticsTrackers.standard.track(.sentImageToSyte)
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = imageData
@@ -35,7 +80,7 @@ class NetworkingPromise: NSObject {
         return promise
     }
 
-    static func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
+    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
         return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification)
             .then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
@@ -51,7 +96,7 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func feedbackToSyte(isPositive: Bool, imageUrl: String?, offersUrl: String?, b0x: Double, b0y: Double, b1x: Double, b1y: Double) {
+    func feedbackToSyte(isPositive: Bool, imageUrl: String?, offersUrl: String?, b0x: Double, b0y: Double, b1x: Double, b1y: Double) {
         // From an email from Adi Mizrahi on Dec. 20, 2017 at 11:43 am:
 //        Headers:
 //        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTM3NjEzNzI1OTksInV1aWQiOiJjMTliZmVkNy05M2FmLTVkZjAtYTQ1ZS1kNWQ5ZGVmMjMzMjYifQ.6KtjqtvusixdqoaZjfp3au9b6SU5x-mdyq8WEJJx2U0
@@ -111,7 +156,7 @@ class NetworkingPromise: NSObject {
         dataTask.resume()
     }
     
-    static func jsonStringify(object: Any) -> String? {
+    func jsonStringify(object: Any) -> String? {
         if let objectData = try? JSONSerialization.data(withJSONObject: object, options: []) {
             let objectString = String(data: objectData, encoding: .utf8)
             return objectString
@@ -119,7 +164,7 @@ class NetworkingPromise: NSObject {
         return nil
     }
     
-    static func jsonDestringify(string: String) -> [[String : Any]]? {
+    func jsonDestringify(string: String) -> [[String : Any]]? {
         guard let data = string.data(using: .utf8),
             let segments = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[String: Any]] else {
                 return nil
@@ -127,7 +172,7 @@ class NetworkingPromise: NSObject {
         return segments
     }
     
-    static func downloadJsonArray(url: URL) -> Promise<NSArray> {
+    func downloadJsonArray(url: URL) -> Promise<NSArray> {
         let request = URLRequest(url: url)
         let session = URLSession.shared
         let dataPromise: URLDataPromise = session.dataTask(with: request)
@@ -135,7 +180,7 @@ class NetworkingPromise: NSObject {
     }
     
     // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
-    static func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
+    func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
         var attempts = 0
         
         func attempt() -> Promise<T> {
@@ -151,7 +196,7 @@ class NetworkingPromise: NSObject {
         return attempt()
     }
     
-    static func downloadInfo(url: URL) -> Promise<[String : Any]> {
+    func downloadInfo(url: URL) -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
             let request = URLRequest(url: url)
             let session = URLSession.shared
@@ -170,7 +215,7 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func downloadProducts(url: URL) -> Promise<[String : Any]> {
+    func downloadProducts(url: URL) -> Promise<[String : Any]> {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 45
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
@@ -188,11 +233,11 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
-        return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {downloadProducts(url: url)})
+    func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
+        return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {self.downloadProducts(url: url)})
     }
     
-    static func downloadImage(url: URL, screenshotDict: [String : Any]) -> Promise<(Data, [String : Any])> {
+    func downloadImage(url: URL, screenshotDict: [String : Any]) -> Promise<(Data, [String : Any])> {
         return Promise { fulfill, reject in
             let request = URLRequest(url: url)
             let session = URLSession.shared
@@ -210,7 +255,7 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func nextMatchsticks() -> Promise<NSDictionary> {
+    func nextMatchsticks() -> Promise<NSDictionary> {
         let syncTokenParam: String
         if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
           !matchsticksSyncToken.isEmpty {
@@ -228,7 +273,7 @@ class NetworkingPromise: NSObject {
         return promise
     }
     
-    static func downloadImageData(urlString: String) -> Promise<Data> {
+    func downloadImageData(urlString: String) -> Promise<Data> {
         guard let url = URL(string: urlString) else {
             let error = NSError(domain: "Craze", code: 25, userInfo: [NSLocalizedDescriptionKey: "Cannot form image url:\(urlString)"])
             return Promise(error: error)
@@ -274,7 +319,7 @@ class NetworkingPromise: NSObject {
     }
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
-    static func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
+    func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "push-subscribe") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
             return Promise(error: error)
@@ -318,7 +363,7 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
+    func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots?createShare=true") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
             print(error)
@@ -330,10 +375,10 @@ class NetworkingPromise: NSObject {
             print(error)
             return Promise(error: error)
         }
-        return NetworkingPromise.shareWorkhorse(parameterData: parameterData, url: url)
+        return self.shareWorkhorse(parameterData: parameterData, url: url)
     }
     
-    static func reshare(userName: String?, shareId: String?) -> Promise<(String, String)> {
+    func reshare(userName: String?, shareId: String?) -> Promise<(String, String)> {
         guard let encoded = shareId?.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
           let url = URL(string: Constants.screenShotLambdaDomain + "shares?reshare=" + encoded) else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
@@ -346,10 +391,10 @@ class NetworkingPromise: NSObject {
             print(error)
             return Promise(error: error)
         }
-        return NetworkingPromise.shareWorkhorse(parameterData: parameterData, url: url)
+        return self.shareWorkhorse(parameterData: parameterData, url: url)
     }
     
-    static func shareWorkhorse(parameterData: Data, url: URL) -> Promise<(String, String)> {
+    func shareWorkhorse(parameterData: Data, url: URL) -> Promise<(String, String)> {
         return Promise { fulfill, reject in
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
@@ -376,7 +421,7 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func appSettings() -> Promise<[String : Any]> {
+    func appSettings() -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
             guard let URL = URL(string: Constants.appSettingsDomain) else {
                 return
@@ -404,7 +449,7 @@ class NetworkingPromise: NSObject {
         }
     }
     
-    static func shorten(url: URL, completion: @escaping (URL?) -> Void) {
+    func shorten(url: URL, completion: @escaping (URL?) -> Void) {
         guard let shortenerUrl = URL(string: "https://craz.me/shortener") else {
             completion(nil)
             return

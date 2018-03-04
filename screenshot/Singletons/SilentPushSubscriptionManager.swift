@@ -90,7 +90,7 @@ class SilentPushSubscriptionManager : NSObject {
             return Promise(error: NSError(domain: "Craze", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid device token"]))
         }
         
-        return NetworkingPromise.createAndSubscribeToSilentPushEndpoint(pushToken: token.description,
+        return NetworkingPromise.sharedInstance.createAndSubscribeToSilentPushEndpoint(pushToken: token.description,
                                                                         tzOffset: timeZone.serverFormattedOffset,
                                                                         subscriptionARN: self.subscriptionARN).then { ARN -> Void in
             self.subscriptionARN = ARN

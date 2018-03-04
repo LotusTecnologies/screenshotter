@@ -93,7 +93,7 @@ class TutorialVideoViewController : BaseViewController {
             player.play()
             delegate?.tutorialVideoViewControllerDidPlay?(self)
             
-            AnalyticsTrackers.standard.track("Started Tutorial Video")
+            AnalyticsTrackers.standard.track(.startedTutorialVideo)
         }
     }
     
@@ -154,12 +154,12 @@ class TutorialVideoViewController : BaseViewController {
             }
         }
         
-        AnalyticsTrackers.standard.track("Replayed Tutorial Video")
+        AnalyticsTrackers.standard.track(.replayedTutorialVideo)
         delegate?.tutorialVideoViewControllerDidPlay?(self)
     }
     
     @objc private func doneButtonTapped() {
-        AnalyticsTrackers.standard.track("User Exited Tutorial Video", properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
+        AnalyticsTrackers.standard.track(.userExitedTutorialVideo, properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
         
         delegate?.tutorialVideoViewControllerDidTapDone(self)
     }
@@ -188,11 +188,11 @@ class TutorialVideoViewController : BaseViewController {
         if player.togglePlayback() == .paused {
             overlayView.flashPauseOverlay()
             
-            AnalyticsTrackers.standard.track("Paused Tutorial Video")
+            AnalyticsTrackers.standard.track(.pausedTutorialVideo)
             delegate?.tutorialVideoViewControllerDidPause?(self)
             
         } else {
-            AnalyticsTrackers.standard.track("Continued Tutorial Video")
+            AnalyticsTrackers.standard.track(.continuedTutorialVideo)
             delegate?.tutorialVideoViewControllerDidPlay?(self)
         }
     }
@@ -206,7 +206,7 @@ class TutorialVideoViewController : BaseViewController {
         
         overlayView.hideVolumeToggleButton()
         
-        AnalyticsTrackers.standard.track("Completed Tutorial Video")
+        AnalyticsTrackers.standard.track(.completedTutorialVideo)
         delegate?.tutorialVideoViewControllerDidEnd?(self)
     }
 }

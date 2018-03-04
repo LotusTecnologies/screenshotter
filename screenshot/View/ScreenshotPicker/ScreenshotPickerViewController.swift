@@ -55,7 +55,7 @@ class ScreenshotPickerNavigationController : UINavigationController {
         }
         
         let title = screenshotPickerViewController.selectedSegmentTitle()
-        AnalyticsTrackers.standard.track("Imported Photos", properties: ["Section":title, "Count":assets.count])
+        AnalyticsTrackers.standard.track(.importedPhotos, properties: ["Section":title, "Count":assets.count])
     }
 }
 
@@ -220,7 +220,7 @@ class ScreenshotPickerViewController : BaseViewController {
     
     @objc private func segmentsChanged() {
         prepareSegmentReload()
-        AnalyticsTrackers.standard.track("Tapped \(selectedSegmentTitle()) Picker List")
+        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped \(selectedSegmentTitle()) Picker List")
     }
     
     fileprivate func setSegmentsIndex(_ index: Int) {
@@ -303,14 +303,14 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
             
-            AnalyticsTrackers.standard.track("Created Photo")
+            AnalyticsTrackers.standard.track(.createdPhoto)
         }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.presentingViewController?.dismiss(animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track("Canceled Photo Creation")
+        AnalyticsTrackers.standard.track(.canceledPhotoCreation)
     }
     
     func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
@@ -374,6 +374,16 @@ extension ScreenshotPickerViewController : UICollectionViewDataSource {
 // MARK: - Collection View Delegate
 
 extension ScreenshotPickerViewController : UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if selectedIndexPaths.count < 20 {
+            return true
+        }
+        let alertcontroller = UIAlertController.init(title: nil, message: "picker.limit.alert.message".localized, preferredStyle: .alert)
+        alertcontroller.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+        self.present(alertcontroller, animated: true, completion: nil)
+        return false
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndexPaths.append(indexPath)
         syncDoneEnabledState()
