@@ -298,7 +298,7 @@ fileprivate extension ProductViewControllerProductView {
         selectedItem.resetBorderColor()
         
         if selectedItem == selectionColorItem {
-            guard let variant = structuredProduct?.variant(forColor: selectedItem.selectedPickerItem) else {
+            guard let variant = structuredProduct?.structuredColorVariant(forColor: selectedItem.selectedPickerItem) else {
                 return
             }
             
@@ -370,7 +370,19 @@ fileprivate extension ProductViewControllerProductView {
         
         // TODO:
         
+        let url: String?
         
+        if let color = selectionColorItem?.selectedPickerItem,
+            let size = selectionSizeItem?.selectedPickerItem,
+            let variantUrl = structuredProduct?.variant(forColor: color, size: size)?.url
+        {
+            url = variantUrl
+        }
+        else {
+            url = structuredProduct?.product.url
+        }
+        
+        OpenProductPage.present(urlString: url, fromViewController: self)
     }
 }
 
@@ -524,10 +536,14 @@ fileprivate extension ProductViewController {
             return product.productDescription?.split(separator: ",").dropLast().joined(separator: ",")
         }
         
-        func variant(forColor color: String?) -> StructuredColorVariant? {
+        func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
             return structuredColorVariants.first { structuredColorVariant -> Bool in
                 return structuredColorVariant.color == color
             }
+        }
+        
+        func variant(forColor color: String?, size: String?) -> Variant? {
+            return structuredColorVariant(forColor: color)?.variant(forSize: size)
         }
         
         func subtractingSizes(of structuredColorVariant: StructuredColorVariant) -> [String] {
@@ -551,6 +567,12 @@ fileprivate extension ProductViewController {
         init(color: String?) {
             self.color = color
             super.init()
+        }
+        
+        func variant(forSize size: String?) -> Variant? {
+            return variants.first { variant -> Bool in
+                return variant.size == size
+            }
         }
     }
 }

@@ -53,36 +53,41 @@ enum OpenProductPage : String {
         }
     }
     
-    static func present(product:Product, fromViewController:UIViewController, analyticsKey:String){
+    static func present(urlString: String?, fromViewController: UIViewController) {
+        guard var urlString = urlString else {
+            return
+        }
         
-        if var urlString = product.offer {
-            if urlString.hasPrefix("//") {
-                urlString = "https:".appending(urlString)
+        if urlString.hasPrefix("//") {
+            urlString = "https:".appending(urlString)
+        }
+        
+        if let url = URL(string: urlString){
+            var openInSetting = OpenProductPage.fromSystemInfo()
+            
+            for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
+                if !openInSetting.canOpen(url: url) {
+                    openInSetting = fallbackSetting
+                }
             }
-            if let url = URL(string: urlString){
-                var openInSetting = OpenProductPage.fromSystemInfo()
-                
-                for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
-                    if !openInSetting.canOpen(url: url) {
-                        openInSetting = fallbackSetting
-                    }
+            
+            switch openInSetting {
+            case .embededSafari:
+                let svc = SFSafariViewController(url: url)
+                if #available(iOS 11.0, *) {
+                    svc.dismissButtonStyle = .done
                 }
-                
-                switch openInSetting {
-                case .embededSafari:
-                    let svc = SFSafariViewController(url: url)
-                    if #available(iOS 11.0, *) {
-                        svc.dismissButtonStyle = .done
-                    }
-                    fromViewController.present(svc, animated: true, completion: nil)
-                case .safari:
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                case .chrome:
-                    UIApplication.shared.openInChrome(url: url) //returns success
-                    
-                }
+                fromViewController.present(svc, animated: true, completion: nil)
+            case .safari:
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            case .chrome:
+                UIApplication.shared.openInChrome(url: url) //returns success
             }
         }
+    }
+    
+    static func present(product:Product, fromViewController:UIViewController, analyticsKey:String){
+        present(urlString: product.offer, fromViewController: fromViewController)
         
         AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: analyticsKey)
         
