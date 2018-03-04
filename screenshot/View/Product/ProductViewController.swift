@@ -227,7 +227,7 @@ fileprivate extension ProductViewControllerProductView {
             return
         }
         
-        productView.contentTextView.text = title
+        productView.contentTextView.text = description
     }
     
     func setPrice(_ price: String?) {
@@ -384,7 +384,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
         print("||| \(structuredProduct.product)")
         
         setProductTitle(structuredProduct.title)
-        setProductDescription(structuredProduct.title) // TODO:
+        setProductDescription(structuredProduct.product.detailedDescription)
         setImages(urls: structuredProduct.product.imageURLs())
         setWebsiteMerchant(structuredProduct.product.merchant)
         setPrice(structuredProduct.product.price)
