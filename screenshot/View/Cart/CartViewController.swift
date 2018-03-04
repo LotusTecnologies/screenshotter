@@ -10,7 +10,8 @@ import UIKit
 import CoreData
 
 class CartViewController: BaseViewController {
-    fileprivate let tableView = UITableView()
+    fileprivate let tableView = TableView()
+    private let emptyListView = HelperView()
     
     fileprivate var cart: Cart?
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
@@ -60,12 +61,16 @@ class CartViewController: BaseViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorInset = .zero
         tableView.allowsSelection = false
+        tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
         tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        emptyListView.titleLabel.text = "cart.empty.title".localized
+        tableView.emptyView = emptyListView
     }
 }
 
