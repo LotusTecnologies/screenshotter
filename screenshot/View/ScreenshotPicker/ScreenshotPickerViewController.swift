@@ -379,7 +379,7 @@ extension ScreenshotPickerViewController : UICollectionViewDelegate {
             return true
         }
         let alertcontroller = UIAlertController.init(title: nil, message: "picker.limit.alert.message".localized, preferredStyle: .alert)
-        alertcontroller.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
+        alertcontroller.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
         self.present(alertcontroller, animated: true, completion: nil)
         return false
     }
