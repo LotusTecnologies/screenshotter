@@ -12,6 +12,7 @@ import CoreData
 class CartViewController: BaseViewController {
     fileprivate let tableView = UITableView()
     
+    fileprivate var cart: Cart?
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     
     fileprivate lazy var formatter: NumberFormatter = {
@@ -36,6 +37,7 @@ class CartViewController: BaseViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         ShoppingCartModel.shared.getAddableCart().then(execute: { cart -> Void in
+            self.cart = cart
             self.cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self, cart: cart)
             
             if self.isViewLoaded {
@@ -54,6 +56,7 @@ class CartViewController: BaseViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.tableFooterView = UIView() // Remove empty cell dividers
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorInset = .zero
         tableView.allowsSelection = false
@@ -74,18 +77,23 @@ extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? CartTableViewCell, let cartItem =  cartItemFrc?.object(at: indexPath) {
-            
-            
+        if let cell = cell as? CartTableViewCell, let cartItem = cartItemFrc?.object(at: indexPath) {
             cell.productImageView.backgroundColor = .red
             cell.titleLabel.text = "Anthropologie Tweed Long-Sleeve"
             cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
             cell.size = cartItem.size
+            cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(button:)), for: .touchUpInside)
         }
         
         return cell
+    }
+    
+    func tableView(removeCellForRowAt indexPath: IndexPath) {
+        if let cartItem = cartItemFrc?.object(at: indexPath) {
+            cart?.remove(item: cartItem)
+        }
     }
 }
 
@@ -98,5 +106,18 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
         if isViewLoaded {
             change.applyChanges(tableView: tableView)
         }
+    }
+}
+
+typealias CartViewControllerCartItem = CartViewController
+fileprivate extension CartViewControllerCartItem {
+    @objc func cartItemRemoveAction(button: UIButton) {
+        let position: CGPoint = button.convert(.zero, to: tableView)
+        
+        if let indexPath = tableView.indexPathForRow(at: position) {
+            tableView(removeCellForRowAt: indexPath)
+        }
+        
+        // TODO: analytic event for did tap remove
     }
 }
