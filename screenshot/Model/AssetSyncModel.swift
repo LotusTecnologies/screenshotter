@@ -70,7 +70,7 @@ class AssetSyncModel: NSObject {
     lazy var PHAssetToUIImageQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "PHAsset to UIImage Queue"
-        queue.maxConcurrentOperationCount = 10
+        queue.maxConcurrentOperationCount = 2
         return queue
     }()
     override init() {
