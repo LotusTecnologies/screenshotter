@@ -38,7 +38,7 @@ class TutorialViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        AnalyticsTrackers.standard.track("Started Tutorial")
+        AnalyticsTrackers.standard.track(.startedTutorial)
         
         view.backgroundColor = .white
         
@@ -236,7 +236,7 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
     func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideView) {
         tutorialTrySlideViewDidComplete(slideView)
         
-        AnalyticsTrackers.standard.track("Skipped Tutorial")
+        AnalyticsTrackers.standard.track(.skippedTutorial)
         AppDelegate.shared.shouldLoadDiscoverNextLoad = true
     }
     
@@ -244,8 +244,9 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        AnalyticsTrackers.standard.track("Finished Tutorial")
-        AnalyticsTrackers.branch.track("Finished Tutorial")
+        AnalyticsTrackers.standard.track(.finishedTutorial)
+        //TODO: why is this extra branch tracking here?
+        AnalyticsTrackers.branch.track(.finishedTutorial)
         
         delegate?.tutoriaViewControllerDidComplete(self)
     }

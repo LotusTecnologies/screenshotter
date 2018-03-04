@@ -10,6 +10,7 @@ import UIKit
 
 class ProductView: UIView {
     let scrollView = UIScrollView()
+    
     let galleryScrollView = UIScrollView()
     let galleryScrollContentView = UIView()
     let pageControl = UIPageControl()
@@ -18,11 +19,14 @@ class ProductView: UIView {
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
+    let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
+    fileprivate(set) var selectionColorItem: SegmentedDropDownItem?
+    fileprivate(set) var selectionSizeItem: SegmentedDropDownItem?
+    fileprivate(set) var selectionQuantityItem: SegmentedDropDownItem?
     let cartButton = MainButton()
 //    let buyButton = MainButton()
-    let websiteButton = UIButton()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -78,23 +82,29 @@ class ProductView: UIView {
         labelContainerView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
-        priceLabel.font = UIFont.preferredFont(forTextStyle: .title1)
         priceLabel.textColor = .gray3
+        priceLabel.font = UIFont.preferredFont(forTextStyle: .title1)
+        priceLabel.minimumScaleFactor = 0.3
+        priceLabel.adjustsFontSizeToFitWidth = true
         priceLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(priceLabel)
         priceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
         priceLabel.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
         priceLabel.trailingAnchor.constraint(equalTo: labelContainerView.trailingAnchor).isActive = true
+        priceLabel.widthAnchor.constraint(lessThanOrEqualTo: labelContainerView.widthAnchor, multiplier: 0.4).isActive = true
         
         originalPriceLabel.translatesAutoresizingMaskIntoConstraints = false
-        originalPriceLabel.font = UIFont.preferredFont(forTextStyle: .title2)
         originalPriceLabel.textColor = .gray7
+        originalPriceLabel.font = UIFont.preferredFont(forTextStyle: .title2)
+        originalPriceLabel.minimumScaleFactor = 0.3
+        originalPriceLabel.adjustsFontSizeToFitWidth = true
         originalPriceLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(originalPriceLabel)
         originalPriceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
         originalPriceLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor).isActive = true
         originalPriceLabel.bottomAnchor.constraint(lessThanOrEqualTo: labelContainerView.bottomAnchor).isActive = true
         originalPriceLabel.trailingAnchor.constraint(equalTo: labelContainerView.trailingAnchor).isActive = true
+        originalPriceLabel.widthAnchor.constraint(lessThanOrEqualTo: labelContainerView.widthAnchor, multiplier: 0.4).isActive = true
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.preferredFont(forTextStyle: .title2)
@@ -118,9 +128,12 @@ class ProductView: UIView {
         selectionControl.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
-        contentTextView.backgroundColor = .green
+        contentTextView.backgroundColor = .clear
         contentTextView.isScrollEnabled = false
         contentTextView.scrollsToTop = false
+        contentTextView.font = .preferredFont(forTextStyle: .body)
+        contentTextView.adjustsFontForContentSizeCategory = true
+        contentTextView.isEditable = false
         scrollView.addSubview(contentTextView)
         contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -192,9 +205,12 @@ class ProductView: UIView {
         }
         
         // TODO: keep this value synced with the CartViewController stepper.maxValue
-        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" })
+        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" }, selectedPickerItem: "1")
         items.append(quantityItem)
         
         selectionControl.items = items
+        selectionColorItem = colorItem
+        selectionSizeItem = sizeItem
+        selectionQuantityItem = quantityItem
     }
 }

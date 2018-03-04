@@ -10,21 +10,19 @@ import UIKit
 
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String]
+    private(set) var selectedPickerItem: String?
     var disabledPickerItems: [String]? {
         didSet {
-            guard let segment = segment, let items = disabledPickerItems, let title = title else {
+            guard let items = disabledPickerItems, let selectedTitle = selectedPickerItem else {
                 return
             }
             
-            if items.contains(title) {
-                segment.titleLabel.text = placeholderTitle
+            if items.contains(selectedTitle) {
+                title = placeholderTitle
             }
         }
     }
     var placeholderTitle: String?
-    var title: String? {
-        return segment?.titleLabel.text
-    }
     
     /// Value from 1 to 0 where 1 takes up the whole segmented control
     /// width. -1 uses auto calculate.
@@ -33,9 +31,13 @@ class SegmentedDropDownItem : NSObject {
     fileprivate var segment: DropDownControl?
     fileprivate var frameLayer: CAShapeLayer?
     
-    init(pickerItems: [String]) {
+    init(pickerItems: [String], selectedPickerItem: String? = nil) {
         self.pickerItems = pickerItems
         super.init()
+        
+        if let selectedPickerItem = selectedPickerItem, pickerItems.contains(selectedPickerItem) {
+            self.selectedPickerItem = selectedPickerItem
+        }
     }
     
     fileprivate func setBorderColor(_ color: UIColor) {
@@ -73,12 +75,18 @@ class SegmentedDropDownItem : NSObject {
         segment.superview?.sendSubview(toBack: segment)
     }
     
-    fileprivate var text: String? {
-        if let title = title, !title.isEmpty {
-            return title
+    fileprivate var title: String? {
+        set(newTitle) {
+            segment?.titleLabel.text = newTitle
+            selectedPickerItem = (newTitle == placeholderTitle) ? nil : newTitle
         }
-        else {
-            return placeholderTitle
+        get {
+            if let selectedPickerItem = selectedPickerItem, pickerItems.contains(selectedPickerItem) {
+                return selectedPickerItem
+            }
+            else {
+                return placeholderTitle
+            }
         }
     }
 }
@@ -100,7 +108,7 @@ class SegmentedDropDownControl : UIControl {
                 segment.translatesAutoresizingMaskIntoConstraints = false
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
-                segment.titleLabel.text = item.placeholderTitle ?? item.pickerItems.first
+                segment.titleLabel.text = item.title
                 segment.titleLabel.textColor = .gray6
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 addSubview(segment)
@@ -279,7 +287,7 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
             return
         }
         
-        item.segment?.titleLabel.text = title
+        item.title = title
         
         sendActions(for: .valueChanged)
         _ = item.segment?.resignFirstResponder()

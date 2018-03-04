@@ -68,10 +68,10 @@ extension DataModel {
     func receivedCoreDataError(error:Error) {
         let error = error as NSError
         if error.domain == NSSQLiteErrorDomain && error.code == 13{ // disk full  see https://sqlite.org/c3ref/c_abort.html
-            AnalyticsTrackers.standard.track("Error", properties: ["type":"noHardDriveSpace"])
+            AnalyticsTrackers.standard.track(.error, properties: ["type":"noHardDriveSpace"])
             AppDelegate.shared.presentLowDiskSpaceWarning()
         }else{
-            AnalyticsTrackers.standard.track("Error", properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
         }
     }
 }
@@ -106,7 +106,7 @@ extension DataModel {
     func favoriteFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot> {
         let request: NSFetchRequest = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastFavorited", ascending: false)]
-        request.predicate = NSPredicate(format: "lastFavorited != nil")
+        request.predicate = NSPredicate(format: "favoritesCount != 0")
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
@@ -133,6 +133,14 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?, cart: Cart) -> FetchedResultsControllerManager<CartItem>  {
+        let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        request.predicate = NSPredicate(format: "cart == %@", cart)
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
 }
 
 extension DataModel {
@@ -560,22 +568,15 @@ extension DataModel {
             fetchRequest.sortDescriptors = nil
             
             do {
-                var screenshotsToUpdate = Set<Screenshot>()
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     if let screenshot = product.screenshot {
                         screenshot.removeFromFavorites(product)
                         screenshot.favoritesCount -= 1
-                        if let screenshotFavoritedDate = screenshot.lastFavorited,
-                            let productFavoritedDate = product.dateFavorited,
-                            (screenshotFavoritedDate as Date) <= (productFavoritedDate as Date) {
-                            screenshotsToUpdate.insert(screenshot)
-                        }
                     }
                     product.isFavorite = false
                     product.dateFavorited = nil
                 }
-                screenshotsToUpdate.forEach {$0.updateLastFavorited()}
                 try managedObjectContext.save()
             } catch {
                 self.receivedCoreDataError(error: error)
@@ -927,17 +928,6 @@ extension Screenshot {
         return frame
     }
     
-    // Typically called after unfavoriting a product, its screenshot's lastFavorited needs to be set to the most recently favorited,
-    // so the favoriteFrc correctly orders the screenshots.
-    func updateLastFavorited() {
-        if let favoritesArray = favorites?.allObjects as? [Product] {
-            let latest = favoritesArray.flatMap({$0.dateFavorited as Date?}).reduce(Date.distantPast, { $0 > $1 ? $0 : $1 })
-            lastFavorited = (latest == Date.distantPast ? nil : latest as NSDate)
-        } else {
-            lastFavorited = nil
-        }
-    }
-    
     var favoritedShoppablesCount: Int {
         if let favoritedShoppablesCount = shoppables?.filtered(using: NSPredicate(format: "ANY products.isFavorite == TRUE")).count {
             return favoritedShoppablesCount
@@ -1123,15 +1113,15 @@ extension Shoppable {
                 if let offersUrl = offersUrl {
                     augmentedOffersUrl = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersUrl, optionsMask: optionsMask)?.absoluteString
                 }
-                NetworkingPromise.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
+                NetworkingPromise.sharedInstance.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
                 
                 let imageOrDash = imageUrl ?? "-"
                 let categoryOrDash = category ?? "-"
                 let augmentedOffersUrlOrDash = augmentedOffersUrl ?? "-"
                 if positive {
-                    AnalyticsTrackers.standard.track("Shoppable rating positive", properties: ["Rating" : positiveRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
+                    AnalyticsTrackers.standard.track(.shoppableRatingPositive, properties: ["Rating" : positiveRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
                 } else {
-                    AnalyticsTrackers.standard.track("Shoppable rating negative", properties: ["Rating" : negativeRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
+                    AnalyticsTrackers.standard.track(.shoppableRatingNegative, properties: ["Rating" : negativeRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
                 }
                 try managedObjectContext.save()
             } catch {
@@ -1215,19 +1205,11 @@ extension Product {
                             screenshot.lastFavorited = now
                         }
                     } else {
-                        let dateFavorited = product.dateFavorited
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.removeFromFavorites(product)
                             if let favorites = screenshot.favorites {
                                 screenshot.favoritesCount = Int16(favorites.count)
-                                if let dateFavorited = dateFavorited,
-                                    let screenshotLastFavorited = screenshot.lastFavorited,
-                                    dateFavorited.compare(screenshotLastFavorited as Date) == .orderedAscending {
-                                    // No need to update the screenshot's lastFavorited.
-                                } else {
-                                    screenshot.updateLastFavorited()
-                                }
                             } else {
                                 screenshot.favoritesCount = 0
                                 screenshot.lastFavorited = nil
@@ -1279,7 +1261,7 @@ extension Matchstick {
                     let assetId = matchstick.remoteId,
                     let uploadedImageURL = matchstick.imageUrl,
                     let syteJson = matchstick.syteJson,
-                    let segments = NetworkingPromise.jsonDestringify(string: syteJson) {
+                    let segments = NetworkingPromise.sharedInstance.jsonDestringify(string: syteJson) {
                     let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                    assetId: assetId,
                                                                    createdAt: Date(),

@@ -185,8 +185,12 @@ public class TutorialEmailSlideView : HelperView {
         AnalyticsTrackers.standard.identify(user)
         AnalyticsTrackers.branch.identify(user)
         
-        let eventName = email.count > 0 ? "Submitted email" : "Submitted blank email"
-        AnalyticsTrackers.standard.track(eventName, properties: user.analyticsProperties)
+        if email.count > 0 {
+            AnalyticsTrackers.standard.track(.submittedEmail, properties: user.analyticsProperties)
+        }else{
+            AnalyticsTrackers.standard.track(.submittedBlankEmail, properties: user.analyticsProperties)
+
+        }
 
         UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
         UserDefaults.standard.synchronize()

@@ -19,7 +19,7 @@ class ShoppingCartModel {
         return firstly {
             return deleteVariantsIfOld(productOID: productOID)
             }.then { partNumber -> Promise<NSDictionary> in
-                return partNumber.isEmpty ? Promise(value: NSDictionary()) : NetworkingPromise.getAvailableVariants(partNumber: partNumber)
+                return partNumber.isEmpty ? Promise(value: NSDictionary()) : NetworkingPromise.sharedInstance.getAvailableVariants(partNumber: partNumber)
             }.then { dict -> Promise<Bool> in
                 print("populateVariants dict:\(dict)")
                 guard dict.count > 0 else {
@@ -150,7 +150,7 @@ class ShoppingCartModel {
     }
     
     func addRemoteId(cartOID: NSManagedObjectID) {
-        NetworkingPromise.createCart().then { dict -> Void in
+        NetworkingPromise.sharedInstance.createCart().then { dict -> Void in
             guard let cartInfo = dict["cart"] as? [String : Any],
               let remoteId = cartInfo["id"] as? String else {
                 print("addRemoteId failed to extract remoteId for cartOID:\(cartOID)")

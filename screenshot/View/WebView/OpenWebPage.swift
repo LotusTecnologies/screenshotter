@@ -1,5 +1,5 @@
 //
-//  OpenProductPageInSetting.swift
+//  OpenWebPage.swift
 //  screenshot
 //
 //  Created by Jonathan Rose on 2/20/18.
@@ -10,8 +10,7 @@ import Foundation
 import FBSDKCoreKit
 import SafariServices
 
-
-enum OpenProductPage : String {
+enum OpenWebPage : String {
     case embededSafari
     case safari
     case chrome
@@ -27,19 +26,19 @@ enum OpenProductPage : String {
         }
     }
     
-    static func fromSystemInfo() -> OpenProductPage{
-        var defaultValue:OpenProductPage = .safari
+    static func fromSystemInfo() -> OpenWebPage{
+        var defaultValue:OpenWebPage = .safari
 
-        if let appSettingsDefaultString = AppDelegate.shared.appSettings.openProductsPageDefault, let appSettingsDefault = OpenProductPage.init(rawValue:appSettingsDefaultString){
+        if let appSettingsDefaultString = AppDelegate.shared.appSettings.openWebPageDefault, let appSettingsDefault = OpenWebPage.init(rawValue:appSettingsDefaultString){
             defaultValue = appSettingsDefault
         }
 
-        let stringValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.openProductPageInSetting) as? String ?? defaultValue.rawValue
-        return OpenProductPage(rawValue: stringValue) ?? defaultValue
+        let stringValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.openWebPage) as? String ?? defaultValue.rawValue
+        return OpenWebPage(rawValue: stringValue) ?? defaultValue
     }
     
     func saveToUserDefaults() {
-        UserDefaults.standard.set(self.rawValue, forKey: UserDefaultsKeys.openProductPageInSetting)
+        UserDefaults.standard.set(self.rawValue, forKey: UserDefaultsKeys.openWebPage)
     }
     
     func canOpen(url:URL) -> Bool{
@@ -53,38 +52,43 @@ enum OpenProductPage : String {
         }
     }
     
-    static func present(product:Product, fromViewController:UIViewController, analyticsKey:String){
-        
-        if var urlString = product.offer {
-            if urlString.hasPrefix("//") {
-                urlString = "https:".appending(urlString)
-            }
-            if let url = URL(string: urlString){
-                var openInSetting = OpenProductPage.fromSystemInfo()
-                
-                for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
-                    if !openInSetting.canOpen(url: url) {
-                        openInSetting = fallbackSetting
-                    }
-                }
-                
-                switch openInSetting {
-                case .embededSafari:
-                    let svc = SFSafariViewController(url: url)
-                    if #available(iOS 11.0, *) {
-                        svc.dismissButtonStyle = .done
-                    }
-                    fromViewController.present(svc, animated: true, completion: nil)
-                case .safari:
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                case .chrome:
-                    UIApplication.shared.openInChrome(url: url) //returns success
-                    
-                }
-            }
+    static func present(urlString: String?, fromViewController: UIViewController) {
+        guard var urlString = urlString else {
+            return
         }
         
-        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: analyticsKey)
+        if urlString.hasPrefix("//") {
+            urlString = "https:".appending(urlString)
+        }
+        
+        if let url = URL(string: urlString){
+            var openInSetting = OpenWebPage.fromSystemInfo()
+            
+            for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
+                if !openInSetting.canOpen(url: url) {
+                    openInSetting = fallbackSetting
+                }
+            }
+            
+            switch openInSetting {
+            case .embededSafari:
+                let svc = SFSafariViewController(url: url)
+                if #available(iOS 11.0, *) {
+                    svc.dismissButtonStyle = .done
+                }
+                fromViewController.present(svc, animated: true, completion: nil)
+            case .safari:
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            case .chrome:
+                UIApplication.shared.openInChrome(url: url) //returns success
+            }
+        }
+    }
+    
+    static func presentProduct(_ product: Product, fromViewController: UIViewController, analyticsKey: AnalyticsEvent, fromPage: String) {
+        present(urlString: product.offer, fromViewController: fromViewController)
+        
+        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: fromPage)
         
         let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
         
@@ -107,11 +111,11 @@ enum OpenProductPage : String {
                               "price": price,
                               "email": email,
                               "name": name ]
-            AnalyticsTrackers.standard.track("Product for email", properties:properties)
+            AnalyticsTrackers.standard.track(.productForEmail, properties:properties)
         }
         
         product.recordViewedProduct()
-        AnalyticsTrackers.branch.track("Tapped on product - \(analyticsKey)")
+        AnalyticsTrackers.branch.track(analyticsKey)
         FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
     }
 }

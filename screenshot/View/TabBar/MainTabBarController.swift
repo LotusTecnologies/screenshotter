@@ -141,9 +141,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             }
             
             if foundIntercomWindow {
-                AnalyticsTrackers.standard.track("Took Screenshot While Showing Intercom Window", properties: nil)
+                AnalyticsTrackers.standard.track(.tookScreenshotWhileShowingIntercomWindow, properties: nil)
             } else {
-                AnalyticsTrackers.standard.track("Took Screenshot", properties: nil)
+                AnalyticsTrackers.standard.track(.tookScreenshot, properties: nil)
             }
         }
     }
@@ -197,7 +197,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
         
         if let tabTitle = tabTitle {
-            AnalyticsTrackers.standard.track("Tab Bar tapped", properties:["tab": tabTitle])
+            AnalyticsTrackers.standard.track(.tabBarTapped, properties:["tab": tabTitle])
         }
     }
     

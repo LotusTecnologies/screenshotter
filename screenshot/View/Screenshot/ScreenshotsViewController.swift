@@ -34,7 +34,6 @@ class ScreenshotsViewController: BaseViewController {
     var deleteButton:ScreenshotsDeleteButton?
     var refreshControl:UIRefreshControl?
     var emptyListView:ScreenshotsHelperView?
-    var hasNewScreenshot = false
     var hasNewScreenshotSection = false
     var hasProductBar = false
     var notificationCellAssetId:String?
@@ -103,6 +102,7 @@ extension ScreenshotsViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         syncEmptyListView()
+        self.updateHasNewScreenshot()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -124,6 +124,8 @@ extension ScreenshotsViewController {
     func applicationWillEnterForeground(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             syncEmptyListView()
+            self.updateHasNewScreenshot()
+
         }
     }
     
@@ -265,7 +267,7 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
     
     func productBar(_ controller: ProductsBarController, didTap product: Product) {
         if !self.isEditing {
-            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "ProductBar")
+            OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: .tappedOnProductProductbar, fromPage: "ProductBar")
         }else{
             if let index = self.toHideFromProductBarObjectIDs.index(of: product.objectID){
                 self.toHideFromProductBarObjectIDs.remove(at: index)
@@ -492,15 +494,16 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: nil)
                 activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
                     if (completed) {
-                        AnalyticsTrackers.standard.track("Share completed")
-                        AnalyticsTrackers.branch.track("Share completed")
+                        AnalyticsTrackers.standard.track(.shareCompleted)
+                        //TODO: why is this branch tracking here?
+                        AnalyticsTrackers.branch.track(.shareCompleted)
                     } else {
-                        AnalyticsTrackers.standard.track("Share incomplete")
+                        AnalyticsTrackers.standard.track(.shareIncomplete)
                     }
                 }
                 activityViewController.popoverPresentationController?.sourceView = self.view // so iPads don't crash
                 self.present(activityViewController, animated: true, completion: nil)
-                AnalyticsTrackers.standard.track("Shared screenshot")
+                AnalyticsTrackers.standard.track(.sharedScreenshot)
             }
         }
     }
@@ -519,7 +522,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                         UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
                             cell.selectedState = .disabled
                         })
-                        AnalyticsTrackers.standard.track("Removed screenshot")
+                        AnalyticsTrackers.standard.track(.removedScreenshot)
                         
                     }else{
                         print("collectionView update when trying to delete item")
@@ -608,7 +611,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-        AnalyticsTrackers.standard.track("Screenshot notification cancelled", properties: ["Screenshot count": screenshotsCount])
+        AnalyticsTrackers.standard.track(.screenshotNotificationCancelled, properties: ["Screenshot count": screenshotsCount])
     }
     
     func screenshotNotificationCollectionViewCellDidTapConfirm(_ cell: ScreenshotNotificationCollectionViewCell){
@@ -625,12 +628,12 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-        AnalyticsTrackers.standard.track("Screenshot notification accepted", properties: ["Screenshot count": screenshotsCount])
+        AnalyticsTrackers.standard.track(.screenshotNotificationAccepted, properties: ["Screenshot count": screenshotsCount])
     }
     
     func updateHasNewScreenshot(){
         let hadSection = self.hasNewScreenshotSection
-        self.hasNewScreenshotSection = self.hasNewScreenshot && !self.isEditing
+        self.hasNewScreenshotSection = (AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) && !self.isEditing
         if hadSection != self.hasNewScreenshotSection {
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
             if self.hasNewScreenshotSection {
@@ -649,7 +652,6 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     
     func presentNotificationCell(assetId:String){
         if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
-            self.hasNewScreenshot = true
             self.notificationCellAssetId = assetId
             
             if self.hasNewScreenshotSection {  //Already has a new screenshot section -  just do an update
@@ -667,7 +669,6 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     }
     
     func dismissNotificationCell(){
-        self.hasNewScreenshot = false
         updateHasNewScreenshot()
     }
 }
@@ -708,7 +709,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .product:
                 return .zero
             case .notification:
-                if self.hasNewScreenshot {
+                if self.hasNewScreenshotSection {
                     return defaultInset
                 }
                 
@@ -794,7 +795,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
                     self.delegate?.screenshotsViewController(self, didSelectItemAt: indexPath)
                     
                     if let uploadedImageURL = screenshot.uploadedImageURL {
-                        AnalyticsTrackers.standard.track("Tapped on screenshot", properties: ["screenshot":uploadedImageURL])
+                        AnalyticsTrackers.standard.track(.tappedOnScreenshot, properties: ["screenshot":uploadedImageURL])
                     }
                 }
             }

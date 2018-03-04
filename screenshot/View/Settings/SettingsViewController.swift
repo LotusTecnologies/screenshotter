@@ -305,7 +305,7 @@ class SettingsViewController : BaseViewController {
         let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
         let integer = gender.rawValue
         
-        AnalyticsTrackers.standard.track("Set Global Gender Filter to \(gender.stringValue)")
+        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Gender Filter to \(gender.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
@@ -313,7 +313,7 @@ class SettingsViewController : BaseViewController {
         let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
         let integer = size.rawValue
         
-        AnalyticsTrackers.standard.track("Set Global Size Filter to \(size.stringValue)")
+        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Size Filter to \(size.stringValue)")
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -484,7 +484,7 @@ extension SettingsViewController : UITableViewDelegate {
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            let options:[OpenProductPage] = [.embededSafari, .safari, .chrome]
+            let options:[OpenWebPage] = [.embededSafari, .safari, .chrome]
             options.forEach({ (setting) in
                 alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
                     setting.saveToUserDefaults()
@@ -676,7 +676,7 @@ fileprivate extension SettingsViewController {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
         case .openIn:
-            return OpenProductPage.fromSystemInfo().localizedDisplayString()
+            return OpenWebPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
@@ -919,7 +919,7 @@ extension SettingsViewController : TutorialVideoViewControllerDelegate {
     func tutorialVideoViewControllerDidEnd(_ viewController: TutorialVideoViewController) {
         dismiss(animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track("Automatically Exited Tutorial Video")
+        AnalyticsTrackers.standard.track(.automaticallyExitedTutorialVideo)
     }
 }
 
