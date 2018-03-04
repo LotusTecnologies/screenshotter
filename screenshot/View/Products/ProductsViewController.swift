@@ -399,7 +399,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 navigationController?.pushViewController(productViewController, animated: true)
             }
             else {
-                OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Products")
+                OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: "Products")
             }
         }
     }

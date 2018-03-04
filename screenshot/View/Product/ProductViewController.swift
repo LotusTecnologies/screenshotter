@@ -382,7 +382,7 @@ fileprivate extension ProductViewControllerProductView {
             url = structuredProduct?.product.url
         }
         
-        OpenProductPage.present(urlString: url, fromViewController: self)
+        OpenWebPage.present(urlString: url, fromViewController: self)
     }
 }
 

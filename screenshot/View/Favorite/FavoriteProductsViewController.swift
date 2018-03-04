@@ -107,7 +107,7 @@ extension FavoriteProductsViewController : UICollectionViewDelegate {
             return
         }
 
-        OpenProductPage.present(product: product, fromViewController: self, analyticsKey: "Favorites")
+        OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: "Favorites")
     }
 }
 
