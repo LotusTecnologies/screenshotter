@@ -15,7 +15,7 @@ def shared_pods
     pod 'FBSDKShareKit'
     pod 'FBSDKLoginKit'
     pod 'Branch'
-    pod 'EggRating', :git => 'https://github.com/jacobrelkin/EGGRating.git', :branch => 'jacobrelkin/ios-11-support'
+    pod 'EggRating'
     pod 'Intercom'
     pod 'lottie-ios'
     pod 'Segment-Amplitude'

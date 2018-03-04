@@ -1,5 +1,5 @@
 PODS:
-  - Amplitude-iOS (4.0.4)
+  - Amplitude-iOS (4.1.0)
   - Analytics (3.6.9)
   - Appsee (2.3.6)
   - Bolts (1.9.0):
@@ -12,14 +12,14 @@ PODS:
     - Branch/Core (= 0.22.5)
   - Branch/Core (0.22.5)
   - Clarifai-Apple-SDK (3.0.0-beta14)
-  - EggRating (0.1.2):
+  - EggRating (0.1.5):
     - RateView
-  - FBSDKCoreKit (4.30.0):
+  - FBSDKCoreKit (4.31.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.30.0):
+  - FBSDKLoginKit (4.31.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.30.0):
-    - FBSDKCoreKit (~> 4.30.0)
+  - FBSDKShareKit (4.31.0):
+    - FBSDKCoreKit (~> 4.31.0)
   - Intercom (4.1.9)
   - lottie-ios (2.5.0)
   - PromiseKit/CorePromise (4.5.2)
@@ -28,9 +28,9 @@ PODS:
   - PromiseKit/StoreKit (4.5.2):
     - PromiseKit/CorePromise
   - RateView (1.2)
-  - SDWebImage (4.3.1):
-    - SDWebImage/Core (= 4.3.1)
-  - SDWebImage/Core (4.3.1)
+  - SDWebImage (4.3.2):
+    - SDWebImage/Core (= 4.3.2)
+  - SDWebImage/Core (4.3.2)
   - Segment-Amplitude (2.0.0):
     - Amplitude-iOS (~> 4.0)
     - Analytics (~> 3.6)
@@ -40,7 +40,7 @@ DEPENDENCIES:
   - Appsee
   - Branch
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
-  - EggRating (from `https://github.com/jacobrelkin/EGGRating.git`, branch `jacobrelkin/ios-11-support`)
+  - EggRating
   - FBSDKCoreKit
   - FBSDKLoginKit
   - FBSDKShareKit
@@ -51,34 +51,24 @@ DEPENDENCIES:
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
 
-EXTERNAL SOURCES:
-  EggRating:
-    :branch: jacobrelkin/ios-11-support
-    :git: https://github.com/jacobrelkin/EGGRating.git
-
-CHECKOUT OPTIONS:
-  EggRating:
-    :commit: 7f86300619125dac919168d3f27b7b3778e4c638
-    :git: https://github.com/jacobrelkin/EGGRating.git
-
 SPEC CHECKSUMS:
-  Amplitude-iOS: 2ad4d7270c99186236c1272a3a9425463b1ae1a7
+  Amplitude-iOS: c923c4a576698083c1cd05e45072c92d41e206bd
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 4f0482418d99e77d15b0e6065ef216c10e24797b
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
-  EggRating: ac37ed4dad156c9912a384464a25f554bd4198c8
-  FBSDKCoreKit: 7c4bba2877781a131ab5d54c0a78c405d4307b62
-  FBSDKLoginKit: fe7a7e82373dc5daad92e1623219e86224ab1fb1
-  FBSDKShareKit: a9427574b51bde4f437262c3f118c4ccfddeef6c
+  EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
+  FBSDKCoreKit: 54db4c581123745d25a9f7c1608020b3aeabd118
+  FBSDKLoginKit: 95a252ddffd6919c0f132a02292f0824616d8709
+  FBSDKShareKit: 7c3a2e6bb5be15676aebe256444afb18c5d238b3
   Intercom: c69c28474ffc9bf99cce5a7c25f515aad3796944
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 09808bac78357b39f8db4ea360c7b5534d785ef4
+  SDWebImage: 29bd3c0bc1f01e5eb59720847c64ad4c4ca1af5d
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: 4b8c8a53c82d61f6769e72fd93ac9c139bc8b664
+PODFILE CHECKSUM: c4ded11963e31cbf32336339e68e9aff2100faab
 
 COCOAPODS: 1.4.0
