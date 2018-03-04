@@ -19,12 +19,11 @@ class ProductViewController : BaseViewController {
     
     fileprivate var cartBarButtonItem: ProductCartBarButtonItem?
     fileprivate var productView: ProductView?
-    fileprivate var selectionColorItem: SegmentedDropDownItem?
-    fileprivate var selectionSizeItem: SegmentedDropDownItem?
     fileprivate var productEmptyView: UIView?
     fileprivate var loadingView: Loader?
     
     fileprivate var structuredProduct: StructuredProduct?
+    fileprivate var cart: Cart?
     
     // MARK: Life Cycle
     
@@ -256,31 +255,7 @@ fileprivate extension ProductViewControllerProductView {
         }
     }
     
-    func setWebsiteMerchant(_ merchant: String?) {
-        guard let productView = productView else {
-            return
-        }
-        
-        if let name = merchant, !name.isEmpty {
-            let color = productView.websiteButton.titleColor(for: .normal) ?? .crazeGreen
-            
-            let title = NSAttributedString(string: "product.website".localized(withFormat: name), attributes: [
-                NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-                NSUnderlineColorAttributeName: color,
-                NSForegroundColorAttributeName: color,
-                NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFontWeightBold)
-                ])
-            
-            productView.websiteButton.setAttributedTitle(title, for: .normal)
-            productView.websiteButton.isHidden = false
-        }
-        else {
-            productView.websiteButton.setTitle(nil, for: .normal)
-            productView.websiteButton.isHidden = true
-        }
-    }
-    
-    // MARK: Actions
+    // MARK: Selection
     
     @objc func selectionButtonTouchUpInside() {
 //        guard let productView = productView else {
@@ -297,14 +272,16 @@ fileprivate extension ProductViewControllerProductView {
         
         selectedItem.resetBorderColor()
         
-        if selectedItem == selectionColorItem {
+        if selectedItem == productView.selectionColorItem {
             guard let variant = structuredProduct?.structuredColorVariant(forColor: selectedItem.selectedPickerItem) else {
                 return
             }
             
-            selectionSizeItem?.disabledPickerItems = structuredProduct?.subtractingSizes(of: variant)
+            productView.selectionSizeItem?.disabledPickerItems = structuredProduct?.subtractingSizes(of: variant)
         }
     }
+    
+    // MARK: Cart
     
     @objc func cartButtonAction() {
         guard let productView = productView else {
@@ -320,7 +297,25 @@ fileprivate extension ProductViewControllerProductView {
         }
         
         if errorItems.isEmpty {
-            // TODO: do stuff
+            func updateCart() {
+                guard let variant = selectedVariant() else {
+                    return
+                }
+                
+                let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
+                
+                cart?.update(variant: variant, quantity: Int16(quantity))
+            }
+            
+            if let cart = cart {
+                updateCart()
+            }
+            else {
+                ShoppingCartModel.shared.getAddableCart().then(execute: { cart -> Void in
+                    self.cart = cart
+                    updateCart()
+                })
+            }
         }
         else {
             func displayErrorItems() {
@@ -356,20 +351,39 @@ fileprivate extension ProductViewControllerProductView {
     }
     
     @objc func buyButtonAction() {
-//        guard let productView = productView else {
-//            return
-//        }
-        
         // TODO:
+    }
+    
+    // MARK: Web
+    
+    func setWebsiteMerchant(_ merchant: String?) {
+        guard let productView = productView else {
+            return
+        }
+        
+        if let name = merchant, !name.isEmpty {
+            let color = productView.websiteButton.titleColor(for: .normal) ?? .crazeGreen
+            
+            let title = NSAttributedString(string: "product.website".localized(withFormat: name), attributes: [
+                NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
+                NSUnderlineColorAttributeName: color,
+                NSForegroundColorAttributeName: color,
+                NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFontWeightBold)
+                ])
+            
+            productView.websiteButton.setAttributedTitle(title, for: .normal)
+            productView.websiteButton.isHidden = false
+        }
+        else {
+            productView.websiteButton.setTitle(nil, for: .normal)
+            productView.websiteButton.isHidden = true
+        }
     }
     
     @objc func pushMerchantURL() {
         let url: String?
         
-        if let color = selectionColorItem?.selectedPickerItem,
-            let size = selectionSizeItem?.selectedPickerItem,
-            let variantUrl = structuredProduct?.variant(forColor: color, size: size)?.url
-        {
+        if let variantUrl = selectedVariant()?.url {
             url = variantUrl
         }
         else {
@@ -398,7 +412,6 @@ fileprivate extension ProductViewControllerStructuredProduct {
         }
         
         let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors, selectedPickerItem: structuredProduct.product.color)
-        selectionColorItem = colorItem
         
         var sizeItem: SegmentedDropDownItem? = nil
         
@@ -408,13 +421,17 @@ fileprivate extension ProductViewControllerStructuredProduct {
             if colorItem.selectedPickerItem == nil {
                 sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
             }
-            
-            selectionSizeItem = sizeItem
         }
         
         productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         
         repositionScrollView()
+    }
+    
+    func selectedVariant() -> Variant? {
+        let color = productView?.selectionColorItem?.selectedPickerItem
+        let size = productView?.selectionSizeItem?.selectedPickerItem
+        return structuredProduct?.variant(forColor: color, size: size)
     }
 }
 
@@ -428,44 +445,32 @@ extension ProductViewControllerCart {
 
 extension ProductViewController : UIScrollViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        guard let productView = productView else {
-            return
-        }
-        
-        if scrollView == productView.galleryScrollView {
+        if scrollView == productView?.galleryScrollView {
             if !decelerate {
-                productView.pageControl.currentPage = currentPage
+                productView?.pageControl.currentPage = currentPage
             }
         }
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        guard let productView = productView else {
-            return
-        }
-        
-        if scrollView == productView.galleryScrollView {
-            productView.pageControl.currentPage = currentPage
+        if scrollView == productView?.galleryScrollView {
+            productView?.pageControl.currentPage = currentPage
         }
     }
     
     fileprivate func repositionScrollView() {
-        guard let productView = productView else {
-            return
-        }
-        
         view.layoutIfNeeded()
         
         let y: CGFloat = {
             if #available(iOS 11.0, *) {
-                return productView.scrollView.adjustedContentInset.top
+                return productView?.scrollView.adjustedContentInset.top ?? 0
             }
             else {
                 return navigationController?.navigationBar.frame.maxY ?? 0
             }
         }()
         
-        productView.scrollView.contentOffset = CGPoint(x: 0, y: -y)
+        productView?.scrollView.contentOffset = CGPoint(x: 0, y: -y)
     }
 }
 

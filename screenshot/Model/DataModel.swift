@@ -133,6 +133,14 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?, cart: Cart) -> FetchedResultsControllerManager<CartItem>  {
+        let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        request.predicate = NSPredicate(format: "cart == %@", cart)
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
 }
 
 extension DataModel {

@@ -7,10 +7,24 @@
 //
 
 import UIKit
+import CoreData
 
 class CartViewController: BaseViewController {
     fileprivate let tableView = UITableView()
-    fileprivate let tableFooterView = UIView()
+    
+    fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
+    
+    fileprivate lazy var formatter: NumberFormatter = {
+        let localeIdentifier = Locale.identifier(fromComponents: [
+            NSLocale.Key.currencyCode.rawValue: "USD",
+            NSLocale.Key.languageCode.rawValue: "en"
+            ])
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter
+    }()
     
     // MARK: Life Cycle
     
@@ -21,6 +35,14 @@ class CartViewController: BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
+        ShoppingCartModel.shared.getAddableCart().then(execute: { cart -> Void in
+            self.cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self, cart: cart)
+            
+            if self.isViewLoaded {
+                self.tableView.reloadData()
+            }
+        })
+        
         restorationIdentifier = String(describing: type(of: self))
         
         addNavigationItemLogo()
@@ -29,16 +51,11 @@ class CartViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableFooterView.translatesAutoresizingMaskIntoConstraints = false
-        tableFooterView.backgroundColor = .red
-        tableFooterView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorInset = .zero
-        tableView.tableFooterView = tableFooterView
         tableView.allowsSelection = false
         tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
         view.addSubview(tableView)
@@ -51,19 +68,21 @@ class CartViewController: BaseViewController {
 
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return cartItemFrc?.fetchedObjectsCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? CartTableViewCell {
+        if let cell = cell as? CartTableViewCell, let cartItem =  cartItemFrc?.object(at: indexPath) {
+            
+            
             cell.productImageView.backgroundColor = .red
             cell.titleLabel.text = "Anthropologie Tweed Long-Sleeve"
-            cell.priceLabel.text = "$85"
-            cell.quantity = (indexPath.row == 1) ? 2 : 1
-            cell.color = (indexPath.row > 0) ? "Green" : nil
-            cell.size = (indexPath.row == 2) ? "M" : nil
+            cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
+            cell.quantity = Double(cartItem.quantity)
+            cell.color = cartItem.color
+            cell.size = cartItem.size
         }
         
         return cell
@@ -72,4 +91,12 @@ extension CartViewController: UITableViewDataSource {
 
 extension CartViewController: UITableViewDelegate {
     
+}
+
+extension CartViewController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        if isViewLoaded {
+            change.applyChanges(tableView: tableView)
+        }
+    }
 }

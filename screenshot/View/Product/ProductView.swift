@@ -10,6 +10,7 @@ import UIKit
 
 class ProductView: UIView {
     let scrollView = UIScrollView()
+    
     let galleryScrollView = UIScrollView()
     let galleryScrollContentView = UIView()
     let pageControl = UIPageControl()
@@ -18,11 +19,14 @@ class ProductView: UIView {
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
+    let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
+    fileprivate(set) var selectionColorItem: SegmentedDropDownItem?
+    fileprivate(set) var selectionSizeItem: SegmentedDropDownItem?
+    fileprivate(set) var selectionQuantityItem: SegmentedDropDownItem?
     let cartButton = MainButton()
 //    let buyButton = MainButton()
-    let websiteButton = UIButton()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -205,5 +209,8 @@ class ProductView: UIView {
         items.append(quantityItem)
         
         selectionControl.items = items
+        selectionColorItem = colorItem
+        selectionSizeItem = sizeItem
+        selectionQuantityItem = quantityItem
     }
 }
