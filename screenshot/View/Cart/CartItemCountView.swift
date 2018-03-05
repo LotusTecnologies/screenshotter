@@ -1,5 +1,5 @@
 //
-//  CartTableHeaderView.swift
+//  CartItemCountView.swift
 //  screenshot
 //
 //  Created by Corey Werner on 3/5/18.
