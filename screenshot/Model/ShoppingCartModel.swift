@@ -115,6 +115,45 @@ class ShoppingCartModel {
         }
     }
     
+    public func checkout() -> Promise<NSDictionary> {
+        // Get cart purchase data. Error if cart not previously created.
+        let dataModel = DataModel.sharedInstance
+        return firstly {
+            dataModel.retrieveForCheckout()
+        }
+        // Wait for network to get remoteId if not previously available.
+            .then { purchaseJsonObject, cartOID -> Promise<[String : Any]> in
+                if let remoteId = purchaseJsonObject["id"] as? String,
+                  !remoteId.isEmpty {
+                    let items = purchaseJsonObject["items"] as? [[String : Any]]
+                    print("ShoppingCartModel checkout successfully got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
+                    return Promise(value: purchaseJsonObject)
+                } else {
+                    return NetworkingPromise.sharedInstance.createCart().then { dict -> Promise<[String : Any]> in
+                        if let cartInfo = dict["cart"] as? [String : Any],
+                          let remoteId = cartInfo["id"] as? String,
+                          !remoteId.isEmpty {
+                            DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
+                            var completeJsonObject = purchaseJsonObject
+                            completeJsonObject["id"] = remoteId
+                            let items = completeJsonObject["items"] as? [[String : Any]]
+                            print("ShoppingCartModel checkout finally got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
+                            return Promise(value: completeJsonObject)
+                        } else {
+                            print("ShoppingCartModel checkout failed to extract remoteId from dict:\(dict)")
+                            let error = NSError(domain: "Craze", code: 40, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel checkout failed to extract remoteId"])
+                            return Promise(error: error)
+                        }
+                    }
+                }
+        }
+        // Wait for network to add items to remoteId.
+            .then { jsonObject -> Promise<NSDictionary> in
+                return NetworkingPromise.sharedInstance.checkoutCart(jsonObject: jsonObject)
+        }
+        // Process cart checkout network response.
+    }
+    
     // MARK: Helper
     
     // Deletes variants if older than, say, an hour.

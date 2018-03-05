@@ -445,7 +445,7 @@ extension DataModel {
         return variantToSave
     }
     
-    func retrieveOrCreateAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
+    func retrieveAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
         let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
@@ -456,20 +456,63 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             if let mostRecentAddableCart = results.first {
                 return mostRecentAddableCart
-            } else {
-                let cartToSave = Cart(context: managedObjectContext)
-                cartToSave.dateModified = NSDate()
-                try managedObjectContext.save()
-                ShoppingCartModel.shared.addRemoteId(cartOID: cartToSave.objectID)
-                return cartToSave
             }
         } catch {
             self.receivedCoreDataError(error: error)
-            print("retrieveOrCreateAddableCart results with error:\(error)")
+            print("retrieveAddableCart results with error:\(error)")
         }
         return nil
     }
+    
+    func retrieveOrCreateAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
+        if let mostRecentAddableCart = retrieveAddableCart(managedObjectContext: managedObjectContext) {
+            return mostRecentAddableCart
+        } else {
+            do {
+                let cartToSave = Cart(context: managedObjectContext)
+                cartToSave.dateModified = NSDate()
+                try managedObjectContext.save()
+                // Return quickly; add remoteId leisurely.
+                ShoppingCartModel.shared.addRemoteId(cartOID: cartToSave.objectID)
+                return cartToSave
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("retrieveOrCreateAddableCart results with error:\(error)")
+            }
+            return nil
+        }
+    }
 
+    // Errors if cart not previously created. Okay if cart has no remoteId.
+    func retrieveForCheckout() -> Promise<([String : Any], NSManagedObjectID)> {
+        return Promise { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                guard let cart = self.retrieveAddableCart(managedObjectContext: managedObjectContext),
+                  let items = cart.items?.sortedArray(using: []) as? [CartItem],
+                  items.count > 0 else {
+                    let error = NSError(domain: "Craze", code: 38, userInfo: [NSLocalizedDescriptionKey : "No cart with cartItems before checkout."])
+                    reject(error)
+                    return
+                }
+                var purchaseItems: [[String : Any]] = []
+                for item in items {
+                    let quantity = item.quantity
+                    if let sku = item.sku,
+                        !sku.isEmpty,
+                        quantity > 0 {
+                        purchaseItems.append(["sku" : sku, "qty" : quantity])
+                    }
+                }
+                guard purchaseItems.count > 0 else {
+                    let error = NSError(domain: "Craze", code: 39, userInfo: [NSLocalizedDescriptionKey : "No cartItems with sku and positive quantity to checkout."])
+                    reject(error)
+                    return
+                }
+                fulfill((["id" : cart.remoteId ?? "", "items" : purchaseItems], cart.objectID))
+            }
+        }
+    }
+    
     func add(remoteId: String, toCartOID: NSManagedObjectID) {
         performBackgroundTask { (managedObjectContext) in
             do {

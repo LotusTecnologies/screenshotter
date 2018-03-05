@@ -307,16 +307,7 @@ class NetworkingPromise : NSObject {
         return promise
     }
     
-    func checkoutCart(_ cart: Cart) -> Promise<NSDictionary> {
-        guard let remoteId = cart.remoteId else {
-            let error = NSError(domain: "Craze", code: 35, userInfo: [NSLocalizedDescriptionKey: "No remoteId on cart with oid:\(cart.objectID)"])
-            return Promise(error: error)
-        }
-        guard let items = cart.items?.sortedArray(using: []) as? [CartItem],
-          items.count > 0 else {
-            let error = NSError(domain: "Craze", code: 36, userInfo: [NSLocalizedDescriptionKey: "No items in cart with oid:\(cart.objectID)"])
-            return Promise(error: error)
-        }
+    func checkoutCart(jsonObject: [String : Any]) -> Promise<NSDictionary> {
         guard let url = URL(string: Constants.shoppableDomain + "/cart/put/bundling") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form cart bundle url from shoppableDomain:\(Constants.shoppableDomain)"])
             return Promise(error: error)
@@ -325,10 +316,6 @@ class NetworkingPromise : NSObject {
         request.httpMethod = "POST"
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        // TODO: GMK Handle nil sku.
-        let skuQuantity = items.flatMap({["sku" : $0.sku ?? "", "qty" : $0.quantity]})
-        let jsonObject: [String : Any] = ["id" : remoteId,
-                                          "items" : skuQuantity]
         request.httpBody = jsonDatafy(object: jsonObject)
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
