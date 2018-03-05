@@ -56,7 +56,7 @@ class CartViewController: BaseViewController {
         tableView.separatorInset = .zero
         tableView.allowsSelection = false
         tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
-        tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
+//        tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -96,10 +96,17 @@ extension CartViewController: UITableViewDataSource {
         return count
     }
     
+    func generate() -> CartTableViewCell { // TODO: rename
+        let cell = CartTableViewCell(style: .default, reuseIdentifier: "cell")
+        cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(_:)), for: .touchUpInside)
+        cell.quantityStepper.addTarget(self, action: #selector(cartItemQuantityChanged(_:)), for: .valueChanged)
+        return cell
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as? CartTableViewCell ?? generate()
         
-        if let cell = cell as? CartTableViewCell, let cartItem = cartItemFrc?.object(at: indexPath) {
+        if let cartItem = cartItemFrc?.object(at: indexPath) {
             let url = URL(string: cartItem.imageURL ?? "")
             cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
             
@@ -108,10 +115,6 @@ extension CartViewController: UITableViewDataSource {
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
             cell.size = cartItem.size
-            
-            // TODO: only set on cell creation
-            cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(_:)), for: .touchUpInside)
-            cell.quantityStepper.addTarget(self, action: #selector(cartItemQuantityChanged(_:)), for: .valueChanged)
         }
         
         return cell

@@ -22,6 +22,7 @@ class ProductViewController : BaseViewController {
     fileprivate var productEmptyView: UIView?
     fileprivate var loadingView: Loader?
     
+    fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
     
     // MARK: Life Cycle
@@ -43,14 +44,16 @@ class ProductViewController : BaseViewController {
                 self.state = .empty
         }
         
+        cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
+        
         cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCart))
-        cartBarButtonItem?.count = 0 // TODO:
         navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         syncState()
+        syncCartItemCount()
     }
     
     // MARK: State
@@ -409,10 +412,14 @@ fileprivate extension ProductViewControllerStructuredProduct {
 }
 
 typealias ProductViewControllerCart = ProductViewController
-extension ProductViewControllerCart {
-    @objc fileprivate func presentCart() {
+fileprivate extension ProductViewControllerCart {
+    @objc func presentCart() {
         let navigationController = ModalNavigationController(rootViewController: CartViewController())
         present(navigationController, animated: true, completion: nil)
+    }
+    
+    func syncCartItemCount() {
+        cartBarButtonItem?.count = UInt(cartItemFrc?.fetchedObjectsCount ?? 0)
     }
 }
 
@@ -453,6 +460,12 @@ extension ProductViewController : UIScrollViewDelegate {
         }()
         
         productView?.scrollView.contentOffset = CGPoint(x: 0, y: -y)
+    }
+}
+
+extension ProductViewController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        syncCartItemCount()
     }
 }
 
