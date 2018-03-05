@@ -133,10 +133,10 @@ extension DataModel {
         return fetchedResultsController
     }
     
-    func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?, cart: Cart) -> FetchedResultsControllerManager<CartItem>  {
+    func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<CartItem>  {
         let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        request.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
         request.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
-        request.predicate = NSPredicate(format: "cart == %@", cart)
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
@@ -445,32 +445,29 @@ extension DataModel {
         return variantToSave
     }
     
-    func retrieveOrCreateAddableCart() -> Promise<NSManagedObjectID> {
-        return Promise { fulfill, reject in
-            performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
-                fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
-                fetchRequest.fetchBatchSize = 1
-                fetchRequest.fetchLimit = 1
-                
-                do {
-                    let results = try managedObjectContext.fetch(fetchRequest)
-                    if let mostRecentAddableCart = results.first {
-                        fulfill(mostRecentAddableCart.objectID)
-                    } else {
-                        let cartToSave = Cart(context: managedObjectContext)
-                        cartToSave.dateModified = NSDate()
-                        try managedObjectContext.save()
-                        fulfill(cartToSave.objectID)
-                    }
-                } catch {
-                    self.receivedCoreDataError(error: error)
-                    print("retrieveOrCreateAddableCart results with error:\(error)")
-                    reject(error)
-                }
+    func retrieveOrCreateAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
+        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        fetchRequest.fetchBatchSize = 1
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let mostRecentAddableCart = results.first {
+                return mostRecentAddableCart
+            } else {
+                let cartToSave = Cart(context: managedObjectContext)
+                cartToSave.dateModified = NSDate()
+                try managedObjectContext.save()
+                ShoppingCartModel.shared.addRemoteId(cartOID: cartToSave.objectID)
+                return cartToSave
             }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveOrCreateAddableCart results with error:\(error)")
         }
+        return nil
     }
 
     func add(remoteId: String, toCartOID: NSManagedObjectID) {

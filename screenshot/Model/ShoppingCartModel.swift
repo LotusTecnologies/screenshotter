@@ -42,23 +42,56 @@ class ShoppingCartModel {
         }
     }
     
-    func getAddableCart() -> Promise<Cart> {
+    public func update(variant: Variant, quantity: Int16) {
+        let variantOID = variant.objectID
         let dataModel = DataModel.sharedInstance
-        return firstly {
-            return dataModel.retrieveOrCreateAddableCart()
-            }.then { cartOID -> Promise<Cart> in // Must be on main thread.
-                guard let cart = dataModel.mainMoc().object(with: cartOID) as? Cart else {
-                    let error = NSError(domain: "Craze", code: 34, userInfo: [NSLocalizedDescriptionKey : "getAddableCart failed to instantiate cart from objectID:\(cartOID)"])
-                    return Promise(error: error)
-                }
-                if let remoteId = cart.remoteId,
-                  !remoteId.isEmpty {
-                    // Do nothing.
-                } else {
-                    // Return the cart right away, but also kick off networking to request a remoteId.
-                    self.addRemoteId(cartOID: cartOID)
-                }
-                return Promise(value: cart)
+        dataModel.performBackgroundTask { managedObjectContext in
+            guard let cart = dataModel.retrieveOrCreateAddableCart(managedObjectContext: managedObjectContext) else {
+                print("Failed to retrieve addable cart")
+                return
+            }
+            guard let variantToCopy = managedObjectContext.object(with: variantOID) as? Variant else {
+                print("Failed to retrieve variant with OID:\(variantOID)")
+                return
+            }
+            let cartItem: CartItem
+            if let sku = variantToCopy.sku,
+                !sku.isEmpty,
+                let item = cart.items?.filtered(using: NSPredicate(format: "sku == %@", sku)).firstObject as? CartItem {
+                cartItem = item
+            } else {
+                cartItem = CartItem(context: managedObjectContext)
+            }
+            cartItem.color = variantToCopy.color
+            cartItem.imageURL = variantToCopy.imageURLs?.components(separatedBy: ",").first
+            cartItem.retailPrice = variantToCopy.retailPrice
+            cartItem.size = variantToCopy.size
+            cartItem.sku = variantToCopy.sku
+            cartItem.url = variantToCopy.url
+            cartItem.productDescription = variantToCopy.product?.productDescription
+            cartItem.quantity = quantity
+            cartItem.dateModified = NSDate()
+            cartItem.cart = cart
+            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+        }
+    }
+    
+    public func remove(item: CartItem) {
+        let cartItemOID = item.objectID
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { managedObjectContext in
+            guard let cartItem = managedObjectContext.object(with: cartItemOID) as? CartItem else {
+                print("ShoppingCartModel failed to retrieve cartItem with OID:\(cartItemOID)")
+                return
+            }
+            do {
+                try cartItem.validateForUpdate()
+                managedObjectContext.delete(cartItem)
+                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            } catch {
+                dataModel.receivedCoreDataError(error: error)
+                print("ShoppingCartModel remove item with OID:\(cartItemOID) results with error:\(error)")
+            }
         }
     }
     
@@ -158,71 +191,6 @@ class ShoppingCartModel {
             }
             DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
         }
-    }
-    
-}
-
-
-extension Cart {
-    
-    // TODO: GMK better error solution than print, return.
-    public func update(variant: Variant, quantity: Int16) {
-        let cartOID = self.objectID
-        let variantOID = variant.objectID
-        let dataModel = DataModel.sharedInstance
-        dataModel.performBackgroundTask { managedObjectContext in
-            guard let cart = managedObjectContext.object(with: cartOID) as? Cart else {
-                print("Failed to retrieve cart with cartOID:\(cartOID)")
-                return
-            }
-            guard let variantToCopy = managedObjectContext.object(with: variantOID) as? Variant else {
-                print("Failed to retrieve variant with variantOID:\(variantOID)")
-                return
-            }
-            let cartItem: CartItem
-            if let sku = variantToCopy.sku,
-              !sku.isEmpty,
-              let item = cart.locateItem(sku: sku) {
-                cartItem = item
-            } else {
-                cartItem = CartItem(context: managedObjectContext)
-            }
-            cartItem.color = variantToCopy.color
-            cartItem.imageURL = variantToCopy.imageURLs?.components(separatedBy: ",").first
-            cartItem.retailPrice = variantToCopy.retailPrice
-            cartItem.size = variantToCopy.size
-            cartItem.sku = variantToCopy.sku
-            cartItem.url = variantToCopy.url
-            cartItem.productDescription = variantToCopy.product?.productDescription
-            cartItem.quantity = quantity
-            cartItem.dateModified = NSDate()
-            cartItem.cart = cart
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
-        }
-    }
-    
-    // TODO: GMK better error solution than print, return.
-    public func remove(item: CartItem) {
-        let cartOID = self.objectID
-        let cartItemOID = item.objectID
-        let dataModel = DataModel.sharedInstance
-        dataModel.performBackgroundTask { managedObjectContext in
-            guard let cartItem = managedObjectContext.object(with: cartItemOID) as? CartItem else {
-                print("Cart.remove failed to retrieve cartItem with cartItemOID:\(cartItemOID)")
-                return
-            }
-            guard let itemCartOID = cartItem.cart?.objectID,
-              itemCartOID == cartOID else {
-                print("Cart.remove item.cart oid mismatched cartOID:\(cartOID)")
-                return
-            }
-            managedObjectContext.delete(cartItem)
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
-        }
-    }
-    
-    func locateItem(sku: String) -> CartItem? {
-        return items?.filtered(using: NSPredicate(format: "sku == %@", sku)).firstObject as? CartItem
     }
     
 }

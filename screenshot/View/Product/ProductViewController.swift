@@ -23,7 +23,6 @@ class ProductViewController : BaseViewController {
     fileprivate var loadingView: Loader?
     
     fileprivate var structuredProduct: StructuredProduct?
-    fileprivate var cart: Cart?
     
     // MARK: Life Cycle
     
@@ -283,25 +282,13 @@ fileprivate extension ProductViewControllerProductView {
         }
         
         if errorItems.isEmpty {
-            func updateCart() {
-                guard let variant = selectedVariant() else {
-                    return
-                }
-                
-                let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
-                
-                cart?.update(variant: variant, quantity: Int16(quantity))
+            guard let variant = selectedVariant() else {
+                return
             }
             
-            if let cart = cart {
-                updateCart()
-            }
-            else {
-                ShoppingCartModel.shared.getAddableCart().then(execute: { cart -> Void in
-                    self.cart = cart
-                    updateCart()
-                })
-            }
+            let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
+            
+            ShoppingCartModel.shared.update(variant: variant, quantity: Int16(quantity))
         }
         else {
             func displayErrorItems() {

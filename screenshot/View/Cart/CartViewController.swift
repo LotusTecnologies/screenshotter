@@ -13,7 +13,6 @@ class CartViewController: BaseViewController {
     fileprivate let tableView = TableView()
     private let emptyListView = HelperView()
     
-    fileprivate var cart: Cart?
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     
     fileprivate lazy var formatter: NumberFormatter = {
@@ -37,14 +36,7 @@ class CartViewController: BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        ShoppingCartModel.shared.getAddableCart().then(execute: { cart -> Void in
-            self.cart = cart
-            self.cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self, cart: cart)
-            
-            if self.isViewLoaded {
-                self.tableView.reloadData()
-            }
-        })
+        cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
         
         restorationIdentifier = String(describing: type(of: self))
         
@@ -97,7 +89,7 @@ extension CartViewController: UITableViewDataSource {
     
     func tableView(removeCellForRowAt indexPath: IndexPath) {
         if let cartItem = cartItemFrc?.object(at: indexPath) {
-            cart?.remove(item: cartItem)
+            ShoppingCartModel.shared.remove(item: cartItem)
         }
     }
 }
