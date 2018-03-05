@@ -1288,6 +1288,10 @@ extension Product {
         return altImageURLs?.components(separatedBy: ",").flatMap {URL(string: $0)} ?? []
     }
     
+    func productTitle() -> String? {
+        return productDescription?.productTitle()
+    }
+    
 }
 
 extension Matchstick {
@@ -1364,10 +1368,24 @@ extension Matchstick {
     
 }
 
+extension CartItem {
+    
+    func productTitle() -> String? {
+        return productDescription?.productTitle()
+    }
+    
+}
+
 extension NSFetchedResultsController {
     var fetchedObjectsCount:Int {
         get {
             return sections?.reduce(0, {$0 + $1.numberOfObjects}) ?? 0
         }
+    }
+}
+
+fileprivate extension String {
+    func productTitle() -> String? {
+        return split(separator: ",").dropLast().joined(separator: ",")
     }
 }

@@ -472,7 +472,7 @@ fileprivate extension ProductViewController {
                 return
             }
             
-            title = generateTitle(product)
+            title = product.productTitle()
             
             var structuredColorVariantsDict: [String : StructuredColorVariant] = [:]
             var colors: Set<String> = Set()
@@ -511,10 +511,6 @@ fileprivate extension ProductViewController {
                 
                 return aIndex < bIndex
             })
-        }
-        
-        func generateTitle(_ product: Product) -> String? {
-            return product.productDescription?.split(separator: ",").dropLast().joined(separator: ",")
         }
         
         func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
