@@ -244,24 +244,6 @@ class NetworkingPromise : NSObject {
         return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {self.downloadProducts(url: url)})
     }
     
-    func downloadImage(url: URL, screenshotDict: [String : Any]) -> Promise<(Data, [String : Any])> {
-        return Promise { fulfill, reject in
-            let request = URLRequest(url: url)
-            let session = URLSession.shared
-            let dataTask = session.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    reject(error)
-                } else if let data = data {
-                    fulfill(data, screenshotDict)
-                } else {
-                    let error = NSError(domain: "Craze", code: 6, userInfo: [NSLocalizedDescriptionKey: "downloadImage unknown error"])
-                    reject(error)
-                }
-            }
-            dataTask.resume()
-        }
-    }
-    
     func nextMatchsticks() -> Promise<NSDictionary> {
         let syncTokenParam: String
         if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
