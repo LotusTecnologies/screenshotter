@@ -77,6 +77,25 @@ class ShoppingCartModel {
         }
     }
     
+    public func update(cartItem: CartItem, quantity: Int16) {
+        let cartItemOID = cartItem.objectID
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { managedObjectContext in
+            do {
+                guard let cartItemToUpdate = managedObjectContext.object(with: cartItemOID) as? CartItem else {
+                    print("On update, failed to retrieve cartItem with OID:\(cartItemOID)")
+                    return
+                }
+                try cartItemToUpdate.validateForUpdate()
+                cartItemToUpdate.quantity = quantity
+                try managedObjectContext.save()
+            } catch {
+                dataModel.receivedCoreDataError(error: error)
+                print("update cartItem:\(cartItemOID) results with error:\(error)")
+            }
+        }
+    }
+    
     public func remove(item: CartItem) {
         let cartItemOID = item.objectID
         let dataModel = DataModel.sharedInstance
