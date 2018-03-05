@@ -38,7 +38,7 @@ class AccumulatorModel: NSObject {
 
 class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
     let assetId: String
-    let imageData: Data?
+    var imageData: Data?
     init(assetId: String, imageData: Data?) {
         self.assetId = assetId
         self.imageData = imageData
@@ -146,6 +146,7 @@ class AssetSyncModel: NSObject {
                         self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
                     } else { // Screenshot taken while app in background (or killed)
                         AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
+                        self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
                         self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
                     }
                 }
