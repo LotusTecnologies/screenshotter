@@ -108,7 +108,10 @@ extension CartViewController: UITableViewDataSource {
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
             cell.size = cartItem.size
-            cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(button:)), for: .touchUpInside)
+            
+            // TODO: only set on cell creation
+            cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(_:)), for: .touchUpInside)
+            cell.quantityStepper.addTarget(self, action: #selector(cartItemQuantityChanged(_:)), for: .valueChanged)
         }
         
         return cell
@@ -142,7 +145,19 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
 
 typealias CartViewControllerCartItem = CartViewController
 fileprivate extension CartViewControllerCartItem {
-    @objc func cartItemRemoveAction(button: UIButton) {
+    @objc func cartItemQuantityChanged(_ stepper: UIStepper) {
+        let position: CGPoint = stepper.convert(.zero, to: tableView)
+        
+        guard let indexPath = tableView.indexPathForRow(at: position) else {
+            return
+        }
+        
+        let cartItem = cartItemFrc?.object(at: indexPath)
+        let quantity = Int16(stepper.value)
+//        ShoppingCartModel.shared.update(cartItem: cartItem, quantity: quantity)
+    }
+    
+    @objc func cartItemRemoveAction(_ button: UIButton) {
         let position: CGPoint = button.convert(.zero, to: tableView)
         
         if let indexPath = tableView.indexPathForRow(at: position) {

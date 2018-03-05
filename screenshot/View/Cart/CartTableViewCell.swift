@@ -13,7 +13,7 @@ class CartTableViewCell: UITableViewCell {
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let removeButton = UIButton()
-    fileprivate let quantityStepper = UIStepper()
+    let quantityStepper = UIStepper()
     fileprivate var quantityValueLabel: UILabel?
     fileprivate var colorValueLabel: UILabel?
     fileprivate var sizeValueLabel: UILabel?
@@ -168,7 +168,6 @@ class CartTableViewCell: UITableViewCell {
         quantityStepper.minimumValue = 1
         quantityStepper.maximumValue = Double(Constants.cartItemMaxQuantity)
         quantityStepper.tintColor = .crazeGreen
-        quantityStepper.addTarget(self, action: #selector(quantityChanged(_:)), for: .valueChanged)
         mainView.addSubview(quantityStepper)
         quantityStepper.leadingAnchor.constraint(equalTo: quantityValueLabel.trailingAnchor).isActive = true
         quantityStepper.trailingAnchor.constraint(equalTo: variantDataPositionView.trailingAnchor).isActive = true
@@ -282,8 +281,4 @@ class CartTableViewCell: UITableViewCell {
     
     private var hideColorLabelConstraint: NSLayoutConstraint?
     private var hideSizeLabelConstraint: NSLayoutConstraint?
-    
-    @objc fileprivate func quantityChanged(_ stepper: UIStepper) {
-        self.quantityValueLabel?.text = "\(Int(stepper.value))"
-    }
 }

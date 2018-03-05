@@ -21,7 +21,7 @@ class CartCheckoutView: UIView {
         
         checkoutButton.translatesAutoresizingMaskIntoConstraints = false
         checkoutButton.backgroundColor = .crazeGreen
-        checkoutButton.setTitle("Checkout", for: .normal)
+        checkoutButton.setTitle("cart.checkout.title".localized, for: .normal)
         addSubview(checkoutButton)
         checkoutButton.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
         checkoutButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
