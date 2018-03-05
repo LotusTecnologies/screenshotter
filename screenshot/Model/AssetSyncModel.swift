@@ -38,7 +38,7 @@ class AccumulatorModel: NSObject {
 
 class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
     let assetId: String
-    let imageData: Data?
+    var imageData: Data?
     init(assetId: String, imageData: Data?) {
         self.assetId = assetId
         self.imageData = imageData
@@ -146,6 +146,7 @@ class AssetSyncModel: NSObject {
                         self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
                     } else { // Screenshot taken while app in background (or killed)
                         AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
+                        self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
                         self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
                     }
                 }
@@ -322,12 +323,12 @@ class AssetSyncModel: NSObject {
                 // Download image from Syte S3.
                 guard let share = jsonDict["share"] as? [String : Any],
                   let screenshotDict = share["screenshot"] as? [String : Any],
-                  let imageURLString = screenshotDict["image"] as? String,
-                  let imageURL = URL(string: imageURLString) else {
+                  let imageURLString = screenshotDict["image"] as? String
+                    else {
                         let imageURLError = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey : "Could not form image URL from jsonDict:\(jsonDict)"])
                         return Promise(error: imageURLError)
                 }
-                return NetworkingPromise.sharedInstance.downloadImage(url: imageURL, screenshotDict: screenshotDict)
+                return when(fulfilled:  NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURLString), Promise.init(value: screenshotDict))
             }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
                 // Save screenshot to db.
                 return dataModel.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
