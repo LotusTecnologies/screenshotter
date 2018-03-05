@@ -137,11 +137,11 @@ fileprivate class RatingFlowController : NSObject {
     
     func prompt(force: Bool = false, inViewController viewController: UIViewController) {
         guard force == false else {
-            EggRating.promptRateUs(viewController: viewController)
+            EggRating.promptRateUs(in: viewController)
             return
         }
 
-        EggRating.promptRateUsIfNeeded(viewController: viewController)
+        EggRating.promptRateUsIfNeeded(in: viewController)
     }
 }
 
