@@ -204,8 +204,8 @@ class ProductView: UIView {
             items.append(sizeItem)
         }
         
-        // TODO: keep this value synced with the CartViewController stepper.maxValue
-        let quantityItem = SegmentedDropDownItem(pickerItems: (1...10).map { "\($0)" }, selectedPickerItem: "1")
+        let quantityRange = (1...Constants.cartItemMaxQuantity)
+        let quantityItem = SegmentedDropDownItem(pickerItems: quantityRange.map { "\($0)" }, selectedPickerItem: "1")
         items.append(quantityItem)
         
         selectionControl.items = items

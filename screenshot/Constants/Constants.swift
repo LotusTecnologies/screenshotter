@@ -20,6 +20,9 @@ class Constants {
     // DB
     static let currentMomVersion = 10
     
+    // Cart
+    static let cartItemMaxQuantity = 10
+    
     // Syte
     static let syteAccountId = 6677
     static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="
