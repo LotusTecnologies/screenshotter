@@ -71,8 +71,28 @@ class ShoppingCartModel {
             cartItem.productDescription = variantToCopy.product?.productDescription
             cartItem.quantity = quantity
             cartItem.dateModified = NSDate()
+            cartItem.product = variantToCopy.product
             cartItem.cart = cart
             dataModel.saveMoc(managedObjectContext: managedObjectContext)
+        }
+    }
+    
+    public func update(cartItem: CartItem, quantity: Int16) {
+        let cartItemOID = cartItem.objectID
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { managedObjectContext in
+            do {
+                guard let cartItemToUpdate = managedObjectContext.object(with: cartItemOID) as? CartItem else {
+                    print("On update, failed to retrieve cartItem with OID:\(cartItemOID)")
+                    return
+                }
+                try cartItemToUpdate.validateForUpdate()
+                cartItemToUpdate.quantity = quantity
+                try managedObjectContext.save()
+            } catch {
+                dataModel.receivedCoreDataError(error: error)
+                print("update cartItem:\(cartItemOID) results with error:\(error)")
+            }
         }
     }
     
@@ -93,6 +113,45 @@ class ShoppingCartModel {
                 print("ShoppingCartModel remove item with OID:\(cartItemOID) results with error:\(error)")
             }
         }
+    }
+    
+    public func checkout() -> Promise<NSDictionary> {
+        // Get cart purchase data. Error if cart not previously created.
+        let dataModel = DataModel.sharedInstance
+        return firstly {
+            dataModel.retrieveForCheckout()
+        }
+        // Wait for network to get remoteId if not previously available.
+            .then { purchaseJsonObject, cartOID -> Promise<[String : Any]> in
+                if let remoteId = purchaseJsonObject["id"] as? String,
+                  !remoteId.isEmpty {
+                    let items = purchaseJsonObject["items"] as? [[String : Any]]
+                    print("ShoppingCartModel checkout successfully got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
+                    return Promise(value: purchaseJsonObject)
+                } else {
+                    return NetworkingPromise.sharedInstance.createCart().then { dict -> Promise<[String : Any]> in
+                        if let cartInfo = dict["cart"] as? [String : Any],
+                          let remoteId = cartInfo["id"] as? String,
+                          !remoteId.isEmpty {
+                            DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
+                            var completeJsonObject = purchaseJsonObject
+                            completeJsonObject["id"] = remoteId
+                            let items = completeJsonObject["items"] as? [[String : Any]]
+                            print("ShoppingCartModel checkout finally got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
+                            return Promise(value: completeJsonObject)
+                        } else {
+                            print("ShoppingCartModel checkout failed to extract remoteId from dict:\(dict)")
+                            let error = NSError(domain: "Craze", code: 40, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel checkout failed to extract remoteId"])
+                            return Promise(error: error)
+                        }
+                    }
+                }
+        }
+        // Wait for network to add items to remoteId.
+            .then { jsonObject -> Promise<NSDictionary> in
+                return NetworkingPromise.sharedInstance.checkoutCart(jsonObject: jsonObject)
+        }
+        // Process cart checkout network response.
     }
     
     // MARK: Helper
