@@ -167,6 +167,7 @@ class CartTableViewCell: UITableViewCell {
         quantityStepper.translatesAutoresizingMaskIntoConstraints = false
         quantityStepper.minimumValue = 1
         quantityStepper.maximumValue = Double(Constants.cartItemMaxQuantity)
+        quantityStepper.autorepeat = false
         quantityStepper.tintColor = .crazeGreen
         mainView.addSubview(quantityStepper)
         quantityStepper.leadingAnchor.constraint(equalTo: quantityValueLabel.trailingAnchor).isActive = true
