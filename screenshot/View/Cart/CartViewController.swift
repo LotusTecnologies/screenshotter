@@ -80,6 +80,8 @@ class CartViewController: BaseViewController {
         checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         checkoutView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        syncTotalPrice()
     }
 }
 
@@ -123,7 +125,7 @@ extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return numberOfItems == 0 ? 0 : 74
     }
-
+    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return itemCountView
     }
@@ -133,6 +135,7 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
             change.applyChanges(tableView: tableView, with: .fade)
+            syncTotalPrice()
         }
     }
 }
@@ -147,5 +150,15 @@ fileprivate extension CartViewControllerCartItem {
         }
         
         // TODO: analytic event for did tap remove
+    }
+    
+    func syncTotalPrice() {
+        var price: Double = 0
+        
+        cartItemFrc?.fetchedObjects.forEach({ cartItem in
+            price += Double(cartItem.retailPrice)
+        })
+        
+        checkoutView.price = formatter.string(from: NSNumber(value: price))
     }
 }

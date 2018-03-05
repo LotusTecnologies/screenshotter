@@ -29,7 +29,6 @@ class CartCheckoutView: UIView {
         checkoutButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
-        priceLabel.backgroundColor = .yellow
         priceLabel.textColor = .gray3
         priceLabel.textAlignment = .center
         priceLabel.minimumScaleFactor = 0.7
@@ -51,7 +50,18 @@ class CartCheckoutView: UIView {
     
     fileprivate func syncPrice() {
         if let price = price, !price.isEmpty {
-            priceLabel.text = "Total: \(price)"
+            let text = "cart.checkout.total".localized(withFormat: price)
+            let countRange = NSString(string: text).range(of: "\(price)")
+            
+            let fontLight = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
+            let fontMedium = UIFont.systemFont(ofSize: 22, weight: UIFontWeightMedium)
+            
+            let attributedString = NSMutableAttributedString(string: text, attributes: [
+                NSFontAttributeName: fontMedium
+                ])
+            attributedString.addAttribute(NSFontAttributeName, value: fontLight, range: countRange)
+            
+            priceLabel.attributedText = attributedString
         }
         else {
             priceLabel.text = nil
