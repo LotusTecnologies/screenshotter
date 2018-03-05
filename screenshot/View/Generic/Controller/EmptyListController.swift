@@ -24,7 +24,7 @@ class EmptyListController: NSObject {
     func didSetEmptyView(_ emptyView: UIView?, scrollView: UIScrollView) {
         if let emptyView = emptyView {
             emptyView.translatesAutoresizingMaskIntoConstraints = false
-            emptyView.isHidden = isEmptyViewHidden
+            emptyView.alpha = isEmptyViewHidden ? 0 : 1
             scrollView.insertSubview(emptyView, at: 0)
             emptyView.topAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.topAnchor).isActive = true
             emptyView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -53,13 +53,19 @@ class EmptyListController: NSObject {
         if height != previousContentHeight {
             if Int(height) == 0 && previousContentHeight > 0 {
                 isEmptyViewHidden = false
-                emptyView?.isHidden = false
                 scrollView.isScrollEnabled = false
+                
+                UIView.animate(withDuration: .defaultAnimationDuration, animations: {
+                    emptyView?.alpha = 1
+                })
             }
             else if height > 0 && Int(previousContentHeight) == 0 {
                 isEmptyViewHidden = true
-                emptyView?.isHidden = true
                 scrollView.isScrollEnabled = true
+                
+                UIView.animate(withDuration: .defaultAnimationDuration, animations: {
+                    emptyView?.alpha = 0
+                })
             }
         }
         

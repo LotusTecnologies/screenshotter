@@ -409,7 +409,7 @@ extension ScreenshotsViewController {
         }
         
         if (animated) {
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                 cellEditing()
                 // TODO:
                 ///     putting `removeDeleteButton` here instead of in the completion
@@ -519,7 +519,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                         screenshot.setHide()
                         self.removeScreenshotHelperView()
                         self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                        UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                             cell.selectedState = .disabled
                         })
                         AnalyticsTrackers.standard.track(.removedScreenshot)

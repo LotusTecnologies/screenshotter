@@ -25,7 +25,7 @@ class ShoppablesCollectionView: UICollectionView {
                     self.shoppableDelegate?.repositionShoppables()
                 } else {
                     self.layoutIfNeeded()
-                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                         self.shoppableDelegate?.repositionShoppables()
                     })
                 }

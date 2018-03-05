@@ -77,13 +77,13 @@ class TutorialVideoOverlayView : UIView {
     }
     
     func hideVolumeToggleButton() {
-        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
             self.volumeToggleButton.alpha = 0
         }
     }
     
     func showVolumeToggleButton() {
-        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
             self.volumeToggleButton.alpha = 1
         }
     }
@@ -92,7 +92,7 @@ class TutorialVideoOverlayView : UIView {
         replayPauseButton.isSelected = true
         replayPauseButton.alpha = 0
         
-        UIView.animateKeyframes(withDuration: Constants.defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
+        UIView.animateKeyframes(withDuration: .defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.33, animations: {
                 self.replayPauseButton.alpha = 1
             })
@@ -109,7 +109,7 @@ class TutorialVideoOverlayView : UIView {
             return
         }
         
-        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
             self.replayPauseButton.alpha = 1
         }
     }
@@ -119,7 +119,7 @@ class TutorialVideoOverlayView : UIView {
             return
         }
         
-        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
             self.replayPauseButton.alpha = 0
         }
     }
