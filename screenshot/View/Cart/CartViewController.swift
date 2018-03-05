@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 class CartViewController: BaseViewController {
-    fileprivate let tableView = TableView()
+    fileprivate let tableView = TableView(frame: .zero, style: .grouped)
     fileprivate let itemCountView = CartItemCountView()
     fileprivate let emptyListView = HelperView()
     
@@ -58,7 +58,6 @@ class CartViewController: BaseViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.tableFooterView = UIView() // Remove empty cell dividers
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorInset = .zero
         tableView.allowsSelection = false
@@ -81,7 +80,9 @@ extension CartViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return numberOfItems
+        let count = numberOfItems
+        itemCountView.itemCount = UInt(count)
+        return count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -111,7 +112,7 @@ extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return numberOfItems == 0 ? 0 : 74
     }
-    
+
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return itemCountView
     }
