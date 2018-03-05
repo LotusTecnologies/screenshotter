@@ -17,11 +17,11 @@ class Constants {
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     static let uploadedURLStringKey = "uploadedURLStringKey"
     
-    // Default UI / UX
-    static let defaultAnimationDuration = 0.25
-    
     // DB
     static let currentMomVersion = 10
+    
+    // Cart
+    static let cartItemMaxQuantity = 10
     
     // Syte
     static let syteAccountId = 6677

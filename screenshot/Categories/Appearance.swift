@@ -47,6 +47,10 @@ extension UIColor {
     }
 }
 
+extension TimeInterval {
+    static let defaultAnimationDuration = 0.25
+}
+
 extension UIContentSizeCategory {
     var isAccessibilityCategory: Bool {
         let isAccessibility: Bool

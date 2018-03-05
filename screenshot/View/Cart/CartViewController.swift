@@ -8,10 +8,12 @@
 
 import UIKit
 import CoreData
+import SDWebImage
 
 class CartViewController: BaseViewController {
-    fileprivate let tableView = TableView()
-    private let emptyListView = HelperView()
+    fileprivate let tableView = TableView(frame: .zero, style: .grouped)
+    fileprivate let itemCountView = CartItemCountView()
+    fileprivate let emptyListView = HelperView()
     
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     
@@ -49,7 +51,6 @@ class CartViewController: BaseViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.tableFooterView = UIView() // Remove empty cell dividers
         tableView.backgroundColor = view.backgroundColor
         tableView.separatorInset = .zero
         tableView.allowsSelection = false
@@ -67,15 +68,23 @@ class CartViewController: BaseViewController {
 }
 
 extension CartViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    fileprivate var numberOfItems: Int {
         return cartItemFrc?.fetchedObjectsCount ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let count = numberOfItems
+        itemCountView.itemCount = UInt(count)
+        return count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? CartTableViewCell, let cartItem = cartItemFrc?.object(at: indexPath) {
-            cell.productImageView.backgroundColor = .red
+            let url = URL(string: cartItem.imageURL ?? "")
+            cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
+            
             cell.titleLabel.text = "Anthropologie Tweed Long-Sleeve"
             cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
             cell.quantity = Double(cartItem.quantity)
@@ -95,13 +104,19 @@ extension CartViewController: UITableViewDataSource {
 }
 
 extension CartViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return numberOfItems == 0 ? 0 : 74
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return itemCountView
+    }
 }
 
 extension CartViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
-            change.applyChanges(tableView: tableView)
+            change.applyChanges(tableView: tableView, with: .fade)
         }
     }
 }

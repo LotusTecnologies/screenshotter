@@ -185,7 +185,7 @@ class ProductsRateView : UIView {
             syncLabel()
             syncBackgroundColor()
         }else if animated && hasRating {
-            let duration = Constants.defaultAnimationDuration
+            let duration: TimeInterval = .defaultAnimationDuration
             
             UIView.animate(withDuration: duration, animations: {
                 self.voteUpButton.alpha = 0

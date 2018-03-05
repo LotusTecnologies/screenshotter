@@ -310,7 +310,7 @@ fileprivate extension ProductViewControllerProductView {
             let minOffsetY = productView.selectionControl.frame.minY
             
             if currentOffsetY > minOffsetY {
-                UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                     productView.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
                     
                 }, completion: { completed in
