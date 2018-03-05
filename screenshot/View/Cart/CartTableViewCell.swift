@@ -155,7 +155,7 @@ class CartTableViewCell: UITableViewCell {
         }
         
         let quantityTitleLabel = createTitleLabel()
-        quantityTitleLabel.text = "Quantity:"
+        quantityTitleLabel.text = "cart.variant.quantity".localized
         quantityTitleLabel.topAnchor.constraint(equalTo: variantDataPositionView.topAnchor).isActive = true
         quantityTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionView.leadingAnchor).isActive = true
         quantityTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
@@ -175,7 +175,7 @@ class CartTableViewCell: UITableViewCell {
         quantityStepper.centerYAnchor.constraint(equalTo: quantityTitleLabel.centerYAnchor).isActive = true
         
         let colorTitleLabel = createTitleLabel()
-        colorTitleLabel.text = "Color:"
+        colorTitleLabel.text = "cart.variant.color".localized
         colorTitleLabel.topAnchor.constraint(equalTo: quantityTitleLabel.bottomAnchor).isActive = true
         colorTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionView.leadingAnchor).isActive = true
         colorTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
@@ -188,7 +188,7 @@ class CartTableViewCell: UITableViewCell {
         self.colorValueLabel = colorValueLabel
         
         let sizeTitleLabel = createTitleLabel()
-        sizeTitleLabel.text = "Size:"
+        sizeTitleLabel.text = "cart.variant.size".localized
         sizeTitleLabel.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor).isActive = true
         sizeTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionView.leadingAnchor).isActive = true
         sizeTitleLabel.bottomAnchor.constraint(equalTo: variantDataPositionView.bottomAnchor).isActive = true
@@ -210,7 +210,7 @@ class CartTableViewCell: UITableViewCell {
         actionView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         removeButton.translatesAutoresizingMaskIntoConstraints = false
-        removeButton.setTitle("Remove", for: .normal)
+        removeButton.setTitle("cart.remove".localized, for: .normal)
         removeButton.setTitleColor(.crazeGreen, for: .normal)
         removeButton.layer.borderColor = UIColor.crazeGreen.cgColor
         removeButton.layer.borderWidth = 1

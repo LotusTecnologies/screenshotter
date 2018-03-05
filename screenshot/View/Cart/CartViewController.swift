@@ -60,6 +60,7 @@ class CartViewController: BaseViewController {
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         emptyListView.titleLabel.text = "cart.empty.title".localized
@@ -67,20 +68,45 @@ class CartViewController: BaseViewController {
         
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.backgroundColor = .white
-        checkoutView.layoutMargins = {
-            var insets = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
-            
-            // TODO: bottom safe area for iPhone X
-            
-            return insets
-        }()
         view.addSubview(checkoutView)
-        checkoutView.topAnchor.constraint(equalTo: tableView.bottomAnchor).isActive = true
+//        checkoutView.topAnchor.constraint(equalTo: tableView.bottomAnchor).isActive = true
         checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        checkoutView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
+        var insets = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
+        
+        if #available(iOS 11.0, *) {
+            // TODO: check if this works
+            insets.bottom += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+            
+            checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        }
+        else {
+            checkoutView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+        }
+        
+        checkoutView.layoutMargins = insets
+        
         syncTotalPrice()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        var bottom = checkoutView.bounds.height
+        
+        if #available(iOS 11.0, *) {
+            // TODO: test on all devices and versions
+            bottom -= bottomLayoutGuide.length
+        }
+        
+        var contentInset = tableView.contentInset
+        contentInset.bottom = bottom
+        tableView.contentInset = contentInset
+        
+        var scrollIndicatorInsets = tableView.scrollIndicatorInsets
+        scrollIndicatorInsets.bottom = bottom
+        tableView.scrollIndicatorInsets = scrollIndicatorInsets
     }
 }
 
@@ -138,6 +164,11 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
             
             change.applyChanges(tableView: tableView, with: animation)
             syncTotalPrice()
+
+            // TODO: make into function
+//            if tableView.indexPathsForVisibleRows?.isEmpty ?? true {
+//                checkoutView.isHidden = true
+//            }
         }
     }
 }

@@ -14,11 +14,15 @@
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
-"cart.checkout.title" = "Checkout";
+"cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
 "cart.empty.title" = "No Items in Cart";
 "cart.header.title" = "Your Cart";
 "cart.header.item_count" = "Items: %d";
+"cart.remove" = "Remove";
+"cart.variant.color" = "Color:";
+"cart.variant.quantity" = "Quantity:";
+"cart.variant.size" = "Size:";
 
 "changelog.title" = "What's New";
 
