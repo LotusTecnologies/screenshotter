@@ -14,6 +14,7 @@ class CartViewController: BaseViewController {
     fileprivate let tableView = TableView(frame: .zero, style: .grouped)
     fileprivate let itemCountView = CartItemCountView()
     fileprivate let emptyListView = HelperView()
+    fileprivate let checkoutView = CartCheckoutView()
     
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     
@@ -59,11 +60,26 @@ class CartViewController: BaseViewController {
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         emptyListView.titleLabel.text = "cart.empty.title".localized
         tableView.emptyView = emptyListView
+        
+        checkoutView.translatesAutoresizingMaskIntoConstraints = false
+        checkoutView.backgroundColor = .white
+        checkoutView.layoutMargins = {
+            var insets = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
+            
+            // TODO: bottom safe area for iPhone X
+            
+            return insets
+        }()
+        view.addSubview(checkoutView)
+//        checkoutView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        checkoutView.topAnchor.constraint(equalTo: tableView.bottomAnchor).isActive = true
+        checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        checkoutView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+        checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
 }
 
@@ -85,7 +101,7 @@ extension CartViewController: UITableViewDataSource {
             let url = URL(string: cartItem.imageURL ?? "")
             cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
             
-            cell.titleLabel.text = "Anthropologie Tweed Long-Sleeve"
+            cell.titleLabel.text = cartItem.productTitle()
             cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
