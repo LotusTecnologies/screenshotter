@@ -19,6 +19,8 @@ class CartCheckoutView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        addSubview(BorderView(edge: .top))
+        
         checkoutButton.translatesAutoresizingMaskIntoConstraints = false
         checkoutButton.backgroundColor = .crazeGreen
         checkoutButton.setTitle("cart.checkout.title".localized, for: .normal)

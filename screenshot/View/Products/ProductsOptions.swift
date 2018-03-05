@@ -434,14 +434,7 @@ class ProductsOptionsView : UIView {
         
         backgroundColor = .white
         
-        let borderView = UIView()
-        borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = .border
-        addSubview(borderView)
-        borderView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        borderView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        addSubview(BorderView(edge: .top))
         
         categoryControl = controls.createCategoryControl()
         categoryControl.translatesAutoresizingMaskIntoConstraints = false

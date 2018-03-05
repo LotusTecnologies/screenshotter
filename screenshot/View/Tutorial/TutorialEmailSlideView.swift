@@ -161,14 +161,7 @@ public class TutorialEmailSlideView : HelperView {
         textField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
         textField.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         
-        let borderView = UIView()
-        borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = .border
-        textField.addSubview(borderView)
-        borderView.leadingAnchor.constraint(equalTo: textField.leadingAnchor).isActive = true
-        borderView.bottomAnchor.constraint(equalTo: textField.bottomAnchor).isActive = true
-        borderView.trailingAnchor.constraint(equalTo: textField.trailingAnchor).isActive = true
-        borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        textField.addSubview(BorderView(edge: .bottom))
     }
     
     // MARK: Actions

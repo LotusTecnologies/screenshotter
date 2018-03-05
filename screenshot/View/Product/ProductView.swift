@@ -158,14 +158,7 @@ class ProductView: UIView {
         controlContainerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         controlContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
-        let controlContainerBorderView = UIView()
-        controlContainerBorderView.translatesAutoresizingMaskIntoConstraints = false
-        controlContainerBorderView.backgroundColor = .border
-        controlContainerView.addSubview(controlContainerBorderView)
-        controlContainerBorderView.topAnchor.constraint(equalTo: controlContainerView.topAnchor).isActive = true
-        controlContainerBorderView.leadingAnchor.constraint(equalTo: controlContainerView.leadingAnchor).isActive = true
-        controlContainerBorderView.trailingAnchor.constraint(equalTo: controlContainerView.trailingAnchor).isActive = true
-        controlContainerBorderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        controlContainerView.addSubview(BorderView(edge: .top))
         
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.backgroundColor = .crazeGreen
