@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import SDWebImage
 
 class CartViewController: BaseViewController {
     fileprivate let tableView = TableView(frame: .zero, style: .grouped)
@@ -89,7 +90,9 @@ extension CartViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? CartTableViewCell, let cartItem = cartItemFrc?.object(at: indexPath) {
-            cell.productImageView.backgroundColor = .red
+            let url = URL(string: cartItem.imageURL ?? "")
+            cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
+            
             cell.titleLabel.text = "Anthropologie Tweed Long-Sleeve"
             cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
             cell.quantity = Double(cartItem.quantity)
