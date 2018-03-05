@@ -71,6 +71,7 @@ class ShoppingCartModel {
             cartItem.productDescription = variantToCopy.product?.productDescription
             cartItem.quantity = quantity
             cartItem.dateModified = NSDate()
+            cartItem.product = variantToCopy.product
             cartItem.cart = cart
             dataModel.saveMoc(managedObjectContext: managedObjectContext)
         }
