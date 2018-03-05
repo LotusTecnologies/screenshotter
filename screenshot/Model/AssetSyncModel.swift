@@ -146,11 +146,8 @@ class AssetSyncModel: NSObject {
                         self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
                     } else { // Screenshot taken while app in background (or killed)
                         AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
-                        for b in self.backgroundScreenshotDataArray {   // we only use the last image, so clear all other UIImages
-                            b.imageData = nil
-                        }
+                        self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
                         self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
-                        
                     }
                 }
             }.always(on: self.serialQ) {
