@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CartTableViewCell: UITableViewCell {
+class CartItemsCountView: UITableViewCell {
     let productImageView = UIImageView()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
