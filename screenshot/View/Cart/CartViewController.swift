@@ -170,7 +170,7 @@ fileprivate extension CartViewControllerCartItem {
         var price: Double = 0
         
         cartItemFrc?.fetchedObjects.forEach({ cartItem in
-            price += Double(cartItem.retailPrice)
+            price += Double(cartItem.retailPrice) * Double(cartItem.quantity)
         })
         
         checkoutView.price = formatter.string(from: NSNumber(value: price))
