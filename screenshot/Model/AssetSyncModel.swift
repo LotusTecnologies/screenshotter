@@ -122,35 +122,38 @@ class AssetSyncModel: NSObject {
                 }
                 do {
                     try managedObjectContext.save()
+                    let objectId = shamrockScreenshot.objectID
+                    DispatchQueue.main.async {
+                        completion(objectId)
+                    }
                 }catch{
                     DataModel.sharedInstance.receivedCoreDataError(error: error)
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
                 }
-                DispatchQueue.main.async {
-                    completion(shamrockScreenshot.objectID)
-                }
+            }else{
+                let shamrockScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                             assetId: nickNameAssetId,
+                                                                             createdAt:Date(),
+                                                                             isRecognized: isRecognized,
+                                                                             isFromShare: false,
+                                                                             isHidden:false,
+                                                                             imageData: imageData as Data,
+                                                                             classification: "h")
                 
-                return
-            }
-            
-            let screenshotCopy = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                             assetId: nickNameAssetId,
-                                             createdAt:Date(),
-                                             isRecognized: isRecognized,
-                                             isFromShare: false,
-                                             isHidden:false,
-                                             imageData: imageData as Data,
-                                             classification: "h")
-            
-            self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
-            do{
-                try managedObjectContext.save()
-                DispatchQueue.main.async {
-                    completion(screenshotCopy.objectID)
-                }
-            }catch{
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                DispatchQueue.main.async {
-                    completion(nil)
+                self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
+                do{
+                    try managedObjectContext.save()
+                    let objectId = shamrockScreenshot.objectID
+                    DispatchQueue.main.async {
+                        completion(objectId)
+                    }
+                }catch{
+                    DataModel.sharedInstance.receivedCoreDataError(error: error)
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
                 }
             }
         }
