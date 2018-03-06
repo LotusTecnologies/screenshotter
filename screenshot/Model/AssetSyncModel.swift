@@ -103,7 +103,6 @@ class AssetSyncModel: NSObject {
             return
         }
         
-        let syteJson = screenshot.syteJson
         let nickNameAssetId = "shamrock|\(assetId)"
         let isRecognized = screenshot.isRecognized
         
@@ -124,7 +123,7 @@ class AssetSyncModel: NSObject {
                                              isFromShare: false,
                                              isHidden:false,
                                              imageData: imageData as Data,
-                                             classification: syteJson)
+                                             classification: "h")
             
             self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
             do{
