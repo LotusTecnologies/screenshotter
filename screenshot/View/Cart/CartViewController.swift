@@ -87,7 +87,9 @@ class CartViewController: BaseViewController {
         
         checkoutView.layoutMargins = insets
         
+        syncItemCount()
         syncTotalPrice()
+        syncCheckoutViewVisibility()
     }
     
     override func viewDidLayoutSubviews() {
@@ -108,6 +110,41 @@ class CartViewController: BaseViewController {
         scrollIndicatorInsets.bottom = bottom
         tableView.scrollIndicatorInsets = scrollIndicatorInsets
     }
+    
+    // MARK: Sync Views
+    
+    fileprivate func syncTotalPrice() {
+        var price: Double = 0
+        
+        cartItemFrc?.fetchedObjects.forEach({ cartItem in
+            price += Double(cartItem.retailPrice) * Double(cartItem.quantity)
+        })
+        
+        checkoutView.price = formatter.string(from: NSNumber(value: price))
+    }
+    
+    fileprivate func syncCheckoutViewVisibility() {
+        func setAlpha() {
+            checkoutView.alpha = (numberOfItems > 0) ? 1 : 0
+        }
+        
+        if view.window == nil {
+            setAlpha()
+        }
+        else {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
+                setAlpha()
+            })
+        }
+    }
+    
+    fileprivate func syncItemCount() {
+        let count = numberOfItems
+        
+        if itemCountView.itemCount != count {
+            itemCountView.itemCount = count
+        }
+    }
 }
 
 extension CartViewController: UITableViewDataSource {
@@ -116,9 +153,7 @@ extension CartViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let count = numberOfItems
-        itemCountView.itemCount = UInt(count)
-        return count
+        return numberOfItems
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -161,14 +196,11 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
             let animation: UITableViewRowAnimation = change.deletedRows.isEmpty ? .none : .fade
-            
             change.applyChanges(tableView: tableView, with: animation)
+            
+            syncItemCount()
             syncTotalPrice()
-
-            // TODO: make into function
-//            if tableView.indexPathsForVisibleRows?.isEmpty ?? true {
-//                checkoutView.isHidden = true
-//            }
+            syncCheckoutViewVisibility()
         }
     }
 }
@@ -195,15 +227,5 @@ fileprivate extension CartViewControllerCartItem {
         }
         
         // TODO: analytic event for did tap remove
-    }
-    
-    func syncTotalPrice() {
-        var price: Double = 0
-        
-        cartItemFrc?.fetchedObjects.forEach({ cartItem in
-            price += Double(cartItem.retailPrice) * Double(cartItem.quantity)
-        })
-        
-        checkoutView.price = formatter.string(from: NSNumber(value: price))
     }
 }

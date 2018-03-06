@@ -45,15 +45,16 @@ class CartItemCountView: UIView {
         syncItemCount()
     }
     
-    var itemCount: UInt = 0 {
+    var itemCount = 0 {
         didSet {
             syncItemCount()
         }
     }
     
     fileprivate func syncItemCount() {
-        let text = "cart.header.item_count".localized(withFormat: itemCount)
-        let countRange = NSString(string: text).range(of: "\(itemCount)")
+        let count = max(0, itemCount)
+        let text = "cart.header.item_count".localized(withFormat: count)
+        let countRange = NSString(string: text).range(of: "\(count)")
         
         let fontLight = UIFont.systemFont(ofSize: 16, weight: UIFontWeightLight)
         let fontMedium = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
