@@ -145,16 +145,16 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     private func createShamrockViewIfNeeded() {
         if self.shamrockView == nil {
-            let imageView = UIImageView.init(image: #imageLiteral(resourceName: "ShamrockBadge"))
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            mainView.addSubview(imageView)
-            imageView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
-            imageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: 58).isActive = true
-            imageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+            let shamrackImageView = UIImageView.init(image: #imageLiteral(resourceName: "ShamrockBadge"))
+            shamrackImageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.addSubview(shamrackImageView)
+            shamrackImageView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
+            shamrackImageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
+            shamrackImageView.widthAnchor.constraint(equalToConstant: 58).isActive = true
+            shamrackImageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
 
             
-            self.shamrockView = imageView
+            self.shamrockView = shamrackImageView
         }
     }
     

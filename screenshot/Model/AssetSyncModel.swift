@@ -99,16 +99,17 @@ class AssetSyncModel: NSObject {
     
     func uploadShamrockVersionOfScreenshotWithClarifai(screenshot: Screenshot, completion:@escaping (NSManagedObjectID?)->()) {
         
-        let dataModel = DataModel.sharedInstance
-        guard let assetId = screenshot.assetId, let imageData = screenshot.imageData,  let syteJson = screenshot.syteJson else {
+        guard let assetId = screenshot.assetId, let imageData = screenshot.imageData else{
             return
         }
+        
+        let syteJson = screenshot.syteJson
         let nickNameAssetId = "shamrock|\(assetId)"
         let isRecognized = screenshot.isRecognized
         
         
-        dataModel.performBackgroundTask { (managedObjectContext) in
-            if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: nickNameAssetId) {
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            if let screenshot = DataModel.sharedInstance.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: nickNameAssetId) {
                 DispatchQueue.main.async {
                     completion(screenshot.objectID)
                 }
@@ -116,11 +117,11 @@ class AssetSyncModel: NSObject {
                 return
             }
             
-            let screenshotCopy = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+            let screenshotCopy = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
                                              assetId: nickNameAssetId,
                                              createdAt:Date(),
                                              isRecognized: isRecognized,
-                                             isFromShare: true,
+                                             isFromShare: false,
                                              isHidden:false,
                                              imageData: imageData as Data,
                                              classification: syteJson)
