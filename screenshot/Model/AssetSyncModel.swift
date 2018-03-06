@@ -117,6 +117,7 @@ class AssetSyncModel: NSObject {
                     shamrockScreenshot.imageData = imageData
                 }
                 if shamrockScreenshot.shoppables?.count == 0 {
+                    shamrockScreenshot.shoppablesCount = 0
                     self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
                 }
                 do {
