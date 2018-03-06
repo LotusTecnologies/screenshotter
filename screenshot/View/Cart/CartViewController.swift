@@ -56,6 +56,8 @@ class CartViewController: BaseViewController {
         tableView.separatorInset = .zero
         tableView.allowsSelection = false
         tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 200
         tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -68,24 +70,17 @@ class CartViewController: BaseViewController {
         
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.backgroundColor = .white
+        checkoutView.layoutMargins = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
         view.addSubview(checkoutView)
-//        checkoutView.topAnchor.constraint(equalTo: tableView.bottomAnchor).isActive = true
         checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        var insets = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
-        
         if #available(iOS 11.0, *) {
-            // TODO: check if this works
-            insets.bottom += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
-            
             checkoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
         else {
             checkoutView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         }
-        
-        checkoutView.layoutMargins = insets
         
         syncItemCount()
         syncTotalPrice()
@@ -98,8 +93,10 @@ class CartViewController: BaseViewController {
         var bottom = checkoutView.bounds.height
         
         if #available(iOS 11.0, *) {
-            // TODO: test on all devices and versions
             bottom -= bottomLayoutGuide.length
+        }
+        else {
+            bottom += bottomLayoutGuide.length
         }
         
         var contentInset = tableView.contentInset
