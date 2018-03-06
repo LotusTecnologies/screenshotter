@@ -159,7 +159,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             
             let fab = FloatingActionButton()
             fab.translatesAutoresizingMaskIntoConstraints = false
-            fab.setImage(#imageLiteral(resourceName: "Shamrock"), for: .normal)
+            fab.setImage(UIImage(named:"Shamrock"), for: .normal)
             fab.backgroundColor = .shamrockGreen
             fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
             fab.adjustsImageWhenHighlighted = false
