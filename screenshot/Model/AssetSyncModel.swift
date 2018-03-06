@@ -102,23 +102,21 @@ class AssetSyncModel: NSObject {
         guard let assetId = screenshot.assetId, let imageData = screenshot.imageData else{
             return
         }
-        
+        //Set values here - cannot caputre screenshot in performBackgroundTask scope
         let nickNameAssetId = "shamrock|\(assetId)"
         let isRecognized = screenshot.isRecognized
         
         
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            if let screenshot = DataModel.sharedInstance.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: nickNameAssetId) {
-                if screenshot.isHidden == true {
-                    screenshot.isHidden = false
-                    screenshot.createdAt = NSDate()
-                    AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot, classificationString: "h")
-
+            if let shamrockScreenshot = DataModel.sharedInstance.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: nickNameAssetId) {
+                if shamrockScreenshot.isHidden == true {
+                    shamrockScreenshot.isHidden = false
+                    shamrockScreenshot.createdAt = NSDate()
                 }
-                if screenshot.imageData == nil {
-                    screenshot.imageData = imageData
+                if shamrockScreenshot.imageData == nil {
+                    shamrockScreenshot.imageData = imageData
                 }
-                if screenshot.shoppables?.count == 0 {
+                if shamrockScreenshot.shoppables?.count == 0 {
                     self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
                 }
                 do {
@@ -127,7 +125,7 @@ class AssetSyncModel: NSObject {
                     DataModel.sharedInstance.receivedCoreDataError(error: error)
                 }
                 DispatchQueue.main.async {
-                    completion(screenshot.objectID)
+                    completion(shamrockScreenshot.objectID)
                 }
                 
                 return
