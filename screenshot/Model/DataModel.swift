@@ -776,7 +776,7 @@ extension Screenshot {
     var isShamrockVersion:Bool {
         return self.assetId?.hasPrefix("shamrock") ?? false
     }
-    static func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? { //main thread only
+    static func findWith(objectId:NSManagedObjectID) -> Screenshot? { //main thread only
         if let screenshot = DataModel.sharedInstance.mainMoc().object(with: objectId) as? Screenshot {
             do{
                 try screenshot.validateForUpdate()
