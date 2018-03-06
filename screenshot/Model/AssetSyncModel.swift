@@ -109,6 +109,23 @@ class AssetSyncModel: NSObject {
         
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             if let screenshot = DataModel.sharedInstance.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: nickNameAssetId) {
+                if screenshot.isHidden == true {
+                    screenshot.isHidden = false
+                    screenshot.createdAt = NSDate()
+                    AssetSyncModel.sharedInstance.refetchShoppables(screenshot: screenshot, classificationString: "h")
+
+                }
+                if screenshot.imageData == nil {
+                    screenshot.imageData = imageData
+                }
+                if screenshot.shoppables?.count == 0 {
+                    self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
+                }
+                do {
+                    try managedObjectContext.save()
+                }catch{
+                    DataModel.sharedInstance.receivedCoreDataError(error: error)
+                }
                 DispatchQueue.main.async {
                     completion(screenshot.objectID)
                 }

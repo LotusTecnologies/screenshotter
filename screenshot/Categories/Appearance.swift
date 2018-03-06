@@ -154,12 +154,12 @@ extension UIImage {
     
     
     // Source: https://gist.github.com/fabb/007d30ba0759de9be8a3
-    // (modified to remove all force casting
+    // (modified to remove all force casting)
     // colorize image with given tint color
     // this is similar to Photoshop's "Color" layer blend mode
     // this is perfect for non-greyscale source images, and images that have both highlights and shadows that should be preserved
     // white will stay white and black will stay black as the lightness of the image is preserved
-    func tint(tintColor: UIColor) -> UIImage {
+    func tint(tintColor: UIColor) -> UIImage? {
         if let cgImage = self.cgImage {
             return modifiedImage { context, rect in
                 // draw black background - workaround to preserve color of partially transparent pixels
@@ -182,11 +182,11 @@ extension UIImage {
             }
         }else{
             print("unable to tint image - no cgImage")
-            return self
+            return nil
         }
     }
     
-    private func modifiedImage( draw: (CGContext, CGRect) -> ()) -> UIImage {
+    private func modifiedImage( draw: (CGContext, CGRect) -> ()) -> UIImage? {
         var image:UIImage?
         // using scale correctly preserves retina images
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
@@ -206,7 +206,7 @@ extension UIImage {
             return i
         }else{
             print("unable to modifiy image - no context or image in context")
-            return self
+            return nil
         }
     }
     
