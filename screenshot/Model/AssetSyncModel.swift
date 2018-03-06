@@ -97,7 +97,7 @@ class AssetSyncModel: NSObject {
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
     
-    func uploadShamrockVersionOfScreenshotWithClarifai(screenshot: Screenshot, completion:@escaping (NSManagedObjectID?)->()) {
+    func findOrCreateShamrockVersion(screenshot: Screenshot, completion:@escaping (NSManagedObjectID?)->()) {
         
         guard let assetId = screenshot.assetId, let imageData = screenshot.imageData else{
             return

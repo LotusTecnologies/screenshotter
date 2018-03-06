@@ -260,7 +260,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 
 extension ProductsViewController {
     func shamrockAction(_ sender:Any) {
-        AssetSyncModel.sharedInstance.uploadShamrockVersionOfScreenshotWithClarifai(screenshot: self.screenshot) { (objectId) in
+        AssetSyncModel.sharedInstance.findOrCreateShamrockVersion(screenshot: self.screenshot) { (objectId) in
             if let objectId = objectId, let screenshot = Screenshot.findWith(objectId: objectId), let navVC = self.navigationController as? ScreenshotsNavigationController{
                 navVC.popViewController(animated: false)
                 let productsViewController = ProductsViewController.init(screenshot: screenshot)
