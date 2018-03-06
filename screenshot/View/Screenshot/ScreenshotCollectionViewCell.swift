@@ -27,7 +27,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     private let toolbar = UIToolbar()
     private let badge = UIView()
     private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
-    private let shamrockView = UIView()
+    private var shamrockView:UIView?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -101,25 +101,6 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         
         
         
-        shamrockView.frame = CGRect(x: 0, y: 0, width: 120, height: 120) // half is offscreen
-        shamrockView.alpha = 0.7
-        shamrockView.translatesAutoresizingMaskIntoConstraints = false
-        shamrockView.backgroundColor = .shamrockGreen
-        shamrockView.isUserInteractionEnabled = false
-        shamrockView.isHidden = true
-        shamrockView.layer.cornerRadius = 60
-        mainView.addSubview(shamrockView)
-        shamrockView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: -shamrockView.bounds.size.height / 2).isActive = true
-        shamrockView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: -shamrockView.bounds.size.width / 2).isActive = true
-        shamrockView.widthAnchor.constraint(equalToConstant: shamrockView.bounds.size.width).isActive = true
-        shamrockView.heightAnchor.constraint(equalToConstant: shamrockView.bounds.size.height).isActive = true
-        let shamrockImageView = UIImageView.init(image: #imageLiteral(resourceName: "shamrock"))
-        shamrockView.addSubview(shamrockImageView)
-        shamrockImageView.translatesAutoresizingMaskIntoConstraints = false
-        shamrockImageView.widthAnchor.constraint(equalToConstant: 45).isActive = true
-        shamrockImageView.heightAnchor.constraint(equalToConstant: 45).isActive = true
-        shamrockImageView.bottomAnchor.constraint(equalTo: shamrockView.bottomAnchor, constant: -15).isActive = true
-        shamrockImageView.trailingAnchor.constraint(equalTo: shamrockView.trailingAnchor, constant: -15).isActive = true
 
     }
     
@@ -161,6 +142,21 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     }
     
     // MARK: States
+    
+    private func createShamrockViewIfNeeded() {
+        if self.shamrockView == nil {
+            let imageView = UIImageView.init(image: #imageLiteral(resourceName: "ShamrockBadge"))
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            mainView.addSubview(imageView)
+            imageView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
+            imageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
+            imageView.widthAnchor.constraint(equalToConstant: 58).isActive = true
+            imageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+
+            
+            self.shamrockView = imageView
+        }
+    }
     
     var selectedState: ScreenshotCollectionViewCellSelectedState = .none {
         didSet {
@@ -205,7 +201,10 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     var isShamrock:Bool = false {
         didSet {
-            shamrockView.isHidden = !isShamrock
+            if isShamrock {
+                createShamrockViewIfNeeded()
+            }
+            self.shamrockView?.isHidden = !isShamrock
         }
     }
     override var isSelected: Bool {
