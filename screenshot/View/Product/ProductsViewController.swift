@@ -607,7 +607,7 @@ extension ProductsViewControllerLoader {
             if self.screenshot.isShamrockVersion {
                 loader.color = .shamrockGreen
                 let text = UILabel.init()
-                text.text = "Hang tight while we greenify your products"
+                text.text = "shamrock.loading".localized
                 text.textColor = .shamrockGreen
                 text.font =  UIFont(name: "Futura-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14)
                 text.translatesAutoresizingMaskIntoConstraints = false

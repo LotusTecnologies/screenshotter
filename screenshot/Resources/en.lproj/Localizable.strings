@@ -11,6 +11,7 @@
 // https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
+
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
@@ -193,6 +194,8 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+"shamrock.loading" = "Hang tight while we greenify your products";
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";

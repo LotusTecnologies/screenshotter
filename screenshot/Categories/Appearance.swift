@@ -14,7 +14,7 @@ extension UIColor {
     
     static let crazeRed = UIColor(red: 237.0/255.0, green: 20.0/255.0, blue: 90.0/255.0, alpha: 1)
     static let crazeGreen = UIColor(red: 32.0/255.0, green: 200.0/255.0, blue: 163.0/255.0, alpha: 1)
-    static let shamrockGreen = UIColor(red:0.00, green:0.62, blue:0.38, alpha:1.0)
+    static let shamrockGreen = UIColor(red:0.0, green:0.50, blue:0.0, alpha:1.0)
 
     
     static let gray1 = UIColor(white: 0.1, alpha: 1) // 25.5
