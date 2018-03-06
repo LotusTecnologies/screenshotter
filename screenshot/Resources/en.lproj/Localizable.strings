@@ -96,7 +96,8 @@
 
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
-"picker.limit.alert.message" = "Maximum 20 items please";
+"picker.limit.alert.title" = "Limit Exceeded";
+"picker.limit.alert.message" = "You can only select 20 images at a time";
 "picker.list.gallery" = "Gallery";
 "picker.list.screenshot" = "Screenshots";
 "picker.permission.add" = "Add Photos";

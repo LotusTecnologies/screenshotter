@@ -378,7 +378,7 @@ extension ScreenshotPickerViewController : UICollectionViewDelegate {
         if selectedIndexPaths.count < 20 {
             return true
         }
-        let alertcontroller = UIAlertController.init(title: nil, message: "picker.limit.alert.message".localized, preferredStyle: .alert)
+        let alertcontroller = UIAlertController.init(title: "picker.limit.alert.title".localized, message: "picker.limit.alert.message".localized, preferredStyle: .alert)
         alertcontroller.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
         self.present(alertcontroller, animated: true, completion: nil)
         return false
