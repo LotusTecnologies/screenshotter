@@ -826,6 +826,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         let screenshot = self.screenshot(at: indexPath.item)
         cell.delegate = self
         cell.contentView.backgroundColor = collectionView.backgroundColor
+        cell.isShamrock = screenshot?.isShamrockVersion ?? false
         cell.screenshot = screenshot
         cell.isBadgeEnabled = screenshot?.isNew ?? false
         cell.isEditing = self.isEditing

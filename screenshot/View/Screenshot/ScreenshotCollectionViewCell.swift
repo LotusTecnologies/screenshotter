@@ -27,6 +27,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     private let toolbar = UIToolbar()
     private let badge = UIView()
     private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
+    private var shamrockView:UIView?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -97,6 +98,10 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         mainView.addSubview(checkImageView)
         checkImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 6).isActive = true
         checkImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -6).isActive = true
+        
+        
+        
+
     }
     
     override func prepareForReuse() {
@@ -105,6 +110,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         isEditing = false
         isBadgeEnabled = false
         selectedState = .none
+        isShamrock = false
     }
     
     // MARK: Screenshot
@@ -136,6 +142,21 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     }
     
     // MARK: States
+    
+    private func createShamrockViewIfNeeded() {
+        if self.shamrockView == nil {
+            let shamrackImageView = UIImageView.init(image: UIImage(named: "ShamrockBadge"))
+            shamrackImageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.addSubview(shamrackImageView)
+            shamrackImageView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
+            shamrackImageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
+            shamrackImageView.widthAnchor.constraint(equalToConstant: 58).isActive = true
+            shamrackImageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+
+            
+            self.shamrockView = shamrackImageView
+        }
+    }
     
     var selectedState: ScreenshotCollectionViewCellSelectedState = .none {
         didSet {
@@ -178,7 +199,14 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
-    
+    var isShamrock:Bool = false {
+        didSet {
+            if isShamrock {
+                createShamrockViewIfNeeded()
+            }
+            self.shamrockView?.isHidden = !isShamrock
+        }
+    }
     override var isSelected: Bool {
         didSet {
             isSelected ? syncSelectedState() : resetSelectedState()

@@ -97,6 +97,69 @@ class AssetSyncModel: NSObject {
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
     
+    func findOrCreateShamrockVersion(screenshot: Screenshot, completion:@escaping (NSManagedObjectID?)->()) {
+        
+        guard let assetId = screenshot.assetId, let imageData = screenshot.imageData else{
+            return
+        }
+        //Set values here - cannot caputre screenshot in performBackgroundTask scope
+        let nickNameAssetId = "shamrock|\(assetId)"
+        let isRecognized = screenshot.isRecognized
+        
+        
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            if let shamrockScreenshot = DataModel.sharedInstance.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: nickNameAssetId) {
+                if shamrockScreenshot.isHidden == true {
+                    shamrockScreenshot.isHidden = false
+                    shamrockScreenshot.createdAt = NSDate()
+                }
+                if shamrockScreenshot.imageData == nil {
+                    shamrockScreenshot.imageData = imageData
+                }
+                if shamrockScreenshot.shoppables?.count == 0 {
+                    shamrockScreenshot.shoppablesCount = 0
+                    self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
+                }
+                do {
+                    try managedObjectContext.save()
+                    let objectId = shamrockScreenshot.objectID
+                    DispatchQueue.main.async {
+                        completion(objectId)
+                    }
+                }catch{
+                    DataModel.sharedInstance.receivedCoreDataError(error: error)
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                }
+            }else{
+                let shamrockScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                             assetId: nickNameAssetId,
+                                                                             createdAt:Date(),
+                                                                             isRecognized: isRecognized,
+                                                                             isFromShare: false,
+                                                                             isHidden:false,
+                                                                             imageData: imageData as Data,
+                                                                             classification: "h")
+                
+                self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
+                do{
+                    try managedObjectContext.save()
+                    let objectId = shamrockScreenshot.objectID
+                    DispatchQueue.main.async {
+                        completion(objectId)
+                    }
+                }catch{
+                    DataModel.sharedInstance.receivedCoreDataError(error: error)
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                }
+            }
+        }
+        
+    }
+
     func uploadScreenshotWithClarifai(asset: PHAsset) {
         let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
@@ -261,12 +324,19 @@ class AssetSyncModel: NSObject {
     }
     
     func syteProcessing(imageClassification: ClarifaiModel.ImageClassification, imageData: Data?, assetId: String, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
+        var localImageData = imageData
+        if assetId.hasPrefix("shamrock") {
+            if let imageData = imageData, let image = UIImage.init(data: imageData),  let image2 = image.shamrock(), let data = self.data(for: image2) {
+                localImageData = data
+            }
+        }
+        
         if imageClassification != .unrecognized {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
             firstly { _ -> Promise<(String, [[String : Any]])> in
-                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, imageClassification: imageClassification)
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
                     AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])

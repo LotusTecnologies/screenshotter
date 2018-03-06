@@ -14,7 +14,9 @@ extension UIColor {
     
     static let crazeRed = UIColor(red: 237.0/255.0, green: 20.0/255.0, blue: 90.0/255.0, alpha: 1)
     static let crazeGreen = UIColor(red: 32.0/255.0, green: 200.0/255.0, blue: 163.0/255.0, alpha: 1)
-        
+    static let shamrockGreen = UIColor(red:0.0, green:0.50, blue:0.0, alpha:1.0)
+
+    
     static let gray1 = UIColor(white: 0.1, alpha: 1) // 25.5
     static let gray2 = UIColor(white: 0.2, alpha: 1) // 51
     static let gray3 = UIColor(white: 0.3, alpha: 1) // 76.5
@@ -140,4 +142,72 @@ extension UIApplication {
         
         UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [UIToolbar.self]).color = crazeRedColor
     }
+}
+
+
+
+extension UIImage {
+    func shamrock() -> UIImage? {
+        return self.tint(tintColor: .shamrockGreen)
+    }
+
+    
+    
+    // Source: https://gist.github.com/fabb/007d30ba0759de9be8a3
+    // (modified to remove all force casting)
+    // colorize image with given tint color
+    // this is similar to Photoshop's "Color" layer blend mode
+    // this is perfect for non-greyscale source images, and images that have both highlights and shadows that should be preserved
+    // white will stay white and black will stay black as the lightness of the image is preserved
+    func tint(tintColor: UIColor) -> UIImage? {
+        if let cgImage = self.cgImage {
+            return modifiedImage { context, rect in
+                // draw black background - workaround to preserve color of partially transparent pixels
+                context.setBlendMode(.normal)
+                UIColor.black.setFill()
+                context.fill(rect)
+                
+                // draw original image
+                context.setBlendMode(.normal)
+                context.draw(cgImage, in: rect)
+                
+                // tint image (loosing alpha) - the luminosity of the original image is preserved
+                context.setBlendMode(.color)
+                tintColor.setFill()
+                context.fill(rect)
+                
+                // mask by alpha values of original image
+                context.setBlendMode(.destinationIn)
+                context.draw(cgImage, in: rect)
+            }
+        }else{
+            print("unable to tint image - no cgImage")
+            return nil
+        }
+    }
+    
+    private func modifiedImage( draw: (CGContext, CGRect) -> ()) -> UIImage? {
+        var image:UIImage?
+        // using scale correctly preserves retina images
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        if let context = UIGraphicsGetCurrentContext() {
+            // correctly rotate image
+            context.translateBy(x: 0, y: size.height)
+            context.scaleBy(x: 1.0, y: -1.0)
+            
+            let rect = CGRect(x: 0.0, y: 0.0, width: size.width, height: size.height)
+            
+            draw(context, rect)
+            
+            image = UIGraphicsGetImageFromCurrentImageContext()
+        }
+        UIGraphicsEndImageContext()
+        if let i = image {
+            return i
+        }else{
+            print("unable to modifiy image - no context or image in context")
+            return nil
+        }
+    }
+    
 }
