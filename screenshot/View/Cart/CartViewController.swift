@@ -71,6 +71,7 @@ class CartViewController: BaseViewController {
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.backgroundColor = .white
         checkoutView.layoutMargins = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
+        checkoutView.checkoutButton.addTarget(self, action: #selector(checkoutAction(_:)), for: .touchUpInside)
         view.addSubview(checkoutView)
         checkoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         checkoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -224,5 +225,14 @@ fileprivate extension CartViewControllerCartItem {
         }
         
         // TODO: analytic event for did tap remove
+    }
+}
+
+typealias CartViewControllerCheckout = CartViewController
+fileprivate extension CartViewControllerCheckout {
+    @objc func checkoutAction(_ button: UIButton) {
+        ShoppingCartModel.shared.checkout().then { dict -> Void in
+            print("||| \(dict)")
+        }
     }
 }
