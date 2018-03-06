@@ -165,7 +165,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             fab.adjustsImageWhenHighlighted = false
             fab.addTarget(self, action: #selector(shamrockAction(_:)), for: .touchUpInside)
             view.addSubview(fab)
-            fab.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor, constant: -p / 2).isActive = true
+            fab.bottomAnchor.constraint(equalTo: rateView.topAnchor, constant: -p / 2).isActive = true
             fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
         }
         
