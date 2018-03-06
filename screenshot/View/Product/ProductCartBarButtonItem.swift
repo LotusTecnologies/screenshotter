@@ -43,6 +43,9 @@ class ProductCartBarButtonItem: UIBarButtonItem {
                 }
             }
         }
+        else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
     }
     
     deinit {
