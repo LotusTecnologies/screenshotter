@@ -293,9 +293,9 @@ fileprivate extension ProductViewControllerStructuredProduct {
             return
         }
         
-        productView?.unavailableImageView.isHidden = !structuredProduct.structuredColorVariants.isEmpty
-        productView?.setGalleryImages(urls: structuredProduct.imageURLs)
-        productView?.titleLabel.text = structuredProduct.title
+        productView?.unavailableImageView.isHidden = structuredProduct.isAvailable
+        productView?.setGalleryImages(urls: structuredProduct.imageURLs ?? structuredProduct.product.imageURLs())
+        productView?.titleLabel.text = structuredProduct.product.productTitle()
         productView?.priceLabel.text = structuredProduct.product.price
         productView?.contentTextView.text = structuredProduct.product.detailedDescription
         
@@ -305,19 +305,21 @@ fileprivate extension ProductViewControllerStructuredProduct {
             setOriginalPrice(structuredProduct.product.originalPrice)
         }
         
-        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors, selectedPickerItem: structuredProduct.product.color)
-        
-        var sizeItem: SegmentedDropDownItem? = nil
-        
-        if !structuredProduct.sizes.isEmpty {
-            sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
+        if let colors = structuredProduct.colors {
+            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: structuredProduct.product.color)
+            var sizeItem: SegmentedDropDownItem?
             
-            if colorItem.selectedPickerItem == nil {
-                sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            if let sizes = structuredProduct.sizes {
+                sizeItem = SegmentedDropDownItem(pickerItems: sizes)
+                
+                if colorItem.selectedPickerItem == nil {
+                    // Disabled until color is selected
+                    sizeItem?.disabledPickerItems = structuredProduct.sizes
+                }
             }
+            
+            productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         }
-        
-        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         
         repositionScrollView()
     }
@@ -372,11 +374,10 @@ extension ProductViewController: FetchedResultsControllerManagerDelegate {
 
 class StructuredProduct: NSObject {
     let product: Product
-    private(set) var title: String?
-    private(set) var structuredColorVariants: [StructuredColorVariant] = []
-    private(set) var colors: [String] = []
-    private(set) var sizes: [String] = []
-    private var imageURLDict: [String: URL] = [:]
+    private(set) var structuredColorVariants: [StructuredColorVariant]?
+    private(set) var colors: [String]?
+    private(set) var sizes: [String]?
+    private(set) var isAvailable = false
     
     init(_ product: Product) {
         self.product = product
@@ -386,11 +387,12 @@ class StructuredProduct: NSObject {
             return
         }
         
-        title = product.productTitle()
+        isAvailable = true
         
         var structuredColorVariantsDict: [String : StructuredColorVariant] = [:]
         var colors: Set<String> = Set()
         var sizes: Set<String> = Set()
+        imageURLDict = [:]
         
         variants.forEach { variant in
             guard let color = variant.color else {
@@ -409,8 +411,8 @@ class StructuredProduct: NSObject {
             
             structuredColorVariantsDict[color] = structuredColorVariant
             
-            if imageURLDict[color] == nil, let imageURL = variant.parsedImageURLs().first {
-                imageURLDict[color] = imageURL
+            if imageURLDict?[color] == nil, let imageURL = variant.parsedImageURLs().first {
+                imageURLDict?[color] = imageURL
             }
         }
         
@@ -431,8 +433,10 @@ class StructuredProduct: NSObject {
         })
     }
     
+    // MARK: Variant
+    
     func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
-        return structuredColorVariants.first { structuredColorVariant -> Bool in
+        return structuredColorVariants?.first { structuredColorVariant -> Bool in
             return structuredColorVariant.color == color
         }
     }
@@ -442,15 +446,19 @@ class StructuredProduct: NSObject {
     }
     
     func subtractingSizes(of structuredColorVariant: StructuredColorVariant) -> [String] {
-        return Array(Set(sizes).subtracting(structuredColorVariant.sizes))
+        return Array(Set(sizes ?? []).subtracting(structuredColorVariant.sizes))
     }
+    
+    // MARK: Image
+    
+    private var imageURLDict: [String: URL]?
     
     func imageURL(forColor color: String?) -> URL? {
-        return imageURLDict[color ?? ""]
+        return imageURLDict?[color ?? ""]
     }
     
-    var imageURLs: [URL] {
-        return imageURLDict.sorted { $0.key < $1.key }.map { $0.value }
+    var imageURLs: [URL]? {
+        return imageURLDict?.sorted { $0.key < $1.key }.map { $0.value }
     }
 }
 
