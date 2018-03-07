@@ -226,6 +226,21 @@ class ShoppingCartModel {
         }
     }
     
+    func hostedUrl() -> Promise<URL> {
+        return firstly {
+            return retrieveCartRemoteId()
+            }.then { remoteId -> Promise<URL> in
+                if let url = URL(string: "\(Constants.shoppableHosted)/checkout?cart=\(remoteId)?apiToken=\(Constants.shoppableToken)?campaign=screenshop?noiframe=0?publisherCheckout=\(Constants.shoppablePublisherCheckout)?returnToSite=\(Constants.shoppableThankYou)?orderComplete=\(Constants.shoppableThankYou)") {
+                    print("hostedUrl succeeded to form url:\(url)")
+                    return Promise(value: url)
+                } else {
+                    print("hostedUrl failed to form url for remoteId:\(remoteId)")
+                    let error = NSError(domain: "Craze", code: 48, userInfo: [NSLocalizedDescriptionKey : "hostedUrl failed to form url"])
+                    return Promise(error: error)
+                }
+        }
+    }
+    
     // MARK: Helper
     
     // Deletes variants if older than, say, an hour.
@@ -321,6 +336,23 @@ class ShoppingCartModel {
                 return
             }
             DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
+        }
+    }
+    
+    func retrieveCartRemoteId() -> Promise<String> {
+        let dataModel = DataModel.sharedInstance
+        return Promise { fulfill, reject in
+            dataModel.performBackgroundTask { managedObjectContext in
+                if let cart = dataModel.retrieveAddableCart(managedObjectContext: managedObjectContext),
+                  let remoteId = cart.remoteId,
+                  !remoteId.isEmpty {
+                    fulfill(remoteId)
+                } else {
+                    print("retrieveCartRemoteId failed")
+                    let error = NSError(domain: "Craze", code: 47, userInfo: [NSLocalizedDescriptionKey : "retrieveCartRemoteId failed"])
+                    reject(error)
+                }
+            }
         }
     }
     
