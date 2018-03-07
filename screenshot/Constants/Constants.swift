@@ -32,6 +32,10 @@ class Constants {
     static let furnitureAccountSignature = "G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c="
     static let furnitureHardcodedAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTQzNjgxOTYxNzIsInV1aWQiOiI3OWIyNWJkZi1lMWI2LTVkOWEtOGJkZi1iZDMwNDkzZmE4NjYifQ.IUpV_u797rI0Asvog26y7cHG1mIuHMnDiPsJvLnIAc4"
 
+    // Shoppable
+    static let shoppablePublisherCheckout = "https://screenshopit.com"
+    static let shoppableThankYou = "https://screenshopit.com/yourthankyoupage"
+
     // Keys
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
@@ -43,6 +47,7 @@ class Constants {
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
     static let shoppableDomain = "https://api.shoppable.co/v3"
+    static let shoppableHosted = "https://secure.shoppable.co"
     static let shoppableToken = "gD1GV3cVFGC9hk8W5927b13e5e"
     static let syteFeed = "shoppable_nordstrom"
 #else
@@ -55,6 +60,7 @@ class Constants {
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-api.com/static/whatsnew"
     static let shoppableDomain = "https://api.shoppable.com/v3"
+    static let shoppableHosted = "https://secure.shoppable.com"
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52"
     static let syteFeed = "shoppable_production"
 #endif
