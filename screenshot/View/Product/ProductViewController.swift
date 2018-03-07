@@ -293,20 +293,38 @@ fileprivate extension ProductViewControllerStructuredProduct {
             return
         }
         
+        let product = structuredProduct.product
+        
+        let imageURLs: [URL]? = {
+            if let structuredProductImageURLs = structuredProduct.imageURLs {
+                return structuredProductImageURLs
+            }
+            else if let productImageURL = URL(string: product.imageURL ?? "") {
+                return [productImageURL]
+            }
+            else {
+                return nil
+            }
+        }()
+        
+        if let imageURLs = imageURLs {
+            let imageURL = structuredProduct.imageURL(forColor: product.color)
+            productView?.setGalleryImages(urls: imageURLs, selectedURL: imageURL)
+        }
+        
         productView?.unavailableImageView.isHidden = structuredProduct.isAvailable
-        productView?.setGalleryImages(urls: structuredProduct.imageURLs ?? structuredProduct.product.imageURLs())
-        productView?.titleLabel.text = structuredProduct.product.productTitle()
-        productView?.priceLabel.text = structuredProduct.product.price
-        productView?.contentTextView.text = structuredProduct.product.detailedDescription
+        productView?.titleLabel.text = product.productTitle()
+        productView?.priceLabel.text = product.price
+        productView?.contentTextView.text = product.detailedDescription
         
-        setWebsiteMerchant(structuredProduct.product.merchant)
+        setWebsiteMerchant(product.merchant)
         
-        if structuredProduct.product.isSale() {
-            setOriginalPrice(structuredProduct.product.originalPrice)
+        if product.isSale() {
+            setOriginalPrice(product.originalPrice)
         }
         
         if let colors = structuredProduct.colors {
-            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: structuredProduct.product.color)
+            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: product.color)
             var sizeItem: SegmentedDropDownItem?
             
             if let sizes = structuredProduct.sizes {
@@ -372,7 +390,7 @@ extension ProductViewController: FetchedResultsControllerManagerDelegate {
     }
 }
 
-class StructuredProduct: NSObject {
+fileprivate class StructuredProduct: NSObject {
     let product: Product
     private(set) var structuredColorVariants: [StructuredColorVariant]?
     private(set) var colors: [String]?
@@ -398,6 +416,11 @@ class StructuredProduct: NSObject {
             guard let color = variant.color else {
                 return
             }
+            
+            // TODO: if the color is NA and the image url already exists in a variant with a real color, remove the na variant
+//            if ["N/A", "NA"].contains(color.uppercased()) {
+//                variant.parsedImageURLs().first
+//            }
             
             colors.insert(color)
             let structuredColorVariant = structuredColorVariantsDict[color] ?? StructuredColorVariant(color: color)
@@ -462,7 +485,7 @@ class StructuredProduct: NSObject {
     }
 }
 
-class StructuredColorVariant: NSObject {
+fileprivate class StructuredColorVariant: NSObject {
     let color: String?
     
     fileprivate var sizeSet: Set<String> = Set()

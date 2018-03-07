@@ -12,7 +12,7 @@ import SDWebImage
 class ProductView: UIView {
     let scrollView = UIScrollView()
     
-    let galleryScrollView = UIScrollView()
+    let galleryScrollView: UIScrollView = ScrollView()
     let galleryScrollContentView = UIView()
     fileprivate let pageControl = UIPageControl()
     
@@ -48,6 +48,7 @@ class ProductView: UIView {
         scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
+        (galleryScrollView as? ScrollView)?.lifeCycleDelegate = self
         galleryScrollView.translatesAutoresizingMaskIntoConstraints = false
         galleryScrollView.delegate = self
         galleryScrollView.scrollsToTop = false
@@ -197,13 +198,15 @@ class ProductView: UIView {
     
     // MARK: Gallery
     
-    private var galleryURLs: [URL] = []
+    private var galleryURLs: [URL]?
+    fileprivate var selectedGalleryURL: URL?
     
-    func setGalleryImages(urls: [URL]) {
+    func setGalleryImages(urls: [URL], selectedURL: URL?) {
         galleryScrollContentView.subviews.forEach { subview in
             subview.removeFromSuperview()
         }
         galleryURLs = urls
+        selectedGalleryURL = selectedURL
         
         pageControl.numberOfPages = urls.count
         pageControl.currentPage = 0
@@ -237,20 +240,28 @@ class ProductView: UIView {
         }
     }
     
-    func scrollGalleryImages(toPage page: Int) {
+    func scrollGalleryImages(toPage page: Int, animated: Bool = true) {
         var point: CGPoint = .zero
         point.x = galleryScrollView.bounds.width * CGFloat(page)
-        galleryScrollView.setContentOffset(point, animated: true)
+        galleryScrollView.setContentOffset(point, animated: animated)
+        
+        if !animated {
+            syncPageControl()
+        }
     }
     
-    func scrollGalleryImages(toURL url: URL) {
-        if let index = galleryURLs.index(of: url) {
-            scrollGalleryImages(toPage: index)
+    func scrollGalleryImages(toURL url: URL, animated: Bool = true) {
+        if let index = galleryURLs?.index(of: url) {
+            scrollGalleryImages(toPage: index, animated: animated)
         }
     }
     
     var currentGalleryPage: Int {
         return Int(galleryScrollView.contentOffset.x / galleryScrollView.bounds.width)
+    }
+    
+    fileprivate func syncPageControl() {
+        pageControl.currentPage = currentGalleryPage
     }
     
     @objc fileprivate func pageControlDidChange() {
@@ -301,11 +312,37 @@ extension ProductView: UIScrollViewDelegate {
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            pageControl.currentPage = currentGalleryPage
+            syncPageControl()
         }
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        pageControl.currentPage = currentGalleryPage
+        syncPageControl()
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        syncPageControl()
+    }
+}
+
+fileprivate protocol ProductViewScrollViewDelegate: NSObjectProtocol {
+    func scrollViewDidLayoutSubviews()
+}
+
+extension ProductView: ProductViewScrollViewDelegate {
+    fileprivate class ScrollView: UIScrollView {
+        weak var lifeCycleDelegate: ProductViewScrollViewDelegate?
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            lifeCycleDelegate?.scrollViewDidLayoutSubviews()
+        }
+    }
+    
+    fileprivate func scrollViewDidLayoutSubviews() {
+        if let selectedGalleryURL = selectedGalleryURL {
+            scrollGalleryImages(toURL: selectedGalleryURL, animated: false)
+            self.selectedGalleryURL = nil
+        }
     }
 }
