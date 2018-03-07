@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SDWebImage
 import CoreData
 
 class ProductViewController : BaseViewController {
@@ -121,8 +120,6 @@ class ProductViewController : BaseViewController {
             productView.scrollView.delegate = self
             productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
             productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
-            productView.galleryScrollView.delegate = self
-            productView.pageControl.addTarget(self, action: #selector(pageControlDidChange), for: .valueChanged)
             productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
             productView.websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
@@ -138,92 +135,7 @@ class ProductViewController : BaseViewController {
 
 typealias ProductViewControllerProductView = ProductViewController
 fileprivate extension ProductViewControllerProductView {
-    // MARK: Gallery
-    
-    func setImages(urls: [URL]) {
-        guard let productView = productView else {
-            return
-        }
-        
-        productView.galleryScrollContentView.subviews.forEach { subview in
-            subview.removeFromSuperview()
-        }
-        
-        productView.pageControl.numberOfPages = urls.count
-        productView.pageControl.currentPage = 0
-        
-        urls.enumerated().forEach { (index: Int, url: URL) in
-            let previousImageView = productView.galleryScrollContentView.subviews.last
-            
-            let imageView = UIImageView()
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            imageView.contentMode = .scaleAspectFit
-            imageView.backgroundColor = .white
-            productView.galleryScrollContentView.addSubview(imageView)
-            imageView.topAnchor.constraint(equalTo: productView.galleryScrollContentView.topAnchor).isActive = true
-            imageView.bottomAnchor.constraint(equalTo: productView.galleryScrollContentView.bottomAnchor).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: view.bounds.width).isActive = true
-            
-            if index == 0 {
-                imageView.leadingAnchor.constraint(equalTo: productView.galleryScrollContentView.leadingAnchor).isActive = true
-            }
-            else {
-                if let previousImageView = previousImageView {
-                    imageView.leadingAnchor.constraint(equalTo: previousImageView.trailingAnchor).isActive = true
-                }
-            }
-            
-            if index == urls.count - 1 {
-                imageView.trailingAnchor.constraint(equalTo: productView.galleryScrollContentView.trailingAnchor).isActive = true
-            }
-            
-            imageView.sd_setImage(with: url, completed: nil)
-        }
-    }
-    
-    @objc func pageControlDidChange() {
-        guard let productView = productView else {
-            return
-        }
-        
-        var point: CGPoint = .zero
-        point.x = productView.galleryScrollView.bounds.width * CGFloat(productView.pageControl.currentPage)
-        productView.galleryScrollView.setContentOffset(point, animated: true)
-    }
-    
-    var currentPage: Int {
-        guard let productView = productView else {
-            return 0
-        }
-        
-        return Int(productView.galleryScrollView.contentOffset.x / productView.galleryScrollView.bounds.width)
-    }
-    
     // MARK: Labels
-    
-    func setProductTitle(_ title: String?) {
-        guard let productView = productView else {
-            return
-        }
-        
-        productView.titleLabel.text = title
-    }
-    
-    func setProductDescription(_ description: String?) {
-        guard let productView = productView else {
-            return
-        }
-        
-        productView.contentTextView.text = description
-    }
-    
-    func setPrice(_ price: String?) {
-        guard let productView = productView else {
-            return
-        }
-        
-        productView.priceLabel.text = price
-    }
     
     func setOriginalPrice(_ price: String?) {
         guard let productView = productView else {
@@ -261,11 +173,15 @@ fileprivate extension ProductViewControllerProductView {
         selectedItem.resetBorderColor()
         
         if selectedItem == productView.selectionColorItem {
-            guard let variant = structuredProduct?.structuredColorVariant(forColor: selectedItem.selectedPickerItem) else {
+            guard let structuredColorVariant = structuredProduct?.structuredColorVariant(forColor: selectedItem.selectedPickerItem) else {
                 return
             }
             
-            productView.selectionSizeItem?.disabledPickerItems = structuredProduct?.subtractingSizes(of: variant)
+            productView.selectionSizeItem?.disabledPickerItems = structuredProduct?.subtractingSizes(of: structuredColorVariant)
+            
+            if let imageURL = structuredProduct?.imageURL(forColor: structuredColorVariant.color) {
+                productView.scrollGalleryImages(toURL: imageURL)
+            }
         }
     }
     
@@ -377,29 +293,33 @@ fileprivate extension ProductViewControllerStructuredProduct {
             return
         }
         
-        setProductTitle(structuredProduct.title)
-        setProductDescription(structuredProduct.product.detailedDescription)
-        setImages(urls: structuredProduct.product.imageURLs())
+        productView?.unavailableImageView.isHidden = structuredProduct.isAvailable
+        productView?.setGalleryImages(urls: structuredProduct.imageURLs ?? structuredProduct.product.imageURLs())
+        productView?.titleLabel.text = structuredProduct.product.productTitle()
+        productView?.priceLabel.text = structuredProduct.product.price
+        productView?.contentTextView.text = structuredProduct.product.detailedDescription
+        
         setWebsiteMerchant(structuredProduct.product.merchant)
-        setPrice(structuredProduct.product.price)
         
         if structuredProduct.product.isSale() {
             setOriginalPrice(structuredProduct.product.originalPrice)
         }
         
-        let colorItem = SegmentedDropDownItem(pickerItems: structuredProduct.colors, selectedPickerItem: structuredProduct.product.color)
-        
-        var sizeItem: SegmentedDropDownItem? = nil
-        
-        if !structuredProduct.sizes.isEmpty {
-            sizeItem = SegmentedDropDownItem(pickerItems: structuredProduct.sizes)
+        if let colors = structuredProduct.colors {
+            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: structuredProduct.product.color)
+            var sizeItem: SegmentedDropDownItem?
             
-            if colorItem.selectedPickerItem == nil {
-                sizeItem?.disabledPickerItems = structuredProduct.sizes // Disabled until color is selected
+            if let sizes = structuredProduct.sizes {
+                sizeItem = SegmentedDropDownItem(pickerItems: sizes)
+                
+                if colorItem.selectedPickerItem == nil {
+                    // Disabled until color is selected
+                    sizeItem?.disabledPickerItems = structuredProduct.sizes
+                }
             }
+            
+            productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         }
-        
-        productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         
         repositionScrollView()
     }
@@ -425,25 +345,8 @@ fileprivate extension ProductViewControllerCart {
 
 extension ProductViewController : UIScrollViewDelegate {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if productView?.scrollView.keyboardDismissMode == .onDrag {
-            if productView?.selectionControl.isFirstResponder ?? false {
-                // Dismiss selected state
-                _ = productView?.selectionControl.resignFirstResponder()
-            }
-        }
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if scrollView == productView?.galleryScrollView {
-            if !decelerate {
-                productView?.pageControl.currentPage = currentPage
-            }
-        }
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        if scrollView == productView?.galleryScrollView {
-            productView?.pageControl.currentPage = currentPage
+        if scrollView.keyboardDismissMode == .onDrag {
+            productView?.resignSelectionControl()
         }
     }
     
@@ -469,100 +372,117 @@ extension ProductViewController: FetchedResultsControllerManagerDelegate {
     }
 }
 
-fileprivate extension ProductViewController {
-    class StructuredProduct: NSObject {
-        let product: Product
-        private(set) var title: String?
-        private(set) var structuredColorVariants: [StructuredColorVariant] = []
-        private(set) var colors: [String] = []
-        private(set) var sizes: [String] = []
+class StructuredProduct: NSObject {
+    let product: Product
+    private(set) var structuredColorVariants: [StructuredColorVariant]?
+    private(set) var colors: [String]?
+    private(set) var sizes: [String]?
+    private(set) var isAvailable = false
+    
+    init(_ product: Product) {
+        self.product = product
+        super.init()
         
-        init(_ product: Product) {
-            self.product = product
-            super.init()
-            
-            guard let variants = product.availableVariants?.allObjects as? [Variant] else {
+        guard let variants = product.availableVariants?.allObjects as? [Variant] else {
+            return
+        }
+        
+        isAvailable = true
+        
+        var structuredColorVariantsDict: [String : StructuredColorVariant] = [:]
+        var colors: Set<String> = Set()
+        var sizes: Set<String> = Set()
+        imageURLDict = [:]
+        
+        variants.forEach { variant in
+            guard let color = variant.color else {
                 return
             }
             
-            title = product.productTitle()
+            colors.insert(color)
+            let structuredColorVariant = structuredColorVariantsDict[color] ?? StructuredColorVariant(color: color)
             
-            var structuredColorVariantsDict: [String : StructuredColorVariant] = [:]
-            var colors: Set<String> = Set()
-            var sizes: Set<String> = Set()
+            structuredColorVariant.variantSet.insert(variant)
             
-            variants.forEach { variant in
-                guard let color = variant.color else {
-                    return
-                }
-                
-                colors.insert(color)
-                let structuredColorVariant = structuredColorVariantsDict[color] ?? StructuredColorVariant(color: color)
-                
-                structuredColorVariant.variantSet.insert(variant)
-                
-                if let size = variant.size {
-                    sizes.insert(size)
-                    structuredColorVariant.sizeSet.insert(size)
-                }
-                
-                structuredColorVariantsDict[color] = structuredColorVariant
+            if let size = variant.size {
+                sizes.insert(size)
+                structuredColorVariant.sizeSet.insert(size)
             }
             
-            structuredColorVariants = Array(structuredColorVariantsDict.values)
+            structuredColorVariantsDict[color] = structuredColorVariant
             
-            let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
-            
-            self.colors = colors.sorted()
-            self.sizes = sizes.sorted(by: { (a, b) -> Bool in
-                let aIndex = (sortedSizes.index(of: a) ?? Int.max)
-                let bIndex = (sortedSizes.index(of: b) ?? Int.max)
-                
-                if aIndex == Int.max && bIndex == Int.max {
-                    return a.localizedStandardCompare(b) == .orderedAscending
-                }
-                
-                return aIndex < bIndex
-            })
-        }
-        
-        func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
-            return structuredColorVariants.first { structuredColorVariant -> Bool in
-                return structuredColorVariant.color == color
+            if imageURLDict?[color] == nil, let imageURL = variant.parsedImageURLs().first {
+                imageURLDict?[color] = imageURL
             }
         }
         
-        func variant(forColor color: String?, size: String?) -> Variant? {
-            return structuredColorVariant(forColor: color)?.variant(forSize: size)
-        }
+        structuredColorVariants = Array(structuredColorVariantsDict.values)
         
-        func subtractingSizes(of structuredColorVariant: StructuredColorVariant) -> [String] {
-            return Array(Set(sizes).subtracting(structuredColorVariant.sizes))
+        let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
+        
+        self.colors = colors.sorted()
+        self.sizes = sizes.sorted(by: { (a, b) -> Bool in
+            let aIndex = (sortedSizes.index(of: a) ?? Int.max)
+            let bIndex = (sortedSizes.index(of: b) ?? Int.max)
+            
+            if aIndex == Int.max && bIndex == Int.max {
+                return a.localizedStandardCompare(b) == .orderedAscending
+            }
+            
+            return aIndex < bIndex
+        })
+    }
+    
+    // MARK: Variant
+    
+    func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
+        return structuredColorVariants?.first { structuredColorVariant -> Bool in
+            return structuredColorVariant.color == color
         }
     }
     
-    class StructuredColorVariant: NSObject {
-        let color: String?
-        
-        fileprivate var sizeSet: Set<String> = Set()
-        var sizes: [String] {
-            return Array(sizeSet)
-        }
-        
-        fileprivate var variantSet: Set<Variant> = Set()
-        var variants: [Variant] {
-            return Array(variantSet)
-        }
-        
-        init(color: String?) {
-            self.color = color
-            super.init()
-        }
-        
-        func variant(forSize size: String?) -> Variant? {
-            return variants.first { variant -> Bool in
-                return variant.size == size
-            }
+    func variant(forColor color: String?, size: String?) -> Variant? {
+        return structuredColorVariant(forColor: color)?.variant(forSize: size)
+    }
+    
+    func subtractingSizes(of structuredColorVariant: StructuredColorVariant) -> [String] {
+        return Array(Set(sizes ?? []).subtracting(structuredColorVariant.sizes))
+    }
+    
+    // MARK: Image
+    
+    private var imageURLDict: [String: URL]?
+    
+    func imageURL(forColor color: String?) -> URL? {
+        return imageURLDict?[color ?? ""]
+    }
+    
+    var imageURLs: [URL]? {
+        return imageURLDict?.sorted { $0.key < $1.key }.map { $0.value }
+    }
+}
+
+class StructuredColorVariant: NSObject {
+    let color: String?
+    
+    fileprivate var sizeSet: Set<String> = Set()
+    var sizes: [String] {
+        return Array(sizeSet)
+    }
+    
+    fileprivate var variantSet: Set<Variant> = Set()
+    var variants: [Variant] {
+        return Array(variantSet)
+    }
+    
+    init(color: String?) {
+        self.color = color
+        super.init()
+    }
+    
+    func variant(forSize size: String?) -> Variant? {
+        return variants.first { variant -> Bool in
+            return variant.size == size
         }
     }
 }

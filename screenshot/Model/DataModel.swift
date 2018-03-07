@@ -1309,6 +1309,14 @@ extension Product {
     
 }
 
+extension Variant {
+    
+    func parsedImageURLs() -> [URL] {
+        return imageURLs?.components(separatedBy: ",").flatMap { URL(string: $0) } ?? []
+    }
+    
+}
+
 extension Matchstick {
     
     public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {

@@ -7,14 +7,16 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ProductView: UIView {
     let scrollView = UIScrollView()
     
     let galleryScrollView = UIScrollView()
     let galleryScrollContentView = UIView()
-    let pageControl = UIPageControl()
+    fileprivate let pageControl = UIPageControl()
     
+    let unavailableImageView = UIImageView(image: UIImage(named: "ProductUnavailable"))
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
@@ -27,6 +29,8 @@ class ProductView: UIView {
     fileprivate(set) var selectionQuantityItem: SegmentedDropDownItem?
     let cartButton = MainButton()
 //    let buyButton = MainButton()
+    
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -45,6 +49,7 @@ class ProductView: UIView {
         scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         galleryScrollView.translatesAutoresizingMaskIntoConstraints = false
+        galleryScrollView.delegate = self
         galleryScrollView.scrollsToTop = false
         galleryScrollView.isPagingEnabled = true
         galleryScrollView.showsHorizontalScrollIndicator = false
@@ -68,11 +73,19 @@ class ProductView: UIView {
         pageControl.hidesForSinglePage = true
         pageControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.5)
         pageControl.currentPageIndicatorTintColor = .crazeGreen
+        pageControl.addTarget(self, action: #selector(pageControlDidChange), for: .valueChanged)
         scrollView.addSubview(pageControl)
         pageControl.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: .padding).isActive = true
         pageControl.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
         pageControl.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -.padding).isActive = true
         pageControl.centerXAnchor.constraint(equalTo: galleryScrollView.centerXAnchor).isActive = true
+        
+        unavailableImageView.translatesAutoresizingMaskIntoConstraints = false
+        unavailableImageView.contentMode = .scaleAspectFit
+        unavailableImageView.isHidden = true
+        scrollView.addSubview(unavailableImageView)
+        unavailableImageView.topAnchor.constraint(equalTo: galleryScrollView.topAnchor, constant: .padding).isActive = true
+        unavailableImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
         
         let labelContainerView = UIView()
         labelContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -182,6 +195,70 @@ class ProductView: UIView {
 //        buyButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
     }
     
+    // MARK: Gallery
+    
+    private var galleryURLs: [URL] = []
+    
+    func setGalleryImages(urls: [URL]) {
+        galleryScrollContentView.subviews.forEach { subview in
+            subview.removeFromSuperview()
+        }
+        galleryURLs = urls
+        
+        pageControl.numberOfPages = urls.count
+        pageControl.currentPage = 0
+        
+        urls.enumerated().forEach { (index: Int, url: URL) in
+            let previousImageView = galleryScrollContentView.subviews.last
+            
+            let imageView = UIImageView()
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.contentMode = .scaleAspectFit
+            imageView.backgroundColor = .white
+            galleryScrollContentView.addSubview(imageView)
+            imageView.topAnchor.constraint(equalTo: galleryScrollContentView.topAnchor).isActive = true
+            imageView.bottomAnchor.constraint(equalTo: galleryScrollContentView.bottomAnchor).isActive = true
+            imageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+            
+            if index == 0 {
+                imageView.leadingAnchor.constraint(equalTo: galleryScrollContentView.leadingAnchor).isActive = true
+            }
+            else {
+                if let previousImageView = previousImageView {
+                    imageView.leadingAnchor.constraint(equalTo: previousImageView.trailingAnchor).isActive = true
+                }
+            }
+            
+            if index == urls.count - 1 {
+                imageView.trailingAnchor.constraint(equalTo: galleryScrollContentView.trailingAnchor).isActive = true
+            }
+            
+            imageView.sd_setImage(with: url, completed: nil)
+        }
+    }
+    
+    func scrollGalleryImages(toPage page: Int) {
+        var point: CGPoint = .zero
+        point.x = galleryScrollView.bounds.width * CGFloat(page)
+        galleryScrollView.setContentOffset(point, animated: true)
+    }
+    
+    func scrollGalleryImages(toURL url: URL) {
+        if let index = galleryURLs.index(of: url) {
+            scrollGalleryImages(toPage: index)
+        }
+    }
+    
+    var currentGalleryPage: Int {
+        return Int(galleryScrollView.contentOffset.x / galleryScrollView.bounds.width)
+    }
+    
+    @objc fileprivate func pageControlDidChange() {
+        scrollGalleryImages(toPage: pageControl.currentPage)
+    }
+    
+    // MARK: Selection
+    
     func setSelection(colorItem: SegmentedDropDownItem, sizeItem: SegmentedDropDownItem?) {
         var items: [SegmentedDropDownItem] = []
         let hasSizeItem = sizeItem != nil
@@ -205,5 +282,30 @@ class ProductView: UIView {
         selectionColorItem = colorItem
         selectionSizeItem = sizeItem
         selectionQuantityItem = quantityItem
+    }
+    
+    func resignSelectionControl() {
+        if selectionControl.isFirstResponder {
+            // Dismiss selected state
+            _ = selectionControl.resignFirstResponder()
+        }
+    }
+}
+
+extension ProductView: UIScrollViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if scrollView.keyboardDismissMode == .onDrag {
+            resignSelectionControl()
+        }
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            pageControl.currentPage = currentGalleryPage
+        }
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        pageControl.currentPage = currentGalleryPage
     }
 }
