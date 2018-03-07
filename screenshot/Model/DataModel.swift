@@ -483,6 +483,21 @@ extension DataModel {
         }
     }
 
+    func retrieveItems(managedObjectContext: NSManagedObjectContext, remoteId: String) -> [CartItem]? {
+        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "cart.remoteId == %@", remoteId)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveItems results with error:\(error)")
+        }
+        return nil
+    }
+    
     // Errors if cart not previously created. Okay if cart has no remoteId.
     func retrieveForCheckout() -> Promise<([String : Any], NSManagedObjectID)> {
         return Promise { fulfill, reject in
