@@ -230,7 +230,11 @@ class ShoppingCartModel {
         return firstly {
             return retrieveCartRemoteId()
             }.then { remoteId -> Promise<URL> in
-                if let url = URL(string: "\(Constants.shoppableHosted)/checkout?cart=\(remoteId)?apiToken=\(Constants.shoppableToken)?campaign=screenshop?noiframe=0?publisherCheckout=\(Constants.shoppablePublisherCheckout)?returnToSite=\(Constants.shoppableThankYou)?orderComplete=\(Constants.shoppableThankYou)") {
+                if !remoteId.isEmpty,
+                  let returnSite = "\(Constants.shoppableThankYou)?remoteId=\(remoteId)&from=return".addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+                  let orderComplete = "\(Constants.shoppableThankYou)?remoteId=\(remoteId)&from=complete".addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+                  let publisherCheckout = Constants.shoppablePublisherCheckout.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+                  let url = URL(string: "\(Constants.shoppableHosted)/checkout?cart=\(remoteId)&apiToken=\(Constants.shoppableToken)&campaign=screenshop&noiframe=0&publisherCheckout=\(publisherCheckout)&returnToSite=\(returnSite)&orderComplete=\(orderComplete)") {
                     print("hostedUrl succeeded to form url:\(url)")
                     return Promise(value: url)
                 } else {
