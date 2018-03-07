@@ -135,25 +135,7 @@ class ProductViewController : BaseViewController {
 
 typealias ProductViewControllerProductView = ProductViewController
 fileprivate extension ProductViewControllerProductView {
-    // MARK: Gallery
-    
-    func setImages(urls: [URL]) {
-        productView?.setGalleryImages(urls: urls)
-    }
-    
     // MARK: Labels
-    
-    func setProductTitle(_ title: String?) {
-        productView?.titleLabel.text = title
-    }
-    
-    func setProductDescription(_ description: String?) {
-        productView?.contentTextView.text = description
-    }
-    
-    func setPrice(_ price: String?) {
-        productView?.priceLabel.text = price
-    }
     
     func setOriginalPrice(_ price: String?) {
         guard let productView = productView else {
@@ -311,11 +293,13 @@ fileprivate extension ProductViewControllerStructuredProduct {
             return
         }
         
-        setProductTitle(structuredProduct.title)
-        setProductDescription(structuredProduct.product.detailedDescription)
-        setImages(urls: structuredProduct.imageURLs)
+        productView?.unavailableImageView.isHidden = !structuredProduct.structuredColorVariants.isEmpty
+        productView?.setGalleryImages(urls: structuredProduct.imageURLs)
+        productView?.titleLabel.text = structuredProduct.title
+        productView?.priceLabel.text = structuredProduct.product.price
+        productView?.contentTextView.text = structuredProduct.product.detailedDescription
+        
         setWebsiteMerchant(structuredProduct.product.merchant)
-        setPrice(structuredProduct.product.price)
         
         if structuredProduct.product.isSale() {
             setOriginalPrice(structuredProduct.product.originalPrice)

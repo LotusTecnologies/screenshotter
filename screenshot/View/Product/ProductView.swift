@@ -16,6 +16,7 @@ class ProductView: UIView {
     let galleryScrollContentView = UIView()
     fileprivate let pageControl = UIPageControl()
     
+    let unavailableImageView = UIImageView(image: UIImage(named: "ProductUnavailable"))
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
@@ -78,6 +79,13 @@ class ProductView: UIView {
         pageControl.bottomAnchor.constraint(equalTo: galleryScrollView.bottomAnchor).isActive = true
         pageControl.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -.padding).isActive = true
         pageControl.centerXAnchor.constraint(equalTo: galleryScrollView.centerXAnchor).isActive = true
+        
+        unavailableImageView.translatesAutoresizingMaskIntoConstraints = false
+        unavailableImageView.contentMode = .scaleAspectFit
+        unavailableImageView.isHidden = true
+        scrollView.addSubview(unavailableImageView)
+        unavailableImageView.topAnchor.constraint(equalTo: galleryScrollView.topAnchor, constant: .padding).isActive = true
+        unavailableImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
         
         let labelContainerView = UIView()
         labelContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -210,7 +218,7 @@ class ProductView: UIView {
             galleryScrollContentView.addSubview(imageView)
             imageView.topAnchor.constraint(equalTo: galleryScrollContentView.topAnchor).isActive = true
             imageView.bottomAnchor.constraint(equalTo: galleryScrollContentView.bottomAnchor).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width).isActive = true
+            imageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
             
             if index == 0 {
                 imageView.leadingAnchor.constraint(equalTo: galleryScrollContentView.leadingAnchor).isActive = true
