@@ -257,6 +257,10 @@ class ProductView: UIView {
     }
     
     var currentGalleryPage: Int {
+        guard galleryScrollView.bounds.width > 0 else {
+            return 0
+        }
+        
         return Int(galleryScrollView.contentOffset.x / galleryScrollView.bounds.width)
     }
     

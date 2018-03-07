@@ -10,16 +10,10 @@ import UIKit
 import CoreData
 
 class ProductViewController : BaseViewController {
-    enum State {
-        case loading
-        case product
-        case empty
-    }
-    
     fileprivate var cartBarButtonItem: ProductCartBarButtonItem?
-    fileprivate var productView: ProductView?
-    fileprivate var productEmptyView: UIView?
-    fileprivate var loadingView: Loader?
+    fileprivate var productView: ProductView {
+        return view as! ProductView
+    }
     
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
@@ -34,13 +28,8 @@ class ProductViewController : BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         ShoppingCartModel.shared.populateVariants(productOID: productOID)
-            .then { product -> Void in
-                self.state = .product
-                self.structuredProduct = StructuredProduct(product)
-                self.applyStructuredProductIfPossible()
-            }
-            .catch { error in
-                self.state = .empty
+            .then { [weak self] product -> Void in
+                self?.setup(with: product)
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
@@ -49,87 +38,25 @@ class ProductViewController : BaseViewController {
         navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     
+    override func loadView() {
+        let productView = ProductView()
+        productView.scrollView.delegate = self
+        productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
+        productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
+        productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
+//            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
+        productView.websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
+        view = productView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        syncState()
         syncCartItemCount()
     }
     
-    // MARK: State
-    
-    fileprivate var state: ProductViewController.State = .loading {
-        didSet {
-            if isViewLoaded {
-                syncState()
-            }
-        }
-    }
-    
-    fileprivate func syncState() {
-        switch state {
-        case .empty:
-            guard self.productEmptyView == nil else {
-                return
-            }
-            
-            loadingView?.removeFromSuperview()
-            loadingView = nil
-            productView?.removeFromSuperview()
-            productView = nil
-            
-            let productEmptyView = UIView()
-            productEmptyView.translatesAutoresizingMaskIntoConstraints = false
-            productEmptyView.backgroundColor = .orange
-            view.addSubview(productEmptyView)
-            productEmptyView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-            productEmptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            productEmptyView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
-            productEmptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            self.productEmptyView = productEmptyView
-            
-        case .loading:
-            guard self.loadingView == nil else {
-                return
-            }
-            
-            productView?.removeFromSuperview()
-            productView = nil
-            productEmptyView?.removeFromSuperview()
-            productEmptyView = nil
-            
-            let loadingView = Loader()
-            loadingView.translatesAutoresizingMaskIntoConstraints = false
-            loadingView.startAnimation()
-            view.addSubview(loadingView)
-            loadingView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            loadingView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-            self.loadingView = loadingView
-            
-        case .product:
-            guard self.productView == nil else {
-                return
-            }
-            
-            loadingView?.removeFromSuperview()
-            loadingView = nil
-            productEmptyView?.removeFromSuperview()
-            productEmptyView = nil
-            
-            let productView = ProductView()
-            productView.translatesAutoresizingMaskIntoConstraints = false
-            productView.scrollView.delegate = self
-            productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
-            productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
-            productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
-//            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
-            productView.websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
-            view.addSubview(productView)
-            productView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            productView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            productView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-            productView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            self.productView = productView
-        }
+    func setup(with product: Product) {
+        structuredProduct = StructuredProduct(product)
+        applyStructuredProductIfPossible()
     }
 }
 
@@ -138,10 +65,6 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Labels
     
     func setOriginalPrice(_ price: String?) {
-        guard let productView = productView else {
-            return
-        }
-        
         if let text = price {
             productView.priceLabel.textColor = .crazeRed
             productView.originalPriceLabel.attributedText = NSAttributedString(string: text, attributes: [
@@ -166,7 +89,7 @@ fileprivate extension ProductViewControllerProductView {
     }
     
     @objc func selectionButtonValueChanged() {
-        guard let productView = productView, let selectedItem = productView.selectionControl.selectedItem else {
+        guard let selectedItem = productView.selectionControl.selectedItem else {
             return
         }
         
@@ -188,10 +111,6 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Cart
     
     @objc func cartButtonAction() {
-        guard let productView = productView else {
-            return
-        }
-        
         var errorItems: [SegmentedDropDownItem] = []
         
         productView.selectionControl.items.forEach { item in
@@ -230,7 +149,7 @@ fileprivate extension ProductViewControllerProductView {
             
             if currentOffsetY > minOffsetY {
                 UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                    productView.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
+                    self.productView.scrollView.contentOffset = CGPoint(x: 0, y: minOffsetY - adjustedContentInsetTop - .padding)
                     
                 }, completion: { completed in
                     displayErrorItems()
@@ -249,10 +168,6 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Web
     
     func setWebsiteMerchant(_ merchant: String?) {
-        guard let productView = productView else {
-            return
-        }
-        
         if let name = merchant, !name.isEmpty {
             let color = productView.websiteButton.titleColor(for: .normal) ?? .crazeGreen
             
@@ -309,13 +224,13 @@ fileprivate extension ProductViewControllerStructuredProduct {
         
         if let imageURLs = imageURLs {
             let imageURL = structuredProduct.imageURL(forColor: product.color)
-            productView?.setGalleryImages(urls: imageURLs, selectedURL: imageURL)
+            productView.setGalleryImages(urls: imageURLs, selectedURL: imageURL)
         }
         
-        productView?.unavailableImageView.isHidden = structuredProduct.isAvailable
-        productView?.titleLabel.text = product.productTitle()
-        productView?.priceLabel.text = product.price
-        productView?.contentTextView.text = product.detailedDescription
+        productView.unavailableImageView.isHidden = structuredProduct.isAvailable
+        productView.titleLabel.text = product.productTitle()
+        productView.priceLabel.text = product.price
+        productView.contentTextView.text = product.detailedDescription
         
         setWebsiteMerchant(product.merchant)
         
@@ -336,15 +251,15 @@ fileprivate extension ProductViewControllerStructuredProduct {
                 }
             }
             
-            productView?.setSelection(colorItem: colorItem, sizeItem: sizeItem)
+            productView.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         }
         
-        repositionScrollView()
+//        repositionScrollView()
     }
     
     func selectedVariant() -> Variant? {
-        let color = productView?.selectionColorItem?.selectedPickerItem
-        let size = productView?.selectionSizeItem?.selectedPickerItem
+        let color = productView.selectionColorItem?.selectedPickerItem
+        let size = productView.selectionSizeItem?.selectedPickerItem
         return structuredProduct?.variant(forColor: color, size: size)
     }
 }
@@ -364,7 +279,7 @@ fileprivate extension ProductViewControllerCart {
 extension ProductViewController : UIScrollViewDelegate {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if scrollView.keyboardDismissMode == .onDrag {
-            productView?.resignSelectionControl()
+            productView.resignSelectionControl()
         }
     }
     
@@ -373,14 +288,14 @@ extension ProductViewController : UIScrollViewDelegate {
         
         let y: CGFloat = {
             if #available(iOS 11.0, *) {
-                return productView?.scrollView.adjustedContentInset.top ?? 0
+                return productView.scrollView.adjustedContentInset.top
             }
             else {
                 return navigationController?.navigationBar.frame.maxY ?? 0
             }
         }()
         
-        productView?.scrollView.contentOffset = CGPoint(x: 0, y: -y)
+        productView.scrollView.contentOffset = CGPoint(x: 0, y: -y)
     }
 }
 
@@ -410,7 +325,7 @@ fileprivate class StructuredProduct: NSObject {
         var structuredColorVariantsDict: [String : StructuredColorVariant] = [:]
         var colors: Set<String> = Set()
         var sizes: Set<String> = Set()
-        imageURLDict = [:]
+        var imageURLDict: [String: URL] = [:]
         
         variants.forEach { variant in
             guard let color = variant.color else {
@@ -434,26 +349,37 @@ fileprivate class StructuredProduct: NSObject {
             
             structuredColorVariantsDict[color] = structuredColorVariant
             
-            if imageURLDict?[color] == nil, let imageURL = variant.parsedImageURLs().first {
-                imageURLDict?[color] = imageURL
+            if imageURLDict[color] == nil, let imageURL = variant.parsedImageURLs().first {
+                imageURLDict[color] = imageURL
             }
         }
         
-        structuredColorVariants = Array(structuredColorVariantsDict.values)
+        if !structuredColorVariantsDict.isEmpty {
+            structuredColorVariants = Array(structuredColorVariantsDict.values)
+        }
         
-        let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
+        if !colors.isEmpty {
+            self.colors = colors.sorted()
+        }
         
-        self.colors = colors.sorted()
-        self.sizes = sizes.sorted(by: { (a, b) -> Bool in
-            let aIndex = (sortedSizes.index(of: a) ?? Int.max)
-            let bIndex = (sortedSizes.index(of: b) ?? Int.max)
+        if !sizes.isEmpty {
+            let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
             
-            if aIndex == Int.max && bIndex == Int.max {
-                return a.localizedStandardCompare(b) == .orderedAscending
-            }
-            
-            return aIndex < bIndex
-        })
+            self.sizes = sizes.sorted(by: { (a, b) -> Bool in
+                let aIndex = (sortedSizes.index(of: a) ?? Int.max)
+                let bIndex = (sortedSizes.index(of: b) ?? Int.max)
+                
+                if aIndex == Int.max && bIndex == Int.max {
+                    return a.localizedStandardCompare(b) == .orderedAscending
+                }
+                
+                return aIndex < bIndex
+            })
+        }
+        
+        if !imageURLDict.isEmpty {
+            self.imageURLDict = imageURLDict
+        }
     }
     
     // MARK: Variant

@@ -407,6 +407,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             if product.partNumber != nil {
                 let productViewController = ProductViewController(productOID: product.objectID)
                 productViewController.title = product.displayTitle
+                productViewController.setup(with: product)
                 navigationController?.pushViewController(productViewController, animated: true)
             }
             else {
