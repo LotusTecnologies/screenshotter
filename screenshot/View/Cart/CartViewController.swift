@@ -231,8 +231,17 @@ fileprivate extension CartViewControllerCartItem {
 typealias CartViewControllerCheckout = CartViewController
 fileprivate extension CartViewControllerCheckout {
     @objc func checkoutAction(_ button: UIButton) {
-        ShoppingCartModel.shared.checkout().then { dict -> Void in
-            print("||| \(dict)")
+        // TODO: spinner
+        
+        ShoppingCartModel.shared.checkout().then { success -> Void in
+            if success {
+                ShoppingCartModel.shared.hostedUrl().then { url -> Void in
+                    OpenWebPage.present(urlString: url.absoluteString, fromViewController: self)
+                }
+            }
+            else {
+                
+            }
         }
     }
 }
