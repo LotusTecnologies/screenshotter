@@ -185,34 +185,35 @@ class ShoppingCartModel {
                             return
                         }
                         // Start with all cartItems errorMask as unavailable.
-                        cartItems.forEach { $0.errorMask = (1 << 0) } // unavailable
+                        cartItems.forEach { $0.errorMask = CartItem.ErrorMaskOptions.unavailable.rawValue }
                         merchants.forEach { merchant in
                             let items = merchant["items"] as? [[String : Any]]
                             items?.forEach { item in
                                 if let sku = item["sku"] as? String,
                                   !sku.isEmpty,
                                   let cartItem = cartItems.first(where: {$0.sku == sku}) {
-                                    cartItem.errorMask = 0 // Is available.
+                                    var errorMaskOptions: CartItem.ErrorMaskOptions = []
                                     if let qty = item["qty"] as? Int16,
                                       cartItem.quantity != qty {
                                         cartItem.quantity = qty
-                                        cartItem.errorMask |= (1 << 1) // qty
+                                        errorMaskOptions.insert(.quantity)
                                     }
                                     if let price = item["price"] as? Float,
                                       cartItem.retailPrice != price {
                                         cartItem.retailPrice = price
-                                        cartItem.errorMask |= (1 << 2) // price
+                                        errorMaskOptions.insert(.price)
                                     }
-                                    if let color = item["color"] as? String,
-                                      cartItem.color != color {
-                                        cartItem.color = color
-                                        cartItem.errorMask |= (1 << 3) // color
-                                    }
-                                    if let size = item["size"] as? String,
-                                      cartItem.size != size {
-                                        cartItem.size = size
-                                        cartItem.errorMask |= (1 << 4) // size
-                                    }
+//                                    if let color = item["color"] as? String,
+//                                      cartItem.color != color {
+//                                        cartItem.color = color
+//                                        errorMaskOptions.insert(.color)
+//                                    }
+//                                    if let size = item["size"] as? String,
+//                                      cartItem.size != size {
+//                                        cartItem.size = size
+//                                        errorMaskOptions.insert(.size)
+//                                    }
+                                    cartItem.errorMask = errorMaskOptions.rawValue
                                     print("errorMask:\(cartItem.errorMask) retailPrice:\(cartItem.retailPrice)")
                                 }
                             }
@@ -321,6 +322,21 @@ class ShoppingCartModel {
             }
             DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
         }
+    }
+    
+}
+
+
+extension CartItem {
+    
+    struct ErrorMaskOptions : OptionSet {
+        let rawValue: Int16
+        static let none         = ErrorMaskOptions(rawValue: 0)
+        static let unavailable  = ErrorMaskOptions(rawValue: 1 << 0)
+        static let quantity     = ErrorMaskOptions(rawValue: 1 << 1)
+        static let price        = ErrorMaskOptions(rawValue: 1 << 2)
+//        static let color        = ErrorMaskOptions(rawValue: 1 << 3)
+//        static let size         = ErrorMaskOptions(rawValue: 1 << 4)
     }
     
 }
