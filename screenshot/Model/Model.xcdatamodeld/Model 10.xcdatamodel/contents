@@ -10,6 +10,7 @@
     <entity name="CartItem" representedClassName="CartItem" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="errorMask" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="quantity" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" syncable="YES"/>
@@ -111,7 +112,7 @@
     </entity>
     <elements>
         <element name="Cart" positionX="369" positionY="-108" width="128" height="118"/>
-        <element name="CartItem" positionX="540" positionY="27" width="128" height="210"/>
+        <element name="CartItem" positionX="540" positionY="27" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="510"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>

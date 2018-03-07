@@ -302,12 +302,25 @@ class NetworkingPromise : NSObject {
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
+        sessionConfiguration.timeoutIntervalForResource = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
         return promise
     }
-    
-    func checkoutCart(jsonObject: [String : Any]) -> Promise<NSDictionary> {
+
+    func clearCart(remoteId: String) -> Promise<NSDictionary> {
+        guard let url = URL(string: Constants.shoppableDomain + "/cart/\(remoteId)/clear") else {
+            let error = NSError(domain: "Craze", code: 43, userInfo: [NSLocalizedDescriptionKey: "Cannot create clearCart url from remoteId:\(remoteId)  shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+        return promise
+    }
+
+    func checkoutCart(jsonObject: [String : Any]) -> Promise<[String : Any]> {
         guard let url = URL(string: Constants.shoppableDomain + "/cart/put/bundling") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form cart bundle url from shoppableDomain:\(Constants.shoppableDomain)"])
             return Promise(error: error)
@@ -317,10 +330,26 @@ class NetworkingPromise : NSObject {
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = jsonDatafy(object: jsonObject)
+        print("checkoutCart requesting url:\(url)  headers:\(String(describing: request.allHTTPHeaderFields))  data:\(String(data: request.httpBody!, encoding: .utf8) ?? "-")")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
-        return promise
+        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<[String : Any]> in
+            print("checkoutCart received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "checkoutCart invalid http statusCode for url:\(url)"])
+                    print("checkoutCart httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String : Any] {
+                return Promise(value: jsonObject)
+            } else {
+                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkoutCart JSONSerialize failed for url:\(url)"])
+                print("checkoutCart failed to JSONSerialize data.count:\(data.count)")
+                return Promise(error: error)
+            }
+        }
     }
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud

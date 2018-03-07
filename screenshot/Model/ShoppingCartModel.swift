@@ -115,19 +115,30 @@ class ShoppingCartModel {
         }
     }
     
-    public func checkout() -> Promise<NSDictionary> {
+    public func checkout() -> Promise<Bool> {
         // Get cart purchase data. Error if cart not previously created.
         let dataModel = DataModel.sharedInstance
         return firstly {
             dataModel.retrieveForCheckout()
         }
-        // Wait for network to get remoteId if not previously available.
+        // Wait for network to clear cart, or get new (cart) remoteId if not previously available.
             .then { purchaseJsonObject, cartOID -> Promise<[String : Any]> in
                 if let remoteId = purchaseJsonObject["id"] as? String,
                   !remoteId.isEmpty {
                     let items = purchaseJsonObject["items"] as? [[String : Any]]
                     print("ShoppingCartModel checkout successfully got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
-                    return Promise(value: purchaseJsonObject)
+                    return NetworkingPromise.sharedInstance.clearCart(remoteId: remoteId).then { dict -> Promise<[String : Any]> in
+                        print("clearCart returned dict:\(dict)")
+                        if let code = dict["code"] as? Int,
+                          code >= 200,
+                          code < 300 {
+                            return Promise(value: purchaseJsonObject)
+                        } else {
+                            print("ShoppingCartModel clearCart failed to extract code from dict:\(dict)")
+                            let error = NSError(domain: "Craze", code: 44, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to extract code"])
+                            return Promise(error: error)
+                        }
+                    }
                 } else {
                     return NetworkingPromise.sharedInstance.createCart().then { dict -> Promise<[String : Any]> in
                         if let cartInfo = dict["cart"] as? [String : Any],
@@ -148,10 +159,70 @@ class ShoppingCartModel {
                 }
         }
         // Wait for network to add items to remoteId.
-            .then { jsonObject -> Promise<NSDictionary> in
+            .then { jsonObject -> Promise<[String : Any]> in
                 return NetworkingPromise.sharedInstance.checkoutCart(jsonObject: jsonObject)
         }
         // Process cart checkout network response.
+            .then { dict -> Promise<Bool> in
+                return Promise { fulfill, reject in
+                    guard let cart = dict["cart"] as? [String : Any],
+                      let remoteId = cart["id"] as? String,
+                      //let total = cart["total"] as? Float,
+                      let merchants = dict["merchants"] as? [[String : Any]],
+                      merchants.count > 0,
+                      !remoteId.isEmpty else {
+                        print("ShoppingCartModel clearCart failed to extract code or merchants from dict:\(dict)")
+                        let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to extract cart id and total"])
+                        reject(error)
+                        return
+                    }
+                    dataModel.performBackgroundTask { managedObjectContext in
+                        guard let cartItems = dataModel.retrieveItems(managedObjectContext: managedObjectContext, remoteId: remoteId),
+                          cartItems.count > 0 else {
+                            print("ShoppingCartModel clearCart failed to retrieve items for cart remoteId:\(remoteId)")
+                            let error = NSError(domain: "Craze", code: 46, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to retrieve items"])
+                            reject(error)
+                            return
+                        }
+                        // Start with all cartItems errorMask as unavailable.
+                        cartItems.forEach { $0.errorMask = (1 << 0) } // unavailable
+                        merchants.forEach { merchant in
+                            let items = merchant["items"] as? [[String : Any]]
+                            items?.forEach { item in
+                                if let sku = item["sku"] as? String,
+                                  !sku.isEmpty,
+                                  let cartItem = cartItems.first(where: {$0.sku == sku}) {
+                                    cartItem.errorMask = 0 // Is available.
+                                    if let qty = item["qty"] as? Int16,
+                                      cartItem.quantity != qty {
+                                        cartItem.quantity = qty
+                                        cartItem.errorMask |= (1 << 1) // qty
+                                    }
+                                    if let price = item["price"] as? Float,
+                                      cartItem.retailPrice != price {
+                                        cartItem.retailPrice = price
+                                        cartItem.errorMask |= (1 << 2) // price
+                                    }
+                                    if let color = item["color"] as? String,
+                                      cartItem.color != color {
+                                        cartItem.color = color
+                                        cartItem.errorMask |= (1 << 3) // color
+                                    }
+                                    if let size = item["size"] as? String,
+                                      cartItem.size != size {
+                                        cartItem.size = size
+                                        cartItem.errorMask |= (1 << 4) // size
+                                    }
+                                    print("errorMask:\(cartItem.errorMask) retailPrice:\(cartItem.retailPrice)")
+                                }
+                            }
+                        }
+                        let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
+                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        fulfill(isErrorFree)
+                    }
+                }
+        }
     }
     
     // MARK: Helper
@@ -219,7 +290,7 @@ class ShoppingCartModel {
                     print(" colorString:\(colorString ?? "-")  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
-                        if let sku = size["merchant_sku"] as? String ?? size["id"] as? String,
+                        if let sku = size["id"] as? String,
                           !sku.isEmpty {
                             let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
                                                                 product: rootProduct,
