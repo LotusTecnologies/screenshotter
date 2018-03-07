@@ -9,7 +9,11 @@
 import UIKit
 
 class SegmentedDropDownItem : NSObject {
-    var pickerItems: [String]
+    var pickerItems: [String] {
+        didSet {
+            segment?.isEnabled = !pickerItems.isEmpty
+        }
+    }
     private(set) var selectedPickerItem: String?
     var disabledPickerItems: [String]? {
         didSet {
@@ -99,6 +103,11 @@ class SegmentedDropDownControl : UIControl {
     // MARK: Life Cycle
     
     var items: [SegmentedDropDownItem] = [] {
+        willSet {
+            items.forEach { item in
+                item.segment?.removeFromSuperview()
+            }
+        }
         didSet {
             items.enumerated().forEach { (index, item) in
                 let isFirst = index == 0
@@ -110,6 +119,7 @@ class SegmentedDropDownControl : UIControl {
                 segment.pickerDelegate = self
                 segment.titleLabel.text = item.title
                 segment.titleLabel.textColor = .gray6
+                segment.isEnabled = !item.pickerItems.isEmpty
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 addSubview(segment)
                 segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -206,6 +216,10 @@ class SegmentedDropDownControl : UIControl {
     // MARK: Interaction
     
     @objc fileprivate func touchUpInside(_ control: DropDownControl) {
+        guard let item = items.first(where: { $0.segment == control }), !item.pickerItems.isEmpty else {
+            return
+        }
+        
         if control.isFirstResponder {
             _ = control.resignFirstResponder()
         }
@@ -322,7 +336,7 @@ fileprivate class DropDownControl : UIControl {
     weak var pickerDelegate: UIPickerViewDelegate?
     
     let titleLabel = UILabel()
-    
+    fileprivate let imageView = UIImageView()
     fileprivate let image = UIImage(named: "DropDownArrow")
     
     // MARK: Life Cycle
@@ -334,8 +348,8 @@ fileprivate class DropDownControl : UIControl {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let imageView = UIImageView(image: image)
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.image = image
         imageView.contentMode = .scaleAspectFit
         addSubview(imageView)
         imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
@@ -372,9 +386,19 @@ fileprivate class DropDownControl : UIControl {
         return size
     }
     
+    // MARK: States
+    
     override var isSelected: Bool {
         didSet {
             backgroundColor = isSelected ? .gray9 : nil
+        }
+    }
+    
+    override var isEnabled: Bool {
+        didSet {
+            let alpha: CGFloat = isEnabled ? 1 : 0.5
+            titleLabel.alpha = alpha
+            imageView.alpha = alpha
         }
     }
     
