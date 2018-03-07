@@ -1409,6 +1409,13 @@ extension NSFetchedResultsController {
 
 fileprivate extension String {
     func productTitle() -> String? {
-        return split(separator: ",").dropLast().joined(separator: ",")
+        let components = split(separator: ",")
+        
+        if components.count > 1 {
+            return components.dropLast().joined(separator: ",")
+        }
+        else {
+            return self
+        }
     }
 }
