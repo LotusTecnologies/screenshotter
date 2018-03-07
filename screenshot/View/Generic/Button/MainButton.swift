@@ -9,8 +9,8 @@
 import UIKit
 
 class MainButton: UIButton {
-    private var edgePadding = CGFloat(16)
-    private var imagePadding = CGFloat(6)
+    private var edgePadding: CGFloat = 16
+    private var imagePadding: CGFloat = 6
     
     private var backgroundColorStates: [UInt : UIColor] = [:]
     private var isSettingBackgroundColor = false
@@ -46,17 +46,17 @@ class MainButton: UIButton {
         return size
     }
     
-    // MARK: Interaction
+    // MARK: States
     
     override var isHighlighted: Bool {
         didSet {
-            isSettingBackgroundColor = true
-            backgroundColor = backgroundColorStates[isHighlighted ? UIControlState.highlighted.rawValue : UIControlState.normal.rawValue]
-            isSettingBackgroundColor = false
-            
-            if isLoading {
-                activityIndicator?.backgroundColor = self.backgroundColor
-            }
+            setBackgroundColor(to: isHighlighted ? .highlighted : state)
+        }
+    }
+    
+    override var isEnabled: Bool {
+        didSet {
+            setBackgroundColor(to: isEnabled ? state : .disabled)
         }
     }
     
@@ -67,7 +67,18 @@ class MainButton: UIButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
+                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter().withAlphaComponent(0.7)
             }
+        }
+    }
+    
+    fileprivate func setBackgroundColor(to state: UIControlState) {
+        isSettingBackgroundColor = true
+        backgroundColor = backgroundColorStates[state.rawValue]
+        isSettingBackgroundColor = false
+        
+        if isLoading {
+            activityIndicator?.backgroundColor = backgroundColor
         }
     }
     

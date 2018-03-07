@@ -15,6 +15,8 @@ class CartViewController: BaseViewController {
     fileprivate let itemCountView = CartItemCountView()
     fileprivate let emptyListView = HelperView()
     fileprivate let checkoutView = CartCheckoutView()
+    fileprivate let loadingContainerView = UIView()
+    fileprivate let loaderView = Loader()
     
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     
@@ -82,6 +84,21 @@ class CartViewController: BaseViewController {
         else {
             checkoutView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
         }
+        
+        loadingContainerView.translatesAutoresizingMaskIntoConstraints = false
+        loadingContainerView.backgroundColor = UIColor.gray3.withAlphaComponent(0.5)
+        loadingContainerView.isHidden = true
+        view.addSubview(loadingContainerView)
+        loadingContainerView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        loadingContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        loadingContainerView.bottomAnchor.constraint(equalTo: checkoutView.topAnchor).isActive = true
+        loadingContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        loaderView.translatesAutoresizingMaskIntoConstraints = false
+        loaderView.color = .white
+        loadingContainerView.addSubview(loaderView)
+        loaderView.centerXAnchor.constraint(equalTo: loadingContainerView.centerXAnchor).isActive = true
+        loaderView.centerYAnchor.constraint(equalTo: loadingContainerView.centerYAnchor).isActive = true
         
         syncItemCount()
         syncTotalPrice()
@@ -168,6 +185,11 @@ extension CartViewController: UITableViewDataSource {
             cell.size = cartItem.size
             cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(_:)), for: .touchUpInside)
             cell.quantityStepper.addTarget(self, action: #selector(cartItemQuantityChanged(_:)), for: .valueChanged)
+            
+            // TODO:
+//            let e = CartItem.ErrorMaskOptions(rawValue: cartItem.errorMask)
+//            let a = e == .price
+//            e.contains(.none)
         }
         
         return cell
@@ -231,17 +253,46 @@ fileprivate extension CartViewControllerCartItem {
 typealias CartViewControllerCheckout = CartViewController
 fileprivate extension CartViewControllerCheckout {
     @objc func checkoutAction(_ button: UIButton) {
-        // TODO: spinner
+        presentCheckoutLoader()
         
-        ShoppingCartModel.shared.checkout().then { success -> Void in
-            if success {
-                ShoppingCartModel.shared.hostedUrl().then { url -> Void in
-                    OpenWebPage.present(urlString: url.absoluteString, fromViewController: self)
+        ShoppingCartModel.shared.checkout()
+            .then { [weak self] success -> Void in
+                if success {
+                    guard let _ = self else {
+                        return
+                    }
+                    
+                    ShoppingCartModel.shared.hostedUrl()
+                        .then { url -> Void in
+                            guard let strongSelf = self else {
+                                return
+                            }
+                            
+                            strongSelf.dismissCheckoutLoader()
+                            OpenWebPage.present(urlString: url.absoluteString, fromViewController: strongSelf)
+                        }
+                        .catch(execute: { error in
+                            self?.dismissCheckoutLoader()
+                        })
+                }
+                else {
+                    self?.dismissCheckoutLoader()
                 }
             }
-            else {
-                
-            }
+            .catch { [weak self] error in
+                self?.dismissCheckoutLoader()
         }
+    }
+    
+    func presentCheckoutLoader() {
+        checkoutView.checkoutButton.isEnabled = false
+        loadingContainerView.isHidden = false
+        loaderView.startAnimation()
+    }
+    
+    func dismissCheckoutLoader() {
+        checkoutView.checkoutButton.isEnabled = true
+        loadingContainerView.isHidden = true
+        loaderView.stopAnimation()
     }
 }
