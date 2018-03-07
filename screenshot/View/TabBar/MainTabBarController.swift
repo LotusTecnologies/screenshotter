@@ -17,12 +17,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     let discoverNavigationController = DiscoverNavigationController()
     let settingsNavigationController = SettingsNavigationController()
     let cartNavigationController = CartNavigationController()
-    var settingsTabBarItem: UITabBarItem
-    var updatePromptHandler: UpdatePromptHandler?
-    let discoverTabTag = 1
     
-    var isObservingSettingsBadgeFont = false
-    let TabBarBadgeFontKey = "view.badge.label.font"
+    fileprivate var settingsTabBarItem: UITabBarItem?
+    var updatePromptHandler: UpdatePromptHandler?
+    
+    fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
+    
+    fileprivate var isObservingSettingsBadgeFont = false
+    fileprivate let TabBarBadgeFontKey = "view.badge.label.font"
+    fileprivate let discoverTabTag = 1
     
     // MARK: - Lifecycle
     
@@ -32,7 +35,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     init(delegate: ViewControllerLifeCycle) {
         lifeCycleDelegate = delegate
-        settingsTabBarItem = settingsNavigationController.tabBarItem
         
         super.init(nibName: nil, bundle: nil)
         
@@ -54,6 +56,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         cartNavigationController.title = cartNavigationController.cartViewController.title
         cartNavigationController.tabBarItem = tabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: 4)
+        cartNavigationController.tabBarItem.badgeColor = .crazeRed
         
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
@@ -73,6 +76,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name:.fetchedAppSettings, object: nil)
         
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
+        
+        cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
+        syncCartTabItemCount()
     }
     
     override func viewDidLoad() {
@@ -158,8 +164,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if keyPath == TabBarBadgeFontKey {
             if let badgeFont = UIFont(name: "Optima-ExtraBlack", size: 14) {
                 // Remove the previous value so UIKit recognizes the update.
-                self.settingsTabBarItem.setBadgeTextAttributes(nil, for: .normal)
-                self.settingsTabBarItem.setBadgeTextAttributes([NSFontAttributeName : badgeFont], for: .normal)
+                settingsTabBarItem?.setBadgeTextAttributes(nil, for: .normal)
+                settingsTabBarItem?.setBadgeTextAttributes([NSFontAttributeName : badgeFont], for: .normal)
             }
         } else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
@@ -202,21 +208,21 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     func presentTabBarSettingsBadge() {
-        self.settingsTabBarItem.badgeValue = "!"
+        settingsTabBarItem?.badgeValue = "!"
         
         if !isObservingSettingsBadgeFont {
             isObservingSettingsBadgeFont = true
-            self.settingsTabBarItem.addObserver(self, forKeyPath: TabBarBadgeFontKey, options: .new, context: nil)
+            settingsTabBarItem?.addObserver(self, forKeyPath: TabBarBadgeFontKey, options: .new, context: nil)
         }
     }
     
     func dismissTabBarSettingsBadge() {
         if isObservingSettingsBadgeFont {
             isObservingSettingsBadgeFont = false
-            self.settingsTabBarItem.removeObserver(self, forKeyPath: TabBarBadgeFontKey)
+            settingsTabBarItem?.removeObserver(self, forKeyPath: TabBarBadgeFontKey)
         }
         
-        self.settingsTabBarItem.badgeValue = nil
+        settingsTabBarItem?.badgeValue = nil
     }
     
     func refreshTabBarSettingsBadge() {
@@ -297,4 +303,16 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         ChangelogAlertController.presentIfNeeded(inViewController: self)
     }
     
+    // MARK: - Cart
+    
+    fileprivate func syncCartTabItemCount() {
+        let count = cartItemFrc?.fetchedObjectsCount ?? 0
+        cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+    }
+}
+
+extension MainTabBarController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        syncCartTabItemCount()
+    }
 }
