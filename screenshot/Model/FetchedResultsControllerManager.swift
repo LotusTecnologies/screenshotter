@@ -79,12 +79,10 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
                 collectionView.deleteSections(deletedSections)
                 collectionView.insertSections(insertedSections)
                 collectionView.insertItems(at: insertedRows)
-            }) { (completed) in
-            }
-            collectionView.reloadItems(at: self.updatedRows)
-            
-            
+            })
+            collectionView.reloadItems(at: updatedRows)
         }
+        
         override var description: String {
             return "insertedSections:\(insertedSections.toArray()), deletedSections:\(deletedSections.toArray()), insertedRows:\(insertedRows), deletedRows:\(deletedRows), updatedRows:\(updatedRows)"
         }

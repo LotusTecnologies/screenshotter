@@ -26,23 +26,23 @@ extension UIColor {
     static let gray8 = UIColor(white: 0.8, alpha: 1) // 204
     static let gray9 = UIColor(white: 0.9, alpha: 1) // 229.5
     
-    func lighter(by percentage: CGFloat = 8) -> UIColor? {
-        return adjust(by: abs(percentage))
+    func lighter(by percentage: CGFloat = 8) -> UIColor {
+        return adjust(rgbBy: abs(percentage))
     }
     
-    func darker(by percentage: CGFloat = 8) -> UIColor? {
-        return adjust(by: -1 * abs(percentage))
+    func darker(by percentage: CGFloat = 8) -> UIColor {
+        return adjust(rgbBy: -1 * abs(percentage))
     }
     
-    private func adjust(by percentage: CGFloat = 8) -> UIColor? {
+    private func adjust(rgbBy percentage: CGFloat = 8) -> UIColor {
         var r = CGFloat(), g = CGFloat(), b = CGFloat(), a = CGFloat()
         
         if getRed(&r, green: &g, blue: &b, alpha: &a) {
             let p = percentage / 100
             return UIColor(red: min(r + p, 1), green: min(g + p, 1), blue: min(b + p, 1), alpha: a)
-            
-        } else {
-            return nil
+        }
+        else {
+            return self
         }
     }
 }
