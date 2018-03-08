@@ -28,9 +28,10 @@ class ProductViewController : BaseViewController {
         super.init(nibName: nil, bundle: nil)
         
         ShoppingCartModel.shared.populateVariants(productOID: productOID)
-            .then { [weak self] product -> Void in
-                // TODO: this should not return if the variants are cached on product
-                self?.setup(with: product)
+            .then { [weak self] product, didSaveVariants -> Void in
+                if didSaveVariants {
+                    self?.setup(with: product)
+                }
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
