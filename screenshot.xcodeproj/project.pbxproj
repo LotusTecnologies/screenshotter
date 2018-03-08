@@ -40,6 +40,8 @@
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
+		C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005A205133BA004DD7A3 /* FavoriteButton.swift */; };
+		C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005C2051342B004DD7A3 /* BorderButton.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -184,6 +186,8 @@
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		C528005A205133BA004DD7A3 /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
+		C528005C2051342B004DD7A3 /* BorderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderButton.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -650,6 +654,8 @@
 		C540884D1FE90E2200198955 /* Button */ = {
 			isa = PBXGroup;
 			children = (
+				C528005C2051342B004DD7A3 /* BorderButton.swift */,
+				C528005A205133BA004DD7A3 /* FavoriteButton.swift */,
 				C540884F1FE90E2200198955 /* FloatingActionButton.swift */,
 				C540884E1FE90E2200198955 /* MainButton.swift */,
 			);
@@ -1085,6 +1091,7 @@
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
+				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
@@ -1109,6 +1116,7 @@
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
+				C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
 				C543695E20453FE300599134 /* ProductsRateView.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
