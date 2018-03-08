@@ -64,7 +64,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             self.priceLabel?.layoutMargins = isSale ?  ProductCollectionViewCell.priceLabelLayoutMargins : .zero
         }
     }
-    var favoriteButton:FavoriteButton?
+    var favoriteControl:FavoriteControl?
     
     var productView:EmbossedView?
     var titleLabel:UILabel?
@@ -196,19 +196,19 @@ class ProductCollectionViewCell : UICollectionViewCell {
         }()
         self.originalPriceLabel = originalPriceLabel
         
-        let favoriteButton : FavoriteButton = {
-            let button = FavoriteButton.init()
+        let favoriteControl : FavoriteControl = {
+            let control = FavoriteControl.init()
             
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
-            self.contentView.addSubview(button)
+            control.translatesAutoresizingMaskIntoConstraints = false
+            control.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
+            self.contentView.addSubview(control)
             
-            button.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
-            button.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
+            control.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
+            control.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
             
-            return button
+            return control
         }()
-        self.favoriteButton = favoriteButton
+        self.favoriteControl = favoriteControl
         
         let buyLabel: UILabel = {
             let label = UILabel()

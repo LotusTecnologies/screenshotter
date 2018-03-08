@@ -21,6 +21,7 @@ class ProductView: UIView {
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
+    let favoriteButton = FavoriteButton()
     let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
@@ -153,6 +154,16 @@ class ProductView: UIView {
             selectionControl.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor)
         ]
         
+        favoriteButton.translatesAutoresizingMaskIntoConstraints = false
+        favoriteButton.setTitle("cart.favorite.add".localized, for: .normal)
+        favoriteButton.setTitle("cart.favorite.remove".localized, for: .selected)
+        favoriteButton.setTitleColor(.crazeRed, for: .normal)
+        scrollView.addSubview(favoriteButton)
+        favoriteButton.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true
+        favoriteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        favoriteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        favoriteButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .clear
         contentTextView.isScrollEnabled = false
@@ -165,10 +176,10 @@ class ProductView: UIView {
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         completeDetailsConstraints += [
-            contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding)
+            contentTextView.topAnchor.constraint(equalTo: favoriteButton.bottomAnchor, constant: .padding)
         ]
         partialDetailsConstraints += [
-            contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor),
+            contentTextView.topAnchor.constraint(equalTo: favoriteButton.bottomAnchor),
             contentTextView.heightAnchor.constraint(equalToConstant: 0)
         ]
         

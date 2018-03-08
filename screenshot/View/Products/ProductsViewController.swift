@@ -209,7 +209,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     
     func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
         
-        guard let isFavorited = cell.favoriteButton?.isSelected else{
+        guard let isFavorited = cell.favoriteControl?.isSelected else{
             return
         }
         guard let indexPath = self.collectionView?.indexPath(for: cell) else{
@@ -369,7 +369,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.originalPrice = product.originalPrice
                 cell.imageUrl = product.imageURL
                 cell.isSale = product.isSale()
-                cell.favoriteButton?.isSelected = product.isFavorite
+                cell.favoriteControl?.isSelected = product.isFavorite
                 return cell
             }
         }

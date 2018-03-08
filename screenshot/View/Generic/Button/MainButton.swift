@@ -9,9 +9,6 @@
 import UIKit
 
 class MainButton: UIButton {
-    private var edgePadding: CGFloat = 16
-    private var imagePadding: CGFloat = 6
-    
     private var backgroundColorStates: [UInt : UIColor] = [:]
     private var isSettingBackgroundColor = false
     
@@ -25,7 +22,7 @@ class MainButton: UIButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: edgePadding, left: edgePadding, bottom: edgePadding, right: edgePadding)
+        contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         adjustsImageWhenHighlighted = false
         layer.cornerRadius = 9
         layer.shadowColor = Shadow.basic.color.cgColor
@@ -86,6 +83,8 @@ class MainButton: UIButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
+        
+        let imagePadding: CGFloat = 6
         
         imageEdgeInsets = UIEdgeInsets(top: 0, left: -imagePadding, bottom: 0, right: imagePadding / 2.0)
         titleEdgeInsets = UIEdgeInsets(top: 0, left: imagePadding / 2.0, bottom: 0, right: -imagePadding)

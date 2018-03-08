@@ -47,6 +47,7 @@ class ProductViewController : BaseViewController {
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
+        productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
         productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
         view = productView
     }
@@ -167,6 +168,12 @@ fileprivate extension ProductViewControllerProductView {
         // TODO:
     }
     
+    // MARK: Favorite
+    
+    @objc func favoriteAction() {
+        structuredProduct?.product.setFavorited(toFavorited: productView.favoriteButton.isSelected)
+    }
+    
     // MARK: Web
     
     func setWebsiteMerchant(_ merchant: String?) {
@@ -233,6 +240,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
         productView.titleLabel.text = product.productTitle()
         productView.priceLabel.text = product.price
         productView.contentTextView.text = product.detailedDescription
+        productView.favoriteButton.isSelected = structuredProduct.product.isFavorite
         
         setWebsiteMerchant(product.merchant)
         
