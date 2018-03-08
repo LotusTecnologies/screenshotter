@@ -29,6 +29,7 @@ class ProductViewController : BaseViewController {
         
         ShoppingCartModel.shared.populateVariants(productOID: productOID)
             .then { [weak self] product -> Void in
+                // TODO: this should not return if the variants are cached on product
                 self?.setup(with: product)
         }
         
@@ -45,7 +46,7 @@ class ProductViewController : BaseViewController {
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
-        productView.websiteButton.addTarget(self, action: #selector(pushMerchantURL), for: .touchUpInside)
+        productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
         view = productView
     }
     
@@ -187,14 +188,14 @@ fileprivate extension ProductViewControllerProductView {
         }
     }
     
-    @objc func pushMerchantURL() {
+    @objc func pushWebsiteURL() {
         let url: String?
         
         if let variantUrl = selectedVariant()?.url {
             url = variantUrl
         }
         else {
-            url = structuredProduct?.product.url
+            url = structuredProduct?.product.offer
         }
         
         OpenWebPage.present(urlString: url, fromViewController: self)
@@ -253,8 +254,6 @@ fileprivate extension ProductViewControllerStructuredProduct {
             
             productView.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         }
-        
-//        repositionScrollView()
     }
     
     func selectedVariant() -> Variant? {
@@ -281,21 +280,6 @@ extension ProductViewController : UIScrollViewDelegate {
         if scrollView.keyboardDismissMode == .onDrag {
             productView.resignSelectionControl()
         }
-    }
-    
-    fileprivate func repositionScrollView() {
-        view.layoutIfNeeded()
-        
-        let y: CGFloat = {
-            if #available(iOS 11.0, *) {
-                return productView.scrollView.adjustedContentInset.top
-            }
-            else {
-                return navigationController?.navigationBar.frame.maxY ?? 0
-            }
-        }()
-        
-        productView.scrollView.contentOffset = CGPoint(x: 0, y: -y)
     }
 }
 

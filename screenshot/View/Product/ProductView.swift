@@ -30,6 +30,9 @@ class ProductView: UIView {
     let cartButton = MainButton()
 //    let buyButton = MainButton()
     
+    private var completeDetailsConstraints: [NSLayoutConstraint] = []
+    private var partialDetailsConstraints: [NSLayoutConstraint] = []
+    
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
@@ -47,6 +50,10 @@ class ProductView: UIView {
         scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        partialDetailsConstraints += [
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ]
         
         (galleryScrollView as? ScrollView)?.lifeCycleDelegate = self
         galleryScrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -133,13 +140,18 @@ class ProductView: UIView {
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: priceLabel.leadingAnchor, constant: -.padding).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: originalPriceLabel.leadingAnchor, constant: -.padding).isActive = true
         
-        // TODO: how does UI look when all variants are out of stock
         selectionControl.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(selectionControl)
-        selectionControl.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding).isActive = true
         selectionControl.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         selectionControl.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
-        selectionControl.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        completeDetailsConstraints += [
+            selectionControl.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor, constant: .padding),
+            selectionControl.heightAnchor.constraint(equalToConstant: 50)
+        ]
+        partialDetailsConstraints += [
+            selectionControl.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor)
+        ]
         
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .clear
@@ -149,9 +161,16 @@ class ProductView: UIView {
         contentTextView.adjustsFontForContentSizeCategory = true
         contentTextView.isEditable = false
         scrollView.addSubview(contentTextView)
-        contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true
         contentTextView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        completeDetailsConstraints += [
+            contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding)
+        ]
+        partialDetailsConstraints += [
+            contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor),
+            contentTextView.heightAnchor.constraint(equalToConstant: 0)
+        ]
         
         websiteButton.translatesAutoresizingMaskIntoConstraints = false
         websiteButton.setTitleColor(.crazeGreen, for: .normal)
@@ -169,8 +188,11 @@ class ProductView: UIView {
         addSubview(controlContainerView)
         controlContainerView.topAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         controlContainerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        controlContainerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         controlContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        completeDetailsConstraints += [
+            controlContainerView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ]
         
         controlContainerView.addSubview(BorderView(edge: .top))
         
@@ -194,6 +216,46 @@ class ProductView: UIView {
 //        buyButton.leadingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.centerXAnchor, constant: .padding / 2).isActive = true
 //        buyButton.bottomAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
 //        buyButton.trailingAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        NSLayoutConstraint.activate(partialDetailsConstraints)
+    }
+    
+    fileprivate func syncDetailViewConstraints() {
+        let shouldActivatePartial = selectionControl.items.isEmpty
+        
+        guard let constraint = partialDetailsConstraints.first, constraint.isActive != shouldActivatePartial else {
+            return
+        }
+        
+        func changeDetailViewConstraints() {
+            if shouldActivatePartial {
+                NSLayoutConstraint.deactivate(completeDetailsConstraints)
+                NSLayoutConstraint.activate(partialDetailsConstraints)
+            }
+            else {
+                NSLayoutConstraint.deactivate(partialDetailsConstraints)
+                NSLayoutConstraint.activate(completeDetailsConstraints)
+            }
+        }
+        
+        if window == nil {
+            changeDetailViewConstraints()
+        }
+        else {
+            func adjustDetailViewAlpha(_ alpha: CGFloat) {
+                selectionControl.alpha = alpha
+                contentTextView.alpha = alpha
+            }
+            
+            adjustDetailViewAlpha(0)
+            layoutIfNeeded()
+            changeDetailViewConstraints()
+            
+            UIView.animate(withDuration: .defaultAnimationDuration) {
+                adjustDetailViewAlpha(1)
+                self.layoutIfNeeded()
+            }
+        }
     }
     
     // MARK: Gallery
@@ -297,6 +359,8 @@ class ProductView: UIView {
         selectionColorItem = colorItem
         selectionSizeItem = sizeItem
         selectionQuantityItem = quantityItem
+        
+        syncDetailViewConstraints()
     }
     
     func resignSelectionControl() {
