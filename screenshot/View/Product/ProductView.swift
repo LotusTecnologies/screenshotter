@@ -21,6 +21,7 @@ class ProductView: UIView {
     let priceLabel = UILabel()
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
+    let favoriteButton = UIButton()
     let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
@@ -153,6 +154,30 @@ class ProductView: UIView {
             selectionControl.topAnchor.constraint(equalTo: labelContainerView.bottomAnchor)
         ]
         
+        favoriteButton.translatesAutoresizingMaskIntoConstraints = false
+        favoriteButton.setTitle("Add to Favorites", for: .normal)
+        favoriteButton.setTitle("Added to Favorites", for: .selected)
+        favoriteButton.setTitleColor(.crazeGreen, for: .normal)
+        favoriteButton.layer.cornerRadius = .defaultCornerRadius
+        favoriteButton.layer.borderColor = UIColor.crazeGreen.cgColor
+        favoriteButton.layer.borderWidth = 1
+        scrollView.addSubview(favoriteButton)
+        favoriteButton.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true
+        favoriteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        favoriteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        favoriteButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        let image = UIImage(color: .purple, size: CGSize(width: 30, height: 30))
+        favoriteButton.setImage(image, for: .normal)
+        
+        if let favoriteButtonImageView = favoriteButton.imageView {
+            let favoriteView = FavoriteControl()
+            favoriteView.translatesAutoresizingMaskIntoConstraints = false
+            favoriteButtonImageView.addSubview(favoriteView)
+            favoriteView.centerXAnchor.constraint(equalTo: favoriteButtonImageView.centerXAnchor).isActive = true
+            favoriteView.centerYAnchor.constraint(equalTo: favoriteButtonImageView.centerYAnchor).isActive = true
+        }
+        
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .clear
         contentTextView.isScrollEnabled = false
@@ -165,10 +190,10 @@ class ProductView: UIView {
         contentTextView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         completeDetailsConstraints += [
-            contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding)
+            contentTextView.topAnchor.constraint(equalTo: favoriteButton.bottomAnchor, constant: .padding)
         ]
         partialDetailsConstraints += [
-            contentTextView.topAnchor.constraint(equalTo: selectionControl.bottomAnchor),
+            contentTextView.topAnchor.constraint(equalTo: favoriteButton.bottomAnchor),
             contentTextView.heightAnchor.constraint(equalToConstant: 0)
         ]
         

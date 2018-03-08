@@ -1,5 +1,5 @@
 //
-//  FavoriteButton.swift
+//  FavoriteControl.swift
 //  screenshot
 //
 //  Created by Corey Werner on 9/4/17.
@@ -10,7 +10,7 @@ import UIKit
 import Lottie
 import Appsee
 
-class FavoriteButton: UIButton {
+class FavoriteControl: UIControl {
     private let heartSwitch = LOTAnimatedSwitch(named: "FavoriteHeart")
     private var heartSwitchWidthConstraint: NSLayoutConstraint!
     private var animate = false

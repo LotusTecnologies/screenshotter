@@ -94,7 +94,7 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
             cell.title = product.productDescription
             cell.price = product.price
             cell.imageUrl = product.imageURL
-            cell.favoriteButton?.isSelected = product.isFavorite
+            cell.favoriteControl?.isSelected = product.isFavorite
         }
         
         return cell
@@ -128,7 +128,7 @@ extension FavoriteProductsViewController : ProductCollectionViewCellDelegate {
             return
         }
         
-        let isFavorited = cell.favoriteButton?.isSelected ?? false
+        let isFavorited = cell.favoriteControl?.isSelected ?? false
         
         if isFavorited {
             if let index = unfavoriteProducts.index(of: product) {
