@@ -67,7 +67,12 @@ class ClarifaiModel: NSObject {
         let dataAsset = DataAsset(image: localImage)
         let input = Input(dataAsset: dataAsset)
         let generalModel = Clarifai.sharedInstance().generalModel
-        generalModel.predict([input], completionHandler: completionHandler)
+        generalModel.predict([input]) { (outputs, error) in
+            let _ = localImage
+            let _ = dataAsset
+            let _ = input  //this is a shot in a the dark attempt to fix clarfia crashes.  I (rose) suspects that the input (or related items) are being released at some point that is too early.  so we are retaining them for clarifia. Check the crashes for version 03.08 to see if this helped.
+            completionHandler(outputs, error)
+        }
     }
     
     func localClarifaiOutputs(image: UIImage) -> Promise<[Output]> {
