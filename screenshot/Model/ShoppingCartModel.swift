@@ -269,6 +269,8 @@ class ShoppingCartModel {
             if let cart = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
                 cart.isPastOrder = true
                 cart.dateSubmitted = NSDate()
+                // Write to items without changing anything, so the cartItemFrc is updated.
+                (cart.items?.sortedArray(using: []) as? [CartItem])?.forEach { $0.errorMask = $0.errorMask }
                 dataModel.saveMoc(managedObjectContext: managedObjectContext)
                 print("hostedCompleted cart:\(cart)")
             } else {
