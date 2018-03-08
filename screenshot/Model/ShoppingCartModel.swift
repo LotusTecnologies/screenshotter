@@ -261,6 +261,22 @@ class ShoppingCartModel {
         }
     }
     
+    // TODO: GMK determine if 'from' matters whether Shoppable's hosted checkout redirects to returnToSite or orderComplete url.
+    func hostedCompleted(remoteId: String, from: String) {
+        print("hostedCompleted remoteId:\(remoteId)  from:\(from)")
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { managedObjectContext in
+            if let cart = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
+                cart.isPastOrder = true
+                cart.dateSubmitted = NSDate()
+                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                print("hostedCompleted cart:\(cart)")
+            } else {
+                print("hostedCompleted failed to retrieve cart")
+            }
+        }
+    }
+    
     // MARK: Helper
     
     // Deletes variants if older than, say, an hour.
