@@ -514,19 +514,14 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             let alertController = UIAlertController.init(title: "screenshot.delete.title".localized, message: nil, preferredStyle: .alert)
             alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
             alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
-                if let screenshot = self.screenshot(at: indexPath.item) {
-                    if screenshot.objectID.isEqual(objectId) {
-                        screenshot.setHide()
-                        self.removeScreenshotHelperView()
-                        self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                            cell.selectedState = .disabled
-                        })
-                        AnalyticsTrackers.standard.track(.removedScreenshot)
-                        
-                    }else{
-                        print("collectionView update when trying to delete item")
-                    }
+                if let screenshot = Screenshot.findWith(objectId: objectId) {
+                    screenshot.setHide()
+                    self.removeScreenshotHelperView()
+                    self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                        cell.selectedState = .disabled
+                    })
+                    AnalyticsTrackers.standard.track(.removedScreenshot)
                 }
             }))
             
