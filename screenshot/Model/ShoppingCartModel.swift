@@ -185,41 +185,57 @@ class ShoppingCartModel {
                             return
                         }
                         // Start with all cartItems errorMask as unavailable.
-                        cartItems.forEach { $0.errorMask = CartItem.ErrorMaskOptions.unavailable.rawValue }
+                        var errorDict: [String : CartItem.ErrorMaskOptions] = [:]
+                        cartItems.forEach { cartItem in
+                            if let sku = cartItem.sku {
+                                errorDict[sku] = CartItem.ErrorMaskOptions.unavailable
+                            }
+                        }
                         merchants.forEach { merchant in
                             let items = merchant["items"] as? [[String : Any]]
                             items?.forEach { item in
                                 if let sku = item["sku"] as? String,
                                   !sku.isEmpty,
                                   let cartItem = cartItems.first(where: {$0.sku == sku}) {
-                                    var errorMaskOptions: CartItem.ErrorMaskOptions = []
+                                    var errorMask = CartItem.ErrorMaskOptions.none
                                     if let qty = item["qty"] as? Int16,
                                       cartItem.quantity != qty {
                                         cartItem.quantity = qty
-                                        errorMaskOptions.insert(.quantity)
+                                        errorMask.insert(.quantity)
                                     }
                                     if let price = item["price"] as? Float,
                                       cartItem.retailPrice != price {
                                         cartItem.retailPrice = price
-                                        errorMaskOptions.insert(.price)
+                                        errorMask.insert(.price)
                                     }
 //                                    if let color = item["color"] as? String,
 //                                      cartItem.color != color {
 //                                        cartItem.color = color
-//                                        errorMaskOptions.insert(.color)
+//                                        errorMask.insert(.color)
 //                                    }
 //                                    if let size = item["size"] as? String,
 //                                      cartItem.size != size {
 //                                        cartItem.size = size
-//                                        errorMaskOptions.insert(.size)
+//                                        errorMask.insert(.size)
 //                                    }
-                                    cartItem.errorMask = errorMaskOptions.rawValue
-                                    print("errorMask:\(cartItem.errorMask) retailPrice:\(cartItem.retailPrice)")
+                                    errorDict[sku] = errorMask  // Clear unavailable.
+                                    print("errorMask:\(errorMask.rawValue) retailPrice:\(cartItem.retailPrice)")
                                 }
                             }
                         }
+                        var didChange = false
+                        cartItems.forEach { cartItem in
+                            if let sku = cartItem.sku,
+                              let errorMask = errorDict[sku],
+                              cartItem.errorMask != errorMask.rawValue {
+                                cartItem.errorMask = errorMask.rawValue
+                                didChange = true
+                            }
+                        }
                         let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        if didChange {
+                            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        }
                         fulfill(isErrorFree)
                     }
                 }
