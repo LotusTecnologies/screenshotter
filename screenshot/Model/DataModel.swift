@@ -136,7 +136,7 @@ extension DataModel {
     func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<CartItem>  {
         let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
         request.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
-        request.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "errorMask", ascending: false), NSSortDescriptor(key: "dateModified", ascending: false)]
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
@@ -456,6 +456,25 @@ extension DataModel {
             let results = try managedObjectContext.fetch(fetchRequest)
             if let mostRecentAddableCart = results.first {
                 return mostRecentAddableCart
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveAddableCart results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveCart(managedObjectContext: NSManagedObjectContext, remoteId: String) -> Cart? {
+        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "remoteId == %@", remoteId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchBatchSize = 1
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let cart = results.first {
+                return cart
             }
         } catch {
             self.receivedCoreDataError(error: error)
