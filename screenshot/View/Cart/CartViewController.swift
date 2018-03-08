@@ -44,6 +44,7 @@ class CartViewController: BaseViewController {
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
         
         restorationIdentifier = String(describing: type(of: self))
+        title = "cart.title".localized
         
         addNavigationItemLogo()
     }
@@ -313,7 +314,7 @@ fileprivate extension CartViewControllerCheckout {
                             }
                             
                             strongSelf.dismissCheckoutLoader()
-                            OpenWebPage.present(urlString: url.absoluteString, fromViewController: strongSelf)
+                            strongSelf.pushCheckoutViewController(with: url)
                         }
                         .catch(execute: { error in
                             self?.dismissCheckoutLoader()
@@ -338,5 +339,21 @@ fileprivate extension CartViewControllerCheckout {
         checkoutView.checkoutButton.isEnabled = true
         loadingContainerView.isHidden = true
         loaderView.stopAnimation()
+    }
+    
+    func pushCheckoutViewController(with url: URL) {
+        let checkoutWebViewController = CheckoutWebViewController()
+        checkoutWebViewController.hidesBottomBarWhenPushed = true
+        checkoutWebViewController.title = "checkout.title".localized
+        checkoutWebViewController.loadURL(url)
+        checkoutWebViewController.isToolbarEnabled = false
+        
+        if let navigationController = navigationController {
+            navigationController.pushViewController(checkoutWebViewController, animated: true)
+        }
+        else {
+            let navigationController = ModalNavigationController(rootViewController: checkoutWebViewController)
+            present(navigationController, animated: true, completion: nil)
+        }
     }
 }

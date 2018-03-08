@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import WebKit
 import SpriteKit
 import Appsee
@@ -456,6 +456,18 @@ extension WebViewController : WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        // TODO: this code belongs in CheckoutWebViewController
+        if let url = webView.url, url.path == "/yourthankyoupage",
+            let components = URLComponents(string: url.absoluteString)
+        {
+            let remoteIdQueryItem = components.queryItems?.first { $0.name == "remoteId" }
+            let fromQueryItem = components.queryItems?.first { $0.name == "from" }
+            
+            if let remoteId = remoteIdQueryItem?.value {
+                ShoppingCartModel.shared.hostedCompleted(remoteId: remoteId, from: fromQueryItem?.value ?? "")
+            }
+        }
+        
         if !didLoadInitialPage {
             showLoadingView()
             
@@ -465,25 +477,6 @@ extension WebViewController : WKNavigationDelegate {
         }
     }
     
-    func urlIsTracker(url:URL?) -> Bool{
-        let trackers = [
-            "api.shopstyle.com",
-            "doubleclick.net",
-            "adservice.google",
-            "www.googletagmanager.com"
-        ]
-        if let host = url?.host {
-            for t in trackers{
-                if host.contains(t) {
-                    
-                    return true
-                }
-            }
-        }
-        
-        return false
-        
-    }
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         
         if didLoadInitialPage == false {
@@ -514,6 +507,24 @@ extension WebViewController : WKNavigationDelegate {
         let alertController = UIAlertController(title: "webview.invalid.title".localized, message: "webview.invalid.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alertController
+    }
+    
+    fileprivate func urlIsTracker(url: URL?) -> Bool {
+        let trackers = [
+            "api.shopstyle.com",
+            "doubleclick.net",
+            "adservice.google",
+            "www.googletagmanager.com"
+        ]
+        if let host = url?.host {
+            for t in trackers {
+                if host.contains(t) {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 }
 
