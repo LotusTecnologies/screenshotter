@@ -136,7 +136,7 @@ extension DataModel {
     func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<CartItem>  {
         let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
         request.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
-        request.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "errorMask", ascending: false), NSSortDescriptor(key: "dateModified", ascending: false)]
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
