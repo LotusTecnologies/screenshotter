@@ -69,7 +69,9 @@ extension DataModel {
         let error = error as NSError
         if error.domain == NSSQLiteErrorDomain && error.code == 13{ // disk full  see https://sqlite.org/c3ref/c_abort.html
             AnalyticsTrackers.standard.track(.error, properties: ["type":"noHardDriveSpace"])
-            AppDelegate.shared.presentLowDiskSpaceWarning()
+            DispatchQueue.main.async {
+                AppDelegate.shared.presentLowDiskSpaceWarning()
+            }
         }else{
             AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
         }
@@ -926,6 +928,22 @@ extension DataModel {
 }
 
 extension Screenshot {
+
+    var isShamrockVersion:Bool {
+        return self.assetId?.hasPrefix("shamrock") ?? false
+    }
+    static func findWith(objectId:NSManagedObjectID) -> Screenshot? { //main thread only
+        if let screenshot = DataModel.sharedInstance.mainMoc().object(with: objectId) as? Screenshot {
+            do{
+                try screenshot.validateForUpdate()
+                return screenshot
+            }catch{
+                
+            }
+        }
+        return nil
+    }
+    
     
     // hideWorkhorse is not meant to be called from UI code,
     // but may be called on the main queue, even if generally called on a background queue.

@@ -16,7 +16,7 @@ class FloatingActionButton: UIButton {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        self.showsTouchWhenHighlighted = true
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 3
