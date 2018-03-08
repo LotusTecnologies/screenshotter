@@ -827,9 +827,10 @@ extension ProductsViewControllerNoItemsHelperView{
             retryButton.setTitle("products.helper.retry".localized, for: .normal)
             retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
             helperView.controlView.addSubview(retryButton)
-            
             retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
+            retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
             retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
+            retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
             retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
         }
     }

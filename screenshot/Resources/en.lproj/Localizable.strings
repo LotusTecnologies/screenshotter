@@ -16,6 +16,7 @@
 
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
+"cart.empty.button" = "Find your next outfit!";
 "cart.empty.title" = "No Items in Cart";
 "cart.favorite.add" = "Add to Favorites";
 "cart.favorite.remove" = "Added to Favorites";

@@ -340,14 +340,13 @@ extension AppDelegate {
         let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            
             viewController = mainTabBarController
+            
             if self.shouldLoadDiscoverNextLoad {
                 self.shouldLoadDiscoverNextLoad = false
+                
                 if let mainTabBarController = viewController as? MainTabBarController {
-                    if let vc = mainTabBarController.viewControllers?.first(where: {($0 as? DiscoverNavigationController) != nil}) {
-                        mainTabBarController.selectedViewController = vc
-                    }
+                    mainTabBarController.selectedViewController = mainTabBarController.discoverNavigationController
                 }
             }
         }

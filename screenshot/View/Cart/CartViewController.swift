@@ -67,6 +67,18 @@ class CartViewController: BaseViewController {
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
+        let emptyListButton = MainButton()
+        emptyListButton.translatesAutoresizingMaskIntoConstraints = false
+        emptyListButton.backgroundColor = .crazeGreen
+        emptyListButton.setTitle("cart.empty.button".localized, for: .normal)
+        emptyListButton.addTarget(self, action: #selector(emptyListAction), for: .touchUpInside)
+        emptyListView.controlView.addSubview(emptyListButton)
+        emptyListButton.topAnchor.constraint(equalTo: emptyListView.controlView.topAnchor).isActive = true
+        emptyListButton.leadingAnchor.constraint(greaterThanOrEqualTo: emptyListView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
+        emptyListButton.bottomAnchor.constraint(equalTo: emptyListView.controlView.bottomAnchor).isActive = true
+        emptyListButton.trailingAnchor.constraint(lessThanOrEqualTo: emptyListView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
+        emptyListButton.centerXAnchor.constraint(equalTo: emptyListView.controlView.centerXAnchor).isActive = true
+        
         emptyListView.titleLabel.text = "cart.empty.title".localized
         tableView.emptyView = emptyListView
         
@@ -158,6 +170,38 @@ class CartViewController: BaseViewController {
         
         if itemCountView.itemCount != count {
             itemCountView.itemCount = count
+        }
+    }
+    
+    // MARK: Empty List
+    
+    @objc fileprivate func emptyListAction() {
+        func select(_ tabBarController: MainTabBarController) {
+            tabBarController.selectedViewController = tabBarController.discoverNavigationController
+        }
+        
+        func popToRoot(_ tabBarController: MainTabBarController) {
+            if let navigationController = tabBarController.selectedViewController as? UINavigationController {
+                navigationController.popToRootViewController(animated: false)
+            }
+        }
+        
+        func dismiss(_ tabBarController: MainTabBarController) {
+            tabBarController.dismiss(animated: true, completion: nil)
+        }
+        
+        if let mainTabBarController = presentingViewController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+            dismiss(mainTabBarController)
+        }
+        else if let mainTabBarController = presentingViewController?.tabBarController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+            dismiss(mainTabBarController)
+        }
+        else if let mainTabBarController = tabBarController as? MainTabBarController {
+            select(mainTabBarController)
         }
     }
 }
