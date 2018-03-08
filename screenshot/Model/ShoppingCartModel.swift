@@ -14,7 +14,7 @@ class ShoppingCartModel {
     
     static let shared = ShoppingCartModel()
     
-    func populateVariants(productOID: NSManagedObjectID) -> Promise<Product> {
+    func populateVariants(productOID: NSManagedObjectID) -> Promise<(Product, Bool)> {
         let dataModel = DataModel.sharedInstance
         return firstly {
             return deleteVariantsIfOld(productOID: productOID)
@@ -30,10 +30,10 @@ class ShoppingCartModel {
                     return Promise(error: error)
                 }
                 return self.saveVariantsFromDictionary(productOID: productOID, dict: dict)
-            }.then { didSaveVariants -> Promise<Product> in // Must be on main queue.
+            }.then { didSaveVariants -> Promise<(Product, Bool)> in // Must be on main queue.
                 print("populateVariants final then clause didSaveVariants:\(didSaveVariants)")
                 if let product = dataModel.mainMoc().object(with: productOID) as? Product {
-                    return Promise(value: product)
+                    return Promise(value: (product, didSaveVariants))
                 } else {
                     let error = NSError(domain: "Craze", code: 32, userInfo: [NSLocalizedDescriptionKey : "populateVariants failed to fetch a third time product:\(productOID)"])
                     print("populateVariants catch error:\(error)")
