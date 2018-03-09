@@ -43,6 +43,7 @@
 		C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005A205133BA004DD7A3 /* FavoriteButton.swift */; };
 		C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005C2051342B004DD7A3 /* BorderButton.swift */; };
 		C528006020516293004DD7A3 /* CheckoutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */; };
+		C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -190,6 +191,7 @@
 		C528005A205133BA004DD7A3 /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
 		C528005C2051342B004DD7A3 /* BorderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderButton.swift; sourceTree = "<group>"; };
 		C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWebViewController.swift; sourceTree = "<group>"; };
+		C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmationViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -411,6 +413,7 @@
 		C528005E20516276004DD7A3 /* Checkout */ = {
 			isa = PBXGroup;
 			children = (
+				C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
 			);
 			path = Checkout;
@@ -1141,6 +1144,7 @@
 				C540882A1FE90C8E00198955 /* FavoriteControl.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
+				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
 				C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,

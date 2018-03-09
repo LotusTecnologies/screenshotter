@@ -9,7 +9,7 @@
 import UIKit
 
 class CartNavigationController: UINavigationController {
-    let cartViewController = CartViewController()
+    let cartViewController = CheckoutConfirmationViewController()// CartViewController()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

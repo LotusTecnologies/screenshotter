@@ -31,6 +31,8 @@
 
 "changelog.title" = "What's New";
 
+"checkout.confirmation.detail" = "Thanks for shopping\nwith Screenshop!";
+"checkout.confirmation.title" = "Order Placed";
 "checkout.title" = "Checkout";
 
 "currency.auto" = "Automatic";
@@ -73,6 +75,7 @@
 
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
+"generic.close" = "Close";
 "generic.continue" = "Continue";
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";

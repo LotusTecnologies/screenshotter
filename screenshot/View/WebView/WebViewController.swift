@@ -456,18 +456,6 @@ extension WebViewController : WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        // TODO: this code belongs in CheckoutWebViewController
-        if let url = webView.url, url.path == "/yourthankyoupage",
-            let components = URLComponents(string: url.absoluteString)
-        {
-            let remoteIdQueryItem = components.queryItems?.first { $0.name == "remoteId" }
-            let fromQueryItem = components.queryItems?.first { $0.name == "from" }
-            
-            if let remoteId = remoteIdQueryItem?.value {
-                ShoppingCartModel.shared.hostedCompleted(remoteId: remoteId, from: fromQueryItem?.value ?? "")
-            }
-        }
-        
         if !didLoadInitialPage {
             showLoadingView()
             
@@ -478,10 +466,8 @@ extension WebViewController : WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
         if didLoadInitialPage == false {
-            if !self.urlIsTracker(url: navigationResponse.response.url){
-                
+            if !isTrackerURL(url: navigationResponse.response.url) {
                 didLoadInitialPage = true
                 
                 if !isShowingGame {
@@ -509,7 +495,7 @@ extension WebViewController : WKNavigationDelegate {
         return alertController
     }
     
-    fileprivate func urlIsTracker(url: URL?) -> Bool {
+    fileprivate func isTrackerURL(url: URL?) -> Bool {
         let trackers = [
             "api.shopstyle.com",
             "doubleclick.net",
@@ -517,8 +503,8 @@ extension WebViewController : WKNavigationDelegate {
             "www.googletagmanager.com"
         ]
         if let host = url?.host {
-            for t in trackers {
-                if host.contains(t) {
+            for tracker in trackers {
+                if host.contains(tracker) {
                     return true
                 }
             }
