@@ -65,7 +65,7 @@ class ShoppingCartModel {
             }
             cartItem.color = variantToCopy.color
             cartItem.imageURL = variantToCopy.imageURLs?.components(separatedBy: ",").first
-            cartItem.retailPrice = variantToCopy.retailPrice
+            cartItem.price = variantToCopy.price
             cartItem.size = variantToCopy.size
             cartItem.sku = variantToCopy.sku
             cartItem.url = variantToCopy.url
@@ -205,8 +205,8 @@ class ShoppingCartModel {
                                         errorMask.insert(.quantity)
                                     }
                                     if let price = item["price"] as? Float,
-                                      cartItem.retailPrice != price {
-                                        cartItem.retailPrice = price
+                                      cartItem.price != price {
+                                        cartItem.price = price
                                         errorMask.insert(.price)
                                     }
 //                                    if let color = item["color"] as? String,
@@ -220,7 +220,7 @@ class ShoppingCartModel {
 //                                        errorMask.insert(.size)
 //                                    }
                                     errorDict[sku] = errorMask  // Clear unavailable.
-                                    print("errorMask:\(errorMask.rawValue) retailPrice:\(cartItem.retailPrice)")
+                                    print("errorMask:\(errorMask.rawValue) price:\(cartItem.price)")
                                 }
                             }
                         }
@@ -351,15 +351,19 @@ class ShoppingCartModel {
                 rootProduct.detailedDescription = dict["description"] as? String
                 rootProduct.name = dict["name"] as? String
                 rootProduct.url = dict["url"] as? String
+                if let dictPrice = dict["price"] as? Float {
+                    rootProduct.fallbackPrice = dictPrice
+                }
                 print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
                 
                 var hasVariants = false
                 let colors = dict["colors"] as? [[String : Any]]
                 colors?.forEach { color in
                     let colorString = color["color"] as? String
+                    let colorPrice = color["price"] as? Float // Never exists
                     let colorRetailPrice = color["retail_price"] as? Float
                     let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-                    print(" colorString:\(colorString ?? "-")  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
+                    print(" colorString:\(colorString ?? "-")  colorPrice:\(String(describing: colorPrice))  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
@@ -368,12 +372,12 @@ class ShoppingCartModel {
                                                                 product: rootProduct,
                                                                 color: colorString,
                                                                 size: size["size"] as? String,
-                                                                retailPrice: size["retail_price"] as? Float ?? colorRetailPrice ?? rootProduct.retailPrice,
+                                                                price: size["price"] as? Float ?? colorPrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
                                                                 sku: sku,
                                                                 url: size["url"] as? String,
                                                                 imageURLs: colorImageURLs)
                             hasVariants = true
-                            print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  retailPrice:\(variant.retailPrice)  imageURLs:\(variant.imageURLs ?? "-")")
+                            print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  price:\(variant.price)  imageURLs:\(variant.imageURLs ?? "-")")
                         }
                     }
                 }
