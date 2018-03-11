@@ -185,6 +185,7 @@ class ShoppingCartModel {
                             reject(error)
                             return
                         }
+                        var didChange = false
                         // Start with all cartItems errorMask as unavailable.
                         var errorDict: [String : CartItem.ErrorMaskOptions] = [:]
                         cartItems.forEach { cartItem in
@@ -203,32 +204,40 @@ class ShoppingCartModel {
                                       cartItem.quantity != qty {
                                         cartItem.quantity = qty
                                         errorMask.insert(.quantity)
+                                        didChange = true
                                     }
                                     if let price = item["price"] as? Float,
                                       cartItem.price != price {
                                         cartItem.price = price
                                         errorMask.insert(.price)
+                                        didChange = true
                                     }
 //                                    if let color = item["color"] as? String,
 //                                      cartItem.color != color {
 //                                        cartItem.color = color
 //                                        errorMask.insert(.color)
+//                                        didChange = true
 //                                    }
 //                                    if let size = item["size"] as? String,
 //                                      cartItem.size != size {
 //                                        cartItem.size = size
 //                                        errorMask.insert(.size)
+//                                        didChange = true
 //                                    }
-                                    errorDict[sku] = errorMask  // Clear unavailable.
+                                    if cartItem.errorMask != errorMask.rawValue {
+                                        cartItem.errorMask = errorMask.rawValue
+                                        didChange = true
+                                    }
+                                    errorDict.removeValue(forKey: sku)  // Clear unavailable.
                                     print("errorMask:\(errorMask.rawValue) price:\(cartItem.price)")
                                 }
                             }
                         }
-                        var didChange = false
-                        cartItems.forEach { cartItem in
-                            if let sku = cartItem.sku,
-                              let errorMask = errorDict[sku],
-                              cartItem.errorMask != errorMask.rawValue {
+                        // Save the unavailables.
+                        errorDict.keys.forEach { sku in
+                            if let cartItem = cartItems.first(where:{ $0.sku == sku }),
+                                let errorMask = errorDict[sku],
+                                cartItem.errorMask != errorMask.rawValue {
                                 cartItem.errorMask = errorMask.rawValue
                                 didChange = true
                             }
