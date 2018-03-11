@@ -39,31 +39,6 @@ class CheckoutConfirmationViewController: BaseViewController {
     }
     
     @objc fileprivate func navigateToScreenshotTab() {
-        func select(_ tabBarController: MainTabBarController) {
-            tabBarController.selectedViewController = tabBarController.screenshotsNavigationController
-        }
-        
-        func popToRoot(_ tabBarController: MainTabBarController) {
-            if let navigationController = tabBarController.selectedViewController as? UINavigationController {
-                navigationController.popToRootViewController(animated: false)
-            }
-        }
-        
-        func dismiss(_ tabBarController: MainTabBarController) {
-            tabBarController.dismiss(animated: true, completion: nil)
-        }
-        
-        if let mainTabBarController = presentingViewController as? MainTabBarController {
-            select(mainTabBarController)
-            dismiss(mainTabBarController)
-        }
-        else if let mainTabBarController = presentingViewController?.tabBarController as? MainTabBarController {
-            select(mainTabBarController)
-            dismiss(mainTabBarController)
-        }
-        else if let mainTabBarController = tabBarController as? MainTabBarController {
-            popToRoot(mainTabBarController)
-            select(mainTabBarController)
-        }
+        MainTabBarController.resetViewControllerHierarchy(self, select: .screenshots)
     }
 }

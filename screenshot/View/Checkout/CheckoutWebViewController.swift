@@ -26,6 +26,11 @@ extension CheckoutWebViewController {
             if let remoteId = remoteIdQueryItem?.value {
                 ShoppingCartModel.shared.hostedCompleted(remoteId: remoteId, from: fromQueryItem?.value ?? "")
             }
+            else {
+                // TODO: should a log be made here. this seems like a serious issue if it happens
+            }
+            
+            navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
         }
     }
 }

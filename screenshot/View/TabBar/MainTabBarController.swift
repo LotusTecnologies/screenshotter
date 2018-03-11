@@ -10,6 +10,14 @@ import UIKit
 import Intercom
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
+    enum TabIndex: Int {
+        case favorites   = 0
+        case discover    = 1
+        case screenshots = 2
+        case settings    = 3
+        case cart        = 4
+    }
+    
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
     
     let favoritesNavigationController = FavoritesNavigationController()
@@ -25,7 +33,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     fileprivate var isObservingSettingsBadgeFont = false
     fileprivate let TabBarBadgeFontKey = "view.badge.label.font"
-    fileprivate let discoverTabTag = 1
     
     // MARK: - Lifecycle
     
@@ -39,23 +46,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         super.init(nibName: nil, bundle: nil)
         
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
-        favoritesNavigationController.tabBarItem = tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: 0)
+        favoritesNavigationController.tabBarItem = tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: TabIndex.favorites.rawValue)
         
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
-        discoverNavigationController.tabBarItem = tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: discoverTabTag)
+        discoverNavigationController.tabBarItem = tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: TabIndex.discover.rawValue)
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
         screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: 2)
+        screenshotsNavigationController.tabBarItem = tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: TabIndex.screenshots.rawValue)
         
         settingsNavigationController.settingsViewController.delegate = self
         settingsNavigationController.title = settingsNavigationController.settingsViewController.title
-        settingsNavigationController.tabBarItem = tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: 3)
+        settingsNavigationController.tabBarItem = tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: TabIndex.settings.rawValue)
         settingsNavigationController.tabBarItem.badgeColor = .crazeRed
         settingsTabBarItem = settingsNavigationController.tabBarItem
         
         cartNavigationController.title = cartNavigationController.cartViewController.title
-        cartNavigationController.tabBarItem = tabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: 4)
+        cartNavigationController.tabBarItem = tabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: TabIndex.cart.rawValue)
         cartNavigationController.tabBarItem.badgeColor = .crazeRed
         
         self.delegate = self
@@ -198,7 +205,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         var tabTitle = self.selectedViewController?.title
         
-        if item.tag == self.discoverTabTag {
+        if item.tag == TabIndex.discover.rawValue {
             tabTitle = "Matchsticks"
         }
         
@@ -258,6 +265,39 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 tabView.transform = CGAffineTransform.identity
             })
         })
+    }
+    
+    // MARK: View Controllers
+    
+    static func resetViewControllerHierarchy(_ viewController: UIViewController, select tabIndex: MainTabBarController.TabIndex) {
+        func popToRoot(_ tabBarController: MainTabBarController) {
+            if let navigationController = tabBarController.selectedViewController as? UINavigationController {
+                navigationController.popToRootViewController(animated: false)
+            }
+        }
+        
+        func select(_ tabBarController: MainTabBarController) {
+            tabBarController.selectedIndex = tabIndex.rawValue
+        }
+        
+        func dismiss(_ tabBarController: MainTabBarController) {
+            tabBarController.dismiss(animated: true, completion: nil)
+        }
+        
+        if let mainTabBarController = viewController.presentingViewController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+            dismiss(mainTabBarController)
+        }
+        else if let mainTabBarController = viewController.presentingViewController?.tabBarController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+            dismiss(mainTabBarController)
+        }
+        else if let mainTabBarController = viewController.tabBarController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+        }
     }
     
     // MARK: - Screenshots

@@ -44,6 +44,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     override func layoutSubviews() {
         super.layoutSubviews()
         if let collectionView = self.collectionView {
+            // Needed for iOS 10
             self.bringSubview(toFront: collectionView)
         }
     }

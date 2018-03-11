@@ -178,33 +178,7 @@ class CartViewController: BaseViewController {
     // MARK: Empty List
     
     @objc fileprivate func emptyListAction() {
-        func select(_ tabBarController: MainTabBarController) {
-            tabBarController.selectedViewController = tabBarController.discoverNavigationController
-        }
-        
-        func popToRoot(_ tabBarController: MainTabBarController) {
-            if let navigationController = tabBarController.selectedViewController as? UINavigationController {
-                navigationController.popToRootViewController(animated: false)
-            }
-        }
-        
-        func dismiss(_ tabBarController: MainTabBarController) {
-            tabBarController.dismiss(animated: true, completion: nil)
-        }
-        
-        if let mainTabBarController = presentingViewController as? MainTabBarController {
-            popToRoot(mainTabBarController)
-            select(mainTabBarController)
-            dismiss(mainTabBarController)
-        }
-        else if let mainTabBarController = presentingViewController?.tabBarController as? MainTabBarController {
-            popToRoot(mainTabBarController)
-            select(mainTabBarController)
-            dismiss(mainTabBarController)
-        }
-        else if let mainTabBarController = tabBarController as? MainTabBarController {
-            select(mainTabBarController)
-        }
+        MainTabBarController.resetViewControllerHierarchy(self, select: .discover)
     }
 }
 
@@ -225,6 +199,7 @@ extension CartViewController: UITableViewDataSource {
             cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
             
             cell.titleLabel.text = cartItem.productTitle()
+            // !!!: the retailPrice is the original not, not sale price
             cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
