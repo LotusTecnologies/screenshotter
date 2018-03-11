@@ -57,7 +57,8 @@ class ShoppingCartModel {
             let cartItem: CartItem
             if let sku = variantToCopy.sku,
                 !sku.isEmpty,
-                let item = cart.items?.filtered(using: NSPredicate(format: "sku == %@", sku)).firstObject as? CartItem {
+                let items = cart.items as? Set<CartItem>,
+                let item = items.first(where: { $0.sku == sku }) {
                 cartItem = item
             } else {
                 cartItem = CartItem(context: managedObjectContext)

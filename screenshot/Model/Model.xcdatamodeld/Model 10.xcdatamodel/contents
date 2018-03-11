@@ -5,7 +5,7 @@
         <attribute name="dateSubmitted" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isPastOrder" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="remoteId" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CartItem" inverseName="cart" inverseEntity="CartItem" syncable="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CartItem" inverseName="cart" inverseEntity="CartItem" syncable="YES"/>
     </entity>
     <entity name="CartItem" representedClassName="CartItem" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
@@ -111,7 +111,7 @@
         <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="availableVariants" inverseEntity="Product" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Cart" positionX="369" positionY="-108" width="128" height="118"/>
+        <element name="Cart" positionX="369" positionY="-108" width="128" height="30"/>
         <element name="CartItem" positionX="540" positionY="27" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="510"/>
