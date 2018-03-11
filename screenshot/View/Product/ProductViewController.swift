@@ -114,6 +114,19 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Cart
     
     @objc func cartButtonAction() {
+        let v = ProductNextStepViewController()
+        
+        present(v, animated: true, completion: {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(10)) {
+                self.dismiss(animated: true, completion: nil)
+            }
+        })
+        
+        
+        
+        
+        
+        
         var errorItems: [SegmentedDropDownItem] = []
         
         productView.selectionControl.items.forEach { item in
@@ -428,3 +441,23 @@ fileprivate class StructuredColorVariant: NSObject {
         }
     }
 }
+
+
+
+
+
+
+class IView: UIView {
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: 200, height: 200)
+    }
+}
+
+class IViewController: UIViewController {
+    override func loadView() {
+        let v = IView()
+        v.backgroundColor = .green
+        view = v
+    }
+}
+
