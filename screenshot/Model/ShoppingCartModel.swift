@@ -243,6 +243,23 @@ class ShoppingCartModel {
         }
     }
     
+    public func clearErrorMasks() {
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { managedObjectContext in
+            guard let cart = dataModel.retrieveAddableCart(managedObjectContext: managedObjectContext) else {
+                print("clearErrorMasks failed to retrieve cart")
+                return
+            }
+            guard let items = cart.items as? Set<CartItem>,
+              items.count > 0 else {
+                print("clearErrorMasks failed to retrieve cart items")
+                return
+            }
+            items.forEach { $0.errorMask = CartItem.ErrorMaskOptions.none.rawValue }
+            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+        }
+    }
+    
     func hostedUrl() -> Promise<URL> {
         return firstly {
             return retrieveCartRemoteId()
