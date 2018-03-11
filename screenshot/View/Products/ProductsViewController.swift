@@ -188,7 +188,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.shoppablesToolbar?.selectFirstShoppable()
         if !self.hasShoppables() && self.noItemsHelperView == nil {
             self.state = .loading
         }
