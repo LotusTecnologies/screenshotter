@@ -81,6 +81,7 @@ class CartViewController: BaseViewController {
         emptyListButton.centerXAnchor.constraint(equalTo: emptyListView.controlView.centerXAnchor).isActive = true
         
         emptyListView.titleLabel.text = "cart.empty.title".localized
+        emptyListView.contentImage = UIImage(named: "CartEmptyListGraphic")
         tableView.emptyView = emptyListView
         
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
