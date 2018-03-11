@@ -210,6 +210,7 @@ class ShoppingCartModel {
                                       cartItem.price != price {
                                         cartItem.price = price
                                         errorMask.insert(.price)
+                                        (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = price
                                         didChange = true
                                     }
 //                                    if let color = item["color"] as? String,
