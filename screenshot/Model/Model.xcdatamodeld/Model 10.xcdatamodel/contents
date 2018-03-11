@@ -5,16 +5,16 @@
         <attribute name="dateSubmitted" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isPastOrder" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="remoteId" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CartItem" inverseName="cart" inverseEntity="CartItem" syncable="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CartItem" inverseName="cart" inverseEntity="CartItem" syncable="YES"/>
     </entity>
     <entity name="CartItem" representedClassName="CartItem" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="errorMask" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="price" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="quantity" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="size" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sku" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
@@ -39,6 +39,7 @@
         <attribute name="dateViewed" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="detailedDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="displayTitle" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fallbackPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="floatOriginalPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="floatPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="hasVariants" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -54,7 +55,6 @@
         <attribute name="partNumber" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="availableVariants" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Variant" inverseName="product" inverseEntity="Variant" syncable="YES"/>
         <relationship name="cartItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CartItem" inverseName="product" inverseEntity="CartItem" syncable="YES"/>
@@ -104,14 +104,14 @@
         <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="imageURLs" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="price" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="size" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sku" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="availableVariants" inverseEntity="Product" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Cart" positionX="369" positionY="-108" width="128" height="118"/>
+        <element name="Cart" positionX="369" positionY="-108" width="128" height="30"/>
         <element name="CartItem" positionX="540" positionY="27" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="510"/>

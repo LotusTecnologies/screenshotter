@@ -49,7 +49,7 @@ class Constants {
     static let shoppableDomain = "https://api.shoppable.co/v3"
     static let shoppableHosted = "https://secure.shoppable.co"
     static let shoppableToken = "gD1GV3cVFGC9hk8W5927b13e5e"
-    static let syteFeed = "shoppable_nordstrom"
+    static let syteFeed = "shoppable"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"

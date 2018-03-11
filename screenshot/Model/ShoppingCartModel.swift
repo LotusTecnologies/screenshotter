@@ -57,14 +57,15 @@ class ShoppingCartModel {
             let cartItem: CartItem
             if let sku = variantToCopy.sku,
                 !sku.isEmpty,
-                let item = cart.items?.filtered(using: NSPredicate(format: "sku == %@", sku)).firstObject as? CartItem {
+                let items = cart.items as? Set<CartItem>,
+                let item = items.first(where: { $0.sku == sku }) {
                 cartItem = item
             } else {
                 cartItem = CartItem(context: managedObjectContext)
             }
             cartItem.color = variantToCopy.color
             cartItem.imageURL = variantToCopy.imageURLs?.components(separatedBy: ",").first
-            cartItem.retailPrice = variantToCopy.retailPrice
+            cartItem.price = variantToCopy.price
             cartItem.size = variantToCopy.size
             cartItem.sku = variantToCopy.sku
             cartItem.url = variantToCopy.url
@@ -184,6 +185,7 @@ class ShoppingCartModel {
                             reject(error)
                             return
                         }
+                        var didChange = false
                         // Start with all cartItems errorMask as unavailable.
                         var errorDict: [String : CartItem.ErrorMaskOptions] = [:]
                         cartItems.forEach { cartItem in
@@ -202,32 +204,41 @@ class ShoppingCartModel {
                                       cartItem.quantity != qty {
                                         cartItem.quantity = qty
                                         errorMask.insert(.quantity)
+                                        didChange = true
                                     }
                                     if let price = item["price"] as? Float,
-                                      cartItem.retailPrice != price {
-                                        cartItem.retailPrice = price
+                                      cartItem.price != price {
+                                        cartItem.price = price
                                         errorMask.insert(.price)
+                                        (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = price
+                                        didChange = true
                                     }
 //                                    if let color = item["color"] as? String,
 //                                      cartItem.color != color {
 //                                        cartItem.color = color
 //                                        errorMask.insert(.color)
+//                                        didChange = true
 //                                    }
 //                                    if let size = item["size"] as? String,
 //                                      cartItem.size != size {
 //                                        cartItem.size = size
 //                                        errorMask.insert(.size)
+//                                        didChange = true
 //                                    }
-                                    errorDict[sku] = errorMask  // Clear unavailable.
-                                    print("errorMask:\(errorMask.rawValue) retailPrice:\(cartItem.retailPrice)")
+                                    if cartItem.errorMask != errorMask.rawValue {
+                                        cartItem.errorMask = errorMask.rawValue
+                                        didChange = true
+                                    }
+                                    errorDict.removeValue(forKey: sku)  // Clear unavailable.
+                                    print("errorMask:\(errorMask.rawValue) price:\(cartItem.price)")
                                 }
                             }
                         }
-                        var didChange = false
-                        cartItems.forEach { cartItem in
-                            if let sku = cartItem.sku,
-                              let errorMask = errorDict[sku],
-                              cartItem.errorMask != errorMask.rawValue {
+                        // Save the unavailables.
+                        errorDict.keys.forEach { sku in
+                            if let cartItem = cartItems.first(where:{ $0.sku == sku }),
+                                let errorMask = errorDict[sku],
+                                cartItem.errorMask != errorMask.rawValue {
                                 cartItem.errorMask = errorMask.rawValue
                                 didChange = true
                             }
@@ -239,6 +250,23 @@ class ShoppingCartModel {
                         fulfill(isErrorFree)
                     }
                 }
+        }
+    }
+    
+    public func clearErrorMasks() {
+        let dataModel = DataModel.sharedInstance
+        dataModel.performBackgroundTask { managedObjectContext in
+            guard let cart = dataModel.retrieveAddableCart(managedObjectContext: managedObjectContext) else {
+                print("clearErrorMasks failed to retrieve cart")
+                return
+            }
+            guard let items = cart.items as? Set<CartItem>,
+              items.count > 0 else {
+                print("clearErrorMasks failed to retrieve cart items")
+                return
+            }
+            items.forEach { $0.errorMask = CartItem.ErrorMaskOptions.none.rawValue }
+            dataModel.saveMoc(managedObjectContext: managedObjectContext)
         }
     }
     
@@ -333,15 +361,19 @@ class ShoppingCartModel {
                 rootProduct.detailedDescription = dict["description"] as? String
                 rootProduct.name = dict["name"] as? String
                 rootProduct.url = dict["url"] as? String
+                if let dictPrice = dict["price"] as? Float {
+                    rootProduct.fallbackPrice = dictPrice
+                }
                 print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
                 
                 var hasVariants = false
                 let colors = dict["colors"] as? [[String : Any]]
                 colors?.forEach { color in
                     let colorString = color["color"] as? String
+                    let colorPrice = color["price"] as? Float // Never exists
                     let colorRetailPrice = color["retail_price"] as? Float
                     let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-                    print(" colorString:\(colorString ?? "-")  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
+                    print(" colorString:\(colorString ?? "-")  colorPrice:\(String(describing: colorPrice))  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
@@ -350,12 +382,12 @@ class ShoppingCartModel {
                                                                 product: rootProduct,
                                                                 color: colorString,
                                                                 size: size["size"] as? String,
-                                                                retailPrice: size["retail_price"] as? Float ?? colorRetailPrice ?? rootProduct.retailPrice,
+                                                                price: size["price"] as? Float ?? colorPrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
                                                                 sku: sku,
                                                                 url: size["url"] as? String,
                                                                 imageURLs: colorImageURLs)
                             hasVariants = true
-                            print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  retailPrice:\(variant.retailPrice)  imageURLs:\(variant.imageURLs ?? "-")")
+                            print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  price:\(variant.price)  imageURLs:\(variant.imageURLs ?? "-")")
                         }
                     }
                 }

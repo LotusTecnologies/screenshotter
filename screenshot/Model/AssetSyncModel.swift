@@ -522,7 +522,7 @@ class AssetSyncModel: NSObject {
                                                      merchant: prod["merchant"] as? String,
                                                      partNumber: originalData?["part_number"] as? String,
                                                      color: originalData?["colors/0/color"] as? String,  // "tmp_color_keys/0"
-                                                     retailPrice: originalData?["retail_price"] as? Float ?? 0,
+                                                     fallbackPrice: originalData?["price"] as? Float ?? 0,
                                                      optionsMask: optionsMask)
     }
     

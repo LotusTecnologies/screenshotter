@@ -146,7 +146,7 @@ class CartViewController: BaseViewController {
         var price: Double = 0
         
         cartItemFrc?.fetchedObjects.forEach({ cartItem in
-            price += Double(cartItem.retailPrice) * Double(cartItem.quantity)
+            price += Double(cartItem.price) * Double(cartItem.quantity)
         })
         
         checkoutView.price = formatter.string(from: NSNumber(value: price))
@@ -199,8 +199,7 @@ extension CartViewController: UITableViewDataSource {
             cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
             
             cell.titleLabel.text = cartItem.productTitle()
-            // !!!: the retailPrice is the original not, not sale price
-            cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.retailPrice))
+            cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.price))
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
             cell.size = cartItem.size
