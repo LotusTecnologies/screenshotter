@@ -12,8 +12,9 @@ class CartTableViewCell: UITableViewCell {
     let productImageView = UIImageView()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
-    let removeButton = UIButton()
+    let removeButton = BorderButton()
     let quantityStepper = UIStepper()
+    fileprivate let errorLabel = UILabel()
     fileprivate var quantityValueLabel: UILabel?
     fileprivate var colorValueLabel: UILabel?
     fileprivate var sizeValueLabel: UILabel?
@@ -29,6 +30,11 @@ class CartTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        var layoutMargins = contentView.layoutMargins
+        layoutMargins.top = .padding
+        layoutMargins.bottom = .padding
+        contentView.layoutMargins = layoutMargins
         
         let mainView = UIView()
         mainView.translatesAutoresizingMaskIntoConstraints = false
@@ -93,7 +99,6 @@ class CartTableViewCell: UITableViewCell {
         
         let variantDataContainerView = UIView()
         variantDataContainerView.translatesAutoresizingMaskIntoConstraints = false
-        variantDataContainerView.isHidden = true
         mainView.addSubview(variantDataContainerView)
         variantDataContainerView.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: .padding).isActive = true
         variantDataContainerView.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
@@ -106,15 +111,15 @@ class CartTableViewCell: UITableViewCell {
             variantDataContainerView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor)
         ]
         
-        let variantDataPositionView = UIView()
-        variantDataPositionView.translatesAutoresizingMaskIntoConstraints = false
-        variantDataPositionView.isHidden = true
-        mainView.addSubview(variantDataPositionView)
-        variantDataPositionView.topAnchor.constraint(greaterThanOrEqualTo: variantDataContainerView.topAnchor).isActive = true
-        variantDataPositionView.leadingAnchor.constraint(equalTo: variantDataContainerView.leadingAnchor).isActive = true
-        variantDataPositionView.bottomAnchor.constraint(lessThanOrEqualTo: variantDataContainerView.bottomAnchor).isActive = true
-        variantDataPositionView.trailingAnchor.constraint(equalTo: variantDataContainerView.trailingAnchor).isActive = true
-        variantDataPositionView.centerYAnchor.constraint(equalTo: variantDataContainerView.centerYAnchor).isActive = true
+        let variantDataPositionGuide = UIView()
+        variantDataPositionGuide.translatesAutoresizingMaskIntoConstraints = false
+        variantDataPositionGuide.isHidden = true
+        mainView.addSubview(variantDataPositionGuide)
+        variantDataPositionGuide.topAnchor.constraint(greaterThanOrEqualTo: variantDataContainerView.topAnchor).isActive = true
+        variantDataPositionGuide.leadingAnchor.constraint(equalTo: variantDataContainerView.leadingAnchor).isActive = true
+        variantDataPositionGuide.bottomAnchor.constraint(lessThanOrEqualTo: variantDataContainerView.bottomAnchor).isActive = true
+        variantDataPositionGuide.trailingAnchor.constraint(equalTo: variantDataContainerView.trailingAnchor).isActive = true
+        variantDataPositionGuide.centerYAnchor.constraint(equalTo: variantDataContainerView.centerYAnchor).isActive = true
         
         let variantDataVerticalGuide = UIView()
         variantDataVerticalGuide.translatesAutoresizingMaskIntoConstraints = false
@@ -130,10 +135,10 @@ class CartTableViewCell: UITableViewCell {
             label.minimumScaleFactor = 0.2
             label.adjustsFontSizeToFitWidth = true
             label.adjustsFontForContentSizeCategory = true
-            mainView.addSubview(label)
+            variantDataContainerView.addSubview(label)
             label.setContentHuggingPriority(UILayoutPriorityDefaultHigh, for: .horizontal)
             label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-            label.widthAnchor.constraint(lessThanOrEqualTo: variantDataPositionView.widthAnchor, multiplier: 0.4).isActive = true
+            label.widthAnchor.constraint(lessThanOrEqualTo: variantDataPositionGuide.widthAnchor, multiplier: 0.4).isActive = true
             let heightConstraint = label.heightAnchor.constraint(greaterThanOrEqualToConstant: quantityStepper.intrinsicContentSize.height)
             heightConstraint.priority = UILayoutPriorityDefaultHigh
             heightConstraint.isActive = true
@@ -148,7 +153,7 @@ class CartTableViewCell: UITableViewCell {
             label.minimumScaleFactor = 0.2
             label.adjustsFontSizeToFitWidth = true
             label.adjustsFontForContentSizeCategory = true
-            mainView.addSubview(label)
+            variantDataContainerView.addSubview(label)
             label.topAnchor.constraint(equalTo: titleLabel.topAnchor).isActive = true
             label.bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
             return label
@@ -156,8 +161,8 @@ class CartTableViewCell: UITableViewCell {
         
         let quantityTitleLabel = createTitleLabel()
         quantityTitleLabel.text = "cart.variant.quantity".localized
-        quantityTitleLabel.topAnchor.constraint(equalTo: variantDataPositionView.topAnchor).isActive = true
-        quantityTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionView.leadingAnchor).isActive = true
+        quantityTitleLabel.topAnchor.constraint(equalTo: variantDataPositionGuide.topAnchor).isActive = true
+        quantityTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionGuide.leadingAnchor).isActive = true
         quantityTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
         
         let quantityValueLabel = createValueLabel(titleLabel: quantityTitleLabel)
@@ -169,52 +174,69 @@ class CartTableViewCell: UITableViewCell {
         quantityStepper.maximumValue = Double(Constants.cartItemMaxQuantity)
         quantityStepper.autorepeat = false
         quantityStepper.tintColor = .crazeGreen
-        mainView.addSubview(quantityStepper)
+        variantDataContainerView.addSubview(quantityStepper)
         quantityStepper.leadingAnchor.constraint(equalTo: quantityValueLabel.trailingAnchor).isActive = true
-        quantityStepper.trailingAnchor.constraint(equalTo: variantDataPositionView.trailingAnchor).isActive = true
+        quantityStepper.trailingAnchor.constraint(equalTo: variantDataPositionGuide.trailingAnchor).isActive = true
         quantityStepper.centerYAnchor.constraint(equalTo: quantityTitleLabel.centerYAnchor).isActive = true
         
         let colorTitleLabel = createTitleLabel()
         colorTitleLabel.text = "cart.variant.color".localized
         colorTitleLabel.topAnchor.constraint(equalTo: quantityTitleLabel.bottomAnchor).isActive = true
-        colorTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionView.leadingAnchor).isActive = true
+        colorTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionGuide.leadingAnchor).isActive = true
         colorTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
         hideColorLabelConstraint = colorTitleLabel.heightAnchor.constraint(equalToConstant: 0)
         hideColorLabelConstraint?.isActive = true
         
         let colorValueLabel = createValueLabel(titleLabel: colorTitleLabel)
         colorValueLabel.leadingAnchor.constraint(equalTo: variantDataVerticalGuide.trailingAnchor).isActive = true
-        colorValueLabel.trailingAnchor.constraint(equalTo: variantDataPositionView.trailingAnchor).isActive = true
+        colorValueLabel.trailingAnchor.constraint(equalTo: variantDataPositionGuide.trailingAnchor).isActive = true
         self.colorValueLabel = colorValueLabel
         
         let sizeTitleLabel = createTitleLabel()
         sizeTitleLabel.text = "cart.variant.size".localized
         sizeTitleLabel.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor).isActive = true
-        sizeTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionView.leadingAnchor).isActive = true
-        sizeTitleLabel.bottomAnchor.constraint(equalTo: variantDataPositionView.bottomAnchor).isActive = true
+        sizeTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionGuide.leadingAnchor).isActive = true
+        sizeTitleLabel.bottomAnchor.constraint(equalTo: variantDataPositionGuide.bottomAnchor).isActive = true
         sizeTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
         hideSizeLabelConstraint = sizeTitleLabel.heightAnchor.constraint(equalToConstant: 0)
         hideSizeLabelConstraint?.isActive = true
         
         let sizeValueLabel = createValueLabel(titleLabel: sizeTitleLabel)
         sizeValueLabel.leadingAnchor.constraint(equalTo: variantDataVerticalGuide.trailingAnchor).isActive = true
-        sizeValueLabel.trailingAnchor.constraint(equalTo: variantDataPositionView.trailingAnchor).isActive = true
+        sizeValueLabel.trailingAnchor.constraint(equalTo: variantDataPositionGuide.trailingAnchor).isActive = true
         self.sizeValueLabel = sizeValueLabel
+        
+        errorLabel.translatesAutoresizingMaskIntoConstraints = false
+        errorLabel.textAlignment = .center
+        errorLabel.textColor = .crazeRed
+        errorLabel.numberOfLines = 0
+        errorLabel.font = {
+            var font = UIFont.preferredFont(forTextStyle: .footnote)
+            
+            if let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) {
+                font = UIFont(descriptor: descriptor, size: 0)
+            }
+            
+            return font
+        }()
+        errorLabel.adjustsFontForContentSizeCategory = true
+        mainView.addSubview(errorLabel)
+        errorLabel.layoutMarginsGuide.topAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        errorLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        errorLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let actionView = UIView()
         actionView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(actionView)
-        actionView.topAnchor.constraint(equalTo: mainView.bottomAnchor, constant: .padding).isActive = true
+        actionView.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: .padding).isActive = true
         actionView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         actionView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         actionView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         removeButton.translatesAutoresizingMaskIntoConstraints = false
         removeButton.setTitle("cart.remove".localized, for: .normal)
-        removeButton.setTitleColor(.crazeGreen, for: .normal)
-        removeButton.layer.borderColor = UIColor.crazeGreen.cgColor
-        removeButton.layer.borderWidth = 1
-        removeButton.layer.cornerRadius = .defaultCornerRadius
+        removeButton.setTitleColor(.gray6, for: .normal)
+        removeButton.setTitleColor(.crazeRed, for: .selected)
         actionView.addSubview(removeButton)
         removeButton.topAnchor.constraint(equalTo: actionView.topAnchor).isActive = true
         removeButton.leadingAnchor.constraint(equalTo: actionView.leadingAnchor).isActive = true
@@ -246,6 +268,10 @@ class CartTableViewCell: UITableViewCell {
     }
     
     // MARK: Variant Data
+    
+    private var hideQuantityLabelConstraint: NSLayoutConstraint?
+    private var hideColorLabelConstraint: NSLayoutConstraint?
+    private var hideSizeLabelConstraint: NSLayoutConstraint?
     
     var quantity: Double = 1.0 {
         didSet {
@@ -280,6 +306,44 @@ class CartTableViewCell: UITableViewCell {
         }
     }
     
-    private var hideColorLabelConstraint: NSLayoutConstraint?
-    private var hideSizeLabelConstraint: NSLayoutConstraint?
+    // MARK: Error
+    
+    var errorMask: CartItem.ErrorMaskOptions = .none {
+        didSet {
+            removeButton.isSelected = false
+            priceLabel.textColor = .gray3
+            quantityStepper.isEnabled = true
+            quantityStepper.tintColor = .crazeGreen
+            
+            var layoutMargins = errorLabel.layoutMargins
+            layoutMargins.top = -.padding
+            
+            if errorMask == .none {
+                errorLabel.text = nil
+                layoutMargins.top = 0
+            }
+            else if errorMask.contains(.unavailable) {
+                errorLabel.text = "cart.item.error.unavailable".localized
+                removeButton.isSelected = true
+                quantityStepper.isEnabled = false
+                quantityStepper.tintColor = .gray8
+            }
+            else {
+                var texts: [String] = []
+                
+                if errorMask.contains(.price) {
+                    texts.append("cart.item.error.price".localized)
+                    priceLabel.textColor = .crazeRed
+                }
+                if errorMask.contains(.quantity) {
+                    texts.append("cart.item.error.quantity".localized)
+                    quantityStepper.tintColor = .crazeRed
+                }
+                
+                errorLabel.text = texts.joined(separator: "; ")
+            }
+            
+            errorLabel.layoutMargins = layoutMargins
+        }
+    }
 }

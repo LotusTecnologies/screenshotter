@@ -203,13 +203,9 @@ extension CartViewController: UITableViewDataSource {
             cell.quantity = Double(cartItem.quantity)
             cell.color = cartItem.color
             cell.size = cartItem.size
+            cell.errorMask = CartItem.ErrorMaskOptions(rawValue: cartItem.errorMask)
             cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(_:)), for: .touchUpInside)
             cell.quantityStepper.addTarget(self, action: #selector(cartItemQuantityChanged(_:)), for: .valueChanged)
-            
-            // TODO:
-//            let e = CartItem.ErrorMaskOptions(rawValue: cartItem.errorMask)
-//            let a = e == .price
-//            e.contains(.none)
         }
         
         return cell

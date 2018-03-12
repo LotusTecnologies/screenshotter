@@ -23,6 +23,9 @@
 "cart.favorite.remove" = "Added to Favorites";
 "cart.header.title" = "Your Cart";
 "cart.header.item_count" = "Items: %d";
+"cart.item.error.price" = "Price has changed";
+"cart.item.error.quantity" = "Quantity has changed";
+"cart.item.error.unavailable" = "Out of stock";
 "cart.remove" = "Remove";
 "cart.title" = "Cart";
 "cart.variant.color" = "Color:";

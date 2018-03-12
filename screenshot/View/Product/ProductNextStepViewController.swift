@@ -34,6 +34,7 @@ class ProductNextStepViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .gray3
         label.font = UIFont.preferredFont(forTextStyle: .title2)
+        label.adjustsFontForContentSizeCategory = true // TODO: test this
         label.text = "product.next_step.added".localized
         label.numberOfLines = 0
         view.addSubview(label)
