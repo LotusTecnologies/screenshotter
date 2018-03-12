@@ -504,9 +504,11 @@ class AssetSyncModel: NSObject {
         let extractedCategories = prod["categories"] as? [String]
         let originalData = prod["original_data"] as? [String : Any]
         // TODO: GMK remove rejecting product with no partNumber.
+#if DEV
         guard let _ = originalData?["part_number"] as? String else {
             return
         }
+#endif
         let _ = DataModel.sharedInstance.saveProduct(managedObjectContext: managedObjectContext,
                                                      shoppable: shoppable,
                                                      order: productOrder,
