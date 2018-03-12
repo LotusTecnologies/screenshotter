@@ -129,6 +129,9 @@
 "product.add" = "Add to Cart";
 "product.buy" = "Buy Now";
 "product.color.default" = "Color";
+"product.next_step.cart" = "Go to Cart";
+"product.next_step.continue" = "Continue Shopping";
+"product.next_step.added" = "Product was added to your cart!";
 "product.size.default" = "Size";
 "product.website" = "Go To %@";
 

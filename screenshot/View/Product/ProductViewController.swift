@@ -114,19 +114,6 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Cart
     
     @objc func cartButtonAction() {
-        let v = ProductNextStepViewController()
-        
-        present(v, animated: true, completion: {
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(10)) {
-                self.dismiss(animated: true, completion: nil)
-            }
-        })
-        
-        
-        
-        
-        
-        
         var errorItems: [SegmentedDropDownItem] = []
         
         productView.selectionControl.items.forEach { item in
@@ -143,6 +130,8 @@ fileprivate extension ProductViewControllerProductView {
             let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
             
             ShoppingCartModel.shared.update(variant: variant, quantity: Int16(quantity))
+            
+            presentNextStep()
         }
         else {
             func displayErrorItems() {
@@ -179,6 +168,17 @@ fileprivate extension ProductViewControllerProductView {
     
     @objc func buyButtonAction() {
         // TODO:
+    }
+    
+    fileprivate func presentNextStep() {
+        let nextStepViewController = ProductNextStepViewController()
+        nextStepViewController.cartButton.addTarget(self, action: #selector(presentCart), for: .touchUpInside)
+        nextStepViewController.continueButton.addTarget(self, action: #selector(dismissNextStep), for: .touchUpInside)
+        present(nextStepViewController, animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func dismissNextStep() {
+        dismiss(animated: true, completion: nil)
     }
     
     // MARK: Favorite
@@ -288,6 +288,10 @@ fileprivate extension ProductViewControllerStructuredProduct {
 typealias ProductViewControllerCart = ProductViewController
 fileprivate extension ProductViewControllerCart {
     @objc func presentCart() {
+        if presentedViewController != nil {
+            dismiss(animated: true, completion: nil)
+        }
+        
         let navigationController = ModalNavigationController(rootViewController: CartViewController())
         present(navigationController, animated: true, completion: nil)
     }
@@ -441,23 +445,3 @@ fileprivate class StructuredColorVariant: NSObject {
         }
     }
 }
-
-
-
-
-
-
-class IView: UIView {
-    override var intrinsicContentSize: CGSize {
-        return CGSize(width: 200, height: 200)
-    }
-}
-
-class IViewController: UIViewController {
-    override func loadView() {
-        let v = IView()
-        v.backgroundColor = .green
-        view = v
-    }
-}
-
