@@ -361,7 +361,7 @@ class ShoppingCartModel {
                 rootProduct.detailedDescription = dict["description"] as? String
                 rootProduct.name = dict["name"] as? String
                 rootProduct.url = dict["url"] as? String
-                if let dictPrice = dict["price"] as? Float {
+                if let dictPrice = self.parseFloat(dict["price"]) {
                     rootProduct.fallbackPrice = dictPrice
                 }
                 print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
@@ -370,10 +370,10 @@ class ShoppingCartModel {
                 let colors = dict["colors"] as? [[String : Any]]
                 colors?.forEach { color in
                     let colorString = color["color"] as? String
-                    let colorPrice = color["price"] as? Float // Never exists
-                    let colorRetailPrice = color["retail_price"] as? Float
+                    let colorSalePrice = self.parseFloat(color["sale_price"])
+                    let colorRetailPrice = self.parseFloat(color["retail_price"])
                     let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-                    print(" colorString:\(colorString ?? "-")  colorPrice:\(String(describing: colorPrice))  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
+                    print(" colorString:\(colorString ?? "-")  colorSalePrice:\(String(describing: colorSalePrice))  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
@@ -382,7 +382,7 @@ class ShoppingCartModel {
                                                                 product: rootProduct,
                                                                 color: colorString,
                                                                 size: size["size"] as? String,
-                                                                price: size["price"] as? Float ?? colorPrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
+                                                                price: self.parseFloat(size["price"]) ?? self.parseFloat(size["retail_price"]) ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
                                                                 sku: sku,
                                                                 url: size["url"] as? String,
                                                                 imageURLs: colorImageURLs)
@@ -424,6 +424,15 @@ class ShoppingCartModel {
                 }
             }
         }
+    }
+    
+    func parseFloat(_ any: Any?) -> Float? {
+        if let string = any as? String,
+          !string.isEmpty, // Not an empty string, which directly casting as Float => 0.
+          let float = any as? Float {
+            return float
+        }
+        return nil
     }
     
 }
