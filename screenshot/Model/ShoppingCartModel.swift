@@ -206,11 +206,15 @@ class ShoppingCartModel {
                                         errorMask.insert(.quantity)
                                         didChange = true
                                     }
-                                    if let price = item["price"] as? Float,
-                                      cartItem.price != price {
-                                        cartItem.price = price
+                                    let price = self.parseFloat(item["price"])
+                                    let salePrice = self.parseFloat(item["sale_price"])
+                                    let retailPrice = self.parseFloat(item["retail_price"])
+                                    print("price:\(String(describing: price))  salePrice:\(String(describing: salePrice))  retailPrice:\(String(describing: retailPrice))")
+                                    if let toPayPrice = price ?? salePrice ?? retailPrice,
+                                      cartItem.price != toPayPrice {
+                                        cartItem.price = toPayPrice
                                         errorMask.insert(.price)
-                                        (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = price
+                                        (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = toPayPrice
                                         didChange = true
                                     }
 //                                    if let color = item["color"] as? String,
@@ -229,7 +233,7 @@ class ShoppingCartModel {
                                         cartItem.errorMask = errorMask.rawValue
                                         didChange = true
                                     }
-                                    errorDict.removeValue(forKey: sku)  // Clear unavailable.
+                                    errorDict[sku] = nil  // Clear unavailable.
                                     print("errorMask:\(errorMask.rawValue) price:\(cartItem.price)")
                                 }
                             }
@@ -361,7 +365,7 @@ class ShoppingCartModel {
                 rootProduct.detailedDescription = dict["description"] as? String
                 rootProduct.name = dict["name"] as? String
                 rootProduct.url = dict["url"] as? String
-                if let dictPrice = self.parseFloat(dict["price"]) {
+                if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["retail_price"]) {
                     rootProduct.fallbackPrice = dictPrice
                 }
                 print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
@@ -378,16 +382,18 @@ class ShoppingCartModel {
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
                           !sku.isEmpty {
+                            let sizePrice = self.parseFloat(size["price"])
+                            let sizeRetailPrice = self.parseFloat(size["retail_price"])
                             let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
                                                                 product: rootProduct,
                                                                 color: colorString,
                                                                 size: size["size"] as? String,
-                                                                price: self.parseFloat(size["price"]) ?? self.parseFloat(size["retail_price"]) ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
+                                                                price: sizePrice ?? sizeRetailPrice ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
                                                                 sku: sku,
                                                                 url: size["url"] as? String,
                                                                 imageURLs: colorImageURLs)
                             hasVariants = true
-                            print("  colorString:\(variant.color ?? "-")  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  price:\(variant.price)  imageURLs:\(variant.imageURLs ?? "-")")
+                            print("  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  sizePrice:\(String(describing: sizePrice))  sizeRetailPrice:\(String(describing: sizeRetailPrice))  price:\(variant.price)  imageURLs:\(variant.imageURLs ?? "-")")
                         }
                     }
                 }
@@ -426,10 +432,9 @@ class ShoppingCartModel {
         }
     }
     
-    func parseFloat(_ any: Any?) -> Float? {
-        if let string = any as? String,
-          !string.isEmpty, // Not an empty string, which directly casting as Float => 0.
-          let float = any as? Float {
+    func parseFloat(_ anyValueOptional: Any?) -> Float? {
+        if let anyValue = anyValueOptional,
+          let float = anyValue as? Float {
             return float
         }
         return nil
