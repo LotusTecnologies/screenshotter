@@ -98,7 +98,6 @@ class MatchstickModel: NSObject {
     
     func fetchImageData(imageUrl: String) {
         self.downloadMatchsitckQueue.addOperation(AsyncOperation.init { (completed) in
-            print("Started downloading image")
             NetworkingPromise.sharedInstance.downloadImageData(urlString: imageUrl)
                 .then(on: self.processingQ) { imageData -> Void in
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
