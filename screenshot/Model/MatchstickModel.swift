@@ -97,7 +97,7 @@ class MatchstickModel: NSObject {
     }
     
     func fetchImageData(imageUrl: String) {
-        self.downloadMatchsitckQueue.addOperation(AsyncOperation.init { (completed) in
+        self.downloadMatchsitckQueue.addOperation(AsyncOperation.init(timeout: 90.0) { (completed) in
             NetworkingPromise.sharedInstance.downloadImageData(urlString: imageUrl)
                 .then(on: self.processingQ) { imageData -> Void in
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
