@@ -272,6 +272,9 @@ fileprivate extension ProductViewControllerStructuredProduct {
                     // Disabled until color is selected
                     sizeItem?.disabledPickerItems = structuredProduct.sizes
                 }
+                else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: product.color) {
+                    sizeItem?.disabledPickerItems = structuredProduct.subtractingSizes(of: structuredColorVariant)
+                }
             }
             
             productView.setSelection(colorItem: colorItem, sizeItem: sizeItem)
