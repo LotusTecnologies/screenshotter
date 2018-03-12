@@ -41,7 +41,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     var rateView:ProductsRateView!
     var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
     var productsRateNegativeFeedbackTextField:UITextField?
-    
+    var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
     var image:UIImage!
     var state:ProductsViewControllerState = .loading {
@@ -167,6 +167,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             view.addSubview(fab)
             fab.bottomAnchor.constraint(equalTo: rateView.topAnchor, constant: -p / 2).isActive = true
             fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
+            shamrockButton = fab
         }
         
         if #available(iOS 11.0, *) {
@@ -687,6 +688,18 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     func productsRatePositiveAction() {
         if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             shoppable.setRating(positive: true)
+            
+            self.shamrockButton?.isHidden = true
+            let sharePrompt = ShareToDiscoverPrompt.init(frame: .zero)
+            //sharePrompt.delegate = self
+            sharePrompt.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(sharePrompt)
+
+            sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+            sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
+            sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
+//            sharePrompt.heightAnchor.constraint(greaterThanOrEqualToConstant: 150).isActive = true
+            
         }
     }
     
@@ -752,6 +765,18 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         self.productsRateNegativeFeedbackSubmitAction?.isEnabled = isEnabled
         
         return true
+    }
+}
+
+extension ProductsViewController : ShareToDiscoverPromptDelegate {
+    func shareToDiscoverPromptDidClose(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
+        self.shamrockButton?.isHidden = false
+        shareToDiscoverPrompt.removeFromSuperview()
+    }
+    func shareToDiscoverPromptPressAdd(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
+        shareToDiscoverPrompt.removeFromSuperview()
+        
+        
     }
 }
 

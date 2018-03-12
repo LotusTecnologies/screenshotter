@@ -160,6 +160,12 @@
 "screenshots.share.error.title" = "Sorry";
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
 
+"share_to_discover.add_button" = "Add";
+"share_to_discover.text" = "Add this to Discover so other users can shop your screenshot!";
+"share_to_discover.after_share.text" = "Thanks for sharing! Add your screenshot to discover so other users can shop it, too!";
+"share_to_discover.thank_you_popup.title" = "Your screenshot was added to Discover!";
+"share_to_discover.thank_you_popup.message" = "Thanks for making the world a trendier place.";
+
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
 "settings.in_app_purchase.restore.none" = "You have no purchases to restore";

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3101942C205682DF00C828D0 /* ShareToDiscoverPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3101942B205682DF00C828D0 /* ShareToDiscoverPrompt.swift */; };
 		3130FF6F203040F200AA881A /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
@@ -134,6 +135,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3101942B205682DF00C828D0 /* ShareToDiscoverPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareToDiscoverPrompt.swift; sourceTree = "<group>"; };
 		3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
@@ -292,6 +294,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3101942A205682D200C828D0 /* ShareToDiscoverPrompt */ = {
+			isa = PBXGroup;
+			children = (
+				3101942B205682DF00C828D0 /* ShareToDiscoverPrompt.swift */,
+			);
+			path = ShareToDiscoverPrompt;
+			sourceTree = "<group>";
+		};
 		31CE110D203BF055000156EE /* ProductsBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -412,6 +422,7 @@
 				C54087E71FE90C8D00198955 /* ScreenshotDisplay */,
 				C54087DE1FE90C8D00198955 /* ScreenshotPicker */,
 				C54087C61FE90C8D00198955 /* Settings */,
+				3101942A205682D200C828D0 /* ShareToDiscoverPrompt */,
 				C54087D61FE90C8D00198955 /* Shoppable */,
 				C54087E11FE90C8D00198955 /* TabBar */,
 				C54087C81FE90C8D00198955 /* Tutorial */,
@@ -1079,6 +1090,7 @@
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
+				3101942C205682DF00C828D0 /* ShareToDiscoverPrompt.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C5FF4142200F299D00342DEC /* TutorialSlideView.swift in Sources */,
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
