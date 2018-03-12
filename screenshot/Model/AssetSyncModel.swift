@@ -695,8 +695,11 @@ class AssetSyncModel: NSObject {
     
     func image(asset: PHAsset) -> Promise<UIImage> {
         return Promise { fulfill, reject in
-            self.PHAssetToUIImageQueue.addOperation(AsyncOperation.init(withBlock: { ( completion) in
+            self.PHAssetToUIImageQueue.addOperation(AsyncOperation.init(timeout: 0.5, completion: { ( completeOperation) in
                 self.image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
+                    defer {
+                        completeOperation();
+                    }
                     if let imageError = info?[PHImageErrorKey] as? NSError {
                         AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
                         reject(imageError)
@@ -711,6 +714,7 @@ class AssetSyncModel: NSObject {
                     }
                     if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
                         isDegraded == true {
+                        
                         // This callback will be called again with a better quality image.
                         return
                     }
@@ -721,7 +725,6 @@ class AssetSyncModel: NSObject {
                         let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
                         reject(emptyError)
                     }
-                    completion();
                 })
             }))
         }
