@@ -273,8 +273,8 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
                 return false
             }
             
-            return segment.isPickerViewInitialized && segment.inputView == pickerView
-        }!
+            return segment.inputView == pickerView
+        } ?? 0
     }
     
     private func isItemDisabled(_ item: SegmentedDropDownItem, withTitle title: String) -> Bool {
@@ -332,12 +332,21 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
 }
 
 fileprivate class DropDownControl : UIControl {
-    weak var pickerDataSource: UIPickerViewDataSource?
-    weak var pickerDelegate: UIPickerViewDelegate?
+    weak var pickerDataSource: UIPickerViewDataSource? {
+        didSet {
+            pickerView.dataSource = pickerDataSource
+        }
+    }
+    weak var pickerDelegate: UIPickerViewDelegate? {
+        didSet {
+            pickerView.delegate = pickerDelegate
+        }
+    }
     
     let titleLabel = UILabel()
     fileprivate let imageView = UIImageView()
     fileprivate let image = UIImage(named: "DropDownArrow")
+    fileprivate let pickerView = UIPickerView()
     
     // MARK: Life Cycle
     
@@ -403,17 +412,6 @@ fileprivate class DropDownControl : UIControl {
     }
     
     // MARK: Picker
-    
-    private(set) var isPickerViewInitialized = false
-    
-    fileprivate lazy var pickerView: UIPickerView = {
-        self.isPickerViewInitialized = true
-        
-        let view = UIPickerView()
-        view.dataSource = self.pickerDataSource
-        view.delegate = self.pickerDelegate
-        return view
-    }()
     
     override var canBecomeFirstResponder: Bool {
         return true
