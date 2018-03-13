@@ -56,7 +56,7 @@ class ThankYouForSharingView : UIViewController {
         title.font = UIFont.init(name: "Hind", size: 25)
         title.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(title)
-        title.topAnchor.constraint(equalTo: containerView.topAnchor, constant:20).isActive = true
+        title.topAnchor.constraint(equalTo: containerView.topAnchor, constant:120).isActive = true
         title.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:20).isActive = true
         title.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:-20).isActive = true
 
@@ -77,15 +77,14 @@ class ThankYouForSharingView : UIViewController {
         thumbsUpBanner.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(thumbsUpBanner)
         thumbsUpBanner.topAnchor.constraint(equalTo: message.bottomAnchor, constant: 20).isActive = true
-        thumbsUpBanner.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:20).isActive = true
-        thumbsUpBanner.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:20).isActive = true
+        thumbsUpBanner.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:40).isActive = true
+        thumbsUpBanner.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:40).isActive = true
         var multipler:CGFloat = 0.1
         if let image = image {
             multipler = (image.size.height / image.size.width)
         }
         
         thumbsUpBanner.heightAnchor.constraint(equalTo: thumbsUpBanner.widthAnchor, multiplier: multipler).isActive = true
-
 
         closeButton.setTitle("generic.close".localized, for: .normal)
         closeButton.backgroundColor = .crazeRed
@@ -96,13 +95,31 @@ class ThankYouForSharingView : UIViewController {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(closeButton)
         closeButton.topAnchor.constraint(equalTo: thumbsUpBanner.bottomAnchor, constant: 20).isActive = true
-        closeButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         closeButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.5).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
-
-        closeButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -20)
+        closeButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+//        closeButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -20)
 
         self.closeButton = closeButton
+        
+        
+        let backgroundView = UIView.init()
+        backgroundView.backgroundColor = .white
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.insertSubview(backgroundView, belowSubview: title)
+        backgroundView.topAnchor.constraint(equalTo: title.topAnchor, constant:-40).isActive = true
+        backgroundView.bottomAnchor.constraint(equalTo: closeButton.bottomAnchor, constant:20).isActive = true
+        backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant:20).isActive = true
+        backgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:-20).isActive = true
+        
+        
+        backgroundView.layer.cornerRadius = .defaultCornerRadius
+        backgroundView.layer.shadowColor = UIColor.black.cgColor
+        backgroundView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        backgroundView.layer.shadowRadius = 3
+        backgroundView.layer.shadowOpacity = 0.5
+        backgroundView.layer.borderColor = UIColor.black.cgColor
+        backgroundView.layer.borderWidth = 1.0
     }
     
 }
