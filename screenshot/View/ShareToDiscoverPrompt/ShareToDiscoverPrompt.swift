@@ -48,7 +48,7 @@ class ShareToDiscoverPrompt : UIView {
         
         
         
-        closeButton.setImage(UIImage.init(named: "ControlX"), for: .normal)
+        closeButton.setImage(UIImage.init(named: "Close"), for: .normal)
         self.addSubview(closeButton)
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.centerXAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
@@ -61,7 +61,7 @@ class ShareToDiscoverPrompt : UIView {
         textLabel.text = "share_to_discover.text".localized
         textLabel.textAlignment = .center
         textLabel.numberOfLines = 3
-        textLabel.font =  UIFont(name: "Futura-Medium", size: 16) ?? UIFont.systemFont(ofSize: 14)
+        textLabel.font =  UIFont(name: "Hind", size: 16)
         textLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(textLabel)
         textLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20).isActive = true
@@ -70,8 +70,10 @@ class ShareToDiscoverPrompt : UIView {
         
         addButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(addButton)
+        addButton.titleLabel?.font = UIFont(name: "Hind", size: 16)
         addButton.setTitle("share_to_discover.add_button".localized, for: .normal)
         addButton.backgroundColor = .crazeRed
+        addButton.layer.cornerRadius = .defaultCornerRadius
         addButton.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5).isActive = true
         addButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         addButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true

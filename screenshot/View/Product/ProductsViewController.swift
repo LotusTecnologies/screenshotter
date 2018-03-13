@@ -691,7 +691,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             
             self.shamrockButton?.isHidden = true
             let sharePrompt = ShareToDiscoverPrompt.init(frame: .zero)
-            //sharePrompt.delegate = self
+            sharePrompt.delegate = self
             sharePrompt.translatesAutoresizingMaskIntoConstraints = false
             self.view.addSubview(sharePrompt)
 
@@ -768,7 +768,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     }
 }
 
-extension ProductsViewController : ShareToDiscoverPromptDelegate {
+extension ProductsViewController : ShareToDiscoverPromptDelegate, ThankYouForSharingViewProtocol {
     func shareToDiscoverPromptDidClose(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
         self.shamrockButton?.isHidden = false
         shareToDiscoverPrompt.removeFromSuperview()
@@ -776,7 +776,20 @@ extension ProductsViewController : ShareToDiscoverPromptDelegate {
     func shareToDiscoverPromptPressAdd(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
         shareToDiscoverPrompt.removeFromSuperview()
         
+        let thankYou = ThankYouForSharingView.init(frame: .zero)
+        thankYou.delegate = self
+        thankYou.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(thankYou)
         
+        thankYou.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        thankYou.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        thankYou.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.9).isActive = true
+        thankYou.heightAnchor.constraint(greaterThanOrEqualToConstant: 150).isActive = true
+
+    }
+    
+    func thankYouForSharingViewDidClose(_ view: ThankYouForSharingView) {
+        view.removeFromSuperview()
     }
 }
 

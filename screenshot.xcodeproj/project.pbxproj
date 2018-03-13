@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3101942C205682DF00C828D0 /* ShareToDiscoverPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3101942B205682DF00C828D0 /* ShareToDiscoverPrompt.swift */; };
+		3101942E20579CF200C828D0 /* ThankYouForSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3101942D20579CF200C828D0 /* ThankYouForSharingView.swift */; };
 		3130FF6F203040F200AA881A /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
@@ -136,6 +137,7 @@
 
 /* Begin PBXFileReference section */
 		3101942B205682DF00C828D0 /* ShareToDiscoverPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareToDiscoverPrompt.swift; sourceTree = "<group>"; };
+		3101942D20579CF200C828D0 /* ThankYouForSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThankYouForSharingView.swift; sourceTree = "<group>"; };
 		3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 			isa = PBXGroup;
 			children = (
 				3101942B205682DF00C828D0 /* ShareToDiscoverPrompt.swift */,
+				3101942D20579CF200C828D0 /* ThankYouForSharingView.swift */,
 			);
 			path = ShareToDiscoverPrompt;
 			sourceTree = "<group>";
@@ -987,6 +990,7 @@
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
+				3101942E20579CF200C828D0 /* ThankYouForSharingView.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
