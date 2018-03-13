@@ -62,7 +62,7 @@ class ShareToDiscoverPrompt : UIView {
         textLabel.backgroundColor = .white
         textLabel.textAlignment = .center
         textLabel.numberOfLines = 3
-        textLabel.font =  UIFont(name: "Hind", size: 16)
+        textLabel.font =  UIFont.preferredFont(forTextStyle: .body)
         textLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(textLabel)
         textLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20).isActive = true
@@ -71,7 +71,6 @@ class ShareToDiscoverPrompt : UIView {
         
         addButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(addButton)
-        addButton.titleLabel?.font = UIFont(name: "Hind", size: 16)
         addButton.setTitle("share_to_discover.add_button".localized, for: .normal)
         addButton.backgroundColor = .crazeRed
         addButton.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5).isActive = true

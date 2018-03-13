@@ -53,24 +53,24 @@ class ThankYouForSharingView : UIViewController {
         title.text = "share_to_discover.thank_you_popup.title".localized
         title.textAlignment = .center
         title.numberOfLines = 0
-        title.font = UIFont.init(name: "Hind", size: 25)
+        title.font = UIFont.preferredFont(forTextStyle: .title1)
         title.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(title)
         title.topAnchor.constraint(equalTo: containerView.topAnchor, constant:120).isActive = true
-        title.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:20).isActive = true
-        title.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:-20).isActive = true
+        title.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:40).isActive = true
+        title.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:-40).isActive = true
 
         
         message.text = "share_to_discover.thank_you_popup.message".localized
         message.textAlignment = .center
         message.numberOfLines = 0
         message.textColor = .crazeGreen
-        message.font = UIFont.init(name: "Hind", size: 18)
+        message.font = UIFont.preferredFont(forTextStyle: .title2)
         message.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(message)
         message.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 20).isActive =  true
-        message.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:20).isActive = true
-        message.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:-20).isActive = true
+        message.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant:40).isActive = true
+        message.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:-40).isActive = true
         
         let image = UIImage.init(named: "ThumbsUpBanner")
         let thumbsUpBanner = UIImageView.init(image: image)
@@ -89,7 +89,6 @@ class ThankYouForSharingView : UIViewController {
         closeButton.setTitle("generic.close".localized, for: .normal)
         closeButton.backgroundColor = .crazeRed
         closeButton.isUserInteractionEnabled = true
-        closeButton.showsTouchWhenHighlighted = true
         closeButton.setTitleColor(.white, for: .normal)
         closeButton.layer.cornerRadius = .defaultCornerRadius
         closeButton.translatesAutoresizingMaskIntoConstraints = false
