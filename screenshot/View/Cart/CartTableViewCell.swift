@@ -9,7 +9,7 @@
 import UIKit
 
 class CartTableViewCell: UITableViewCell {
-    let productImageView = UIImageView()
+    let productImageView = EmbossedView()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let removeButton = BorderButton()

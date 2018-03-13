@@ -160,7 +160,7 @@ extension FavoritesViewController : UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
         if let cell = cell as? FavoritesTableViewCell {
-            cell.backgroundColor = view.backgroundColor
+            cell.backgroundColor = .cellBackground
             cell.imageData = screenshot.imageData
             cell.setProducts(screenshotFavorites.products)
             cell.activityBadgeView.badge = screenshotFavorites.favoritedEachShoppable ? .goldHeart : .heart

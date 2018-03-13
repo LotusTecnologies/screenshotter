@@ -195,9 +195,8 @@ extension CartViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? CartTableViewCell, let cartItem = cartItemFrc?.object(at: indexPath) {
-            let url = URL(string: cartItem.imageURL ?? "")
-            cell.productImageView.sd_setImage(with: url, placeholderImage: nil)
-            
+            cell.contentView.backgroundColor = .cellBackground
+            cell.productImageView.setImage(withURLString: cartItem.imageURL)
             cell.titleLabel.text = cartItem.productTitle()
             cell.priceLabel.text = formatter.string(from: NSNumber(value: cartItem.price))
             cell.quantity = Double(cartItem.quantity)

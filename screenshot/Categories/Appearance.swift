@@ -10,13 +10,13 @@ import Foundation
 import UIKit
 
 extension UIColor {
-    static let background = UIColor(white: 244.0/255.0, alpha: 1)
+    static let background = UIColor(white: 244/255, alpha: 1)
+    static let cellBackground = UIColor(white: 250/255, alpha: 1)
     static let border = UIColor.black.withAlphaComponent(0.3)
     
-    static let crazeRed = UIColor(red: 237.0/255.0, green: 20.0/255.0, blue: 90.0/255.0, alpha: 1)
-    static let crazeGreen = UIColor(red: 32.0/255.0, green: 200.0/255.0, blue: 163.0/255.0, alpha: 1)
-    static let shamrockGreen = UIColor(red:0.0, green:0.50, blue:0.0, alpha:1.0)
-
+    static let crazeRed = UIColor(red: 237/255, green: 20/255, blue: 90/255, alpha: 1)
+    static let crazeGreen = UIColor(red: 32/255, green: 200/255, blue: 163/255, alpha: 1)
+    static let shamrockGreen = UIColor(red: 0, green: 0.5, blue: 0, alpha: 1)
     
     static let gray1 = UIColor(white: 0.1, alpha: 1) // 25.5
     static let gray2 = UIColor(white: 0.2, alpha: 1) // 51
