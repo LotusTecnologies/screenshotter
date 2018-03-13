@@ -242,7 +242,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     // MARK: User Interaction
     
     private var canPanScreenshot = false
-
+    private var didDismissHelperView = false
 
     @objc private func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
         var translation = panGesture.translation(in: panGesture.view)
@@ -265,6 +265,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                 
                 if cardHelperView != nil {
                     dismissHelperView()
+                    didDismissHelperView = true
                 }
             }
             
@@ -282,6 +283,18 @@ class DiscoverScreenshotViewController : BaseViewController {
             
         case .ended, .cancelled:
             guard canPanScreenshot else {
+                return
+            }
+            
+            func repositionAnimation() {
+                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
+                    self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
+                })
+            }
+            
+            guard !didDismissHelperView else {
+                didDismissHelperView = false
+                repositionAnimation()
                 return
             }
             
@@ -323,9 +336,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                 }
             }
             else {
-                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
-                    self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
-                })
+                repositionAnimation()
             }
             
         default:
@@ -385,6 +396,8 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func dismissHelperView() {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
+        
         UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
             self.cardHelperView?.alpha = 0
             self.passButton.isDisabled(false)
@@ -515,7 +528,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
         
         if self.cardHelperView == nil && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
             showHelperView(inCell: cell)
-            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
         }
     }
     
