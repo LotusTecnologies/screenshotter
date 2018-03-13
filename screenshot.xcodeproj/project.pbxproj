@@ -107,6 +107,8 @@
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
+		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
+		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
 		C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E641FFA2D2600F491C0 /* Size.swift */; };
@@ -130,8 +132,6 @@
 		C5F37C9F20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37C9E20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift */; };
 		C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37CA020555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift */; };
 		C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37CA220555C8C0072FE1D /* ModalAnimatedTransitioning.swift */; };
-		C5F37CA620555CF10072FE1D /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37CA520555CF10072FE1D /* DimmedPresentationController.swift */; };
-		C5F37CA820555D090072FE1D /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37CA720555D090072FE1D /* IntrinsicContentSizePresentationController.swift */; };
 		C5F37CAA20555E1F0072FE1D /* ProductNextStepViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37CA920555E1F0072FE1D /* ProductNextStepViewController.swift */; };
 		C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */; };
 		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
@@ -260,6 +260,8 @@
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
+		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
+		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		C5AC7E641FFA2D2600F491C0 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
@@ -283,8 +285,6 @@
 		C5F37C9E20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerTransitioningDelegate.swift; sourceTree = "<group>"; };
 		C5F37CA020555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerAnimatedTransitioning.swift; sourceTree = "<group>"; };
 		C5F37CA220555C8C0072FE1D /* ModalAnimatedTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalAnimatedTransitioning.swift; sourceTree = "<group>"; };
-		C5F37CA520555CF10072FE1D /* DimmedPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
-		C5F37CA720555D090072FE1D /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5F37CA920555E1F0072FE1D /* ProductNextStepViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductNextStepViewController.swift; sourceTree = "<group>"; };
 		C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalViewControllerFactory.swift; sourceTree = "<group>"; };
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
@@ -626,7 +626,7 @@
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
-				C5F37CA420555CDB0072FE1D /* PresentationController */,
+				C5A1922A2057AD510046303C /* PresentationController */,
 				31CE1106203BEF36000156EE /* SaleView.swift */,
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
 				C5D57930203EDD6200A076FE /* TableView */,
@@ -747,6 +747,15 @@
 			path = Extension;
 			sourceTree = "<group>";
 		};
+		C5A1922A2057AD510046303C /* PresentationController */ = {
+			isa = PBXGroup;
+			children = (
+				C5A1922C2057AD510046303C /* DimmedPresentationController.swift */,
+				C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */,
+			);
+			path = PresentationController;
+			sourceTree = "<group>";
+		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -805,15 +814,6 @@
 				C5F37C9E20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift */,
 			);
 			path = ViewControllerTransitioning;
-			sourceTree = "<group>";
-		};
-		C5F37CA420555CDB0072FE1D /* PresentationController */ = {
-			isa = PBXGroup;
-			children = (
-				C5F37CA520555CF10072FE1D /* DimmedPresentationController.swift */,
-				C5F37CA720555D090072FE1D /* IntrinsicContentSizePresentationController.swift */,
-			);
-			path = PresentationController;
 			sourceTree = "<group>";
 		};
 		C5F53D8C2014A57F003A57EC /* Legal */ = {
@@ -1149,6 +1149,7 @@
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54369672046D6FD00599134 /* BaseViewController.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
+				C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
@@ -1162,7 +1163,6 @@
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
 				C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */,
-				C5F37CA620555CF10072FE1D /* DimmedPresentationController.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
 				C543695E20453FE300599134 /* ProductsRateView.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
@@ -1193,6 +1193,7 @@
 				C5F37C95205505690072FE1D /* ProductsViewController.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
+				C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */,
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
@@ -1203,7 +1204,6 @@
 				C543695B20453FE300599134 /* ProductsTooltipCollectionViewCell.swift in Sources */,
 				C5D2E304204D1C6500B5BD92 /* CartItemCountView.swift in Sources */,
 				C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */,
-				C5F37CA820555D090072FE1D /* IntrinsicContentSizePresentationController.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
 				C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */,
