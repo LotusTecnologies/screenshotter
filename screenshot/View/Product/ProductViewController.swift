@@ -42,7 +42,6 @@ class ProductViewController : BaseViewController {
     
     override func loadView() {
         let productView = ProductView()
-        productView.scrollView.delegate = self
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
@@ -262,7 +261,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
         }
         
         if let colors = structuredProduct.colors {
-            let selectedColor = product.color ?? ((colors.count == 1) ? colors.first : nil)
+            let selectedColor = product.color ?? (colors.count == 1 ? colors.first : nil)
             let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: selectedColor)
             var sizeItem: SegmentedDropDownItem?
             
@@ -302,14 +301,6 @@ fileprivate extension ProductViewControllerCart {
     
     func syncCartItemCount() {
         cartBarButtonItem?.count = UInt(cartItemFrc?.fetchedObjectsCount ?? 0)
-    }
-}
-
-extension ProductViewController : UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if scrollView.keyboardDismissMode == .onDrag {
-            productView.resignSelectionControl()
-        }
     }
 }
 
