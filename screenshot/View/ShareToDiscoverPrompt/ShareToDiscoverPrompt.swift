@@ -25,7 +25,7 @@ class ShareToDiscoverPrompt : UIView {
     override init(frame: CGRect) {
         
         containerView = UIView()
-        closeButton = UIButton.init()
+        closeButton = MainButton.init()
         textLabel = UILabel.init()
         addButton = UIButton.init()
         

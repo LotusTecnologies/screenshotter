@@ -25,7 +25,7 @@ class ThankYouForSharingView : UIView {
         containerView = UIView.init()
         title = UILabel.init()
         message = UILabel.init()
-        let closeButton = UIButton.init()
+        let closeButton = MainButton.init()
 
         super.init(frame: frame)
 
