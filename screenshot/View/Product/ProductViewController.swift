@@ -332,15 +332,12 @@ fileprivate class StructuredProduct: NSObject {
         var sizes: Set<String> = Set()
         var imageURLDict: [String: URL] = [:]
         
-        variants.forEach { variant in
-            guard let color = variant.color else {
-                return
+        for variant in variants {
+            guard let color = variant.color,
+                !hasDuplicateVariantAsNA(variants: variants, currentVariant: variant)
+                else {
+                    continue
             }
-            
-            // TODO: if the color is NA and the image url already exists in a variant with a real color, remove the na variant
-//            if ["N/A", "NA"].contains(color.uppercased()) {
-//                variant.parsedImageURLs().first
-//            }
             
             colors.insert(color)
             let structuredColorVariant = structuredColorVariantsDict[color] ?? StructuredColorVariant(color: color)
@@ -388,6 +385,34 @@ fileprivate class StructuredProduct: NSObject {
     }
     
     // MARK: Variant
+    
+    /// If a variant color is NA, check if it's image exists in another variant
+    private func hasDuplicateVariantAsNA(variants: [Variant], currentVariant: Variant) -> Bool {
+        guard let currentColor = currentVariant.color else {
+            return false
+        }
+        
+        var hasDuplicateVariantAsNA = false
+        
+        func isColorNA(_ color: String) -> Bool {
+            return ["N/A", "NA"].contains(color.uppercased())
+        }
+        
+        if isColorNA(currentColor), let imageURL = currentVariant.parsedImageURLs().first {
+            for variant in variants {
+                guard let color2 = variant.color, !isColorNA(color2) else {
+                    continue
+                }
+                
+                if variant.parsedImageURLs().first == imageURL {
+                    hasDuplicateVariantAsNA = true
+                    break
+                }
+            }
+        }
+        
+        return hasDuplicateVariantAsNA
+    }
     
     func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
         return structuredColorVariants?.first { structuredColorVariant -> Bool in
