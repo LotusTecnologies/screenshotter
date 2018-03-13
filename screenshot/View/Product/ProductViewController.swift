@@ -262,7 +262,8 @@ fileprivate extension ProductViewControllerStructuredProduct {
         }
         
         if let colors = structuredProduct.colors {
-            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: product.color)
+            let selectedColor = product.color ?? ((colors.count == 1) ? colors.first : nil)
+            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: selectedColor)
             var sizeItem: SegmentedDropDownItem?
             
             if let sizes = structuredProduct.sizes {
@@ -272,7 +273,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
                     // Disabled until color is selected
                     sizeItem?.disabledPickerItems = structuredProduct.sizes
                 }
-                else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: product.color) {
+                else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: selectedColor) {
                     sizeItem?.disabledPickerItems = structuredProduct.subtractingSizes(of: structuredColorVariant)
                 }
             }
