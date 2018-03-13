@@ -18,6 +18,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: FetchedResultsControllerManager<Matchstick>?
+    fileprivate var matchsticks:[Matchstick] = []
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
@@ -150,7 +151,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return matchstickFrc?.object(at: currentIndexPath)
+        return matchstickAt(index: currentIndexPath)
     }
     
     // MARK: Decision
@@ -162,25 +163,56 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate func decisionValueThreshold(_ percent: CGFloat) -> CGFloat {
         return percent * decisionValueMultiplier
     }
-    
+
     func decidedToPass() {
         isAdding = false
-        currentMatchstick?.pass()
+        
+        if let matchStick = currentMatchstick {
+            removeCurrentMatchstickIfPossible()
+            matchStick.pass()
+        }
     }
     
     private var needsToCompleteDecision = false
-    
-    func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
-        isAdding = true
-        currentMatchstick?.add(callback: callback)
-        needsToCompleteDecision = callback != nil
-    }
-    
+
     func completeDecision() {
         if needsToCompleteDecision {
             needsToCompleteDecision = false
-            currentMatchstick?.pass()
+            
+            if let matchStick = currentMatchstick {
+                removeCurrentMatchstickIfPossible()
+                screenshotsTabPulseAnimation()
+                matchStick.pass()
+            }
         }
+    }
+    
+    func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
+        isAdding = true
+        
+        if let matchStick = currentMatchstick {
+            if callback == nil {
+                removeCurrentMatchstickIfPossible()
+                screenshotsTabPulseAnimation()
+            }
+            
+            matchStick.add(callback: callback)
+            needsToCompleteDecision = callback != nil
+        }
+    }
+    
+    fileprivate func removeCurrentMatchstickIfPossible() {
+        guard currentMatchstick != nil else {
+            return
+        }
+        
+        matchsticks.remove(at: currentIndexPath.item)
+        
+        collectionView.performBatchUpdates({
+            collectionView.deleteItems(at: [currentIndexPath])
+        })
+        
+        syncEmptyListViews()
     }
     
     // MARK: Cell
@@ -243,7 +275,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc?.fetchedObjectsCount == 1 {
+                if self.matchsticks.count == 1 {
                     emptyView.alpha = abs(percent)
                 }
             }
@@ -353,7 +385,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func dismissHelperView() {
-        UIView.animate(withDuration: 0.2, animations: {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
             self.cardHelperView?.alpha = 0
             self.passButton.isDisabled(false)
             self.addButton.isDisabled(false)
@@ -382,7 +414,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isListEmpty:Bool {
         get {
-            if self.matchstickFrc?.fetchedObjectsCount ?? 0 > 0 {
+            if self.matchsticks.count > 0 {
                 return false
             }
             
@@ -439,11 +471,23 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
+    
+    // MARK: Screenshot Tab
+    
+    fileprivate func screenshotsTabPulseAnimation() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.screenshotsTabPulseAnimation()
+        }
+    }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.matchstickFrc?.fetchedObjectsCount ?? 0
+        return self.matchsticks.count
+    }
+    
+    func matchstickAt(index:IndexPath) -> Matchstick? {
+        return self.matchsticks[index.item]
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -452,7 +496,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
-            let matchstick = matchstickFrc?.object(at: indexPath)
+            let matchstick = matchstickAt(index: indexPath)
             
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
@@ -489,6 +533,8 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelegate {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
         matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
+        self.matchsticks = matchstickFrc?.fetchedObjects ?? []
+        
         self.collectionView.reloadData()
     }
     
@@ -508,15 +554,12 @@ extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelega
 
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if !change.deletedRows.isEmpty && isAdding {
-            if let tabBarController = tabBarController as? MainTabBarController {
-                tabBarController.screenshotsTabPulseAnimation()
-            }
-        }
-        
         if isViewLoaded {
-            change.applyChanges(collectionView: collectionView)
-            syncEmptyListViews()
+            if change.insertedRows.count > 0 {
+                self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
+                self.collectionView.reloadData()
+                syncEmptyListViews()
+            }
         }
     }
 }
@@ -527,8 +570,8 @@ extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLay
     }
 }
 
-extension UIButton {
-    fileprivate func isDisabled(_ disabled: Bool) {
+fileprivate extension UIButton {
+    func isDisabled(_ disabled: Bool) {
         isEnabled = !disabled
         alpha = disabled ? 0.5 : 1
     }
