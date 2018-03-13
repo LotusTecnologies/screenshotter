@@ -317,6 +317,11 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func submitToDiscover(userName: String?, imageURLString: String?, intercomUserId: String?) -> Promise<Bool> {
+    
+        return Promise.init(value: true)
+    }
+    
     func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots?createShare=true") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])

@@ -17,7 +17,7 @@ protocol ShareToDiscoverPromptDelegate {
 class ShareToDiscoverPrompt : UIView {
     private let containerView:UIView
     private let closeButton:UIButton
-    private let addButton:UIButton
+    private let addButton:MainButton
     private let textLabel:UILabel
     
     var delegate:ShareToDiscoverPromptDelegate?
@@ -25,9 +25,9 @@ class ShareToDiscoverPrompt : UIView {
     override init(frame: CGRect) {
         
         containerView = UIView()
-        closeButton = MainButton.init()
+        closeButton = UIButton.init()
         textLabel = UILabel.init()
-        addButton = UIButton.init()
+        addButton = MainButton.init()
         
         super.init(frame: frame)
 
@@ -59,6 +59,7 @@ class ShareToDiscoverPrompt : UIView {
 
         
         textLabel.text = "share_to_discover.text".localized
+        textLabel.backgroundColor = .white
         textLabel.textAlignment = .center
         textLabel.numberOfLines = 3
         textLabel.font =  UIFont(name: "Hind", size: 16)
@@ -73,12 +74,10 @@ class ShareToDiscoverPrompt : UIView {
         addButton.titleLabel?.font = UIFont(name: "Hind", size: 16)
         addButton.setTitle("share_to_discover.add_button".localized, for: .normal)
         addButton.backgroundColor = .crazeRed
-        addButton.layer.cornerRadius = .defaultCornerRadius
         addButton.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.5).isActive = true
         addButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         addButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         addButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -20).isActive = true
-        addButton.showsTouchWhenHighlighted = true
         let attachToText = addButton.topAnchor.constraint(equalTo: textLabel.bottomAnchor, constant: 20) // if have to break a constrant this is the one to break
         attachToText.priority = UILayoutPriorityDefaultHigh
         attachToText.isActive = true

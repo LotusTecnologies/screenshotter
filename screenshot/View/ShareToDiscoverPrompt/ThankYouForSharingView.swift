@@ -9,36 +9,31 @@
 import Foundation
 import UIKit
 
-protocol ThankYouForSharingViewProtocol {
-    func thankYouForSharingViewDidClose(_ view:ThankYouForSharingView)
-}
-class ThankYouForSharingView : UIView {
+class ThankYouForSharingView : UIViewController {
     
-    var delegate:ThankYouForSharingViewProtocol?
+    private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
     
-    private let title:UILabel
-    private let message:UILabel
-    private let containerView:UIView
-
-    override init(frame: CGRect) {
+    var closeButton:MainButton?
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        transitioningDelegate = transitioning
+        modalPresentationStyle = .custom
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        containerView = UIView.init()
-        title = UILabel.init()
-        message = UILabel.init()
+        let containerView = self.view! //UIView.init()
+        let title = UILabel.init()
+        let message = UILabel.init()
         let closeButton = MainButton.init()
 
-        super.init(frame: frame)
-
-        containerView.isUserInteractionEnabled = true
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(containerView)
-
-        containerView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant:20).isActive = true
-        containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant:-20).isActive = true
-        
-        self.topAnchor.constraint(equalTo: containerView.topAnchor, constant:-20).isActive = true
-        self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant:20).isActive = true
-
+        /*
         containerView.backgroundColor = .white
         containerView.layer.cornerRadius = .defaultCornerRadius
         containerView.layer.shadowColor = UIColor.black.cgColor
@@ -47,10 +42,17 @@ class ThankYouForSharingView : UIView {
         containerView.layer.shadowOpacity = 0.5
         containerView.layer.borderColor = UIColor.black.cgColor
         containerView.layer.borderWidth = 1.0
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(containerView)
+        containerView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        containerView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        containerView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+        containerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.75)
+        */
         
         title.text = "share_to_discover.thank_you_popup.title".localized
         title.textAlignment = .center
-        title.numberOfLines = 2
+        title.numberOfLines = 0
         title.font = UIFont.init(name: "Hind", size: 25)
         title.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(title)
@@ -59,9 +61,9 @@ class ThankYouForSharingView : UIView {
         title.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant:-20).isActive = true
 
         
-        title.numberOfLines = 2
         message.text = "share_to_discover.thank_you_popup.message".localized
         message.textAlignment = .center
+        message.numberOfLines = 0
         message.textColor = .crazeGreen
         message.font = UIFont.init(name: "Hind", size: 18)
         message.translatesAutoresizingMaskIntoConstraints = false
@@ -91,7 +93,6 @@ class ThankYouForSharingView : UIView {
         closeButton.showsTouchWhenHighlighted = true
         closeButton.setTitleColor(.white, for: .normal)
         closeButton.layer.cornerRadius = .defaultCornerRadius
-        closeButton.addTarget(self, action: #selector(didClose(_:)), for: .touchUpInside)
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(closeButton)
         closeButton.topAnchor.constraint(equalTo: thumbsUpBanner.bottomAnchor, constant: 20).isActive = true
@@ -99,23 +100,9 @@ class ThankYouForSharingView : UIView {
         closeButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.5).isActive = true
         closeButton.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
 
-        containerView.bottomAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 20)
+        closeButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -20)
 
+        self.closeButton = closeButton
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    @IBAction func didClose(_ sender:Any) {
-        self.delegate?.thankYouForSharingViewDidClose(self)
-    }
-    
-    override func layoutSubviews() {
-        title.preferredMaxLayoutWidth = containerView.bounds.size.width - 40
-        message.preferredMaxLayoutWidth = containerView.bounds.size.width - 40
-        self.setNeedsUpdateConstraints()
-    }
-    
     
 }
