@@ -151,7 +151,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return self.matchstickAt(index: currentIndexPath)
+        return matchstickAt(index: currentIndexPath)
     }
     
     // MARK: Decision
@@ -166,55 +166,53 @@ class DiscoverScreenshotViewController : BaseViewController {
 
     func decidedToPass() {
         isAdding = false
+        
         if let matchStick = currentMatchstick {
-            self.matchsticks.remove(at: currentIndexPath.item)
-            collectionView.performBatchUpdates({
-                self.collectionView.deleteItems(at: [currentIndexPath])
-            }, completion: { (completed) in
-                
-            })
-            syncEmptyListViews()
-
+            removeCurrentMatchstickIfPossible()
             matchStick.pass()
         }
     }
+    
     private var needsToCompleteDecision = false
 
     func completeDecision() {
         if needsToCompleteDecision {
             needsToCompleteDecision = false
+            
             if let matchStick = currentMatchstick {
-                
-                self.matchsticks.remove(at: currentIndexPath.item)
-                collectionView.performBatchUpdates({
-                    self.collectionView.deleteItems(at: [currentIndexPath])
-                }, completion: { (completed) in
-                    
-                })
-                matchStick.pass()  
-                syncEmptyListViews()
+                removeCurrentMatchstickIfPossible()
+                screenshotsTabPulseAnimation()
+                matchStick.pass()
             }
         }
     }
     
     func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
         isAdding = true
+        
         if let matchStick = currentMatchstick {
             if callback == nil {
-                self.matchsticks.remove(at: currentIndexPath.item)
-                collectionView.performBatchUpdates({
-                    self.collectionView.deleteItems(at: [currentIndexPath])
-                }, completion: { (completed) in
-                    
-                })
-                syncEmptyListViews()
+                removeCurrentMatchstickIfPossible()
+                screenshotsTabPulseAnimation()
             }
+            
             matchStick.add(callback: callback)
             needsToCompleteDecision = callback != nil
-            if let tabBarController = tabBarController as? MainTabBarController {
-                tabBarController.screenshotsTabPulseAnimation()
-            }
         }
+    }
+    
+    fileprivate func removeCurrentMatchstickIfPossible() {
+        guard currentMatchstick != nil else {
+            return
+        }
+        
+        matchsticks.remove(at: currentIndexPath.item)
+        
+        collectionView.performBatchUpdates({
+            collectionView.deleteItems(at: [currentIndexPath])
+        })
+        
+        syncEmptyListViews()
     }
     
     // MARK: Cell
@@ -387,7 +385,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func dismissHelperView() {
-        UIView.animate(withDuration: 0.2, animations: {
+        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
             self.cardHelperView?.alpha = 0
             self.passButton.isDisabled(false)
             self.addButton.isDisabled(false)
@@ -473,6 +471,14 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
+    
+    // MARK: Screenshot Tab
+    
+    fileprivate func screenshotsTabPulseAnimation() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.screenshotsTabPulseAnimation()
+        }
+    }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
@@ -480,7 +486,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         return self.matchsticks.count
     }
     
-    func matchstickAt(index:IndexPath) ->Matchstick? {
+    func matchstickAt(index:IndexPath) -> Matchstick? {
         return self.matchsticks[index.item]
     }
     
@@ -548,14 +554,12 @@ extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelega
 
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        
         if isViewLoaded {
             if change.insertedRows.count > 0 {
                 self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
                 self.collectionView.reloadData()
                 syncEmptyListViews()
             }
-            
         }
     }
 }
@@ -564,11 +568,10 @@ extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLay
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
     }
-
 }
 
-extension UIButton {
-    fileprivate func isDisabled(_ disabled: Bool) {
+fileprivate extension UIButton {
+    func isDisabled(_ disabled: Bool) {
         isEnabled = !disabled
         alpha = disabled ? 0.5 : 1
     }
