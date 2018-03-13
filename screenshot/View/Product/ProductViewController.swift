@@ -42,7 +42,6 @@ class ProductViewController : BaseViewController {
     
     override func loadView() {
         let productView = ProductView()
-        productView.scrollView.delegate = self
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
@@ -262,7 +261,8 @@ fileprivate extension ProductViewControllerStructuredProduct {
         }
         
         if let colors = structuredProduct.colors {
-            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: product.color)
+            let selectedColor = product.color ?? (colors.count == 1 ? colors.first : nil)
+            let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: selectedColor)
             var sizeItem: SegmentedDropDownItem?
             
             if let sizes = structuredProduct.sizes {
@@ -272,7 +272,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
                     // Disabled until color is selected
                     sizeItem?.disabledPickerItems = structuredProduct.sizes
                 }
-                else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: product.color) {
+                else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: selectedColor) {
                     sizeItem?.disabledPickerItems = structuredProduct.subtractingSizes(of: structuredColorVariant)
                 }
             }
@@ -304,14 +304,6 @@ fileprivate extension ProductViewControllerCart {
     }
 }
 
-extension ProductViewController : UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if scrollView.keyboardDismissMode == .onDrag {
-            productView.resignSelectionControl()
-        }
-    }
-}
-
 extension ProductViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         syncCartItemCount()
@@ -340,15 +332,12 @@ fileprivate class StructuredProduct: NSObject {
         var sizes: Set<String> = Set()
         var imageURLDict: [String: URL] = [:]
         
-        variants.forEach { variant in
-            guard let color = variant.color else {
-                return
+        for variant in variants {
+            guard let color = variant.color,
+                !hasDuplicateVariantAsNA(variants: variants, currentVariant: variant)
+                else {
+                    continue
             }
-            
-            // TODO: if the color is NA and the image url already exists in a variant with a real color, remove the na variant
-//            if ["N/A", "NA"].contains(color.uppercased()) {
-//                variant.parsedImageURLs().first
-//            }
             
             colors.insert(color)
             let structuredColorVariant = structuredColorVariantsDict[color] ?? StructuredColorVariant(color: color)
@@ -396,6 +385,34 @@ fileprivate class StructuredProduct: NSObject {
     }
     
     // MARK: Variant
+    
+    /// If a variant color is NA, check if it's image exists in another variant
+    private func hasDuplicateVariantAsNA(variants: [Variant], currentVariant: Variant) -> Bool {
+        guard let currentColor = currentVariant.color else {
+            return false
+        }
+        
+        var hasDuplicateVariantAsNA = false
+        
+        func isColorNA(_ color: String) -> Bool {
+            return ["N/A", "NA"].contains(color.uppercased())
+        }
+        
+        if isColorNA(currentColor), let imageURL = currentVariant.parsedImageURLs().first {
+            for variant in variants {
+                guard let color2 = variant.color, !isColorNA(color2) else {
+                    continue
+                }
+                
+                if variant.parsedImageURLs().first == imageURL {
+                    hasDuplicateVariantAsNA = true
+                    break
+                }
+            }
+        }
+        
+        return hasDuplicateVariantAsNA
+    }
     
     func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
         return structuredColorVariants?.first { structuredColorVariant -> Bool in

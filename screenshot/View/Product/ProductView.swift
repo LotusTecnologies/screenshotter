@@ -380,15 +380,29 @@ class ProductView: UIView {
             _ = selectionControl.resignFirstResponder()
         }
     }
+    
+    // MARK: Interaction
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = super.hitTest(point, with: event)
+        var shouldResignSelectionControl = true
+        
+        for subview in selectionControl.subviews {
+            if view == subview {
+                shouldResignSelectionControl = false
+                break
+            }
+        }
+        
+        if shouldResignSelectionControl {
+            resignSelectionControl()
+        }
+        
+        return view
+    }
 }
 
 extension ProductView: UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if scrollView.keyboardDismissMode == .onDrag {
-            resignSelectionControl()
-        }
-    }
-    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
             syncPageControl()
