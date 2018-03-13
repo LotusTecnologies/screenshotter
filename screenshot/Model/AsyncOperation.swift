@@ -45,8 +45,11 @@ class AsyncOperation: Operation {
     }
     
     private let executionBlock: ((@escaping() -> ()) -> ())
-    init(withBlock:@escaping ((@escaping() -> ()) -> ())) {
-        self.executionBlock = withBlock
+    private let timeout:TimeInterval?
+   
+    init(timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
+        self.executionBlock = completion
+        self.timeout = timeout
     }
     
     private func finishedExecuting(){
@@ -61,9 +64,19 @@ class AsyncOperation: Operation {
         }
         
         executing(true)
+        if let timeout = timeout {
+            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + timeout, execute: {
+                if !self.isFinished {
+                    self.executing(false)
+                    self.finish(true)
+                }
+            })
+        }
         self.executionBlock({
-            self.executing(false)
-            self.finish(true)
+            if !self.isFinished {
+                self.executing(false)
+                self.finish(true)
+            }
         })
     }
 }
