@@ -307,7 +307,7 @@ class NetworkingPromise : NSObject {
         return promise
     }
 
-    func clearCart(remoteId: String) -> Promise<NSDictionary> {
+    func clearCart(remoteId: String) -> Promise<Bool> {
         guard let url = URL(string: Constants.shoppableDomain + "/cart/\(remoteId)/clear") else {
             let error = NSError(domain: "Craze", code: 43, userInfo: [NSLocalizedDescriptionKey: "Cannot create clearCart url from remoteId:\(remoteId)  shoppableDomain:\(Constants.shoppableDomain)"])
             return Promise(error: error)
@@ -316,8 +316,19 @@ class NetworkingPromise : NSObject {
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
-        return promise
+        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<Bool> in
+            print("clearCart received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 44, userInfo: [NSLocalizedDescriptionKey: "clearCart invalid http statusCode for url:\(url)"])
+                    print("checkoutCart httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            // Don't bother parsing the contents of what was returned; http status is enough, as on Android.
+            // Contents changes between prod and dev, on March 13, 2018.
+            return Promise(value: true)
+        }
     }
 
     func checkoutCart(jsonObject: [String : Any]) -> Promise<[String : Any]> {

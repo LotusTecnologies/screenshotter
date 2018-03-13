@@ -128,17 +128,9 @@ class ShoppingCartModel {
                   !remoteId.isEmpty {
                     let items = purchaseJsonObject["items"] as? [[String : Any]]
                     print("ShoppingCartModel checkout successfully got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
-                    return NetworkingPromise.sharedInstance.clearCart(remoteId: remoteId).then { dict -> Promise<[String : Any]> in
-                        print("clearCart returned dict:\(dict)")
-                        if let code = dict["code"] as? Int,
-                          code >= 200,
-                          code < 300 {
-                            return Promise(value: purchaseJsonObject)
-                        } else {
-                            print("ShoppingCartModel clearCart failed to extract code from dict:\(dict)")
-                            let error = NSError(domain: "Craze", code: 44, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to extract code"])
-                            return Promise(error: error)
-                        }
+                    return NetworkingPromise.sharedInstance.clearCart(remoteId: remoteId).then { isCleared -> Promise<[String : Any]> in
+                        print("clearCart returned isCleared:\(isCleared)")
+                        return Promise(value: purchaseJsonObject)
                     }
                 } else {
                     return NetworkingPromise.sharedInstance.createCart().then { dict -> Promise<[String : Any]> in
