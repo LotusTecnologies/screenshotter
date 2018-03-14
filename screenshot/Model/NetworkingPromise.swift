@@ -363,6 +363,22 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func geoLocateIsUSC() -> Promise<Bool> {
+        guard let url = URL(string: "https://freegeoip.net/json/") else {
+            let error = NSError(domain: "Craze", code: 49, userInfo: [NSLocalizedDescriptionKey: "Cannot form geoLocate url"])
+            return Promise(error: error)
+        }
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { dict -> Promise<Bool> in
+            if let countryCode = dict["country_code"] as? String,
+              countryCode == "US" || countryCode == "IL" {
+                return Promise(value: true)
+            }
+            return Promise(value: false)
+        }
+    }
+    
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
     func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "push-subscribe") else {
