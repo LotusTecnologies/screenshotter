@@ -20,7 +20,7 @@ class AddToDiscoverActivity : UIActivity {
         return nil
     }
     override var activityTitle: String? {
-        return "Share Publicly"
+        return "share_to_discover.share_icon".localized
     }
     override var activityImage: UIImage? {
         return UIImage.init(named: "AppIcon")

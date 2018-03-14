@@ -319,13 +319,13 @@ class NetworkingPromise : NSObject {
     
     func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) {
         var parameterDict = ["image" : image]
-        if let userName = userName {
+        if userName != nil && userName != "" {
             parameterDict["userName"] = userName
         }
-        if let intercomUserId = intercomUserId {
+        if intercomUserId != nil && intercomUserId != "" {
             parameterDict["intercomUserId"] = intercomUserId
         }
-        if let email = email {
+        if email != nil && email != "" {
             parameterDict["email"] = email
         }
         do {

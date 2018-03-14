@@ -162,6 +162,7 @@
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
 
 "share_to_discover.add_button" = "Add";
+"share_to_discover.share_icon" = "Screenshot Discover";
 "share_to_discover.text" = "Add this to Discover so other users can shop your screenshot!";
 "share_to_discover.after_share.text" = "Thanks for sharing! Add your screenshot to discover so other users can shop it, too!";
 "share_to_discover.thank_you_popup.title" = "Your screenshot was added to Discover!";
