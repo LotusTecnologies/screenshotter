@@ -20,16 +20,24 @@ class PartnersViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let syteVisualString = "syte.ai"
-        let syteDestinationString = "https://www.syte.ai/?utm_campaign=screenshop"
-        let attributedText = NSMutableAttributedString(string: "partners.content".localized(withFormat: syteVisualString))
+        let attributedText:NSAttributedString = {
+            let syteVisualString = "syte.ai"
+            let syteDestinationString = "https://www.syte.ai/?utm_campaign=screenshop"
+            
+            let text = "partners.content".localized(withFormat: syteVisualString)
+            if let range = text.range(of: syteVisualString), let url = URL(string: syteDestinationString) {
+                let attribute: [String : Any] = [
+                    NSLinkAttributeName: url
+                ]
+                let mutableString = NSMutableAttributedString.init(string: text)
+                mutableString.addAttributes(attribute, range: NSRange(range, in: text))
+                return mutableString
+            }else{
+                return  NSAttributedString(string:text)
+            }
+        }()
         
-        if let range = attributedText.string.range(of: syteVisualString), let url = URL(string: syteDestinationString) {
-            let attribute: [String : Any] = [
-                NSLinkAttributeName: url
-            ]
-            attributedText.addAttributes(attribute, range: NSRange(range, in: attributedText.string))
-        }
+       
         
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false

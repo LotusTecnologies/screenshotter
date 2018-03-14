@@ -133,22 +133,10 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
             return
         }
         let longPressPoint = gestureRecognizer.location(in: self.screenshotImageView)
-        var normalizedX = longPressPoint.x / self.screenshotImageView.bounds.size.width
-        var normalizedY = longPressPoint.y / self.screenshotImageView.bounds.size.height
+        let normalizedX = min(1, max(0, longPressPoint.x / self.screenshotImageView.bounds.size.width))
+        let normalizedY =  min(1, max(0, longPressPoint.y / self.screenshotImageView.bounds.size.height))
     
-        //    MAX(0, normalizedX)
-        if normalizedX < 0 {
-            normalizedX = 0
-        }
-        if normalizedY < 0 {
-            normalizedY = 0
-        }
-        if normalizedX > 1 {
-            normalizedX = 1
-        }
-        if normalizedY > 1 {
-            normalizedY = 1
-        }
+     
         let normalizedPressPoint = CGPoint(x: normalizedX, y: normalizedY)
         if self.b0 == .zero {
             self.b0 = normalizedPressPoint

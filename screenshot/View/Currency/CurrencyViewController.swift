@@ -43,12 +43,13 @@ class CurrencyViewController : BaseViewController {
     // MARK: Currency
     
     static var currentCurrency: String {
-        if let code = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency), code != CurrencyMap.autoCode {
-            return code
-            
-        } else {
-            return "currency.auto".localized
+        if let code = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency) {
+            if  code != CurrencyMap.autoCode {
+                return code
+            }
         }
+        return "currency.auto".localized
+        
     }
 }
 
