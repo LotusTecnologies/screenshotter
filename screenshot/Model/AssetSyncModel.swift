@@ -335,8 +335,18 @@ class AssetSyncModel: NSObject {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
-            firstly { _ -> Promise<(String, [[String : Any]])> in
-                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification)
+            firstly { _ -> Promise<Bool> in
+                let userDefaults = UserDefaults.standard
+                if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+                    print("UserDefaultsKeys.isUSC not set. geoLocating.")
+                    return NetworkingPromise.sharedInstance.geoLocateIsUSC()
+                } else {
+                    let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
+                    print("UserDefaultsKeys.isUSC:\(isUSC)")
+                    return Promise(value: isUSC)
+                }
+            }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
                     AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
