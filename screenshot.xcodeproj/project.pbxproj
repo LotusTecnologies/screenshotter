@@ -12,7 +12,7 @@
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
 		31518645203477DB001BD8D6 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */; };
 		318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318FE265204C09C500277DD4 /* AsyncOperation.swift */; };
-		319B030E2057AFCC00446054 /* ThankYouForSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030C2057AFCC00446054 /* ThankYouForSharingView.swift */; };
+		319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */; };
 		319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */; };
 		319B03112059020300446054 /* AddToDiscoverActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B03102059020300446054 /* AddToDiscoverActivity.swift */; };
 		31A3374E203D9A6100FFD2F2 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */; };
@@ -147,7 +147,7 @@
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		318FE265204C09C500277DD4 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
-		319B030C2057AFCC00446054 /* ThankYouForSharingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThankYouForSharingView.swift; sourceTree = "<group>"; };
+		319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThankYouForSharingViewController.swift; sourceTree = "<group>"; };
 		319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareToDiscoverPrompt.swift; sourceTree = "<group>"; };
 		319B03102059020300446054 /* AddToDiscoverActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToDiscoverActivity.swift; sourceTree = "<group>"; };
 		31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
@@ -311,7 +311,7 @@
 		319B030B2057AFCC00446054 /* ShareToDiscoverPrompt */ = {
 			isa = PBXGroup;
 			children = (
-				319B030C2057AFCC00446054 /* ThankYouForSharingView.swift */,
+				319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */,
 				319B03102059020300446054 /* AddToDiscoverActivity.swift */,
 				319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */,
 			);
@@ -1067,7 +1067,7 @@
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
 				C5D57933203EDD7A00A076FE /* TableView.swift in Sources */,
-				319B030E2057AFCC00446054 /* ThankYouForSharingView.swift in Sources */,
+				319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */,
 				C5336D23203D553400A7B4B0 /* BarItem.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
