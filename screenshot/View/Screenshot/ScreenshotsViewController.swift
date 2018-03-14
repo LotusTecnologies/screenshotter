@@ -501,12 +501,11 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                         AnalyticsTrackers.standard.track(.shareCompleted)
                         //TODO: why is this branch tracking here?
                         AnalyticsTrackers.branch.track(.shareCompleted)
-                        if activityType?.rawValue == AddToDiscoverActivity.activityTypeString {
-                            let thankYou = ThankYouForSharingView.init(nibName: nil, bundle: nil)
-                            let _ = thankYou.view
-                            thankYou.closeButton?.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
-                            self.present(thankYou, animated: true, completion: nil)
                         
+                        if activityType?.rawValue == AddToDiscoverActivity.activityTypeString {
+                            let thankYou = ThankYouForSharingViewController()
+                            thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
+                            self.present(thankYou, animated: true, completion: nil)
                         }
                     } else {
                         AnalyticsTrackers.standard.track(.shareIncomplete)

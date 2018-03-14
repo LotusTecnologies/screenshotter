@@ -692,18 +692,21 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             shoppable.setRating(positive: true)
             
-            self.shamrockButton?.isHidden = true
-            
-            let sharePrompt = ShareToDiscoverPrompt.init(frame: .zero)
-            sharePrompt.delegate = self
+            let sharePrompt = ShareToDiscoverPrompt.init()
             sharePrompt.translatesAutoresizingMaskIntoConstraints = false
+            sharePrompt.alpha = 0
             self.view.addSubview(sharePrompt)
-
+            sharePrompt.addButton.addTarget(self, action: #selector(presentThankYouForSharingView), for: .touchUpInside)
+            sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
             sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
             sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
             sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
             self.shareToDiscoverPrompt = sharePrompt
             
+            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                sharePrompt.alpha = 1
+                self.shamrockButton?.alpha = 0
+            })
         }
     }
     
@@ -772,18 +775,19 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     }
 }
 
-extension ProductsViewController : ShareToDiscoverPromptDelegate {
-    func shareToDiscoverPromptDidClose(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
-        self.hideShareToDiscoverPrompt()
-    }
-    
+typealias ProductsViewControllerShareToDiscoverPrompt = ProductsViewController
+extension ProductsViewControllerShareToDiscoverPrompt {
     func hideShareToDiscoverPrompt (){
-        self.shareToDiscoverPrompt?.removeFromSuperview()
-        self.shareToDiscoverPrompt = nil
-        self.shamrockButton?.isHidden = false
+        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            self.shareToDiscoverPrompt?.alpha = 0
+            self.shamrockButton?.alpha = 1
+        }) { completed in
+            self.shareToDiscoverPrompt?.removeFromSuperview()
+            self.shareToDiscoverPrompt = nil
+        }
     }
     
-    func shareToDiscoverPromptPressAdd(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
+    func presentThankYouForSharingView() {
         self.hideShareToDiscoverPrompt()
         
         if let image = self.screenshot.uploadedImageURL {

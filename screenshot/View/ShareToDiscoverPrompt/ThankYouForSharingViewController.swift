@@ -68,7 +68,7 @@ class ThankYouForSharingViewController : UIViewController {
         
         let imageViewPadding: CGFloat = 24
         
-        let thumbsUpImageView = UIImageView(image: UIImage(named: "ThumbsUpBanner"))
+        let thumbsUpImageView = UIImageView(image: UIImage(named: "ShareToMatchsticksThumbsUp"))
         thumbsUpImageView.translatesAutoresizingMaskIntoConstraints = false
         thumbsUpImageView.contentMode = .scaleAspectFit
         thumbsUpImageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
