@@ -12,6 +12,12 @@ import PromiseKit
 class MatchstickModel: NSObject {
     
     public static let shared = MatchstickModel()
+    lazy var downloadMatchsitckQueue:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "Download matchsticks Queue"
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
 
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.matchsticks.serial")
     let processingQ = DispatchQueue.global(qos: .utility)
@@ -91,15 +97,19 @@ class MatchstickModel: NSObject {
     }
     
     func fetchImageData(imageUrl: String) {
-        let dataModel = DataModel.sharedInstance
-        NetworkingPromise.sharedInstance.downloadImageData(urlString: imageUrl)
-            .then(on: processingQ) { imageData -> Void in
-                dataModel.performBackgroundTask { (managedObjectContext) in
-                    dataModel.addImageDataToMatchstick(managedObjectContext: managedObjectContext, imageUrl: imageUrl, imageData: imageData)
-                }
-            }.catch(on: processingQ) { error in
-                print("fetchImageData catch error:\(error)")
-        }
+        self.downloadMatchsitckQueue.addOperation(AsyncOperation.init(timeout: 90.0) { (completed) in
+            NetworkingPromise.sharedInstance.downloadImageData(urlString: imageUrl)
+                .then(on: self.processingQ) { imageData -> Void in
+                    DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+                        DataModel.sharedInstance.addImageDataToMatchstick(managedObjectContext: managedObjectContext, imageUrl: imageUrl, imageData: imageData)
+                        completed()
+                    }
+                }.catch(on: self.processingQ) { error in
+                    print("fetchImageData catch error:\(error)")
+                    completed()
+            }
+            
+        })
     }
 
 }

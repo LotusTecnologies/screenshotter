@@ -18,13 +18,12 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: FetchedResultsControllerManager<Matchstick>?
+    fileprivate var matchsticks:[Matchstick] = []
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
     fileprivate let emptyView = HelperView()
     
-    var tempDisablePass = false
-    var tempDisableAdd = false
     weak var delegate: DiscoverScreenshotViewControllerDelegate?
     
     override var title: String? {
@@ -150,7 +149,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             return nil
         }
         
-        return matchstickFrc?.object(at: currentIndexPath)
+        return matchstickAt(index: currentIndexPath)
     }
     
     // MARK: Decision
@@ -162,25 +161,60 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate func decisionValueThreshold(_ percent: CGFloat) -> CGFloat {
         return percent * decisionValueMultiplier
     }
-    
+
     func decidedToPass() {
         isAdding = false
-        currentMatchstick?.pass()
+        
+        if let matchStick = currentMatchstick {
+            removeCurrentMatchstickIfPossible()
+            matchStick.pass()
+        }
     }
     
     private var needsToCompleteDecision = false
-    
-    func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
-        isAdding = true
-        currentMatchstick?.add(callback: callback)
-        needsToCompleteDecision = callback != nil
-    }
-    
+
     func completeDecision() {
         if needsToCompleteDecision {
             needsToCompleteDecision = false
-            currentMatchstick?.pass()
+            
+            if let matchStick = currentMatchstick {
+                removeCurrentMatchstickIfPossible()
+                screenshotsTabPulseAnimation()
+                matchStick.pass()
+            }
         }
+    }
+    
+    func decidedToAdd(callback: ((_ screenshot: Screenshot) -> ())? = nil) {
+        isAdding = true
+        
+        if let matchStick = currentMatchstick {
+            if callback == nil {
+                removeCurrentMatchstickIfPossible()
+                screenshotsTabPulseAnimation()
+            }
+            else {
+                tempButtonDisable = true
+                syncInteractionElements()
+            }
+            
+            matchStick.add(callback: callback)
+            needsToCompleteDecision = callback != nil
+        }
+    }
+    
+    fileprivate func removeCurrentMatchstickIfPossible() {
+        guard currentMatchstick != nil else {
+            return
+        }
+        
+        matchsticks.remove(at: currentIndexPath.item)
+        
+        collectionView.performBatchUpdates({
+            collectionView.deleteItems(at: [currentIndexPath])
+        })
+        
+        setInteractiveElementsOffWithDelay()
     }
     
     // MARK: Cell
@@ -210,7 +244,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     // MARK: User Interaction
     
     private var canPanScreenshot = false
-
+    private var didDismissHelperView = false
 
     @objc private func collectionViewPanGestureAction(_ panGesture: UIPanGestureRecognizer) {
         var translation = panGesture.translation(in: panGesture.view)
@@ -233,6 +267,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                 
                 if cardHelperView != nil {
                     dismissHelperView()
+                    didDismissHelperView = true
                 }
             }
             
@@ -243,13 +278,33 @@ class DiscoverScreenshotViewController : BaseViewController {
                     updateCell(atIndexPath: indexPath, percent: percent)
                 }
                 
-                if self.matchstickFrc?.fetchedObjectsCount == 1 {
+                if self.matchsticks.count == 1 {
                     emptyView.alpha = abs(percent)
+                }
+                
+                if !tempButtonDisable {
+                    tempButtonDisable = true
+                    syncInteractionElements()
                 }
             }
             
         case .ended, .cancelled:
             guard canPanScreenshot else {
+                return
+            }
+            
+            func repositionAnimation() {
+                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
+                    self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
+                    
+                })
+                
+                setInteractiveElementsOffWithDelay()
+            }
+            
+            guard !didDismissHelperView else {
+                didDismissHelperView = false
+                repositionAnimation()
                 return
             }
             
@@ -291,9 +346,7 @@ class DiscoverScreenshotViewController : BaseViewController {
                 }
             }
             else {
-                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: [.allowUserInteraction, .beginFromCurrentState], animations: {
-                    self.updateCell(atIndexPath: self.currentIndexPath, percent: 0)
-                })
+                repositionAnimation()
             }
             
         default:
@@ -301,14 +354,23 @@ class DiscoverScreenshotViewController : BaseViewController {
         }
     }
     
-    @objc fileprivate func passButtonAction() {
-        self.tempDisablePass = true
+    fileprivate var tempButtonDisable = false
+    
+    fileprivate func setInteractiveElementsOnOff() {
+        tempButtonDisable = true
         syncInteractionElements()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            self.tempDisablePass = false
+        setInteractiveElementsOffWithDelay()
+    }
+    
+    fileprivate func setInteractiveElementsOffWithDelay() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.defaultAnimationDuration) {
+            self.tempButtonDisable = false
             self.syncInteractionElements()
         }
+    }
+    
+    @objc fileprivate func passButtonAction() {
+        setInteractiveElementsOnOff()
         
         AnalyticsTrackers.standard.track(.matchsticksSkip, properties: [
             "by": "tap",
@@ -319,13 +381,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func addButtonAction() {
-        self.tempDisableAdd = true
-        syncInteractionElements()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            self.tempDisableAdd = false
-            self.syncInteractionElements()
-        }
+        setInteractiveElementsOnOff()
         
         AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
             "by": "tap",
@@ -353,7 +409,9 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     @objc fileprivate func dismissHelperView() {
-        UIView.animate(withDuration: 0.2, animations: {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
+        
+        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
             self.cardHelperView?.alpha = 0
             self.passButton.isDisabled(false)
             self.addButton.isDisabled(false)
@@ -370,8 +428,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         let isInteractionEnabled = !isListEmpty
         let isButtonEnabled = isInteractionEnabled && cardHelperView == nil
         
-        passButton.isDisabled(!isButtonEnabled || tempDisablePass)
-        addButton.isDisabled(!isButtonEnabled || tempDisableAdd)
+        passButton.isDisabled(!isButtonEnabled || tempButtonDisable)
+        addButton.isDisabled(!isButtonEnabled || tempButtonDisable)
         collectionView.isUserInteractionEnabled = isInteractionEnabled
     }
     
@@ -382,7 +440,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate var isListEmpty:Bool {
         get {
-            if self.matchstickFrc?.fetchedObjectsCount ?? 0 > 0 {
+            if self.matchsticks.count > 0 {
                 return false
             }
             
@@ -439,11 +497,23 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func dismissViewController() {
         dismiss(animated: true, completion: nil)
     }
+    
+    // MARK: Screenshot Tab
+    
+    fileprivate func screenshotsTabPulseAnimation() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.screenshotsTabPulseAnimation()
+        }
+    }
 }
 
 extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.matchstickFrc?.fetchedObjectsCount ?? 0
+        return self.matchsticks.count
+    }
+    
+    func matchstickAt(index:IndexPath) -> Matchstick? {
+        return self.matchsticks[index.item]
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -452,7 +522,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
         if let cell = cell as? DiscoverScreenshotCollectionViewCell {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
-            let matchstick = matchstickFrc?.object(at: indexPath)
+            let matchstick = matchstickAt(index: indexPath)
             
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
@@ -471,7 +541,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
         
         if self.cardHelperView == nil && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper) {
             showHelperView(inCell: cell)
-            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
         }
     }
     
@@ -489,6 +558,8 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelegate {
     func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
         matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
+        self.matchsticks = matchstickFrc?.fetchedObjects ?? []
+        
         self.collectionView.reloadData()
     }
     
@@ -508,15 +579,12 @@ extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelega
 
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if !change.deletedRows.isEmpty && isAdding {
-            if let tabBarController = tabBarController as? MainTabBarController {
-                tabBarController.screenshotsTabPulseAnimation()
-            }
-        }
-        
         if isViewLoaded {
-            change.applyChanges(collectionView: collectionView)
-            syncEmptyListViews()
+            if change.insertedRows.count > 0 {
+                self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
+                self.collectionView.reloadData()
+                syncEmptyListViews()
+            }
         }
     }
 }
@@ -527,8 +595,8 @@ extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLay
     }
 }
 
-extension UIButton {
-    fileprivate func isDisabled(_ disabled: Bool) {
+fileprivate extension UIButton {
+    func isDisabled(_ disabled: Bool) {
         isEnabled = !disabled
         alpha = disabled ? 0.5 : 1
     }
