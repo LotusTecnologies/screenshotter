@@ -786,13 +786,16 @@ extension ProductsViewController : ShareToDiscoverPromptDelegate {
     func shareToDiscoverPromptPressAdd(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
         
         self.hideShareToDiscoverPrompt()
+        if let image = self.screenshot.uploadedImageURL {
+            NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
+        }
         let thankYou = ThankYouForSharingView.init(nibName: nil, bundle: nil)
         let _ = thankYou.view
         thankYou.closeButton?.addTarget(self, action: #selector(thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
         self.present(thankYou, animated: true, completion: nil)
     }
     
-    @IBAction func thankYouForSharingViewDidClose(_ sender: Any) {
+    func thankYouForSharingViewDidClose(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
 }

@@ -50,15 +50,8 @@ class IntercomHelper : NSObject {
             Intercom.enableLogging()
         #endif
         
-        // Register the user if we're already logged in.
-        if let user = AnalyticsUser.current {
-            register(user: user)
-        } else if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
-            // Backwards compatible w/version < 1.2
-            Intercom.registerUser(withEmail: email)
-        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) == false {
-            registerAnonymousUser()
-        }
+        register(user: AnalyticsUser.current )
+        
         
         if let remoteNotification = launchOptions[UIApplicationLaunchOptionsKey.remoteNotification] as? [AnyHashable : Any] {
             handleRemoteNotification(remoteNotification, opened: true)
