@@ -80,7 +80,19 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
                 collectionView.insertSections(insertedSections)
                 collectionView.insertItems(at: insertedRows)
             })
-            collectionView.reloadItems(at: updatedRows)
+            
+            let indexPathsForSelectedItems = collectionView.indexPathsForSelectedItems
+            
+            collectionView.reloadItems(at: self.updatedRows)
+            
+            if let indexPathsForSelectedItems = indexPathsForSelectedItems {
+                for index in indexPathsForSelectedItems {
+                    if let cell = collectionView.cellForItem(at: index) {
+                        cell.isSelected = true
+                        collectionView.selectItem(at: index, animated: false, scrollPosition: [])
+                    }
+                }
+            }
         }
         
         override var description: String {
