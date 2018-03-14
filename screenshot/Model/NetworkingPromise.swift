@@ -317,9 +317,43 @@ class NetworkingPromise : NSObject {
         }
     }
     
-    func submitToDiscover(userName: String?, imageURLString: String?, intercomUserId: String?) -> Promise<Bool> {
-    
-        return Promise.init(value: true)
+    func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) {
+        var parameterDict = ["image" : image]
+        if userName != nil && userName != "" {
+            parameterDict["userName"] = userName
+        }
+        if intercomUserId != nil && intercomUserId != "" {
+            parameterDict["intercomUserId"] = intercomUserId
+        }
+        if email != nil && email != "" {
+            parameterDict["email"] = email
+        }
+        do {
+            let parameterData = try JSONSerialization.data(withJSONObject: parameterDict, options: [])
+            
+            guard let url = URL(string: Constants.screenShotLambdaDomain + "/matchstick/submit") else {
+                return
+                
+            }
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.httpBody = parameterData
+                request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+                request.setValue("application/json", forHTTPHeaderField:"Content-Type")
+                
+                let session = URLSession.shared
+                let dataTask = session.dataTask(with: request) { data, response, error in
+                    if let data = data, let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] {
+                        print("shared to discover response: \(json)")
+                    }
+                    
+                }
+                dataTask.resume()
+        }catch {
+
+        }
+ 
+        
     }
     
     func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {

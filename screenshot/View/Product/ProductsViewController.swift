@@ -785,6 +785,11 @@ extension ProductsViewController : ShareToDiscoverPromptDelegate {
     
     func shareToDiscoverPromptPressAdd(_ shareToDiscoverPrompt: ShareToDiscoverPrompt) {
         self.hideShareToDiscoverPrompt()
+        
+        if let image = self.screenshot.uploadedImageURL {
+            NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
+        }
+        
         let thankYou = ThankYouForSharingViewController()
         thankYou.closeButton.addTarget(self, action: #selector(thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
         self.present(thankYou, animated: true, completion: nil)
