@@ -794,8 +794,10 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         if indexPath.section == ScreenshotsSection.image.rawValue {
             if let screenshot = self.screenshot(at: indexPath.item) {
                 if (self.isEditing) {
-                    self.deleteScreenshotObjectIDs.append(screenshot.objectID)
-                    self.updateDeleteButtonCount()
+                    if !self.deleteScreenshotObjectIDs.contains(screenshot.objectID) {
+                        self.deleteScreenshotObjectIDs.append(screenshot.objectID)
+                        self.updateDeleteButtonCount()
+                    }
                 } else {
                     if (self.deleteScreenshotObjectIDs.count > 0 && self.deleteScreenshotObjectIDs.contains(screenshot.objectID)) {
                         return

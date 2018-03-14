@@ -70,6 +70,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         }
         
         func applyChanges(collectionView: UICollectionView) {
+            
             collectionView.performBatchUpdates({
                 collectionView.deleteItems(at: deletedRows)
                 collectionView.deleteSections(deletedSections)
@@ -77,8 +78,17 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
                 collectionView.insertItems(at: insertedRows)
             }) { (completed) in
             }
-            collectionView.reloadItems(at: self.updatedRows)
             
+            let indexPathsForSelectedItems = collectionView.indexPathsForSelectedItems
+            collectionView.reloadItems(at: self.updatedRows)
+            if let indexPathsForSelectedItems = indexPathsForSelectedItems {
+                for index in indexPathsForSelectedItems {
+                    if let cell = collectionView.cellForItem(at: index) {
+                        cell.isSelected = true
+                        collectionView.selectItem(at: index, animated: false, scrollPosition: [])
+                    }
+                }
+            }
             
         }
         override var description: String {
