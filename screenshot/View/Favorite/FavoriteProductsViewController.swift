@@ -89,12 +89,12 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? ProductCollectionViewCell, let product = products?[indexPath.item] {
-            cell.delegate = self
             cell.contentView.backgroundColor = collectionView.backgroundColor
             cell.title = product.productDescription
             cell.price = product.price
             cell.imageUrl = product.imageURL
-            cell.favoriteControl?.isSelected = product.isFavorite
+            cell.favoriteControl.isSelected = product.isFavorite
+            cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
         }
         
         return cell
@@ -122,20 +122,24 @@ extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension FavoriteProductsViewController : ProductCollectionViewCellDelegate {
-    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
-        guard let indexPath = collectionView.indexPath(for: cell), let product = products?[indexPath.item] else {
-            return
+typealias FavoriteProductsViewControllerProductCollectionViewCell = FavoriteProductsViewController
+extension FavoriteProductsViewControllerProductCollectionViewCell {
+    func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+        guard let location = event.allTouches?.first?.location(in: collectionView),
+            let indexPath = collectionView.indexPathForItem(at: location),
+            let product = products?[indexPath.item]
+            else {
+                return
         }
         
-        let isFavorited = cell.favoriteControl?.isSelected ?? false
+        let isFavorited = favoriteControl.isSelected
         
         if isFavorited {
             if let index = unfavoriteProducts.index(of: product) {
                 unfavoriteProducts.remove(at: index)
             }
-
-        } else {
+        }
+        else {
             unfavoriteProducts.append(product)
         }
 

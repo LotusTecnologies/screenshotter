@@ -26,7 +26,7 @@ enum ProductsViewControllerState : Int {
     case empty
 }
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
@@ -222,19 +222,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
         self.present(navigationController, animated: true, completion: nil)
     }
-    
-    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
-        
-        guard let isFavorited = cell.favoriteControl?.isSelected else{
-            return
-        }
-        guard let indexPath = self.collectionView?.indexPath(for: cell) else{
-            return
-        }
-        let product = self.productAtIndex(indexPath.item)
-        product.setFavorited(toFavorited: isFavorited)
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
-    }
 }
 
 private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
@@ -394,14 +381,14 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let product = self.productAtIndex(indexPath.item)
             
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
-                cell.delegate = self
                 cell.contentView.backgroundColor = collectionView.backgroundColor
                 cell.title = product.displayTitle
                 cell.price = product.price
                 cell.originalPrice = product.originalPrice
                 cell.imageUrl = product.imageURL
                 cell.isSale = product.isSale()
-                cell.favoriteControl?.isSelected = product.isFavorite
+                cell.favoriteControl.isSelected = product.isFavorite
+                cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 return cell
             }
         }
@@ -446,6 +433,20 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: .tappedOnProductProducts, fromPage: "Products")
             }
         }
+    }
+    
+    func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+        guard let location = event.allTouches?.first?.location(in: collectionView),
+            let indexPath = collectionView?.indexPathForItem(at: location)
+            else {
+                return
+        }
+        
+        let isFavorited = favoriteControl.isSelected
+        let product = self.productAtIndex(indexPath.item)
+        
+        product.setFavorited(toFavorited: isFavorited)
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
     }
 }
 

@@ -83,10 +83,6 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Selection
     
     @objc func selectionButtonTouchUpInside() {
-//        guard let productView = productView else {
-//            return
-//        }
-        
         // ???: need analytics here
     }
     
