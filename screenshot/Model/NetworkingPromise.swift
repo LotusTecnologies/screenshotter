@@ -331,7 +331,7 @@ class NetworkingPromise : NSObject {
         do {
             let parameterData = try JSONSerialization.data(withJSONObject: parameterDict, options: [])
             
-            guard let url = URL(string: Constants.screenShotLambdaDomain + "/matchstick/submit") else {
+            guard let url = URL(string: Constants.screenShotLambdaDomain + "matchstick/submit") else {
                 return
                 
             }
