@@ -29,6 +29,7 @@ enum ProductsViewControllerState : Int {
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>
+    fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
     
     var products:[Product] = []
     
@@ -522,6 +523,11 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
                 }
             }
         }
+        else if controller == productsFRC {
+            if view.window == nil, let collectionView = collectionView {
+                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+            }
+        }
     }
     
     func hasShoppables() -> Bool {
@@ -540,7 +546,6 @@ extension ProductsViewControllerProducts{
     }
     
     func reloadProductsFor(shoppable:Shoppable) {
-        
         self.products = []
         self.productsUnfilteredCount = 0
         self.scrollRevealController?.resetViewOffset()
@@ -560,14 +565,14 @@ extension ProductsViewControllerProducts{
         self.collectionView?.reloadData()
         self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
         
+        productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
+        
         if self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.tooltip.section), at: .top, animated: false)
             
         } else if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
-        
-        
     }
     
     func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
