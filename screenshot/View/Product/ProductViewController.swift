@@ -18,6 +18,14 @@ class ProductViewController : BaseViewController {
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
     
+    var similarProducts: [Product]? {
+        didSet {
+            if isViewLoaded {
+                productView.similarProductsCollectionView.products = similarProducts
+            }
+        }
+    }
+    
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
@@ -42,6 +50,7 @@ class ProductViewController : BaseViewController {
     
     override func loadView() {
         let productView = ProductView()
+        productView.similarProductsCollectionView.products = similarProducts
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)

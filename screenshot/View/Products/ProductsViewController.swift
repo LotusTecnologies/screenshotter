@@ -427,6 +427,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 let productViewController = ProductViewController(productOID: product.objectID)
                 productViewController.title = product.displayTitle
                 productViewController.setup(with: product)
+                productViewController.similarProducts = products
                 navigationController?.pushViewController(productViewController, animated: true)
             }
             else {
