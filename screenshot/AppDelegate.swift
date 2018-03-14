@@ -80,7 +80,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     var lastPresentedLowDiskSpaceWarning:Date?
     func presentLowDiskSpaceWarning(){
-        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*5 else {
+        if let lastPresentation = self.lastPresentedLowDiskSpaceWarning,
+          -lastPresentation.timeIntervalSinceNow <= 60 * 5 { // Do nothing if presented warning within last 5 minutes.
             return
         }
         
