@@ -67,7 +67,7 @@ class AssetSyncModel: NSObject {
     
     let imageMediaType = kUTTypeImage as String
     
-    lazy var uploadScreenshotWithClarifaiQueue:OperationQueue = {
+    var uploadScreenshotWithClarifaiQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "upload Screenshot With Clarifai Queue"
         queue.maxConcurrentOperationCount = 2
@@ -80,14 +80,14 @@ class AssetSyncModel: NSObject {
         return queue
     }()
     
-    lazy var retryScreenshotQueue:OperationQueue = {
+    var retryScreenshotQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "retry Screenshot image processing Queue"
         queue.maxConcurrentOperationCount = 2
         return queue
     }()
     
-    lazy var uploadPhotoQueue:OperationQueue = {
+    var uploadPhotoQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "upload Photo image processing Queue"
         queue.maxConcurrentOperationCount = 2

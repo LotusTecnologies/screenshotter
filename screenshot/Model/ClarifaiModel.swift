@@ -60,7 +60,7 @@ class ClarifaiModel: NSObject {
         UserDefaults.standard.set(isModelDownloaded, forKey: UserDefaultsKeys.isModelDownloaded)
     }
     
-    lazy var clarifaiClassifyQueue:OperationQueue = {
+    var clarifaiClassifyQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "clarifai Classify Queue"
         queue.maxConcurrentOperationCount = 1
