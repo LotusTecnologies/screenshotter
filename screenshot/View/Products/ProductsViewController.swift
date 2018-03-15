@@ -422,16 +422,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
+            product.recordViewedProduct()
             
-            if product.partNumber != nil {
-                let productViewController = ProductViewController(productOID: product.objectID)
-                productViewController.title = product.displayTitle
-                productViewController.setup(with: product)
+            if let productViewController = presentProduct(product, from:"Products") {
                 productViewController.similarProducts = products
-                navigationController?.pushViewController(productViewController, animated: true)
-            }
-            else {
-                OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: .tappedOnProductProducts, fromPage: "Products")
             }
         }
     }

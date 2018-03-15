@@ -56,6 +56,7 @@ class ProductViewController : BaseViewController {
     
     override func loadView() {
         let productView = ProductView()
+        productView.similarProductsCollectionView.delegate = self
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
@@ -236,6 +237,16 @@ fileprivate extension ProductViewControllerProductView {
         }
         
         OpenWebPage.present(urlString: url, fromViewController: self)
+    }
+}
+
+extension ProductViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == productView.similarProductsCollectionView {
+            if let products = productView.similarProductsCollectionView.products, products.count > indexPath.item {
+                presentProduct(products[indexPath.item], from: "ProductSimilar")
+            }
+        }
     }
 }
 

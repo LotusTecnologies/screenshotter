@@ -107,7 +107,9 @@ extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
             return
         }
         
-        OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: .tappedOnProductFavorites, fromPage: "Favorites")
+        if let productViewController = presentProduct(product, from:"Favorites") {
+            productViewController.similarProducts = products
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

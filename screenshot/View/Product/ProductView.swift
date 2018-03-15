@@ -413,7 +413,7 @@ class ProductView: UIView {
     func resignSelectionControl() {
         if selectionControl.isFirstResponder {
             // Dismiss selected state
-            _ = selectionControl.resignFirstResponder()
+            selectionControl.resignFirstResponder()
         }
     }
     
