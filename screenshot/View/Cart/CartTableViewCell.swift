@@ -239,9 +239,11 @@ class CartTableViewCell: UITableViewCell {
         removeButton.setTitleColor(.crazeRed, for: .selected)
         actionView.addSubview(removeButton)
         removeButton.topAnchor.constraint(equalTo: actionView.topAnchor).isActive = true
-        removeButton.leadingAnchor.constraint(equalTo: actionView.leadingAnchor).isActive = true
+        removeButton.leadingAnchor.constraint(greaterThanOrEqualTo: actionView.leadingAnchor).isActive = true
         removeButton.bottomAnchor.constraint(equalTo: actionView.bottomAnchor).isActive = true
-        removeButton.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
+        removeButton.trailingAnchor.constraint(lessThanOrEqualTo: actionView.trailingAnchor).isActive = true
+        removeButton.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
+        removeButton.widthAnchor.constraint(greaterThanOrEqualTo: actionView.widthAnchor, multiplier: 0.5).isActive = true
         
         NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
     }
