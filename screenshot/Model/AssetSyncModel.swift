@@ -197,19 +197,9 @@ class AssetSyncModel: NSObject {
                         return Promise.init(value: (c, image))
                     })
                 }.then(on: self.processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                    let isRecognized: Bool
-                    let classification: String?
-                    switch imageClassification {
-                    case .human:
-                        isRecognized = true
-                        classification = "h"
-                    case .furniture:
-                        isRecognized = true
-                        classification = "f"
-                    case .unrecognized:
-                        isRecognized = false
-                        classification = nil
-                    }
+                    let isRecognized = (imageClassification != .unrecognized)
+                    let classification = imageClassification.shortString()
+
                     AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
                     let imageData: Data? = isRecognized ? self.data(for: image) : nil
                     return Promise { fulfill, reject in
