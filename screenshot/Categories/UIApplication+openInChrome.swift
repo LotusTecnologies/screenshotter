@@ -23,12 +23,14 @@ extension UIApplication {
     func chomeURLFor(url:URL) -> URL? {
         let scheme = url.scheme?.lowercased()
         
-        var chromeScheme:String?
-        if (scheme == "http") {
-            chromeScheme = UIApplication.kGoogleChromeHTTPScheme
-        } else if (scheme == "https") {
-            chromeScheme = UIApplication.kGoogleChromeHTTPSScheme
-        }
+        let chromeScheme:String? = {
+            if (scheme == "http") {
+                return  UIApplication.kGoogleChromeHTTPScheme
+            } else if (scheme == "https") {
+                return UIApplication.kGoogleChromeHTTPSScheme
+            }
+            return nil
+        }()
         
         if let chromeScheme = chromeScheme {
             let rangeForScheme = url.absoluteString.range(of: ":")

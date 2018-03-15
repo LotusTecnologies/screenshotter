@@ -80,9 +80,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     var lastPresentedLowDiskSpaceWarning:Date?
     func presentLowDiskSpaceWarning(){
-        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*5 else {
-            return
+        
+        //don't change to guard - lead to large complie time
+        if let lastTime = self.lastPresentedLowDiskSpaceWarning {
+            let timeInterval = abs(lastTime.timeIntervalSinceNow)
+            if timeInterval  < 60*5 {
+                return
+            }
         }
+        
         
         self.lastPresentedLowDiskSpaceWarning = Date()
         let alert = UIAlertController.init(title: "application.error.no_disk_space.title".localized, message:"application.error.no_disk_space.message".localized, preferredStyle: .alert)

@@ -1262,6 +1262,7 @@
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=120";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1291,6 +1292,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=120";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1374,6 +1376,7 @@
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=120";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1453,6 +1456,7 @@
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=120";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
