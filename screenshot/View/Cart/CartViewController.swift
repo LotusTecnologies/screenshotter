@@ -295,6 +295,7 @@ fileprivate extension CartViewControllerCheckout {
                 }
             }
             .catch { [weak self] error in
+                print("checkout error:\(error)")
                 self?.dismissCheckoutLoader()
         }
     }
