@@ -15,6 +15,17 @@ enum OpenWebPage : String {
     case safari
     case chrome
     
+    func analyticsString() -> String {
+        switch self {
+        case .embededSafari:
+            return "embededSafari"
+        case .safari:
+            return "safari"
+        case .chrome:
+            return "chrome"
+        }
+    }
+    
     func localizedDisplayString() -> String{
         switch self {
         case .embededSafari:
@@ -52,6 +63,17 @@ enum OpenWebPage : String {
         }
     }
     
+    static func using(url:URL) ->OpenWebPage {
+        var openInSetting = OpenWebPage.fromSystemInfo()
+        
+        for fallbackSetting in [.safari, chrome, .embededSafari] {  //Fallbacks are in this order particularly!
+            if !openInSetting.canOpen(url: url) {
+                openInSetting = fallbackSetting
+            }
+        }
+        return openInSetting
+    }
+    
     static func present(urlString: String?, fromViewController: UIViewController) {
         guard var urlString = urlString else {
             return
@@ -85,37 +107,7 @@ enum OpenWebPage : String {
         }
     }
     
-    static func presentProduct(_ product: Product, fromViewController: UIViewController, analyticsKey: AnalyticsEvent, fromPage: String) {
+    static func presentProduct(_ product: Product, fromViewController: UIViewController) {
         present(urlString: product.offer, fromViewController: fromViewController)
-        
-        AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: fromPage)
-        
-        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-        
-        if email.lengthOfBytes(using: .utf8) > 0 {
-            let uploadedImageURL = product.screenshot?.uploadedImageURL ?? ""
-            let merchant = product.merchant ?? ""
-            let brand = product.brand ?? ""
-            let displayTitle = product.displayTitle ?? ""
-            let offer = product.offer ?? ""
-            let imageURL = product.imageURL ?? ""
-            let price = product.price ?? ""
-            let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
-            
-            let properties = ["screenshot": uploadedImageURL,
-                              "merchant": merchant,
-                              "brand": brand,
-                              "title": displayTitle,
-                              "url": offer,
-                              "imageUrl": imageURL,
-                              "price": price,
-                              "email": email,
-                              "name": name ]
-            AnalyticsTrackers.standard.track(.productForEmail, properties:properties)
-        }
-        
-        product.recordViewedProduct()
-        AnalyticsTrackers.branch.track(analyticsKey)
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters:[FBSDKAppEventParameterNameContentID: product.imageURL ?? ""])
     }
 }
