@@ -801,7 +801,7 @@ class AssetSyncModel: NSObject {
         }
         fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", installDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 100
+        fetchOptions.fetchLimit = 25
         futureScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
     }
     
