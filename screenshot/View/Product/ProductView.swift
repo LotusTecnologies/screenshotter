@@ -31,6 +31,9 @@ class ProductView: UIView {
     let cartButton = MainButton()
 //    let buyButton = MainButton()
     
+    fileprivate let similarProductsContainerView = UIView()
+    fileprivate(set) var similarProductsCollectionView: ProductsCollectionView?
+    
     private var completeDetailsConstraints: [NSLayoutConstraint] = []
     private var partialDetailsConstraints: [NSLayoutConstraint] = []
     
@@ -189,8 +192,16 @@ class ProductView: UIView {
         scrollView.addSubview(websiteButton)
         websiteButton.topAnchor.constraint(equalTo: contentTextView.bottomAnchor, constant: .padding).isActive = true
         websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-        websiteButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
         websiteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        similarProductsContainerView.translatesAutoresizingMaskIntoConstraints = false
+        similarProductsContainerView.isHidden = true
+        similarProductsContainerView.backgroundColor = .background
+        scrollView.addSubview(similarProductsContainerView)
+        similarProductsContainerView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
+        similarProductsContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        similarProductsContainerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        similarProductsContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         
         let controlContainerView = UIView()
         controlContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -377,8 +388,51 @@ class ProductView: UIView {
     func resignSelectionControl() {
         if selectionControl.isFirstResponder {
             // Dismiss selected state
-            _ = selectionControl.resignFirstResponder()
+            selectionControl.resignFirstResponder()
         }
+    }
+    
+    // MARK: Products Collection View
+    
+    fileprivate func createProductsCollectionView(title: String, containerView: UIView) -> ProductsCollectionView {
+        containerView.isHidden = false
+        
+        let topBorderView = BorderView(edge: .top)
+        topBorderView.backgroundColor = containerView.backgroundColor?.darker()
+        containerView.addSubview(topBorderView)
+        
+        let similarProductsLabel = UILabel()
+        similarProductsLabel.translatesAutoresizingMaskIntoConstraints = false
+        similarProductsLabel.textColor = .gray3
+        similarProductsLabel.text = title
+        similarProductsLabel.font = .preferredFont(forTextStyle: .title2)
+        similarProductsLabel.adjustsFontForContentSizeCategory = true
+        similarProductsLabel.adjustsFontSizeToFitWidth = true
+        similarProductsLabel.minimumScaleFactor = 0.7
+        containerView.addSubview(similarProductsLabel)
+        similarProductsLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: .padding).isActive = true
+        similarProductsLabel.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        similarProductsLabel.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        let collectionView = ProductsCollectionView()
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = containerView.backgroundColor
+        collectionView.analyticsOnPage = "Product"
+        containerView.addSubview(collectionView)
+        collectionView.topAnchor.constraint(equalTo: similarProductsLabel.bottomAnchor).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        return collectionView
+    }
+    
+    func setSimilarProducts(_ products: [Product]) {
+        guard !products.isEmpty else {
+            return
+        }
+        
+        similarProductsCollectionView = createProductsCollectionView(title: "product.similar_items".localized, containerView: similarProductsContainerView)
+        similarProductsCollectionView?.products = products
     }
     
     // MARK: Interaction

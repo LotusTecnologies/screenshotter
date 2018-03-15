@@ -85,8 +85,9 @@ public enum AnalyticsEvent : String {
     case tabBarTapped = "Tab Bar tapped"
     case tappedOnProduct = "Tapped on product"
     case tappedOnProductFavorites = "Tapped on product - Favorites"
-    case tappedOnProductProductbar = "Tapped on product - ProductBar"
+    case tappedOnProductProductBar = "Tapped on product - ProductBar"
     case tappedOnProductProducts = "Tapped on product - Products"
+    case tappedOnProductProductSimilar = "Tapped on product - Product Similar"
     case tappedOnScreenshot = "Tapped on screenshot"
     case tappedOnShoppable = "Tapped on shoppable"
     case tookScreenshot = "Took Screenshot"
@@ -361,7 +362,9 @@ extension AnalyticsTracker {
         case "Products":
             track(.tappedOnProductProducts, properties: ["display":displayAs])
         case "ProductBar":
-            track(.tappedOnProductProductbar, properties: ["display":displayAs])
+            track(.tappedOnProductProductBar, properties: ["display":displayAs])
+        case "ProductSimilar":
+            track(.tappedOnProductProductSimilar, properties: ["display":displayAs])
         default:
             //do nothing
             break
@@ -412,9 +415,6 @@ extension AnalyticsTracker {
         if marketingBrands.contains(brand) {
             trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped on \(brand) product", properties: [:])
         }
-        
-        
-        
     }
 }
 

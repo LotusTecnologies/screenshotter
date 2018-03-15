@@ -6,12 +6,11 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 extension UIViewController {
     
-    func presentProduct(_ product: Product, from:String) {
+    @discardableResult func presentProduct(_ product: Product, from:String) -> ProductViewController? {
         AnalyticsTrackers.standard.trackTappedOnProduct(product, onPage: from)
         
         if product.partNumber != nil {
@@ -19,10 +18,12 @@ extension UIViewController {
             productViewController.title = product.displayTitle
             productViewController.setup(with: product)
             navigationController?.pushViewController(productViewController, animated: true)
+            return productViewController
         }
         else {
             OpenWebPage.presentProduct(product, fromViewController: self)
         }
         
+        return nil
     }
 }

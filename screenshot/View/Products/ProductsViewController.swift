@@ -116,7 +116,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip")
-            collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+            collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
             
             
             self.view.insertSubview(collectionView, at: 0)
@@ -314,7 +314,7 @@ extension ProductsViewController {
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
 extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    func numberOfCollectionViewProductColumns() ->Int {
+    var numberOfCollectionViewProductColumns: Int {
         return 2
     }
     
@@ -361,9 +361,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
             
         } else if sectionType == .product {
-            let columns = CGFloat(self.numberOfCollectionViewProductColumns())
+            let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = size.width + ProductCollectionViewCell.labelsHeight
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width)
         }
         
         return size
@@ -379,7 +379,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         else if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
             
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductsCollectionViewCell {
                 cell.contentView.backgroundColor = collectionView.backgroundColor
                 cell.title = product.displayTitle
                 cell.price = product.price
@@ -422,7 +422,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
-            self.presentProduct(product, from:"Products")
+            
+            if let productViewController = presentProduct(product, from:"Products") {
+                productViewController.similarProducts = products
+            }
         }
     }
     

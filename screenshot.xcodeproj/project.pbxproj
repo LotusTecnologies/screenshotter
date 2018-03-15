@@ -90,7 +90,7 @@
 		C543695020453CDF00599134 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694F20453CDF00599134 /* ProductView.swift */; };
 		C543695920453FE300599134 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695220453FE300599134 /* ProductsOptions.swift */; };
 		C543695B20453FE300599134 /* ProductsTooltipCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695420453FE300599134 /* ProductsTooltipCollectionViewCell.swift */; };
-		C543695D20453FE300599134 /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695620453FE300599134 /* ProductCollectionViewCell.swift */; };
+		C543695D20453FE300599134 /* ProductsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695620453FE300599134 /* ProductsCollectionViewCell.swift */; };
 		C543695E20453FE300599134 /* ProductsRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695720453FE300599134 /* ProductsRateView.swift */; };
 		C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695820453FE300599134 /* ProductsViewControllerControl.swift */; };
 		C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696120468C4100599134 /* SegmentedDropDownControl.swift */; };
@@ -106,6 +106,7 @@
 		C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C565333A2019D81C00F022D4 /* ProductViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
+		C572FEE6205A53600046BFEB /* ProductsCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
@@ -244,7 +245,7 @@
 		C543694F20453CDF00599134 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		C543695220453FE300599134 /* ProductsOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsOptions.swift; sourceTree = "<group>"; };
 		C543695420453FE300599134 /* ProductsTooltipCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsTooltipCollectionViewCell.swift; sourceTree = "<group>"; };
-		C543695620453FE300599134 /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
+		C543695620453FE300599134 /* ProductsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsCollectionViewCell.swift; sourceTree = "<group>"; };
 		C543695720453FE300599134 /* ProductsRateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsRateView.swift; sourceTree = "<group>"; };
 		C543695820453FE300599134 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		C543696120468C4100599134 /* SegmentedDropDownControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownControl.swift; sourceTree = "<group>"; };
@@ -260,6 +261,7 @@
 		C565333A2019D81C00F022D4 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
+		C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsCollectionView.swift; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
@@ -694,7 +696,8 @@
 		C543695120453FE300599134 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C543695620453FE300599134 /* ProductCollectionViewCell.swift */,
+				C543695620453FE300599134 /* ProductsCollectionViewCell.swift */,
+				C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */,
 				C543695220453FE300599134 /* ProductsOptions.swift */,
 				C543695720453FE300599134 /* ProductsRateView.swift */,
 				C543695420453FE300599134 /* ProductsTooltipCollectionViewCell.swift */,
@@ -1133,7 +1136,7 @@
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
 				C543695920453FE300599134 /* ProductsOptions.swift in Sources */,
-				C543695D20453FE300599134 /* ProductCollectionViewCell.swift in Sources */,
+				C543695D20453FE300599134 /* ProductsCollectionViewCell.swift in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C540880D1FE90C8E00198955 /* Loader.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
@@ -1201,6 +1204,7 @@
 				C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */,
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
+				C572FEE6205A53600046BFEB /* ProductsCollectionView.swift in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,

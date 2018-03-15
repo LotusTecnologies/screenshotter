@@ -18,6 +18,23 @@ class ProductViewController : BaseViewController {
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
     
+    var similarProducts: [Product]? {
+        didSet {
+            guard var products = similarProducts else {
+                return
+            }
+            
+            if let structuredProduct = structuredProduct,
+                let productIndex = products.index(of: structuredProduct.product)
+            {
+                products.remove(at: productIndex)
+            }
+            
+            productView.setSimilarProducts(products)
+            productView.similarProductsCollectionView?.delegate = self
+        }
+    }
+    
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
@@ -35,6 +52,8 @@ class ProductViewController : BaseViewController {
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: nil, style: .plain, target: nil, action: nil)
         
         cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCart))
         navigationItem.rightBarButtonItem = cartBarButtonItem
@@ -179,7 +198,14 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Favorite
     
     @objc func favoriteAction() {
-        structuredProduct?.product.setFavorited(toFavorited: productView.favoriteButton.isSelected)
+        guard let product = structuredProduct?.product else {
+            return
+        }
+        
+        let isFavorited = productView.favoriteButton.isSelected
+        product.setFavorited(toFavorited: isFavorited)
+        
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product")
     }
     
     // MARK: Web
@@ -215,6 +241,27 @@ fileprivate extension ProductViewControllerProductView {
         }
         
         OpenWebPage.present(urlString: url, fromViewController: self)
+    }
+}
+
+extension ProductViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == productView.similarProductsCollectionView {
+            guard let products = productView.similarProductsCollectionView?.products,
+                products.count > indexPath.item
+                else {
+                    return
+            }
+            
+            if let productViewController = presentProduct(products[indexPath.item], from: "ProductSimilar") {
+                productViewController.similarProducts = products
+                productViewController.navigationItem.leftItemsSupplementBackButton = true
+                
+                let barButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarMenu"), style: .plain, target: self, action: #selector(navigateToProductsViewController))
+                barButtonItem.imageInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0)
+                productViewController.navigationItem.leftBarButtonItem = barButtonItem
+            }
+        }
     }
 }
 
@@ -303,6 +350,24 @@ fileprivate extension ProductViewControllerCart {
 extension ProductViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         syncCartItemCount()
+    }
+}
+
+typealias ProductViewControllerNavigation = ProductViewController
+extension ProductViewControllerNavigation {
+    @objc fileprivate func navigateToProductsViewController() {
+        guard let navigationController = navigationController else {
+            return
+        }
+        
+        for viewController in navigationController.viewControllers {
+            if let productsViewController = viewController as? ProductsViewController {
+                navigationController.popToViewController(productsViewController, animated: true)
+                return
+            }
+        }
+
+        navigationController.popToRootViewController(animated: true)
     }
 }
 

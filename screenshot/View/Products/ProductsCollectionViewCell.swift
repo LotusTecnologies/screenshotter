@@ -1,5 +1,5 @@
 //
-//  ProductCollectionViewCell+swift.swift
+//  ProductsCollectionViewCell.swift
 //  screenshot
 //
 //  Created by Jonathan Rose on 2/11/18.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ProductCollectionViewCell : UICollectionViewCell {
+class ProductsCollectionViewCell : UICollectionViewCell {
     var title:String? {
         get {
             return self.titleLabel?.text
@@ -55,7 +55,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             self.saleView?.isHidden = !isSale
             self.originalPriceLabel?.isHidden = !isSale
             self.originalPriceLabelWidthConstraint?.isActive = !isSale
-            self.priceLabel?.layoutMargins = isSale ?  ProductCollectionViewCell.priceLabelLayoutMargins : .zero
+            self.priceLabel?.layoutMargins = isSale ?  ProductsCollectionViewCell.priceLabelLayoutMargins : .zero
         }
     }
     
@@ -73,14 +73,14 @@ class ProductCollectionViewCell : UICollectionViewCell {
     static let buyLabelHeight:CGFloat = 40
     static let priceLabelLayoutMargins:UIEdgeInsets = UIEdgeInsets.init(top: 0, left: 0, bottom: 0, right: -8.0)
     static var titleLableHeight:CGFloat = {
-        return CGFloat(ceil( ProductCollectionViewCell.labelFont.lineHeight + ProductCollectionViewCell.labelVerticalPadding) ) * CGFloat(ProductCollectionViewCell.titleLabelNumberOfLines)
+        return CGFloat(ceil( ProductsCollectionViewCell.labelFont.lineHeight + ProductsCollectionViewCell.labelVerticalPadding) ) * CGFloat(ProductsCollectionViewCell.titleLabelNumberOfLines)
     }()
     static var priceLabelHeight:CGFloat = {
-        return ProductCollectionViewCell.labelFont.lineHeight + ProductCollectionViewCell.labelVerticalPadding
+        return ProductsCollectionViewCell.labelFont.lineHeight + ProductsCollectionViewCell.labelVerticalPadding
     }()
-    static var labelsHeight = {
-        return ProductCollectionViewCell.titleLableHeight + ProductCollectionViewCell.priceLabelHeight + ProductCollectionViewCell.buyLabelHeight
-    }()
+    static func cellHeight(for cellWidth: CGFloat) -> CGFloat {
+        return cellWidth + ProductsCollectionViewCell.titleLableHeight + ProductsCollectionViewCell.priceLabelHeight + ProductsCollectionViewCell.buyLabelHeight
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -103,7 +103,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
             productView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-            productView.heightAnchor.constraint(equalTo: productView.widthAnchor, constant:ProductCollectionViewCell.buyLabelHeight).isActive = true
+            productView.heightAnchor.constraint(equalTo: productView.widthAnchor, constant:ProductsCollectionViewCell.buyLabelHeight).isActive = true
             return productView
         }()
         self.productView = productView
@@ -111,14 +111,14 @@ class ProductCollectionViewCell : UICollectionViewCell {
         let titleLabel: UILabel = {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.numberOfLines = ProductCollectionViewCell.titleLabelNumberOfLines
+            label.numberOfLines = ProductsCollectionViewCell.titleLabelNumberOfLines
             label.minimumScaleFactor = 0.7
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
-            label.font = ProductCollectionViewCell.labelFont
+            label.font = ProductsCollectionViewCell.labelFont
             self.contentView.addSubview(label)
             
-            NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductCollectionViewCell.titleLableHeight).isActive = true
+            NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductsCollectionViewCell.titleLableHeight).isActive = true
             
             label.topAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
             label.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
@@ -147,15 +147,15 @@ class ProductCollectionViewCell : UICollectionViewCell {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
-            label.font = ProductCollectionViewCell.labelFont
+            label.font = ProductsCollectionViewCell.labelFont
             label.textColor = .gray6
             label.minimumScaleFactor = 0.7
             label.adjustsFontSizeToFitWidth = true
-            label.layoutMargins = ProductCollectionViewCell.priceLabelLayoutMargins
+            label.layoutMargins = ProductsCollectionViewCell.priceLabelLayoutMargins
             self.contentView.addSubview(label)
             label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
             
-            label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductCollectionViewCell.priceLabelHeight))
+            label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductsCollectionViewCell.priceLabelHeight))
             
             label.topAnchor.constraint(equalTo: priceContainer.topAnchor).isActive = true
             label.leadingAnchor.constraint(equalTo: priceContainer.leadingAnchor).isActive = true
@@ -169,14 +169,14 @@ class ProductCollectionViewCell : UICollectionViewCell {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
-            label.font = ProductCollectionViewCell.labelFont
+            label.font = ProductsCollectionViewCell.labelFont
             label.textColor = .gray7
             label.minimumScaleFactor = 0.7
             label.adjustsFontSizeToFitWidth = true
             label.isHidden = true
             self.contentView.addSubview(label)
             
-            label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem:nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductCollectionViewCell.priceLabelHeight))
+            label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem:nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductsCollectionViewCell.priceLabelHeight))
             
             label.topAnchor.constraint(equalTo: priceContainer.topAnchor).isActive = true
             label.leadingAnchor.constraint(equalTo:priceLabel.layoutMarginsGuide.trailingAnchor).isActive = true
@@ -203,7 +203,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             label.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
             label.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
             label.bottomAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
-            label.heightAnchor.constraint(equalToConstant: ProductCollectionViewCell.buyLabelHeight).isActive = true
+            label.heightAnchor.constraint(equalToConstant: ProductsCollectionViewCell.buyLabelHeight).isActive = true
             
             label.backgroundColor = .white
             label.text = "generic.buy".localized

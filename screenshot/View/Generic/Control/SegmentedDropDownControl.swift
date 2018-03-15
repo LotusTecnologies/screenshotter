@@ -221,10 +221,10 @@ class SegmentedDropDownControl : UIControl {
         }
         
         if control.isFirstResponder {
-            _ = control.resignFirstResponder()
+            control.resignFirstResponder()
         }
         else {
-            _ = control.becomeFirstResponder()
+            control.becomeFirstResponder()
         }
         
         sendActions(for: .touchUpInside)
@@ -257,9 +257,9 @@ class SegmentedDropDownControl : UIControl {
         return isFirstResponder
     }
     
-    override func resignFirstResponder() -> Bool {
+    @discardableResult override func resignFirstResponder() -> Bool {
         items.forEach { item in
-            _ = item.segment?.resignFirstResponder()
+            item.segment?.resignFirstResponder()
         }
         
         return super.resignFirstResponder()
@@ -327,7 +327,7 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
         item.title = title
         
         sendActions(for: .valueChanged)
-        _ = item.segment?.resignFirstResponder()
+        item.segment?.resignFirstResponder()
     }
 }
 
@@ -444,7 +444,7 @@ fileprivate class DropDownControl : UIControl {
     
     // MARK: First Responder
     
-    override func becomeFirstResponder() -> Bool {
+    @discardableResult override func becomeFirstResponder() -> Bool {
         let becomeFirstResponder = super.becomeFirstResponder()
         
         if becomeFirstResponder {
@@ -455,7 +455,7 @@ fileprivate class DropDownControl : UIControl {
         return becomeFirstResponder
     }
     
-    override func resignFirstResponder() -> Bool {
+    @discardableResult override func resignFirstResponder() -> Bool {
         let resignFirstResponder = super.resignFirstResponder()
         
         if resignFirstResponder {

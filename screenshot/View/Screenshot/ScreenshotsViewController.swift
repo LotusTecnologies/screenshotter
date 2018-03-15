@@ -266,9 +266,10 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
     }
     
     func productBar(_ controller: ProductsBarController, didTap product: Product) {
-        if !self.isEditing {            
+        if !self.isEditing {
             self.presentProduct(product, from:"ProductBar")
-        }else{
+        }
+        else {
             if let index = self.toHideFromProductBarObjectIDs.index(of: product.objectID){
                 self.toHideFromProductBarObjectIDs.remove(at: index)
             }else{
