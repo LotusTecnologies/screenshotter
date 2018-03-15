@@ -6,15 +6,9 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-@objc protocol ProductCollectionViewCellDelegate : NSObjectProtocol {
-    func productCollectionViewCellDidTapFavorite(cell:ProductCollectionViewCell)
-}
 class ProductCollectionViewCell : UICollectionViewCell {
-    
-    weak var delegate:ProductCollectionViewCellDelegate?
     var title:String? {
         get {
             return self.titleLabel?.text
@@ -64,8 +58,8 @@ class ProductCollectionViewCell : UICollectionViewCell {
             self.priceLabel?.layoutMargins = isSale ?  ProductCollectionViewCell.priceLabelLayoutMargins : .zero
         }
     }
-    var favoriteControl:FavoriteControl?
     
+    let favoriteControl = FavoriteControl()
     var productView:EmbossedView?
     var titleLabel:UILabel?
     var priceLabel:UILabel?
@@ -196,19 +190,10 @@ class ProductCollectionViewCell : UICollectionViewCell {
         }()
         self.originalPriceLabel = originalPriceLabel
         
-        let favoriteControl : FavoriteControl = {
-            let control = FavoriteControl.init()
-            
-            control.translatesAutoresizingMaskIntoConstraints = false
-            control.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
-            self.contentView.addSubview(control)
-            
-            control.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
-            control.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-            
-            return control
-        }()
-        self.favoriteControl = favoriteControl
+        favoriteControl.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(favoriteControl)
+        favoriteControl.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        favoriteControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         let buyLabel: UILabel = {
             let label = UILabel()
@@ -238,9 +223,5 @@ class ProductCollectionViewCell : UICollectionViewCell {
             return view
         }()
         self.saleView = saleView
-    }
-    
-    @objc func favoriteAction() {
-        self.delegate?.productCollectionViewCellDidTapFavorite(cell: self)
     }
 }
