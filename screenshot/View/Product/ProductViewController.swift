@@ -193,7 +193,14 @@ fileprivate extension ProductViewControllerProductView {
     // MARK: Favorite
     
     @objc func favoriteAction() {
-        structuredProduct?.product.setFavorited(toFavorited: productView.favoriteButton.isSelected)
+        guard let product = structuredProduct?.product else {
+            return
+        }
+        
+        let isFavorited = productView.favoriteButton.isSelected
+        product.setFavorited(toFavorited: isFavorited)
+        
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product")
     }
     
     // MARK: Web

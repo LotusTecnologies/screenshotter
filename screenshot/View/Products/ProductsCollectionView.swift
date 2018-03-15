@@ -16,6 +16,7 @@ class ProductsCollectionView: UICollectionView {
     }()
     
     var products: [Product]?
+    var analyticsOnPage: String?
     
     // MARK: Life Cycle
     
@@ -65,12 +66,17 @@ class ProductsCollectionView: UICollectionView {
     
     @objc fileprivate func favoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
         guard let location = event.allTouches?.first?.location(in: self),
-            let indexPath = indexPathForItem(at: location)
+            let indexPath = indexPathForItem(at: location),
+            let product = products?[indexPath.item]
             else {
                 return
         }
         
-        // TODO: Analytics
+        let isFavorited = favoriteControl.isSelected
+        let onPage = analyticsOnPage ?? "Product"
+        
+        product.setFavorited(toFavorited: isFavorited)
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: onPage)
     }
 }
 
