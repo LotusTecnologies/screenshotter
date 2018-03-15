@@ -77,6 +77,8 @@ class AssetSyncModel: NSObject {
                 queue.isSuspended = false
             }
         }
+        queue.qualityOfService = .utility
+
         return queue
     }()
     
@@ -84,6 +86,7 @@ class AssetSyncModel: NSObject {
         var queue = OperationQueue()
         queue.name = "retry Screenshot image processing Queue"
         queue.maxConcurrentOperationCount = 2
+        queue.qualityOfService = .userInteractive
         return queue
     }()
 
@@ -197,7 +200,7 @@ class AssetSyncModel: NSObject {
     func uploadScreenshotWithClarifai(asset: PHAsset) {
         let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
-        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
                 return self.fastGetImage(asset: asset)
                 }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
@@ -251,7 +254,7 @@ class AssetSyncModel: NSObject {
     
     func uploadPhoto(asset: PHAsset) {
         let dataModel = DataModel.sharedInstance
-        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
                 return self.image(asset: asset)
                 }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
@@ -286,7 +289,7 @@ class AssetSyncModel: NSObject {
     }
     
     func retryScreenshot(asset: PHAsset) {
-        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
                 return self.image(asset: asset)
                 }.then (on: self.processingQ) { image -> Promise<Data?> in
