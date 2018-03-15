@@ -64,11 +64,14 @@ class AsyncOperation: Operation {
         }
         
         executing(true)
+//        let date = Date()
+
         if let timeout = timeout {
             DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + timeout, execute: {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
+                    //print("operation completed - timeout \(date.timeIntervalSinceNow)")
                 }
             })
         }
@@ -76,6 +79,10 @@ class AsyncOperation: Operation {
             if !self.isFinished {
                 self.executing(false)
                 self.finish(true)
+                //print("operation completed \(date.timeIntervalSinceNow)")
+                
+            }else{
+                //print("operation called completion after already complted timeout: \(date.timeIntervalSinceNow) \(self.timeout)")
             }
         })
     }

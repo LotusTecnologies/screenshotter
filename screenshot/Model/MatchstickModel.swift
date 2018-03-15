@@ -12,7 +12,7 @@ import PromiseKit
 class MatchstickModel: NSObject {
     
     public static let shared = MatchstickModel()
-    lazy var downloadMatchsitckQueue:OperationQueue = {
+    var downloadMatchsitckQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "Download matchsticks Queue"
         queue.maxConcurrentOperationCount = 2
