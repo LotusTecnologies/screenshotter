@@ -71,11 +71,9 @@ class AssetSyncModel: NSObject {
         var queue = OperationQueue()
         queue.name = "upload Screenshot With Clarifai Queue"
         queue.maxConcurrentOperationCount = 2
-        if let image = UIImage.init(named: "ControlX") {
-            queue.isSuspended = true
-            ClarifaiModel.sharedInstance.classify(image: image).always { //make sure that the model is loaded
-                queue.isSuspended = false
-            }
+        queue.isSuspended = true
+        ClarifaiModel.sharedInstance.kickoffModelDownload().always {
+            queue.isSuspended = false
         }
         queue.qualityOfService = .utility
 

@@ -30,6 +30,7 @@ class ClarifaiModel: NSObject {
     
     var isModelDownloaded = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isModelDownloaded)
     var didClassifyAtLeastOneImage = false
+    private var modelDownloadPromise : Promise<Bool>?
     
     override init() {
         super.init()
@@ -37,6 +38,27 @@ class ClarifaiModel: NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidFetchModel, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(modelAvailable), name: Notification.Name.CAIModelDidBecomeAvailable, object: nil)
         Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
+        
+        let _ = kickoffModelDownload()
+    }
+    
+    func kickoffModelDownload() -> Promise<Bool> {
+        if let promise = self.modelDownloadPromise {
+            return promise
+        }
+        
+        let promise:Promise<Bool> = {
+            if !isModelDownloaded,  let image = UIImage.init(named: "ControlX") {
+                return self.classify(image: image).then(execute: { (i) -> Promise<Bool> in
+                    return Promise(value: true)
+                })
+            }else{
+                return Promise.init(value: true)
+            }
+        }()
+    
+        self.modelDownloadPromise = promise
+        return promise
     }
     
     deinit {
