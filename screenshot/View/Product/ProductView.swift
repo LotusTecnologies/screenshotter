@@ -191,22 +191,41 @@ class ProductView: UIView {
         scrollView.addSubview(websiteButton)
         websiteButton.topAnchor.constraint(equalTo: contentTextView.bottomAnchor, constant: .padding).isActive = true
         websiteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
-//        websiteButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
         websiteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        let similarProductsContainerView = UIView()
+        similarProductsContainerView.translatesAutoresizingMaskIntoConstraints = false
+        similarProductsContainerView.backgroundColor = .background
+        scrollView.addSubview(similarProductsContainerView)
+        similarProductsContainerView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
+        similarProductsContainerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        similarProductsContainerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        similarProductsContainerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         
+        let topBorderView = BorderView(edge: .top)
+        topBorderView.backgroundColor = similarProductsContainerView.backgroundColor?.darker()
+        similarProductsContainerView.addSubview(topBorderView)
+        
+        let similarProductsLabel = UILabel()
+        similarProductsLabel.translatesAutoresizingMaskIntoConstraints = false
+        similarProductsLabel.textColor = .gray3
+        similarProductsLabel.text = "product.similar_items".localized
+        similarProductsLabel.font = .preferredFont(forTextStyle: .title2)
+        similarProductsLabel.adjustsFontForContentSizeCategory = true
+        similarProductsLabel.adjustsFontSizeToFitWidth = true
+        similarProductsLabel.minimumScaleFactor = 0.7
+        similarProductsContainerView.addSubview(similarProductsLabel)
+        similarProductsLabel.topAnchor.constraint(equalTo: similarProductsContainerView.topAnchor, constant: .padding).isActive = true
+        similarProductsLabel.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
+        similarProductsLabel.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         similarProductsCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        similarProductsCollectionView.backgroundColor = .red
-        scrollView.addSubview(similarProductsCollectionView)
-        similarProductsCollectionView.topAnchor.constraint(equalTo: websiteButton.bottomAnchor, constant: .padding).isActive = true
+        similarProductsCollectionView.backgroundColor = similarProductsContainerView.backgroundColor
+        similarProductsContainerView.addSubview(similarProductsCollectionView)
+        similarProductsCollectionView.topAnchor.constraint(equalTo: similarProductsLabel.bottomAnchor).isActive = true
         similarProductsCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        similarProductsCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
+        similarProductsCollectionView.bottomAnchor.constraint(equalTo: similarProductsContainerView.bottomAnchor).isActive = true
         similarProductsCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-//        similarProductsCollectionView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        
-        
-        
         
         let controlContainerView = UIView()
         controlContainerView.translatesAutoresizingMaskIntoConstraints = false
