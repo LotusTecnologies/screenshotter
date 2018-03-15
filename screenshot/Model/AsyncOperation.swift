@@ -71,8 +71,7 @@ class AsyncOperation: Operation {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
-                    print("operation completed - timeout \(date.timeIntervalSinceNow)")
-
+                    //print("operation completed - timeout \(date.timeIntervalSinceNow)")
                 }
             })
         }
@@ -80,10 +79,10 @@ class AsyncOperation: Operation {
             if !self.isFinished {
                 self.executing(false)
                 self.finish(true)
-                print("operation completed \(date.timeIntervalSinceNow)")
+                //print("operation completed \(date.timeIntervalSinceNow)")
                 
             }else{
-                print("operation called completion after already complted timeout: \(date.timeIntervalSinceNow) \(self.timeout)")
+                //print("operation called completion after already complted timeout: \(date.timeIntervalSinceNow) \(self.timeout)")
             }
         })
     }
