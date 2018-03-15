@@ -64,7 +64,7 @@ class AsyncOperation: Operation {
         }
         
         executing(true)
-        let date = Date()
+//        let date = Date()
 
         if let timeout = timeout {
             DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + timeout, execute: {
