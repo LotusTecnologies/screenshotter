@@ -150,11 +150,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     fileprivate var restorationViewControllers: [String : UIViewController] = [:]
     
     func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
-        return false // !!!: restoration needs more testing before being enabled
+        return true
     }
     
     func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
-        return false
+        return true
     }
     
     func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
@@ -193,6 +193,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             //TODO:
 //            This isn't working because the productViewController can only be created by giving it a screenshot, but we don't have one yet
+            
+            navigationController.createProductsViewController(screenshot: <#T##Screenshot#>)
+            
             viewController = navigationController
             
         case s(ScreenshotPickerNavigationController.self):

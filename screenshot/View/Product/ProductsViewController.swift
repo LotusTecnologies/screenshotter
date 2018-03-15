@@ -50,9 +50,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         }
     }
     
-    
-    init( screenshot s:Screenshot) {
-        screenshot = s
+    init(screenshot:Screenshot) {
+        self.screenshot = screenshot
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
 
         super.init(nibName: nil, bundle: nil)
