@@ -701,7 +701,7 @@ class AssetSyncModel: NSObject {
         }
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 1
+        fetchOptions.fetchLimit = 100
         
         let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: fetchOptions)
         
