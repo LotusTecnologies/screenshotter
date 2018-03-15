@@ -67,9 +67,9 @@ class AssetSyncModel: NSObject {
     
     let imageMediaType = kUTTypeImage as String
     
-    lazy var PHAssetToUIImageQueue:OperationQueue = {
+    lazy var uploadScreenshotWithClarifaiQueue:OperationQueue = {
         var queue = OperationQueue()
-        queue.name = "PHAsset to UIImage Queue"
+        queue.name = "upload Screenshot With Clarifai Queue"
         queue.maxConcurrentOperationCount = 2
         if let image = UIImage.init(named: "ControlX") {
             queue.isSuspended = true
@@ -79,6 +79,21 @@ class AssetSyncModel: NSObject {
         }
         return queue
     }()
+    
+    lazy var retryScreenshotQueue:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "retry Screenshot image processing Queue"
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
+    
+    lazy var uploadPhotoQueue:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "upload Photo image processing Queue"
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
+    
     override init() {
         super.init()
         registerForPhotoChanges()
@@ -168,6 +183,7 @@ class AssetSyncModel: NSObject {
 
     func fastGetImage(asset:PHAsset) -> Promise<UIImage> {
         return Promise.init(resolvers: { (fulfill, reject) in
+            
             let imageRequestOptions = PHImageRequestOptions()
             imageRequestOptions.version = .current
             imageRequestOptions.deliveryMode = .opportunistic
@@ -188,7 +204,7 @@ class AssetSyncModel: NSObject {
     func uploadScreenshotWithClarifai(asset: PHAsset) {
         let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
-        self.PHAssetToUIImageQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
             firstly {
                 return self.fastGetImage(asset: asset)
                 }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
@@ -242,52 +258,60 @@ class AssetSyncModel: NSObject {
     
     func uploadPhoto(asset: PHAsset) {
         let dataModel = DataModel.sharedInstance
-        firstly {
-            return image(asset: asset)
-            }.then(on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                AnalyticsTrackers.standard.track(.bypassedClarifai)
-                let imageClassification = ClarifaiModel.ImageClassification.human // Kludged, as ClarifaiModel.sharedInstance.classify often crashes.
-                let imageData: Data? = self.data(for: image)
-                let guaranteedImageClassification = (imageClassification == .unrecognized ? .human : imageClassification)
-                return Promise { fulfill, reject in
-                    dataModel.performBackgroundTask { (managedObjectContext) in
-                        let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                         assetId: asset.localIdentifier,
-                                                         createdAt: asset.creationDate,
-                                                         isRecognized: true,
-                                                         isFromShare: false,
-                                                         isHidden: false,
-                                                         imageData: imageData,
-                                                         classification: nil)
-                        fulfill(guaranteedImageClassification, imageData)
+        self.uploadPhotoQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+            firstly {
+                return self.image(asset: asset)
+                }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+                    AnalyticsTrackers.standard.track(.bypassedClarifai)
+                    let imageClassification = ClarifaiModel.ImageClassification.human // Kludged, as ClarifaiModel.sharedInstance.classify often crashes.
+                    let imageData: Data? = self.data(for: image)
+                    let guaranteedImageClassification = (imageClassification == .unrecognized ? .human : imageClassification)
+                    return Promise { fulfill, reject in
+                        dataModel.performBackgroundTask { (managedObjectContext) in
+                            let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                             assetId: asset.localIdentifier,
+                                                             createdAt: asset.creationDate,
+                                                             isRecognized: true,
+                                                             isFromShare: false,
+                                                             isHidden: false,
+                                                             imageData: imageData,
+                                                             classification: nil)
+                            fulfill(guaranteedImageClassification, imageData)
+                        }
                     }
-                }
-            }.then (on: processingQ) { imageClassification, imageData -> Void in
-                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
-            }.always(on: self.serialQ) {
-                self.decrementScreenshots()
-            }.catch { error in
-                print("uploadPhoto outer catch error:\(error)")
-        }
+                }.then (on: self.processingQ) { imageClassification, imageData -> Void in
+                    self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
+                }.catch { error in
+                    print("uploadPhoto outer catch error:\(error)")
+                }.always(on: self.serialQ) {
+                    self.decrementScreenshots()
+                    completeOperation()
+            }
+        }))
+
+       
     }
     
     func retryScreenshot(asset: PHAsset) {
-        firstly {
-            return image(asset: asset)
-            }.then (on: processingQ) { image -> Promise<Data?> in
-                AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
-                let imageData = self.data(for: image)
-                return Promise(value: imageData)
-            }.then (on: processingQ) { imageData -> Promise<(Data?, ClarifaiModel.ImageClassification)> in
-                return self.resaveScreenshot(assetId: asset.localIdentifier, imageData: imageData)
-            }.then (on: processingQ) { (imageData, imageClassification) -> Void in
-                print("retryScreenshot imageClassification:\(imageClassification)")
-                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
-            }.always(on: self.serialQ) {
-                self.decrementScreenshots()
-            }.catch { error in
-                print("retryScreenshot catch error:\(error)")
-        }
+        self.retryScreenshotQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+            firstly {
+                return self.image(asset: asset)
+                }.then (on: self.processingQ) { image -> Promise<Data?> in
+                    AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
+                    let imageData = self.data(for: image)
+                    return Promise(value: imageData)
+                }.then (on: self.processingQ) { imageData -> Promise<(Data?, ClarifaiModel.ImageClassification)> in
+                    return self.resaveScreenshot(assetId: asset.localIdentifier, imageData: imageData)
+                }.then (on: self.processingQ) { (imageData, imageClassification) -> Void in
+                    print("retryScreenshot imageClassification:\(imageClassification)")
+                    self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
+                }.catch { error in
+                    print("retryScreenshot catch error:\(error)")
+                }.always(on: self.serialQ) {
+                    self.decrementScreenshots()
+                    completeOperation()
+            }
+        }))
     }
     
     func resaveScreenshot(assetId: String, imageData: Data?) -> Promise<(Data?, ClarifaiModel.ImageClassification)> {
