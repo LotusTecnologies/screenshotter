@@ -188,8 +188,8 @@ class AssetSyncModel: NSObject {
                 if let data = data,  let image = UIImage.init(data: data) {
                     fulfill(image)
                 }else{
-                    let error = NSError.init(domain: "craze", code: -193, userInfo: [:])
-                    reject(error)
+                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
+                    reject(emptyError)
                 }
             })
         })
