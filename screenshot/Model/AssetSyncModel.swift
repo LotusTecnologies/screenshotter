@@ -103,7 +103,7 @@ class AssetSyncModel: NSObject {
             return
         }
         //Set values here - cannot caputre screenshot in performBackgroundTask scope
-        let nickNameAssetId = "shamrock|\(assetId)"
+        let nickNameAssetId = "shamrock|" + assetId
         let isRecognized = screenshot.isRecognized
         
         

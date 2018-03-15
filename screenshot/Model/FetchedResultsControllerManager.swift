@@ -211,11 +211,11 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         guard let change = self.currentChange else {
             return
         }
-        change.insertedElements.sort(by: { $0.index < $1.index })
-        change.deletedElements.sort(by: { $0.index > $1.index })
+        change.insertedElements.sort { $0.index < $1.index }
+        change.deletedElements.sort { $0.index > $1.index }
         
-        change.updatedElements.forEach { (tuple) in
-            arrayOfArrays[tuple.index.section].items[tuple.index.row] = tuple.element
+        change.updatedElements.forEach { (index, element) in
+            arrayOfArrays[index.section].items[index.row] = element
         }
         let updateOnlyChange = Change()
         updateOnlyChange.updatedElements = change.updatedElements
@@ -223,7 +223,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
             self.delegate?.managerDidChangeContent(self, change:updateOnlyChange)
         }
         
-        change.deletedRows.forEach { (indexPath) in
+        change.deletedElements.forEach { (indexPath, _) in
             arrayOfArrays[indexPath.section].items.remove(at: indexPath.row)
         }
         change.deletedSections.reversed().forEach { (index) in
@@ -232,11 +232,11 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         change.insertedSections.forEach { (index) in
             arrayOfArrays.insert(Section([]), at: index)
         }
-        change.insertedElements.forEach { (tuple) in
-            arrayOfArrays[tuple.index.section].items.insert(tuple.element, at: tuple.index.row)
+        change.insertedElements.forEach { (index, element) in
+            arrayOfArrays[index.section].items.insert(element, at: index.row)
         }
         change.updatedElements = []
-        if change.deletedRows.count + change.deletedSections.count + change.insertedSections.count + change.insertedElements.count > 0 {
+        if change.deletedRows.count > 0 || change.deletedSections.count > 0 ||  change.insertedSections.count > 0 || change.insertedElements.count > 0 {
             self.delegate?.managerDidChangeContent(self, change: change)
         }
 
