@@ -20,9 +20,15 @@ class ProductViewController : BaseViewController {
     
     var similarProducts: [Product]? {
         didSet {
-            if isViewLoaded {
-                productView.similarProductsCollectionView.products = similarProducts
+            var products = similarProducts
+            
+            if let structuredProduct = structuredProduct,
+                let productIndex = products?.index(of: structuredProduct.product)
+            {
+                products?.remove(at: productIndex)
             }
+            
+            productView.similarProductsCollectionView.products = products
         }
     }
     
@@ -50,7 +56,6 @@ class ProductViewController : BaseViewController {
     
     override func loadView() {
         let productView = ProductView()
-        productView.similarProductsCollectionView.products = similarProducts
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
