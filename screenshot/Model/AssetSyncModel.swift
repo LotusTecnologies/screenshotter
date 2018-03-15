@@ -80,20 +80,13 @@ class AssetSyncModel: NSObject {
         return queue
     }()
     
-    var retryScreenshotQueue:OperationQueue = {
+    var userInitiatedQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "retry Screenshot image processing Queue"
         queue.maxConcurrentOperationCount = 2
         return queue
     }()
-    
-    var uploadPhotoQueue:OperationQueue = {
-        var queue = OperationQueue()
-        queue.name = "upload Photo image processing Queue"
-        queue.maxConcurrentOperationCount = 2
-        return queue
-    }()
-    
+
     override init() {
         super.init()
         registerForPhotoChanges()
@@ -258,7 +251,7 @@ class AssetSyncModel: NSObject {
     
     func uploadPhoto(asset: PHAsset) {
         let dataModel = DataModel.sharedInstance
-        self.uploadPhotoQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
             firstly {
                 return self.image(asset: asset)
                 }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
@@ -293,7 +286,7 @@ class AssetSyncModel: NSObject {
     }
     
     func retryScreenshot(asset: PHAsset) {
-        self.retryScreenshotQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
             firstly {
                 return self.image(asset: asset)
                 }.then (on: self.processingQ) { image -> Promise<Data?> in
