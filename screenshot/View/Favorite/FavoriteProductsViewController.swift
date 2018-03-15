@@ -46,7 +46,7 @@ class FavoriteProductsViewController : BaseViewController {
         collectionView.dataSource = self
         collectionView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         collectionView.backgroundColor = view.backgroundColor
-        collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         view.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -88,7 +88,7 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? ProductCollectionViewCell, let product = products?[indexPath.item] {
+        if let cell = cell as? ProductsCollectionViewCell, let product = products?[indexPath.item] {
             cell.contentView.backgroundColor = collectionView.backgroundColor
             cell.title = product.productDescription
             cell.price = product.price
@@ -115,7 +115,7 @@ extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
         
         var size = CGSize.zero
         size.width = (collectionView.bounds.size.width - ((columns + 1) * .padding)) / columns
-        size.height = ProductCollectionViewCell.cellHeight(for: size.width)
+        size.height = ProductsCollectionViewCell.cellHeight(for: size.width)
         return size
     }
 }

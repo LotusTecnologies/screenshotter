@@ -116,7 +116,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip")
-            collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+            collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
             
             
             self.view.insertSubview(collectionView, at: 0)
@@ -364,7 +364,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         } else if sectionType == .product {
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = ProductCollectionViewCell.cellHeight(for: size.width)
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width)
         }
         
         return size
@@ -380,7 +380,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         else if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
             
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductsCollectionViewCell {
                 cell.contentView.backgroundColor = collectionView.backgroundColor
                 cell.title = product.displayTitle
                 cell.price = product.price

@@ -11,7 +11,7 @@ import UIKit
 class ProductsCollectionView: UICollectionView {
     static let cellSize: CGSize = {
         let width: CGFloat = 144
-        let height = ProductCollectionViewCell.cellHeight(for: width)
+        let height = ProductsCollectionViewCell.cellHeight(for: width)
         return CGSize(width: width, height: height)
     }()
     
@@ -39,7 +39,7 @@ class ProductsCollectionView: UICollectionView {
         super.dataSource = self
         
         contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-        register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
     }
     
     // MARK: Layout
@@ -89,7 +89,7 @@ extension ProductsCollectionView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? ProductCollectionViewCell, let product = products?[indexPath.item] {
+        if let cell = cell as? ProductsCollectionViewCell, let product = products?[indexPath.item] {
             cell.contentView.backgroundColor = collectionView.backgroundColor
             cell.title = product.displayTitle
             cell.price = product.price
