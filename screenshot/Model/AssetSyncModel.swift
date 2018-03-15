@@ -71,6 +71,12 @@ class AssetSyncModel: NSObject {
         var queue = OperationQueue()
         queue.name = "PHAsset to UIImage Queue"
         queue.maxConcurrentOperationCount = 2
+        if let image = UIImage.init(named: "ControlX") {
+            queue.isSuspended = true
+            ClarifaiModel.sharedInstance.classify(image: image).always { //make sure that the model is loaded
+                queue.isSuspended = false
+            }
+        }
         return queue
     }()
     override init() {
@@ -160,64 +166,88 @@ class AssetSyncModel: NSObject {
         
     }
 
+    func fastGetImage(asset:PHAsset) -> Promise<UIImage> {
+        return Promise.init(resolvers: { (fulfill, reject) in
+            let imageRequestOptions = PHImageRequestOptions()
+            imageRequestOptions.version = .current
+            imageRequestOptions.deliveryMode = .opportunistic
+            imageRequestOptions.resizeMode = .none
+            imageRequestOptions.isNetworkAccessAllowed = false
+            imageRequestOptions.isSynchronous = true
+            
+            PHImageManager.default().requestImageData(for: asset, options: imageRequestOptions, resultHandler: { (data, s, o, i) in
+                if let data = data,  let image = UIImage.init(data: data) {
+                    fulfill(image)
+                }else{
+                    let error = NSError.init(domain: "craze", code: -193, userInfo: [:])
+                    reject(error)
+                }
+            })
+        })
+    }
     func uploadScreenshotWithClarifai(asset: PHAsset) {
         let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
-        firstly {
-            return image(asset: asset)
-            }.then (on: processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track(.sentImageToClarifai)
-                return ClarifaiModel.sharedInstance.classify(image: image)
-            }.then(on: processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                let isRecognized: Bool
-                let classification: String?
-                switch imageClassification {
-                case .human:
-                    isRecognized = true
-                    classification = "h"
-                case .furniture:
-                    isRecognized = true
-                    classification = "f"
-                case .unrecognized:
-                    isRecognized = false
-                    classification = nil
-                }
-                AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
-                let imageData: Data? = isRecognized ? self.data(for: image) : nil
-                return Promise { fulfill, reject in
-                    dataModel.performBackgroundTask { (managedObjectContext) in
-                        let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                         assetId: asset.localIdentifier,
-                                                         createdAt: asset.creationDate,
-                                                         isRecognized: isRecognized,
-                                                         isFromShare: false,
-                                                         isHidden: !isRecognized || !isForeground,
-                                                         imageData: imageData,
-                                                         classification: classification)
-                        fulfill((imageClassification, imageData))
+        self.PHAssetToUIImageQueue.addOperation(AsyncOperation.init(timeout: 1.5, completion: { (completeOperation) in
+            firstly {
+                return self.fastGetImage(asset: asset)
+                }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
+                    AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                    return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
+                        return Promise.init(value: (c, image))
+                    })
+                }.then(on: self.processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+                    let isRecognized: Bool
+                    let classification: String?
+                    switch imageClassification {
+                    case .human:
+                        isRecognized = true
+                        classification = "h"
+                    case .furniture:
+                        isRecognized = true
+                        classification = "f"
+                    case .unrecognized:
+                        isRecognized = false
+                        classification = nil
                     }
-                }
-            }.then (on: processingQ) { imageClassification, imageData -> Void in
-                if isForeground {
-                    self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
-                }
-                if imageClassification != .unrecognized {
-                    if isForeground { // Screenshot taken while app in foregorund
-                        DispatchQueue.main.async {
-                            self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                    AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+                    let imageData: Data? = isRecognized ? self.data(for: image) : nil
+                    return Promise { fulfill, reject in
+                        dataModel.performBackgroundTask { (managedObjectContext) in
+                            let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                             assetId: asset.localIdentifier,
+                                                             createdAt: asset.creationDate,
+                                                             isRecognized: isRecognized,
+                                                             isFromShare: false,
+                                                             isHidden: !isRecognized || !isForeground,
+                                                             imageData: imageData,
+                                                             classification: classification)
+                            fulfill((imageClassification, imageData))
                         }
-                        self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
-                    } else { // Screenshot taken while app in background (or killed)
-                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
-                        self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
-                        self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
                     }
-                }
-            }.always(on: self.serialQ) {
-                self.decrementScreenshots()
-            }.catch { error in
-                print("uploadScreenshotWithClarifai catch error:\(error)")
-        }
+                }.then (on: self.processingQ) { imageClassification, imageData -> Void in
+                    if isForeground {
+                        self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
+                    }
+                    if imageClassification != .unrecognized {
+                        if isForeground { // Screenshot taken while app in foregorund
+                            DispatchQueue.main.async {
+                                self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
+                            }
+                            self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
+                        } else { // Screenshot taken while app in background (or killed)
+                            AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
+                            self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
+                            self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
+                        }
+                    }
+                }.catch { error in
+                    print("uploadScreenshotWithClarifai catch error:\(error)")
+                }.always(on: self.serialQ) {
+                    self.decrementScreenshots()
+                    completeOperation()
+            }
+        }))
     }
     
     func uploadPhoto(asset: PHAsset) {
@@ -678,11 +708,11 @@ class AssetSyncModel: NSObject {
     
     func image(asset: PHAsset, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
         let imageRequestOptions = PHImageRequestOptions()
-        imageRequestOptions.isSynchronous = false
         imageRequestOptions.version = .current
         imageRequestOptions.deliveryMode = .opportunistic
         imageRequestOptions.resizeMode = .none
-        imageRequestOptions.isNetworkAccessAllowed = true
+        imageRequestOptions.isNetworkAccessAllowed = false
+        imageRequestOptions.isSynchronous = true
         let targetSize = self.targetSize()
         PHImageManager.default().requestImage(for: asset,
                                               targetSize: targetSize,
@@ -695,38 +725,33 @@ class AssetSyncModel: NSObject {
     
     func image(asset: PHAsset) -> Promise<UIImage> {
         return Promise { fulfill, reject in
-            self.PHAssetToUIImageQueue.addOperation(AsyncOperation.init(timeout: 0.5, completion: { ( completeOperation) in
-                self.image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                    defer {
-                        completeOperation();
-                    }
-                    if let imageError = info?[PHImageErrorKey] as? NSError {
-                        AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
-                        reject(imageError)
-                        return
-                    }
-                    if let isCancelled = info?[PHImageCancelledKey] as? Bool,
-                        isCancelled == true {
-                        AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
-                        let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
-                        reject(cancelledError)
-                        return
-                    }
-                    if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
-                        isDegraded == true {
-                        
-                        // This callback will be called again with a better quality image.
-                        return
-                    }
-                    if let image = image {
-                        fulfill(image)
-                    } else {
-                        AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
-                        let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
-                        reject(emptyError)
-                    }
-                })
-            }))
+            self.image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
+                
+                if let imageError = info?[PHImageErrorKey] as? NSError {
+                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
+                    reject(imageError)
+                    return
+                }
+                if let isCancelled = info?[PHImageCancelledKey] as? Bool,
+                    isCancelled == true {
+                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
+                    let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
+                    reject(cancelledError)
+                    return
+                }
+                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
+                    isDegraded == true {
+                    // This callback will be called again with a better quality image.
+                    return
+                }
+                if let image = image {
+                    fulfill(image)
+                } else {
+                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
+                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
+                    reject(emptyError)
+                }
+            })
         }
     }
     
@@ -768,7 +793,7 @@ class AssetSyncModel: NSObject {
         }
         fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", installDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 100
+        fetchOptions.fetchLimit = 25
         futureScreenshotAssets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
     }
     
