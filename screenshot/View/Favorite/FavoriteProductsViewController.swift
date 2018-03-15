@@ -101,7 +101,7 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
     }
 }
 
-extension FavoriteProductsViewController : UICollectionViewDelegate {
+extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let product = products?[indexPath.item] else {
             return
@@ -109,15 +109,13 @@ extension FavoriteProductsViewController : UICollectionViewDelegate {
         
         OpenWebPage.presentProduct(product, fromViewController: self, analyticsKey: .tappedOnProductFavorites, fromPage: "Favorites")
     }
-}
-
-extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let columns = CGFloat(numberOfCollectionViewColumns)
         
         var size = CGSize.zero
         size.width = (collectionView.bounds.size.width - ((columns + 1) * .padding)) / columns
-        size.height = size.width + ProductCollectionViewCell.labelsHeight
+        size.height = ProductCollectionViewCell.cellHeight(for: size.width)
         return size
     }
 }

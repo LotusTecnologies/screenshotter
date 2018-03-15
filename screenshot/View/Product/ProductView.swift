@@ -203,7 +203,7 @@ class ProductView: UIView {
         similarProductsCollectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
         similarProductsCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -.padding).isActive = true
         similarProductsCollectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        similarProductsCollectionView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+//        similarProductsCollectionView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         
         
         
@@ -455,93 +455,3 @@ extension ProductView: ProductViewScrollViewDelegate {
         }
     }
 }
-
-
-
-
-
-
-class ProductsCollectionView: UICollectionView, UICollectionViewDataSource {
-    var products: [Product]?
-    
-    // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    convenience init() {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        
-        self.init(frame: .zero, collectionViewLayout: layout)
-        
-        layout.minimumInteritemSpacing = minimumSpacing.x
-        layout.minimumLineSpacing = minimumSpacing.y
-    }
-    
-    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(frame: frame, collectionViewLayout: layout)
-        
-        register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-    }
-    
-    // MARK: Layout
-    
-    var minimumSpacing: CGPoint = {
-        let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let x = .padding - shadowInsets.left - shadowInsets.right
-        let y = .padding - shadowInsets.top - shadowInsets.bottom
-        return CGPoint(x: x, y: y)
-    }()
-    
-    // MARK: Data Source
-    
-    override var dataSource: UICollectionViewDataSource? {
-        set {}
-        get {
-            return self
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return products?.count ?? 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        
-        if let cell = cell as? ProductCollectionViewCell, let product = products?[indexPath.item] {
-            cell.contentView.backgroundColor = collectionView.backgroundColor
-            cell.title = product.displayTitle
-            cell.price = product.price
-            cell.originalPrice = product.originalPrice
-            cell.imageUrl = product.imageURL
-            cell.isSale = product.isSale()
-            cell.favoriteControl.isSelected = product.isFavorite
-            cell.favoriteControl.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
-        }
-        
-        return cell
-    }
-    
-    @objc fileprivate func favoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
-        guard let location = event.allTouches?.first?.location(in: self),
-            let indexPath = indexPathForItem(at: location)
-            else {
-                return
-        }
-        
-        // TODO: Analytics
-    }
-}
-
-
-
-
-
-
-
-
-
-

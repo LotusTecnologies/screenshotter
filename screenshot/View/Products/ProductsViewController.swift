@@ -315,7 +315,7 @@ extension ProductsViewController {
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
 extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    func numberOfCollectionViewProductColumns() ->Int {
+    var numberOfCollectionViewProductColumns: Int {
         return 2
     }
     
@@ -362,9 +362,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
             
         } else if sectionType == .product {
-            let columns = CGFloat(self.numberOfCollectionViewProductColumns())
+            let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = size.width + ProductCollectionViewCell.labelsHeight
+            size.height = ProductCollectionViewCell.cellHeight(for: size.width)
         }
         
         return size

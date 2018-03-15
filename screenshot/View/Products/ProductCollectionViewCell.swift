@@ -78,9 +78,9 @@ class ProductCollectionViewCell : UICollectionViewCell {
     static var priceLabelHeight:CGFloat = {
         return ProductCollectionViewCell.labelFont.lineHeight + ProductCollectionViewCell.labelVerticalPadding
     }()
-    static var labelsHeight = {
-        return ProductCollectionViewCell.titleLableHeight + ProductCollectionViewCell.priceLabelHeight + ProductCollectionViewCell.buyLabelHeight
-    }()
+    static func cellHeight(for cellWidth: CGFloat) -> CGFloat {
+        return cellWidth + ProductCollectionViewCell.titleLableHeight + ProductCollectionViewCell.priceLabelHeight + ProductCollectionViewCell.buyLabelHeight
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
