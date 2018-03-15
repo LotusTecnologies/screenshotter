@@ -125,7 +125,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
             return collectionView
-            
         }()
         self.collectionView = collectionView
         

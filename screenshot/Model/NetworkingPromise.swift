@@ -56,14 +56,14 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<NSDictionary> {
+    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
         guard let imageData = imageData,
             imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
                 return Promise(error: emptyError)
         }
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=\(Constants.syteFeed)&payload_type=image_bin"
+            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)&payload_type=image_bin"
             : "https://homedecor.syteapi.com/offers/bb?account_id=6722&sig=G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=&feed=craze_home&payload_type=image_bin"
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -80,8 +80,8 @@ class NetworkingPromise : NSObject {
         return promise
     }
 
-    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification)
+    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
+        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification, isUsc: isUsc)
             .then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
@@ -371,11 +371,14 @@ class NetworkingPromise : NSObject {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { dict -> Promise<Bool> in
+            var isUsc = false
             if let countryCode = dict["country_code"] as? String,
               countryCode == "US" || countryCode == "IL" {
-                return Promise(value: true)
+                isUsc = true
             }
-            return Promise(value: false)
+            print("geoLocateIsUSC isUsc:\(isUsc)  dict:\(dict)")
+            UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
+            return Promise(value: isUsc)
         }
     }
     
