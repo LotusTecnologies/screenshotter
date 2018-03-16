@@ -45,6 +45,8 @@ extension UIFont {
         return font
     }
     
+    // MARK: Futura
+    
     static func futura(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
         return screenshopFont("Futura", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle)
     }
@@ -56,6 +58,30 @@ extension UIFont {
     static func futuraBold(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
         return screenshopFont("Futura-Bold", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
     }
+    
+    // MARK: Hind
+    
+    static func hindLight(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
+        return screenshopFont("Hind-Light", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle)
+    }
+    
+    static func hind(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
+        return screenshopFont("Hind-Regular", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle)
+    }
+    
+    static func hindMedium(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
+        return screenshopFont("Hind-Medium", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
+    }
+    
+    static func hindSemiBold(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
+        return screenshopFont("Hind-SemiBold", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
+    }
+    
+    static func hindBold(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
+        return screenshopFont("Hind-Bold", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
+    }
+    
+    // MARK: Din
     
     static func dinCondensedBold(forTextStyle textStyle: UIFontTextStyle) -> UIFont {
         return screenshopFont("DINCondensed-Bold", forTextStyle: textStyle) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: [.traitBold, .traitCondensed])
