@@ -99,6 +99,13 @@ extension ScreenshotsNavigationController {
     @objc func coreDataStackCompleted(_ notification: Notification) {
         // TODO: set screenshot for state restoration
         
+        if let screenshotObjectID = restoredScreenshotObjectID {
+            let screenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: screenshotObjectID)
+            
+            print("||| \(screenshot)")
+        }
+        
+        
 //        if let index = self.restoredScreenshotNumber {
 //            // Dispatch async to allow other listening objects to first do their setup
 //            DispatchQueue.main.async {

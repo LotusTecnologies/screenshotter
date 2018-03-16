@@ -259,6 +259,24 @@ extension DataModel {
         }
         return nil
     }
+    
+    func retrieveScreenshot(objectId: NSManagedObjectID) -> Screenshot? {
+        let managedObjectContext = mainMoc()
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "SELF == %@", objectId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveScreenshot objectId:\(objectId) results with error:\(error)")
+        }
+        return nil
+    }
+    
     public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
         performBackgroundTask { (managedObjectContext) in
             do {
