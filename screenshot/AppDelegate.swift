@@ -194,7 +194,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             //TODO:
 //            This isn't working because the productViewController can only be created by giving it a screenshot, but we don't have one yet
             
-            navigationController.createProductsViewController(screenshot: <#T##Screenshot#>)
+//            navigationController.createProductsViewController(screenshot: <#T##Screenshot#>)
             
             viewController = navigationController
             

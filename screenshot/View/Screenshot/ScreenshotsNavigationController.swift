@@ -285,6 +285,7 @@ extension ScreenshotsNavigationControllerStateRestoration {
     
     override func encodeRestorableState(with coder: NSCoder) {
         if let productsViewController = topViewController as? ProductsViewController {
+            // TODO: saving objectID gives issues...
             coder.encode(productsViewController.screenshot.objectID, forKey: screenshotKey)
         }
         
