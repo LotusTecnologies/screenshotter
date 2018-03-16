@@ -50,6 +50,21 @@ class ScreenshotsNavigationController: UINavigationController {
     override func viewDidLoad(){
         super.viewDidLoad()
         self.view.backgroundColor = .clear
+        
+        
+        let label = UILabel()
+        label.font = .dinCondensedBold(forTextStyle: .body)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Hellow World"
+        label.backgroundColor = .white
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
+        view.addSubview(label)
+        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        label.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        label.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        
     }
     
 }
