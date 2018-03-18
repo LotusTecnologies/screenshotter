@@ -68,7 +68,7 @@ class MatchstickModel: NSObject {
                                 print("Could not parse matchstick:\(matchstick)")
                             }
                         }
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        managedObjectContext.saveIfNeeded()
                         if let token = dict["next"] as? String {
                             UserDefaults.standard.set(token, forKey: UserDefaultsKeys.matchsticksSyncToken)
                         }

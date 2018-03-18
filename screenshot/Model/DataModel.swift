@@ -601,41 +601,6 @@ extension DataModel {
         }
     }
     
-    public func pinMain() {
-        guard !isMainPinned else {
-            return
-        }
-        do {
-            try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
-            isMainPinned = true
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("pinMain results with error:\(error)")
-        }
-    }
-    
-    public func unpinMain() {
-        guard isMainPinned else {
-            return
-        }
-        do {
-            try mainMoc().setQueryGenerationFrom(nil)
-            isMainPinned = false
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("unpinMain results with error:\(error)")
-        }
-    }
-    
-    public func saveMoc(managedObjectContext: NSManagedObjectContext) {
-        do {
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("Updating db results with error:\(error)")
-        }
-    }
-    
     // MARK: DB Migration
     
     func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
@@ -778,18 +743,6 @@ extension Screenshot {
     var isShamrockVersion:Bool {
         return self.assetId?.hasPrefix("shamrock") ?? false
     }
-    static func findWith(objectId:NSManagedObjectID) -> Screenshot? { //main thread only
-        if let screenshot = DataModel.sharedInstance.mainMoc().object(with: objectId) as? Screenshot {
-            do{
-                try screenshot.validateForUpdate()
-                return screenshot
-            }catch{
-                
-            }
-        }
-        return nil
-    }
-    
     
     // hideWorkhorse is not meant to be called from UI code,
     // but may be called on the main queue, even if generally called on a background queue.
@@ -1264,4 +1217,46 @@ extension NSFetchedResultsController {
             return sections?.reduce(0, {$0 + $1.numberOfObjects}) ?? 0
         }
     }
+}
+
+extension NSManagedObjectContext {
+    func saveIfNeeded(){
+        if self.hasChanges {
+            do {
+                try self.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+    
+    func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? {
+        if let screenshot = self.object(with: objectId) as? Screenshot {
+            do{
+                try screenshot.validateForUpdate()
+                return screenshot
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
+    }
+    
+    func screenshotWith(assetId:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot assetId:\(assetId) results with error:\(error)")
+        }
+        return nil
+    }
+    
 }
