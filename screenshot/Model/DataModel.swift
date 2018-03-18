@@ -621,19 +621,23 @@ extension DataModel {
     func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
         let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
         if (from < 9 && to >= 7 && installDate != nil) { // Originally was from < 7, but a bug fixed in 9 should re-run for 7 or 8.
-            self.dbQ.addOperation {
-                let managedObjectContext = container.newBackgroundContext()
-                self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
+            let op = BlockOperation{
+                    let managedObjectContext = container.newBackgroundContext()
+                    self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
             }
+            op.queuePriority = .veryHigh   //earilier actions may have already been queue - make sure migration is at the top of the list
+            self.dbQ.addOperation(op)
         }
         if from < 8 && to >= 8 && installDate != nil {
-            self.dbQ.addOperation {
+            let op = BlockOperation{
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
                 self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
                 self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
+            op.queuePriority = .veryHigh //earilier actions may have already been queue - make sure migration is at the top of the list
+            self.dbQ.addOperation(op)
         }
     }
     
