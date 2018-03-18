@@ -109,7 +109,7 @@ extension UIApplication {
         UINavigationBar.appearance().barTintColor = .white
         UINavigationBar.appearance().tintColor = .gray3
         UINavigationBar.appearance().titleTextAttributes = [
-            NSFontAttributeName: UIFont.futuraMedium(forTextStyle: .title3, staticSize: true),
+            NSFontAttributeName: UIFont.futuraMedium(forTextStyle: .headline, staticSize: true),
             NSForegroundColorAttributeName: UIColor.gray3
         ]
         

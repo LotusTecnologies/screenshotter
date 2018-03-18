@@ -15,12 +15,12 @@ extension UIFontTextStyle {
 extension UIFont {
     static private var sizeMap: [UIFontTextStyle: CGFloat] {
         return [
-            .largeTitle:  34,
-            .title1:      28,
-            .title2:      22,
-            .title3:      20,
-            .headline:    17,
-            .subheadline: 15,
+            .largeTitle:  38, // Does not adjust for content size category!
+            .title1:      34,
+            .title2:      28,
+            .title3:      22,
+            .headline:    20,
+            .subheadline: 18,
             .body:        17,
             .callout:     16,
             .footnote:    13,
@@ -43,6 +43,14 @@ extension UIFont {
     }
     
     static func preferredFont(forTextStyle textStyle: UIFontTextStyle, symbolicTraits: UIFontDescriptorSymbolicTraits) -> UIFont {
+        var textStyle = textStyle
+        
+        if #available(iOS 11.0, *) {} else {
+            if textStyle == .largeTitle {
+                textStyle = .title1
+            }
+        }
+        
         var font = UIFont.preferredFont(forTextStyle: textStyle)
         
         if let descriptor = font.fontDescriptor.withSymbolicTraits(symbolicTraits) {
