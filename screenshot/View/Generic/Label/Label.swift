@@ -9,6 +9,52 @@
 import UIKit
 
 class Label: UILabel {
+    override var text: String? {
+        set {
+            if font.screenshopFamilyName != nil, let newValue = newValue {
+                attributedText = NSAttributedString(string: newValue)
+            }
+            else {
+                super.text = newValue
+            }
+        }
+        get {
+            return super.text
+        }
+    }
+    
+    override var attributedText: NSAttributedString? {
+        set {
+            if let screenshopFamilyName = font.screenshopFamilyName, let newValue = newValue {
+                let attributedText = NSMutableAttributedString(attributedString: newValue)
+                let range = NSMakeRange(0, attributedText.string.count)
+                
+                attributedText.addAttribute(NSFontAttributeName, value: font, range: range)
+                
+                let paragraph = NSMutableParagraphStyle()
+                paragraph.lineHeightMultiple = screenshopFamilyName.lineHeightMultiple
+                paragraph.alignment = textAlignment
+                attributedText.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: range)
+                
+                super.attributedText = attributedText
+            }
+            else {
+                super.attributedText = newValue
+            }
+        }
+        get {
+            return super.attributedText
+        }
+    }
+    
+    override var font: UIFont! {
+        didSet {
+            if font.screenshopFamilyName != nil, let text = text, !text.isEmpty {
+                self.text = text
+            }
+        }
+    }
+    
     override func drawText(in rect: CGRect) {
         var lineHeightMultiple: CGFloat = 0
 

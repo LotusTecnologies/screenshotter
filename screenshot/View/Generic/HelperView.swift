@@ -10,8 +10,8 @@ import UIKit
 
 public class HelperView : UIView {
     private let scrollView = UIScrollView()
-    private(set) var titleLabel = UILabel()
-    private(set) var subtitleLabel = UILabel()
+    private(set) var titleLabel = Label()
+    private(set) var subtitleLabel = Label()
     private(set) var contentView = NotifyChangeView()
     private(set) var controlView = NotifyChangeView()
     

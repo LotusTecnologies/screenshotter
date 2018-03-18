@@ -9,7 +9,7 @@
 import UIKit
 
 class DiscoverScreenshotHelperView : UIView {
-    fileprivate let titleLabel = UILabel()
+    fileprivate let titleLabel = Label()
     fileprivate let swipeLeftLabel = Label()
     fileprivate let swipeRightLabel = Label()
     fileprivate let tapLabel = Label()

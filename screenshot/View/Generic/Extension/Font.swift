@@ -25,8 +25,21 @@ extension UIFont {
             case .futura:
                 return 0.9
             case .hind:
-                return 0.7
+                return 0.8
             }
+        }
+    }
+    
+    var screenshopFamilyName: ScreenshopFamilyName? {
+        switch familyName {
+        case ScreenshopFamilyName.din.rawValue:
+            return ScreenshopFamilyName.din
+        case ScreenshopFamilyName.futura.rawValue:
+            return ScreenshopFamilyName.futura
+        case ScreenshopFamilyName.hind.rawValue:
+            return ScreenshopFamilyName.hind
+        default:
+            return nil
         }
     }
     
@@ -124,20 +137,8 @@ extension UIFont {
     // TODO: after swift 4 update, change to NSAttributedStringKey
     var attributes: [String: Any] {
         var attributes: [String: Any] = [NSFontAttributeName: self]
-        let lineHeightMultiple: CGFloat?
         
-        switch familyName {
-        case ScreenshopFamilyName.din.rawValue:
-            lineHeightMultiple = ScreenshopFamilyName.din.lineHeightMultiple
-        case ScreenshopFamilyName.futura.rawValue:
-            lineHeightMultiple = ScreenshopFamilyName.futura.lineHeightMultiple
-        case ScreenshopFamilyName.hind.rawValue:
-            lineHeightMultiple = ScreenshopFamilyName.hind.lineHeightMultiple
-        default:
-            lineHeightMultiple = nil
-        }
-        
-        if let lineHeightMultiple = lineHeightMultiple {
+        if let lineHeightMultiple = screenshopFamilyName?.lineHeightMultiple {
             let paragraph = NSMutableParagraphStyle()
             paragraph.lineHeightMultiple = lineHeightMultiple
             attributes[NSParagraphStyleAttributeName] = paragraph
