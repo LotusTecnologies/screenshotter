@@ -13,6 +13,23 @@ extension UIFontTextStyle {
 }
 
 extension UIFont {
+    enum ScreenshopFamilyName: String {
+        case din    = "DIN Condensed"
+        case futura = "Futura"
+        case hind   = "Hind"
+        
+        var lineHeightMultiple: CGFloat {
+            switch self {
+            case .din:
+                return 0
+            case .futura:
+                return 0.9
+            case .hind:
+                return 0.7
+            }
+        }
+    }
+    
     static private var sizeMap: [UIFontTextStyle: CGFloat] {
         return [
             .largeTitle:  38, // Does not adjust for content size category!
@@ -60,6 +77,12 @@ extension UIFont {
         return font
     }
     
+    // MARK: Din
+    
+    static func dinCondensedBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
+        return screenshopFont("DINCondensed-Bold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: [.traitBold, .traitCondensed])
+    }
+    
     // MARK: Futura
     
     static func futura(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
@@ -95,10 +118,31 @@ extension UIFont {
     static func hindBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
         return screenshopFont("Hind-Bold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
     }
-    
-    // MARK: Din
-    
-    static func dinCondensedBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("DINCondensed-Bold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: [.traitBold, .traitCondensed])
+}
+
+extension UIFont {
+    // TODO: after swift 4 update, change to NSAttributedStringKey
+    var attributes: [String: Any] {
+        var attributes: [String: Any] = [NSFontAttributeName: self]
+        let lineHeightMultiple: CGFloat?
+        
+        switch familyName {
+        case ScreenshopFamilyName.din.rawValue:
+            lineHeightMultiple = ScreenshopFamilyName.din.lineHeightMultiple
+        case ScreenshopFamilyName.futura.rawValue:
+            lineHeightMultiple = ScreenshopFamilyName.futura.lineHeightMultiple
+        case ScreenshopFamilyName.hind.rawValue:
+            lineHeightMultiple = ScreenshopFamilyName.hind.lineHeightMultiple
+        default:
+            lineHeightMultiple = nil
+        }
+        
+        if let lineHeightMultiple = lineHeightMultiple {
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.lineHeightMultiple = lineHeightMultiple
+            attributes[NSParagraphStyleAttributeName] = paragraph
+        }
+        
+        return attributes
     }
 }

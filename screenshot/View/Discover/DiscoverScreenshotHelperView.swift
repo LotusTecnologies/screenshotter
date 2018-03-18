@@ -6,14 +6,13 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 class DiscoverScreenshotHelperView : UIView {
     fileprivate let titleLabel = UILabel()
-    fileprivate let swipeLeftLabel = UILabel()
-    fileprivate let swipeRightLabel = UILabel()
-    fileprivate let tapLabel = UILabel()
+    fileprivate let swipeLeftLabel = Label()
+    fileprivate let swipeRightLabel = Label()
+    fileprivate let tapLabel = Label()
     
     private class DefinedHeightView : UIView {
         override var intrinsicContentSize: CGSize {
@@ -33,24 +32,24 @@ class DiscoverScreenshotHelperView : UIView {
         super.init(frame: frame)
         
         let padding: CGFloat
-        let fontSize: CGFloat
+        let textStyle: UIFontTextStyle
         
         if UIDevice.is480h {
             padding = .padding * 0.5
-            fontSize = 13
+            textStyle = .footnote
             
         } else if UIDevice.is568h {
             padding = .padding * 0.8
-            fontSize = 16
+            textStyle = .callout
             
         } else {
             padding = .padding
-            fontSize = 20
+            textStyle = .headline
         }
         
         let attributes = [
-            [NSFontAttributeName: UIFont.boldSystemFont(ofSize: fontSize)],
-            [NSFontAttributeName: UIFont.systemFont(ofSize: fontSize)]
+            UIFont.hindMedium(forTextStyle: textStyle, staticSize: true).attributes,
+            UIFont.hindLight(forTextStyle: textStyle, staticSize: true).attributes
         ]
         
         backgroundColor = UIColor.crazeRed.withAlphaComponent(0.9)
@@ -59,7 +58,7 @@ class DiscoverScreenshotHelperView : UIView {
         titleLabel.textColor = .white
         titleLabel.text = "discover.screenshot.helper.title".localized
         titleLabel.textAlignment = .center
-        titleLabel.font = UIFont(name: "DINCondensed-Bold", size: 34)
+        titleLabel.font = .dinCondensedBold(forTextStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)
