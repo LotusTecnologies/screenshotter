@@ -106,17 +106,10 @@ extension UIApplication {
     static func appearanceSetup() {
         let crazeRedColor = UIColor.crazeRed
         
-        let futuraFont: (CGFloat) -> UIFont = { fontSize in
-            return UIFont(name: "Futura", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
-        }
-        let futuraMediumFont: (CGFloat) -> UIFont = { fontSize in
-            return UIFont(name: "Futura-Medium", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
-        }
-        
         UINavigationBar.appearance().barTintColor = .white
         UINavigationBar.appearance().tintColor = .gray3
         UINavigationBar.appearance().titleTextAttributes = [
-            NSFontAttributeName: futuraMediumFont(20),
+            NSFontAttributeName: UIFont.futuraMedium(forTextStyle: .title3, staticSize: true),
             NSForegroundColorAttributeName: UIColor.gray3
         ]
         
@@ -126,7 +119,9 @@ extension UIApplication {
         
         UIToolbar.appearance().tintColor = crazeRedColor
         
-        var barButtonItemTitleTextAttributes: [String:Any] = [NSFontAttributeName: futuraFont(16)]
+        var barButtonItemTitleTextAttributes: [String:Any] = [
+            NSFontAttributeName: UIFont.futura(forTextStyle: .callout, staticSize: true)
+        ]
         let navigationBarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
@@ -134,7 +129,9 @@ extension UIApplication {
         barButtonItemTitleTextAttributes[NSForegroundColorAttributeName] = UIColor.gray7
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
-        barButtonItemTitleTextAttributes = [NSFontAttributeName: futuraFont(12)]
+        barButtonItemTitleTextAttributes = [
+            NSFontAttributeName: UIFont.futura(forTextStyle: .caption1, staticSize: true)
+        ]
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
