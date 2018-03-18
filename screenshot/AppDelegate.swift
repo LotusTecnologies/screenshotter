@@ -46,13 +46,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        let loadingViewController = UIViewController.init()
-        window?.rootViewController = loadingViewController
-        window?.makeKeyAndVisible()
-        if DataModel.sharedInstance.storeNeedsMigration() {
+        
+        if true || DataModel.sharedInstance.storeNeedsMigration() {
             let loadingViewController = UIViewController.init()
+            loadingViewController.view.backgroundColor = .white
+            let loader = Loader()
+            loader.startAnimation()
+            loader.translatesAutoresizingMaskIntoConstraints = false
+            loadingViewController.view.addSubview(loader)
+            loader.topAnchor.constraint(equalTo: loadingViewController.view.topAnchor).isActive = true
+            loader.leadingAnchor.constraint(equalTo: loadingViewController.view.leadingAnchor).isActive = true
+            loader.bottomAnchor.constraint(equalTo: loadingViewController.view.bottomAnchor).isActive = true
+            loader.trailingAnchor.constraint(equalTo: loadingViewController.view.trailingAnchor).isActive = true
             window?.rootViewController = loadingViewController
-            DispatchQueue.global(qos: .userInteractive).async {
+            window?.makeKeyAndVisible()
+            
+            DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + 20) {
+                
                 DataModel.sharedInstance.loadStore(sync:false).always {
                     DispatchQueue.main.async {
                         self.window?.rootViewController = self.nextViewController()

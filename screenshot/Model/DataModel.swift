@@ -29,12 +29,15 @@ class DataModel: NSObject {
         return persistentContainer.newBackgroundContext()
     }
     
-    fileprivate(set) var isMainPinned = false
-    
     
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
-    let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
-    
+    let dbQ:OperationQueue = {
+       let queue = OperationQueue.init()
+        queue.maxConcurrentOperationCount = 1
+        queue.name = "Core data queue"
+        queue.isSuspended = true
+        return queue
+    }()
     
     func loadStore(sync:Bool) -> Promise<Bool>{
         let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
@@ -56,6 +59,7 @@ class DataModel: NSObject {
                     MatchstickModel.shared.prepareMatchsticks()
                     fulfill(true)
                 }
+                self.dbQ.isSuspended = false
             }
         })
        
@@ -474,7 +478,7 @@ extension DataModel {
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
     // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
-        dbQ.async {
+        self.dbQ.addOperation {
             let managedObjectContext = DataModel.sharedInstance.adHocMoc()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
@@ -484,7 +488,7 @@ extension DataModel {
     
     func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
         return Promise { fulfill, reject in
-            dbQ.async {
+            self.dbQ.addOperation {
                 let managedObjectContext = DataModel.sharedInstance.adHocMoc()
                 managedObjectContext.perform {
                     fulfill(block(managedObjectContext), dict)
@@ -617,13 +621,13 @@ extension DataModel {
     func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
         let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
         if (from < 9 && to >= 7 && installDate != nil) { // Originally was from < 7, but a bug fixed in 9 should re-run for 7 or 8.
-            dbQ.async {
+            self.dbQ.addOperation {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
             }
         }
         if from < 8 && to >= 8 && installDate != nil {
-            dbQ.async {
+            self.dbQ.addOperation {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
