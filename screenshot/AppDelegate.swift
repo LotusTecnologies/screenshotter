@@ -47,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         
-        if true || DataModel.sharedInstance.storeNeedsMigration() {
+        if DataModel.sharedInstance.storeNeedsMigration() {
             let loadingViewController = UIViewController.init()
             loadingViewController.view.backgroundColor = .white
             let loader = Loader()
@@ -61,8 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window?.rootViewController = loadingViewController
             window?.makeKeyAndVisible()
             
-            DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + 20) {
-                
+            DispatchQueue.global(qos: .userInteractive).async {
                 DataModel.sharedInstance.loadStore(sync:false).always {
                     DispatchQueue.main.async {
                         self.window?.rootViewController = self.nextViewController()
