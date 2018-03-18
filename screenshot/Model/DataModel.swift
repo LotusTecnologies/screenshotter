@@ -18,7 +18,6 @@ class DataModel: NSObject {
         let _ = DataModel.sharedInstance
     }
     
-    public var isCoreDataStackReady = false
     
     public let persistentContainer = NSPersistentContainer(name: "Model")
     
@@ -32,37 +31,49 @@ class DataModel: NSObject {
     
     fileprivate(set) var isMainPinned = false
     
-    override init() {
-        super.init()
-        DispatchQueue.global(qos: .userInitiated).async {
+    
+    // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
+    let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
+    
+    
+    func loadStore(sync:Bool) -> Promise<Bool>{
+        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+
+        let storeInfo = NSPersistentStoreDescription.init(url: sqliteURL)
+        storeInfo.shouldAddStoreAsynchronously = !sync
+        return Promise.init(resolvers: { (fulfill, reject) in
             self.persistentContainer.loadPersistentStores { (storeDescription, error) in
                 if let error = error as NSError? {
                     print("loadPersistentStores error:\(error)")
-                    // Must async, or lazy eval closure called infinitely. Might as well async to main, as most handlers are there.
-                    // See https://medium.com/@soapyfrog/dont-forget-that-none-of-this-is-thread-safe-so-it-is-actually-possible-for-the-lazy-eval-closure-add1c9b1dd95
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["error" : error])
-                    }
+                    reject(error)
                 } else {
                     self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
-                    self.isCoreDataStackReady = true
                     let lastDbVersionMigrated = UserDefaults.standard.integer(forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     if lastDbVersionMigrated != Constants.currentMomVersion {
                         self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
-                    // See above about lazy eval closure called infinitely if notification not asynced.
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["success" : true])
-                    }
                     MatchstickModel.shared.prepareMatchsticks()
+                    fulfill(true)
                 }
             }
-        }
+        })
+       
     }
     
-    // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
-    let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
+    func storeNeedsMigration() -> Bool {
+        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+        do{
+
+            let metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqliteURL, options: nil)
+            let model = self.persistentContainer.managedObjectModel
+            return !model.isConfiguration(withName: nil, compatibleWithStoreMetadata: metadata)
+        }catch{
+            
+        }
+        return false
+    }
+    
 }
 extension DataModel {
     func receivedCoreDataError(error:Error) {
