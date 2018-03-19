@@ -19,15 +19,19 @@ class TextFieldTableViewCell : UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
+        textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+        
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.returnKeyType = .done
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.font = .screenshopFont(.hindLight, textStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
         textField.tintColor = .crazeGreen
         contentView.addSubview(textField)
+        textField.setContentCompressionResistancePriority(1, for: .vertical)
         textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         textField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         textField.centerYAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerYAnchor).isActive = true
+        textField.heightAnchor.constraint(equalTo: contentView.heightAnchor).isActive = true
     }
     
     override func prepareForReuse() {

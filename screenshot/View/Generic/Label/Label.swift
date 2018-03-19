@@ -57,8 +57,11 @@ class Label: UILabel {
     
     override func drawText(in rect: CGRect) {
         var lineHeightMultiple: CGFloat = 0
-
-        if let attributes = attributedText?.attributes(at: 0, effectiveRange: nil) {
+        
+        if let screenshopFontName = font.screenshopFontName {
+            lineHeightMultiple = screenshopFontName.lineHeightMultiple
+        }
+        else if let attributes = attributedText?.attributes(at: 0, effectiveRange: nil) {
             for attribute in attributes {
                 if let paragraph = attribute.value as? NSMutableParagraphStyle {
                     lineHeightMultiple = paragraph.lineHeightMultiple

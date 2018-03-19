@@ -106,18 +106,27 @@ extension UIApplication {
     static func appearanceSetup() {
         let crazeRedColor = UIColor.crazeRed
         
-        UINavigationBar.appearance().barTintColor = .white
-        UINavigationBar.appearance().tintColor = .gray3
-        UINavigationBar.appearance().titleTextAttributes = [
+        // Navigation Bar
+        
+        let navigationBar = UINavigationBar.appearance()
+        navigationBar.barTintColor = .white
+        navigationBar.tintColor = .gray3
+        navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.screenshopFont(.futuraMedium, size: 20),
             NSForegroundColorAttributeName: UIColor.gray3
         ]
         
-        UITabBar.appearance().barTintColor = .white
-        UITabBar.appearance().tintColor = crazeRedColor
-        UITabBar.appearance().unselectedItemTintColor = .gray3
+        // Tab Bar
         
-        UIToolbar.appearance().tintColor = crazeRedColor
+        let tabBar = UITabBar.appearance()
+        tabBar.barTintColor = .white
+        tabBar.tintColor = crazeRedColor
+        tabBar.unselectedItemTintColor = .gray3
+        
+        // Toolbar
+        
+        let toolbar = UIToolbar.appearance()
+        toolbar.tintColor = crazeRedColor
         
         var barButtonItemTitleTextAttributes: [String:Any] = [
             NSFontAttributeName: UIFont.screenshopFont(.futura, size: 16)
