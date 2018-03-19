@@ -187,6 +187,7 @@ extension DataModel {
         return screenshotToSave
     }
     
+    
     func retrieveAllAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
         return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: nil)
     }
@@ -226,6 +227,11 @@ extension DataModel {
             print("retrieveAllAssetIds results with error:\(error)")
         }
         return nil
+    }
+    
+    func retrieveAssetIds(assetIds:[String], managedObjectContext: NSManagedObjectContext) -> Set<String> {
+        let predicate = NSPredicate(format: "assetId IN %@", assetIds)
+        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: predicate)
     }
     
     func retrieveAssetIds(managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> Set<String> {
@@ -1262,6 +1268,22 @@ extension NSManagedObjectContext {
         return nil
     }
     
+    func findOrCreateScreenshotWith(assetId:String) -> Screenshot {
+        if let screenshot = self.screenshotWith(assetId: assetId) {
+            return screenshot
+        }
+        
+        let screenshot = Screenshot(context: self)
+        screenshot.assetId = assetId
+        let now = NSDate()
+            screenshot.createdAt = now
+
+        screenshot.isHidden = true
+        screenshot.isNew = true
+        screenshot.lastModified = NSDate()
+        return screenshot
+        
+    }
     func screenshotWith(assetId:String) -> Screenshot? {
         let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)

@@ -85,7 +85,6 @@ public class TutorialTrySlideView : HelperView {
     // MARK: Skip
     
     @objc func skipButtonAction() {
-        AssetSyncModel.sharedInstance.syncPhotos()
         self.delegate?.tutorialTrySlideViewDidSkip(self)
     }
 }
