@@ -20,18 +20,42 @@ class AccumulatorModel: NSObject {
     
     private var newScreenshotsCount: Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.newScreenshotsCount)
     
-     public func getNewScreenshotsCount() -> Int {
-        return newScreenshotsCount
+    public func getNewScreenshotsCount() -> Int {
+        return newScreenshotsCount + assetIds.count
     }
     
-     public func resetNewScreenshotsCount() {
-        newScreenshotsCount = 0
-        UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
+    
+    var assetIds:Set<String> = []
+    
+    private func modifyCount(_ block:@escaping ()->()) {
+        DispatchQueue.main.async {
+            let countBefore = self.getNewScreenshotsCount()
+            
+            block()
+            let countAfter = self.getNewScreenshotsCount()
+            if countBefore != countAfter {
+                UserDefaults.standard.set(countAfter, forKey: UserDefaultsKeys.newScreenshotsCount)
+                NotificationCenter.default.post(name: .accumulatorModelDidUpdate, object: self)
+            }
+        }
+    }
+    public func resetNewScreenshotsCount() {
+        modifyCount {
+            self.newScreenshotsCount = 0
+            self.assetIds.removeAll()
+        }
     }
     
-    fileprivate func addToNewScreenshots(count: Int) {
-        newScreenshotsCount += count
-        UserDefaults.standard.set(newScreenshotsCount, forKey: UserDefaultsKeys.newScreenshotsCount)
+    fileprivate func removeAssetId(_ assetId:String){
+        modifyCount {
+            self.assetIds.remove(assetId)
+        }
+    }
+    
+    fileprivate func addAssetId(_ assetId:String){
+        modifyCount {
+            self.assetIds.insert(assetId)
+        }
     }
     
 }
@@ -109,6 +133,7 @@ extension AssetSyncModel {
     
     func uploadPhoto(asset: PHAsset) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0, completion: { (completeOperation) in
+            AccumulatorModel.sharedInstance.removeAssetId(asset.localIdentifier)
             firstly {
                 return asset.image(allowFromICloud: true)
             }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
@@ -322,7 +347,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func uploadScreenshotWithClarifai(asset: PHAsset, isForeground:Bool) {
         
         self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            print("uploadScreenshotWithClarifai \(asset.localIdentifier)")
+            print("uploadScreenshotWithClarifai \(asset.creationDate) \(asset.localIdentifier)")
 
             firstly {
                 return asset.image(allowFromICloud: false)
@@ -366,7 +391,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
                         print("is in foreground no  notification \(asset.localIdentifier)")
                     } else { // Screenshot taken while app in background (or killed)
-                        AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
+                        AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
                         self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
                         self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
                         print("adding item to queue to dispaly notification \(asset.localIdentifier)")

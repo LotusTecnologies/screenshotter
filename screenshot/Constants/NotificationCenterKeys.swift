@@ -10,6 +10,7 @@ import Foundation
 
 extension Notification.Name {
     
-    static let fetchedAppSettings = Notification.Name(rawValue: "FetchedAppSettings")
+    static let fetchedAppSettings = Notification.Name(rawValue: "io.crazeapp.screenshot.FetchedAppSettings")
+    static let accumulatorModelDidUpdate = Notification.Name(rawValue: "io.crazeapp.screenshot.AccumulatorModelDidUpdate")
 
 }

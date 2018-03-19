@@ -95,6 +95,7 @@ extension ScreenshotsViewController {
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
+        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
 
     }
     
@@ -611,22 +612,25 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         
     }
     
-    func presentNotificationCell(assetId:String){
-        if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
+    func accumulatorModelNumberDidChange( _ notification: Notification) {
+        if let assetId = AccumulatorModel.sharedInstance.assetIds.first,  AccumulatorModel.sharedInstance.getNewScreenshotsCount() == 1 {
             self.notificationCellAssetId = assetId
-            
-            if self.hasNewScreenshotSection {  //Already has a new screenshot section -  just do an update
-                let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
-                    self.collectionView.reloadItems(at: [indexPath])
-                }
-            }else{
-                updateHasNewScreenshot()  //time to show it
-            }
-           
-            
-            syncEmptyListView()
+        }else{
+            self.notificationCellAssetId = nil
         }
+        
+        if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
+            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
+                self.collectionView.reloadItems(at: [indexPath])
+            }
+        }else{
+            updateHasNewScreenshot()
+        }
+        
+        
+        syncEmptyListView()
+        
     }
     
     func dismissNotificationCell(){
