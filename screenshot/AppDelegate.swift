@@ -64,11 +64,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         self.window?.rootViewController = self.nextViewController()
                     }
                 }
+                AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
             }
         }else{
             let _ = DataModel.sharedInstance.loadStore(sync:true)
             self.window?.rootViewController = self.nextViewController()
-            
+            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         }
         window?.makeKeyAndVisible()
 
@@ -137,10 +138,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-        AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         ApplicationStateModel.sharedInstance.applicationState = .active
         AnalyticsTrackers.standard.track(.sessionStarted)
-
+        AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

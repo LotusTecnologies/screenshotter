@@ -235,29 +235,20 @@ extension DataModel {
     }
     
     func retrieveAssetIds(managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> Set<String> {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
+        let fetchRequest:NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
         fetchRequest.includesSubentities = false
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.includesPendingChanges = false
-        fetchRequest.propertiesToFetch = ["assetId"]
-        fetchRequest.returnsDistinctResults = true
-        fetchRequest.includesPropertyValues = true
-        fetchRequest.shouldRefreshRefetchedObjects = false
-        fetchRequest.returnsObjectsAsFaults = false
         
         var assetIdsSet = Set<String>()
         do {
-            guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]] else {
-                print("retrieveAssetIds failed to fetch dictionaries")
-                return assetIdsSet
-            }
+            let results = try managedObjectContext.fetch(fetchRequest)
             for result in results {
-                if let assetId = result["assetId"] {
+                if let assetId = result.assetId {
                     assetIdsSet.insert(assetId)
                 }
             }
+            
+         
         } catch {
             self.receivedCoreDataError(error: error)
             print("retrieveAssetIds results with error:\(error)")
