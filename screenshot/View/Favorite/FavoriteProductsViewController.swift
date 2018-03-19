@@ -6,11 +6,31 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
+class FavoriteProductsView: UIView {
+    let tableView = UITableView(frame: .zero, style: .grouped)
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(tableView)
+        tableView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        tableView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+    }
+}
+
 class FavoriteProductsViewController : BaseViewController {
-    fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    fileprivate var favoriteProductsView: FavoriteProductsView {
+        return view as! FavoriteProductsView
+    }
     
     var products: [Product]?
     
@@ -25,33 +45,19 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Life Cycle
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    override func loadView() {
+        view = FavoriteProductsView()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.minimumInteritemSpacing = .padding
-            layout.minimumLineSpacing = .padding
-        }
-        
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-        collectionView.backgroundColor = view.backgroundColor
-        collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        view.addSubview(collectionView)
-        collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        favoriteProductsView.tableView.dataSource = self
+        favoriteProductsView.tableView.delegate = self
+        favoriteProductsView.tableView.backgroundColor = view.backgroundColor
+        favoriteProductsView.tableView.register(FavoriteProductsTableViewCell.self, forCellReuseIdentifier: "cell")
+        favoriteProductsView.tableView.rowHeight = UITableViewAutomaticDimension
+        favoriteProductsView.tableView.estimatedRowHeight = 200
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -60,8 +66,8 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     deinit {
-        collectionView.delegate = nil
-        collectionView.dataSource = nil
+        favoriteProductsView.tableView.dataSource = nil
+        favoriteProductsView.tableView.delegate = nil
     }
     
     // MARK: Favorites
@@ -74,6 +80,31 @@ class FavoriteProductsViewController : BaseViewController {
         DataModel.sharedInstance.unfavorite(favoriteArray: unfavoriteProducts)
         unfavoriteProducts.removeAll()
     }
+}
+
+extension FavoriteProductsViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return products?.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        
+        if let cell = cell as? FavoriteProductsTableViewCell, let product = products?[indexPath.item] {
+            cell.contentView.backgroundColor = .background // TODO: change to cell background
+            
+            cell.productImageView.setImage(withURLString: product.imageURL)
+            cell.titleLabel.text = product.productDescription // TODO: use product.productTitle()
+            cell.priceLabel.text = product.price
+            cell.merchantLabel.text = product.merchant
+        }
+        
+        return cell
+    }
+}
+
+extension FavoriteProductsViewController: UITableViewDelegate {
+    
 }
 
 extension FavoriteProductsViewController : UICollectionViewDataSource {
@@ -89,7 +120,6 @@ extension FavoriteProductsViewController : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? ProductCollectionViewCell, let product = products?[indexPath.item] {
-            cell.delegate = self
             cell.contentView.backgroundColor = collectionView.backgroundColor
             cell.title = product.productDescription
             cell.price = product.price
@@ -107,38 +137,27 @@ extension FavoriteProductsViewController : UICollectionViewDelegate {
             return
         }
         OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductFavorites, fromPage: "Favorites")
-    
     }
 }
 
-extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let columns = CGFloat(numberOfCollectionViewColumns)
-        
-        var size = CGSize.zero
-        size.width = (collectionView.bounds.size.width - ((columns + 1) * .padding)) / columns
-        size.height = size.width + ProductCollectionViewCell.labelsHeight
-        return size
-    }
-}
+//extension FavoriteProductsViewController : ProductCollectionViewCellDelegate {
+//    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
+//        guard let indexPath = collectionView.indexPath(for: cell), let product = products?[indexPath.item] else {
+//            return
+//        }
+//
+//        let isFavorited = cell.favoriteButton?.isSelected ?? false
+//
+//        if isFavorited {
+//            if let index = unfavoriteProducts.index(of: product) {
+//                unfavoriteProducts.remove(at: index)
+//            }
+//        }
+//        else {
+//            unfavoriteProducts.append(product)
+//        }
+//
+//        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
+//    }
+//}
 
-extension FavoriteProductsViewController : ProductCollectionViewCellDelegate {
-    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
-        guard let indexPath = collectionView.indexPath(for: cell), let product = products?[indexPath.item] else {
-            return
-        }
-        
-        let isFavorited = cell.favoriteButton?.isSelected ?? false
-        
-        if isFavorited {
-            if let index = unfavoriteProducts.index(of: product) {
-                unfavoriteProducts.remove(at: index)
-            }
-
-        } else {
-            unfavoriteProducts.append(product)
-        }
-
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
-    }
-}
