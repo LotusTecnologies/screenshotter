@@ -31,8 +31,10 @@
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
+		C501410B205E702C00ABFB5C /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501410A205E702B00ABFB5C /* Font.swift */; };
+		C5014110205E7BF200ABFB5C /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501410F205E7BF200ABFB5C /* Label.swift */; };
 		C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */; };
-		C50EE2761FC40DCD002B4259 /* Hind 700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C50EE2751FC40DCC002B4259 /* Hind 700.ttf */; };
+		C51D363F2010B66400943257 /* ProductsTooltipCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51D363E2010B66400943257 /* ProductsTooltipCollectionViewCell.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */; };
@@ -108,6 +110,11 @@
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C572FEE6205A53600046BFEB /* ProductsCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
+		C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEF9205C00050046BFEB /* Hind-Light.ttf */; };
+		C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFA205C00050046BFEB /* Hind-Bold.ttf */; };
+		C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFB205C00060046BFEB /* Hind-Regular.ttf */; };
+		C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */; };
+		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
@@ -186,8 +193,10 @@
 		52E547431FE2487B00627D6D /* ScreenshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotHelper.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
+		C501410A205E702B00ABFB5C /* Font.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
+		C501410F205E7BF200ABFB5C /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
 		C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollRevealController.swift; path = screenshot/View/Generic/ScrollRevealController.swift; sourceTree = SOURCE_ROOT; };
-		C50EE2751FC40DCC002B4259 /* Hind 700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind 700.ttf"; sourceTree = "<group>"; };
+		C51D363E2010B66400943257 /* ProductsTooltipCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsTooltipCollectionViewCell.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTableViewCell.swift; sourceTree = "<group>"; };
@@ -263,6 +272,11 @@
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsCollectionView.swift; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
+		C572FEF9205C00050046BFEB /* Hind-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Light.ttf"; sourceTree = "<group>"; };
+		C572FEFA205C00050046BFEB /* Hind-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Bold.ttf"; sourceTree = "<group>"; };
+		C572FEFB205C00060046BFEB /* Hind-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Regular.ttf"; sourceTree = "<group>"; };
+		C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-SemiBold.ttf"; sourceTree = "<group>"; };
+		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
@@ -375,10 +389,22 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		C501410E205E7BEB00ABFB5C /* Label */ = {
+			isa = PBXGroup;
+			children = (
+				C501410F205E7BF200ABFB5C /* Label.swift */,
+			);
+			path = Label;
+			sourceTree = "<group>";
+		};
 		C50EE26D1FC406F1002B4259 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
-				C50EE2751FC40DCC002B4259 /* Hind 700.ttf */,
+				C572FEFA205C00050046BFEB /* Hind-Bold.ttf */,
+				C572FEF9205C00050046BFEB /* Hind-Light.ttf */,
+				C572FEFD205C00070046BFEB /* Hind-Medium.ttf */,
+				C572FEFB205C00060046BFEB /* Hind-Regular.ttf */,
+				C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -630,6 +656,7 @@
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
+				C501410E205E7BEB00ABFB5C /* Label */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
 				C5A1922A2057AD510046303C /* PresentationController */,
 				31CE1106203BEF36000156EE /* SaleView.swift */,
@@ -747,6 +774,7 @@
 			children = (
 				C5DDC0DB2015C6D900B009BF /* AttributedString.swift */,
 				C5336D22203D553400A7B4B0 /* BarItem.swift */,
+				C501410A205E702B00ABFB5C /* Font.swift */,
 				C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */,
 				C5AC7E641FFA2D2600F491C0 /* Size.swift */,
 			);
@@ -984,13 +1012,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
+				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
+				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
+				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
+				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
+				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
 				C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */,
-				C50EE2761FC40DCD002B4259 /* Hind 700.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1201,6 +1233,8 @@
 				C5F37C95205505690072FE1D /* ProductsViewController.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
+				C5014110205E7BF200ABFB5C /* Label.swift in Sources */,
+				C501410B205E702C00ABFB5C /* Font.swift in Sources */,
 				C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */,
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
