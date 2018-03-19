@@ -109,7 +109,7 @@ extension UIApplication {
         UINavigationBar.appearance().barTintColor = .white
         UINavigationBar.appearance().tintColor = .gray3
         UINavigationBar.appearance().titleTextAttributes = [
-            NSFontAttributeName: UIFont.futuraMedium(forTextStyle: .headline, staticSize: true),
+            NSFontAttributeName: UIFont.screenshopFont(.futuraMedium, size: 20),
             NSForegroundColorAttributeName: UIColor.gray3
         ]
         
@@ -120,7 +120,7 @@ extension UIApplication {
         UIToolbar.appearance().tintColor = crazeRedColor
         
         var barButtonItemTitleTextAttributes: [String:Any] = [
-            NSFontAttributeName: UIFont.futura(forTextStyle: .callout, staticSize: true)
+            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 16)
         ]
         let navigationBarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
@@ -130,7 +130,7 @@ extension UIApplication {
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         barButtonItemTitleTextAttributes = [
-            NSFontAttributeName: UIFont.futura(forTextStyle: .caption1, staticSize: true)
+            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 12)
         ]
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)

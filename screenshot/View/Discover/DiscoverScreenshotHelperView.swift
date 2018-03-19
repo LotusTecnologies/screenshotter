@@ -32,24 +32,24 @@ class DiscoverScreenshotHelperView : UIView {
         super.init(frame: frame)
         
         let padding: CGFloat
-        let textStyle: UIFontTextStyle
+        let fontSize: CGFloat
         
         if UIDevice.is480h {
             padding = .padding * 0.5
-            textStyle = .footnote
+            fontSize = 13
             
         } else if UIDevice.is568h {
             padding = .padding * 0.8
-            textStyle = .callout
+            fontSize = 16
             
         } else {
             padding = .padding
-            textStyle = .headline
+            fontSize = 20
         }
         
         let attributes = [
-            UIFont.hindMedium(forTextStyle: textStyle, staticSize: true).attributes,
-            UIFont.hindLight(forTextStyle: textStyle, staticSize: true).attributes
+            UIFont.screenshopFont(.hindMedium, size: fontSize).attributes,
+            UIFont.screenshopFont(.hindLight, size: fontSize).attributes
         ]
         
         backgroundColor = UIColor.crazeRed.withAlphaComponent(0.9)
@@ -58,7 +58,7 @@ class DiscoverScreenshotHelperView : UIView {
         titleLabel.textColor = .white
         titleLabel.text = "discover.screenshot.helper.title".localized
         titleLabel.textAlignment = .center
-        titleLabel.font = .dinCondensedBold(forTextStyle: .title1, staticSize: true)
+        titleLabel.font = .screenshopFont(.dinCondensedBold, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)

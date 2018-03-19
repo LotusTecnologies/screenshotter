@@ -13,34 +13,64 @@ extension UIFontTextStyle {
 }
 
 extension UIFont {
-    enum ScreenshopFamilyName: String {
-        case din    = "DIN Condensed"
-        case futura = "Futura"
-        case hind   = "Hind"
+    enum ScreenshopFontName: String {
+        case dinCondensedBold = "DINCondensed-Bold"
+        
+        case futura       = "Futura"
+        case futuraMedium = "Futura-Medium"
+        case futuraBold   = "Futura-Bold"
+        
+        case hindLight    = "Hind-Light"
+        case hind         = "Hind-Regular"
+        case hindMedium   = "Hind-Medium"
+        case hindSemibold = "Hind-SemiBold"
+        case hindBold     = "Hind-Bold"
+        
+        var symbolicTraits: UIFontDescriptorSymbolicTraits {
+            switch self {
+            case .dinCondensedBold:
+                return [.traitBold, .traitCondensed]
+            case .futuraMedium, .futuraBold,
+                 .hindMedium, .hindSemibold, .hindBold:
+                return [.traitBold]
+            default:
+                return []
+            }
+        }
+        
+        var weight: UIFontWeight {
+            switch self {
+            case .hindLight:
+                return UIFontWeightLight
+            case .futura,
+                 .hind:
+                return UIFontWeightRegular
+            case .futuraMedium,
+                 .hindMedium:
+                return UIFontWeightMedium
+            case .hindSemibold:
+                return UIFontWeightSemibold
+            case .dinCondensedBold,
+                 .futuraBold,
+                 .hindBold:
+                return UIFontWeightBold
+            }
+        }
         
         var lineHeightMultiple: CGFloat {
             switch self {
-            case .din:
+            case .dinCondensedBold:
                 return 0
-            case .futura:
+            case .futura, .futuraMedium, .futuraBold:
                 return 0.9
-            case .hind:
+            case .hindLight, .hind, .hindMedium, .hindSemibold, .hindBold:
                 return 0.8
             }
         }
     }
     
-    var screenshopFamilyName: ScreenshopFamilyName? {
-        switch familyName {
-        case ScreenshopFamilyName.din.rawValue:
-            return ScreenshopFamilyName.din
-        case ScreenshopFamilyName.futura.rawValue:
-            return ScreenshopFamilyName.futura
-        case ScreenshopFamilyName.hind.rawValue:
-            return ScreenshopFamilyName.hind
-        default:
-            return nil
-        }
+    var screenshopFontName: ScreenshopFontName? {
+        return ScreenshopFontName(rawValue: fontName)
     }
     
     static private var sizeMap: [UIFontTextStyle: CGFloat] {
@@ -59,17 +89,8 @@ extension UIFont {
         ]
     }
     
-    static private func screenshopFont(_ name: String, textStyle: UIFontTextStyle, staticSize: Bool) -> UIFont? {
-        if let size = sizeMap[textStyle], let font = UIFont(name: name, size: size) {
-            if staticSize {
-                return font
-            }
-            else if #available(iOS 11.0, *) {
-                return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: font)
-            }
-        }
-        
-        return nil
+    convenience init?(screenshopName: ScreenshopFontName, size: CGFloat) {
+        self.init(name: screenshopName.rawValue, size: size)
     }
     
     static func preferredFont(forTextStyle textStyle: UIFontTextStyle, symbolicTraits: UIFontDescriptorSymbolicTraits) -> UIFont {
@@ -90,46 +111,21 @@ extension UIFont {
         return font
     }
     
-    // MARK: Din
-    
-    static func dinCondensedBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("DINCondensed-Bold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: [.traitBold, .traitCondensed])
+    static func screenshopFont(_ name: ScreenshopFontName, textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
+        if let size = sizeMap[textStyle], let font = UIFont(screenshopName: name, size: size) {
+            if staticSize {
+                return font
+            }
+            else if #available(iOS 11.0, *) {
+                return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: font)
+            }
+        }
+        
+        return .preferredFont(forTextStyle: textStyle, symbolicTraits: name.symbolicTraits)
     }
     
-    // MARK: Futura
-    
-    static func futura(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Futura", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle)
-    }
-    
-    static func futuraMedium(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Futura-Medium", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle)
-    }
-    
-    static func futuraBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Futura-Bold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
-    }
-    
-    // MARK: Hind
-    
-    static func hindLight(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Hind-Light", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle)
-    }
-    
-    static func hind(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Hind-Regular", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle)
-    }
-    
-    static func hindMedium(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Hind-Medium", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
-    }
-    
-    static func hindSemiBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Hind-SemiBold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
-    }
-    
-    static func hindBold(forTextStyle textStyle: UIFontTextStyle, staticSize: Bool = false) -> UIFont {
-        return screenshopFont("Hind-Bold", textStyle: textStyle, staticSize: staticSize) ?? .preferredFont(forTextStyle: textStyle, symbolicTraits: .traitBold)
+    static func screenshopFont(_ name: ScreenshopFontName, size: CGFloat) -> UIFont {
+        return UIFont(screenshopName: name, size: size) ?? UIFont.systemFont(ofSize: size, weight: name.weight)
     }
 }
 
@@ -138,7 +134,7 @@ extension UIFont {
     var attributes: [String: Any] {
         var attributes: [String: Any] = [NSFontAttributeName: self]
         
-        if let lineHeightMultiple = screenshopFamilyName?.lineHeightMultiple {
+        if let lineHeightMultiple = screenshopFontName?.lineHeightMultiple {
             let paragraph = NSMutableParagraphStyle()
             paragraph.lineHeightMultiple = lineHeightMultiple
             attributes[NSParagraphStyleAttributeName] = paragraph

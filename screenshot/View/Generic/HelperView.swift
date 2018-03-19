@@ -54,7 +54,7 @@ public class HelperView : UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
         titleLabel.textColor = .gray3
-        titleLabel.font = .dinCondensedBold(forTextStyle: .title1)
+        titleLabel.font = .screenshopFont(.dinCondensedBold, textStyle: .title1)
         titleLabel.numberOfLines = 0
         titleLabel.adjustsFontForContentSizeCategory = true
         scrollContentView.addSubview(titleLabel)
@@ -67,7 +67,7 @@ public class HelperView : UIView {
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.textAlignment = .center
         subtitleLabel.textColor = .gray3
-        subtitleLabel.font = .hindLight(forTextStyle: .body)
+        subtitleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
         subtitleLabel.numberOfLines = 0
         subtitleLabel.adjustsFontForContentSizeCategory = true
         subtitleLabel.layoutMargins = UIEdgeInsets(top: -.padding, left: 0, bottom: 0, right: 0)

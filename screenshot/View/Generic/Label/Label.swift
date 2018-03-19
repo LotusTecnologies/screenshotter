@@ -11,7 +11,7 @@ import UIKit
 class Label: UILabel {
     override var text: String? {
         set {
-            if font.screenshopFamilyName != nil, let newValue = newValue {
+            if font.screenshopFontName != nil, let newValue = newValue {
                 attributedText = NSAttributedString(string: newValue)
             }
             else {
@@ -25,14 +25,14 @@ class Label: UILabel {
     
     override var attributedText: NSAttributedString? {
         set {
-            if let screenshopFamilyName = font.screenshopFamilyName, let newValue = newValue {
+            if let screenshopFontName = font.screenshopFontName, let newValue = newValue {
                 let attributedText = NSMutableAttributedString(attributedString: newValue)
                 let range = NSMakeRange(0, attributedText.string.count)
                 
                 attributedText.addAttribute(NSFontAttributeName, value: font, range: range)
                 
                 let paragraph = NSMutableParagraphStyle()
-                paragraph.lineHeightMultiple = screenshopFamilyName.lineHeightMultiple
+                paragraph.lineHeightMultiple = screenshopFontName.lineHeightMultiple
                 paragraph.alignment = textAlignment
                 attributedText.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: range)
                 
@@ -49,7 +49,7 @@ class Label: UILabel {
     
     override var font: UIFont! {
         didSet {
-            if font.screenshopFamilyName != nil, let text = text, !text.isEmpty {
+            if font.screenshopFontName != nil, let text = text, !text.isEmpty {
                 self.text = text
             }
         }
