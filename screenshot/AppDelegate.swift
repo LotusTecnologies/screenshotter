@@ -48,17 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if DataModel.sharedInstance.storeNeedsMigration() {
-            let loadingViewController = UIViewController.init()
-            loadingViewController.view.backgroundColor = .white
-            let loader = Loader()
-            loader.startAnimation()
-            loader.translatesAutoresizingMaskIntoConstraints = false
-            loadingViewController.view.addSubview(loader)
-            loader.topAnchor.constraint(equalTo: loadingViewController.view.topAnchor).isActive = true
-            loader.leadingAnchor.constraint(equalTo: loadingViewController.view.leadingAnchor).isActive = true
-            loader.bottomAnchor.constraint(equalTo: loadingViewController.view.bottomAnchor).isActive = true
-            loader.trailingAnchor.constraint(equalTo: loadingViewController.view.trailingAnchor).isActive = true
-            window?.rootViewController = loadingViewController
+            window?.rootViewController = LoadingViewController()
             window?.makeKeyAndVisible()
             
             DispatchQueue.global(qos: .userInteractive).async {
@@ -69,9 +59,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }else{
-            let _ = DataModel.sharedInstance.loadStore(sync:true)
+            _ = DataModel.sharedInstance.loadStore(sync:true)
             self.window?.rootViewController = self.nextViewController()
-            
+            window?.makeKeyAndVisible()
         }
 
         fetchAppSettings()
