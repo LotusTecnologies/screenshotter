@@ -10,8 +10,8 @@ import UIKit
 
 public class HelperView : UIView {
     private let scrollView = UIScrollView()
-    private(set) var titleLabel = UILabel()
-    private(set) var subtitleLabel = UILabel()
+    private(set) var titleLabel = Label()
+    private(set) var subtitleLabel = Label()
     private(set) var contentView = NotifyChangeView()
     private(set) var controlView = NotifyChangeView()
     
@@ -51,16 +51,10 @@ public class HelperView : UIView {
         scrollContentViewMaxHeightConstraint = scrollContentView.heightAnchor.constraint(equalTo: layoutMarginsGuide.heightAnchor)
         scrollContentViewMaxHeightConstraint.isActive = !isScrollable()
         
-        var font = UIFont.preferredFont(forTextStyle: .title1)
-        
-        if let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) {
-            font = UIFont(descriptor: descriptor, size: 0)
-        }
-        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
         titleLabel.textColor = .gray3
-        titleLabel.font = font
+        titleLabel.font = .screenshopFont(.dinCondensedBold, textStyle: .title1)
         titleLabel.numberOfLines = 0
         titleLabel.adjustsFontForContentSizeCategory = true
         scrollContentView.addSubview(titleLabel)
@@ -73,7 +67,7 @@ public class HelperView : UIView {
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.textAlignment = .center
         subtitleLabel.textColor = .gray3
-        subtitleLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+        subtitleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
         subtitleLabel.numberOfLines = 0
         subtitleLabel.adjustsFontForContentSizeCategory = true
         subtitleLabel.layoutMargins = UIEdgeInsets(top: -.padding, left: 0, bottom: 0, right: 0)
