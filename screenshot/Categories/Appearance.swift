@@ -147,6 +147,16 @@ extension UIApplication {
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [UIToolbar.self]).color = crazeRedColor
+        
+        // Segmented Control
+        
+        let segmentedControlTitleTextAttributes: [String: Any] = [
+            NSFontAttributeName: UIFont.screenshopFont(.hind, size: 13),
+            NSBaselineOffsetAttributeName: -1
+        ]
+        
+        let segmentedControl = UISegmentedControl.appearance()
+        segmentedControl.setTitleTextAttributes(segmentedControlTitleTextAttributes, for: .normal)
     }
 }
 
