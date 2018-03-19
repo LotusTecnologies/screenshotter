@@ -56,6 +56,7 @@ class AssetSyncModel: NSObject {
     var isRegistered = false
     var isNextScreenshotForeground = false
     var isRecentlyForeground = false
+    var backgroundProcessFetchedResults:PHFetchResult<PHAsset>?
     
     var uploadScreenshotWithClarifaiQueue:OperationQueue = {
         var queue = OperationQueue()
@@ -228,7 +229,7 @@ extension AssetSyncModel {
 //Background image processing
 extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
-    func setupFutureScreenshotAssets() {
+    func scanPhotoGalleryForFashion() {
         let fetchOptions = PHFetchOptions()
         var installDate: NSDate
         if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate {
@@ -237,39 +238,63 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             installDate = NSDate()
             UserDefaults.standard.set(installDate, forKey: UserDefaultsKeys.dateInstalled)
         }
-        fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", installDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
+        
+        let oneDayAgo = NSDate(timeIntervalSinceNow: -60*60*24)
+        let cutOffDate = oneDayAgo.laterDate(installDate as Date) as NSDate
+        
+        
+        fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", cutOffDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 25
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         var assetIds = Set<String>()
+        self.backgroundProcessFetchedResults = assets
         assets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
             assetIds.insert(asset.localIdentifier)
         })
-        let isForeground = (UIApplication.shared.applicationState == .active)
         DataModel.sharedInstance.performBackgroundTask { (context) in
             let dbSet = DataModel.sharedInstance.retrieveAssetIds(assetIds:Array(assetIds), managedObjectContext: context)
             assetIds.subtract(dbSet)
             
             assets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                 if assetIds.contains(asset.localIdentifier) {
-                    self.uploadScreenshotWithClarifai(asset: asset, isForeground: isForeground)
+                    self.uploadScreenshotWithClarifai(asset: asset, isForeground: false)
                 }
             })
+            if ApplicationStateModel.sharedInstance.isBackground() {
+                self.uploadScreenshotWithClarifaiQueue.addOperation {
+                    if self.backgroundScreenshotDataArray.count > 0 && ApplicationStateModel.sharedInstance.isBackground() {
+                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: self.backgroundScreenshotDataArray)
+                    }
+                }
+                self.backgroundScreenshotDataArray.removeAll()
+            }
             
         }
+        registerForPhotoChanges()
     }
     
     func photoLibraryDidChange(_ changeInstance: PHChange) {
-//        print("photoLibraryDidChange")
-//
-//        if let changes = changeInstance.changeDetails(for: allScreenshotAssets),
-//            changes.hasIncrementalChanges {
-//            if let foregroundScreenshotAssetId = changes.insertedObjects.first?.localIdentifier,
-//                isNextScreenshotForeground {
-//                self.foregroundScreenshotAssetIds.insert(foregroundScreenshotAssetId)
-//                isNextScreenshotForeground = false
-//            }
-//        }
+        guard let backgroundProcessFetchedResults = self.backgroundProcessFetchedResults else {
+            //huh?
+            return
+        }
+        
+        if let change = changeInstance.changeDetails(for: backgroundProcessFetchedResults), change.hasIncrementalChanges {
+            let lastScreenshots = change.insertedObjects
+            lastScreenshots.forEach {
+                self.uploadScreenshotWithClarifai(asset: $0, isForeground: isNextScreenshotForeground)
+            }
+            if ApplicationStateModel.sharedInstance.isBackground() {
+                self.uploadScreenshotWithClarifaiQueue.addOperation {
+                    if self.backgroundScreenshotDataArray.count > 0 && ApplicationStateModel.sharedInstance.isBackground() {
+                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: self.backgroundScreenshotDataArray)
+                    }
+                }
+                self.backgroundScreenshotDataArray.removeAll()
+            }
+            isNextScreenshotForeground = false
+        }
     }
     
     
@@ -332,6 +357,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         AccumulatorModel.sharedInstance.addToNewScreenshots(count: 1)
                         self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
                         self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
+
                     }
                 }
             }.catch { error in
