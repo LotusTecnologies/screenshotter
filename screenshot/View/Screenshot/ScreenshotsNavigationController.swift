@@ -68,6 +68,7 @@ extension ScreenshotsNavigationController {
     }
     
     func presentPickerViewController() {
+        AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
         self.dismissPickerClipView()
         
         let picker = self.createScreenshotPickerNavigationController()
