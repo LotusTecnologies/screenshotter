@@ -10,6 +10,7 @@ import UIKit
 
 class FavoriteProductsTableViewCell: UITableViewCell {
     let productImageView = EmbossedView()
+    let favoriteControl = FavoriteControl()
     let titleLabel = Label()
     let priceLabel = Label()
     let merchantLabel = Label()
@@ -80,6 +81,11 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         fontSizeAccessibilityRangeConstraints += [
             productImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding)
         ]
+        
+        favoriteControl.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(favoriteControl)
+        favoriteControl.topAnchor.constraint(equalTo: productImageView.topAnchor).isActive = true
+        favoriteControl.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor).isActive = true
         
         merchantLabel.translatesAutoresizingMaskIntoConstraints = false
         merchantLabel.font = .screenshopFont(.hindLight, size: 15)
@@ -158,6 +164,8 @@ class FavoriteProductsTableViewCell: UITableViewCell {
             }
         }
     }
+    
+    // MARK: Price Alert
     
     func priceAlertAction(_ button: UIButton) {
         button.isSelected = !button.isSelected

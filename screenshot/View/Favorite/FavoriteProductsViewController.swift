@@ -68,6 +68,10 @@ class FavoriteProductsViewController : BaseViewController {
         DataModel.sharedInstance.unfavorite(favoriteArray: unfavoriteProducts)
         unfavoriteProducts.removeAll()
     }
+    
+    @objc fileprivate func favoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+        
+    }
 }
 
 extension FavoriteProductsViewController: UITableViewDataSource {
@@ -85,8 +89,8 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             cell.titleLabel.text = product.productTitle()
             cell.priceLabel.text = product.price
             cell.merchantLabel.text = product.merchant
-//            cell.favoriteControl.isSelected = product.isFavorite
-//            cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
+            cell.favoriteControl.isSelected = product.isFavorite
+            cell.favoriteControl.addTarget(self, action: #selector(favoriteAction(_:event:)), for: .touchUpInside)
         }
         
         return cell
