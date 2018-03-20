@@ -157,9 +157,7 @@ extension AssetSyncModel {
     func uploadPhoto(asset: PHAsset) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0, completion: { (completeOperation) in
             AccumulatorModel.sharedInstance.removeAssetId(asset.localIdentifier)
-            firstly {
-                return asset.image(allowFromICloud: true)
-            }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+            asset.image(allowFromICloud: true).then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                 AnalyticsTrackers.standard.track(.bypassedClarifai)
                 let imageData: Data? = self.data(for: image)
                 return Promise { fulfill, reject in
@@ -370,9 +368,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
         
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            firstly{ () -> Promise<UIImage> in
-                return asset.image(allowFromICloud: false)
-            }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
+            asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
                 AnalyticsTrackers.standard.track(.sentImageToClarifai)
                 return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
                     return Promise.init(value: (c, image))
@@ -434,7 +430,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             return // processed by other function
         }
         self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            firstly{ () -> Promise<UIImage> in
+            firstly{ () -> Promise<Bool> in
                 if !isScreenshotUserJustTook {
                     if let date = asset.creationDate {
                         if let currentValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
@@ -449,6 +445,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         throw error
                     }
                 }
+                return Promise.init(value: true)
+            }.then(on: self.processingQ) { success -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
             }.then (on: self.processingQ) { image -> Promise<ClarifaiModel.ImageClassification> in
                 AnalyticsTrackers.standard.track(.sentImageToClarifai)
@@ -534,12 +532,11 @@ extension AssetSyncModel {
     
     func retryScreenshot(asset: PHAsset) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
-            firstly {
-                return asset.image(allowFromICloud: true)
-                }.then (on: self.processingQ) { image -> Promise<Data?> in
-                    AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
-                    let imageData = self.data(for: image)
-                    return Promise(value: imageData)
+            
+            asset.image(allowFromICloud: true).then (on: self.processingQ) { image -> Promise<Data?> in
+                AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
+                let imageData = self.data(for: image)
+                return Promise(value: imageData)
                 }.then (on: self.processingQ) { imageData -> Promise<(Data?, ClarifaiModel.ImageClassification)> in
                     return self.resaveScreenshot(assetId: asset.localIdentifier, imageData: imageData)
                 }.then (on: self.processingQ) { (imageData, imageClassification) -> Void in

@@ -786,7 +786,8 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         
         cell.iconImage = nil
         if contentType == .importSingleScreenshot, let assetId = self.notificationCellAssetId() {
-            PHAsset.assetWith(assetId: assetId)?.image(allowFromICloud: true).then(execute: { (image) -> Promise<Bool>  in
+            //don't change to allowFromICloud: false.  that will cause a syncronous call on the main thread
+            PHAsset.assetWith(assetId: assetId)?.image(allowFromICloud: true).then(execute: { (image) -> Void  in
                 DispatchQueue.main.async {
                     for cell in self.collectionView.visibleCells {
                         if let c = cell as? ScreenshotNotificationCollectionViewCell {
@@ -794,7 +795,6 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                         }
                     }
                 }
-                return Promise.init(value:true)
             })
         }
         

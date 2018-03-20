@@ -135,10 +135,8 @@ final class NotificationManager: NSObject {
         notificationView.label.text = "notification.screenshot.shoppable".localized
         present(notificationView: notificationView, action: action)
         let asset = PHAsset.assetWith(assetId:assetId)
-        asset?.image(allowFromICloud: true).then(execute: { (image) -> Promise<Bool> in
+        asset?.image(allowFromICloud: true).then(execute: { (image) -> Void in
             notificationView.image = image
-            return Promise.init(value: true)
-            
         })
     }
     
