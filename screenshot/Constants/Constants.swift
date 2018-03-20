@@ -18,7 +18,7 @@ class Constants {
     static let uploadedURLStringKey = "uploadedURLStringKey"
     
     // DB
-    static let currentMomVersion = 11
+    static let currentMomVersion = 12
     
     // Cart
     static let cartItemMaxQuantity = 10
