@@ -781,84 +781,88 @@ class AssetSyncModel: NSObject {
     
      public func syncPhotos() {
         self.serialQ.async {
-            let dataModel = DataModel.sharedInstance
+            
+            
             guard PermissionsManager.shared.hasPermission(for: .photo),
-                dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
                     return
             }
+            
+            
             self.beginSync()
-            let selectedSet = self.retrieveSelectedScreenshotAssetIds()
-            let futureSet = self.retrieveFutureScreenshotAssetIds()
-            let managedObjectContext = dataModel.adHocMoc()
-            var dbSet = Set<String>()
-            managedObjectContext.performAndWait {
+            let dataModel = DataModel.sharedInstance
+            dataModel.performBackgroundTask({ (managedObjectContext) in
+                let selectedSet = self.retrieveSelectedScreenshotAssetIds()
+                let futureSet = self.retrieveFutureScreenshotAssetIds()
+                var dbSet = Set<String>()
                 dbSet = dataModel.retrieveAllAssetIds(managedObjectContext: managedObjectContext)
-            }
-            let toRetry = selectedSet.intersection(dbSet)
-            let toBypassClarifai = selectedSet.subtracting(dbSet)
-            let toUpload = futureSet.subtracting(selectedSet).subtracting(dbSet)//.union(changedAssetIds)
-            let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
-            self.incomingDynamicLinks.removeAll()
-            self.countAndPrint(name: "selectedSet", set: selectedSet)
-            self.countAndPrint(name: "futureSet", set: futureSet)
-            self.countAndPrint(name: "dbSet", set: dbSet)
-            self.countAndPrint(name: "toRetry", set: toRetry)
-            self.countAndPrint(name: "toBypassClarifai", set: toBypassClarifai)
-            self.countAndPrint(name: "toUpload", set: toUpload)
-            self.countAndPrint(name: "toDownload", set: toDownload)
-            if toUpload.count > 0 || toDownload.count > 0 || toBypassClarifai.count > 0 || toRetry.count > 0 {
-                DispatchQueue.main.async {
-                    self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Screenshot)
-                }
-            }
-            if toUpload.count > 0 {
-                AnalyticsTrackers.standard.track(.userImportedScreenshots, properties: ["numScreenshots" : toUpload.count])
-                self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-                    if toUpload.contains(asset.localIdentifier) {
-                        self.screenshotsToProcess += 1
-                        self.processingQ.async {
-                            self.uploadScreenshotWithClarifai(asset: asset)
-                        }
-                    }
-                })
-            }
-            if toDownload.count > 0 {
-                AnalyticsTrackers.standard.track(.userReceivedSharedScreenshots, properties: ["numScreenshots" : toDownload.count]) // Always 1?
-                self.screenshotsToProcess += toDownload.count
-                toDownload.forEach { shareId in
-                    self.processingQ.async {
-                        self.downloadScreenshot(shareId: shareId)
+                
+                let toRetry = selectedSet.intersection(dbSet)
+                let toBypassClarifai = selectedSet.subtracting(dbSet)
+                let toUpload = futureSet.subtracting(selectedSet).subtracting(dbSet)//.union(changedAssetIds)
+                let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
+                self.incomingDynamicLinks.removeAll()
+                self.countAndPrint(name: "selectedSet", set: selectedSet)
+                self.countAndPrint(name: "futureSet", set: futureSet)
+                self.countAndPrint(name: "dbSet", set: dbSet)
+                self.countAndPrint(name: "toRetry", set: toRetry)
+                self.countAndPrint(name: "toBypassClarifai", set: toBypassClarifai)
+                self.countAndPrint(name: "toUpload", set: toUpload)
+                self.countAndPrint(name: "toDownload", set: toDownload)
+                if toUpload.count > 0 || toDownload.count > 0 || toBypassClarifai.count > 0 || toRetry.count > 0 {
+                    DispatchQueue.main.async {
+                        self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Screenshot)
                     }
                 }
-            }
-            if toBypassClarifai.count > 0 {
-                AnalyticsTrackers.standard.track(.userImportedOldScreenshots, properties: ["numScreenshots" : toBypassClarifai.count])
-                self.selectedScreenshotAssets
-                    .filter { toBypassClarifai.contains($0.localIdentifier) }
-                    .forEach { asset in
-                        self.screenshotsToProcess += 1
-                        self.processingQ.async {
-                            self.uploadPhoto(asset: asset)
+                if toUpload.count > 0 {
+                    AnalyticsTrackers.standard.track(.userImportedScreenshots, properties: ["numScreenshots" : toUpload.count])
+                    self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                        if toUpload.contains(asset.localIdentifier) {
+                            self.screenshotsToProcess += 1
+                            self.processingQ.async {
+                                self.uploadScreenshotWithClarifai(asset: asset)
+                            }
                         }
+                    })
                 }
-            }
-            if toRetry.count > 0 {
-                AnalyticsTrackers.standard.track(.userRetriedScreenshots, properties: ["numScreenshots" : toRetry.count])
-                self.selectedScreenshotAssets
-                    .filter { toRetry.contains($0.localIdentifier) }
-                    .forEach { asset in
-                        self.screenshotsToProcess += 1
+                if toDownload.count > 0 {
+                    AnalyticsTrackers.standard.track(.userReceivedSharedScreenshots, properties: ["numScreenshots" : toDownload.count]) // Always 1?
+                    self.screenshotsToProcess += toDownload.count
+                    toDownload.forEach { shareId in
                         self.processingQ.async {
-                            self.retryScreenshot(asset: asset)
+                            self.downloadScreenshot(shareId: shareId)
                         }
+                    }
                 }
-            }
-            // Remove selected assets that were processed, i.e. their assetId is in selectedSet.
-            self.selectedScreenshotAssets.subtract(self.selectedScreenshotAssets.filter { selectedSet.contains($0.localIdentifier) })
-            if self.screenshotsToProcess == 0 {
-                self.endSync()
-            }
+                if toBypassClarifai.count > 0 {
+                    AnalyticsTrackers.standard.track(.userImportedOldScreenshots, properties: ["numScreenshots" : toBypassClarifai.count])
+                    self.selectedScreenshotAssets
+                        .filter { toBypassClarifai.contains($0.localIdentifier) }
+                        .forEach { asset in
+                            self.screenshotsToProcess += 1
+                            self.processingQ.async {
+                                self.uploadPhoto(asset: asset)
+                            }
+                    }
+                }
+                if toRetry.count > 0 {
+                    AnalyticsTrackers.standard.track(.userRetriedScreenshots, properties: ["numScreenshots" : toRetry.count])
+                    self.selectedScreenshotAssets
+                        .filter { toRetry.contains($0.localIdentifier) }
+                        .forEach { asset in
+                            self.screenshotsToProcess += 1
+                            self.processingQ.async {
+                                self.retryScreenshot(asset: asset)
+                            }
+                    }
+                }
+                // Remove selected assets that were processed, i.e. their assetId is in selectedSet.
+                self.selectedScreenshotAssets.subtract(self.selectedScreenshotAssets.filter { selectedSet.contains($0.localIdentifier) })
+                if self.screenshotsToProcess == 0 {
+                    self.endSync()
+                }
+                
+            })
         }
     }
     
@@ -875,8 +879,7 @@ class AssetSyncModel: NSObject {
      public func syncTutorialPhoto(image: UIImage) {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
-            guard dataModel.isCoreDataStackReady,
-                self.isSyncReady() else {
+            guard self.isSyncReady() else {
                     return
             }
             self.beginSync()

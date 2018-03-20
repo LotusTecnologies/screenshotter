@@ -17,7 +17,6 @@ protocol FavoritesViewControllerDelegate : NSObjectProtocol {
 class FavoritesViewController : BaseViewController {
     weak var delegate: FavoritesViewControllerDelegate?
     
-    fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let tableView = TableView()
     private let emptyListView = HelperView()
     
@@ -41,13 +40,18 @@ class FavoritesViewController : BaseViewController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        coreDataPreparationController.delegate = self
-        
         addNavigationItemLogo()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        favoriteFrc = DataModel.sharedInstance.favoriteFrc(delegate: self)
+        tableView.reloadData()
+        
+        syncScreenshotAssetIds()
+
+
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
@@ -70,8 +74,6 @@ class FavoritesViewController : BaseViewController {
         emptyListView.subtitleLabel.text = "favorites.empty.detail".localized
         emptyListView.contentImage = UIImage(named: "FavoriteEmptyListGraphic")
         tableView.emptyView = emptyListView
-        
-        coreDataPreparationController.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -83,7 +85,6 @@ class FavoritesViewController : BaseViewController {
     }
     
     deinit {
-        coreDataPreparationController.delegate = nil
         tableView.delegate = nil
         tableView.dataSource = nil
     }
@@ -182,30 +183,6 @@ extension FavoritesViewController : UITableViewDataSource {
 extension FavoritesViewController : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.favoritesViewController(self, didSelectItemAt: indexPath)
-    }
-}
-
-extension FavoritesViewController : CoreDataPreparationControllerDelegate {
-    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
-        favoriteFrc = DataModel.sharedInstance.favoriteFrc(delegate: self)
-        tableView.reloadData()
-
-        if DataModel.sharedInstance.isCoreDataStackReady {
-            syncScreenshotAssetIds()
-        }
-    }
-    
-    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
-        loader.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(loader)
-        loader.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        loader.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        loader.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        loader.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-    }
-    
-    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
-        loader.removeFromSuperview()
     }
 }
 

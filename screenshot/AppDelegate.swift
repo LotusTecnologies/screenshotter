@@ -43,18 +43,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: .coreDataStackCompleted, object: nil)
+
         
-        // Sets up Core Data stack on a background queue.
-        DataModel.setup()
+        window = UIWindow(frame: UIScreen.main.bounds)
         
+        if DataModel.sharedInstance.storeNeedsMigration() {
+            window?.rootViewController = LoadingViewController()
+            window?.makeKeyAndVisible()
+            
+            DispatchQueue.global(qos: .userInteractive).async {
+                DataModel.sharedInstance.loadStore(sync:false).always {
+                    DispatchQueue.main.async {
+                        self.window?.rootViewController = self.nextViewController()
+                    }
+                }
+            }
+        }else{
+            _ = DataModel.sharedInstance.loadStore(sync:true)
+            self.window?.rootViewController = self.nextViewController()
+            window?.makeKeyAndVisible()
+        }
+
         fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
-        
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = nextViewController()
-        window?.makeKeyAndVisible()
         
         return true
     }
@@ -314,6 +327,7 @@ extension AppDelegate {
             }
         }
         
+    
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     

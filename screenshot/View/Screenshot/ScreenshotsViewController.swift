@@ -39,14 +39,11 @@ class ScreenshotsViewController: BaseViewController {
     var hasNewScreenshotSection = false
     var hasProductBar = false
     var notificationCellAssetId:String?
-    var coreDataPreparationController:CoreDataPreparationController
     
     init() {
-        coreDataPreparationController = CoreDataPreparationController()
 
         
         super.init(nibName: nil, bundle: nil)
-        coreDataPreparationController.delegate = self
         
         self.restorationIdentifier = "ScreenshotsViewController"
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)
@@ -64,7 +61,6 @@ class ScreenshotsViewController: BaseViewController {
     }
     
     deinit {
-        self.coreDataPreparationController.delegate = nil
         self.collectionView?.delegate = nil
         self.collectionView?.dataSource = nil
         
@@ -94,10 +90,11 @@ extension ScreenshotsViewController{
 extension ScreenshotsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
+
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
-        self.coreDataPreparationController.viewDidLoad()
 
     }
     
@@ -222,10 +219,6 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
             change.applyChanges(collectionView: collectionView)
             syncEmptyListView()
         }
-    }
-    
-    func setupFetchedResultsController() {
-        self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
     }
 }
 
@@ -564,37 +557,6 @@ extension ScreenshotsViewController {
     }
 }
 
-extension ScreenshotsViewController : CoreDataPreparationControllerDelegate{
-    
-    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
-        self.setupFetchedResultsController()
-        self.productsBarController = ProductsBarController()
-        self.productsBarController?.setup()
-        self.productsBarController?.delegate = self
-        
-        if DataModel.sharedInstance.isCoreDataStackReady {
-            self.collectionView.reloadData()
-            syncEmptyListView()
-        }
-        if isViewLoaded {
-            self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
-        }
-    }
-    
-    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView){
-        loader.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(loader)
-        loader.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        loader.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        loader.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        loader.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-    }
-    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
-        loader.removeFromSuperview()
-
-    }
-
-}
 //Notification cell
 extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDelegate {
     func newScreenshotsCount() -> Int {
