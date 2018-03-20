@@ -427,6 +427,42 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func registerPriceAlert(partNumber: String, lastPrice: Float, pushToken: String, outOfStock: Bool) -> Promise<Bool> {
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "productSubscription/track") else {
+            let error = NSError(domain: "Craze", code: 60, userInfo: [NSLocalizedDescriptionKey: "Cannot create price alert url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            print(error)
+            return Promise(error: error)
+        }
+        let parameterDict: [String : Any] =
+            ["pushToken" : pushToken,
+             "pushTokenPlatform" : "ios",
+             "partNumber" : partNumber,
+             "lastPrice" : lastPrice,
+             "outOfStock" : outOfStock] // One of lastPrice and outOfStock must be provided. Each is optional. TBD if monitor stock.
+        guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
+            let error = NSError(domain: "Craze", code: 61, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize price alert parameterDict:\(parameterDict)"])
+            print(error)
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = parameterData
+        print("price alert url:\(url)  parameters:\(parameterDict)  httpHeaders:\(String(describing: request.allHTTPHeaderFields))")
+
+        return URLSession.shared.dataTask(with: request).asDataAndResponse().then { data, response -> Promise<Bool> in
+            guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
+                let error = NSError(domain: "Craze", code: 62, userInfo: [NSLocalizedDescriptionKey: "Invalid status code received from price alert url:\(url)"])
+                print(error)
+                return Promise(error: error)
+            }
+            let dataString = String(data: data, encoding: .utf8)
+            print("registerPriceAlert success data:\(dataString ?? "-")")
+            return Promise(value: true)
+        }
+    }
+    
     func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots?createShare=true") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
