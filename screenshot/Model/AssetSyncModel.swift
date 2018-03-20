@@ -87,6 +87,7 @@ class AssetSyncModel: NSObject {
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
     var foregroundScreenshotAssetIds = Set<String>()
     var userJustTookScreenshotAssetIds = Set<String>()
+    var shouldSendPushWhenFindFashionWithoutUserScreenshotAction = true
     var isRegistered = false
     var isNextScreenshotForeground = false
     var isRecentlyForeground = false
@@ -131,10 +132,17 @@ class AssetSyncModel: NSObject {
         super.init()
         registerForPhotoChanges()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    func applicationDidBecomeActive(){
+        self.processingQ.async {
+            self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
+        }
+        
     }
     
 }
@@ -312,13 +320,13 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             assets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                 assetIds.insert(asset.localIdentifier)
             })
-            
+            let startedInBackground = ApplicationStateModel.sharedInstance.isBackground()
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 let dbSet = DataModel.sharedInstance.retrieveAssetIds(assetIds:Array(assetIds), managedObjectContext: context)
                 assetIds.subtract(dbSet)
                 assets.enumerateObjects(options: [.reverse], using: { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                     if assetIds.contains(asset.localIdentifier) {
-                        self.uploadScreenshotWithClarifai(asset: asset)
+                        self.uploadScreenshotWithClarifai(asset: asset, startedInBackground:startedInBackground )
                     }
                 })
             }
@@ -424,7 +432,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }))
     }
     
-    func uploadScreenshotWithClarifai(asset: PHAsset) {
+    func uploadScreenshotWithClarifai(asset: PHAsset, startedInBackground:Bool) {
         let isScreenshotUserJustTook = self.userJustTookScreenshotAssetIds.contains(asset.localIdentifier)
         if isScreenshotUserJustTook {
             return // processed by other function
@@ -448,16 +456,29 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 return Promise.init(value: true)
             }.then(on: self.processingQ) { success -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
-            }.then (on: self.processingQ) { image -> Promise<ClarifaiModel.ImageClassification> in
+            }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
                 AnalyticsTrackers.standard.track(.sentImageToClarifai)
-                return ClarifaiModel.sharedInstance.classify(image: image)
-            }.then(on: self.processingQ) { imageClassification -> Void in
+                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
+                    return Promise.init(value: (c, image))
+                })
+            }.then(on: self.processingQ) { (imageClassification, image) -> Void in
                 if imageClassification != .unrecognized {
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
                         if managedObjectContext.screenshotWith(assetId: asset.localIdentifier) == nil {
                             AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                            if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){
+                                self.processingQ.async {
+                                    if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
+                                        self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
+                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData:                                 self.data(for: image))])
+                                    }
+                                }
+                            }
+
+                           
                         }
                     }
+                    
                 }
             }.catch { error in
                 print("uploadScreenshotWithClarifai catch error:\(error)")
