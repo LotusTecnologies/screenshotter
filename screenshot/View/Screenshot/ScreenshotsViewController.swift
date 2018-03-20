@@ -10,6 +10,8 @@ import Foundation
 import CoreData
 import SafariServices
 import FBSDKCoreKit
+import Photos
+import PromiseKit
 
 enum ScreenshotsSection : Int {
     case product
@@ -514,7 +516,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             let alertController = UIAlertController.init(title: "screenshot.delete.title".localized, message: nil, preferredStyle: .alert)
             alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
             alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
-                if let screenshot = Screenshot.findWith(objectId: objectId) {
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectId) {
                     screenshot.setHide()
                     self.removeScreenshotHelperView()
                     self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
@@ -813,9 +815,16 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         
         cell.iconImage = nil
         if let assetId = self.notificationCellAssetId {
-            AssetSyncModel.sharedInstance.image(assetId: assetId) { (image, info) in
-                cell.iconImage = image ?? UIImage.init(named:"NotificationSnapshot")
-            }
+            PHAsset.assetWith(assetId: assetId)?.image(allowFromICloud: true).then(execute: { (image) -> Promise<Bool>  in
+                DispatchQueue.main.async {
+                    for cell in self.collectionView.visibleCells {
+                        if let c = cell as? ScreenshotNotificationCollectionViewCell {
+                            c.iconImage = image
+                        }
+                    }
+                }
+                return Promise.init(value:true)
+            })
         }
         
     }

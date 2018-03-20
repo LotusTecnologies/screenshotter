@@ -175,32 +175,12 @@ class AssetSyncModel: NSObject {
         
     }
 
-    func fastGetImage(asset:PHAsset) -> Promise<UIImage> {
-        return Promise.init(resolvers: { (fulfill, reject) in
-            
-            let imageRequestOptions = PHImageRequestOptions()
-            imageRequestOptions.version = .current
-            imageRequestOptions.deliveryMode = .opportunistic
-            imageRequestOptions.resizeMode = .none
-            imageRequestOptions.isNetworkAccessAllowed = false
-            imageRequestOptions.isSynchronous = true
-            
-            PHImageManager.default().requestImageData(for: asset, options: imageRequestOptions, resultHandler: { (data, s, o, i) in
-                if let data = data,  let image = UIImage.init(data: data) {
-                    fulfill(image)
-                }else{
-                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
-                    reject(emptyError)
-                }
-            })
-        })
-    }
     func uploadScreenshotWithClarifai(asset: PHAsset) {
         let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
         self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
-                return self.fastGetImage(asset: asset)
+                return asset.image(allowFromICloud: false)
                 }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
                     AnalyticsTrackers.standard.track(.sentImageToClarifai)
                     return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
@@ -254,7 +234,7 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
-                return self.image(asset: asset)
+                return asset.image(allowFromICloud: true)
                 }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                     AnalyticsTrackers.standard.track(.bypassedClarifai)
                     let imageClassification = ClarifaiModel.ImageClassification.human // Kludged, as ClarifaiModel.sharedInstance.classify often crashes.
@@ -289,7 +269,7 @@ class AssetSyncModel: NSObject {
     func retryScreenshot(asset: PHAsset) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
-                return self.image(asset: asset)
+                return asset.image(allowFromICloud: true)
                 }.then (on: self.processingQ) { image -> Promise<Data?> in
                     AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
                     let imageData = self.data(for: image)
@@ -336,10 +316,7 @@ class AssetSyncModel: NSObject {
                     screenshot.isHidden = false
                     screenshot.isRecognized = true
                     screenshot.lastModified = NSDate()
-                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                    // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
-                    screenshot.lastModified = NSDate()
-                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    managedObjectContext.saveIfNeeded()
                     fulfill((imageData, imageClassification))
                 } else {
                     let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(assetId)"])
@@ -609,7 +586,7 @@ class AssetSyncModel: NSObject {
                     screenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: segments)
                     screenshot.uploadedImageURL = uploadedURLString
                 }
-                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                managedObjectContext.saveIfNeeded()
             }
             AnalyticsTrackers.standard.track(.receivedProductsFromSyte, properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
         }
@@ -666,7 +643,7 @@ class AssetSyncModel: NSObject {
             } else {
                 print("AssetSyncModel reExtractProducts no productFilter, changedProductCount:\(changedProductCount)")
             }
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            managedObjectContext.saveIfNeeded()
         }
     }
 
@@ -690,76 +667,6 @@ class AssetSyncModel: NSObject {
             }.catch { error in
                 print("AssetSyncModel reExtractProducts error parsing product:\(error)")
                 self.updateShoppableWithProducts(shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
-        }
-    }
-    
-    func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
-        guard !assetId.isEmpty else {
-            print("assetId is blank")
-            callback(nil, nil)
-            return
-        }
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 1
-        
-        let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: fetchOptions)
-        
-        guard let asset = assets.firstObject else {
-            print("No asset for assetId:\(assetId)")
-            AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No asset for assetId:\(assetId)"])
-            callback(nil, nil)
-            return
-        }
-        image(asset: asset, callback: callback)
-    }
-    
-    func image(asset: PHAsset, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
-        let imageRequestOptions = PHImageRequestOptions()
-        imageRequestOptions.version = .current
-        imageRequestOptions.deliveryMode = .opportunistic
-        imageRequestOptions.resizeMode = .none
-        imageRequestOptions.isNetworkAccessAllowed = false
-        imageRequestOptions.isSynchronous = true
-        let targetSize = self.targetSize()
-        PHImageManager.default().requestImage(for: asset,
-                                              targetSize: targetSize,
-                                              contentMode: .aspectFill,
-                                              options: imageRequestOptions,
-                                              resultHandler: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                                                callback(image, info)
-        })
-    }
-    
-    func image(asset: PHAsset) -> Promise<UIImage> {
-        return Promise { fulfill, reject in
-            self.image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                
-                if let imageError = info?[PHImageErrorKey] as? NSError {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
-                    reject(imageError)
-                    return
-                }
-                if let isCancelled = info?[PHImageCancelledKey] as? Bool,
-                    isCancelled == true {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
-                    let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
-                    reject(cancelledError)
-                    return
-                }
-                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
-                    isDegraded == true {
-                    // This callback will be called again with a better quality image.
-                    return
-                }
-                if let image = image {
-                    fulfill(image)
-                } else {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
-                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
-                    reject(emptyError)
-                }
-            })
         }
     }
     
@@ -865,10 +772,7 @@ class AssetSyncModel: NSObject {
     }
     
     func addToSelected(assetId: String) -> Bool {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
-        let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        guard let asset = fetchResult.firstObject else {
+        guard let asset = PHAsset.assetWith(assetId: assetId) else {
             return false
         }
         let tuple = self.selectedScreenshotAssets.insert(asset)
@@ -1046,7 +950,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             backgroundScreenshot?.shoppablesCount = 0
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            managedObjectContext.saveIfNeeded()
             self.syncPhotos()
         }
     }
@@ -1171,7 +1075,7 @@ extension Screenshot {
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
                         screenshot.shareLink = shareLink
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        managedObjectContext.saveIfNeeded()
                     }
                 }
                 return Promise(value: shareLink)
