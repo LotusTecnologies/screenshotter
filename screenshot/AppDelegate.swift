@@ -79,6 +79,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
+        
+        
         return true
     }
     

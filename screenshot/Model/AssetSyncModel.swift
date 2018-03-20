@@ -448,7 +448,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             }
                         }
                     }
-                    if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > Constants.notificationProductToImportCountLimit {
+                    if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > Constants.notificationProductToImportCountLimit && !self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction {
                         let error = NSError.init(domain: "Craze", code: -82, userInfo: [NSLocalizedDescriptionKey : "already have enough images"])
                         throw error
                     }
