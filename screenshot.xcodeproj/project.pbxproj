@@ -35,6 +35,7 @@
 		C5014110205E7BF200ABFB5C /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501410F205E7BF200ABFB5C /* Label.swift */; };
 		C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5014119205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift */; };
 		C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50141292061080700ABFB5C /* FavoriteProductsView.swift */; };
+		C501412C2061101100ABFB5C /* UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501412B2061101100ABFB5C /* UITableView.swift */; };
 		C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
@@ -198,6 +199,7 @@
 		C501410F205E7BF200ABFB5C /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
 		C5014119205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteProductsTableViewCell.swift; sourceTree = "<group>"; };
 		C50141292061080700ABFB5C /* FavoriteProductsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsView.swift; sourceTree = "<group>"; };
+		C501412B2061101100ABFB5C /* UITableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableView.swift; sourceTree = "<group>"; };
 		C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollRevealController.swift; path = screenshot/View/Generic/ScrollRevealController.swift; sourceTree = SOURCE_ROOT; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
@@ -782,6 +784,7 @@
 				C501410A205E702B00ABFB5C /* Font.swift */,
 				C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */,
 				C5AC7E641FFA2D2600F491C0 /* Size.swift */,
+				C501412B2061101100ABFB5C /* UITableView.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1199,6 +1202,7 @@
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
+				C501412C2061101100ABFB5C /* UITableView.swift in Sources */,
 				C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,

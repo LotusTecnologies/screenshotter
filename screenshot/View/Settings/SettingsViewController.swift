@@ -128,6 +128,7 @@ class SettingsViewController : BaseViewController {
             screenshotsCountLabel.font = .screenshopFont(.hindLight, size: 20)
             screenshotsCountLabel.adjustsFontSizeToFitWidth = true
             screenshotsCountLabel.minimumScaleFactor = 0.7
+            screenshotsCountLabel.baselineAdjustment = .alignCenters
             tableHeaderContentView.addSubview(screenshotsCountLabel)
             screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
             screenshotsCountLabel.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true

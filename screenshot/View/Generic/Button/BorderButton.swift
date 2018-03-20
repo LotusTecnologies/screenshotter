@@ -26,6 +26,10 @@ class BorderButton: UIButton {
     override func setTitleColor(_ color: UIColor?, for state: UIControlState) {
         super.setTitleColor(color, for: state)
         syncBorderColor()
+        
+        if state == .normal {
+            super.setTitleColor(color?.darker(), for: .highlighted)
+        }
     }
     
     override var isHighlighted: Bool {

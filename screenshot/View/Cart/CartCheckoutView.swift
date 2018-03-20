@@ -34,6 +34,7 @@ class CartCheckoutView: UIView {
         priceLabel.textColor = .gray3
         priceLabel.textAlignment = .center
         priceLabel.minimumScaleFactor = 0.7
+        priceLabel.baselineAdjustment = .alignCenters
         priceLabel.adjustsFontSizeToFitWidth = true
         addSubview(priceLabel)
         priceLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true

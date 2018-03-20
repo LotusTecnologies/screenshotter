@@ -113,6 +113,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.translatesAutoresizingMaskIntoConstraints = false
             label.numberOfLines = ProductsCollectionViewCell.titleLabelNumberOfLines
             label.minimumScaleFactor = 0.7
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
             label.font = ProductsCollectionViewCell.labelFont
@@ -150,6 +151,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.font = ProductsCollectionViewCell.labelFont
             label.textColor = .gray6
             label.minimumScaleFactor = 0.7
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.layoutMargins = ProductsCollectionViewCell.priceLabelLayoutMargins
             self.contentView.addSubview(label)
@@ -172,6 +174,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.font = ProductsCollectionViewCell.labelFont
             label.textColor = .gray7
             label.minimumScaleFactor = 0.7
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.isHidden = true
             self.contentView.addSubview(label)

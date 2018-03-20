@@ -10,11 +10,13 @@ import UIKit
 
 class FavoriteProductsTableViewCell: UITableViewCell {
     let productImageView = EmbossedView()
+    let productControl = UIControl()
     let favoriteControl = FavoriteControl()
-    let titleLabel = Label()
+    let titleLabel = UILabel()
     let priceLabel = Label()
     let merchantLabel = Label()
     let priceAlertButton = UIButton()
+    let cartButton = BorderButton()
     
     private var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
     private var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
@@ -28,43 +30,64 @@ class FavoriteProductsTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
+        var layoutMargins = contentView.layoutMargins
+        layoutMargins.top = .padding
+        layoutMargins.bottom = .padding
+        contentView.layoutMargins = layoutMargins
+        
+        titleLabel.backgroundColor = .gray9
+        priceLabel.backgroundColor = .gray9
+        priceAlertButton.backgroundColor = .gray9
+        merchantLabel.backgroundColor = .gray9
+        
+        let labelsContainerView = UIView()
+        labelsContainerView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(labelsContainerView)
+        labelsContainerView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        labelsContainerView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        labelsContainerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.numberOfLines = 0
         titleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
         titleLabel.adjustsFontForContentSizeCategory = true
-        contentView.addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
-        titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        labelsContainerView.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: labelsContainerView.topAnchor).isActive = true
+//        titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         
+        fontSizeStandardRangeConstraints += [
+            titleLabel.bottomAnchor.constraint(equalTo: labelsContainerView.bottomAnchor)
+        ]
         fontSizeAccessibilityRangeConstraints += [
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: labelsContainerView.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: labelsContainerView.trailingAnchor)
         ]
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.textColor = .crazeGreen
         priceLabel.font = .screenshopFont(.hindMedium, textStyle: .body)
         priceLabel.adjustsFontForContentSizeCategory = true
-        contentView.addSubview(priceLabel)
+        labelsContainerView.addSubview(priceLabel)
         priceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-        priceLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        priceLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        priceLabel.trailingAnchor.constraint(equalTo: labelsContainerView.trailingAnchor).isActive = true
+//        priceLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         
         fontSizeStandardRangeConstraints += [
-            priceLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            priceLabel.topAnchor.constraint(equalTo: labelsContainerView.topAnchor),
             priceLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: .padding)
         ]
         fontSizeAccessibilityRangeConstraints += [
-            priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding)
+            priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding),
+            priceLabel.bottomAnchor.constraint(equalTo: labelsContainerView.bottomAnchor)
         ]
         
-        let labelsBottomGuide = UIView()
-        labelsBottomGuide.translatesAutoresizingMaskIntoConstraints = false
-        labelsBottomGuide.isHidden = true
-        contentView.addSubview(labelsBottomGuide)
-        labelsBottomGuide.topAnchor.constraint(greaterThanOrEqualTo: titleLabel.bottomAnchor).isActive = true
-        labelsBottomGuide.topAnchor.constraint(greaterThanOrEqualTo: priceLabel.bottomAnchor).isActive = true
-        labelsBottomGuide.heightAnchor.constraint(equalToConstant: 0).isActive = true
+//        let labelsBottomGuide = UIView()
+//        labelsBottomGuide.translatesAutoresizingMaskIntoConstraints = false
+//        labelsBottomGuide.isHidden = true
+//        contentView.addSubview(labelsBottomGuide)
+//        labelsBottomGuide.topAnchor.constraint(greaterThanOrEqualTo: titleLabel.bottomAnchor).isActive = true
+//        labelsBottomGuide.topAnchor.constraint(greaterThanOrEqualTo: priceLabel.bottomAnchor).isActive = true
+//        labelsBottomGuide.heightAnchor.constraint(equalToConstant: 0).isActive = true
         
         productImageView.translatesAutoresizingMaskIntoConstraints = false
         productImageView.contentMode = .scaleAspectFill
@@ -82,6 +105,13 @@ class FavoriteProductsTableViewCell: UITableViewCell {
             productImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding)
         ]
         
+        productControl.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(productControl)
+        productControl.topAnchor.constraint(equalTo: productImageView.topAnchor).isActive = true
+        productControl.leadingAnchor.constraint(equalTo: productImageView.leadingAnchor).isActive = true
+        productControl.bottomAnchor.constraint(equalTo: productImageView.bottomAnchor).isActive = true
+        productControl.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor).isActive = true
+        
         favoriteControl.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(favoriteControl)
         favoriteControl.topAnchor.constraint(equalTo: productImageView.topAnchor).isActive = true
@@ -91,6 +121,7 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         merchantLabel.font = .screenshopFont(.hindLight, size: 15)
         merchantLabel.adjustsFontSizeToFitWidth = true
         merchantLabel.minimumScaleFactor = 0.7
+        merchantLabel.baselineAdjustment = .alignCenters
         merchantLabel.textAlignment = .center
         contentView.addSubview(merchantLabel)
         merchantLabel.topAnchor.constraint(equalTo: productImageView.bottomAnchor, constant: 10).isActive = true
@@ -127,19 +158,27 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         }()
         priceAlertButton.addTarget(self, action: #selector(priceAlertAction(_:)), for: .touchUpInside)
         contentView.addSubview(priceAlertButton)
-        priceAlertButton.topAnchor.constraint(equalTo: labelsBottomGuide.bottomAnchor, constant: halfPadding).isActive = true
+        priceAlertButton.topAnchor.constraint(equalTo: labelsContainerView.bottomAnchor, constant: halfPadding).isActive = true
         priceAlertButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
         priceAlertButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let cartButton = MainButton() // TODO: change to BorderButton
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.setTitle("Add to Cart", for: .normal)
         cartButton.setTitleColor(.crazeGreen, for: .normal)
         contentView.addSubview(cartButton)
         cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding).isActive = true
         cartButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
-        cartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+//        cartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        // ???: i think this can be removed
+        let bottomGuide = UIView()
+        bottomGuide.translatesAutoresizingMaskIntoConstraints = false
+        bottomGuide.isHidden = true
+        contentView.addSubview(bottomGuide)
+        bottomGuide.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
+        bottomGuide.topAnchor.constraint(equalTo: cartButton.bottomAnchor).isActive = true
+        bottomGuide.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         
         NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
     }
@@ -167,7 +206,7 @@ class FavoriteProductsTableViewCell: UITableViewCell {
     
     // MARK: Price Alert
     
-    func priceAlertAction(_ button: UIButton) {
+    @objc fileprivate func priceAlertAction(_ button: UIButton) {
         button.isSelected = !button.isSelected
     }
 }

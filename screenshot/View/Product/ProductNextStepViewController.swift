@@ -59,6 +59,7 @@ class ProductNextStepViewController: UIViewController {
         cartButton.setTitle("product.next_step.cart".localized, for: .normal)
         cartButton.titleLabel?.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize * 0.8)
         cartButton.titleLabel?.minimumScaleFactor = 0.7
+        cartButton.titleLabel?.baselineAdjustment = .alignCenters
         cartButton.titleLabel?.adjustsFontSizeToFitWidth = true
         view.addSubview(cartButton)
         cartButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
@@ -72,6 +73,7 @@ class ProductNextStepViewController: UIViewController {
         continueButton.setTitle("product.next_step.continue".localized, for: .normal)
         continueButton.titleLabel?.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize * 0.8)
         continueButton.titleLabel?.minimumScaleFactor = 0.7
+        continueButton.titleLabel?.baselineAdjustment = .alignCenters
         continueButton.titleLabel?.adjustsFontSizeToFitWidth = true
         view.addSubview(continueButton)
         continueButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)

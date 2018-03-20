@@ -69,14 +69,45 @@ class FavoriteProductsViewController : BaseViewController {
         unfavoriteProducts.removeAll()
     }
     
-    @objc fileprivate func favoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+    @objc fileprivate func favoriteProductAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event), let product = products?[indexPath.item] else {
+            return
+        }
         
+        let isFavorited = favoriteControl.isSelected
+        
+        if isFavorited {
+            if let index = unfavoriteProducts.index(of: product) {
+                unfavoriteProducts.remove(at: index)
+            }
+        }
+        else {
+            unfavoriteProducts.append(product)
+        }
+        
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
+    }
+    
+    // MARK: Tracking
+    
+    @objc fileprivate func trackProductAction(_ button: UIButton, event: UIEvent) {
+        
+    }
+    
+    // MARK: Navigation
+    
+    @objc fileprivate func presentProductAction(_ control: UIControl, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event), let product = products?[indexPath.item] else {
+            return
+        }
+        
+        OpenWebPage.presentProduct(product, fromViewController: self)
     }
 }
 
 extension FavoriteProductsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return products?.count ?? 0
+        return 1//products?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -84,13 +115,15 @@ extension FavoriteProductsViewController: UITableViewDataSource {
         
         if let cell = cell as? FavoriteProductsTableViewCell, let product = products?[indexPath.item] {
             cell.contentView.backgroundColor = .cellBackground
-            
             cell.productImageView.setImage(withURLString: product.imageURL)
-            cell.titleLabel.text = product.productTitle()
+            cell.productControl.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
+            cell.titleLabel.text = "hello world\ncool beans"//product.productTitle()
             cell.priceLabel.text = product.price
             cell.merchantLabel.text = product.merchant
             cell.favoriteControl.isSelected = product.isFavorite
-            cell.favoriteControl.addTarget(self, action: #selector(favoriteAction(_:event:)), for: .touchUpInside)
+            cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
+            cell.priceAlertButton.isSelected = product.hasPriceAlerts
+            cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
         }
         
         return cell
@@ -100,39 +133,3 @@ extension FavoriteProductsViewController: UITableViewDataSource {
 extension FavoriteProductsViewController: UITableViewDelegate {
     
 }
-
-extension FavoriteProductsViewController : UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let product = products?[indexPath.item] else {
-            return
-        }
-        
-        OpenWebPage.presentProduct(product, fromViewController: self)
-//        OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductFavorites, fromPage: "Favorites")
-    }
-}
-
-//extension FavoriteProductsViewController {
-//    func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
-//        guard let location = event.allTouches?.first?.location(in: collectionView),
-//            let indexPath = collectionView.indexPathForItem(at: location),
-//            let product = products?[indexPath.item]
-//            else {
-//                return
-//        }
-//
-//        let isFavorited = favoriteControl.isSelected
-//
-//        if isFavorited {
-//            if let index = unfavoriteProducts.index(of: product) {
-//                unfavoriteProducts.remove(at: index)
-//            }
-//        }
-//        else {
-//            unfavoriteProducts.append(product)
-//        }
-//
-//        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
-//    }
-//}
-
