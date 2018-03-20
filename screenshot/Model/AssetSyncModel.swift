@@ -275,7 +275,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         
         let cutOffDate = (dates.max { a, b -> Bool in a < b  } ?? installDate )as NSDate
         
-        fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", cutOffDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
+        fetchOptions.predicate = NSPredicate(format: "creationDate > %@ AND (mediaSubtype & %d) != 0", cutOffDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 25
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
