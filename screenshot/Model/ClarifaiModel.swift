@@ -37,7 +37,7 @@ class ClarifaiModel: NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadStarted), name: Notification.Name.CAIWillFetchModel, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(modelDownloadFinished), name: Notification.Name.CAIDidFetchModel, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(modelAvailable), name: Notification.Name.CAIModelDidBecomeAvailable, object: nil)
-        Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")        
+        Clarifai.sharedInstance().start(apiKey: "b0c68b58001546afa6e9cbe0f8f619b2")
     }
     
     func kickoffModelDownload() -> Promise<Bool> {
