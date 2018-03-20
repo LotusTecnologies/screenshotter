@@ -791,7 +791,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                 DispatchQueue.main.async {
                     for cell in self.collectionView.visibleCells {
                         if let c = cell as? ScreenshotNotificationCollectionViewCell {
-                            c.iconImage = image
+                            c.iconImage = image ?? UIImage.init(named:"NotificationSnapshot")
                         }
                     }
                 }
