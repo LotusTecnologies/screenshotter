@@ -18,6 +18,8 @@ class FavoriteProductsTableViewCell: UITableViewCell {
     private var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
     private var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
     
+    // MARK: Life Cycle
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -134,6 +136,27 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        guard let previousContentSizeCategory = previousTraitCollection?.preferredContentSizeCategory else {
+            return
+        }
+        
+        let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        
+        if previousContentSizeCategory.isAccessibilityCategory != isAccessibilityCategory {
+            if isAccessibilityCategory {
+                NSLayoutConstraint.deactivate(fontSizeStandardRangeConstraints)
+                NSLayoutConstraint.activate(fontSizeAccessibilityRangeConstraints)
+            }
+            else {
+                NSLayoutConstraint.deactivate(fontSizeAccessibilityRangeConstraints)
+                NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
+            }
+        }
     }
     
     func priceAlertAction(_ button: UIButton) {

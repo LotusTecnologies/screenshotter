@@ -18,6 +18,7 @@ extension IndexSet {
 
 protocol FetchedResultsControllerManagerChange {
     func applyChanges(tableView: UITableView)
+    func applyChanges(tableView: UITableView, with animation: UITableViewRowAnimation)
     func applyChanges(collectionView: UICollectionView)
     func shiftIndexSections(by: Int)
     var insertedRows: [IndexPath] { get }
@@ -58,29 +59,32 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
         
         
         func applyChanges(tableView: UITableView) {
+            applyChanges(tableView: tableView, with: .none)
+        }
+        
+        func applyChanges(tableView: UITableView, with animation: UITableViewRowAnimation) {
             tableView.beginUpdates()
-            tableView.deleteRows(at: deletedRows, with: .none)
-            tableView.deleteSections(deletedSections, with: .none)
-            tableView.insertSections(insertedSections, with: .none)
-            tableView.insertRows(at: insertedRows, with: .none)
+            tableView.deleteRows(at: deletedRows, with: animation)
+            tableView.deleteSections(deletedSections, with: animation)
+            tableView.insertSections(insertedSections, with: animation)
+            tableView.insertRows(at: insertedRows, with: animation)
             tableView.endUpdates()
             
-            tableView.reloadRows(at: updatedRows, with: .none)
-            
+            tableView.reloadRows(at: updatedRows, with: animation)
         }
         
         func applyChanges(collectionView: UICollectionView) {
-            
             collectionView.performBatchUpdates({
                 collectionView.deleteItems(at: deletedRows)
                 collectionView.deleteSections(deletedSections)
                 collectionView.insertSections(insertedSections)
                 collectionView.insertItems(at: insertedRows)
-            }) { (completed) in
-            }
+            })
             
             let indexPathsForSelectedItems = collectionView.indexPathsForSelectedItems
+            
             collectionView.reloadItems(at: self.updatedRows)
+            
             if let indexPathsForSelectedItems = indexPathsForSelectedItems {
                 for index in indexPathsForSelectedItems {
                     if let cell = collectionView.cellForItem(at: index) {
@@ -89,8 +93,8 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
                     }
                 }
             }
-            
         }
+        
         override var description: String {
             return "insertedSections:\(insertedSections.toArray()), deletedSections:\(deletedSections.toArray()), insertedRows:\(insertedRows), deletedRows:\(deletedRows), updatedRows:\(updatedRows)"
         }

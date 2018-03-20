@@ -9,9 +9,6 @@
 import UIKit
 
 class MainButton: UIButton {
-    private var edgePadding = CGFloat(16)
-    private var imagePadding = CGFloat(6)
-    
     private var backgroundColorStates: [UInt : UIColor] = [:]
     private var isSettingBackgroundColor = false
     
@@ -25,7 +22,7 @@ class MainButton: UIButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: edgePadding, left: edgePadding, bottom: edgePadding, right: edgePadding)
+        contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
@@ -47,17 +44,17 @@ class MainButton: UIButton {
         return size
     }
     
-    // MARK: Interaction
+    // MARK: States
     
     override var isHighlighted: Bool {
         didSet {
-            isSettingBackgroundColor = true
-            backgroundColor = backgroundColorStates[isHighlighted ? UIControlState.highlighted.rawValue : UIControlState.normal.rawValue]
-            isSettingBackgroundColor = false
-            
-            if isLoading {
-                activityIndicator?.backgroundColor = self.backgroundColor
-            }
+            setBackgroundColor(to: isHighlighted ? .highlighted : state)
+        }
+    }
+    
+    override var isEnabled: Bool {
+        didSet {
+            setBackgroundColor(to: isEnabled ? state : .disabled)
         }
     }
     
@@ -68,7 +65,18 @@ class MainButton: UIButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
+                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter().withAlphaComponent(0.7)
             }
+        }
+    }
+    
+    fileprivate func setBackgroundColor(to state: UIControlState) {
+        isSettingBackgroundColor = true
+        backgroundColor = backgroundColorStates[state.rawValue]
+        isSettingBackgroundColor = false
+        
+        if isLoading {
+            activityIndicator?.backgroundColor = backgroundColor
         }
     }
     
@@ -76,6 +84,8 @@ class MainButton: UIButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
+        
+        let imagePadding: CGFloat = 6
         
         imageEdgeInsets = UIEdgeInsets(top: 0, left: -imagePadding, bottom: 0, right: imagePadding / 2.0)
         titleEdgeInsets = UIEdgeInsets(top: 0, left: imagePadding / 2.0, bottom: 0, right: -imagePadding)

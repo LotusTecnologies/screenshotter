@@ -12,15 +12,15 @@ import UIKit
 class ProductWebViewController : WebViewController {
     static let shared = ProductWebViewController()
     
-    fileprivate let favoriteButton = FavoriteButton()
+    fileprivate let favoriteControl = FavoriteControl()
     
     var product: Product? {
         didSet {
             if let product = product {
-                favoriteButton.isSelected = product.isFavorite
+                favoriteControl.isSelected = product.isFavorite
                 
             } else {
-                favoriteButton.isSelected = false
+                favoriteControl.isSelected = false
             }
         }
     }
@@ -34,9 +34,9 @@ class ProductWebViewController : WebViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        favoriteButton.sizeToFit()
-        favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: favoriteButton)
+        favoriteControl.sizeToFit()
+        favoriteControl.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: favoriteControl)
         
         hidesBottomBarWhenPushed = true
         
@@ -49,7 +49,7 @@ class ProductWebViewController : WebViewController {
             return
         }
         
-        let isFavorited = favoriteButton.isSelected
+        let isFavorited = favoriteControl.isSelected
         
         product.setFavorited(toFavorited: isFavorited)
         AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product Web View")

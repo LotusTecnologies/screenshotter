@@ -85,8 +85,9 @@ public enum AnalyticsEvent : String {
     case tabBarTapped = "Tab Bar tapped"
     case tappedOnProduct = "Tapped on product"
     case tappedOnProductFavorites = "Tapped on product - Favorites"
-    case tappedOnProductProductbar = "Tapped on product - ProductBar"
+    case tappedOnProductProductBar = "Tapped on product - ProductBar"
     case tappedOnProductProducts = "Tapped on product - Products"
+    case tappedOnProductProductSimilar = "Tapped on product - Product Similar"
     case tappedOnScreenshot = "Tapped on screenshot"
     case tappedOnShoppable = "Tapped on shoppable"
     case tookScreenshot = "Took Screenshot"
@@ -340,6 +341,59 @@ extension AnalyticsTracker {
     }
     
     func trackTappedOnProduct(_ product: Product, onPage page: String) {
+        
+        let willShowShoppingCartPage = (product.partNumber != nil )
+        let displayAs:String = {
+            if willShowShoppingCartPage {
+                return "In app Product"
+            }else{
+                if let urlString = product.offer, let url = URL(string:urlString) {
+                    let willOpenWith = OpenWebPage.using(url:url)
+                    return willOpenWith.analyticsString()
+                }else{
+                    return "error"
+                }
+            }
+        }()
+        
+        switch page {
+        case "Favorite":
+            track(.tappedOnProductFavorites, properties: ["display":displayAs])
+        case "Products":
+            track(.tappedOnProductProducts, properties: ["display":displayAs])
+        case "ProductBar":
+            track(.tappedOnProductProductBar, properties: ["display":displayAs])
+        case "ProductSimilar":
+            track(.tappedOnProductProductSimilar, properties: ["display":displayAs])
+        default:
+            //do nothing
+            break
+        }
+        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
+        
+        if email.lengthOfBytes(using: .utf8) > 0 {
+            let uploadedImageURL = product.screenshot?.uploadedImageURL ?? ""
+            let merchant = product.merchant ?? ""
+            let brand = product.brand ?? ""
+            let displayTitle = product.displayTitle ?? ""
+            let offer = product.offer ?? ""
+            let imageURL = product.imageURL ?? ""
+            let price = product.price ?? ""
+            let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
+            
+            let properties = ["screenshot": uploadedImageURL,
+                              "merchant": merchant,
+                              "brand": brand,
+                              "title": displayTitle,
+                              "url": offer,
+                              "imageUrl": imageURL,
+                              "price": price,
+                              "email": email,
+                              "name": name,
+                              "display":displayAs]
+            AnalyticsTrackers.standard.track(.productForEmail, properties:properties)
+        }
+        
         let merchant = product.merchant ?? ""
         let brand = product.brand?.lowercased() ?? ""
         let offer = product.offer ?? ""
@@ -352,12 +406,12 @@ extension AnalyticsTracker {
             "url" : offer,
             "imageUrl" : imageURL,
             "sale" : sale,
-            "page" : page
+            "page" : page,
+            "display":displayAs
         ])
         
         FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID : imageURL])
-        
-        // Need to use properties: [:] to clarify which track function we want to call
+
         if marketingBrands.contains(brand) {
             trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped on \(brand) product", properties: [:])
         }

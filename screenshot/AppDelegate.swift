@@ -78,15 +78,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    
     var lastPresentedLowDiskSpaceWarning:Date?
-    func presentLowDiskSpaceWarning(){
-        
+    
+    func presentLowDiskSpaceWarning() {
         //don't change to guard - lead to large complie time
-        if let lastTime = self.lastPresentedLowDiskSpaceWarning {
-            let timeInterval = abs(lastTime.timeIntervalSinceNow)
-            if timeInterval  < 60*5 {
-                return
-            }
+        if let lastPresentation = self.lastPresentedLowDiskSpaceWarning,
+          -lastPresentation.timeIntervalSinceNow <= 60 * 5 { // Do nothing if presented warning within last 5 minutes.
+            return
         }
         
         
@@ -346,14 +345,13 @@ extension AppDelegate {
         let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            
             viewController = mainTabBarController
+            
             if self.shouldLoadDiscoverNextLoad {
                 self.shouldLoadDiscoverNextLoad = false
+                
                 if let mainTabBarController = viewController as? MainTabBarController {
-                    if let vc = mainTabBarController.viewControllers?.first(where: {($0 as? DiscoverNavigationController) != nil}) {
-                        mainTabBarController.selectedViewController = vc
-                    }
+                    mainTabBarController.selectedViewController = mainTabBarController.discoverNavigationController
                 }
             }
         }

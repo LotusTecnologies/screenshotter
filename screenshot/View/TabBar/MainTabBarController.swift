@@ -10,57 +10,72 @@ import UIKit
 import Intercom
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
-
+    enum TabIndex: Int {
+        case favorites   = 0
+        case discover    = 1
+        case screenshots = 2
+        case settings    = 3
+        case cart        = 4
+    }
+    
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
-
-    var isObservingSettingsBadgeFont = false
-
-    let favoritesNavigationController: FavoritesNavigationController
-    let screenshotsNavigationController: ScreenshotsNavigationController
-    let discoverNavigationController: DiscoverNavigationController
-    let settingsNavigationController: SettingsNavigationController
-    var settingsTabBarItem: UITabBarItem
+    
+    let favoritesNavigationController = FavoritesNavigationController()
+    let screenshotsNavigationController = ScreenshotsNavigationController()
+    let discoverNavigationController = DiscoverNavigationController()
+    let settingsNavigationController = SettingsNavigationController()
+    let cartNavigationController = CartNavigationController()
+    
+    fileprivate var settingsTabBarItem: UITabBarItem?
     var updatePromptHandler: UpdatePromptHandler?
-    let discoverTabTag = 2
-
-    let TabBarBadgeFontKey = "view.badge.label.font"
-
+    
+    fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
+    
+    fileprivate var isObservingSettingsBadgeFont = false
+    fileprivate let TabBarBadgeFontKey = "view.badge.label.font"
+    
     // MARK: - Lifecycle
     
-    init(delegate:ViewControllerLifeCycle) {
-        
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    init(delegate: ViewControllerLifeCycle) {
         lifeCycleDelegate = delegate
-        screenshotsNavigationController = ScreenshotsNavigationController()
-        favoritesNavigationController = FavoritesNavigationController(nibName: nil, bundle: nil)
-        discoverNavigationController = DiscoverNavigationController(nibName: nil, bundle: nil)
-        settingsNavigationController = SettingsNavigationController(nibName: nil, bundle: nil)
-        settingsTabBarItem = settingsNavigationController.tabBarItem
-
+        
         super.init(nibName: nil, bundle: nil)
+        
+        favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
+        favoritesNavigationController.tabBarItem = tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: TabIndex.favorites.rawValue)
+        
+        discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
+        discoverNavigationController.tabBarItem = tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: TabIndex.discover.rawValue)
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
         screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = self.tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: 0)
-        
-        favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
-        favoritesNavigationController.tabBarItem = self.tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: 1)
-        
-        discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
-        discoverNavigationController.tabBarItem = self.tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: discoverTabTag)
+        screenshotsNavigationController.tabBarItem = tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: TabIndex.screenshots.rawValue)
         
         settingsNavigationController.settingsViewController.delegate = self
         settingsNavigationController.title = settingsNavigationController.settingsViewController.title
-        settingsNavigationController.tabBarItem = self.tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: 3)
-        settingsNavigationController.tabBarItem.badgeColor = UIColor.crazeRed
+        settingsNavigationController.tabBarItem = tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: TabIndex.settings.rawValue)
+        settingsNavigationController.tabBarItem.badgeColor = .crazeRed
         settingsTabBarItem = settingsNavigationController.tabBarItem
-
+        
+        cartNavigationController.title = cartNavigationController.cartViewController.title
+        cartNavigationController.tabBarItem = tabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: TabIndex.cart.rawValue)
+        cartNavigationController.tabBarItem.badgeColor = .crazeRed
+        
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
         
-        self.viewControllers = [self.screenshotsNavigationController,
-                                self.favoritesNavigationController,
-                                self.discoverNavigationController,
-                                self.settingsNavigationController]
+        viewControllers = [
+            favoritesNavigationController,
+            discoverNavigationController,
+            screenshotsNavigationController,
+            settingsNavigationController,
+            cartNavigationController
+        ]
+        selectedIndex = viewControllers?.index(of: screenshotsNavigationController) ?? 0
         
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
@@ -68,10 +83,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name:.fetchedAppSettings, object: nil)
         
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        
+        cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
+        syncCartTabItemCount()
     }
     
     override func viewDidLoad() {
@@ -157,8 +171,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if keyPath == TabBarBadgeFontKey {
             if let badgeFont = UIFont(name: "Optima-ExtraBlack", size: 14) {
                 // Remove the previous value so UIKit recognizes the update.
-                self.settingsTabBarItem.setBadgeTextAttributes(nil, for: .normal)
-                self.settingsTabBarItem.setBadgeTextAttributes([NSFontAttributeName : badgeFont], for: .normal)
+                settingsTabBarItem?.setBadgeTextAttributes(nil, for: .normal)
+                settingsTabBarItem?.setBadgeTextAttributes([NSFontAttributeName : badgeFont], for: .normal)
             }
         } else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
@@ -191,7 +205,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         var tabTitle = self.selectedViewController?.title
         
-        if item.tag == self.discoverTabTag {
+        if item.tag == TabIndex.discover.rawValue {
             tabTitle = "Matchsticks"
         }
         
@@ -201,21 +215,21 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     func presentTabBarSettingsBadge() {
-        self.settingsTabBarItem.badgeValue = "!"
+        settingsTabBarItem?.badgeValue = "!"
         
         if !isObservingSettingsBadgeFont {
             isObservingSettingsBadgeFont = true
-            self.settingsTabBarItem.addObserver(self, forKeyPath: TabBarBadgeFontKey, options: .new, context: nil)
+            settingsTabBarItem?.addObserver(self, forKeyPath: TabBarBadgeFontKey, options: .new, context: nil)
         }
     }
     
     func dismissTabBarSettingsBadge() {
         if isObservingSettingsBadgeFont {
             isObservingSettingsBadgeFont = false
-            self.settingsTabBarItem.removeObserver(self, forKeyPath: TabBarBadgeFontKey)
+            settingsTabBarItem?.removeObserver(self, forKeyPath: TabBarBadgeFontKey)
         }
         
-        self.settingsTabBarItem.badgeValue = nil
+        settingsTabBarItem?.badgeValue = nil
     }
     
     func refreshTabBarSettingsBadge() {
@@ -251,6 +265,39 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 tabView.transform = CGAffineTransform.identity
             })
         })
+    }
+    
+    // MARK: View Controllers
+    
+    static func resetViewControllerHierarchy(_ viewController: UIViewController, select tabIndex: MainTabBarController.TabIndex) {
+        func popToRoot(_ tabBarController: MainTabBarController) {
+            if let navigationController = tabBarController.selectedViewController as? UINavigationController {
+                navigationController.popToRootViewController(animated: false)
+            }
+        }
+        
+        func select(_ tabBarController: MainTabBarController) {
+            tabBarController.selectedIndex = tabIndex.rawValue
+        }
+        
+        func dismiss(_ tabBarController: MainTabBarController) {
+            tabBarController.dismiss(animated: true, completion: nil)
+        }
+        
+        if let mainTabBarController = viewController.presentingViewController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+            dismiss(mainTabBarController)
+        }
+        else if let mainTabBarController = viewController.presentingViewController?.tabBarController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+            dismiss(mainTabBarController)
+        }
+        else if let mainTabBarController = viewController.tabBarController as? MainTabBarController {
+            popToRoot(mainTabBarController)
+            select(mainTabBarController)
+        }
     }
     
     // MARK: - Screenshots
@@ -296,4 +343,16 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         ChangelogAlertController.presentIfNeeded(inViewController: self)
     }
     
+    // MARK: - Cart
+    
+    fileprivate func syncCartTabItemCount() {
+        let count = cartItemFrc?.fetchedObjectsCount ?? 0
+        cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+    }
+}
+
+extension MainTabBarController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        syncCartTabItemCount()
+    }
 }

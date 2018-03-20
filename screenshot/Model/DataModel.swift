@@ -114,6 +114,16 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func productFrc(delegate:FetchedResultsControllerManagerDelegate?, shoppableOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "shoppable == %@", shoppableOID)
+        
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
     func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
@@ -132,6 +142,15 @@ extension DataModel {
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Matchstick> = FetchedResultsControllerManager<Matchstick>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate:delegate)
         
+        return fetchedResultsController
+    }
+    
+    func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<CartItem>  {
+        let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        request.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
+        request.sortDescriptors = [NSSortDescriptor(key: "errorMask", ascending: false), NSSortDescriptor(key: "dateModified", ascending: false)]
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
 }
@@ -392,6 +411,9 @@ extension DataModel {
                      offer: String?,
                      imageURL: String?,
                      merchant: String?,
+                     partNumber: String?,
+                     color: String?,
+                     fallbackPrice: Float,
                      optionsMask: Int32) -> Product {
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
@@ -406,9 +428,151 @@ extension DataModel {
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
+        productToSave.partNumber = partNumber
+        productToSave.color = color
+        productToSave.fallbackPrice = fallbackPrice
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = NSDate()
         return productToSave
+    }
+    
+    // Save a new Variant to Core Data.
+    func saveVariant(managedObjectContext: NSManagedObjectContext,
+                     product: Product,
+                     color: String?,
+                     size: String?,
+                     price: Float,
+                     sku: String,
+                     url: String?,
+                     imageURLs: String?) -> Variant {
+        let variantToSave = Variant(context: managedObjectContext)
+        variantToSave.product = product
+        variantToSave.color = color
+        variantToSave.size = size
+        variantToSave.price = price
+        variantToSave.sku = sku
+        variantToSave.url = url
+        variantToSave.imageURLs = imageURLs
+        variantToSave.dateModified = NSDate()
+        return variantToSave
+    }
+    
+    func retrieveAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
+        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+        fetchRequest.fetchBatchSize = 1
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let mostRecentAddableCart = results.first {
+                return mostRecentAddableCart
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveAddableCart results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveCart(managedObjectContext: NSManagedObjectContext, remoteId: String) -> Cart? {
+        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "remoteId == %@", remoteId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchBatchSize = 1
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            if let cart = results.first {
+                return cart
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveAddableCart results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveOrCreateAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
+        if let mostRecentAddableCart = retrieveAddableCart(managedObjectContext: managedObjectContext) {
+            return mostRecentAddableCart
+        } else {
+            do {
+                let cartToSave = Cart(context: managedObjectContext)
+                cartToSave.dateModified = NSDate()
+                try managedObjectContext.save()
+                // Return quickly; add remoteId leisurely.
+                ShoppingCartModel.shared.addRemoteId(cartOID: cartToSave.objectID)
+                return cartToSave
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("retrieveOrCreateAddableCart results with error:\(error)")
+            }
+            return nil
+        }
+    }
+
+    func retrieveItems(managedObjectContext: NSManagedObjectContext, remoteId: String) -> [CartItem]? {
+        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "cart.remoteId == %@", remoteId)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
+
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveItems results with error:\(error)")
+        }
+        return nil
+    }
+    
+    // Errors if cart not previously created. Okay if cart has no remoteId.
+    func retrieveForCheckout() -> Promise<([String : Any], NSManagedObjectID)> {
+        return Promise { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                guard let cart = self.retrieveAddableCart(managedObjectContext: managedObjectContext),
+                  let items = cart.items?.sortedArray(using: []) as? [CartItem],
+                  items.count > 0 else {
+                    let error = NSError(domain: "Craze", code: 38, userInfo: [NSLocalizedDescriptionKey : "No cart with cartItems before checkout."])
+                    reject(error)
+                    return
+                }
+                var purchaseItems: [[String : Any]] = []
+                for item in items {
+                    let quantity = item.quantity
+                    if let sku = item.sku,
+                        !sku.isEmpty,
+                        quantity > 0 {
+                        purchaseItems.append(["sku" : sku, "qty" : quantity])
+                    }
+                }
+                guard purchaseItems.count > 0 else {
+                    let error = NSError(domain: "Craze", code: 39, userInfo: [NSLocalizedDescriptionKey : "No cartItems with sku and positive quantity to checkout."])
+                    reject(error)
+                    return
+                }
+                fulfill((["id" : cart.remoteId ?? "", "items" : purchaseItems], cart.objectID))
+            }
+        }
+    }
+    
+    func add(remoteId: String, toCartOID: NSManagedObjectID) {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                guard let cart = managedObjectContext.object(with: toCartOID) as? Cart,
+                  cart.remoteId == nil else {
+                        return
+                }
+                cart.remoteId = remoteId
+                try managedObjectContext.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                print("add remoteId:\(remoteId) toCartOID:\(toCartOID) results with error:\(error)")
+            }
+        }
     }
     
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
@@ -1182,6 +1346,22 @@ extension Product {
         return floatPrice < floatOriginalPrice
     }
     
+    public func imageURLs() -> [URL] {
+        return altImageURLs?.components(separatedBy: ",").flatMap {URL(string: $0)} ?? []
+    }
+    
+    func productTitle() -> String? {
+        return productDescription?.productTitle()
+    }
+    
+}
+
+extension Variant {
+    
+    func parsedImageURLs() -> [URL] {
+        return imageURLs?.components(separatedBy: ",").flatMap { URL(string: $0) } ?? []
+    }
+    
 }
 
 extension Matchstick {
@@ -1258,10 +1438,31 @@ extension Matchstick {
     
 }
 
+extension CartItem {
+    
+    func productTitle() -> String? {
+        return productDescription?.productTitle()
+    }
+    
+}
+
 extension NSFetchedResultsController {
     var fetchedObjectsCount:Int {
         get {
             return sections?.reduce(0, {$0 + $1.numberOfObjects}) ?? 0
+        }
+    }
+}
+
+fileprivate extension String {
+    func productTitle() -> String? {
+        let components = split(separator: ",")
+        
+        if components.count > 1 {
+            return components.dropLast().joined(separator: ",")
+        }
+        else {
+            return self
         }
     }
 }

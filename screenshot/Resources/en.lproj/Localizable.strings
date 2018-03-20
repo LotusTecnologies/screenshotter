@@ -15,7 +15,28 @@
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
+"cart.checkout.button" = "Checkout";
+"cart.checkout.total" = "Total: %@";
+"cart.empty.button" = "Find your next outfit!";
+"cart.empty.title" = "No Items in Cart";
+"cart.favorite.add" = "Add to Favorites";
+"cart.favorite.remove" = "Added to Favorites";
+"cart.header.title" = "Your Cart";
+"cart.header.item_count" = "Items: %d";
+"cart.item.error.price" = "Price has changed";
+"cart.item.error.quantity" = "Quantity has changed";
+"cart.item.error.unavailable" = "Out of stock";
+"cart.remove" = "Remove";
+"cart.title" = "Cart";
+"cart.variant.color" = "Color:";
+"cart.variant.quantity" = "Quantity:";
+"cart.variant.size" = "Size:";
+
 "changelog.title" = "What's New";
+
+"checkout.confirmation.detail" = "Thanks for shopping\nwith Screenshop!";
+"checkout.confirmation.title" = "Order Placed";
+"checkout.title" = "Checkout";
 
 "currency.auto" = "Automatic";
 
@@ -57,6 +78,7 @@
 
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
+"generic.close" = "Close";
 "generic.continue" = "Continue";
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";
@@ -106,6 +128,16 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 "picker.title" = "Add Photos";
+
+"product.add" = "Add to Cart";
+"product.buy" = "Buy Now";
+"product.color.default" = "Color";
+"product.next_step.cart" = "Go to Cart";
+"product.next_step.continue" = "Continue Shopping";
+"product.next_step.added" = "Product was added to your cart!";
+"product.similar_items" = "Related Items";
+"product.size.default" = "Size";
+"product.website" = "Go To %@";
 
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";

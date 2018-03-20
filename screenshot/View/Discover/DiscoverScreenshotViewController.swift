@@ -365,7 +365,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     fileprivate func setInteractiveElementsOffWithDelay() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.defaultAnimationDuration) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .defaultAnimationDuration) {
             self.tempButtonDisable = false
             self.syncInteractionElements()
         }
@@ -413,7 +413,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func dismissHelperView() {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverScreenshotPresentedHelper)
         
-        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+        UIView.animate(withDuration: .defaultAnimationDuration, animations: {
             self.cardHelperView?.alpha = 0
             self.passButton.isDisabled(false)
             self.addButton.isDisabled(false)
@@ -491,7 +491,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     fileprivate func presentTermsOfServiceViewController() {
-        if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
             present(viewController, animated: true, completion: nil)
         }
     }

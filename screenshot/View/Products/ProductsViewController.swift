@@ -26,9 +26,10 @@ enum ProductsViewControllerState : Int {
     case empty
 }
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>
+    fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
     
     var products:[Product] = []
     
@@ -115,7 +116,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip")
-            collectionView.register(ProductCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+            collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
             
             
             self.view.insertSubview(collectionView, at: 0)
@@ -220,19 +221,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
         self.present(navigationController, animated: true, completion: nil)
     }
-    
-    func productCollectionViewCellDidTapFavorite(cell: ProductCollectionViewCell) {
-        
-        guard let isFavorited = cell.favoriteButton?.isSelected else{
-            return
-        }
-        guard let indexPath = self.collectionView?.indexPath(for: cell) else{
-            return
-        }
-        let product = self.productAtIndex(indexPath.item)
-        product.setFavorited(toFavorited: isFavorited)
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
-    }
 }
 
 private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
@@ -326,7 +314,7 @@ extension ProductsViewController {
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
 extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    func numberOfCollectionViewProductColumns() ->Int {
+    var numberOfCollectionViewProductColumns: Int {
         return 2
     }
     
@@ -373,9 +361,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
             
         } else if sectionType == .product {
-            let columns = CGFloat(self.numberOfCollectionViewProductColumns())
+            let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = size.width + ProductCollectionViewCell.labelsHeight
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width)
         }
         
         return size
@@ -387,22 +375,23 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .tooltip {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
             return cell
-            
-        } else if sectionType == .product {
+        }
+        else if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
-                cell.delegate = self
+            
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductsCollectionViewCell {
                 cell.contentView.backgroundColor = collectionView.backgroundColor
                 cell.title = product.displayTitle
                 cell.price = product.price
                 cell.originalPrice = product.originalPrice
                 cell.imageUrl = product.imageURL
                 cell.isSale = product.isSale()
-                cell.favoriteButton?.isSelected = product.isFavorite
+                cell.favoriteControl.isSelected = product.isFavorite
+                cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 return cell
             }
-            
         }
+        
         return UICollectionViewCell()
     }
     
@@ -432,9 +421,26 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductProducts, fromPage: "Products")
-
+            product.recordViewedProduct()
+            
+            if let productViewController = presentProduct(product, from:"Products") {
+                productViewController.similarProducts = products
+            }
         }
+    }
+    
+    func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+        guard let location = event.allTouches?.first?.location(in: collectionView),
+            let indexPath = collectionView?.indexPathForItem(at: location)
+            else {
+                return
+        }
+        
+        let isFavorited = favoriteControl.isSelected
+        let product = self.productAtIndex(indexPath.item)
+        
+        product.setFavorited(toFavorited: isFavorited)
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Products")
     }
 }
 
@@ -512,6 +518,11 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
                 }
             }
         }
+        else if controller == productsFRC {
+            if view.window == nil, let collectionView = collectionView {
+                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+            }
+        }
     }
     
     func hasShoppables() -> Bool {
@@ -530,7 +541,6 @@ extension ProductsViewControllerProducts{
     }
     
     func reloadProductsFor(shoppable:Shoppable) {
-        
         self.products = []
         self.productsUnfilteredCount = 0
         self.scrollRevealController?.resetViewOffset()
@@ -550,14 +560,14 @@ extension ProductsViewControllerProducts{
         self.collectionView?.reloadData()
         self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
         
+        productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
+        
         if self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.tooltip.section), at: .top, animated: false)
             
         } else if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
-        
-        
     }
     
     func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
@@ -862,9 +872,10 @@ extension ProductsViewControllerNoItemsHelperView{
             retryButton.setTitle("products.helper.retry".localized, for: .normal)
             retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
             helperView.controlView.addSubview(retryButton)
-            
             retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
+            retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
             retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
+            retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
             retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
         }
     }

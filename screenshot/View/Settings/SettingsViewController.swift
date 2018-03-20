@@ -221,10 +221,6 @@ class SettingsViewController : BaseViewController {
         }
     }
     
-    @objc fileprivate func dismissViewController() {
-        presentedViewController?.dismiss(animated: true, completion: nil)
-    }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
         
@@ -487,10 +483,7 @@ extension SettingsViewController : UITableViewDelegate {
             IntercomHelper.sharedInstance.presentMessagingUI()
             
         case .coins:
-            let gameViewController = GameViewController()
-            gameViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissViewController))
-            
-            let navigationController = UINavigationController(rootViewController: gameViewController)
+            let navigationController = ModalNavigationController(rootViewController: GameViewController())
             present(navigationController, animated: true, completion: nil)
             
         case .pushPermission, .photoPermission:
@@ -506,7 +499,7 @@ extension SettingsViewController : UITableViewDelegate {
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            let options:[OpenProductPage] = [.embededSafari, .safari, .chrome]
+            let options:[OpenWebPage] = [.embededSafari, .safari, .chrome]
             options.forEach({ (setting) in
                 alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
                     setting.saveToUserDefaults()
@@ -698,7 +691,7 @@ fileprivate extension SettingsViewController {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
         case .openIn:
-            return OpenProductPage.fromSystemInfo().localizedDisplayString()
+            return OpenWebPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {

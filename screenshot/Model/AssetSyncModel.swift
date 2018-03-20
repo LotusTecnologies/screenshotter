@@ -373,8 +373,18 @@ class AssetSyncModel: NSObject {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
-            firstly { _ -> Promise<(String, [[String : Any]])> in
-                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification)
+            firstly { _ -> Promise<Bool> in
+                let userDefaults = UserDefaults.standard
+                if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+                    print("UserDefaultsKeys.isUSC not set. geoLocating.")
+                    return NetworkingPromise.sharedInstance.geoLocateIsUSC()
+                } else {
+                    let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
+                    print("UserDefaultsKeys.isUSC:\(isUSC)")
+                    return Promise(value: isUSC)
+                }
+            }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
                     AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
@@ -540,6 +550,13 @@ class AssetSyncModel: NSObject {
                      prod: [String : Any],
                      optionsMask: Int32) {
         let extractedCategories = prod["categories"] as? [String]
+        let originalData = prod["original_data"] as? [String : Any]
+        let shoppingModel = ShoppingCartModel.shared
+        let fallbackPrice: Float = shoppingModel.parseFloat(originalData?["price"])
+            ?? shoppingModel.parseFloat(originalData?["sale_price"])
+            ?? shoppingModel.parseFloat(originalData?["discount_price"])
+            ?? shoppingModel.parseFloat(originalData?["retail_price"])
+            ?? 0
         let _ = DataModel.sharedInstance.saveProduct(managedObjectContext: managedObjectContext,
                                                      shoppable: shoppable,
                                                      order: productOrder,
@@ -553,6 +570,9 @@ class AssetSyncModel: NSObject {
                                                      offer: prod["offer"] as? String,
                                                      imageURL: prod["imageUrl"] as? String,
                                                      merchant: prod["merchant"] as? String,
+                                                     partNumber: originalData?["part_number"] as? String,
+                                                     color: originalData?["color"] as? String,
+                                                     fallbackPrice: fallbackPrice,
                                                      optionsMask: optionsMask)
     }
     

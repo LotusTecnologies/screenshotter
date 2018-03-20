@@ -236,7 +236,7 @@ extension ScreenshotsNavigationController {
                     clipView.bottomAnchor.constraint(equalTo: tabBarView.bottomAnchor).isActive = true
                     clipView.trailingAnchor.constraint(equalTo: tabBarView.trailingAnchor).isActive = true
                     self.clipView = clipView
-                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                         self.clipView?.alpha = 1.0
                     })
                 }
@@ -246,7 +246,7 @@ extension ScreenshotsNavigationController {
     
     func dismissPickerClipView() {
         if let _ = self.clipView {
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                 self.clipView?.alpha = 0.0
                 
             }, completion: { (finished) in

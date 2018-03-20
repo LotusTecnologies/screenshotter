@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import WebKit
 import SpriteKit
 import Appsee
@@ -465,30 +465,9 @@ extension WebViewController : WKNavigationDelegate {
         }
     }
     
-    func urlIsTracker(url:URL?) -> Bool{
-        let trackers = [
-            "api.shopstyle.com",
-            "doubleclick.net",
-            "adservice.google",
-            "www.googletagmanager.com"
-        ]
-        if let host = url?.host {
-            for t in trackers{
-                if host.contains(t) {
-                    
-                    return true
-                }
-            }
-        }
-        
-        return false
-        
-    }
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
         if didLoadInitialPage == false {
-            if !self.urlIsTracker(url: navigationResponse.response.url){
-                
+            if !isTrackerURL(url: navigationResponse.response.url) {
                 didLoadInitialPage = true
                 
                 if !isShowingGame {
@@ -514,6 +493,24 @@ extension WebViewController : WKNavigationDelegate {
         let alertController = UIAlertController(title: "webview.invalid.title".localized, message: "webview.invalid.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alertController
+    }
+    
+    fileprivate func isTrackerURL(url: URL?) -> Bool {
+        let trackers = [
+            "api.shopstyle.com",
+            "doubleclick.net",
+            "adservice.google",
+            "www.googletagmanager.com"
+        ]
+        if let host = url?.host {
+            for tracker in trackers {
+                if host.contains(tracker) {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 }
 

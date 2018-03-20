@@ -56,14 +56,14 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<NSDictionary> {
+    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
         guard let imageData = imageData,
             imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
                 return Promise(error: emptyError)
         }
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=default&payload_type=image_bin"
+            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)&payload_type=image_bin"
             : "https://homedecor.syteapi.com/offers/bb?account_id=6722&sig=G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=&feed=craze_home&payload_type=image_bin"
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -80,8 +80,8 @@ class NetworkingPromise : NSObject {
         return promise
     }
 
-    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification)
+    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
+        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification, isUsc: isUsc)
             .then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
@@ -91,6 +91,7 @@ class NetworkingPromise : NSObject {
                         print("Syte no segments. responseObject:\(dict)")
                         return Promise(error: emptyError)
                 }
+                print("uploadToSyte segments:\(segments)")
                 return Promise(value: (uploadedURLString, segments))
         }
     }
@@ -126,7 +127,7 @@ class NetworkingPromise : NSObject {
         let urlEncodedImageUrl = imageUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
         let urlEncodedOffersUrl = offersUrl?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
         let coordsObject = ["x0": b0x, "y0": b0y, "x1": b1x, "y1": b1y]
-        let base64EncodedJsonCoords = jsonStringify(object: coordsObject)?.data(using: .utf8)?.base64EncodedString() ?? ""
+        let base64EncodedJsonCoords = jsonDatafy(object: coordsObject)?.base64EncodedString() ?? ""
         let urlString = "https://syteapi.com/et" +
             "?name=\(isPositive ? "positive_feedback" : "negative_feedback")" +
             "&account_id=\(accountId)" +
@@ -153,6 +154,13 @@ class NetworkingPromise : NSObject {
             }
         }
         dataTask.resume()
+    }
+    
+    func jsonDatafy(object: Any) -> Data? {
+        if let objectData = try? JSONSerialization.data(withJSONObject: object, options: []) {
+            return objectData
+        }
+        return nil
     }
     
     func jsonStringify(object: Any) -> String? {
@@ -220,6 +228,7 @@ class NetworkingPromise : NSObject {
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
+                    print("downloadProducts productsArray:\(productsArray)")
                     return Promise(value: productsDict)
                 } else {
                     let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
@@ -269,6 +278,107 @@ class NetworkingPromise : NSObject {
                     return Promise(error: error)
             }
             return Promise(value: data)
+        }
+    }
+    
+    func getAvailableVariants(partNumber: String) -> Promise<NSDictionary> {
+        guard let url = URL(string: Constants.shoppableDomain + "/product/" + partNumber) else {
+            let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+        return promise
+    }
+    
+    func createCart() -> Promise<NSDictionary> {
+        guard let url = URL(string: Constants.shoppableDomain + "/cart") else {
+            let error = NSError(domain: "Craze", code: 33, userInfo: [NSLocalizedDescriptionKey: "Cannot create cart url from shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+        return promise
+    }
+
+    func clearCart(remoteId: String) -> Promise<Bool> {
+        guard let url = URL(string: Constants.shoppableDomain + "/cart/\(remoteId)/clear") else {
+            let error = NSError(domain: "Craze", code: 43, userInfo: [NSLocalizedDescriptionKey: "Cannot create clearCart url from remoteId:\(remoteId)  shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<Bool> in
+            print("clearCart received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 44, userInfo: [NSLocalizedDescriptionKey: "clearCart invalid http statusCode for url:\(url)"])
+                    print("checkoutCart httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            // Don't bother parsing the contents of what was returned; http status is enough, as on Android.
+            // Contents changes between prod and dev, on March 13, 2018.
+            return Promise(value: true)
+        }
+    }
+
+    func checkoutCart(jsonObject: [String : Any]) -> Promise<[String : Any]> {
+        guard let url = URL(string: Constants.shoppableDomain + "/cart/put/bundling") else {
+            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form cart bundle url from shoppableDomain:\(Constants.shoppableDomain)"])
+            return Promise(error: error)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonDatafy(object: jsonObject)
+        print("checkoutCart requesting url:\(url)  headers:\(String(describing: request.allHTTPHeaderFields))  data:\(String(data: request.httpBody!, encoding: .utf8) ?? "-")")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<[String : Any]> in
+            print("checkoutCart received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
+            guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200,
+                httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "checkoutCart invalid http statusCode for url:\(url)"])
+                    print("checkoutCart httpResponse.statusCode error")
+                    return Promise(error: error)
+            }
+            if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String : Any] {
+                return Promise(value: jsonObject)
+            } else {
+                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkoutCart JSONSerialize failed for url:\(url)"])
+                print("checkoutCart failed to JSONSerialize data.count:\(data.count)")
+                return Promise(error: error)
+            }
+        }
+    }
+    
+    func geoLocateIsUSC() -> Promise<Bool> {
+        guard let url = URL(string: "https://freegeoip.net/json/") else {
+            let error = NSError(domain: "Craze", code: 49, userInfo: [NSLocalizedDescriptionKey: "Cannot form geoLocate url"])
+            return Promise(error: error)
+        }
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { dict -> Promise<Bool> in
+            var isUsc = false
+            if let countryCode = dict["country_code"] as? String,
+              countryCode == "US" || countryCode == "IL" {
+                isUsc = true
+            }
+            print("geoLocateIsUSC isUsc:\(isUsc)  dict:\(dict)")
+            UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
+            return Promise(value: isUsc)
         }
     }
     

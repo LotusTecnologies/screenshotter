@@ -267,8 +267,9 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
     
     func productBar(_ controller: ProductsBarController, didTap product: Product) {
         if !self.isEditing {
-            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductProductbar, fromPage: "ProductBar")
-        }else{
+            self.presentProduct(product, from:"ProductBar")
+        }
+        else {
             if let index = self.toHideFromProductBarObjectIDs.index(of: product.objectID){
                 self.toHideFromProductBarObjectIDs.remove(at: index)
             }else{
@@ -409,7 +410,7 @@ extension ScreenshotsViewController {
         }
         
         if (animated) {
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                 cellEditing()
                 // TODO:
                 ///     putting `removeDeleteButton` here instead of in the completion
@@ -518,7 +519,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                     screenshot.setHide()
                     self.removeScreenshotHelperView()
                     self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                         cell.selectedState = .disabled
                     })
                     AnalyticsTrackers.standard.track(.removedScreenshot)

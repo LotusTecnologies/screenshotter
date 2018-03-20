@@ -11,7 +11,7 @@ import Foundation
 enum AppSettingKeys : String {
     case updateVersion = "SuggestedUpdateVersion"
     case forcedUpdateVersion = "ForceUpdateVersion"
-    case openProductsPageDefault = "OpenProductsPageDefault"
+    case openWebPageDefault = "OpenProductsPageDefault"
 }
 
 class AppSettings  {
@@ -26,8 +26,8 @@ class AppSettings  {
         return self.appSettingsDict?[AppSettingKeys.forcedUpdateVersion.rawValue] as? String
     }
     
-    var openProductsPageDefault: String? {
-        return self.appSettingsDict?[AppSettingKeys.openProductsPageDefault.rawValue] as? String
+    var openWebPageDefault: String? {
+        return self.appSettingsDict?[AppSettingKeys.openWebPageDefault.rawValue] as? String
     }
     
     var previousVersion: String? 

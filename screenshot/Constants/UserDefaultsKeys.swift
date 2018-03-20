@@ -17,6 +17,9 @@ class UserDefaultsKeys  {
     static let referralChannel = "ReferralChannel"
     static let campaign = "Campaign"
 
+    // USC
+    static let isUSC = "IsUSC"
+    
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     
@@ -29,7 +32,7 @@ class UserDefaultsKeys  {
     static let productCurrency = "ProductCurrency"
     static let productCategory = "ProductCategory"
     
-    static let openProductPageInSetting = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
+    static let openWebPage = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"

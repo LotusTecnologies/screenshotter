@@ -47,23 +47,38 @@ class EmptyListController: NSObject {
     
     private var previousContentHeight: CGFloat = 0
     
+    // Note: This doesn't work work table views with a grouped style.
     func didSetContentSize(scrollView: UIScrollView, emptyView: UIView?) {
         let height = max(0, scrollView.contentSize.height - scrollView.contentInset.top - scrollView.contentInset.bottom)
         
         if height != previousContentHeight {
             if Int(height) == 0 && previousContentHeight > 0 {
                 isEmptyViewHidden = false
-                emptyView?.isHidden = false
-                scrollView.isScrollEnabled = false
+                emptyView?.isHidden = isEmptyViewHidden
+                scrollView.isScrollEnabled = isEmptyViewHidden
             }
             else if height > 0 && Int(previousContentHeight) == 0 {
                 isEmptyViewHidden = true
-                emptyView?.isHidden = true
-                scrollView.isScrollEnabled = true
+                emptyView?.isHidden = isEmptyViewHidden
+                scrollView.isScrollEnabled = isEmptyViewHidden
             }
         }
         
         previousContentHeight = height
+    }
+    
+    private var previousHasTableViewRows = false
+    
+    func didSetContentSize(tableView: UITableView, emptyView: UIView?) {
+        let hasTableViewRows = !(tableView.indexPathsForVisibleRows?.isEmpty ?? true)
+        
+        if hasTableViewRows != previousHasTableViewRows {
+            isEmptyViewHidden = hasTableViewRows
+            emptyView?.isHidden = isEmptyViewHidden
+            tableView.isScrollEnabled = isEmptyViewHidden
+        }
+        
+        previousHasTableViewRows = hasTableViewRows
     }
     
     func didSetContentInset(scrollView: UIScrollView) {

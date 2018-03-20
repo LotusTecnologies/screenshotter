@@ -1,5 +1,5 @@
 //
-//  FavoriteButton.swift
+//  FavoriteControl.swift
 //  screenshot
 //
 //  Created by Corey Werner on 9/4/17.
@@ -10,10 +10,10 @@ import UIKit
 import Lottie
 import Appsee
 
-class FavoriteButton: UIButton {
-    private let heartSwitch = LOTAnimatedSwitch(named: "FavoriteHeart")
-    private var heartSwitchWidthConstraint: NSLayoutConstraint!
-    private var animate = false
+class FavoriteControl: UIControl {
+    fileprivate let heartSwitch = LOTAnimatedSwitch(named: "FavoriteHeart")
+    fileprivate var heartSwitchWidthConstraint: NSLayoutConstraint!
+    fileprivate var animate = false
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -22,7 +22,7 @@ class FavoriteButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addTarget(self, action: #selector(selectAction), for: .touchUpInside)
+        addTarget(self, action: #selector(touchUpInsideAction), for: .touchUpInside)
         
         // The heart switch animation needs to be a subview since it's
         // view extends beyond the bounds of the desired tappable rect.
@@ -46,7 +46,7 @@ class FavoriteButton: UIButton {
         return CGSize(width: 36, height: 36)
     }
     
-    private func heartWidth(for width: CGFloat) -> CGFloat {
+    fileprivate func heartWidth(for width: CGFloat) -> CGFloat {
         return width * 2.28
     }
     
@@ -56,7 +56,7 @@ class FavoriteButton: UIButton {
         }
     }
     
-    func selectAction() {
+    func touchUpInsideAction() {
         animate = true
         isSelected = !isSelected
         animate = false

@@ -58,14 +58,7 @@ class ProductsRateView : UIView {
         
         labelTrailingConstraint = label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.padding)
         
-        let borderView = UIView()
-        borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
-        addSubview(borderView)
-        borderView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        borderView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        borderView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        borderView.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+        addSubview(BorderView(edge: .top))
         
         contentView.addSubview(talkToYourStylistButton)
         talkToYourStylistButton.translatesAutoresizingMaskIntoConstraints = false
@@ -185,7 +178,7 @@ class ProductsRateView : UIView {
             syncLabel()
             syncBackgroundColor()
         }else if animated && hasRating {
-            let duration = Constants.defaultAnimationDuration
+            let duration: TimeInterval = .defaultAnimationDuration
             
             UIView.animate(withDuration: duration, animations: {
                 self.voteUpButton.alpha = 0
