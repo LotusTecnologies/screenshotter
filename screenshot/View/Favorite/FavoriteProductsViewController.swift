@@ -55,6 +55,7 @@ class FavoriteProductsViewController : BaseViewController {
         favoriteProductsView.tableView.dataSource = self
         favoriteProductsView.tableView.delegate = self
         favoriteProductsView.tableView.backgroundColor = view.backgroundColor
+        favoriteProductsView.tableView.allowsSelection = false
         favoriteProductsView.tableView.register(FavoriteProductsTableViewCell.self, forCellReuseIdentifier: "cell")
         favoriteProductsView.tableView.rowHeight = UITableViewAutomaticDimension
         favoriteProductsView.tableView.estimatedRowHeight = 200
