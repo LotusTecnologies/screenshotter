@@ -144,6 +144,7 @@
 "screenshot.empty.title" = "No Screenshots Yet";
 "screenshot.import.latest" = "Import your latest screenshot?";
 "screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
+"screenshot.import.very_many" = "You have many new screenshots, do you want to import them?";
 "screenshot.option.delete" = "DELETE";
 "screenshot.option.share" = "SHARE";
 "screenshot.permission.photo.allow" = "Allow Access";

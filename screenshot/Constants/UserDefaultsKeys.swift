@@ -46,7 +46,8 @@ class UserDefaultsKeys  {
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
     static let persistentVersion = "PersistentVersion"
     static let dailyStreak = "dailyStreak"
-    
+    static let processBackgroundImagesForFashionAfterDate = "ProcessBackgroundImagesForFashionAfterDate"
+
     // DB
     static let lastDbVersionMigrated = "LastDbVersionMigrated"
     

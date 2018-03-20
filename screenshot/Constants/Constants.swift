@@ -10,6 +10,10 @@ import Foundation
 
 class Constants {
 
+    
+    //Product decisions
+    static let notificationProductToImportCountLimit = 4
+    
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"

@@ -655,10 +655,10 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         
         if (count == 1) {
             return .importSingleScreenshot
-            
+        }else if (count >= Constants.notificationProductToImportCountLimit){
+            return .importVeryManyScreenshots
         } else if (count > 1) {
             return .importMultipleScreenshots
-            
         } else {
             return .none
         }

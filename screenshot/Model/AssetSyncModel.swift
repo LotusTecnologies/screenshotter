@@ -24,13 +24,12 @@ class AccumulatorModel: NSObject {
         return newScreenshotsCount + assetIds.count
     }
     
-    
     var assetIds:Set<String> = []
     
     private func modifyCount(_ block:@escaping ()->()) {
-        DispatchQueue.main.async {
-            let countBefore = self.getNewScreenshotsCount()
+        DispatchQueue.main.async {  //we want to post the notification on the main queue
             
+            let countBefore = self.getNewScreenshotsCount()
             block()
             let countAfter = self.getNewScreenshotsCount()
             if countBefore != countAfter {
@@ -74,19 +73,19 @@ class AssetSyncModel: NSObject {
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
     public weak var screenshotDetectionDelegate: ScreenshotDetectionProtocol?
-    var backgroundScreenshotDataArray: [BackgroundScreenshotData] = []
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
+    var foregroundScreenshotAssetIds = Set<String>()
+    var userJustTookScreenshotAssetIds = Set<String>()
     var isRegistered = false
     var isNextScreenshotForeground = false
     var isRecentlyForeground = false
     var backgroundProcessFetchedResults:PHFetchResult<PHAsset>?
-    var scanPhotoGalleryForFashionCutOffDate:Date?
     
     var uploadScreenshotWithClarifaiQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "upload Screenshot With Clarifai Queue"
-        queue.maxConcurrentOperationCount = 2
+        queue.maxConcurrentOperationCount = 1
         queue.isSuspended = true
         ClarifaiModel.sharedInstance.kickoffModelDownload().always {
             queue.isSuspended = false
@@ -95,6 +94,7 @@ class AssetSyncModel: NSObject {
 
         return queue
     }()
+    
     
     var userInitiatedQueue:OperationQueue = {
         var queue = OperationQueue()
@@ -254,64 +254,49 @@ extension AssetSyncModel {
 
 //Background image processing
 extension AssetSyncModel: PHPhotoLibraryChangeObserver {
-    
-    func scanPhotoGalleryForFashion() {
+    func updatePhotoGalleryFetch() {
         let fetchOptions = PHFetchOptions()
-        var installDate: NSDate
-        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate {
+        var dates:[Date] = []
+        
+        var installDate: Date
+        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
             installDate = UserDefaultsInstallDate
         } else {
-            installDate = NSDate()
+            installDate = Date()
             UserDefaults.standard.set(installDate, forKey: UserDefaultsKeys.dateInstalled)
         }
         
-        let oneDayAgo = NSDate(timeIntervalSinceNow: -60*60*24)
-        var cutOffDate = oneDayAgo.laterDate(installDate as Date) as NSDate
+        dates.append(installDate)
+        dates.append(Date(timeIntervalSinceNow: -60*60*24))
         
-        if let cutOff = self.scanPhotoGalleryForFashionCutOffDate {
-            cutOffDate = cutOffDate.laterDate(cutOff) as NSDate
+        if let date = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
+            dates.append(date)
         }
-        self.scanPhotoGalleryForFashionCutOffDate = Date()
+        
+        let cutOffDate = (dates.max { a, b -> Bool in a < b  } ?? installDate )as NSDate
         
         fetchOptions.predicate = NSPredicate(format: "creationDate >= %@ AND (mediaSubtype & %d) != 0", cutOffDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 25
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         self.backgroundProcessFetchedResults = assets
-        registerForPhotoChanges()
+        registerForPhotoChanges()  //just in case we got permissions since init
+    }
+    
+    func scanPhotoGalleryForFashion() {
+        updatePhotoGalleryFetch()
         
         if let assets = self.backgroundProcessFetchedResults {
             var assetIds = Set<String>()
             assets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                 assetIds.insert(asset.localIdentifier)
             })
-            
-            DataModel.sharedInstance.performBackgroundTask { (context) in
-                let dbSet = DataModel.sharedInstance.retrieveAssetIds(assetIds:Array(assetIds), managedObjectContext: context)
-                assetIds.subtract(dbSet)
-                
-                var didAdd = false
-                assets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-                    if assetIds.contains(asset.localIdentifier) {
-                        didAdd = true
-                        self.uploadScreenshotWithClarifai(asset: asset, isForeground: false)
-                    }
-                })
-                if didAdd && ApplicationStateModel.sharedInstance.isBackground() {
-                    let operation = BlockOperation.init(block: {
-                        print("processing end of scanPhotoGalleryForFashion to display notification" )
-                        if self.backgroundScreenshotDataArray.count > 0 && ApplicationStateModel.sharedInstance.isBackground() {
-                            self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: self.backgroundScreenshotDataArray)
-                        }
-                        self.backgroundScreenshotDataArray.removeAll()
-                    })
-                    
-                    self.uploadScreenshotWithClarifaiQueue.operations.forEach {  operation.addDependency($0)}
-                    self.uploadScreenshotWithClarifaiQueue.addOperation(operation)
+            assets.enumerateObjects(options: [.reverse], using: { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                if assetIds.contains(asset.localIdentifier) {
+                    self.uploadScreenshotWithClarifai(asset: asset)
                 }
-               
-                
-            }
+            })
+           
         }
     }
     
@@ -322,7 +307,15 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }
         
         if let change = changeInstance.changeDetails(for: backgroundProcessFetchedResults), change.hasIncrementalChanges {
-            scanPhotoGalleryForFashion()
+            if isNextScreenshotForeground {
+                if let asset = change.insertedObjects.last {
+                    self.foregroundScreenshotAssetIds.insert(asset.localIdentifier)
+                    isNextScreenshotForeground = false
+                }
+            }
+            change.insertedObjects.forEach{ self.userJustTookScreenshotAssetIds.insert($0.localIdentifier) }
+            change.insertedObjects.forEach{ self.uploadScreenshotWithClarifaiFromUserScreenshotAction(asset:$0) }
+            updatePhotoGalleryFetch()
         }
     }
     
@@ -344,12 +337,11 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     }
     
 
-    func uploadScreenshotWithClarifai(asset: PHAsset, isForeground:Bool) {
-        
-        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            print("uploadScreenshotWithClarifai \(asset.creationDate) \(asset.localIdentifier)")
-
-            firstly {
+    func uploadScreenshotWithClarifaiFromUserScreenshotAction(asset: PHAsset) {
+        let isForeground = self.foregroundScreenshotAssetIds.contains(asset.localIdentifier)
+        self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
+        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(priority:.high, timeout: 20.0, completion: { (completeOperation) in
+            firstly{ () -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
             }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
                 AnalyticsTrackers.standard.track(.sentImageToClarifai)
@@ -359,27 +351,33 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             }.then(on: self.processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                 let isRecognized = (imageClassification != .unrecognized)
                 let classification = imageClassification.shortString()
-
+                
                 AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
-                let imageData: Data? = isRecognized ? self.data(for: image) : nil
                 return Promise { fulfill, reject in
-                    DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-                        if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
-                            //do nothing if already exsists
-                            let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
-                            reject(error)
-                        }else{
-                            let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                             assetId: asset.localIdentifier,
-                                                             createdAt: asset.creationDate,
-                                                             isRecognized: isRecognized,
-                                                             isFromShare: false,
-                                                             isHidden: !isRecognized || !isForeground,
-                                                             imageData: imageData,
-                                                             classification: classification)
-                            fulfill((imageClassification, imageData))
-
+                    let isHidden = ( !isRecognized || !isForeground)
+                    if !isHidden {
+                        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                                //do nothing if already exsists
+                                let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
+                                reject(error)
+                            }else{
+                                let imageData = self.data(for: image)
+                                let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                                assetId: asset.localIdentifier,
+                                                                                createdAt: asset.creationDate,
+                                                                                isRecognized: isRecognized,
+                                                                                isFromShare: false,
+                                                                                isHidden: false,
+                                                                                imageData: imageData,
+                                                                                classification: classification)
+                                fulfill((imageClassification, imageData))
+                                
+                            }
                         }
+                    }else{
+                        let imageData = self.data(for: image)
+                        fulfill((imageClassification, imageData))
                     }
                 }
             }.then (on: self.processingQ) { imageClassification, imageData -> Void in
@@ -389,17 +387,59 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
                         }
                         self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
-                        print("is in foreground no  notification \(asset.localIdentifier)")
                     } else { // Screenshot taken while app in background (or killed)
                         AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
-                        self.backgroundScreenshotDataArray.forEach { $0.imageData = nil } // we only use the last image, so clear all other UIImages
-                        self.backgroundScreenshotDataArray.append(BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData))
-                        print("adding item to queue to dispaly notification \(asset.localIdentifier)")
+                        if  ApplicationStateModel.sharedInstance.isBackground() {
+                            self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
+                        }
                     }
                 }
             }.catch { error in
                 print("uploadScreenshotWithClarifai catch error:\(error)")
             }.always(on: self.serialQ) {
+                completeOperation()
+            }
+        }))
+    }
+    
+    func uploadScreenshotWithClarifai(asset: PHAsset) {
+        let isScreenshotUserJustTook = self.userJustTookScreenshotAssetIds.contains(asset.localIdentifier)
+        if isScreenshotUserJustTook {
+            return // processed by other function
+        }
+        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
+            firstly{ () -> Promise<UIImage> in
+                if !isScreenshotUserJustTook {
+                    if let date = asset.creationDate {
+                        if let currentValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
+                            if date < currentValue {
+                                let error = NSError.init(domain: "Craze", code: -81, userInfo: [NSLocalizedDescriptionKey : "asset is too old to process"])
+                                throw error
+                            }
+                        }
+                    }
+                    if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > Constants.notificationProductToImportCountLimit {
+                        let error = NSError.init(domain: "Craze", code: -82, userInfo: [NSLocalizedDescriptionKey : "already have enough images"])
+                        throw error
+                    }
+                }
+                return asset.image(allowFromICloud: false)
+            }.then (on: self.processingQ) { image -> Promise<ClarifaiModel.ImageClassification> in
+                AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                return ClarifaiModel.sharedInstance.classify(image: image)
+            }.then(on: self.processingQ) { imageClassification -> Void in
+               if imageClassification != .unrecognized {
+                    AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                }
+            }.catch { error in
+                print("uploadScreenshotWithClarifai catch error:\(error)")
+            }.always(on: self.serialQ) {
+                if let date = asset.creationDate {
+                    let currentValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date ?? Date.distantPast
+                    if currentValue < date {
+                        UserDefaults.standard.setValue(date, forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate)
+                    }
+                }
                 completeOperation()
             }
         }))
