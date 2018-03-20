@@ -578,13 +578,18 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         let screenshotsCount = self.newScreenshotsCount()
         AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
 
-        if (cell.contentText == .importSingleScreenshot) {
-            if let assetId = self.notificationCellAssetId {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId])
-            }
-            
-        } else if (cell.contentText == .importMultipleScreenshots) {
-            self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+        switch cell.contentText {
+            case .importSingleScreenshot:
+                if let assetId = self.notificationCellAssetId {
+                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId])
+                }else{
+                    self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+                }
+            case .importMultipleScreenshots, .importVeryManyScreenshots:
+                self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+            case .none:
+                //huh?
+                break
         }
         
         self.dismissNotificationCell()
