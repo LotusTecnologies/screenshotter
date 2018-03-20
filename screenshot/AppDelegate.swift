@@ -63,8 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     DispatchQueue.main.async {
                         self.window?.rootViewController = self.nextViewController()
                     }
+                    AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
                 }
-                AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
             }
         }else{
             let _ = DataModel.sharedInstance.loadStore(sync:true)
