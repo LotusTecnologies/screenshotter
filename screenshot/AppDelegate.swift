@@ -74,6 +74,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             contentAvailable.intValue == 1 {
             //TODO: why is this only segment
             AnalyticsTrackers.segment.track(.wokeFromSilentPush)
+        } else {
+            AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
         }
         
         return true
