@@ -470,7 +470,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                         self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData:                                 self.data(for: image))])
+                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData: self.data(for: image))])
                                     }
                                 }
                             }
