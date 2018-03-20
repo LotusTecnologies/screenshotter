@@ -51,13 +51,6 @@ class AsyncOperation: Operation {
         self.executionBlock = completion
         self.timeout = timeout
     }
-    
-    init(priority:QueuePriority , timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
-        self.executionBlock = completion
-        self.timeout = timeout
-        super.init()
-        self.queuePriority = priority
-    }
 
     private func finishedExecuting(){
         self.executing(false)

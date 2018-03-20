@@ -18,36 +18,47 @@ class AccumulatorModel: NSObject {
     
     public static let sharedInstance = AccumulatorModel()
     
-    private var newScreenshotsCount: Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.newScreenshotsCount)
     
     public func getNewScreenshotsCount() -> Int {
-        return newScreenshotsCount + assetIds.count
+        return assetIds.count
     }
     
-    var assetIds:Set<String> = []
+    var assetIds:Set<String> = {
+        if let array = UserDefaults.standard.value(forKey: UserDefaultsKeys.newScreenshotsAssetIds) as? [String]{
+            return Set(array)
+        }else{
+            let a:[String] = []
+            UserDefaults.standard.setValue(a, forKey: UserDefaultsKeys.newScreenshotsAssetIds)
+            return Set(a)
+        }
+        
+    }()
     
     private func modifyCount(_ block:@escaping ()->()) {
         DispatchQueue.main.async {  //we want to post the notification on the main queue
             
             let countBefore = self.getNewScreenshotsCount()
+            
             block()
             let countAfter = self.getNewScreenshotsCount()
             if countBefore != countAfter {
-                UserDefaults.standard.set(countAfter, forKey: UserDefaultsKeys.newScreenshotsCount)
+                UserDefaults.standard.set(Array(self.assetIds), forKey: UserDefaultsKeys.newScreenshotsAssetIds)
                 NotificationCenter.default.post(name: .accumulatorModelDidUpdate, object: self)
             }
         }
     }
     public func resetNewScreenshotsCount() {
         modifyCount {
-            self.newScreenshotsCount = 0
             self.assetIds.removeAll()
         }
     }
     
     fileprivate func removeAssetId(_ assetId:String){
         modifyCount {
-            self.assetIds.remove(assetId)
+            let isMany = self.getNewScreenshotsCount() >= Constants.notificationProductToImportCountLimit
+            if !isMany { // once it is 'many' it can only be cleared by user interaction
+                self.assetIds.remove(assetId)
+            }
         }
     }
     
@@ -56,7 +67,6 @@ class AccumulatorModel: NSObject {
             self.assetIds.insert(assetId)
         }
     }
-    
 }
 
 class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
@@ -92,6 +102,19 @@ class AssetSyncModel: NSObject {
         }
         queue.qualityOfService = .utility
 
+        return queue
+    }()
+    
+    var uploadScreenshotWithClarifaiQueueFromUserScreenshot:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "upload Screenshot With Clarifai Queue from user screenshot"
+        queue.maxConcurrentOperationCount = 1
+        queue.isSuspended = true
+        ClarifaiModel.sharedInstance.kickoffModelDownload().always {
+            queue.isSuspended = false
+        }
+        queue.qualityOfService = .userInitiated
+        
         return queue
     }()
     
@@ -291,11 +314,16 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             assets.enumerateObjects({ (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
                 assetIds.insert(asset.localIdentifier)
             })
-            assets.enumerateObjects(options: [.reverse], using: { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-                if assetIds.contains(asset.localIdentifier) {
-                    self.uploadScreenshotWithClarifai(asset: asset)
-                }
-            })
+            
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                let dbSet = DataModel.sharedInstance.retrieveAssetIds(assetIds:Array(assetIds), managedObjectContext: context)
+                assetIds.subtract(dbSet)
+                assets.enumerateObjects(options: [.reverse], using: { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                    if assetIds.contains(asset.localIdentifier) {
+                        self.uploadScreenshotWithClarifai(asset: asset)
+                    }
+                })
+            }
            
         }
     }
@@ -340,7 +368,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func uploadScreenshotWithClarifaiFromUserScreenshotAction(asset: PHAsset) {
         let isForeground = self.foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
-        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(priority:.high, timeout: 20.0, completion: { (completeOperation) in
+        
+        self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
             firstly{ () -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
             }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
@@ -354,31 +383,28 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 
                 AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
                 return Promise { fulfill, reject in
-                    let isHidden = ( !isRecognized || !isForeground)
-                    if !isHidden {
-                        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
-                                //do nothing if already exsists
-                                let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
-                                reject(error)
-                            }else{
-                                let imageData = self.data(for: image)
-                                let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                                                assetId: asset.localIdentifier,
-                                                                                createdAt: asset.creationDate,
-                                                                                isRecognized: isRecognized,
-                                                                                isFromShare: false,
-                                                                                isHidden: false,
-                                                                                imageData: imageData,
-                                                                                classification: classification)
-                                fulfill((imageClassification, imageData))
-                                
-                            }
+                    DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+                        if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                            //do nothing if already exsists
+                            let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
+                            reject(error)
+                        }else{
+                            let isHidden = ( !isRecognized || !isForeground)
+                            let imageData:Data? = isRecognized ? self.data(for: image) : nil
+                            
+                            let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                            assetId: asset.localIdentifier,
+                                                                            createdAt: asset.creationDate,
+                                                                            isRecognized: isRecognized,
+                                                                            isFromShare: false,
+                                                                            isHidden: isHidden,
+                                                                            imageData: imageData,
+                                                                            classification: classification)
+                            
+                            fulfill((imageClassification, imageData))
                         }
-                    }else{
-                        let imageData = self.data(for: image)
-                        fulfill((imageClassification, imageData))
                     }
+                   
                 }
             }.then (on: self.processingQ) { imageClassification, imageData -> Void in
                 if imageClassification != .unrecognized {
@@ -428,8 +454,12 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 AnalyticsTrackers.standard.track(.sentImageToClarifai)
                 return ClarifaiModel.sharedInstance.classify(image: image)
             }.then(on: self.processingQ) { imageClassification -> Void in
-               if imageClassification != .unrecognized {
-                    AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                if imageClassification != .unrecognized {
+                    DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+                        if managedObjectContext.screenshotWith(assetId: asset.localIdentifier) == nil {
+                            AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                        }
+                    }
                 }
             }.catch { error in
                 print("uploadScreenshotWithClarifai catch error:\(error)")

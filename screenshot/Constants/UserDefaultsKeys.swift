@@ -19,7 +19,8 @@ class UserDefaultsKeys  {
 
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
-    
+    static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
+
     // Product
     static let productCompletedTooltip = "ProductCompletedTooltip"
     static let productGender = "ProductGender"
