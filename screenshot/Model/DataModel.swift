@@ -18,7 +18,6 @@ class DataModel: NSObject {
         let _ = DataModel.sharedInstance
     }
     
-    public var isCoreDataStackReady = false
     
     public let persistentContainer = NSPersistentContainer(name: "Model")
     
@@ -30,39 +29,55 @@ class DataModel: NSObject {
         return persistentContainer.newBackgroundContext()
     }
     
-    fileprivate(set) var isMainPinned = false
     
-    override init() {
-        super.init()
-        DispatchQueue.global(qos: .userInitiated).async {
+    // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
+    let dbQ:OperationQueue = {
+       let queue = OperationQueue.init()
+        queue.maxConcurrentOperationCount = 1
+        queue.name = "Core data queue"
+        queue.isSuspended = true
+        return queue
+    }()
+    
+    func loadStore(sync:Bool) -> Promise<Bool>{
+        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+
+        let storeInfo = NSPersistentStoreDescription.init(url: sqliteURL)
+        storeInfo.shouldAddStoreAsynchronously = !sync
+        return Promise.init(resolvers: { (fulfill, reject) in
             self.persistentContainer.loadPersistentStores { (storeDescription, error) in
                 if let error = error as NSError? {
                     print("loadPersistentStores error:\(error)")
-                    // Must async, or lazy eval closure called infinitely. Might as well async to main, as most handlers are there.
-                    // See https://medium.com/@soapyfrog/dont-forget-that-none-of-this-is-thread-safe-so-it-is-actually-possible-for-the-lazy-eval-closure-add1c9b1dd95
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["error" : error])
-                    }
+                    reject(error)
                 } else {
                     self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
-                    self.isCoreDataStackReady = true
                     let lastDbVersionMigrated = UserDefaults.standard.integer(forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     if lastDbVersionMigrated != Constants.currentMomVersion {
                         self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
-                    // See above about lazy eval closure called infinitely if notification not asynced.
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .coreDataStackCompleted, object: nil, userInfo: ["success" : true])
-                    }
                     MatchstickModel.shared.prepareMatchsticks()
+                    fulfill(true)
                 }
+                self.dbQ.isSuspended = false
             }
-        }
+        })
+       
     }
     
-    // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
-    let dbQ = DispatchQueue(label: "io.crazeapp.screenshot.db.serial")
+    func storeNeedsMigration() -> Bool {
+        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+        do{
+
+            let metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqliteURL, options: nil)
+            let model = self.persistentContainer.managedObjectModel
+            return !model.isConfiguration(withName: nil, compatibleWithStoreMetadata: metadata)
+        }catch{
+            
+        }
+        return false
+    }
+    
 }
 extension DataModel {
     func receivedCoreDataError(error:Error) {
@@ -627,7 +642,7 @@ extension DataModel {
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
     // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
-        dbQ.async {
+        self.dbQ.addOperation {
             let managedObjectContext = DataModel.sharedInstance.adHocMoc()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
@@ -637,7 +652,7 @@ extension DataModel {
     
     func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
         return Promise { fulfill, reject in
-            dbQ.async {
+            self.dbQ.addOperation {
                 let managedObjectContext = DataModel.sharedInstance.adHocMoc()
                 managedObjectContext.perform {
                     fulfill(block(managedObjectContext), dict)
@@ -765,59 +780,28 @@ extension DataModel {
         }
     }
     
-    public func pinMain() {
-        guard !isMainPinned else {
-            return
-        }
-        do {
-            try mainMoc().setQueryGenerationFrom(NSQueryGenerationToken.current)
-            isMainPinned = true
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("pinMain results with error:\(error)")
-        }
-    }
-    
-    public func unpinMain() {
-        guard isMainPinned else {
-            return
-        }
-        do {
-            try mainMoc().setQueryGenerationFrom(nil)
-            isMainPinned = false
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("unpinMain results with error:\(error)")
-        }
-    }
-    
-    public func saveMoc(managedObjectContext: NSManagedObjectContext) {
-        do {
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("Updating db results with error:\(error)")
-        }
-    }
-    
     // MARK: DB Migration
     
     func postDbMigration(from: Int, to: Int, container: NSPersistentContainer) {
         let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? NSDate
         if (from < 9 && to >= 7 && installDate != nil) { // Originally was from < 7, but a bug fixed in 9 should re-run for 7 or 8.
-            dbQ.async {
-                let managedObjectContext = container.newBackgroundContext()
-                self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
+            let op = BlockOperation{
+                    let managedObjectContext = container.newBackgroundContext()
+                    self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
             }
+            op.queuePriority = .veryHigh   //earilier actions may have already been queue - make sure migration is at the top of the list
+            self.dbQ.addOperation(op)
         }
         if from < 8 && to >= 8 && installDate != nil {
-            dbQ.async {
+            let op = BlockOperation{
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
                 self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
                 self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
+            op.queuePriority = .veryHigh //earilier actions may have already been queue - make sure migration is at the top of the list
+            self.dbQ.addOperation(op)
         }
     }
     
@@ -942,18 +926,6 @@ extension Screenshot {
     var isShamrockVersion:Bool {
         return self.assetId?.hasPrefix("shamrock") ?? false
     }
-    static func findWith(objectId:NSManagedObjectID) -> Screenshot? { //main thread only
-        if let screenshot = DataModel.sharedInstance.mainMoc().object(with: objectId) as? Screenshot {
-            do{
-                try screenshot.validateForUpdate()
-                return screenshot
-            }catch{
-                
-            }
-        }
-        return nil
-    }
-    
     
     // hideWorkhorse is not meant to be called from UI code,
     // but may be called on the main queue, even if generally called on a background queue.
@@ -1465,4 +1437,46 @@ fileprivate extension String {
             return self
         }
     }
+}
+
+extension NSManagedObjectContext {
+    func saveIfNeeded(){
+        if self.hasChanges {
+            do {
+                try self.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+    
+    func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? {
+        if let screenshot = self.object(with: objectId) as? Screenshot {
+            do{
+                try screenshot.validateForUpdate()
+                return screenshot
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
+    }
+    
+    func screenshotWith(assetId:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot assetId:\(assetId) results with error:\(error)")
+        }
+        return nil
+    }
+    
 }

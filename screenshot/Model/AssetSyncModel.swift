@@ -175,32 +175,12 @@ class AssetSyncModel: NSObject {
         
     }
 
-    func fastGetImage(asset:PHAsset) -> Promise<UIImage> {
-        return Promise.init(resolvers: { (fulfill, reject) in
-            
-            let imageRequestOptions = PHImageRequestOptions()
-            imageRequestOptions.version = .current
-            imageRequestOptions.deliveryMode = .opportunistic
-            imageRequestOptions.resizeMode = .none
-            imageRequestOptions.isNetworkAccessAllowed = false
-            imageRequestOptions.isSynchronous = true
-            
-            PHImageManager.default().requestImageData(for: asset, options: imageRequestOptions, resultHandler: { (data, s, o, i) in
-                if let data = data,  let image = UIImage.init(data: data) {
-                    fulfill(image)
-                }else{
-                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
-                    reject(emptyError)
-                }
-            })
-        })
-    }
     func uploadScreenshotWithClarifai(asset: PHAsset) {
         let isForeground = foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         let dataModel = DataModel.sharedInstance
         self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
-                return self.fastGetImage(asset: asset)
+                return asset.image(allowFromICloud: false)
                 }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
                     AnalyticsTrackers.standard.track(.sentImageToClarifai)
                     return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
@@ -254,7 +234,7 @@ class AssetSyncModel: NSObject {
         let dataModel = DataModel.sharedInstance
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
-                return self.image(asset: asset)
+                return asset.image(allowFromICloud: true)
                 }.then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                     AnalyticsTrackers.standard.track(.bypassedClarifai)
                     let imageClassification = ClarifaiModel.ImageClassification.human // Kludged, as ClarifaiModel.sharedInstance.classify often crashes.
@@ -289,7 +269,7 @@ class AssetSyncModel: NSObject {
     func retryScreenshot(asset: PHAsset) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
             firstly {
-                return self.image(asset: asset)
+                return asset.image(allowFromICloud: true)
                 }.then (on: self.processingQ) { image -> Promise<Data?> in
                     AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
                     let imageData = self.data(for: image)
@@ -336,10 +316,7 @@ class AssetSyncModel: NSObject {
                     screenshot.isHidden = false
                     screenshot.isRecognized = true
                     screenshot.lastModified = NSDate()
-                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
-                    // Shitty FRCs sometimes misreport a move as an update, unless saved twice.
-                    screenshot.lastModified = NSDate()
-                    dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                    managedObjectContext.saveIfNeeded()
                     fulfill((imageData, imageClassification))
                 } else {
                     let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(assetId)"])
@@ -629,7 +606,7 @@ class AssetSyncModel: NSObject {
                     screenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: segments)
                     screenshot.uploadedImageURL = uploadedURLString
                 }
-                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                managedObjectContext.saveIfNeeded()
             }
             AnalyticsTrackers.standard.track(.receivedProductsFromSyte, properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
         }
@@ -686,7 +663,7 @@ class AssetSyncModel: NSObject {
             } else {
                 print("AssetSyncModel reExtractProducts no productFilter, changedProductCount:\(changedProductCount)")
             }
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            managedObjectContext.saveIfNeeded()
         }
     }
 
@@ -710,76 +687,6 @@ class AssetSyncModel: NSObject {
             }.catch { error in
                 print("AssetSyncModel reExtractProducts error parsing product:\(error)")
                 self.updateShoppableWithProducts(shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
-        }
-    }
-    
-    func image(assetId: String, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
-        guard !assetId.isEmpty else {
-            print("assetId is blank")
-            callback(nil, nil)
-            return
-        }
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.fetchLimit = 1
-        
-        let assets = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: fetchOptions)
-        
-        guard let asset = assets.firstObject else {
-            print("No asset for assetId:\(assetId)")
-            AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No asset for assetId:\(assetId)"])
-            callback(nil, nil)
-            return
-        }
-        image(asset: asset, callback: callback)
-    }
-    
-    func image(asset: PHAsset, callback: @escaping ((UIImage?, [AnyHashable : Any]?) -> Void)) {
-        let imageRequestOptions = PHImageRequestOptions()
-        imageRequestOptions.version = .current
-        imageRequestOptions.deliveryMode = .opportunistic
-        imageRequestOptions.resizeMode = .none
-        imageRequestOptions.isNetworkAccessAllowed = false
-        imageRequestOptions.isSynchronous = true
-        let targetSize = self.targetSize()
-        PHImageManager.default().requestImage(for: asset,
-                                              targetSize: targetSize,
-                                              contentMode: .aspectFill,
-                                              options: imageRequestOptions,
-                                              resultHandler: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                                                callback(image, info)
-        })
-    }
-    
-    func image(asset: PHAsset) -> Promise<UIImage> {
-        return Promise { fulfill, reject in
-            self.image(asset: asset, callback: { (image: UIImage?, info: [AnyHashable : Any]?) in
-                
-                if let imageError = info?[PHImageErrorKey] as? NSError {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageErrorKey. info:\(info ?? ["-" : "-"])"])
-                    reject(imageError)
-                    return
-                }
-                if let isCancelled = info?[PHImageCancelledKey] as? Bool,
-                    isCancelled == true {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "PHImageCancelledKey. info:\(info ?? ["-" : "-"])"])
-                    let cancelledError = NSError(domain: "Craze", code: 7, userInfo: [NSLocalizedDescriptionKey : "Image request canceled"])
-                    reject(cancelledError)
-                    return
-                }
-                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool,
-                    isDegraded == true {
-                    // This callback will be called again with a better quality image.
-                    return
-                }
-                if let image = image {
-                    fulfill(image)
-                } else {
-                    AnalyticsTrackers.standard.track(.errImgHang, properties: ["reason" : "No image. info:\(info ?? ["-" : "-"])"])
-                    let emptyError = NSError(domain: "Craze", code: 2, userInfo: [NSLocalizedDescriptionKey : "Asset returned no image"])
-                    reject(emptyError)
-                }
-            })
         }
     }
     
@@ -885,10 +792,7 @@ class AssetSyncModel: NSObject {
     }
     
     func addToSelected(assetId: String) -> Bool {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
-        let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        guard let asset = fetchResult.firstObject else {
+        guard let asset = PHAsset.assetWith(assetId: assetId) else {
             return false
         }
         let tuple = self.selectedScreenshotAssets.insert(asset)
@@ -897,84 +801,88 @@ class AssetSyncModel: NSObject {
     
      public func syncPhotos() {
         self.serialQ.async {
-            let dataModel = DataModel.sharedInstance
+            
+            
             guard PermissionsManager.shared.hasPermission(for: .photo),
-                dataModel.isCoreDataStackReady,
                 self.isSyncReady() else {
                     return
             }
+            
+            
             self.beginSync()
-            let selectedSet = self.retrieveSelectedScreenshotAssetIds()
-            let futureSet = self.retrieveFutureScreenshotAssetIds()
-            let managedObjectContext = dataModel.adHocMoc()
-            var dbSet = Set<String>()
-            managedObjectContext.performAndWait {
+            let dataModel = DataModel.sharedInstance
+            dataModel.performBackgroundTask({ (managedObjectContext) in
+                let selectedSet = self.retrieveSelectedScreenshotAssetIds()
+                let futureSet = self.retrieveFutureScreenshotAssetIds()
+                var dbSet = Set<String>()
                 dbSet = dataModel.retrieveAllAssetIds(managedObjectContext: managedObjectContext)
-            }
-            let toRetry = selectedSet.intersection(dbSet)
-            let toBypassClarifai = selectedSet.subtracting(dbSet)
-            let toUpload = futureSet.subtracting(selectedSet).subtracting(dbSet)//.union(changedAssetIds)
-            let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
-            self.incomingDynamicLinks.removeAll()
-            self.countAndPrint(name: "selectedSet", set: selectedSet)
-            self.countAndPrint(name: "futureSet", set: futureSet)
-            self.countAndPrint(name: "dbSet", set: dbSet)
-            self.countAndPrint(name: "toRetry", set: toRetry)
-            self.countAndPrint(name: "toBypassClarifai", set: toBypassClarifai)
-            self.countAndPrint(name: "toUpload", set: toUpload)
-            self.countAndPrint(name: "toDownload", set: toDownload)
-            if toUpload.count > 0 || toDownload.count > 0 || toBypassClarifai.count > 0 || toRetry.count > 0 {
-                DispatchQueue.main.async {
-                    self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Screenshot)
-                }
-            }
-            if toUpload.count > 0 {
-                AnalyticsTrackers.standard.track(.userImportedScreenshots, properties: ["numScreenshots" : toUpload.count])
-                self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-                    if toUpload.contains(asset.localIdentifier) {
-                        self.screenshotsToProcess += 1
-                        self.processingQ.async {
-                            self.uploadScreenshotWithClarifai(asset: asset)
-                        }
-                    }
-                })
-            }
-            if toDownload.count > 0 {
-                AnalyticsTrackers.standard.track(.userReceivedSharedScreenshots, properties: ["numScreenshots" : toDownload.count]) // Always 1?
-                self.screenshotsToProcess += toDownload.count
-                toDownload.forEach { shareId in
-                    self.processingQ.async {
-                        self.downloadScreenshot(shareId: shareId)
+                
+                let toRetry = selectedSet.intersection(dbSet)
+                let toBypassClarifai = selectedSet.subtracting(dbSet)
+                let toUpload = futureSet.subtracting(selectedSet).subtracting(dbSet)//.union(changedAssetIds)
+                let toDownload = Set<String>(self.incomingDynamicLinks).subtracting(dbSet)
+                self.incomingDynamicLinks.removeAll()
+                self.countAndPrint(name: "selectedSet", set: selectedSet)
+                self.countAndPrint(name: "futureSet", set: futureSet)
+                self.countAndPrint(name: "dbSet", set: dbSet)
+                self.countAndPrint(name: "toRetry", set: toRetry)
+                self.countAndPrint(name: "toBypassClarifai", set: toBypassClarifai)
+                self.countAndPrint(name: "toUpload", set: toUpload)
+                self.countAndPrint(name: "toDownload", set: toDownload)
+                if toUpload.count > 0 || toDownload.count > 0 || toBypassClarifai.count > 0 || toRetry.count > 0 {
+                    DispatchQueue.main.async {
+                        self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Screenshot)
                     }
                 }
-            }
-            if toBypassClarifai.count > 0 {
-                AnalyticsTrackers.standard.track(.userImportedOldScreenshots, properties: ["numScreenshots" : toBypassClarifai.count])
-                self.selectedScreenshotAssets
-                    .filter { toBypassClarifai.contains($0.localIdentifier) }
-                    .forEach { asset in
-                        self.screenshotsToProcess += 1
-                        self.processingQ.async {
-                            self.uploadPhoto(asset: asset)
+                if toUpload.count > 0 {
+                    AnalyticsTrackers.standard.track(.userImportedScreenshots, properties: ["numScreenshots" : toUpload.count])
+                    self.futureScreenshotAssets?.enumerateObjects( { (asset: PHAsset, index: Int, stop: UnsafeMutablePointer<ObjCBool>) in
+                        if toUpload.contains(asset.localIdentifier) {
+                            self.screenshotsToProcess += 1
+                            self.processingQ.async {
+                                self.uploadScreenshotWithClarifai(asset: asset)
+                            }
                         }
+                    })
                 }
-            }
-            if toRetry.count > 0 {
-                AnalyticsTrackers.standard.track(.userRetriedScreenshots, properties: ["numScreenshots" : toRetry.count])
-                self.selectedScreenshotAssets
-                    .filter { toRetry.contains($0.localIdentifier) }
-                    .forEach { asset in
-                        self.screenshotsToProcess += 1
+                if toDownload.count > 0 {
+                    AnalyticsTrackers.standard.track(.userReceivedSharedScreenshots, properties: ["numScreenshots" : toDownload.count]) // Always 1?
+                    self.screenshotsToProcess += toDownload.count
+                    toDownload.forEach { shareId in
                         self.processingQ.async {
-                            self.retryScreenshot(asset: asset)
+                            self.downloadScreenshot(shareId: shareId)
                         }
+                    }
                 }
-            }
-            // Remove selected assets that were processed, i.e. their assetId is in selectedSet.
-            self.selectedScreenshotAssets.subtract(self.selectedScreenshotAssets.filter { selectedSet.contains($0.localIdentifier) })
-            if self.screenshotsToProcess == 0 {
-                self.endSync()
-            }
+                if toBypassClarifai.count > 0 {
+                    AnalyticsTrackers.standard.track(.userImportedOldScreenshots, properties: ["numScreenshots" : toBypassClarifai.count])
+                    self.selectedScreenshotAssets
+                        .filter { toBypassClarifai.contains($0.localIdentifier) }
+                        .forEach { asset in
+                            self.screenshotsToProcess += 1
+                            self.processingQ.async {
+                                self.uploadPhoto(asset: asset)
+                            }
+                    }
+                }
+                if toRetry.count > 0 {
+                    AnalyticsTrackers.standard.track(.userRetriedScreenshots, properties: ["numScreenshots" : toRetry.count])
+                    self.selectedScreenshotAssets
+                        .filter { toRetry.contains($0.localIdentifier) }
+                        .forEach { asset in
+                            self.screenshotsToProcess += 1
+                            self.processingQ.async {
+                                self.retryScreenshot(asset: asset)
+                            }
+                    }
+                }
+                // Remove selected assets that were processed, i.e. their assetId is in selectedSet.
+                self.selectedScreenshotAssets.subtract(self.selectedScreenshotAssets.filter { selectedSet.contains($0.localIdentifier) })
+                if self.screenshotsToProcess == 0 {
+                    self.endSync()
+                }
+                
+            })
         }
     }
     
@@ -991,8 +899,7 @@ class AssetSyncModel: NSObject {
      public func syncTutorialPhoto(image: UIImage) {
         self.serialQ.async {
             let dataModel = DataModel.sharedInstance
-            guard dataModel.isCoreDataStackReady,
-                self.isSyncReady() else {
+            guard self.isSyncReady() else {
                     return
             }
             self.beginSync()
@@ -1066,7 +973,7 @@ class AssetSyncModel: NSObject {
                 }
             }
             backgroundScreenshot?.shoppablesCount = 0
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            managedObjectContext.saveIfNeeded()
             self.syncPhotos()
         }
     }
@@ -1191,7 +1098,7 @@ extension Screenshot {
                 dataModel.performBackgroundTask { (managedObjectContext) in
                     if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
                         screenshot.shareLink = shareLink
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        managedObjectContext.saveIfNeeded()
                     }
                 }
                 return Promise(value: shareLink)

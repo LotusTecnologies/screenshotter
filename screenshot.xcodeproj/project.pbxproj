@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3130FF6F203040F200AA881A /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */; };
+		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318FE265204C09C500277DD4 /* AsyncOperation.swift */; };
 		319B031320592A7700446054 /* ShowProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B031220592A7700446054 /* ShowProduct.swift */; };
@@ -105,7 +107,6 @@
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */; };
-		C55D89BB2021C021004A5245 /* CoreDataPreparationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */; };
 		C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */; };
 		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C565333A2019D81C00F022D4 /* ProductViewController.swift */; };
@@ -168,6 +169,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
+		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		318FE265204C09C500277DD4 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		319B031220592A7700446054 /* ShowProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowProduct.swift; sourceTree = "<group>"; };
@@ -270,7 +273,6 @@
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsDeleteButton.swift; sourceTree = "<group>"; };
-		C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPreparationController.swift; sourceTree = "<group>"; };
 		C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationController.swift; sourceTree = "<group>"; };
 		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C565333A2019D81C00F022D4 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
@@ -661,7 +663,6 @@
 				C54088471FE90E2200198955 /* CollectionViewCell */,
 				C543696020468C2F00599134 /* Control */,
 				C5D57934203F043200A076FE /* Controller */,
-				C55D89BA2021C021004A5245 /* CoreDataPreparationController.swift */,
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
@@ -814,6 +815,7 @@
 				31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */,
 				319B031220592A7700446054 /* ShowProduct.swift */,
 				52E547431FE2487B00627D6D /* ScreenshotHelper.swift */,
+				314C4889205E86E700B8381D /* PHAsset+craze.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -1158,7 +1160,6 @@
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
-				C55D89BB2021C021004A5245 /* CoreDataPreparationController.swift in Sources */,
 				C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */,
 				31CE1111203BF055000156EE /* ProductsBarCollectionViewCell.swift in Sources */,
 				C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */,
@@ -1204,6 +1205,7 @@
 				C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
+				314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
 				C501412C2061101100ABFB5C /* UITableView.swift in Sources */,
 				C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */,
@@ -1422,7 +1424,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 111;
+				CURRENT_PROJECT_VERSION = 112;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1451,7 +1453,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 111;
+				CURRENT_PROJECT_VERSION = 112;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1536,7 +1538,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 111;
+				CURRENT_PROJECT_VERSION = 112;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1616,7 +1618,7 @@
 				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 111;
+				CURRENT_PROJECT_VERSION = 112;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
