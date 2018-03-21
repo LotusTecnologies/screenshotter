@@ -204,16 +204,10 @@ fileprivate extension ProductViewControllerProductView {
             return
         }
         
-        // TODO: GMK undo.
-//        let isFavorited = productView.favoriteButton.isSelected
-//        product.setFavorited(toFavorited: isFavorited)
-//
-//        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product")
-        if let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
-            NetworkingPromise.sharedInstance.registerPriceAlert(partNumber: product.partNumber!, lastPrice: product.fallbackPrice, pushToken: pushTokenData.description, outOfStock: !product.hasVariants)
-        } else {
-            print("No pushToken")
-        }
+        let isFavorited = productView.favoriteButton.isSelected
+        product.setFavorited(toFavorited: isFavorited)
+
+        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product")
     }
     
     // MARK: Web
