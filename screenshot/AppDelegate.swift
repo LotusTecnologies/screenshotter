@@ -46,18 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if DataModel.sharedInstance.storeNeedsMigration() {
-            let loadingViewController = UIViewController.init()
-            loadingViewController.view.backgroundColor = .white
-            let loader = Loader()
-            loader.startAnimation()
-            loader.translatesAutoresizingMaskIntoConstraints = false
-            loadingViewController.view.addSubview(loader)
-            loader.topAnchor.constraint(equalTo: loadingViewController.view.topAnchor).isActive = true
-            loader.leadingAnchor.constraint(equalTo: loadingViewController.view.leadingAnchor).isActive = true
-            loader.bottomAnchor.constraint(equalTo: loadingViewController.view.bottomAnchor).isActive = true
-            loader.trailingAnchor.constraint(equalTo: loadingViewController.view.trailingAnchor).isActive = true
-            window?.rootViewController = loadingViewController
-            
+            window?.rootViewController = LoadingViewController()
             DispatchQueue.global(qos: .userInteractive).async {
                 DataModel.sharedInstance.loadStore(sync:false).always {
                     DispatchQueue.main.async {
@@ -67,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }else{
-            let _ = DataModel.sharedInstance.loadStore(sync:true)
+            _ = DataModel.sharedInstance.loadStore(sync:true)
             self.window?.rootViewController = self.nextViewController()
             AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         }
@@ -99,6 +88,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             contentAvailable.intValue == 1 {
             //TODO: why is this only segment
             AnalyticsTrackers.segment.track(.wokeFromSilentPush)
+        } else {
+            AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
         }
         
         return true

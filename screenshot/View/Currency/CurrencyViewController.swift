@@ -61,7 +61,9 @@ extension CurrencyViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? createTableViewCell()
         cell.textLabel?.text = cellText(indexPath)
+        cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
         cell.detailTextLabel?.text = cellDetailText(indexPath)
+        cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
         return cell
     }
     

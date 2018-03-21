@@ -48,7 +48,7 @@ class ScreenshotsNavigationController: UINavigationController {
     
     override func viewDidLoad(){
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
+        self.view.backgroundColor = .background
     }
     
 }
