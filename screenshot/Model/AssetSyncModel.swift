@@ -374,64 +374,59 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func uploadScreenshotWithClarifaiFromUserScreenshotAction(asset: PHAsset) {
         let isForeground = self.foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
-        let assetId = asset.localIdentifier
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            if let asset = PHAsset.assetWith(assetId: assetId) {
-                asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                    AnalyticsTrackers.standard.track(.sentImageToClarifai)
-                    return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
-                        return Promise.init(value: (c, image))
-                    })
-                    }.then(on: self.processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                        let isRecognized = (imageClassification != .unrecognized)
-                        let classification = imageClassification.shortString()
+            asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
+                AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
+                    return Promise.init(value: (c, image))
+                })
+                }.then(on: self.processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+                    let isRecognized = (imageClassification != .unrecognized)
+                    let classification = imageClassification.shortString()
+                    
+                    AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+                    return Promise { fulfill, reject in
+                        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                                //do nothing if already exsists
+                                let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
+                                reject(error)
+                            }else{
+                                let isHidden = ( !isRecognized || !isForeground)
+                                let imageData:Data? = isRecognized ? self.data(for: image) : nil
+                                
+                                let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                                assetId: asset.localIdentifier,
+                                                                                createdAt: asset.creationDate,
+                                                                                isRecognized: isRecognized,
+                                                                                isFromShare: false,
+                                                                                isHidden: isHidden,
+                                                                                imageData: imageData,
+                                                                                classification: classification)
+                                
+                                fulfill((imageClassification, imageData))
+                            }
+                        }
                         
-                        AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
-                        return Promise { fulfill, reject in
-                            DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-                                if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
-                                    //do nothing if already exsists
-                                    let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
-                                    reject(error)
-                                }else{
-                                    let isHidden = ( !isRecognized || !isForeground)
-                                    let imageData:Data? = isRecognized ? self.data(for: image) : nil
-                                    
-                                    let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                                                    assetId: asset.localIdentifier,
-                                                                                    createdAt: asset.creationDate,
-                                                                                    isRecognized: isRecognized,
-                                                                                    isFromShare: false,
-                                                                                    isHidden: isHidden,
-                                                                                    imageData: imageData,
-                                                                                    classification: classification)
-                                    
-                                    fulfill((imageClassification, imageData))
-                                }
+                    }
+                }.then (on: self.processingQ) { imageClassification, imageData -> Void in
+                    if imageClassification != .unrecognized {
+                        if isForeground { // Screenshot taken while app in foregorund
+                            DispatchQueue.main.async {
+                                self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
                             }
-                            
-                        }
-                    }.then (on: self.processingQ) { imageClassification, imageData -> Void in
-                        if imageClassification != .unrecognized {
-                            if isForeground { // Screenshot taken while app in foregorund
-                                DispatchQueue.main.async {
-                                    self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
-                                }
-                                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
-                            } else { // Screenshot taken while app in background (or killed)
-                                AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
-                                if  ApplicationStateModel.sharedInstance.isBackground() {
-                                    self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
-                                }
+                            self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
+                        } else { // Screenshot taken while app in background (or killed)
+                            AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                            if  ApplicationStateModel.sharedInstance.isBackground() {
+                                self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
                             }
                         }
-                    }.catch { error in
-                        print("uploadScreenshotWithClarifai catch error:\(error)")
-                    }.always(on: self.serialQ) {
-                        completeOperation()
-                }
-            }else{
-                completeOperation()
+                    }
+                }.catch { error in
+                    print("uploadScreenshotWithClarifai catch error:\(error)")
+                }.always(on: self.serialQ) {
+                    completeOperation()
             }
         }))
     }
