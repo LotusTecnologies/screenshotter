@@ -502,8 +502,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }
         print("should display notification")
         let content = UNMutableNotificationContent()
-        content.title = "Ready to shop?"
-        content.body = "Check out the products in your screenshot"
+        content.title = "notification.title".localized
+        content.body = "notification.message".localized
         if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
             -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
             content.sound = nil
