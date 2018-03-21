@@ -173,15 +173,57 @@ extension AssetSyncModel {
                 let imageData: Data? = self.data(for: image)
                 return Promise { fulfill, reject in
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-                        let screenshot = managedObjectContext.findOrCreateScreenshotWith(assetId: asset.localIdentifier)
-                        screenshot.createdAt = asset.creationDate as NSDate?
-                        screenshot.lastModified = NSDate()
-                        screenshot.isRecognized = true
-                        screenshot.isFromShare = false
-                        screenshot.isHidden = false
-                        screenshot.imageData = imageData as NSData?
-                        managedObjectContext.saveIfNeeded()
-                        fulfill(ClarifaiModel.ImageClassification.human, imageData)
+                        if let screenshot = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                            //this is retry screenshot
+                            var imageClassification: ClarifaiModel.ImageClassification
+                            if let classification = screenshot.syteJson,
+                                classification.utf8.count == 1 { // Dual-purposing syteJson for imageClassification, if one character
+                                screenshot.syteJson = nil
+                                
+                                switch classification {
+                                case "h":
+                                    imageClassification = .human
+                                case "f":
+                                    imageClassification = .furniture
+                                default:
+                                    imageClassification = .human
+                                }
+                            } else {
+                                imageClassification = .human
+                            }
+                            
+                            if screenshot.shoppablesCount > 0 {
+                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                            }
+                            screenshot.shoppablesCount = 0
+                            screenshot.imageData = imageData as NSData?
+                            screenshot.isHidden = false
+                            screenshot.isRecognized = true
+                            screenshot.lastModified = NSDate()
+
+                            managedObjectContext.saveIfNeeded()
+                            fulfill((imageClassification, imageData))
+                        }else{
+                            let screenshot = Screenshot(context: managedObjectContext)
+                            screenshot.assetId = asset.localIdentifier
+                            let now = NSDate()
+                            if let date =  asset.creationDate as NSDate? {
+                                screenshot.createdAt = date
+                            }else{
+                                screenshot.createdAt = now
+                                
+                            }
+                            screenshot.isHidden = true
+                            screenshot.isNew = true
+                            screenshot.lastModified = now
+                            screenshot.isRecognized = true
+                            screenshot.isFromShare = false
+                            screenshot.isHidden = false
+                            screenshot.imageData = imageData as NSData?
+                            
+                            managedObjectContext.saveIfNeeded()
+                            fulfill(ClarifaiModel.ImageClassification.human, imageData)
+                        }
                     }
                 }
             }.then (on: self.processingQ) { imageClassification, imageData -> Promise<Bool> in
@@ -567,26 +609,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 }
 
 extension AssetSyncModel {
-    
-    func retryScreenshot(asset: PHAsset) {
-        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 2.0, completion: { (completeOperation) in
-            
-            asset.image(allowFromICloud: true).then (on: self.processingQ) { image -> Promise<Data?> in
-                AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
-                let imageData = self.data(for: image)
-                return Promise(value: imageData)
-                }.then (on: self.processingQ) { imageData -> Promise<(Data?, ClarifaiModel.ImageClassification)> in
-                    return self.resaveScreenshot(assetId: asset.localIdentifier, imageData: imageData)
-                }.then (on: self.processingQ) { (imageData, imageClassification) -> Void in
-                    print("retryScreenshot imageClassification:\(imageClassification)")
-                    self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: asset.localIdentifier)
-                }.catch { error in
-                    print("retryScreenshot catch error:\(error)")
-                }.always(on: self.serialQ) {
-                    completeOperation()
-            }
-        }))
-    }
+
     
     func resaveScreenshot(assetId: String, imageData: Data?) -> Promise<(Data?, ClarifaiModel.ImageClassification)> {
         let dataModel = DataModel.sharedInstance
