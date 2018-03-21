@@ -38,16 +38,22 @@ class DataModel: NSObject {
         queue.isSuspended = true
         return queue
     }()
-    
+    func sqlFileUrl() -> URL {
+        return NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+    }
     func loadStore(sync:Bool) -> Promise<Bool>{
-        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+        let sqliteURL = self.sqlFileUrl()
 
         let storeInfo = NSPersistentStoreDescription.init(url: sqliteURL)
         storeInfo.shouldAddStoreAsynchronously = !sync
+        self.persistentContainer.persistentStoreDescriptions = [storeInfo]
         return Promise.init(resolvers: { (fulfill, reject) in
             self.persistentContainer.loadPersistentStores { (storeDescription, error) in
                 if let error = error as NSError? {
                     print("loadPersistentStores error:\(error)")
+                    self.dbQ.isSuspended = false  //I don't what failed, but it may be something minor that we can continue from
+                    self.receivedCoreDataError(error:error) // this will at least log.  In the future we may present an alert
+
                     reject(error)
                 } else {
                     self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
@@ -57,23 +63,24 @@ class DataModel: NSObject {
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
                     MatchstickModel.shared.prepareMatchsticks()
+                    self.dbQ.isSuspended = false
                     fulfill(true)
                 }
-                self.dbQ.isSuspended = false
             }
         })
        
     }
     
     func storeNeedsMigration() -> Bool {
-        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+        let sqliteURL = self.sqlFileUrl()
         do{
 
             let metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqliteURL, options: nil)
             let model = self.persistentContainer.managedObjectModel
             return !model.isConfiguration(withName: nil, compatibleWithStoreMetadata: metadata)
         }catch{
-            
+            self.receivedCoreDataError(error:error) // this will log. 
+
         }
         return false
     }
