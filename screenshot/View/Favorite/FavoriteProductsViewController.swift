@@ -89,17 +89,30 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Tracking
     
-    @objc fileprivate func trackProductAction(_ button: UIButton, event: UIEvent) {
-        guard let indexPath = tableView.indexPath(for: event), let product = products?[indexPath.item] else {
-            return
+    @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
+        if PermissionsManager.shared.hasPermission(for: .push) {
+            guard let indexPath = tableView.indexPath(for: event),
+                let product = products?[indexPath.item],
+                !button.isLoading
+                else {
+                    return
+            }
+            
+            button.isLoading = true
+            
+            (product.hasPriceAlerts ? product.untrack() : product.track())
+                .then { [weak button] isTracking -> Void in
+                    button?.isLoading = false
+                    button?.isSelected = isTracking
+                    
+                }.catch { [weak button] error in
+                    button?.isLoading = false
+            }
         }
-        
-        // TODO:
-        
-        button.isSelected = !button.isSelected
-        
-        if let loadingButton = button as? LoadingButton {
-            loadingButton.isLoading = !loadingButton.isLoading
+        else {
+            // TODO: need to present explanation alert before taking user to settings page
+            
+            PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true, response: nil)
         }
     }
     
@@ -139,7 +152,7 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             cell.merchantLabel.text = product.merchant
             cell.favoriteControl.isSelected = product.isFavorite
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
-            cell.priceAlertButton.isSelected = product.hasPriceAlerts
+            cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
             cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
             cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
             cell.isCartButtonHidden = (product.partNumber == nil)
