@@ -54,7 +54,7 @@ class AccumulatorModel: NSObject {
     
     fileprivate func removeAssetId(_ assetId:String){
         modifyCount {
-            let isMany = self.getNewScreenshotsCount() >= Constants.notificationProductToImportCountLimit
+            let isMany = self.getNewScreenshotsCount() > Constants.notificationProductToImportCountLimit
             if !isMany { // once it is 'many' it can only be cleared by user interaction, ie `resetNewScreenshotsCount`
                 self.assetIds.remove(assetId)
             }

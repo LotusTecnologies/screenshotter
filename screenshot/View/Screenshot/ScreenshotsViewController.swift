@@ -659,7 +659,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         
         if (count == 1) {
             return .importSingleScreenshot
-        }else if (count >= Constants.notificationProductToImportCountLimit){
+        }else if (count > Constants.notificationProductToImportCountLimit){
             return .importVeryManyScreenshots
         } else if (count > 1) {
             return .importMultipleScreenshots
