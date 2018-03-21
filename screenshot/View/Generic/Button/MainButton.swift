@@ -24,6 +24,7 @@ class MainButton: UIButton {
         backgroundColor = .crazeRed
         contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         adjustsImageWhenHighlighted = false
+        titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
         layer.shadowColor = Shadow.basic.color.cgColor
         layer.shadowOffset = Shadow.basic.offset
