@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainButton: UIButton {
+class MainButton: LoadingButton {
     private var backgroundColorStates: [UInt : UIColor] = [:]
     private var isSettingBackgroundColor = false
     
@@ -74,10 +74,6 @@ class MainButton: UIButton {
         isSettingBackgroundColor = true
         backgroundColor = backgroundColorStates[state.rawValue]
         isSettingBackgroundColor = false
-        
-        if isLoading {
-            activityIndicator?.backgroundColor = backgroundColor
-        }
     }
     
     // MARK: Image
@@ -95,36 +91,4 @@ class MainButton: UIButton {
         contentInsets.right += titleEdgeInsets.left
         contentEdgeInsets = contentInsets
     }
-    
-    // MARK: Loader
-    
-    var isLoading = Bool() {
-        didSet {
-            if isLoading {
-                activityIndicator?.isHidden = false
-                activityIndicator?.startAnimating()
-                
-            } else {
-                activityIndicator?.stopAnimating()
-                activityIndicator?.isHidden = true
-            }
-        }
-    }
-    
-    lazy var activityIndicator: UIActivityIndicatorView? = {
-        guard let imageView = self.imageView else {
-            return nil
-        }
-        
-        let activity = UIActivityIndicatorView(activityIndicatorStyle: .white)
-        activity.translatesAutoresizingMaskIntoConstraints = false
-        activity.backgroundColor = self.backgroundColor
-        activity.isHidden = true
-        self.addSubview(activity)
-        activity.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
-        activity.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
-        activity.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
-        activity.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
-        return activity
-    }()
 }

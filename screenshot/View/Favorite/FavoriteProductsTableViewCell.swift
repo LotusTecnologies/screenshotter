@@ -15,7 +15,7 @@ class FavoriteProductsTableViewCell: UITableViewCell {
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let merchantLabel = UILabel()
-    let priceAlertButton = UIButton()
+    let priceAlertButton = LoadingButton()
     let cartButton = BorderButton()
     
     private var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
@@ -114,7 +114,7 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         contentView.addSubview(merchantLabel)
         merchantLabel.topAnchor.constraint(equalTo: productImageView.bottomAnchor, constant: 10).isActive = true
         merchantLabel.leadingAnchor.constraint(equalTo: productImageView.leadingAnchor).isActive = true
-        merchantLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        merchantLabel.firstBaselineAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         merchantLabel.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor).isActive = true
         
         let priceAlertImage = UIImage(named: "FavoriteBell")
@@ -132,6 +132,7 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         priceAlertButton.setTitleColor(.crazeRed, for: [.selected, .highlighted])
         priceAlertButton.titleLabel?.font = .screenshopFont(.hindSemibold, size: 12)
         priceAlertButton.tintColor = .crazeRed
+        priceAlertButton.activityIndicatorColor = priceAlertButton.tintColor
         priceAlertButton.contentEdgeInsets = UIEdgeInsets(top: halfPadding, left: 0, bottom: halfPadding, right: 0)
         priceAlertButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
         priceAlertButton.contentHorizontalAlignment = {
@@ -142,20 +143,21 @@ class FavoriteProductsTableViewCell: UITableViewCell {
                 return .left
             }
         }()
-        priceAlertButton.addTarget(self, action: #selector(priceAlertAction(_:)), for: .touchUpInside)
         contentView.addSubview(priceAlertButton)
         priceAlertButton.topAnchor.constraint(equalTo: labelsContainerView.bottomAnchor, constant: halfPadding).isActive = true
         priceAlertButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
         priceAlertButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        cartButtonHideConstraints = priceAlertButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -halfPadding)
         
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.setTitle("favorites.product.cart".localized, for: .normal)
         cartButton.setTitleColor(.crazeGreen, for: .normal)
         contentView.addSubview(cartButton)
-        cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding).isActive = true
         cartButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
         cartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        cartButtonShowConstraints = cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding)
+        cartButtonShowConstraints?.isActive = true
         
         NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
     }
@@ -181,9 +183,27 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         }
     }
     
-    // MARK: Price Alert
+    // MARK: Cart
     
-    @objc fileprivate func priceAlertAction(_ button: UIButton) {
-        button.isSelected = !button.isSelected
+    private var cartButtonShowConstraints: NSLayoutConstraint?
+    private var cartButtonHideConstraints: NSLayoutConstraint?
+    
+    var isCartButtonHidden = false {
+        didSet {
+            cartButton.isHidden = isCartButtonHidden
+            
+            if isCartButtonHidden {
+                if cartButtonHideConstraints?.isActive == false {
+                    cartButtonShowConstraints?.isActive = false
+                    cartButtonHideConstraints?.isActive = true
+                }
+            }
+            else {
+                if cartButtonShowConstraints?.isActive == false {
+                    cartButtonHideConstraints?.isActive = false
+                    cartButtonShowConstraints?.isActive = true
+                }
+            }
+        }
     }
 }

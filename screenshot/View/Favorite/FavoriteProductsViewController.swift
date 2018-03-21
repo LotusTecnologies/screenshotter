@@ -92,12 +92,13 @@ class FavoriteProductsViewController : BaseViewController {
     
     @objc fileprivate func trackProductAction(_ button: UIButton, event: UIEvent) {
         // TODO:
-    }
-    
-    // MARK: Cart
-    
-    @objc fileprivate func addProductAction(_ button: UIButton, event: UIEvent) {
-        // TODO:
+        
+        button.isSelected = !button.isSelected
+        
+        if let loadingButton = button as? LoadingButton {
+            loadingButton.isLoading = !loadingButton.isLoading
+        }
+        
     }
     
     // MARK: Navigation
@@ -107,7 +108,7 @@ class FavoriteProductsViewController : BaseViewController {
             return
         }
         
-        OpenWebPage.presentProduct(product, fromViewController: self)
+        presentProduct(product, atLocation: .favorite)
     }
 }
 
@@ -130,7 +131,8 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
             cell.priceAlertButton.isSelected = product.hasPriceAlerts
             cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
-            cell.cartButton.addTarget(self, action: #selector(addProductAction(_:event:)), for: .touchUpInside)
+            cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
+            cell.isCartButtonHidden = (product.partNumber == nil)
         }
         
         return cell

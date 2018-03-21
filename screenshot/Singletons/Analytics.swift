@@ -298,6 +298,15 @@ fileprivate let marketingBrands = [
     "nordstrom"
 ]
 
+extension AnalyticsTrackers {
+    enum Location: String {
+        case favorite = "Favorite"
+        case products = "Products"
+        case productBar = "ProductBar"
+        case productSimilar = "ProductSimilar"
+    }
+}
+
 extension AnalyticsTracker {
     public func track(_ event: AnalyticsEvent, properties: [AnyHashable : Any]? = nil) {
         self.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(event.rawValue, properties: properties)
@@ -340,8 +349,7 @@ extension AnalyticsTracker {
         }
     }
     
-    func trackTappedOnProduct(_ product: Product, onPage page: String) {
-        
+    func trackTappedOnProduct(_ product: Product, atLocation location: AnalyticsTrackers.Location) {
         let willShowShoppingCartPage = (product.partNumber != nil )
         let displayAs:String = {
             if willShowShoppingCartPage {
@@ -356,19 +364,17 @@ extension AnalyticsTracker {
             }
         }()
         
-        switch page {
-        case "Favorite":
+        switch location {
+        case .favorite:
             track(.tappedOnProductFavorites, properties: ["display":displayAs])
-        case "Products":
+        case .products:
             track(.tappedOnProductProducts, properties: ["display":displayAs])
-        case "ProductBar":
+        case .productBar:
             track(.tappedOnProductProductBar, properties: ["display":displayAs])
-        case "ProductSimilar":
+        case .productSimilar:
             track(.tappedOnProductProductSimilar, properties: ["display":displayAs])
-        default:
-            //do nothing
-            break
         }
+        
         let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
         
         if email.lengthOfBytes(using: .utf8) > 0 {
@@ -406,7 +412,7 @@ extension AnalyticsTracker {
             "url" : offer,
             "imageUrl" : imageURL,
             "sale" : sale,
-            "page" : page,
+            "page" : location,
             "display":displayAs
         ])
         

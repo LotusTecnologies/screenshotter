@@ -255,7 +255,7 @@ extension ProductViewController: UICollectionViewDelegate {
                     return
             }
             
-            if let productViewController = presentProduct(products[indexPath.item], from: "ProductSimilar") {
+            if let productViewController = presentProduct(products[indexPath.item], atLocation: .productSimilar) {
                 productViewController.similarProducts = products
                 productViewController.navigationItem.leftItemsSupplementBackButton = true
                 
