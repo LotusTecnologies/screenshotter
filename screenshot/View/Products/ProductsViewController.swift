@@ -430,10 +430,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
-        guard let location = event.allTouches?.first?.location(in: collectionView),
-            let indexPath = collectionView?.indexPathForItem(at: location)
-            else {
-                return
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
         }
         
         let isFavorited = favoriteControl.isSelected

@@ -54,8 +54,8 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     deinit {
-        favoriteProductsView.tableView.dataSource = nil
-        favoriteProductsView.tableView.delegate = nil
+        tableView.dataSource = nil
+        tableView.delegate = nil
     }
     
     // MARK: Favorites
@@ -91,7 +91,13 @@ class FavoriteProductsViewController : BaseViewController {
     // MARK: Tracking
     
     @objc fileprivate func trackProductAction(_ button: UIButton, event: UIEvent) {
-        
+        // TODO:
+    }
+    
+    // MARK: Cart
+    
+    @objc fileprivate func addProductAction(_ button: UIButton, event: UIEvent) {
+        // TODO:
     }
     
     // MARK: Navigation
@@ -107,7 +113,7 @@ class FavoriteProductsViewController : BaseViewController {
 
 extension FavoriteProductsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1//products?.count ?? 0
+        return products?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -117,13 +123,14 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             cell.contentView.backgroundColor = .cellBackground
             cell.productImageView.setImage(withURLString: product.imageURL)
             cell.productControl.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
-            cell.titleLabel.text = "hello world\ncool beans"//product.productTitle()
+            cell.titleLabel.text = product.productTitle()
             cell.priceLabel.text = product.price
             cell.merchantLabel.text = product.merchant
             cell.favoriteControl.isSelected = product.isFavorite
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
             cell.priceAlertButton.isSelected = product.hasPriceAlerts
             cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
+            cell.cartButton.addTarget(self, action: #selector(addProductAction(_:event:)), for: .touchUpInside)
         }
         
         return cell

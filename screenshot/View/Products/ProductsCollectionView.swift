@@ -65,11 +65,8 @@ class ProductsCollectionView: UICollectionView {
     // MARK: Favorite
     
     @objc fileprivate func favoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
-        guard let location = event.allTouches?.first?.location(in: self),
-            let indexPath = indexPathForItem(at: location),
-            let product = products?[indexPath.item]
-            else {
-                return
+        guard let indexPath = indexPath(for: event), let product = products?[indexPath.item] else {
+            return
         }
         
         let isFavorited = favoriteControl.isSelected
