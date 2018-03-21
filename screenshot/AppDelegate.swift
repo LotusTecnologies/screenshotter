@@ -47,6 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if DataModel.sharedInstance.storeNeedsMigration() {
             window?.rootViewController = LoadingViewController()
+            window?.makeKeyAndVisible()
             DispatchQueue.global(qos: .userInteractive).async {
                 DataModel.sharedInstance.loadStore(sync:false).always {
                     DispatchQueue.main.async {
@@ -58,9 +59,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }else{
             _ = DataModel.sharedInstance.loadStore(sync:true)
             self.window?.rootViewController = self.nextViewController()
+            window?.makeKeyAndVisible()
             AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         }
-        window?.makeKeyAndVisible()
 
 
         fetchAppSettings()
