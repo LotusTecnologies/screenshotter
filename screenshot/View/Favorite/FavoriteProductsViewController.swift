@@ -42,7 +42,6 @@ class FavoriteProductsViewController : BaseViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = view.backgroundColor
-        tableView.allowsSelection = false
         tableView.register(FavoriteProductsTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 200
@@ -91,6 +90,10 @@ class FavoriteProductsViewController : BaseViewController {
     // MARK: Tracking
     
     @objc fileprivate func trackProductAction(_ button: UIButton, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event), let product = products?[indexPath.item] else {
+            return
+        }
+        
         // TODO:
         
         button.isSelected = !button.isSelected
@@ -98,17 +101,24 @@ class FavoriteProductsViewController : BaseViewController {
         if let loadingButton = button as? LoadingButton {
             loadingButton.isLoading = !loadingButton.isLoading
         }
-        
     }
     
     // MARK: Navigation
     
-    @objc fileprivate func presentProductAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = tableView.indexPath(for: event), let product = products?[indexPath.item] else {
+    fileprivate func presentProduct(at indexPath: IndexPath) {
+        guard let product = products?[indexPath.item] else {
             return
         }
         
         presentProduct(product, atLocation: .favorite)
+    }
+    
+    @objc fileprivate func presentProductAction(_ control: UIControl, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event) else {
+            return
+        }
+        
+        presentProduct(at: indexPath)
     }
 }
 
@@ -121,9 +131,9 @@ extension FavoriteProductsViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? FavoriteProductsTableViewCell, let product = products?[indexPath.item] {
+            cell.selectionStyle = .none
             cell.contentView.backgroundColor = .cellBackground
             cell.productImageView.setImage(withURLString: product.imageURL)
-            cell.productControl.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
             cell.titleLabel.text = product.productTitle()
             cell.priceLabel.text = product.price
             cell.merchantLabel.text = product.merchant
@@ -140,5 +150,7 @@ extension FavoriteProductsViewController: UITableViewDataSource {
 }
 
 extension FavoriteProductsViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        presentProduct(at: indexPath)
+    }
 }
