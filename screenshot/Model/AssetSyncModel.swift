@@ -291,41 +291,6 @@ extension AssetSyncModel {
     }
 }
 
-extension AssetSyncModel {
-    func findOrCreateShamrockVersion(screenshot: Screenshot, completion:@escaping (NSManagedObjectID?)->()) {
-        guard let assetId = screenshot.assetId, let imageData = screenshot.imageData else{
-            return
-        }
-        //Set values here - cannot capture screenshot in performBackgroundTask scope
-        let nickNameAssetId = "shamrock|" + assetId
-        
-        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            let shamrockScreenshot = managedObjectContext.findOrCreateScreenshotWith(assetId: nickNameAssetId)
-            
-            if shamrockScreenshot.isRecognized == false{
-                shamrockScreenshot.isRecognized = true
-            }
-            
-            if shamrockScreenshot.isHidden == true {
-                shamrockScreenshot.isHidden = false
-                shamrockScreenshot.createdAt = NSDate()
-            }
-            if shamrockScreenshot.imageData == nil {
-                shamrockScreenshot.imageData = imageData
-            }
-            if shamrockScreenshot.shoppables?.count == 0 {
-                shamrockScreenshot.shoppablesCount = 0
-                self.syteProcessing(imageClassification: .human, imageData: imageData as Data, assetId: nickNameAssetId)
-            }
-            managedObjectContext.saveIfNeeded()
-            let objectId = shamrockScreenshot.objectID
-            DispatchQueue.main.async {
-                completion(objectId)
-            }
-        }
-    }
-}
-
 //Background image processing
 extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func updatePhotoGalleryFetch() {
