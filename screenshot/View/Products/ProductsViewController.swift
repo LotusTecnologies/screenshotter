@@ -363,7 +363,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         } else if sectionType == .product {
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = ProductsCollectionViewCell.cellHeight(for: size.width)
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
         }
         
         return size
@@ -388,6 +388,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.isSale = product.isSale()
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
+                cell.hasBuyLabel = true
                 return cell
             }
         }
