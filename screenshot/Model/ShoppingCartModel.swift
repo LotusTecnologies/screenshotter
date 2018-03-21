@@ -448,3 +448,44 @@ extension CartItem {
     }
     
 }
+
+
+extension Product {
+    
+    func track() -> Promise<Bool> {
+        // TODO: GMK, Handle push notification permissions.
+        guard let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData else {
+            let error = NSError(domain: "Craze", code: 70, userInfo: [NSLocalizedDescriptionKey : "No pushToken"])
+            print("Product.track error:\(error)")
+            return Promise(error: error)
+        }
+        guard let partNumber = self.partNumber,
+          !partNumber.isEmpty else {
+            let error = NSError(domain: "Craze", code: 71, userInfo: [NSLocalizedDescriptionKey : "No partNumber"])
+            print("Product.track error:\(error)")
+            return Promise(error: error)
+        }
+        let productOID = objectID
+        return NetworkingPromise.sharedInstance.registerPriceAlert(partNumber: partNumber, lastPrice: self.fallbackPrice, pushToken: pushTokenData.description, outOfStock: !self.hasVariants)
+            .then { networkSucceeded -> Promise<Bool> in
+                let dataModel = DataModel.sharedInstance
+                return Promise { fulfill, reject in
+                    dataModel.performBackgroundTask { managedObjectContext in
+                        if let product = managedObjectContext.object(with: productOID) as? Product {
+                            product.hasPriceAlerts = networkSucceeded
+                            fulfill(true)
+                        } else {
+                            let error = NSError(domain: "Craze", code: 72, userInfo: [NSLocalizedDescriptionKey : "Product.track failed to extract product with OID:\(productOID)"])
+                            print("Product.track error:\(error)")
+                            reject(error)
+                        }
+                    }
+                }
+        }
+    }
+    
+    func untrack() -> Promise<Bool> {
+        return Promise(value: true)
+    }
+    
+}
