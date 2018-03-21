@@ -25,9 +25,6 @@ class DataModel: NSObject {
         return persistentContainer.viewContext
     }
     
-    public func adHocMoc() -> NSManagedObjectContext {
-        return persistentContainer.newBackgroundContext()
-    }
     
     
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
@@ -483,7 +480,7 @@ extension DataModel {
     // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
         self.dbQ.addOperation {
-            let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+            let managedObjectContext = self.persistentContainer.newBackgroundContext()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
             }
@@ -493,7 +490,7 @@ extension DataModel {
     func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
         return Promise { fulfill, reject in
             self.dbQ.addOperation {
-                let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+                let managedObjectContext = self.persistentContainer.newBackgroundContext()
                 managedObjectContext.perform {
                     fulfill(block(managedObjectContext), dict)
                 }
