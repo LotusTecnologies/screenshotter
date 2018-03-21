@@ -193,6 +193,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
                 if let response = response {
                     response(requestedStatus == .authorized)
                 }
+                NotificationCenter.default.post(name: .permissionsManagerDidUpdate, object: self)
             }
             
         } else {
@@ -217,6 +218,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             if let response = response {
                 response(granted)
             }
+            NotificationCenter.default.post(name: .permissionsManagerDidUpdate, object: self)
         }
     }
     
@@ -270,7 +272,9 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             
             locationManager?.delegate = nil
             locationManager = nil
+            
         }
+        NotificationCenter.default.post(name: .permissionsManagerDidUpdate, object: self)
     }
     
     // MARK: Alert

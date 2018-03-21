@@ -18,7 +18,6 @@ class AccumulatorModel: NSObject {
     
     public static let sharedInstance = AccumulatorModel()
     
-    
     public func getNewScreenshotsCount() -> Int {
         return assetIds.count
     }
@@ -133,6 +132,8 @@ class AssetSyncModel: NSObject {
         registerForPhotoChanges()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(scanPhotoGalleryForFashion), name: .permissionsManagerDidUpdate, object: nil)
+
     }
     
     deinit {
@@ -312,7 +313,12 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         registerForPhotoChanges()  //just in case we got permissions since init
     }
     
-    func scanPhotoGalleryForFashion() {
+    @objc func scanPhotoGalleryForFashion() {
+        guard PermissionsManager.shared.hasPermission(for: .photo) else {
+            print("scanPhotoGalleryForFashion refused by guard")
+            return
+        }
+        
         updatePhotoGalleryFetch()
         
         if let assets = self.backgroundProcessFetchedResults {
