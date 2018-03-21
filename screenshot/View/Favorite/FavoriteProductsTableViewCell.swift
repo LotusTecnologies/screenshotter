@@ -10,7 +10,6 @@ import UIKit
 
 class FavoriteProductsTableViewCell: UITableViewCell {
     let productImageView = EmbossedView()
-    let productControl = UIControl()
     let favoriteControl = FavoriteControl()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
@@ -45,7 +44,7 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         labelsContainerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.numberOfLines = 0
+        titleLabel.numberOfLines = 2
         titleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -halfPadding, right: 0)
@@ -92,13 +91,6 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         fontSizeAccessibilityRangeConstraints += [
             productImageView.topAnchor.constraint(equalTo: titleLabel.layoutMarginsGuide.bottomAnchor)
         ]
-        
-        productControl.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(productControl)
-        productControl.topAnchor.constraint(equalTo: productImageView.topAnchor).isActive = true
-        productControl.leadingAnchor.constraint(equalTo: productImageView.leadingAnchor).isActive = true
-        productControl.bottomAnchor.constraint(equalTo: productImageView.bottomAnchor).isActive = true
-        productControl.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor).isActive = true
         
         favoriteControl.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(favoriteControl)
