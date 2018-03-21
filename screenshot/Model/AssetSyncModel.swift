@@ -387,6 +387,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func photoLibraryDidChange(_ changeInstance: PHChange) {
         guard let backgroundProcessFetchedResults = self.backgroundProcessFetchedResults else {
             //huh?
+            print("photoLibraryDidChange ignored - no fetch results")
             return
         }
 
