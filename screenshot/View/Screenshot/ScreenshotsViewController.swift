@@ -282,7 +282,7 @@ extension ScreenshotsViewController {
     func insertScreenshotHelperView() {
         
         let hasPresented = UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
-        if !hasPresented && self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) == 1{
+        if !hasPresented && self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) == 1 && !self.hasNewScreenshotSection {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
             if let layout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
                 let backgroundView = UIView()
@@ -609,10 +609,12 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
                 if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 0{
                     self.collectionView.insertItems(at: [indexPath])
                     self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+                    self.removeScreenshotHelperView()
                 }
             }else{
                 if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
                     self.collectionView.deleteItems(at: [indexPath])
+                    self.insertScreenshotHelperView()
                 }
             }
         }
