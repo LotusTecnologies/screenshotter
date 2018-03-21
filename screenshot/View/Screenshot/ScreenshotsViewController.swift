@@ -94,6 +94,7 @@ extension ScreenshotsViewController {
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
+        self.syncEmptyListView()
         NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
 
     }
@@ -214,11 +215,9 @@ extension ScreenshotsViewController {
 
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if isViewLoaded {
-            change.shiftIndexSections(by: 2)
-            change.applyChanges(collectionView: collectionView)
-            syncEmptyListView()
-        }
+        change.shiftIndexSections(by: 2)
+        change.applyChanges(collectionView: collectionView)
+        syncEmptyListView()
     }
 }
 
