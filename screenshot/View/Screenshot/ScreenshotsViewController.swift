@@ -38,7 +38,6 @@ class ScreenshotsViewController: BaseViewController {
     var emptyListView:ScreenshotsHelperView?
     var hasNewScreenshotSection = false
     var hasProductBar = false
-    var notificationCellAssetId:String?
     
     init() {
 
@@ -95,6 +94,7 @@ extension ScreenshotsViewController {
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
+        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
 
     }
     
@@ -282,7 +282,7 @@ extension ScreenshotsViewController {
     func insertScreenshotHelperView() {
         
         let hasPresented = UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
-        if !hasPresented && self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) == 1{
+        if !hasPresented && self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) == 1 && !self.hasNewScreenshotSection {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
             if let layout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
                 let backgroundView = UIView()
@@ -572,16 +572,26 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         
         AnalyticsTrackers.standard.track(.screenshotNotificationCancelled, properties: ["Screenshot count": screenshotsCount])
     }
+    func notificationCellAssetId() -> String?{
+        return AccumulatorModel.sharedInstance.assetIds.first
+    }
     
     func screenshotNotificationCollectionViewCellDidTapConfirm(_ cell: ScreenshotNotificationCollectionViewCell){
         let screenshotsCount = self.newScreenshotsCount()
         AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
 
-        if (cell.contentText == .importSingleScreenshot) {
-            AssetSyncModel.sharedInstance.refetchLastScreenshot()
-            
-        } else if (cell.contentText == .importMultipleScreenshots) {
-            self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+        switch cell.contentText {
+            case .importSingleScreenshot:
+                if let assetId = self.notificationCellAssetId() {
+                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId])
+                }else{
+                    self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+                }
+            case .importMultipleScreenshots, .importVeryManyScreenshots:
+                self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+            case .none:
+                //huh?
+                break
         }
         
         self.dismissNotificationCell()
@@ -599,32 +609,32 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
                 if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 0{
                     self.collectionView.insertItems(at: [indexPath])
                     self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+                    self.removeScreenshotHelperView()
                 }
             }else{
                 if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
                     self.collectionView.deleteItems(at: [indexPath])
+                    self.insertScreenshotHelperView()
                 }
             }
         }
         
     }
     
-    func presentNotificationCell(assetId:String){
-        if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {
-            self.notificationCellAssetId = assetId
-            
-            if self.hasNewScreenshotSection {  //Already has a new screenshot section -  just do an update
-                let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
-                    self.collectionView.reloadItems(at: [indexPath])
-                }
-            }else{
-                updateHasNewScreenshot()  //time to show it
+    func accumulatorModelNumberDidChange( _ notification: Notification) {
+        
+        if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
+            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
+            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
+                self.collectionView.reloadItems(at: [indexPath])
             }
-           
-            
-            syncEmptyListView()
+        }else{
+            updateHasNewScreenshot()
         }
+        
+        
+        syncEmptyListView()
+        
     }
     
     func dismissNotificationCell(){
@@ -649,10 +659,10 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         
         if (count == 1) {
             return .importSingleScreenshot
-            
+        }else if (count > Constants.notificationProductToImportCountLimit){
+            return .importVeryManyScreenshots
         } else if (count > 1) {
             return .importMultipleScreenshots
-            
         } else {
             return .none
         }
@@ -772,12 +782,14 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         
         cell.delegate = self
         cell.contentView.backgroundColor = collectionView.backgroundColor
-        cell.contentText = self.notificationContentText()
+        let contentType = self.notificationContentText()
+        cell.contentText = contentType
         cell.setContentType(.labelWithButtons)
         
         cell.iconImage = nil
-        if let assetId = self.notificationCellAssetId {
-            PHAsset.assetWith(assetId: assetId)?.image(allowFromICloud: true).then(execute: { (image) -> Promise<Bool>  in
+        if contentType == .importSingleScreenshot, let assetId = self.notificationCellAssetId() {
+            //don't change to allowFromICloud: false.  that will cause a syncronous call on the main thread
+            PHAsset.assetWith(assetId: assetId)?.image(allowFromICloud: true).then(execute: { (image) -> Void  in
                 DispatchQueue.main.async {
                     for cell in self.collectionView.visibleCells {
                         if let c = cell as? ScreenshotNotificationCollectionViewCell {
@@ -785,7 +797,14 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                         }
                     }
                 }
-                return Promise.init(value:true)
+            }).catch(execute: { (error) in
+                DispatchQueue.main.async {
+                    for cell in self.collectionView.visibleCells {
+                        if let c = cell as? ScreenshotNotificationCollectionViewCell {
+                            c.iconImage = UIImage.init(named:"NotificationSnapshot")
+                        }
+                    }
+                }
             })
         }
         

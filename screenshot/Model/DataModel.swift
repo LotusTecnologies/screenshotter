@@ -25,9 +25,6 @@ class DataModel: NSObject {
         return persistentContainer.viewContext
     }
     
-    public func adHocMoc() -> NSManagedObjectContext {
-        return persistentContainer.newBackgroundContext()
-    }
     
     
     // See https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data . Go Rose!
@@ -38,16 +35,22 @@ class DataModel: NSObject {
         queue.isSuspended = true
         return queue
     }()
-    
+    func sqlFileUrl() -> URL {
+        return NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+    }
     func loadStore(sync:Bool) -> Promise<Bool>{
-        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+        let sqliteURL = self.sqlFileUrl()
 
         let storeInfo = NSPersistentStoreDescription.init(url: sqliteURL)
         storeInfo.shouldAddStoreAsynchronously = !sync
+        self.persistentContainer.persistentStoreDescriptions = [storeInfo]
         return Promise.init(resolvers: { (fulfill, reject) in
             self.persistentContainer.loadPersistentStores { (storeDescription, error) in
                 if let error = error as NSError? {
                     print("loadPersistentStores error:\(error)")
+                    self.dbQ.isSuspended = false  //I don't what failed, but it may be something minor that we can continue from
+                    self.receivedCoreDataError(error:error) // this will at least log.  In the future we may present an alert
+
                     reject(error)
                 } else {
                     self.persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
@@ -57,23 +60,24 @@ class DataModel: NSObject {
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
                     MatchstickModel.shared.prepareMatchsticks()
+                    self.dbQ.isSuspended = false
                     fulfill(true)
                 }
-                self.dbQ.isSuspended = false
             }
         })
        
     }
     
     func storeNeedsMigration() -> Bool {
-        let sqliteURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
+        let sqliteURL = self.sqlFileUrl()
         do{
 
             let metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqliteURL, options: nil)
             let model = self.persistentContainer.managedObjectModel
             return !model.isConfiguration(withName: nil, compatibleWithStoreMetadata: metadata)
         }catch{
-            
+            self.receivedCoreDataError(error:error) // this will log. 
+
         }
         return false
     }
@@ -187,6 +191,7 @@ extension DataModel {
         return screenshotToSave
     }
     
+    
     func retrieveAllAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
         return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: nil)
     }
@@ -228,30 +233,26 @@ extension DataModel {
         return nil
     }
     
+    func retrieveAssetIds(assetIds:[String], managedObjectContext: NSManagedObjectContext) -> Set<String> {
+        let predicate = NSPredicate(format: "assetId IN %@", assetIds)
+        return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: predicate)
+    }
+    
     func retrieveAssetIds(managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> Set<String> {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
+        let fetchRequest:NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
         fetchRequest.includesSubentities = false
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.includesPendingChanges = false
-        fetchRequest.propertiesToFetch = ["assetId"]
-        fetchRequest.returnsDistinctResults = true
-        fetchRequest.includesPropertyValues = true
-        fetchRequest.shouldRefreshRefetchedObjects = false
-        fetchRequest.returnsObjectsAsFaults = false
         
         var assetIdsSet = Set<String>()
         do {
-            guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]] else {
-                print("retrieveAssetIds failed to fetch dictionaries")
-                return assetIdsSet
-            }
+            let results = try managedObjectContext.fetch(fetchRequest)
             for result in results {
-                if let assetId = result["assetId"] {
+                if let assetId = result.assetId {
                     assetIdsSet.insert(assetId)
                 }
             }
+            
+         
         } catch {
             self.receivedCoreDataError(error: error)
             print("retrieveAssetIds results with error:\(error)")
@@ -479,7 +480,7 @@ extension DataModel {
     // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
         self.dbQ.addOperation {
-            let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+            let managedObjectContext = self.persistentContainer.newBackgroundContext()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
             }
@@ -489,7 +490,7 @@ extension DataModel {
     func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
         return Promise { fulfill, reject in
             self.dbQ.addOperation {
-                let managedObjectContext = DataModel.sharedInstance.adHocMoc()
+                let managedObjectContext = self.persistentContainer.newBackgroundContext()
                 managedObjectContext.perform {
                     fulfill(block(managedObjectContext), dict)
                 }
@@ -1262,6 +1263,22 @@ extension NSManagedObjectContext {
         return nil
     }
     
+    func findOrCreateScreenshotWith(assetId:String) -> Screenshot {
+        if let screenshot = self.screenshotWith(assetId: assetId) {
+            return screenshot
+        }
+        
+        let screenshot = Screenshot(context: self)
+        screenshot.assetId = assetId
+        let now = NSDate()
+            screenshot.createdAt = now
+
+        screenshot.isHidden = true
+        screenshot.isNew = true
+        screenshot.lastModified = NSDate()
+        return screenshot
+        
+    }
     func screenshotWith(assetId:String) -> Screenshot? {
         let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
