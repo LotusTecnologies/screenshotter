@@ -91,6 +91,7 @@ class AssetSyncModel: NSObject {
     var isNextScreenshotForeground = false
     var isRecentlyForeground = false
     var backgroundProcessFetchedResults:PHFetchResult<PHAsset>?
+    var lastDidBecomeActiveDate:Date?
     
     var uploadScreenshotWithClarifaiQueue:OperationQueue = {
         var queue = OperationQueue()
@@ -140,6 +141,7 @@ class AssetSyncModel: NSObject {
         NotificationCenter.default.removeObserver(self)
     }
     func applicationDidBecomeActive(){
+        self.lastDidBecomeActiveDate = Date()
         self.processingQ.async {
             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
         }
@@ -345,7 +347,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             //huh?
             return
         }
-        
+
         if let change = changeInstance.changeDetails(for: backgroundProcessFetchedResults), change.hasIncrementalChanges {
             if isNextScreenshotForeground {
                 if let asset = change.insertedObjects.last {
@@ -353,8 +355,18 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     isNextScreenshotForeground = false
                 }
             }
-            change.insertedObjects.forEach{ self.userJustTookScreenshotAssetIds.insert($0.localIdentifier) }
-            change.insertedObjects.forEach{ self.uploadScreenshotWithClarifaiFromUserScreenshotAction(asset:$0) }
+            change.insertedObjects.forEach({ (asset) in
+                var isOld = false
+                if let dateCreated = asset.creationDate, let lastDidBecomeActiveDate = self.lastDidBecomeActiveDate {
+                    if dateCreated < lastDidBecomeActiveDate {
+                        isOld = true
+                    }
+                }
+                if !isOld{
+                    self.userJustTookScreenshotAssetIds.insert(asset.localIdentifier)
+                    self.uploadScreenshotWithClarifaiFromUserScreenshotAction(asset:asset)
+                }
+            })
             updatePhotoGalleryFetch()
         }
     }
