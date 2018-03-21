@@ -917,7 +917,7 @@ extension AssetSyncModel {
     }
     
     public func refetchShoppables(screenshot: Screenshot, classificationString: String) {
-        guard let asset = PHAsset.assetWith(assetId: screenshot.assetId) else {
+        guard let assetId = screenshot.assetId, let asset = PHAsset.assetWith(assetId: assetId) else {
             return
         }
         

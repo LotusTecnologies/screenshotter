@@ -10,15 +10,11 @@ import Foundation
 import Photos
 import PromiseKit
 extension PHAsset {
-    static func assetWith(assetId:String?) -> PHAsset?{
-        if let assetId = assetId {
-            let fetchOptions = PHFetchOptions()
-            fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
-            let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-            return fetchResult.firstObject
-        }else{
-            return nil
-        }
+    static func assetWith(assetId:String) -> PHAsset?{
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
+        let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        return fetchResult.firstObject
     }
     
     func goodTargetSize() -> CGSize{
