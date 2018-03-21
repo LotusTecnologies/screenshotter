@@ -42,32 +42,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: .coreDataStackCompleted, object: nil)
-
         
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if DataModel.sharedInstance.storeNeedsMigration() {
             window?.rootViewController = LoadingViewController()
             window?.makeKeyAndVisible()
-            
             DispatchQueue.global(qos: .userInteractive).async {
                 DataModel.sharedInstance.loadStore(sync:false).always {
                     DispatchQueue.main.async {
                         self.window?.rootViewController = self.nextViewController()
                     }
+                    AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
                 }
             }
         }else{
             _ = DataModel.sharedInstance.loadStore(sync:true)
             self.window?.rootViewController = self.nextViewController()
             window?.makeKeyAndVisible()
+            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         }
+
 
         fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
+        
+        
         
         return true
     }
@@ -131,7 +133,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
         AnalyticsTrackers.standard.track(.sessionStarted)
-        AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+        AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -313,7 +315,8 @@ extension AppDelegate {
             }
             
             if let shareId = params["shareId"] as? String {
-                AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
+
+                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
                 self.showScreenshotListTop()
             }
             
@@ -379,17 +382,6 @@ extension AppDelegate {
         }
         
         return viewController
-    }
-    
-    func coreDataStackCompletionHandler(notification: Notification) {
-        if notification.userInfo?["error"] == nil {
-            if ApplicationStateModel.sharedInstance.isBackground() {
-                AssetSyncModel.sharedInstance.syncPhotos()
-            }
-            else {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
-            }
-        }
     }
     
     func transitionTo(_ toViewController: UIViewController) {
@@ -469,7 +461,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
           let openingScreen = userInfo[Constants.openingScreenKey],
           openingScreen == Constants.openingScreenValueScreenshot,
           let openingAssetId = userInfo[Constants.openingAssetIdKey] {
-            AssetSyncModel.sharedInstance.refetchOpenedFromNotification(assetId: openingAssetId)
+            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
             showScreenshotListTop()
         }
         
