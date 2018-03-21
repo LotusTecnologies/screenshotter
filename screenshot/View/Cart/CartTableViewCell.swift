@@ -240,6 +240,7 @@ class CartTableViewCell: UITableViewCell {
         removeButton.setTitle("cart.remove".localized, for: .normal)
         removeButton.setTitleColor(.gray6, for: .normal)
         removeButton.setTitleColor(.crazeRed, for: .selected)
+        removeButton.setTitleColor(.crazeRed, for: [.selected, .highlighted])
         actionView.addSubview(removeButton)
         removeButton.topAnchor.constraint(equalTo: actionView.topAnchor).isActive = true
         removeButton.leadingAnchor.constraint(greaterThanOrEqualTo: actionView.leadingAnchor).isActive = true

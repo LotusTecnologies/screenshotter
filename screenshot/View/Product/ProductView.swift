@@ -162,6 +162,7 @@ class ProductView: UIView {
         favoriteButton.translatesAutoresizingMaskIntoConstraints = false
         favoriteButton.setTitle("cart.favorite.add".localized, for: .normal)
         favoriteButton.setTitle("cart.favorite.remove".localized, for: .selected)
+        favoriteButton.setTitle("cart.favorite.remove".localized, for: [.selected, .highlighted])
         favoriteButton.setTitleColor(.crazeRed, for: .normal)
         scrollView.addSubview(favoriteButton)
         favoriteButton.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true

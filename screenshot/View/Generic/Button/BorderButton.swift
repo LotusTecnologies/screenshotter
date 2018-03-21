@@ -28,7 +28,10 @@ class BorderButton: UIButton {
         syncBorderColor()
         
         if state == .normal {
-            super.setTitleColor(color?.darker(), for: .highlighted)
+            let darkerColor = color?.darker(by: 14)
+            
+            super.setTitleColor(darkerColor, for: .highlighted)
+            super.setTitleColor(darkerColor, for: [.highlighted, .selected])
         }
     }
     

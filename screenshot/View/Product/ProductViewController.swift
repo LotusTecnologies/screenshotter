@@ -11,10 +11,6 @@ import CoreData
 
 class ProductViewController : BaseViewController {
     fileprivate var cartBarButtonItem: ProductCartBarButtonItem?
-    fileprivate var productView: ProductView {
-        return view as! ProductView
-    }
-    
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
     
@@ -33,6 +29,23 @@ class ProductViewController : BaseViewController {
             productView.setSimilarProducts(products)
             productView.similarProductsCollectionView?.delegate = self
         }
+    }
+    
+    // MARK: Views
+    
+    fileprivate var productView: ProductView {
+        return view as! ProductView
+    }
+    
+    override func loadView() {
+        let productView = ProductView()
+        productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
+        productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
+        productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
+//            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
+        productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
+        productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
+        view = productView
     }
     
     // MARK: Life Cycle
@@ -57,17 +70,6 @@ class ProductViewController : BaseViewController {
         
         cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCart))
         navigationItem.rightBarButtonItem = cartBarButtonItem
-    }
-    
-    override func loadView() {
-        let productView = ProductView()
-        productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
-        productView.selectionControl.addTarget(self, action: #selector(selectionButtonValueChanged), for: .valueChanged)
-        productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
-//            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
-        productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
-        productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
-        view = productView
     }
     
     override func viewDidLoad() {
