@@ -452,40 +452,70 @@ extension CartItem {
 
 extension Product {
     
+    // Returns the new value of hasPriceAlerts as determined by the network.
     func track() -> Promise<Bool> {
-        // TODO: GMK, Handle push notification permissions.
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
+            let error = NSError(domain: "Craze", code: 70, userInfo: [NSLocalizedDescriptionKey : "Product.track No push permissions"])
+            print("error:\(error)")
+            return Promise(error: error)
+        }
         guard let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData else {
-            let error = NSError(domain: "Craze", code: 70, userInfo: [NSLocalizedDescriptionKey : "No pushToken"])
-            print("Product.track error:\(error)")
+            let error = NSError(domain: "Craze", code: 71, userInfo: [NSLocalizedDescriptionKey : "Product.track No pushToken"])
+            print("error:\(error)")
             return Promise(error: error)
         }
         guard let partNumber = self.partNumber,
           !partNumber.isEmpty else {
-            let error = NSError(domain: "Craze", code: 71, userInfo: [NSLocalizedDescriptionKey : "No partNumber"])
-            print("Product.track error:\(error)")
+            let error = NSError(domain: "Craze", code: 72, userInfo: [NSLocalizedDescriptionKey : "Product.track No partNumber"])
+            print("error:\(error)")
             return Promise(error: error)
         }
         let productOID = objectID
         return NetworkingPromise.sharedInstance.registerPriceAlert(partNumber: partNumber, lastPrice: self.fallbackPrice, pushToken: pushTokenData.description, outOfStock: !self.hasVariants)
             .then { networkSucceeded -> Promise<Bool> in
-                let dataModel = DataModel.sharedInstance
-                return Promise { fulfill, reject in
-                    dataModel.performBackgroundTask { managedObjectContext in
-                        if let product = managedObjectContext.object(with: productOID) as? Product {
-                            product.hasPriceAlerts = networkSucceeded
-                            fulfill(true)
-                        } else {
-                            let error = NSError(domain: "Craze", code: 72, userInfo: [NSLocalizedDescriptionKey : "Product.track failed to extract product with OID:\(productOID)"])
-                            print("Product.track error:\(error)")
-                            reject(error)
-                        }
-                    }
-                }
+                return self.priceAlertDB(productOID: productOID, networkSucceeded: networkSucceeded, successValue: true)
         }
     }
     
+    // Returns the new value of hasPriceAlerts as determined by the network.
     func untrack() -> Promise<Bool> {
-        return Promise(value: true)
+        guard let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData else {
+            let error = NSError(domain: "Craze", code: 73, userInfo: [NSLocalizedDescriptionKey : "Product.untrack No pushToken"])
+            print("error:\(error)")
+            return Promise(error: error)
+        }
+        guard let partNumber = self.partNumber,
+            !partNumber.isEmpty else {
+                let error = NSError(domain: "Craze", code: 74, userInfo: [NSLocalizedDescriptionKey : "Product.untrack No partNumber"])
+                print("error:\(error)")
+                return Promise(error: error)
+        }
+        let productOID = objectID
+        return NetworkingPromise.sharedInstance.deregisterPriceAlert(partNumber: partNumber, pushToken: pushTokenData.description)
+            .then { networkSucceeded -> Promise<Bool> in
+                return self.priceAlertDB(productOID: productOID, networkSucceeded: networkSucceeded, successValue: false)
+        }
+    }
+    
+    fileprivate func priceAlertDB(productOID: NSManagedObjectID, networkSucceeded: Bool, successValue: Bool) -> Promise<Bool> {
+        guard networkSucceeded else {
+            let error = NSError(domain: "Craze", code: 75, userInfo: [NSLocalizedDescriptionKey : "Product.priceAlertDB Failed network for product with OID:\(productOID)"])
+            print("error:\(error)")
+            return Promise(error: error)
+        }
+        return Promise { fulfill, reject in
+            DataModel.sharedInstance.performBackgroundTask { managedObjectContext in
+                if let product = managedObjectContext.object(with: productOID) as? Product {
+                    product.hasPriceAlerts = successValue
+                    managedObjectContext.saveIfNeeded()
+                    fulfill(successValue)
+                } else {
+                    let error = NSError(domain: "Craze", code: 76, userInfo: [NSLocalizedDescriptionKey : "Product.priceAlertDB Failed to extract product with OID:\(productOID)"])
+                    print("error:\(error)")
+                    reject(error)
+                }
+            }
+        }
     }
     
 }

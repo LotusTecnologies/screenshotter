@@ -428,19 +428,31 @@ class NetworkingPromise : NSObject {
     }
     
     func registerPriceAlert(partNumber: String, lastPrice: Float, pushToken: String, outOfStock: Bool) -> Promise<Bool> {
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "productSubscription/track") else {
-            let error = NSError(domain: "Craze", code: 60, userInfo: [NSLocalizedDescriptionKey: "Cannot create price alert url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-            print(error)
-            return Promise(error: error)
-        }
         let parameterDict: [String : Any] =
             ["pushToken" : pushToken,
              "pushTokenPlatform" : "ios",
              "partNumber" : partNumber,
              "lastPrice" : lastPrice,
-             "outOfStock" : outOfStock] // One of lastPrice and outOfStock must be provided. Each is optional. TBD if monitor stock.
+             "outOfStock" : outOfStock] // One of lastPrice and outOfStock must be provided. Each is optional.
+        return priceAlertWorkhorse(parameterDict: parameterDict, actionName: "registerPriceAlert", serverActionName: "track")
+    }
+    
+    func deregisterPriceAlert(partNumber: String, pushToken: String) -> Promise<Bool> {
+        let parameterDict: [String : Any] =
+            ["pushToken" : pushToken,
+             "pushTokenPlatform" : "ios",
+             "partNumber" : partNumber]
+        return priceAlertWorkhorse(parameterDict: parameterDict, actionName: "deregisterPriceAlert", serverActionName: "unTrack")
+    }
+
+    func priceAlertWorkhorse(parameterDict: [String : Any], actionName: String, serverActionName: String) -> Promise<Bool> {
+        guard let url = URL(string: Constants.screenShotLambdaDomain + "productSubscription/\(serverActionName)") else {
+            let error = NSError(domain: "Craze", code: 60, userInfo: [NSLocalizedDescriptionKey: "Cannot create \(actionName) url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
+            print(error)
+            return Promise(error: error)
+        }
         guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
-            let error = NSError(domain: "Craze", code: 61, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize price alert parameterDict:\(parameterDict)"])
+            let error = NSError(domain: "Craze", code: 61, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize \(actionName) parameterDict:\(parameterDict)"])
             print(error)
             return Promise(error: error)
         }
@@ -449,16 +461,16 @@ class NetworkingPromise : NSObject {
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = parameterData
-        print("price alert url:\(url)  parameters:\(parameterDict)  httpHeaders:\(String(describing: request.allHTTPHeaderFields))")
-
+        print("\(actionName) url:\(url)  parameters:\(parameterDict)  httpHeaders:\(String(describing: request.allHTTPHeaderFields))")
+        
         return URLSession.shared.dataTask(with: request).asDataAndResponse().then { data, response -> Promise<Bool> in
             guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
-                let error = NSError(domain: "Craze", code: 62, userInfo: [NSLocalizedDescriptionKey: "Invalid status code received from price alert url:\(url)"])
+                let error = NSError(domain: "Craze", code: 62, userInfo: [NSLocalizedDescriptionKey: "Invalid status code received from \(actionName) url:\(url)"])
                 print(error)
                 return Promise(error: error)
             }
             let dataString = String(data: data, encoding: .utf8)
-            print("registerPriceAlert success data:\(dataString ?? "-")")
+            print("\(actionName) success data:\(dataString ?? "-")")
             return Promise(value: true)
         }
     }
