@@ -110,6 +110,7 @@ class ProductView: UIView {
         priceLabel.textColor = .gray3
         priceLabel.font = UIFont.preferredFont(forTextStyle: .title1)
         priceLabel.minimumScaleFactor = 0.3
+        priceLabel.baselineAdjustment = .alignCenters
         priceLabel.adjustsFontSizeToFitWidth = true
         priceLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(priceLabel)
@@ -122,6 +123,7 @@ class ProductView: UIView {
         originalPriceLabel.textColor = .gray7
         originalPriceLabel.font = UIFont.preferredFont(forTextStyle: .title2)
         originalPriceLabel.minimumScaleFactor = 0.3
+        originalPriceLabel.baselineAdjustment = .alignCenters
         originalPriceLabel.adjustsFontSizeToFitWidth = true
         originalPriceLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(originalPriceLabel)
@@ -160,6 +162,7 @@ class ProductView: UIView {
         favoriteButton.translatesAutoresizingMaskIntoConstraints = false
         favoriteButton.setTitle("cart.favorite.add".localized, for: .normal)
         favoriteButton.setTitle("cart.favorite.remove".localized, for: .selected)
+        favoriteButton.setTitle("cart.favorite.remove".localized, for: [.selected, .highlighted])
         favoriteButton.setTitleColor(.crazeRed, for: .normal)
         scrollView.addSubview(favoriteButton)
         favoriteButton.topAnchor.constraint(equalTo: selectionControl.bottomAnchor, constant: .padding).isActive = true

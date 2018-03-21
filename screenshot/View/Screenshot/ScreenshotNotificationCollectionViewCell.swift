@@ -17,6 +17,7 @@ enum ScreenshotNotificationCollectionViewCellContentText {
     case none
     case importSingleScreenshot
     case importMultipleScreenshots
+    case importVeryManyScreenshots
 }
 
 @objc protocol ScreenshotNotificationCollectionViewCellDelegate: NSObjectProtocol {
@@ -214,8 +215,10 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         case .importMultipleScreenshots:
             text = "screenshot.import.multiple".localized(withFormat: AccumulatorModel.sharedInstance.getNewScreenshotsCount())
             break
+        case .importVeryManyScreenshots:
+            text = "screenshot.import.very_many".localized
+            break
         }
-        
         return text
     }
     

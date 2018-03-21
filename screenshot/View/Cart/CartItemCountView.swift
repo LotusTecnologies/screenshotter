@@ -24,6 +24,7 @@ class CartItemCountView: UIView {
         titleLabel.textColor = .gray3
         titleLabel.font = UIFont.systemFont(ofSize: 28, weight: UIFontWeightLight)
         titleLabel.minimumScaleFactor = 0.7
+        titleLabel.baselineAdjustment = .alignCenters
         titleLabel.adjustsFontSizeToFitWidth = true
         addSubview(titleLabel)
         titleLabel.topAnchor.constraint(greaterThanOrEqualTo: topAnchor).isActive = true

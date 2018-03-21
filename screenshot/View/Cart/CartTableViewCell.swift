@@ -81,6 +81,7 @@ class CartTableViewCell: UITableViewCell {
         priceLabel.textColor = .gray3
         priceLabel.font = UIFont.preferredFont(forTextStyle: .headline)
         priceLabel.minimumScaleFactor = 0.2
+        priceLabel.baselineAdjustment = .alignCenters
         priceLabel.adjustsFontSizeToFitWidth = true
         priceLabel.adjustsFontForContentSizeCategory = true
         mainView.addSubview(priceLabel)
@@ -133,6 +134,7 @@ class CartTableViewCell: UITableViewCell {
             label.textColor = .gray3
             label.font = UIFont.preferredFont(forTextStyle: .body)
             label.minimumScaleFactor = 0.2
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.adjustsFontForContentSizeCategory = true
             variantDataContainerView.addSubview(label)
@@ -151,6 +153,7 @@ class CartTableViewCell: UITableViewCell {
             label.textColor = .gray6
             label.font = UIFont.preferredFont(forTextStyle: .body)
             label.minimumScaleFactor = 0.2
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.adjustsFontForContentSizeCategory = true
             variantDataContainerView.addSubview(label)
@@ -237,6 +240,7 @@ class CartTableViewCell: UITableViewCell {
         removeButton.setTitle("cart.remove".localized, for: .normal)
         removeButton.setTitleColor(.gray6, for: .normal)
         removeButton.setTitleColor(.crazeRed, for: .selected)
+        removeButton.setTitleColor(.crazeRed, for: [.selected, .highlighted])
         actionView.addSubview(removeButton)
         removeButton.topAnchor.constraint(equalTo: actionView.topAnchor).isActive = true
         removeButton.leadingAnchor.constraint(greaterThanOrEqualTo: actionView.leadingAnchor).isActive = true

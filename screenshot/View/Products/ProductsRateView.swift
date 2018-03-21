@@ -46,6 +46,7 @@ class ProductsRateView : UIView {
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.7
+        label.baselineAdjustment = .alignCenters
         contentView.addSubview(label)
         label.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
         label.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true

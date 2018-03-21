@@ -74,7 +74,7 @@ class ShoppingCartModel {
             cartItem.dateModified = NSDate()
             cartItem.product = variantToCopy.product
             cartItem.cart = cart
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            managedObjectContext.saveIfNeeded()
         }
     }
     
@@ -108,7 +108,7 @@ class ShoppingCartModel {
             do {
                 try cartItem.validateForUpdate()
                 managedObjectContext.delete(cartItem)
-                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                managedObjectContext.saveIfNeeded()
             } catch {
                 dataModel.receivedCoreDataError(error: error)
                 print("ShoppingCartModel remove item with OID:\(cartItemOID) results with error:\(error)")
@@ -241,7 +241,7 @@ class ShoppingCartModel {
                         }
                         let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
                         if didChange {
-                            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                            managedObjectContext.saveIfNeeded()
                         }
                         fulfill(isErrorFree)
                     }
@@ -262,7 +262,7 @@ class ShoppingCartModel {
                 return
             }
             items.forEach { $0.errorMask = CartItem.ErrorMaskOptions.none.rawValue }
-            dataModel.saveMoc(managedObjectContext: managedObjectContext)
+            managedObjectContext.saveIfNeeded()
         }
     }
     
@@ -295,7 +295,7 @@ class ShoppingCartModel {
                 cart.dateSubmitted = NSDate()
                 // Write to items without changing anything, so the cartItemFrc is updated.
                 (cart.items?.sortedArray(using: []) as? [CartItem])?.forEach { $0.errorMask = $0.errorMask }
-                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                managedObjectContext.saveIfNeeded()
                 print("hostedCompleted cart:\(cart)")
             } else {
                 print("hostedCompleted failed to retrieve cart")
@@ -332,7 +332,7 @@ class ShoppingCartModel {
                         print("populateVariants variant > an hour old. Deleting:\(variants.count)")
                         variants.forEach {managedObjectContext.delete($0)}
                         rootProduct.hasVariants = false
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        managedObjectContext.saveIfNeeded()
                     }
                 } else {
                     print("populateVariants no previous variants")
@@ -390,7 +390,7 @@ class ShoppingCartModel {
                     }
                 }
                 rootProduct.hasVariants = hasVariants
-                dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                managedObjectContext.saveIfNeeded()
                 return fulfill(hasVariants)
             }
         }

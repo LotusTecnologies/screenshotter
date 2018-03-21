@@ -30,18 +30,20 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             return self.originalPriceLabel?.text
         }
         set(newOriginalPrice){
-            if let newString = newOriginalPrice, newString.lengthOfBytes(using: .utf8) > 0 {
-                let attributes: [String: Any] = [
-                    NSForegroundColorAttributeName : UIColor.gray6,
-                    NSStrikethroughStyleAttributeName : NSUnderlineStyle.styleSingle.rawValue,
-                    NSStrikethroughColorAttributeName:UIColor.gray6
-                ]
-                self.originalPriceLabel?.attributedText = NSAttributedString.init(string: newString, attributes: attributes)
-                
-            }else{
+            guard let newString = newOriginalPrice, !newString.isEmpty else {
                 self.originalPriceLabel?.attributedText = nil
-                
+                return
             }
+            
+            let color: UIColor = .gray6
+            
+            let attributes: [String: Any] = [
+                NSForegroundColorAttributeName: color,
+                NSStrikethroughStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
+                NSStrikethroughColorAttributeName: color
+            ]
+            
+            self.originalPriceLabel?.attributedText = NSAttributedString.init(string: newString, attributes: attributes)
         }
     }
     var imageUrl:String? {
@@ -70,7 +72,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     static let labelFont = UIFont.systemFont(ofSize: 17)
     static let labelVerticalPadding:CGFloat = 6.0
     static let titleLabelNumberOfLines:Int = 1
-    static let buyLabelHeight:CGFloat = 40
     static let priceLabelLayoutMargins:UIEdgeInsets = UIEdgeInsets.init(top: 0, left: 0, bottom: 0, right: -8.0)
     static var titleLableHeight:CGFloat = {
         return CGFloat(ceil( ProductsCollectionViewCell.labelFont.lineHeight + ProductsCollectionViewCell.labelVerticalPadding) ) * CGFloat(ProductsCollectionViewCell.titleLabelNumberOfLines)
@@ -78,8 +79,9 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     static var priceLabelHeight:CGFloat = {
         return ProductsCollectionViewCell.labelFont.lineHeight + ProductsCollectionViewCell.labelVerticalPadding
     }()
-    static func cellHeight(for cellWidth: CGFloat) -> CGFloat {
-        return cellWidth + ProductsCollectionViewCell.titleLableHeight + ProductsCollectionViewCell.priceLabelHeight + ProductsCollectionViewCell.buyLabelHeight
+    
+    static func cellHeight(for cellWidth: CGFloat, withBottomLabel: Bool = false) -> CGFloat {
+        return cellWidth + ProductsCollectionViewCell.titleLableHeight + ProductsCollectionViewCell.priceLabelHeight + buyLabelHeight(withBottomLabel)
     }
     
     override init(frame: CGRect) {
@@ -103,7 +105,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
             productView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-            productView.heightAnchor.constraint(equalTo: productView.widthAnchor, constant:ProductsCollectionViewCell.buyLabelHeight).isActive = true
             return productView
         }()
         self.productView = productView
@@ -113,6 +114,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.translatesAutoresizingMaskIntoConstraints = false
             label.numberOfLines = ProductsCollectionViewCell.titleLabelNumberOfLines
             label.minimumScaleFactor = 0.7
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .center
             label.font = ProductsCollectionViewCell.labelFont
@@ -142,7 +144,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             return view
         }()
         
-        
         let priceLabel:UILabel = {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -150,6 +151,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.font = ProductsCollectionViewCell.labelFont
             label.textColor = .gray6
             label.minimumScaleFactor = 0.7
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.layoutMargins = ProductsCollectionViewCell.priceLabelLayoutMargins
             self.contentView.addSubview(label)
@@ -172,6 +174,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.font = ProductsCollectionViewCell.labelFont
             label.textColor = .gray7
             label.minimumScaleFactor = 0.7
+            label.baselineAdjustment = .alignCenters
             label.adjustsFontSizeToFitWidth = true
             label.isHidden = true
             self.contentView.addSubview(label)
@@ -203,7 +206,10 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
             label.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
             label.bottomAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
-            label.heightAnchor.constraint(equalToConstant: ProductsCollectionViewCell.buyLabelHeight).isActive = true
+            
+            let constant = ProductsCollectionViewCell.buyLabelHeight(hasBuyLabel)
+            buyLabelHeightConstraint = label.heightAnchor.constraint(equalToConstant: constant)
+            buyLabelHeightConstraint?.isActive = true
             
             label.backgroundColor = .white
             label.text = "generic.buy".localized
@@ -223,5 +229,19 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             return view
         }()
         self.saleView = saleView
+    }
+    
+    // MARK: Buy Label
+    
+    fileprivate static func buyLabelHeight(_ hasBuyLabel: Bool) -> CGFloat {
+        return hasBuyLabel ? 40 : 0
+    }
+    
+    fileprivate var buyLabelHeightConstraint: NSLayoutConstraint?
+    
+    var hasBuyLabel: Bool = false {
+        didSet {
+            buyLabelHeightConstraint?.constant = ProductsCollectionViewCell.buyLabelHeight(hasBuyLabel)
+        }
     }
 }

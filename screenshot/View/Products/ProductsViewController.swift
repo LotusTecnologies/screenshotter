@@ -153,22 +153,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
         var height = self.rateView.intrinsicContentSize.height
         
-        let isAlreadyShamrock = self.screenshot.isShamrockVersion
-        if !isAlreadyShamrock {
-            let p = CGFloat.padding
-            
-            let fab = FloatingActionButton()
-            fab.translatesAutoresizingMaskIntoConstraints = false
-            fab.setImage(UIImage(named:"Shamrock"), for: .normal)
-            fab.backgroundColor = .shamrockGreen
-            fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
-            fab.adjustsImageWhenHighlighted = false
-            fab.addTarget(self, action: #selector(shamrockAction(_:)), for: .touchUpInside)
-            view.addSubview(fab)
-            fab.bottomAnchor.constraint(equalTo: rateView.topAnchor, constant: -p / 2).isActive = true
-            fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
-        }
-        
         if #available(iOS 11.0, *) {
             height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
         }
@@ -245,23 +229,6 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 }
 
 extension ProductsViewController {
-    func shamrockAction(_ sender:Any) {
-        AssetSyncModel.sharedInstance.findOrCreateShamrockVersion(screenshot: self.screenshot) { (objectId) in
-            if let objectId = objectId, let screenshot = Screenshot.findWith(objectId: objectId), let navVC = self.navigationController as? ScreenshotsNavigationController{
-                navVC.popViewController(animated: false)
-                let productsViewController = ProductsViewController.init(screenshot: screenshot)
-                
-                productsViewController.lifeCycleDelegate = navVC
-                productsViewController.hidesBottomBarWhenPushed = true
-                navVC.pushViewController(productsViewController, animated: false)
-                
-                if (screenshot.isNew) {
-                    screenshot.setViewed()
-                }
-            }
-        }
-    }
-
     func clearProductListAndStateLoading(){
         self.products = []
         self.productsUnfilteredCount = 0
@@ -363,7 +330,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         } else if sectionType == .product {
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = ProductsCollectionViewCell.cellHeight(for: size.width)
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
         }
         
         return size
@@ -388,6 +355,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.isSale = product.isSale()
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
+                cell.hasBuyLabel = true
                 return cell
             }
         }
@@ -430,10 +398,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
-        guard let location = event.allTouches?.first?.location(in: collectionView),
-            let indexPath = collectionView?.indexPathForItem(at: location)
-            else {
-                return
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
         }
         
         let isFavorited = favoriteControl.isSelected
@@ -607,18 +573,6 @@ extension ProductsViewControllerLoader {
             view.addSubview(loader)
             loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
             loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-            
-            if self.screenshot.isShamrockVersion {
-                loader.color = .shamrockGreen
-                let text = UILabel.init()
-                text.text = "shamrock.loading".localized
-                text.textColor = .shamrockGreen
-                text.font =  UIFont(name: "Futura-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14)
-                text.translatesAutoresizingMaskIntoConstraints = false
-                loader.addSubview(text)
-                text.centerXAnchor.constraint(equalTo: loader.centerXAnchor).isActive = true
-                text.topAnchor.constraint(equalTo: loader.bottomAnchor).isActive = true
-            }
             
             
             return loader
