@@ -124,7 +124,6 @@ class FavoriteProductsTableViewCell: UITableViewCell {
         priceAlertButton.setTitleColor(.crazeRed, for: [.selected, .highlighted])
         priceAlertButton.titleLabel?.font = .screenshopFont(.hindSemibold, size: 12)
         priceAlertButton.tintColor = .crazeRed
-        priceAlertButton.activityIndicatorColor = priceAlertButton.tintColor // TODO: needs to change color based on selected state
         priceAlertButton.contentEdgeInsets = UIEdgeInsets(top: halfPadding, left: 0, bottom: halfPadding, right: 0)
         priceAlertButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
         priceAlertButton.contentHorizontalAlignment = {

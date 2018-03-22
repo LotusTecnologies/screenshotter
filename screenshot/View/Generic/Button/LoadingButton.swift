@@ -15,19 +15,12 @@ class LoadingButton: UIButton {
                 imageView?.isHidden = true
                 activityIndicator?.isHidden = false
                 activityIndicator?.startAnimating()
+                syncActivityIndicatorColor()
             }
             else {
                 imageView?.isHidden = false
                 activityIndicator?.stopAnimating()
                 activityIndicator?.isHidden = true
-            }
-        }
-    }
-    
-    var activityIndicatorColor: UIColor = .white {
-        didSet {
-            if isLoading {
-                activityIndicator?.color = activityIndicatorColor
             }
         }
     }
@@ -40,7 +33,7 @@ class LoadingButton: UIButton {
         let activity = UIActivityIndicatorView(activityIndicatorStyle: .white)
         activity.translatesAutoresizingMaskIntoConstraints = false
         activity.isHidden = true
-        activity.color = self.activityIndicatorColor
+        activity.color = self.titleColor(for: self.state)
         self.addSubview(activity)
         activity.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
         activity.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
@@ -49,10 +42,26 @@ class LoadingButton: UIButton {
         return activity
     }()
     
+    fileprivate func syncActivityIndicatorColor() {
+        activityIndicator?.color = titleColor(for: state)
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         
         // Force isHidden since UIKit can unset it
         imageView?.isHidden = isLoading
+    }
+    
+    override var isHighlighted: Bool {
+        didSet {
+            syncActivityIndicatorColor()
+        }
+    }
+    
+    override var isSelected: Bool {
+        didSet {
+            syncActivityIndicatorColor()
+        }
     }
 }

@@ -50,7 +50,7 @@ class SettingsViewController : BaseViewController {
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableHeaderContentView = UIView()
-    fileprivate let screenshotsCountLabel = Label()
+    fileprivate let screenshotsCountLabel = UILabel()
     fileprivate let tableFooterTextView = UITextView()
     
     fileprivate var nameTextField: UITextField?
