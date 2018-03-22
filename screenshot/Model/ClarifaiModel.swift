@@ -104,7 +104,7 @@ class ClarifaiModel: NSObject {
                             let conceptNamesArray = outputs.flatMap({$0.dataAsset.concepts}).flatMap({$0}).flatMap({$0.name})
                             let conceptNames = Set<String>(conceptNamesArray)
                             
-                            if !conceptNames.isDisjoint(with: ["woman", "man", "child"]) {
+                            if !conceptNames.isDisjoint(with: ["woman", "man", "child", "people", "person", "apparel","garment", "dress", "jewelry", "fashion"  ]) {
                                 fulfill(.human)
                             } else if !conceptNames.isDisjoint(with: ["furniture", "chair", "table", "desk", "sofa", "couch", "rug", "drapes", "bookshelf"]) {
                                 fulfill(.furniture)
