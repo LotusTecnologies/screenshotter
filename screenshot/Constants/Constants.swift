@@ -52,10 +52,11 @@ class Constants {
     static let buildEnvironmentSuffix = "d"
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
-    static let shoppableDomain = "https://api.shoppable.co/v3"
-    static let shoppableHosted = "https://secure.shoppable.co"
-    static let shoppableToken = "gD1GV3cVFGC9hk8W5927b13e5e"
-    static let syteUscFeed = "shoppable"
+    // Shoppable and Syte should point to prod until they fix their staging environment.
+    static let shoppableDomain = "https://api.shoppable.com/v3" //"https://api.shoppable.co/v3"
+    static let shoppableHosted = "https://secure.shoppable.com" //"https://secure.shoppable.co"
+    static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52" //"gD1GV3cVFGC9hk8W5927b13e5e"
+    static let syteUscFeed = "shoppable_production" //"shoppable"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
