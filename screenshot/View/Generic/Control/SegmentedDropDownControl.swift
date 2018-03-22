@@ -121,6 +121,7 @@ class SegmentedDropDownControl : UIControl {
                 segment.titleLabel.textColor = .gray6
                 segment.isEnabled = !item.pickerItems.isEmpty
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
+                segment.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
                 addSubview(segment)
                 segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
                 segment.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
@@ -273,7 +274,7 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
                 return false
             }
             
-            return segment.inputView == pickerView
+            return segment.pickerInputView.pickerView == pickerView
         } ?? 0
     }
     
@@ -316,7 +317,16 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
         return NSAttributedString(string: title, attributes: attributes)
     }
     
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    @objc fileprivate func pickerDoneButtonAction(_ button: UIButton) {
+        func `where`(_ view: UIView) -> Bool {
+            return type(of: view) == UIPickerView.self
+        }
+        
+        guard let pickerView = button.superview?.subviews.first(where: `where`) as? UIPickerView else {
+            return
+        }
+        
+        let row = pickerView.selectedRow(inComponent: 0)
         let item = items[itemIndex(pickerView: pickerView)]
         let title = item.pickerItems[row]
         
@@ -334,19 +344,19 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
 fileprivate class DropDownControl : UIControl {
     weak var pickerDataSource: UIPickerViewDataSource? {
         didSet {
-            pickerView.dataSource = pickerDataSource
+            pickerInputView.pickerView.dataSource = pickerDataSource
         }
     }
     weak var pickerDelegate: UIPickerViewDelegate? {
         didSet {
-            pickerView.delegate = pickerDelegate
+            pickerInputView.pickerView.delegate = pickerDelegate
         }
     }
     
     let titleLabel = UILabel()
-    fileprivate let imageView = UIImageView()
-    fileprivate let image = UIImage(named: "DropDownArrow")
-    fileprivate let pickerView = UIPickerView()
+    let imageView = UIImageView()
+    let image = UIImage(named: "DropDownArrow")
+    let pickerInputView = PickerInputView(frame: .zero, inputViewStyle: .default)
     
     // MARK: Life Cycle
     
@@ -419,11 +429,13 @@ fileprivate class DropDownControl : UIControl {
     
     override var inputView: UIView? {
         get {
-            return pickerView
+            return pickerInputView
         }
     }
     
-    fileprivate func selectCurrentRow() {
+    func selectCurrentRow() {
+        let pickerView = pickerInputView.pickerView
+        
         guard let dataSource = pickerView.dataSource, let delegate = pickerView.delegate else {
             return
         }
@@ -463,5 +475,39 @@ fileprivate class DropDownControl : UIControl {
         }
         
         return resignFirstResponder
+    }
+}
+
+fileprivate extension DropDownControl {
+    class PickerInputView: UIInputView {
+        let pickerView = UIPickerView()
+        let doneButton = UIButton()
+        
+        required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+        }
+        
+        override init(frame: CGRect, inputViewStyle: UIInputViewStyle) {
+            super.init(frame: frame, inputViewStyle: inputViewStyle)
+            
+            translatesAutoresizingMaskIntoConstraints = false
+            allowsSelfSizing = true
+            
+            doneButton.translatesAutoresizingMaskIntoConstraints = false
+            doneButton.setTitle("generic.done".localized, for: .normal)
+            doneButton.setTitleColor(.gray3, for: .normal)
+            doneButton.setTitleColor(.gray6, for: .highlighted)
+            doneButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+            addSubview(doneButton)
+            doneButton.topAnchor.constraint(equalTo: topAnchor).isActive = true
+            doneButton.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+            
+            pickerView.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(pickerView)
+            pickerView.topAnchor.constraint(equalTo: doneButton.bottomAnchor).isActive = true
+            pickerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+            pickerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+            pickerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        }
     }
 }
