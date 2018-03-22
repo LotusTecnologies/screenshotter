@@ -257,11 +257,12 @@ extension ProductViewController: UICollectionViewDelegate {
             
             if let productViewController = presentProduct(products[indexPath.item], atLocation: .productSimilar) {
                 productViewController.similarProducts = products
-                productViewController.navigationItem.leftItemsSupplementBackButton = true
                 
-                let barButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarMenu"), style: .plain, target: self, action: #selector(navigateToProductsViewController))
-                barButtonItem.imageInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0)
-                productViewController.navigationItem.leftBarButtonItem = barButtonItem
+                let rootItem = UIBarButtonItem(image: UIImage(named: "NavigationBarDoubleArrow"), style: .plain, target: self, action: #selector(navigateToProductsViewController))
+                
+                let backItem = UIBarButtonItem(image: UIImage(named: "NavigationBarArrow"), style: .plain, target: self, action: #selector(navigateToPreviousViewController))
+                
+                productViewController.navigationItem.leftBarButtonItems = [rootItem, backItem]
             }
         }
     }
@@ -357,6 +358,10 @@ extension ProductViewController: FetchedResultsControllerManagerDelegate {
 
 typealias ProductViewControllerNavigation = ProductViewController
 extension ProductViewControllerNavigation {
+    @objc fileprivate func navigateToPreviousViewController() {
+        navigationController?.popViewController(animated: true)
+    }
+    
     @objc fileprivate func navigateToProductsViewController() {
         guard let navigationController = navigationController else {
             return
@@ -368,7 +373,7 @@ extension ProductViewControllerNavigation {
                 return
             }
         }
-
+        
         navigationController.popToRootViewController(animated: true)
     }
 }
