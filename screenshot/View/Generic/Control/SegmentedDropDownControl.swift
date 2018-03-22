@@ -330,13 +330,12 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
         let item = items[itemIndex(pickerView: pickerView)]
         let title = item.pickerItems[row]
         
-        guard !isItemDisabled(item, withTitle: title) else {
-            return
+        if !isItemDisabled(item, withTitle: title) {
+            item.title = title
+            
+            sendActions(for: .valueChanged)
         }
         
-        item.title = title
-        
-        sendActions(for: .valueChanged)
         item.segment?.resignFirstResponder()
     }
 }
