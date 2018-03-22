@@ -110,9 +110,14 @@ class FavoriteProductsViewController : BaseViewController {
             }
         }
         else {
-            // TODO: need to present explanation alert before taking user to settings page
-            
-            PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true, response: nil)
+            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
+                PermissionsManager.shared.requestPermission(for: .push)
+            }
+            else {
+                if let alertController = PermissionsManager.shared.deniedAlertController(for: .push) {
+                    present(alertController, animated: true, completion: nil)
+                }
+            }
         }
     }
     
