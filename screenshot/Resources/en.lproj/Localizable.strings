@@ -12,7 +12,6 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
-"PRICE_ALERT" = "Price alert: Your fav just dropped to %@, get it quick!!";
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
@@ -145,6 +144,11 @@
 "product.similar_items" = "Related Items";
 "product.size.default" = "Size";
 "product.website" = "Go To %@";
+
+// Push notifications
+"product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
+"product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
