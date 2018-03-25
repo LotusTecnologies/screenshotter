@@ -389,7 +389,7 @@ fileprivate class StructuredProduct: NSObject {
         self.product = product
         super.init()
         
-        guard let variants = product.availableVariants?.allObjects as? [Variant] else {
+        guard let variants = product.availableVariants?.allObjects as? [Variant], !variants.isEmpty else {
             return
         }
         
