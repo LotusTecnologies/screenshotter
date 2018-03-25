@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import Photos
+import PromiseKit
 
 private enum NotificationAnimation {
     case none
@@ -132,10 +134,10 @@ final class NotificationManager: NSObject {
         notificationView.image = UIImage(named: "NotificationSnapshot")?.withRenderingMode(.alwaysTemplate)
         notificationView.label.text = "notification.screenshot.shoppable".localized
         present(notificationView: notificationView, action: action)
-        
-        AssetSyncModel.sharedInstance.image(assetId: assetId) { (image, info) in
+        let asset = PHAsset.assetWith(assetId:assetId)
+        asset?.image(allowFromICloud: true).then(execute: { (image) -> Void in
             notificationView.image = image
-        }
+        })
     }
     
     private func present(notificationView: NotificationView, action: (() -> Void)? = nil) {

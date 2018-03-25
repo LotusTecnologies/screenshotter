@@ -6,14 +6,13 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 class DiscoverScreenshotHelperView : UIView {
-    fileprivate let titleLabel = UILabel()
-    fileprivate let swipeLeftLabel = UILabel()
-    fileprivate let swipeRightLabel = UILabel()
-    fileprivate let tapLabel = UILabel()
+    fileprivate let titleLabel = Label()
+    fileprivate let swipeLeftLabel = Label()
+    fileprivate let swipeRightLabel = Label()
+    fileprivate let tapLabel = Label()
     
     private class DefinedHeightView : UIView {
         override var intrinsicContentSize: CGSize {
@@ -49,8 +48,8 @@ class DiscoverScreenshotHelperView : UIView {
         }
         
         let attributes = [
-            [NSFontAttributeName: UIFont.boldSystemFont(ofSize: fontSize)],
-            [NSFontAttributeName: UIFont.systemFont(ofSize: fontSize)]
+            UIFont.screenshopFont(.hindMedium, size: fontSize).attributes,
+            UIFont.screenshopFont(.hindLight, size: fontSize).attributes
         ]
         
         backgroundColor = UIColor.crazeRed.withAlphaComponent(0.9)
@@ -59,7 +58,7 @@ class DiscoverScreenshotHelperView : UIView {
         titleLabel.textColor = .white
         titleLabel.text = "discover.screenshot.helper.title".localized
         titleLabel.textAlignment = .center
-        titleLabel.font = UIFont(name: "DINCondensed-Bold", size: 34)
+        titleLabel.font = .screenshopFont(.dinCondensedBold, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)

@@ -10,5 +10,4 @@ import Foundation
 
 @objc protocol ScreenshotDetectionProtocol: NSObjectProtocol {
     @objc func foregroundScreenshotTaken(assetId: String)
-    @objc func backgroundScreenshotsWereTaken(assetIds: Set<String>)
 }

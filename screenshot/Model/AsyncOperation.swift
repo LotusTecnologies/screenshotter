@@ -44,14 +44,14 @@ class AsyncOperation: Operation {
         _finished = finished
     }
     
-    private let executionBlock: ((@escaping() -> ()) -> ())
+    private var executionBlock: ((@escaping() -> ()) -> ())?
     private let timeout:TimeInterval?
    
     init(timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
         self.executionBlock = completion
         self.timeout = timeout
     }
-    
+
     private func finishedExecuting(){
         self.executing(false)
         self.finish(true)
@@ -64,19 +64,34 @@ class AsyncOperation: Operation {
         }
         
         executing(true)
+//        let date = Date()
+
         if let timeout = timeout {
             DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + timeout, execute: {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
+                    //print("operation completed - timeout \(date.timeIntervalSinceNow)")
                 }
             })
         }
-        self.executionBlock({
-            if !self.isFinished {
-                self.executing(false)
-                self.finish(true)
-            }
-        })
+        if let block = self.executionBlock {
+            block({
+                if !self.isFinished {
+                    self.executing(false)
+                    self.finish(true)
+                    //print("operation completed \(date.timeIntervalSinceNow)")
+                    
+                }else{
+                    //print("operation called completion after already complted timeout: \(date.timeIntervalSinceNow) \(self.timeout)")
+                }
+            })
+        }else{
+            print("CRITICAL bug in asyncOperation")
+            self.executing(false)
+            self.finish(true)
+        }
+        self.executionBlock = nil
+        
     }
 }

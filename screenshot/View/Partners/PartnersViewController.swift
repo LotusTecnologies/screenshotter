@@ -20,16 +20,22 @@ class PartnersViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let syteVisualString = "syte.ai"
-        let syteDestinationString = "https://www.syte.ai/?utm_campaign=screenshop"
-        let attributedText = NSMutableAttributedString(string: "partners.content".localized(withFormat: syteVisualString))
-        
-        if let range = attributedText.string.range(of: syteVisualString), let url = URL(string: syteDestinationString) {
-            let attribute: [String : Any] = [
-                NSLinkAttributeName: url
-            ]
-            attributedText.addAttributes(attribute, range: NSRange(range, in: attributedText.string))
-        }
+        let attributedText:NSAttributedString = {
+            let syteVisualString = "syte.ai"
+            let syteDestinationString = "https://www.syte.ai/?utm_campaign=screenshop"
+            
+            let text = "partners.content".localized(withFormat: syteVisualString)
+            if let range = text.range(of: syteVisualString), let url = URL(string: syteDestinationString) {
+                let attribute: [String : Any] = [
+                    NSLinkAttributeName: url
+                ]
+                let mutableString = NSMutableAttributedString.init(string: text)
+                mutableString.addAttributes(attribute, range: NSRange(range, in: text))
+                return mutableString
+            }else{
+                return  NSAttributedString(string:text)
+            }
+        }()
         
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +44,7 @@ class PartnersViewController : BaseViewController {
         textView.isEditable = false
         textView.scrollsToTop = false
         textView.textColor = .gray3
-        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        textView.font = .screenshopFont(.hindLight, textStyle: .body)
         textView.adjustsFontForContentSizeCategory = true
         textView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         view.addSubview(textView)

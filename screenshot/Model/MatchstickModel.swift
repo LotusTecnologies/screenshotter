@@ -12,7 +12,7 @@ import PromiseKit
 class MatchstickModel: NSObject {
     
     public static let shared = MatchstickModel()
-    lazy var downloadMatchsitckQueue:OperationQueue = {
+    var downloadMatchsitckQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "Download matchsticks Queue"
         queue.maxConcurrentOperationCount = 2
@@ -68,7 +68,7 @@ class MatchstickModel: NSObject {
                                 print("Could not parse matchstick:\(matchstick)")
                             }
                         }
-                        dataModel.saveMoc(managedObjectContext: managedObjectContext)
+                        managedObjectContext.saveIfNeeded()
                         if let token = dict["next"] as? String {
                             UserDefaults.standard.set(token, forKey: UserDefaultsKeys.matchsticksSyncToken)
                         }

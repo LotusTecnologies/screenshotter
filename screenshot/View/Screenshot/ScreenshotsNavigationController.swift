@@ -31,7 +31,6 @@ class ScreenshotsNavigationController: UINavigationController {
         screenshotsViewController.lifeCycleDelegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: .coreDataStackCompleted, object: nil)
         
         self.viewControllers = [self.screenshotsViewController]
         
@@ -49,7 +48,7 @@ class ScreenshotsNavigationController: UINavigationController {
     
     override func viewDidLoad(){
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
+        self.view.backgroundColor = .background
     }
     
 }
@@ -93,21 +92,7 @@ extension ScreenshotsNavigationController {
     }
     
 }
-extension ScreenshotsNavigationController {
-    @objc func coreDataStackCompleted(_ notification: Notification) {
-        if let index = self.restoredScreenshotNumber {
-            // Dispatch async to allow other listening objects to first do their setup
-            DispatchQueue.main.async {
-                if let productsViewController = self.topViewController as? ProductsViewController{
-                    if let screenshot = self.screenshotsViewController.screenshot(at: index) {
-                        productsViewController.screenshot = screenshot
-                    }
-                }
-            }
-            self.restoredScreenshotNumber = nil
-        }
-    }
-}
+
 extension ScreenshotsNavigationController : ViewControllerLifeCycle {
     func viewController(_ viewController: UIViewController, didAppear animated: Bool){
         if (viewController == self.screenshotsViewController &&

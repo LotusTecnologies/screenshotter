@@ -48,7 +48,7 @@ class ScreenshotPickerNavigationController : UINavigationController {
     
     func doneAction() {
         let assets = screenshotPickerViewController.selectedAssets()
-        AssetSyncModel.sharedInstance.syncSelectedPhotos(assets: assets)
+        AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets)
         
         if let action = doneButton.action {
             UIApplication.shared.sendAction(action, to: doneButton.target, from: self, for: nil)
