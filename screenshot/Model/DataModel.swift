@@ -429,6 +429,7 @@ extension DataModel {
                      merchant: String?,
                      partNumber: String?,
                      color: String?,
+                     sku: String?,
                      fallbackPrice: Float,
                      optionsMask: Int32) -> Product {
         let productToSave = Product(context: managedObjectContext)
@@ -446,6 +447,7 @@ extension DataModel {
         productToSave.merchant = merchant
         productToSave.partNumber = partNumber
         productToSave.color = color
+        productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = NSDate()

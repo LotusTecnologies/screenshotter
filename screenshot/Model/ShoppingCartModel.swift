@@ -385,6 +385,12 @@ class ShoppingCartModel {
                                                                 url: size["url"] as? String,
                                                                 imageURLs: colorImageURLs)
                             hasVariants = true
+                            if rootProduct.sku == sku,
+                              let updatedColor = colorString,
+                              !updatedColor.isEmpty {
+                                rootProduct.color = updatedColor
+                                print("updated product color string:\(updatedColor)")
+                            }
                             print("  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  sizePrice:\(String(describing: sizePrice))  sizeRetailPrice:\(String(describing: sizeRetailPrice))  price:\(variant.price)  imageURLs:\(variant.imageURLs ?? "-")")
                         }
                     }

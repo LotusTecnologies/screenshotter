@@ -761,6 +761,7 @@ extension AssetSyncModel {
                                                      merchant: prod["merchant"] as? String,
                                                      partNumber: originalData?["part_number"] as? String,
                                                      color: originalData?["color"] as? String,
+                                                     sku: originalData?["id"] as? String,
                                                      fallbackPrice: fallbackPrice,
                                                      optionsMask: optionsMask)
     }
