@@ -356,6 +356,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.hasBuyLabel = true
+                cell.hasExternalPreview = (product.partNumber == nil)
                 return cell
             }
         }
