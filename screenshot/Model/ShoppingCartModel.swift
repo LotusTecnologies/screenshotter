@@ -387,7 +387,8 @@ class ShoppingCartModel {
                             hasVariants = true
                             if rootProduct.sku == sku,
                               let updatedColor = colorString,
-                              !updatedColor.isEmpty {
+                              !updatedColor.isEmpty,
+                              rootProduct.color != updatedColor {
                                 rootProduct.color = updatedColor
                                 print("updated product color string:\(updatedColor)")
                             }
