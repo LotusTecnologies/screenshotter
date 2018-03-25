@@ -44,6 +44,7 @@ class SettingsViewController : BaseViewController {
         case restoreInAppPurchase
         case talkToStylist
         case openIn
+        case region
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -249,6 +250,7 @@ class SettingsViewController : BaseViewController {
             .talkToStylist,
             .usageStreak,
             .coins,
+            .region,
             .version,
             .partners
         ],
@@ -609,6 +611,22 @@ extension SettingsViewController : UITableViewDelegate {
                 }
             }
  
+        case .region:
+            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "settings.region.US".localized, style: .default, handler: { (alertAction) in
+                UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isUSC)
+                tableView.reloadRows(at: [indexPath], with: .none)
+            }))
+            alert.addAction(UIAlertAction(title: "settings.region.other".localized, style: .default, handler: { (alertAction) in
+                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.isUSC)
+                tableView.reloadRows(at: [indexPath], with: .none)
+            }))
+
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            
+            present(alert, animated: true, completion: nil)
+            
         default:
             break
         }
@@ -684,6 +702,8 @@ fileprivate extension SettingsViewController {
             return "settings.row.restore_in_app_purchase.title".localized
         case .talkToStylist:
             return "settings.row.talk_to_stylist.title".localized
+        case .region:
+            return "settings.row.region.title".localized
         }
     }
     
@@ -717,6 +737,18 @@ fileprivate extension SettingsViewController {
             }
             else {
                 return "🔒"
+            }
+        case .region:
+            let userDefaults = UserDefaults.standard
+            if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+                return "settings.region.unknown".localized
+            } else {
+                let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
+                if isUSC {
+                    return "settings.region.US".localized
+                } else {
+                    return "settings.region.other".localized
+                }
             }
         default:
             return nil
