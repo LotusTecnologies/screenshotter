@@ -94,7 +94,7 @@ class ProductView: UIView {
         
         unavailableImageView.translatesAutoresizingMaskIntoConstraints = false
         unavailableImageView.contentMode = .scaleAspectFit
-        unavailableImageView.isHidden = true
+        unavailableImageView.alpha = 0
         scrollView.addSubview(unavailableImageView)
         unavailableImageView.topAnchor.constraint(equalTo: galleryScrollView.topAnchor, constant: .padding).isActive = true
         unavailableImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.padding).isActive = true
@@ -357,6 +357,12 @@ class ProductView: UIView {
     
     @objc fileprivate func pageControlDidChange() {
         scrollGalleryImages(toPage: pageControl.currentPage)
+    }
+    
+    func setUnavailableImageViewAlpha(_ alpha: CGFloat) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
+            self.unavailableImageView.alpha = alpha
+        }
     }
     
     // MARK: Selection

@@ -13,6 +13,7 @@ class ProductViewController : BaseViewController {
     fileprivate var cartBarButtonItem: ProductCartBarButtonItem?
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
+    fileprivate var didSaveVariants = false
     
     var similarProducts: [Product]? {
         didSet {
@@ -59,9 +60,14 @@ class ProductViewController : BaseViewController {
         
         ShoppingCartModel.shared.populateVariants(productOID: productOID)
             .then { [weak self] product, didSaveVariants -> Void in
+                self?.didSaveVariants = didSaveVariants
+                
                 if didSaveVariants {
                     self?.setup(with: product)
                 }
+            }
+            .catch { [weak self] error in
+                self?.productView.setUnavailableImageViewAlpha(1)
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
@@ -294,7 +300,11 @@ fileprivate extension ProductViewControllerStructuredProduct {
             productView.setGalleryImages(urls: imageURLs, selectedURL: imageURL)
         }
         
-        productView.unavailableImageView.isHidden = structuredProduct.isAvailable
+        if didSaveVariants {
+            // Prevent a jarring UX by showing this only once we have confirmed data
+            productView.setUnavailableImageViewAlpha(structuredProduct.isAvailable ? 0 : 1)
+        }
+        
         productView.titleLabel.text = product.productTitle()
         productView.priceLabel.text = product.price
         productView.contentTextView.text = product.detailedDescription
