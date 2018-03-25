@@ -116,7 +116,7 @@
 
 "permission.denied.title" = "Allow Permissions To Continue";
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
-"permission.push.denied.message" = "We can't send you important updates without push notifications.";
+"permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
 
 "personal_stylist.error" = "Unlocking a personal stylist requires a one time in-app purchase.\nUnable to connect to the appstore at this time:\n%@";
 "personal_stylist.error.invalid_device" = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases.";
@@ -136,6 +136,9 @@
 "picker.title" = "Add Photos";
 
 "product.add" = "Add to Cart";
+"product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
 "product.buy" = "Buy Now";
 "product.color.default" = "Color";
 "product.next_step.cart" = "Go to Cart";
@@ -144,11 +147,6 @@
 "product.similar_items" = "Related Items";
 "product.size.default" = "Size";
 "product.website" = "Go To %@";
-
-// Push notifications
-"product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
-"product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
-"product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
