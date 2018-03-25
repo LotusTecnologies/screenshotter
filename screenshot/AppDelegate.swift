@@ -393,6 +393,16 @@ extension AppDelegate {
             })
         }
     }
+    
+    func openToProduct(partNumber: String) {
+        print("AppDelegate openToProduct partNumber:\(partNumber)")
+        self.showScreenshotListTop()
+        let dataModel = DataModel.sharedInstance
+        if mainTabBarController.selectedViewController == mainTabBarController.screenshotsNavigationController,
+          let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
+            mainTabBarController.screenshotsNavigationController.presentProduct(product, atLocation: .favorite) // TODO: GMK change to priceAlert.
+        }
+    }
 }
 
 // MARK: - Tutorial
@@ -421,7 +431,16 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print("application didReceiveRemoteNotification userInfo:\(userInfo)")
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+
+        if let aps = userInfo["aps"] as? [String : Any],
+            let category = aps["category"] as? String,
+            category == "PRICE_ALERT",
+            let partNumber = userInfo["partNumber"] as? String,
+            !partNumber.isEmpty {
+            self.openToProduct(partNumber: partNumber)
+        }
 
         // Only spin up a background task if we are already in the background
         if application.applicationState == .background {
@@ -444,6 +463,7 @@ extension AppDelegate {
         IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
         Branch.getInstance().handlePushNotification(userInfo)
     }
+    
 }
 
 // MARK: - Settings
@@ -458,7 +478,9 @@ extension AppDelegate {
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("userNotificationCenter:\(center) didReceive response:\(response.description)  userInfo:\(response.notification.request.content.userInfo)")
         if let userInfo = response.notification.request.content.userInfo as? [String : String],
           let openingScreen = userInfo[Constants.openingScreenKey],
           openingScreen == Constants.openingScreenValueScreenshot,
@@ -471,4 +493,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         AnalyticsTrackers.standard.track(.appOpenedFromLocalNotification)
     }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        print("userNotificationCenter:\(center) willPresent notification:\(notification.description)")
+        completionHandler([])
+    }
+    
 }

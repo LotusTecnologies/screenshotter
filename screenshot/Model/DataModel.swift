@@ -294,6 +294,7 @@ extension DataModel {
         }
         return nil
     }
+    
     public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
         performBackgroundTask { (managedObjectContext) in
             do {
@@ -452,6 +453,22 @@ extension DataModel {
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = NSDate()
         return productToSave
+    }
+    
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, partNumber: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "partNumber == %@", partNumber)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct partNumber:\(partNumber) results with error:\(error)")
+        }
+        return nil
     }
     
     // Save a new Variant to Core Data.
