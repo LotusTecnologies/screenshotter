@@ -10,6 +10,10 @@ import Foundation
 
 class Constants {
 
+    
+    //Product decisions
+    static let notificationProductToImportCountLimit = 4
+    
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
@@ -21,7 +25,7 @@ class Constants {
     static let defaultAnimationDuration = 0.25
     
     // DB
-    static let currentMomVersion = 11
+    static let currentMomVersion = 12
     
     // Syte
     static let syteAccountId = 6677

@@ -15,7 +15,6 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
 }
 
 class DiscoverScreenshotViewController : BaseViewController {
-    fileprivate let coreDataPreparationController = CoreDataPreparationController()
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: FetchedResultsControllerManager<Matchstick>?
     fileprivate var matchsticks:[Matchstick] = []
@@ -44,13 +43,16 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        coreDataPreparationController.delegate = self
         
         addNavigationItemLogo()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
+        self.matchsticks = matchstickFrc?.fetchedObjects ?? []
+        
         
         automaticallyAdjustsScrollViewInsets = false
         
@@ -80,6 +82,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         passButton.setTitle("discover.screenshot.pass".localized, for: .normal)
         passButton.setTitleColor(.gray3, for: .normal)
         passButton.setImage(image, for: .normal)
+        passButton.titleLabel?.font = .screenshopFont(.hindMedium, textStyle: .subheadline, staticSize: true)
         passButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -arrowPadding, bottom: 0, right: arrowPadding)
         passButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: arrowPadding, bottom: .padding, right: .padding)
         passButton.addTarget(self, action: #selector(passButtonAction), for: .touchUpInside)
@@ -97,6 +100,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         addButton.setImage(image, for: .normal)
         addButton.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
         addButton.titleLabel?.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
+        addButton.titleLabel?.font = .screenshopFont(.hindMedium, textStyle: .subheadline, staticSize: true)
         addButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -arrowPadding, bottom: 0, right: arrowPadding)
         addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: arrowPadding, bottom: .padding, right: .padding)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
@@ -119,7 +123,6 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        coreDataPreparationController.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -128,9 +131,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncEmptyListViews()
     }
     
-    deinit {
-        coreDataPreparationController.delegate = nil
-        
+    deinit {        
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = nil
         }
@@ -552,28 +553,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
         AnalyticsTrackers.standard.track(.matchsticksOpenedScreenshot)
         
         delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
-    }
-}
-
-extension DiscoverScreenshotViewController : CoreDataPreparationControllerDelegate {
-    func coreDataPreparationControllerSetup(_ controller: CoreDataPreparationController) {
-        matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
-        self.matchsticks = matchstickFrc?.fetchedObjects ?? []
-        
-        self.collectionView.reloadData()
-    }
-    
-    func coreDataPreparationController(_ controller: CoreDataPreparationController, presentLoader loader: UIView) {
-        loader.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(loader)
-        loader.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        loader.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        loader.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        loader.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-    }
-    
-    func coreDataPreparationController(_ controller: CoreDataPreparationController, dismissLoader loader: UIView) {
-        loader.removeFromSuperview()
     }
 }
 

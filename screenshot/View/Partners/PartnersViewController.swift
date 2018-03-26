@@ -37,8 +37,6 @@ class PartnersViewController : BaseViewController {
             }
         }()
         
-       
-        
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.backgroundColor = view.backgroundColor
@@ -46,7 +44,7 @@ class PartnersViewController : BaseViewController {
         textView.isEditable = false
         textView.scrollsToTop = false
         textView.textColor = .gray3
-        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        textView.font = .screenshopFont(.hindLight, textStyle: .body)
         textView.adjustsFontForContentSizeCategory = true
         textView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         view.addSubview(textView)

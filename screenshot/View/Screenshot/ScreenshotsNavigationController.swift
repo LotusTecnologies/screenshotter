@@ -33,7 +33,6 @@ class ScreenshotsNavigationController: UINavigationController {
         screenshotsViewController.lifeCycleDelegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: .coreDataStackCompleted, object: nil)
         
         self.viewControllers = [self.screenshotsViewController]
         
@@ -51,7 +50,7 @@ class ScreenshotsNavigationController: UINavigationController {
     
     override func viewDidLoad(){
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
+        self.view.backgroundColor = .background
     }
     
 }
