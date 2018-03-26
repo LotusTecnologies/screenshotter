@@ -50,9 +50,9 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         }
     }
     
-    init(screenshot:Screenshot) {
+    init(screenshot: Screenshot) {
         self.screenshot = screenshot
-        
+    
         super.init(nibName: nil, bundle: nil)
         
         self.title = "products.title".localized
@@ -165,6 +165,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
