@@ -6,6 +6,7 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
+import Foundation
 import UIKit
 import CoreData
 
@@ -27,7 +28,7 @@ enum ProductsViewControllerState : Int {
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
-    var screenshotController: FetchedResultsControllerManager<Screenshot>
+    var screenshotController: FetchedResultsControllerManager<Screenshot>?
     
     var products:[Product] = []
     
@@ -51,10 +52,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     
     init(screenshot:Screenshot) {
         self.screenshot = screenshot
-        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
-
+        
         super.init(nibName: nil, bundle: nil)
-        screenshotController.delegate = self
         
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
@@ -70,6 +69,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
         let toolbar:ShoppablesToolbar = {
             let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
@@ -157,7 +158,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         self.syncScreenshotRelatedObjects()
         
-        if self.screenshotController.first?.shoppablesCount == -1  {
+        if self.screenshotController?.first?.shoppablesCount == -1  {
             self.state = .retry
             AnalyticsTrackers.standard.track(.screenshotOpenedWithoutShoppables)
         }
@@ -467,7 +468,7 @@ private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if controller == self.screenshotController {
-            if let screenShot = self.screenshotController.first {
+            if let screenShot = self.screenshotController?.first {
                 if screenShot.shoppablesCount == 0 {
                     
                 }else if screenShot.shoppablesCount == -1 {

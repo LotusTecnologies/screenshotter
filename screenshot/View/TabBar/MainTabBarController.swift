@@ -28,7 +28,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     // MARK: - Lifecycle
     
     init(delegate:ViewControllerLifeCycle) {
-        
         lifeCycleDelegate = delegate
         screenshotsNavigationController = ScreenshotsNavigationController()
         favoritesNavigationController = FavoritesNavigationController(nibName: nil, bundle: nil)
@@ -57,11 +56,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
         
-        self.viewControllers = [self.screenshotsNavigationController,
-                                self.favoritesNavigationController,
-                                self.discoverNavigationController,
-                                self.settingsNavigationController]
-        
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
@@ -76,6 +70,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.viewControllers = [
+            self.screenshotsNavigationController,
+            self.favoritesNavigationController,
+            self.discoverNavigationController,
+            self.settingsNavigationController
+        ]
         
         lifeCycleDelegate?.viewControllerDidLoad(self)
     }

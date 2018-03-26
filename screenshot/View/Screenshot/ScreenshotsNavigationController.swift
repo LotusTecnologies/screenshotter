@@ -23,6 +23,7 @@ class ScreenshotsNavigationController: UINavigationController {
     
     var restoredScreenshotNumber: Int?
     fileprivate var restoredScreenshot: Screenshot?
+    fileprivate var restoredProductsViewController: ProductsViewController?
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -48,11 +49,10 @@ class ScreenshotsNavigationController: UINavigationController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func viewDidLoad(){
+    override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .background
     }
-    
 }
 
 extension ScreenshotsNavigationController {
@@ -153,6 +153,15 @@ extension ScreenshotsNavigationControllerProducts {
         productsViewController.hidesBottomBarWhenPushed = true
         return productsViewController
     }
+    
+    func createRestoredProductsViewController() -> ProductsViewController? {
+        // This solution does not work. The only solution is to design the ProductsViewController so it can be created without a screenshot. In the meantime, return nil and restoration wont work for this view controller.
+        return nil
+//        let tempScreenshot = Screenshot()
+//        let productsViewController = createProductsViewController(screenshot: tempScreenshot)
+//        restoredProductsViewController = productsViewController
+//        return productsViewController
+    }
 }
 
 extension ScreenshotsNavigationController { //push permission
@@ -250,8 +259,6 @@ extension ScreenshotsNavigationControllerClipView {
     }
 }
 
-//UIViewControllerRestoration
-
 typealias ScreenshotsNavigationControllerStateRestoration = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerStateRestoration {
     private var screenshotKey: String {
@@ -260,7 +267,6 @@ extension ScreenshotsNavigationControllerStateRestoration {
     
     override func encodeRestorableState(with coder: NSCoder) {
         if let productsViewController = topViewController as? ProductsViewController {
-            // TODO: saving objectID gives issues...
             coder.encode(productsViewController.screenshot.objectID.uriRepresentation(), forKey: screenshotKey)
         }
         
@@ -270,21 +276,21 @@ extension ScreenshotsNavigationControllerStateRestoration {
     override func decodeRestorableState(with coder: NSCoder) {
         super.decodeRestorableState(with: coder)
         
+        // Below isn't needed until createRestoredProductsViewController is implemented
+        guard "keep the below code alive" == "but make this fail" else {
+            return
+        }
+        
         guard let persistentStoreCoordinator = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
             return
         }
         
         if coder.containsValue(forKey: screenshotKey),
             let url = coder.decodeObject(forKey: screenshotKey) as? URL,
-            let objectID = persistentStoreCoordinator.managedObjectID(forURIRepresentation: url)
+            let objectID = persistentStoreCoordinator.managedObjectID(forURIRepresentation: url),
+            let screenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: objectID)
         {
-            restoredScreenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: objectID)
+            restoredProductsViewController?.screenshot = screenshot
         }
-    }
-    
-    override func applicationFinishedRestoringState() {
-        super.applicationFinishedRestoringState()
-        
-        
     }
 }

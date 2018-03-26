@@ -208,12 +208,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
                 return nil
             }
-            //TODO:
-//            This isn't working because the productViewController can only be created by giving it a screenshot, but we don't have one yet
             
-//            navigationController.createProductsViewController(screenshot: <#T##Screenshot#>)
-            
-            viewController = nil//ProductsViewController()
+            viewController = navigationController.createRestoredProductsViewController()
             
         case s(ScreenshotPickerNavigationController.self):
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
