@@ -193,6 +193,7 @@
 "screenshot.permission.photo.title" = "Shop With Screenshop";
 "screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 "screenshot.permission.push.title" = "Start Screenshotting";
+
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.plural" = "Delete %d Items";
 "screenshots.delete.single" = "Delete %d Item";
@@ -201,6 +202,7 @@
 "screenshots.share.error.message" = "We could not find similar items to share.";
 "screenshots.share.error.title" = "Sorry";
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
+"screenshots.title" = "Screenshots";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
