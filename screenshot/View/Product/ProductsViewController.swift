@@ -6,7 +6,6 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import CoreData
 

@@ -213,7 +213,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
 //            navigationController.createProductsViewController(screenshot: <#T##Screenshot#>)
             
-            viewController = navigationController
+            viewController = nil//ProductsViewController()
             
         case s(ScreenshotPickerNavigationController.self):
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {

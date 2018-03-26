@@ -21,8 +21,8 @@ class ScreenshotsNavigationController: UINavigationController {
     var activityBarButtonItem:UIBarButtonItem?
     var previousDidAppearViewControllerWasProductViewController = false
     
-    var restoredScreenshotNumber:Int?
-    fileprivate var restoredScreenshotObjectID: NSManagedObjectID?
+    var restoredScreenshotNumber: Int?
+    fileprivate var restoredScreenshot: Screenshot?
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -54,7 +54,7 @@ class ScreenshotsNavigationController: UINavigationController {
     }
     
 }
-//picker
+
 extension ScreenshotsNavigationController {
     func createScreenshotPickerNavigationController()->ScreenshotPickerNavigationController{
         let navigationController = ScreenshotPickerNavigationController.init(nibName: nil, bundle: nil)
@@ -91,31 +91,6 @@ extension ScreenshotsNavigationController {
     func pickerViewControllerDidFinish(){
         self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
-    }
-}
-
-extension ScreenshotsNavigationController {
-    @objc func coreDataStackCompleted(_ notification: Notification) {
-        // TODO: set screenshot for state restoration
-        
-        if let screenshotObjectID = restoredScreenshotObjectID {
-            let screenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: screenshotObjectID)
-            
-            print("||| \(screenshot)")
-        }
-        
-        
-//        if let index = self.restoredScreenshotNumber {
-//            // Dispatch async to allow other listening objects to first do their setup
-//            DispatchQueue.main.async {
-//                if let productsViewController = self.topViewController as? ProductsViewController {
-//                    if let screenshot = self.screenshotsViewController.screenshot(at: index) {
-//                        productsViewController.screenshot = screenshot
-//                    }
-//                }
-//            }
-//            self.restoredScreenshotNumber = nil
-//        }
     }
 }
 
@@ -232,10 +207,9 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     }
 }
 
-//clipview
-extension ScreenshotsNavigationController {
+typealias ScreenshotsNavigationControllerClipView = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerClipView {
     func presentPickerClipView() {
-        
         if (self.clipView == nil && !self.screenshotsViewController.isEditing) {
             if let tabBarView = self.tabBarController?.view {
                 if let rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem?.targetView, let rightBarButtonViewSuperview = rightBarButtonView.superview {
@@ -276,29 +250,41 @@ extension ScreenshotsNavigationController {
     }
 }
 
+//UIViewControllerRestoration
+
 typealias ScreenshotsNavigationControllerStateRestoration = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerStateRestoration {
     private var screenshotKey: String {
-        return "screenshotObjectIDKey"
+        return "screenshotKey"
     }
     
     override func encodeRestorableState(with coder: NSCoder) {
         if let productsViewController = topViewController as? ProductsViewController {
             // TODO: saving objectID gives issues...
-            coder.encode(productsViewController.screenshot.objectID, forKey: screenshotKey)
+            coder.encode(productsViewController.screenshot.objectID.uriRepresentation(), forKey: screenshotKey)
         }
         
         super.encodeRestorableState(with: coder)
     }
     
     override func decodeRestorableState(with coder: NSCoder) {
-        if coder.containsValue(forKey: screenshotKey),
-            let objectID = coder.decodeObject(forKey: screenshotKey) as? NSManagedObjectID
-        {
-            // TODO: test this
-            restoredScreenshotObjectID = objectID
+        super.decodeRestorableState(with: coder)
+        
+        guard let persistentStoreCoordinator = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
+            return
         }
         
-        super.decodeRestorableState(with: coder)
+        if coder.containsValue(forKey: screenshotKey),
+            let url = coder.decodeObject(forKey: screenshotKey) as? URL,
+            let objectID = persistentStoreCoordinator.managedObjectID(forURIRepresentation: url)
+        {
+            restoredScreenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: objectID)
+        }
+    }
+    
+    override func applicationFinishedRestoringState() {
+        super.applicationFinishedRestoringState()
+        
+        
     }
 }
