@@ -50,10 +50,9 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         }
     }
     
+    init(screenshot: Screenshot) {
+        self.screenshot = screenshot
     
-    init( screenshot s:Screenshot) {
-        screenshot = s
-
         super.init(nibName: nil, bundle: nil)
         
         self.title = "products.title".localized
@@ -70,8 +69,9 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
-
+        
         let toolbar:ShoppablesToolbar = {
             let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
             let shoppableHeight:CGFloat = 60
