@@ -614,7 +614,7 @@ extension SettingsViewController : UITableViewDelegate {
         case .region:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            alert.addAction(UIAlertAction(title: "settings.region.US".localized, style: .default, handler: { (alertAction) in
+            alert.addAction(UIAlertAction(title: "settings.region.us".localized, style: .default, handler: { (alertAction) in
                 UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isUSC)
                 tableView.reloadRows(at: [indexPath], with: .none)
             }))
@@ -739,13 +739,11 @@ fileprivate extension SettingsViewController {
                 return "🔒"
             }
         case .region:
-            let userDefaults = UserDefaults.standard
-            if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+            if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
                 return "settings.region.unknown".localized
             } else {
-                let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-                if isUSC {
-                    return "settings.region.US".localized
+                if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+                    return "settings.region.us".localized
                 } else {
                     return "settings.region.other".localized
                 }

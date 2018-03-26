@@ -208,9 +208,9 @@
 "settings.open_in.option.chrome" = "Chrome";
 "settings.open_in.option.embeded" = "ScreenShop";
 "settings.open_in.option.safari" = "Safari";
-"settings.region.US" = "United States";
 "settings.region.other" = "Other";
 "settings.region.unknown" = "Unknown";
+"settings.region.us" = "United States";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
