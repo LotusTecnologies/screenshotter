@@ -21,8 +21,6 @@ class ScreenshotsNavigationController: UINavigationController {
     var activityBarButtonItem:UIBarButtonItem?
     var previousDidAppearViewControllerWasProductViewController = false
     
-    var restoredScreenshotNumber: Int?
-    fileprivate var restoredScreenshot: Screenshot?
     fileprivate var restoredProductsViewController: ProductsViewController?
     
     init() {
