@@ -43,6 +43,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     init(delegate: ViewControllerLifeCycle) {
         lifeCycleDelegate = delegate
         
+        // Important to note that super.init will call viewDidLoad before completing the init
         super.init(nibName: nil, bundle: nil)
         
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
@@ -67,7 +68,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
-        
+    
         viewControllers = [
             favoritesNavigationController,
             discoverNavigationController,
