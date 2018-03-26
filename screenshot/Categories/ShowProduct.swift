@@ -26,3 +26,18 @@ extension UIViewController {
         return nil
     }
 }
+
+extension ProductViewController {
+    static func present(with partNumber: String) {
+        print("ProductViewController present partNumber:\(partNumber)")
+        let dataModel = DataModel.sharedInstance
+        if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
+            let productViewController = ProductViewController(productOID: product.objectID)
+            productViewController.title = product.displayTitle
+            productViewController.setup(with: product)
+            
+            let navigationController = ModalNavigationController(rootViewController: productViewController)
+            AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+        }
+    }
+}
