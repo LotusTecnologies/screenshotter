@@ -28,7 +28,7 @@ enum ProductsViewControllerState : Int {
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
-    var screenshotController: FetchedResultsControllerManager<Screenshot>
+    var screenshotController: FetchedResultsControllerManager<Screenshot>?
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
     
     var products:[Product] = []
@@ -51,13 +51,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         }
     }
     
+    init(screenshot: Screenshot) {
+        self.screenshot = screenshot
     
-    init( screenshot s:Screenshot) {
-        screenshot = s
-        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
-
         super.init(nibName: nil, bundle: nil)
-        screenshotController.delegate = self
         
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
@@ -73,6 +70,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
         let toolbar:ShoppablesToolbar = {
             let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
@@ -160,13 +159,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
         self.syncScreenshotRelatedObjects()
         
-        if self.screenshotController.first?.shoppablesCount == -1  {
+        if self.screenshotController?.first?.shoppablesCount == -1  {
             self.state = .retry
             AnalyticsTrackers.standard.track(.screenshotOpenedWithoutShoppables)
         }
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -475,7 +475,7 @@ private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if controller == self.screenshotController {
-            if let screenShot = self.screenshotController.first {
+            if let screenShot = self.screenshotController?.first {
                 if screenShot.shoppablesCount == 0 {
                     
                 }else if screenShot.shoppablesCount == -1 {
