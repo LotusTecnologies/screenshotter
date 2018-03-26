@@ -40,11 +40,11 @@ class ScreenshotsViewController: BaseViewController {
     var hasProductBar = false
     
     init() {
-
-        
         super.init(nibName: nil, bundle: nil)
         
         self.restorationIdentifier = "ScreenshotsViewController"
+        title = "screenshots.title".localized
+            
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)

@@ -78,6 +78,12 @@ class ProductViewController : BaseViewController {
         navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     
+    convenience init(product: Product) {
+        self.init(productOID: product.objectID)
+        title = product.displayTitle
+        setup(with: product)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         syncCartItemCount()
