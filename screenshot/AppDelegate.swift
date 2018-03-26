@@ -392,16 +392,6 @@ extension AppDelegate {
             })
         }
     }
-    
-    func openToProduct(partNumber: String) {
-        print("AppDelegate openToProduct partNumber:\(partNumber)")
-        self.showScreenshotListTop()
-        let dataModel = DataModel.sharedInstance
-        if mainTabBarController.selectedViewController == mainTabBarController.screenshotsNavigationController,
-          let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
-            mainTabBarController.screenshotsNavigationController.presentProduct(product, atLocation: .favorite) // TODO: GMK change to priceAlert.
-        }
-    }
 }
 
 // MARK: - Tutorial
@@ -438,7 +428,7 @@ extension AppDelegate {
             category == "PRICE_ALERT",
             let partNumber = userInfo["partNumber"] as? String,
             !partNumber.isEmpty {
-            self.openToProduct(partNumber: partNumber)
+            ProductViewController.present(with: partNumber)
         }
 
         // Only spin up a background task if we are already in the background
