@@ -27,15 +27,27 @@ class CartNavigationController: UINavigationController {
         // !!!: DEBUG
         var formRows: [FormRow] = []
         
-        let text = Form.Text()
-        text.placeholder = "Placeholder 1"
+        let text = FormRow.Text()
+        text.placeholder = "Text"
         formRows.append(text)
         
-        let email = Form.Email()
-        email.placeholder = "Placeholder 2"
+        let email = FormRow.Email()
+        email.placeholder = "Email"
         formRows.append(email)
         
-        let formViewController = FormViewController(with: Form(with: formRows))
+        let selection = FormRow.Selection()
+        selection.placeholder = "Selection"
+        selection.options = [
+            "United States",
+            "Antartica",
+            "Atlantis"
+        ]
+        formRows.append(selection)
+        
+        let section = FormSection()
+        section.rows = formRows
+        
+        let formViewController = FormViewController(with: Form(with: [section]))
         viewControllers = [
             formViewController
 //            cartViewController

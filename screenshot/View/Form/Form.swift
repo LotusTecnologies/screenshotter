@@ -8,27 +8,34 @@
 
 import UIKit
 
-protocol FormRow {
-    var placeholder: String? { get set }
+class Form {
+    var sections: [FormSection]?
+    
+    convenience init(with sections: [FormSection]) {
+        self.init()
+        self.sections = sections
+    }
 }
 
-class Form {
-    let rows: [FormRow]
-    
-    init(with rows: [FormRow]) {
-        self.rows = rows
-    }
-    
-    class Text: FormRow {
-        var placeholder: String?
-        var value: String?
-    }
-    
-    class Email: Text {
+class FormSection {
+    var title: String?
+    var rows: [FormRow]?
+}
+
+class FormRow {
+    var placeholder: String?
+}
+
+extension FormRow {
+    class Card: Text {
         
     }
     
-    class Phone: Text {
+    class Date: FormRow {
+        var value: (month: UInt, year: UInt)?
+    }
+    
+    class Email: Text {
         
     }
     
@@ -36,17 +43,16 @@ class Form {
         
     }
     
-    class Card: Text {
+    class Phone: Text {
         
     }
     
     class Selection: FormRow {
-        var placeholder: String?
         var value: String?
+        var options: [String]?
     }
     
-    class Date: FormRow {
-        var placeholder: String?
-        var value: (month: UInt, year: UInt)?
+    class Text: FormRow {
+        var value: String?
     }
 }

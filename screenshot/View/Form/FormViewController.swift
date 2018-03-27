@@ -40,10 +40,20 @@ class FormViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        func tableViewRegister(_ classType: AnyClass, for identifierType: AnyClass) {
+            tableView.register(classType, forCellReuseIdentifier: String(describing: identifierType))
+        }
+        
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(FormTextTableViewCell.self, forCellReuseIdentifier: String(describing: Form.Text.self))
-        tableView.register(FormEmailTableViewCell.self, forCellReuseIdentifier: String(describing: Form.Email.self))
+        tableViewRegister(FormCardTableViewCell.self, for: FormRow.Card.self)
+        tableViewRegister(FormDateTableViewCell.self, for: FormRow.Date.self)
+        tableViewRegister(FormEmailTableViewCell.self, for: FormRow.Email.self)
+        tableViewRegister(FormNumberTableViewCell.self, for: FormRow.Number.self)
+        tableViewRegister(FormPhoneTableViewCell.self, for: FormRow.Phone.self)
+        tableViewRegister(FormSelectionTableViewCell.self, for: FormRow.Selection.self)
+        tableViewRegister(FormSelectionPickerTableViewCell.self, for: FormRow.SelectionPicker.self)
+        tableViewRegister(FormTextTableViewCell.self, for: FormRow.Text.self)
     }
     
     deinit {
@@ -53,12 +63,23 @@ class FormViewController: BaseViewController {
 }
 
 extension FormViewController: UITableViewDataSource {
+    fileprivate func formSection(at index: Int) -> FormSection? {
+        return form.sections?[index]
+    }
+    
+    fileprivate func formRow(at indexPath: IndexPath) -> FormRow? {
+        return formSection(at: indexPath.section)?.rows?[indexPath.row]
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return form.rows.count
+        return formSection(at: section)?.rows?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let row = form.rows[indexPath.row]
+        guard let row = formRow(at: indexPath) else {
+            return UITableViewCell()
+        }
+        
         let identifier = String(describing: type(of: row))
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
@@ -100,6 +121,39 @@ extension FormViewController: UITableViewDelegate {
             return
         }
         
-        cell.becomeFirstResponder()
+        if let cell = cell as? FormTextTableViewCell {
+            cell.becomeFirstResponder()
+        }
+        else if cell is FormSelectionTableViewCell {
+            tableView.deselectRow(at: indexPath, animated: true)
+            
+            let lastRowIndex = tableView.numberOfRows(inSection: indexPath.section) - 1
+            let isLastRow = indexPath.row == lastRowIndex
+            let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
+            let shouldInsertPicker: Bool = {
+                if !isLastRow, let row = formRow(at: IndexPath(row: nextIndexPath.row, section: indexPath.section)) {
+                    return type(of: row) != FormRow.SelectionPicker.self
+                }
+                else {
+                    return false
+                }
+            }()
+            
+            if isLastRow || shouldInsertPicker {
+                let row = FormRow.SelectionPicker()
+                formSection(at: indexPath.section)?.rows?.insert(row, at: nextIndexPath.row)
+                tableView.insertRows(at: [nextIndexPath], with: .top)
+            }
+            else {
+                formSection(at: indexPath.section)?.rows?.remove(at: nextIndexPath.row)
+                tableView.deleteRows(at: [nextIndexPath], with: .top)
+            }
+        }
+    }
+}
+
+extension FormRow {
+    class SelectionPicker: FormRow {
+        
     }
 }
