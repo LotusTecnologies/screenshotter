@@ -84,7 +84,7 @@ class DataModel: NSObject {
             self.persistentContainer.loadPersistentStores { (storeDescription, error) in
                 if let error = error as NSError? {
                     print("loadPersistentStores error:\(error)")
-                    self.receivedCoreDataError(error:error) // this will at least log.  In the future we may present an alert
+                    self.receivedCoreDataError(error:error)
 
                     reject(error)
                 } else {
