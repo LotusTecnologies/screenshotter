@@ -917,22 +917,36 @@ extension AssetSyncModel {
     func data(for image: UIImage) -> Data? {
         let actualToTargetRatio = image.size.width / targetSize().width
         var compressionQuality: CGFloat
+        var imageForData = image
         switch actualToTargetRatio {
         case 0..<0.8:
             compressionQuality = 0.99
         case 2.0..<4.0:
             compressionQuality = 0.25
         case 4.0...:
-            compressionQuality = 0.10
+            let originalRect = CGRect(origin: .zero, size: image.size)
+            let downSampledRect = CGRect(origin: .zero, size: targetSize())
+            let downSampleSize = originalRect.aspectFit(in: downSampledRect).size
+            imageForData = downSample(for: image, size: downSampleSize)
+            compressionQuality = 0.99
         default:
             compressionQuality = 0.75
         }
 #if STORE_NEW_TUTORIAL_SCREENSHOT
         compressionQuality = 0.99
 #endif
-        let data = UIImageJPEGRepresentation(image, compressionQuality)
-        print("image.size:\(image.size)  targetSize:\(targetSize())  actualToTargetRatio:\(actualToTargetRatio)  compressionQuality:\(compressionQuality)  data.count:\(data?.count ?? 0)")
+        let data = UIImageJPEGRepresentation(imageForData, compressionQuality)
+        print("image.size:\(image.size)  targetSize:\(targetSize())  imageForData.size\(imageForData.size)  actualToTargetRatio:\(actualToTargetRatio)  compressionQuality:\(compressionQuality)  data.count:\(data?.count ?? 0)")
         return data
+    }
+    
+    func downSample(for image: UIImage, size: CGSize) -> UIImage {
+        // See: http://nshipster.com/image-resizing/
+        UIGraphicsBeginImageContextWithOptions(size, false, image.scale)
+        image.draw(in: CGRect(origin: .zero, size: size))
+        let scaledImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return scaledImage ?? image
     }
     
 }
