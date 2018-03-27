@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 9/11/17.
-//  Copyright Â© 2017 crazeapp. All rights reserved.
+//  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -83,7 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if let loadingView = self.window?.rootViewController as? LoadingViewController {
                     loadingView.storeLoadingFailed()
                 }else{
-                    fatalError("Unable to load store and appliation is in undefined state")
+                    fatalError("Unable to load store and application is in undefined state")
                 }
             }
         })
