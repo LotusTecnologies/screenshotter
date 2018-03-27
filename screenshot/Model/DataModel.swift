@@ -38,6 +38,42 @@ class DataModel: NSObject {
     func sqlFileUrl() -> URL {
         return NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Model.sqlite")
     }
+    
+    func deleteDatabase() -> Promise<Bool> {
+        let sqliteURL = self.sqlFileUrl()
+        return Promise.init(resolvers: { (fulfill, reject) in
+            do {
+                try self.persistentContainer.persistentStoreCoordinator.destroyPersistentStore(at: sqliteURL, ofType: NSSQLiteStoreType, options: [:])
+                fulfill(true)
+            }catch{
+                reject(error)
+            }
+        })
+    }
+    
+    func loadStore(multipleAttempts:Int) -> Promise<Bool>{
+        return loadingStore(attempt: 1, maxTries: multipleAttempts)
+    }
+    
+    private func loadingStore(attempt:Int, maxTries:Int) -> Promise<Bool>{
+        return Promise.init(resolvers: { (fulfill, reject) in
+            if attempt > maxTries {
+                let error = NSError.init(domain: "Craze", code: -100, userInfo: [NSLocalizedDescriptionKey:"max load store attempts exceeded"])
+                reject(error)
+            }else{
+                self.loadStore(sync: true).then(execute: { (success) -> (Void) in
+                    fulfill(success)
+                }).catch(execute: { (error) in
+                    self.loadingStore(attempt: attempt + 1, maxTries: maxTries).then(execute: { (success) -> (Void) in
+                        fulfill(success)
+                    }).catch(execute: { (error) in
+                        reject(error)
+                    })
+                })
+            }
+        })
+    }
+    
     func loadStore(sync:Bool) -> Promise<Bool>{
         let sqliteURL = self.sqlFileUrl()
 
@@ -48,7 +84,6 @@ class DataModel: NSObject {
             self.persistentContainer.loadPersistentStores { (storeDescription, error) in
                 if let error = error as NSError? {
                     print("loadPersistentStores error:\(error)")
-                    self.dbQ.isSuspended = false  //I don't what failed, but it may be something minor that we can continue from
                     self.receivedCoreDataError(error:error) // this will at least log.  In the future we may present an alert
 
                     reject(error)
@@ -61,6 +96,7 @@ class DataModel: NSObject {
                     }
                     MatchstickModel.shared.prepareMatchsticks()
                     self.dbQ.isSuspended = false
+                    
                     fulfill(true)
                 }
             }
