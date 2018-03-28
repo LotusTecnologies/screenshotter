@@ -15,6 +15,27 @@ class Form {
         self.init()
         self.sections = sections
     }
+    
+    func indexPath(for formRow: FormRow) -> IndexPath? {
+        if let sections = sections {
+            var sectionIndex: Int?
+            var rowIndex: Int?
+            
+            for i in sections.startIndex...sections.endIndex {
+                if let j = sections[i].rows?.index(where: { $0 == formRow }) {
+                    sectionIndex = i
+                    rowIndex = j
+                    break
+                }
+            }
+            
+            if let rowIndex = rowIndex, let sectionIndex = sectionIndex {
+                return IndexPath(row: rowIndex, section: sectionIndex)
+            }
+        }
+        
+        return nil
+    }
 }
 
 class FormSection {
@@ -22,7 +43,7 @@ class FormSection {
     var rows: [FormRow]?
 }
 
-class FormRow {
+class FormRow: NSObject {
     var placeholder: String?
 }
 

@@ -63,7 +63,17 @@ class FormPhoneTableViewCell: FormTextTableViewCell {
 }
 
 class FormSelectionTableViewCell: FormTableViewCell {
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        let dropDownImageView = UIImageView(image: UIImage(named: "CheckoutDownArrow"))
+        dropDownImageView.contentMode = .scaleAspectFit
+        accessoryView = dropDownImageView
+    }
 }
 
 class FormSelectionPickerTableViewCell: FormTableViewCell {

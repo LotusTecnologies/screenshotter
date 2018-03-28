@@ -109,12 +109,15 @@ extension FormViewController: UITableViewDataSource {
         if let cell = cell as? FormTextTableViewCell {
             
         }
+        else if let row = row as? FormRow.Selection {
+            cell.detailTextLabel?.text = row.value
+        }
         else if let cell = cell as? FormSelectionPickerTableViewCell {
             cell.pickerView.dataSource = self
             cell.pickerView.delegate = self
         }
         else {
-            cell.detailTextLabel?.text = "derp "
+            
         }
         
 //        switch row {
@@ -226,7 +229,16 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        guard let selectionPickerRow = selectionPickerRow(for: pickerView),
+            let options = selectionPickerRow.selectionRow.options else {
+                return
+        }
         
+        selectionPickerRow.selectionRow.value = options[row]
+        
+        if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow) {
+            tableView.reloadRows(at: [indexPath], with: .none)
+        }
     }
 }
 
