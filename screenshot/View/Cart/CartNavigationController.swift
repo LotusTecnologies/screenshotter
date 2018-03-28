@@ -12,7 +12,7 @@ class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
     convenience init() {
@@ -25,35 +25,9 @@ class CartNavigationController: UINavigationController {
         restorationIdentifier = String(describing: type(of: self))
         
         // !!!: DEBUG
-        var formRows: [FormRow] = []
         
-        let text = FormRow.Text()
-        text.placeholder = "Text"
-        formRows.append(text)
-        
-        let selection = FormRow.Selection()
-        selection.placeholder = "Selection"
-        selection.options = [
-            "United States",
-            "Agartha",
-            "Antartica",
-            "Atlantis",
-            "Bermuda",
-            "Categat",
-            "Pangea"
-        ]
-        formRows.append(selection)
-        
-        let email = FormRow.Email()
-        email.placeholder = "Email"
-        formRows.append(email)
-        
-        let section = FormSection()
-        section.rows = formRows
-        
-        let formViewController = FormViewController(with: Form(with: [section]))
         viewControllers = [
-            formViewController
+            CheckoutShippingViewController(),
 //            cartViewController
         ]
     }

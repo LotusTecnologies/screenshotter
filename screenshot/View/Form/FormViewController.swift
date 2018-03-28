@@ -99,19 +99,22 @@ extension FormViewController: UITableViewDataSource {
         }
         
         let identifier = String(describing: type(of: row))
-        let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? FormTableViewCell else {
+            return UITableViewCell()
+        }
         
         cell.selectionStyle = .none
+        cell.textLabel?.text = row.placeholder
         
         if let cell = cell as? FormTextTableViewCell {
-            cell.textField.placeholder = row.placeholder
+            
         }
         else if let cell = cell as? FormSelectionPickerTableViewCell {
             cell.pickerView.dataSource = self
             cell.pickerView.delegate = self
         }
         else {
-            cell.textLabel?.text = row.placeholder
+            cell.detailTextLabel?.text = "derp "
         }
         
 //        switch row {

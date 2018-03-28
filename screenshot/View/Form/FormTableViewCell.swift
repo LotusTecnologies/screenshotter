@@ -8,11 +8,21 @@
 
 import UIKit
 
-class FormCardTableViewCell: UITableViewCell {
+class FormTableViewCell: UITableViewCell {
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+    }
+}
+
+class FormCardTableViewCell: FormTableViewCell {
     
 }
 
-class FormDateTableViewCell: UITableViewCell {
+class FormDateTableViewCell: FormTableViewCell {
     
 }
 
@@ -52,11 +62,11 @@ class FormPhoneTableViewCell: FormTextTableViewCell {
     }
 }
 
-class FormSelectionTableViewCell: UITableViewCell {
+class FormSelectionTableViewCell: FormTableViewCell {
     
 }
 
-class FormSelectionPickerTableViewCell: UITableViewCell {
+class FormSelectionPickerTableViewCell: FormTableViewCell {
     let pickerView = UIPickerView()
     
     required init?(coder aDecoder: NSCoder) {
@@ -104,7 +114,9 @@ class FormSelectionPickerTableViewCell: UITableViewCell {
     }
 }
 
-class FormTextTableViewCell: TextFieldTableViewCell {
+class FormTextTableViewCell: FormTableViewCell {
+    let textField = UITextField()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -119,19 +131,19 @@ class FormTextTableViewCell: TextFieldTableViewCell {
     override var canBecomeFirstResponder: Bool {
         return textField.canBecomeFirstResponder
     }
-    
+
     override var canResignFirstResponder: Bool {
         return textField.canResignFirstResponder
     }
-    
+
     @discardableResult override func becomeFirstResponder() -> Bool {
         return textField.becomeFirstResponder()
     }
-    
+
     @discardableResult override func resignFirstResponder() -> Bool {
         return textField.resignFirstResponder()
     }
-    
+
     override var isFirstResponder: Bool {
         return textField.isFirstResponder
     }
