@@ -64,3 +64,30 @@ extension UIApplication {
         return false
     }
 }
+
+extension URL {
+    static func googleMailUrl(to:String?, body:String?, subject:String? ) -> URL? {
+        var components = URLComponents(string: "googlegmail://co")
+        components?.scheme = "googlegmail"
+        
+        var queryItems: [URLQueryItem] = []
+        
+        if let to = to {
+            queryItems.append(URLQueryItem(name: "to", value:to))
+        }
+        
+        if let subject = subject{
+            queryItems.append(URLQueryItem(name: "subject", value:subject))
+        }
+        
+        if let body = body{
+            queryItems.append(URLQueryItem(name: "body", value:body))
+        }
+        
+        if queryItems.isEmpty == false {
+            components?.queryItems = queryItems
+        }
+        
+        return components?.url
+    }
+}

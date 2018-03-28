@@ -930,32 +930,36 @@ extension AssetSyncModel {
 //Image processing
 extension AssetSyncModel {
     func targetSize() -> CGSize {
-        let screenSizePx = UIScreen.main.nativeBounds.size
-        let targetSize = CGSize(width: screenSizePx.width / 2, height: screenSizePx.height / 2)
-        return targetSize
+        // The width really determines the amount of data uploaded, to look good even if shared to other device sizes.
+        // Experimenting gives a decent tradeoff between smallest amount of data ~200k and quality of Syte analyzing image.
+        // Go with the squattest height we support, iPhone 5.
+        return CGSize(width: 675, height: 1200)
     }
     
+    func landscapeTargetSize() -> CGSize {
+        let portraitSize = targetSize()
+        return CGSize(width: portraitSize.height, height: portraitSize.width)
+    }
+
     func data(for image: UIImage) -> Data? {
-        let actualToTargetRatio = image.size.width / targetSize().width
-        var compressionQuality: CGFloat
-        switch actualToTargetRatio {
-        case 0..<0.8:
-            compressionQuality = 0.99
-        case 2.0..<4.0:
-            compressionQuality = 0.25
-        case 4.0...:
-            compressionQuality = 0.10
-        default:
-            compressionQuality = 0.75
-        }
+        let desiredSize = image.size.width > image.size.height ? landscapeTargetSize() : targetSize()
+        let actualToTargetRatio = image.size.width / desiredSize.width
+        let compressionQuality: CGFloat = 0.99
+        var imageForData = image
 #if STORE_NEW_TUTORIAL_SCREENSHOT
-        compressionQuality = 0.99
+#else
+        if actualToTargetRatio > 1.2 {
+            let originalRect = CGRect(origin: .zero, size: image.size)
+            let downSampledRect = CGRect(origin: .zero, size: desiredSize)
+            let downSampleSize = originalRect.aspectFit(in: downSampledRect).size
+            imageForData = image.downSample(toSize: downSampleSize)
+        }
 #endif
-        let data = UIImageJPEGRepresentation(image, compressionQuality)
-        print("image.size:\(image.size)  targetSize:\(targetSize())  actualToTargetRatio:\(actualToTargetRatio)  compressionQuality:\(compressionQuality)  data.count:\(data?.count ?? 0)")
+        let data = UIImageJPEGRepresentation(imageForData, compressionQuality)
+        print("image.size:\(image.size)  desiredSize:\(desiredSize)  imageForData.size\(imageForData.size)  actualToTargetRatio:\(actualToTargetRatio)  data.count:\(data?.count ?? 0)")
         return data
     }
-    
+        
 }
 
 //Tutorial photo

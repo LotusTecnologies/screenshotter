@@ -48,30 +48,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if DataModel.sharedInstance.storeNeedsMigration() {
             window?.rootViewController = LoadingViewController()
             window?.makeKeyAndVisible()
-            DispatchQueue.global(qos: .userInteractive).async {
-                DataModel.sharedInstance.loadStore(sync:false).always {
-                    DispatchQueue.main.async {
-                        self.window?.rootViewController = self.nextViewController()
-                    }
-                    AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
-                }
-            }
+            asyncLoadStore()
         }else{
-            _ = DataModel.sharedInstance.loadStore(sync:true)
-            self.window?.rootViewController = self.nextViewController()
-            window?.makeKeyAndVisible()
-            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
-        }
+            let promise = DataModel.sharedInstance.loadStore(sync:true)
+            if promise.isRejected{
+                window?.rootViewController = LoadingViewController()
+                window?.makeKeyAndVisible()
+                asyncLoadStore()
+            }else{
+                self.window?.rootViewController = self.nextViewController()
+                window?.makeKeyAndVisible()
+                AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
 
+            }
+        }
 
         fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        
-        
         return true
+    }
+    
+    func asyncLoadStore(){
+        DataModel.sharedInstance.loadStore(multipleAttempts: 5).then(execute: { (success) -> Void in
+            DispatchQueue.main.async {
+                self.window?.rootViewController = self.nextViewController()
+            }
+            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
+            
+        }).catch(execute: { (error) in
+            DispatchQueue.main.async {
+                if let loadingView = self.window?.rootViewController as? LoadingViewController {
+                    loadingView.storeLoadingFailed()
+                }else{
+                    fatalError("Unable to load store and application is in undefined state")
+                }
+            }
+        })
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
