@@ -67,6 +67,7 @@
 		C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */; };
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
 		C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */; };
+		C5406A83206B6858002977CE /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A82206B6858002977CE /* UIApplication.swift */; };
 		C540880D1FE90C8E00198955 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C21FE90C8D00198955 /* Loader.swift */; };
 		C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C31FE90C8D00198955 /* LoadingViewController.swift */; };
 		C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C71FE90C8D00198955 /* SettingsViewController.swift */; };
@@ -124,7 +125,6 @@
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
-		C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E641FFA2D2600F491C0 /* Size.swift */; };
 		C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E661FFA363500F491C0 /* EmbossedView.swift */; };
 		C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5BE7C1E20186309000DB8A0 /* DiscoverNavigationController.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
@@ -263,6 +263,7 @@
 		C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterKeys.swift; sourceTree = "<group>"; };
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
 		C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWebViewController.swift; sourceTree = "<group>"; };
+		C5406A82206B6858002977CE /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
 		C54087C21FE90C8D00198955 /* Loader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C54087C31FE90C8D00198955 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		C54087C71FE90C8D00198955 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -320,7 +321,6 @@
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
-		C5AC7E641FFA2D2600F491C0 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
 		C5AC7E661FFA363500F491C0 /* EmbossedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbossedView.swift; sourceTree = "<group>"; };
 		C5BE7C1E20186309000DB8A0 /* DiscoverNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverNavigationController.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
@@ -833,7 +833,7 @@
 				C5336D22203D553400A7B4B0 /* BarItem.swift */,
 				C501410A205E702B00ABFB5C /* Font.swift */,
 				C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */,
-				C5AC7E641FFA2D2600F491C0 /* Size.swift */,
+				C5406A82206B6858002977CE /* UIApplication.swift */,
 				C501412D20623DFD00ABFB5C /* UICollectionView.swift */,
 				C501412B2061101100ABFB5C /* UITableView.swift */,
 			);
@@ -1275,7 +1275,6 @@
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
-				C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
@@ -1386,6 +1385,7 @@
 				C5014130206283A200ABFB5C /* LoadingButton.swift in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
+				C5406A83206B6858002977CE /* UIApplication.swift in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C543696B2046D74100599134 /* ModalNavigationController.swift in Sources */,

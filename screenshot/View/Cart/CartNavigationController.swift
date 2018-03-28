@@ -31,18 +31,22 @@ class CartNavigationController: UINavigationController {
         text.placeholder = "Text"
         formRows.append(text)
         
-        let email = FormRow.Email()
-        email.placeholder = "Email"
-        formRows.append(email)
-        
         let selection = FormRow.Selection()
         selection.placeholder = "Selection"
         selection.options = [
             "United States",
+            "Agartha",
             "Antartica",
-            "Atlantis"
+            "Atlantis",
+            "Bermuda",
+            "Categat",
+            "Pangea"
         ]
         formRows.append(selection)
+        
+        let email = FormRow.Email()
+        email.placeholder = "Email"
+        formRows.append(email)
         
         let section = FormSection()
         section.rows = formRows

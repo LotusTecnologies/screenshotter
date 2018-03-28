@@ -57,6 +57,8 @@ class FormSelectionTableViewCell: UITableViewCell {
 }
 
 class FormSelectionPickerTableViewCell: UITableViewCell {
+    let pickerView = UIPickerView()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -64,7 +66,41 @@ class FormSelectionPickerTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        contentView.backgroundColor = .cyan
+        let containerView = NotifyChangeView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.clipsToBounds = true
+        containerView.notifySizeChange = sizeChanged
+        contentView.addSubview(containerView)
+        containerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        
+        pickerView.translatesAutoresizingMaskIntoConstraints = false
+        pickerView.backgroundColor = .gray9
+        containerView.addSubview(pickerView)
+        pickerView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        pickerView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        pickerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+    }
+    
+    fileprivate func sizeChanged(_ size: CGSize) {
+        guard floor(size.height) > 0,
+            pickerView.dataSource != nil,
+            pickerView.numberOfComponents > 0,
+            pickerView.numberOfRows(inComponent: 0) == 0
+            else {
+                return
+        }
+        
+        pickerView.reloadAllComponents()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        pickerView.dataSource = nil
+        pickerView.delegate = nil
     }
 }
 
