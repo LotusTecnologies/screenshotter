@@ -32,7 +32,7 @@ extension PHAsset {
         return Promise.init(resolvers: { (fulfill, reject) in
             let imageRequestOptions = PHImageRequestOptions()
             imageRequestOptions.version = .current
-            imageRequestOptions.deliveryMode = .opportunistic
+            imageRequestOptions.deliveryMode = .highQualityFormat
             imageRequestOptions.resizeMode = .none
             imageRequestOptions.isNetworkAccessAllowed = allowFromICloud
             imageRequestOptions.isSynchronous = !allowFromICloud
