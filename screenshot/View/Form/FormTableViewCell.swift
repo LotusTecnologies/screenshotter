@@ -8,21 +8,11 @@
 
 import UIKit
 
-class FormTableViewCell: UITableViewCell {
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
-    }
-}
-
-class FormCardTableViewCell: FormTableViewCell {
+class FormCardTableViewCell: UITableViewCell {
     
 }
 
-class FormDateTableViewCell: FormTableViewCell {
+class FormDateTableViewCell: UITableViewCell {
     
 }
 
@@ -62,21 +52,62 @@ class FormPhoneTableViewCell: FormTextTableViewCell {
     }
 }
 
-class FormSelectionTableViewCell: FormTableViewCell {
+class FormSelectionTableViewCell: UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         
         let dropDownImageView = UIImageView(image: UIImage(named: "CheckoutDownArrow"))
         dropDownImageView.contentMode = .scaleAspectFit
         accessoryView = dropDownImageView
     }
+    
+    // MARK: First Responder
+    
+    var canResignFirstResponderOverride: Bool?
+    
+    override var canBecomeFirstResponder: Bool {
+        return next is UITableView
+    }
+    
+    override var canResignFirstResponder: Bool {
+        if let override = canResignFirstResponderOverride {
+            return override
+        }
+        else {
+            return super.canResignFirstResponder
+        }
+    }
+    
+    override func becomeFirstResponder() -> Bool {
+        if !isFirstResponder {
+            toggleSelectionPickerVisibility()
+        }
+        
+        return super.becomeFirstResponder()
+    }
+    
+    override func resignFirstResponder() -> Bool {
+        if isFirstResponder {
+            toggleSelectionPickerVisibility()
+        }
+        
+        return super.resignFirstResponder()
+    }
+    
+    // MARK: Selection Picker
+    
+    private func toggleSelectionPickerVisibility() {
+        if let tableView = next as? FormViewTableView, let indexPath = tableView.indexPath(for: self) {
+            tableView.toggleSelectionPickerVisibility(for: indexPath)
+        }
+    }
 }
 
-class FormSelectionPickerTableViewCell: FormTableViewCell {
+class FormSelectionPickerTableViewCell: UITableViewCell {
     let pickerView = UIPickerView()
     
     required init?(coder aDecoder: NSCoder) {
@@ -84,7 +115,7 @@ class FormSelectionPickerTableViewCell: FormTableViewCell {
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         
         let containerView = NotifyChangeView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -124,37 +155,12 @@ class FormSelectionPickerTableViewCell: FormTableViewCell {
     }
 }
 
-class FormTextTableViewCell: FormTableViewCell {
-    let textField = UITextField()
-    
+class FormTextTableViewCell: TextFieldTableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-    }
-    
-    // MARK: First Responder
-    
-    override var canBecomeFirstResponder: Bool {
-        return textField.canBecomeFirstResponder
-    }
-
-    override var canResignFirstResponder: Bool {
-        return textField.canResignFirstResponder
-    }
-
-    @discardableResult override func becomeFirstResponder() -> Bool {
-        return textField.becomeFirstResponder()
-    }
-
-    @discardableResult override func resignFirstResponder() -> Bool {
-        return textField.resignFirstResponder()
-    }
-
-    override var isFirstResponder: Bool {
-        return textField.isFirstResponder
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
     }
 }

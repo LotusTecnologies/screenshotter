@@ -69,6 +69,7 @@
 		C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */; };
 		C5406A83206B6858002977CE /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A82206B6858002977CE /* UIApplication.swift */; };
 		C5406A85206B7D85002977CE /* CheckoutShippingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */; };
+		C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */; };
 		C540880D1FE90C8E00198955 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C21FE90C8D00198955 /* Loader.swift */; };
 		C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C31FE90C8D00198955 /* LoadingViewController.swift */; };
 		C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C71FE90C8D00198955 /* SettingsViewController.swift */; };
@@ -266,6 +267,7 @@
 		C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWebViewController.swift; sourceTree = "<group>"; };
 		C5406A82206B6858002977CE /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
 		C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingViewController.swift; sourceTree = "<group>"; };
+		C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTypeAccessibilityLayout.swift; sourceTree = "<group>"; };
 		C54087C21FE90C8D00198955 /* Loader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C54087C31FE90C8D00198955 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		C54087C71FE90C8D00198955 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -712,6 +714,7 @@
 				C54088471FE90E2200198955 /* CollectionViewCell */,
 				C543696020468C2F00599134 /* Control */,
 				C5D57934203F043200A076FE /* Controller */,
+				C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */,
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
@@ -1373,6 +1376,7 @@
 				C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
+				C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */,
 				C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */,
 				C5F37C9F20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,

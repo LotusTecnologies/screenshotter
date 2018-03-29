@@ -14,6 +14,7 @@ class CheckoutShippingViewController: FormViewController {
         
         let firstName = FormRow.Text()
         firstName.placeholder = "First Name"
+        firstName.value = "Corey"
         formRows.append(firstName)
         
         let lastName = FormRow.Text()

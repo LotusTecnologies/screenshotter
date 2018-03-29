@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CartTableViewCell: UITableViewCell {
+class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
     let productImageView = EmbossedView()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
@@ -19,8 +19,8 @@ class CartTableViewCell: UITableViewCell {
     fileprivate var colorValueLabel: UILabel?
     fileprivate var sizeValueLabel: UILabel?
     
-    private var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
-    private var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
+    var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
+    var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
     
     // MARK: Life Cycle
     
@@ -255,22 +255,7 @@ class CartTableViewCell: UITableViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        guard let previousContentSizeCategory = previousTraitCollection?.preferredContentSizeCategory else {
-            return
-        }
-        
-        let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
-        
-        if previousContentSizeCategory.isAccessibilityCategory != isAccessibilityCategory {
-            if isAccessibilityCategory {
-                NSLayoutConstraint.deactivate(fontSizeStandardRangeConstraints)
-                NSLayoutConstraint.activate(fontSizeAccessibilityRangeConstraints)
-            }
-            else {
-                NSLayoutConstraint.deactivate(fontSizeAccessibilityRangeConstraints)
-                NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
-            }
-        }
+        adjustDynamicTypeLayout(traitCollection: traitCollection, previousTraitCollection: previousTraitCollection)
     }
     
     // MARK: Variant Data

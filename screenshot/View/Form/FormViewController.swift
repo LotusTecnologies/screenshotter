@@ -80,6 +80,22 @@ extension FormViewController: UITableViewDataSource {
         return formSection(at: indexPath.section)?.rows?[indexPath.row]
     }
     
+    fileprivate func tableViewCellOwning(_ view: UIView) -> UITableViewCell? {
+        var cell: UITableViewCell?
+        var superview = view.superview
+        
+        while cell == nil || superview == nil {
+            if let superviewCell = superview as? UITableViewCell {
+                cell = superviewCell
+            }
+            else {
+                superview = superview?.superview
+            }
+        }
+        
+        return cell
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return formSection(at: section)?.rows?.count ?? 0
     }
@@ -99,17 +115,19 @@ extension FormViewController: UITableViewDataSource {
         }
         
         let identifier = String(describing: type(of: row))
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? FormTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
-        cell.selectionStyle = .none
+//        cell.selectionStyle = .none
         cell.textLabel?.text = row.placeholder
         
-        if let cell = cell as? FormTextTableViewCell {
+        if let cell = cell as? FormTextTableViewCell, let row = row as? FormRow.Text {
+            let isLastCell = (indexPath.row > tableView.numberOfRows(inSection: indexPath.section) - 1)
             
+            cell.textField.delegate = self
+            cell.textField.text = row.value
+            cell.textField.returnKeyType = isLastCell ? .done : .next
         }
-        else if let row = row as? FormRow.Selection {
+        else if let cell = cell as? FormSelectionTableViewCell, let row = row as? FormRow.Selection {
             cell.detailTextLabel?.text = row.value
         }
         else if let cell = cell as? FormSelectionPickerTableViewCell {
@@ -120,76 +138,59 @@ extension FormViewController: UITableViewDataSource {
             
         }
         
-//        switch row {
-//        case is Form.Card:
-//            break
-//        case is Form.Date:
-//            break
-//        case is Form.Email:
-//            break
-//        case is Form.Number:
-//            break
-//        case is Form.Phone:
-//            break
-//        case is Form.Selection:
-//            break
-//        case is Form.Text:
-//            break
-//        default:
-//            break
-//        }
-        
         return cell
     }
 }
 
 extension FormViewController: UITableViewDelegate {
-    fileprivate func didSelectFormSelectionRow(_ selectionRow: FormRow.Selection, at indexPath: IndexPath) {
-        let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
-        
-        guard let selectionPickerRow = formRow(at: nextIndexPath) as? FormRow.SelectionPicker else {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) else {
             return
         }
         
-        selectionPickerRow.cellHeight = (selectionPickerRow.cellHeight > 0) ? 0 : 200
+        _ = cell.isFirstResponder ? cell.resignFirstResponder() : cell.becomeFirstResponder()
         
-        self.tableView.beginUpdates()
-        self.tableView.endUpdates()
+        // Must come after first responder
+        tableView.deselectRow(at: indexPath, animated: true)
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let formSelectionRow = formRow(at: indexPath) as? FormRow.Selection {
-            tableView.deselectRow(at: indexPath, animated: true)
-            
-            didSelectFormSelectionRow(formSelectionRow, at: indexPath)
+}
+
+extension FormViewController: UITextFieldDelegate {
+    private func indexPath(for textField: UITextField) -> IndexPath? {
+        if let cell = tableViewCellOwning(textField) {
+            return tableView.indexPath(for: cell)
         }
         else {
-            guard let cell = tableView.cellForRow(at: indexPath) else {
-                return
-            }
+            return nil
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField.returnKeyType == .next, let indexPath = indexPath(for: textField) {
+            let total = tableView.numberOfRows(inSection: indexPath.section)
+            let start = indexPath.row + 1
             
-            if let cell = cell as? FormTextTableViewCell {
-                cell.becomeFirstResponder()
+            if total > start {
+                for next in start...total {
+                    let nextIndexPath = IndexPath(row: next, section: indexPath.section)
+                    
+                    if let cell = tableView.cellForRow(at: nextIndexPath), cell.canBecomeFirstResponder {
+                        if cell.becomeFirstResponder() {
+                            return true
+                        }
+                    }
+                }
             }
         }
+        
+        textField.resignFirstResponder()
+        return true
     }
 }
 
 extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     private func indexPath(for pickerView: UIPickerView) -> IndexPath? {
-        var cell: UITableViewCell?
-        var superview = pickerView.superview
-        
-        while cell == nil || superview == nil {
-            if let superviewCell = superview as? UITableViewCell {
-                cell = superviewCell
-            }
-            else {
-                superview = superview?.superview
-            }
-        }
-        
-        if let cell = cell {
+        if let cell = tableViewCellOwning(pickerView) {
             return tableView.indexPath(for: cell)
         }
         else {
@@ -236,8 +237,12 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         
         selectionPickerRow.selectionRow.value = options[row]
         
-        if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow) {
+        if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow),
+            let cell = tableViewCellOwning(pickerView) as? FormSelectionTableViewCell
+        {
+            cell.canResignFirstResponderOverride = false
             tableView.reloadRows(at: [indexPath], with: .none)
+            cell.canResignFirstResponderOverride = nil
         }
     }
 }
@@ -245,11 +250,32 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
 extension FormRow {
     class SelectionPicker: FormRow {
         let selectionRow: Selection
-        var cellHeight: CGFloat = 0
+        
+        fileprivate var cellHeight: CGFloat = 0
+        fileprivate var isCellVisible: Bool {
+            return cellHeight > 0
+        }
         
         init(with selectionRow: Selection) {
             self.selectionRow = selectionRow
             super.init()
         }
+    }
+}
+
+extension FormViewTableView {
+    func toggleSelectionPickerVisibility(for indexPath: IndexPath) {
+        let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
+        
+        guard let viewController = superview?.next as? FormViewController,
+            let selectionPickerRow = viewController.formRow(at: nextIndexPath) as? FormRow.SelectionPicker
+            else {
+                return
+        }
+        
+        selectionPickerRow.cellHeight = (selectionPickerRow.cellHeight > 0) ? 0 : 200
+        
+        beginUpdates()
+        endUpdates()
     }
 }
