@@ -22,10 +22,9 @@ class Loader: UIView {
         activityView.color = .gray6
         activityView.transform = activityTransform
         addSubview(activityView)
-        activityView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        activityView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        activityView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        activityView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        activityView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        activityView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         activityView.widthAnchor.constraint(equalToConstant: intrinsicContentSize.width).isActive = true
         activityView.heightAnchor.constraint(equalToConstant: intrinsicContentSize.height).isActive = true
     }

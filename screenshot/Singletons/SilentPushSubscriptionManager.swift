@@ -91,17 +91,16 @@ class SilentPushSubscriptionManager : NSObject {
         }
         
         return NetworkingPromise.sharedInstance.createAndSubscribeToSilentPushEndpoint(pushToken: token.description,
-                                                                        tzOffset: timeZone.serverFormattedOffset,
+                                                                        tzOffset: self.serverFormattedOffset(timezone: timeZone),
                                                                         subscriptionARN: self.subscriptionARN).then { ARN -> Void in
             self.subscriptionARN = ARN
         }
     }
-}
-
-extension TimeZone {
-    var serverFormattedOffset: String {
-        let isNegative = secondsFromGMT() < 0
-        let seconds = abs(secondsFromGMT())
+    
+    func serverFormattedOffset(timezone:TimeZone) -> String{
+        let secondsFromGMT = timezone.secondsFromGMT()
+        let isNegative = secondsFromGMT < 0
+        let seconds = abs(secondsFromGMT)
         let minutes = Double(seconds) / 60
         var hours = Int(round(minutes / 60.0)) // Rounding because we don't want half timzeones like +3.5
         
@@ -109,8 +108,9 @@ extension TimeZone {
             hours = -12
         }
         
-        let prefix = isNegative == false ? "+" : "-"
+        let prefix = isNegative ? "-" : "+"
         let zeropad = hours < 10 && hours > -10 ? "0" : ""
         return "\(prefix)\(zeropad)\(abs(hours))"
     }
 }
+

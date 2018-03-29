@@ -50,7 +50,7 @@ class SettingsViewController : BaseViewController {
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableHeaderContentView = UIView()
-    fileprivate let screenshotsCountLabel = UILabel()
+    fileprivate let screenshotsCountLabel = Label()
     fileprivate let tableFooterTextView = UITextView()
     
     fileprivate var nameTextField: UITextField?
@@ -122,10 +122,10 @@ class SettingsViewController : BaseViewController {
             imageView.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
             imageView.leftAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.leftAnchor).isActive = true
             imageView.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
-
+            
             screenshotsCountLabel.translatesAutoresizingMaskIntoConstraints = false
             screenshotsCountLabel.textAlignment = .center
-            screenshotsCountLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
+            screenshotsCountLabel.font = .screenshopFont(.hindLight, size: 20)
             screenshotsCountLabel.adjustsFontSizeToFitWidth = true
             screenshotsCountLabel.minimumScaleFactor = 0.7
             tableHeaderContentView.addSubview(screenshotsCountLabel)
@@ -134,21 +134,21 @@ class SettingsViewController : BaseViewController {
             screenshotsCountLabel.leftAnchor.constraint(equalTo: imageView.layoutMarginsGuide.rightAnchor).isActive = true
             screenshotsCountLabel.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
             screenshotsCountLabel.rightAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.rightAnchor).isActive = true
-
+            
             var rect = view.frame
             rect.size.height = view.layoutMargins.top + view.layoutMargins.bottom + tableHeaderContentView.layoutMargins.top + tableHeaderContentView.layoutMargins.bottom + (imageView.image?.size.height ?? 0)
             view.frame = rect
-
+            
             return view
         }()
-
+        
         tableFooterTextView.backgroundColor = .clear
         tableFooterTextView.isEditable = false
         tableFooterTextView.scrollsToTop = false
         tableFooterTextView.isScrollEnabled = false
         tableFooterTextView.dataDetectorTypes = .link
         tableFooterTextView.textAlignment = .center
-        tableFooterTextView.font = UIFont.preferredFont(forTextStyle: .footnote)
+        tableFooterTextView.font = .screenshopFont(.hindLight, textStyle: .footnote)
         tableFooterTextView.adjustsFontForContentSizeCategory = true
         tableFooterTextView.text = "settings.contact".localized
         tableFooterTextView.linkTextAttributes = [
@@ -156,7 +156,7 @@ class SettingsViewController : BaseViewController {
             NSUnderlineColorAttributeName: UIColor.gray7
         ]
         tableFooterTextView.frame = rectForTableFooterTextView()
-
+        
         tableView.frame = view.bounds
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
@@ -234,7 +234,7 @@ class SettingsViewController : BaseViewController {
     
     // MARK: Data
     
-    fileprivate let data: [SettingsViewController.Section : [SettingsViewController.Row]] = [
+    fileprivate let data: [Section : [Row]] = [
         .permission: [
             .photoPermission,
             .pushPermission
@@ -266,14 +266,14 @@ class SettingsViewController : BaseViewController {
         ]
     ]
     
-    fileprivate func settingsRow(for indexPath: IndexPath) -> SettingsViewController.Row? {
-        guard let section = SettingsViewController.Section(rawValue: indexPath.section) else {
+    fileprivate func settingsRow(for indexPath: IndexPath) -> Row? {
+        guard let section = Section(rawValue: indexPath.section) else {
             return nil
         }
         return data[section]?[indexPath.row]
     }
     
-    fileprivate func indexPath(for row: SettingsViewController.Row, in section: SettingsViewController.Section) -> IndexPath? {
+    fileprivate func indexPath(for row: Row, in section: Section) -> IndexPath? {
         guard let rowValue = data[section]?.index(of: row) else {
             return nil
         }
@@ -338,17 +338,26 @@ extension SettingsViewController : UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let settingsSection = SettingsViewController.Section(rawValue: section) else {
+        guard let settingsSection = Section(rawValue: section) else {
             return 0
         }
         return data[settingsSection]?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        guard let settingsSection = SettingsViewController.Section(rawValue: section) else {
+        guard let settingsSection = Section(rawValue: section) else {
             return nil
         }
         return sectionText(for: settingsSection)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let tableViewHeaderFooterView = view as? UITableViewHeaderFooterView else {
+            return
+        }
+        
+        tableViewHeaderFooterView.textLabel?.textColor = .gray3
+        tableViewHeaderFooterView.textLabel?.font = .screenshopFont(.dinCondensedBold, textStyle: .title3)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -358,7 +367,7 @@ extension SettingsViewController : UITableViewDataSource {
         
         var cell: UITableViewCell
         
-        if indexPath.section == SettingsViewController.Section.info.rawValue && (row == .name || row == .email) {
+        if indexPath.section == Section.info.rawValue && (row == .name || row == .email) {
             cell = self.tableView(tableView, inputCellForRowAt: indexPath, withRow: row)
             
         } else {
@@ -375,7 +384,7 @@ extension SettingsViewController : UITableViewDataSource {
             return
         }
         
-        if indexPath.section == SettingsViewController.Section.product.rawValue &&
+        if indexPath.section == Section.product.rawValue &&
             (row == .productGender || row == .productSize),
             let genderControl = productsOptionsControls.genderControl,
             let sizeControl = productsOptionsControls.sizeControl,
@@ -391,7 +400,7 @@ extension SettingsViewController : UITableViewDataSource {
         }
     }
     
-    private func tableView(_ tableView: UITableView, inputCellForRowAt indexPath: IndexPath, withRow row: SettingsViewController.Row) -> UITableViewCell {
+    private func tableView(_ tableView: UITableView, inputCellForRowAt indexPath: IndexPath, withRow row: Row) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: "input") as? TextFieldTableViewCell
         let cell = reusableCell ?? TextFieldTableViewCell(style: .default, reuseIdentifier: "input")
         
@@ -413,18 +422,24 @@ extension SettingsViewController : UITableViewDataSource {
         return cell
     }
     
-    private func tableView(_ tableView: UITableView, defaultCellForRowAt indexPath: IndexPath, withRow row: SettingsViewController.Row) -> UITableViewCell {
+    private func tableView(_ tableView: UITableView, defaultCellForRowAt indexPath: IndexPath, withRow row: Row) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
+        
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
+        cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+        
         if (row == .restoreInAppPurchase && self.isRestoring) ||
-            (row == .talkToStylist && InAppPurchaseManager.sharedInstance.isInProcessOfBuying()){
+            (row == .talkToStylist && InAppPurchaseManager.sharedInstance.isInProcessOfBuying()) {
             cell.textLabel?.textColor = .gray
-        }else{
+        }
+        else {
             cell.textLabel?.textColor = .black
         }
+        
         cell.detailTextLabel?.text = cellDetailedText(for: row)
+        cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
         return cell
     }
 }
@@ -436,7 +451,7 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .email, .productGender, .productSize, .usageStreak:
+        case .version, .name, .email, .productGender, .productSize, .usageStreak:
             return false
             
         case .pushPermission, .photoPermission:
@@ -609,7 +624,7 @@ extension SettingsViewController : UITableViewDelegate {
 }
 
 fileprivate extension SettingsViewController {
-    func sectionText(for section: SettingsViewController.Section) -> String {
+    func sectionText(for section: Section) -> String {
         switch section {
         case .permission:
             return "settings.section.permission".localized
@@ -624,7 +639,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellImage(for row: SettingsViewController.Row) -> UIImage? {
+    func cellImage(for row: Row) -> UIImage? {
         switch (row) {
         case .followInstagram:
             return UIImage(named: "SettingsInstagram")
@@ -635,7 +650,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellText(for row: SettingsViewController.Row) -> String {
+    func cellText(for row: Row) -> String {
         switch (row) {
         case .usageStreak:
             return "settings.row.usage_streak.title".localized
@@ -678,7 +693,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellDetailedText(for row: SettingsViewController.Row) -> String? {
+    func cellDetailedText(for row: Row) -> String? {
         switch (row) {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
@@ -714,7 +729,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellEnabledText(for row: SettingsViewController.Row) -> String? {
+    func cellEnabledText(for row: Row) -> String? {
         guard let permissionType = row.permissionType else {
             return nil
         }
@@ -727,7 +742,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellAccessoryType(for row: SettingsViewController.Row) -> UITableViewCellAccessoryType {
+    func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
         case .currency, .partners:
             return .disclosureIndicator
@@ -736,7 +751,7 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellAccessoryView(for row: SettingsViewController.Row) -> UIView? {
+    func cellAccessoryView(for row: Row) -> UIView? {
         switch (row) {
         case .photoPermission, .pushPermission:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
@@ -828,13 +843,13 @@ fileprivate extension SettingsViewController {
     }
     
     @objc func reloadChangeableIndexPaths() {
-        func append(section: SettingsViewController.Section, row: SettingsViewController.Row, to indexPaths: inout [IndexPath]) {
+        func append(section: Section, row: Row, to indexPaths: inout [IndexPath]) {
             if let indexPath = indexPath(for: row, in: section) {
                 indexPaths.append(indexPath)
             }
         }
         
-        func sectionIndexPaths(_ section: SettingsViewController.Section) -> [IndexPath] {
+        func sectionIndexPaths(_ section: Section) -> [IndexPath] {
             var indexPaths: [IndexPath] = []
             
             data[section]?.forEach { row in
@@ -933,30 +948,7 @@ extension SettingsViewController : TutorialVideoViewControllerDelegate {
 // MARK: - Mail
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
-    func googleMailUrl(to:String?, body:String?, subject:String? ) -> URL? {
-        var components = URLComponents(string: "googlegmail://co")
-        components?.scheme = "googlegmail"
-        
-        var queryItems: [URLQueryItem] = []
-        
-        if let to = to {
-            queryItems.append(URLQueryItem(name: "to", value:to))
-        }
-        
-        if let subject = subject{
-            queryItems.append(URLQueryItem(name: "subject", value:subject))
-        }
-        
-        if let body = body{
-            queryItems.append(URLQueryItem(name: "body", value:body))
-        }
-        
-        if queryItems.isEmpty == false {
-            components?.queryItems = queryItems
-        }
-        
-        return components?.url
-    }
+  
     
     func presentMailComposer() {
         let message = [
@@ -977,7 +969,7 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
             mail.setToRecipients([recipient])
             present(mail, animated: true, completion: nil)
             
-        } else if let url = googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
+        } else if let url = URL.googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
             
         } else {

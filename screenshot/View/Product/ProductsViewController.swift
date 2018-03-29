@@ -28,7 +28,7 @@ enum ProductsViewControllerState : Int {
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
-    var screenshotController: FetchedResultsControllerManager<Screenshot>
+    var screenshotController: FetchedResultsControllerManager<Screenshot>?
     
     var products:[Product] = []
     
@@ -51,13 +51,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     }
     var shareToDiscoverPrompt:UIView?
     
+    init(screenshot: Screenshot) {
+        self.screenshot = screenshot
     
-    init( screenshot s:Screenshot) {
-        screenshot = s
-        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
-
         super.init(nibName: nil, bundle: nil)
-        screenshotController.delegate = self
         
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
@@ -73,6 +70,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
         let toolbar:ShoppablesToolbar = {
             let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
@@ -125,7 +124,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
             return collectionView
-            
         }()
         self.collectionView = collectionView
         
@@ -154,23 +152,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         var height = self.rateView.intrinsicContentSize.height
         
-        let isAlreadyShamrock = self.screenshot.isShamrockVersion
-        if !isAlreadyShamrock {
-            let p = CGFloat.padding
-            
-            let fab = FloatingActionButton()
-            fab.translatesAutoresizingMaskIntoConstraints = false
-            fab.setImage(UIImage(named:"Shamrock"), for: .normal)
-            fab.backgroundColor = .shamrockGreen
-            fab.contentEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
-            fab.adjustsImageWhenHighlighted = false
-            fab.addTarget(self, action: #selector(shamrockAction(_:)), for: .touchUpInside)
-            view.addSubview(fab)
-            fab.bottomAnchor.constraint(equalTo: rateView.topAnchor, constant: -p / 2).isActive = true
-            fab.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -p / 2).isActive = true
-            shamrockButton = fab
-        }
-        
+
         if #available(iOS 11.0, *) {
             height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
         }
@@ -178,13 +160,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         self.syncScreenshotRelatedObjects()
         
-        if self.screenshotController.first?.shoppablesCount == -1  {
+        if self.screenshotController?.first?.shoppablesCount == -1  {
             self.state = .retry
             AnalyticsTrackers.standard.track(.screenshotOpenedWithoutShoppables)
         }
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -262,23 +245,6 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 }
 
 extension ProductsViewController {
-    func shamrockAction(_ sender:Any) {
-        AssetSyncModel.sharedInstance.findOrCreateShamrockVersion(screenshot: self.screenshot) { (objectId) in
-            if let objectId = objectId, let screenshot = Screenshot.findWith(objectId: objectId), let navVC = self.navigationController as? ScreenshotsNavigationController{
-                navVC.popViewController(animated: false)
-                let productsViewController = ProductsViewController.init(screenshot: screenshot)
-                
-                productsViewController.lifeCycleDelegate = navVC
-                productsViewController.hidesBottomBarWhenPushed = true
-                navVC.pushViewController(productsViewController, animated: false)
-                
-                if (screenshot.isNew) {
-                    screenshot.setViewed()
-                }
-            }
-        }
-    }
-
     func clearProductListAndStateLoading(){
         self.products = []
         self.productsUnfilteredCount = 0
@@ -507,7 +473,7 @@ private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if controller == self.screenshotController {
-            if let screenShot = self.screenshotController.first {
+            if let screenShot = self.screenshotController?.first {
                 if screenShot.shoppablesCount == 0 {
                     
                 }else if screenShot.shoppablesCount == -1 {
@@ -602,18 +568,6 @@ extension ProductsViewControllerLoader {
             view.addSubview(loader)
             loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
             loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-            
-            if self.screenshot.isShamrockVersion {
-                loader.color = .shamrockGreen
-                let text = UILabel.init()
-                text.text = "shamrock.loading".localized
-                text.textColor = .shamrockGreen
-                text.font =  UIFont(name: "Futura-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14)
-                text.translatesAutoresizingMaskIntoConstraints = false
-                loader.addSubview(text)
-                text.centerXAnchor.constraint(equalTo: loader.centerXAnchor).isActive = true
-                text.topAnchor.constraint(equalTo: loader.bottomAnchor).isActive = true
-            }
             
             
             return loader

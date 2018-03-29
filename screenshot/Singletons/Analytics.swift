@@ -339,10 +339,20 @@ extension AnalyticsTracker {
     }
     
     func trackTappedOnProduct(_ product: Product, onPage page: String) {
+        let screenshot = product.shoppable?.screenshot ?? product.screenshot
         let merchant = product.merchant ?? ""
         let brand = product.brand?.lowercased() ?? ""
         let offer = product.offer ?? ""
         let imageURL = product.imageURL ?? ""
+        let screenshotURL = screenshot?.uploadedImageURL ?? ""
+        let screenshotID: String
+        if let isFromShare = screenshot?.isFromShare,
+          isFromShare,
+          let assetId = screenshot?.assetId {
+            screenshotID = assetId
+        } else {
+            screenshotID =  ""
+        }
         let sale = product.isSale()
 
         track(.tappedOnProduct, properties: [
@@ -350,6 +360,8 @@ extension AnalyticsTracker {
             "brand" : brand,
             "url" : offer,
             "imageUrl" : imageURL,
+            "screenshotURL" : screenshotURL,
+            "screenshotID" : screenshotID,
             "sale" : sale,
             "page" : page
         ])

@@ -108,27 +108,31 @@ extension UIApplication {
     static func appearanceSetup() {
         let crazeRedColor = UIColor.crazeRed
         
-        let futuraFont: (CGFloat) -> UIFont = { fontSize in
-            return UIFont(name: "Futura", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
-        }
-        let futuraMediumFont: (CGFloat) -> UIFont = { fontSize in
-            return UIFont(name: "Futura-Medium", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
-        }
+        // Navigation Bar
         
-        UINavigationBar.appearance().barTintColor = .white
-        UINavigationBar.appearance().tintColor = .gray3
-        UINavigationBar.appearance().titleTextAttributes = [
-            NSFontAttributeName: futuraMediumFont(20),
+        let navigationBar = UINavigationBar.appearance()
+        navigationBar.barTintColor = .white
+        navigationBar.tintColor = .gray3
+        navigationBar.titleTextAttributes = [
+            NSFontAttributeName: UIFont.screenshopFont(.futuraMedium, size: 20),
             NSForegroundColorAttributeName: UIColor.gray3
         ]
         
-        UITabBar.appearance().barTintColor = .white
-        UITabBar.appearance().tintColor = crazeRedColor
-        UITabBar.appearance().unselectedItemTintColor = .gray3
+        // Tab Bar
         
-        UIToolbar.appearance().tintColor = crazeRedColor
+        let tabBar = UITabBar.appearance()
+        tabBar.barTintColor = .white
+        tabBar.tintColor = crazeRedColor
+        tabBar.unselectedItemTintColor = .gray3
         
-        var barButtonItemTitleTextAttributes: [String:Any] = [NSFontAttributeName: futuraFont(16)]
+        // Toolbar
+        
+        let toolbar = UIToolbar.appearance()
+        toolbar.tintColor = crazeRedColor
+        
+        var barButtonItemTitleTextAttributes: [String:Any] = [
+            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 16)
+        ]
         let navigationBarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
@@ -136,13 +140,25 @@ extension UIApplication {
         barButtonItemTitleTextAttributes[NSForegroundColorAttributeName] = UIColor.gray7
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
-        barButtonItemTitleTextAttributes = [NSFontAttributeName: futuraFont(12)]
+        barButtonItemTitleTextAttributes = [
+            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 12)
+        ]
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [UIToolbar.self]).color = crazeRedColor
+        
+        // Segmented Control
+        
+        let segmentedControlTitleTextAttributes: [String: Any] = [
+            NSFontAttributeName: UIFont.screenshopFont(.hind, size: 13),
+            NSBaselineOffsetAttributeName: -1
+        ]
+        
+        let segmentedControl = UISegmentedControl.appearance()
+        segmentedControl.setTitleTextAttributes(segmentedControlTitleTextAttributes, for: .normal)
     }
 }
 

@@ -43,12 +43,13 @@ class CurrencyViewController : BaseViewController {
     // MARK: Currency
     
     static var currentCurrency: String {
-        if let code = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency), code != CurrencyMap.autoCode {
-            return code
-            
-        } else {
-            return "currency.auto".localized
+        if let code = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency) {
+            if  code != CurrencyMap.autoCode {
+                return code
+            }
         }
+        return "currency.auto".localized
+        
     }
 }
 
@@ -60,7 +61,9 @@ extension CurrencyViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? createTableViewCell()
         cell.textLabel?.text = cellText(indexPath)
+        cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
         cell.detailTextLabel?.text = cellDetailText(indexPath)
+        cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
         return cell
     }
     

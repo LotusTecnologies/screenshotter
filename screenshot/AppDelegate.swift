@@ -42,21 +42,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompletionHandler), name: .coreDataStackCompleted, object: nil)
         
-        // Sets up Core Data stack on a background queue.
-        DataModel.setup()
+        window = UIWindow(frame: UIScreen.main.bounds)
         
+        if DataModel.sharedInstance.storeNeedsMigration() {
+            window?.rootViewController = LoadingViewController()
+            window?.makeKeyAndVisible()
+            asyncLoadStore()
+        }else{
+            let promise = DataModel.sharedInstance.loadStore(sync:true)
+            if promise.isRejected{
+                window?.rootViewController = LoadingViewController()
+                window?.makeKeyAndVisible()
+                asyncLoadStore()
+            }else{
+                self.window?.rootViewController = self.nextViewController()
+                window?.makeKeyAndVisible()
+                AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
+
+            }
+        }
+
         fetchAppSettings()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = nextViewController()
-        window?.makeKeyAndVisible()
-        
         return true
+    }
+    
+    func asyncLoadStore(){
+        DataModel.sharedInstance.loadStore(multipleAttempts: 5).then(execute: { (success) -> Void in
+            DispatchQueue.main.async {
+                self.window?.rootViewController = self.nextViewController()
+            }
+            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
+            
+        }).catch(execute: { (error) in
+            DispatchQueue.main.async {
+                if let loadingView = self.window?.rootViewController as? LoadingViewController {
+                    loadingView.storeLoadingFailed()
+                }else{
+                    fatalError("Unable to load store and application is in undefined state")
+                }
+            }
+        })
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -74,15 +104,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             contentAvailable.intValue == 1 {
             //TODO: why is this only segment
             AnalyticsTrackers.segment.track(.wokeFromSilentPush)
+        } else {
+            AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
         }
         
         return true
     }
     var lastPresentedLowDiskSpaceWarning:Date?
     func presentLowDiskSpaceWarning(){
-        guard self.lastPresentedLowDiskSpaceWarning == nil || abs(self.lastPresentedLowDiskSpaceWarning?.timeIntervalSinceNow ?? 0) > 60*5 else {
-            return
+        
+        //don't change to guard - lead to large complie time
+        if let lastTime = self.lastPresentedLowDiskSpaceWarning {
+            let timeInterval = abs(lastTime.timeIntervalSinceNow)
+            if timeInterval  < 60*5 {
+                return
+            }
         }
+        
         
         self.lastPresentedLowDiskSpaceWarning = Date()
         let alert = UIAlertController.init(title: "application.error.no_disk_space.title".localized, message:"application.error.no_disk_space.message".localized, preferredStyle: .alert)
@@ -111,7 +149,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
         AnalyticsTrackers.standard.track(.sessionStarted)
-        AssetSyncModel.sharedInstance.syncPhotosUponForeground()
+        AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -144,11 +182,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     fileprivate var restorationViewControllers: [String : UIViewController] = [:]
     
     func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
-        return false // !!!: restoration needs more testing before being enabled
+        return true
     }
     
     func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
-        return false
+        return true
     }
     
     func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
@@ -185,9 +223,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
                 return nil
             }
-            //TODO:
-//            This isn't working because the productViewController can only be created by giving it a screenshot, but we don't have one yet
-            viewController = navigationController
+            
+            viewController = navigationController.createRestoredProductsViewController()
             
         case s(ScreenshotPickerNavigationController.self):
             guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
@@ -293,7 +330,8 @@ extension AppDelegate {
             }
             
             if let shareId = params["shareId"] as? String {
-                AssetSyncModel.sharedInstance.handleDynamicLink(shareId: shareId)
+
+                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
                 self.showScreenshotListTop()
             }
             
@@ -306,6 +344,7 @@ extension AppDelegate {
             }
         }
         
+    
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
@@ -359,17 +398,6 @@ extension AppDelegate {
         }
         
         return viewController
-    }
-    
-    func coreDataStackCompletionHandler(notification: Notification) {
-        if notification.userInfo?["error"] == nil {
-            if ApplicationStateModel.sharedInstance.isBackground() {
-                AssetSyncModel.sharedInstance.syncPhotos()
-            }
-            else {
-                AssetSyncModel.sharedInstance.syncPhotosUponForeground()
-            }
-        }
     }
     
     func transitionTo(_ toViewController: UIViewController) {
@@ -449,7 +477,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
           let openingScreen = userInfo[Constants.openingScreenKey],
           openingScreen == Constants.openingScreenValueScreenshot,
           let openingAssetId = userInfo[Constants.openingAssetIdKey] {
-            AssetSyncModel.sharedInstance.refetchOpenedFromNotification(assetId: openingAssetId)
+            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
             showScreenshotListTop()
         }
         

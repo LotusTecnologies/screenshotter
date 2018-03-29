@@ -6,7 +6,7 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 extension NSMutableAttributedString {
     // TODO: after swift 4 upgrade switch attributes: String with NSAttributedStringKey

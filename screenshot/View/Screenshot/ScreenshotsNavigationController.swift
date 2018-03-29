@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController)
@@ -20,7 +21,7 @@ class ScreenshotsNavigationController: UINavigationController {
     var activityBarButtonItem:UIBarButtonItem?
     var previousDidAppearViewControllerWasProductViewController = false
     
-    var restoredScreenshotNumber:Int?
+    fileprivate var restoredProductsViewController: ProductsViewController?
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -31,7 +32,6 @@ class ScreenshotsNavigationController: UINavigationController {
         screenshotsViewController.lifeCycleDelegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
-        NotificationCenter.default.addObserver(self, selector: #selector(coreDataStackCompleted(_:)), name: .coreDataStackCompleted, object: nil)
         
         self.viewControllers = [self.screenshotsViewController]
         
@@ -47,13 +47,12 @@ class ScreenshotsNavigationController: UINavigationController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func viewDidLoad(){
+    override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
+        self.view.backgroundColor = .background
     }
-    
 }
-//picker
+
 extension ScreenshotsNavigationController {
     func createScreenshotPickerNavigationController()->ScreenshotPickerNavigationController{
         let navigationController = ScreenshotPickerNavigationController.init(nibName: nil, bundle: nil)
@@ -91,23 +90,8 @@ extension ScreenshotsNavigationController {
         self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
     }
-    
 }
-extension ScreenshotsNavigationController {
-    @objc func coreDataStackCompleted(_ notification: Notification) {
-        if let index = self.restoredScreenshotNumber {
-            // Dispatch async to allow other listening objects to first do their setup
-            DispatchQueue.main.async {
-                if let productsViewController = self.topViewController as? ProductsViewController{
-                    if let screenshot = self.screenshotsViewController.screenshot(at: index) {
-                        productsViewController.screenshot = screenshot
-                    }
-                }
-            }
-            self.restoredScreenshotNumber = nil
-        }
-    }
-}
+
 extension ScreenshotsNavigationController : ViewControllerLifeCycle {
     func viewController(_ viewController: UIViewController, didAppear animated: Bool){
         if (viewController == self.screenshotsViewController &&
@@ -136,17 +120,15 @@ extension ScreenshotsNavigationController : ViewControllerLifeCycle {
 }
 
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
-    func screenshotsViewController(_  viewController:ScreenshotsViewController, didSelectItemAt:IndexPath){
-        if let screenshot = viewController.screenshot(at: didSelectItemAt.item){
-            let productsViewController = ProductsViewController.init(screenshot: screenshot)
-            
-            productsViewController.lifeCycleDelegate = self
-            productsViewController.hidesBottomBarWhenPushed = true
+    func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
+        if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
+            let productsViewController = createProductsViewController(screenshot: screenshot)
             self.pushViewController(productsViewController, animated: true)
             
             if (screenshot.isNew) {
                 screenshot.setViewed()
             }
+            
             RatingFlow.sharedInstance.recordSignificantEvent()
         }
     }
@@ -158,6 +140,25 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     }
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController){
         self.presentPickerViewController()
+    }
+}
+
+typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerProducts {
+    func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
+        let productsViewController = ProductsViewController(screenshot: screenshot)
+        productsViewController.lifeCycleDelegate = self
+        productsViewController.hidesBottomBarWhenPushed = true
+        return productsViewController
+    }
+    
+    func createRestoredProductsViewController() -> ProductsViewController? {
+        // This solution does not work. The only solution is to design the ProductsViewController so it can be created without a screenshot. In the meantime, return nil and restoration wont work for this view controller.
+        return nil
+//        let tempScreenshot = Screenshot()
+//        let productsViewController = createProductsViewController(screenshot: tempScreenshot)
+//        restoredProductsViewController = productsViewController
+//        return productsViewController
     }
 }
 
@@ -213,10 +214,9 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     }
 }
 
-//clipview
-extension ScreenshotsNavigationController {
+typealias ScreenshotsNavigationControllerClipView = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerClipView {
     func presentPickerClipView() {
-        
         if (self.clipView == nil && !self.screenshotsViewController.isEditing) {
             if let tabBarView = self.tabBarController?.view {
                 if let rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem?.targetView, let rightBarButtonViewSuperview = rightBarButtonView.superview {
@@ -257,25 +257,38 @@ extension ScreenshotsNavigationController {
     }
 }
 
-extension ScreenshotsNavigationController  {
-    override func encodeRestorableState(with coder: NSCoder){
-        
-        if let productsViewController = self.topViewController as? ProductsViewController {
-            let screenshot = productsViewController.screenshot
-            if let index = self.screenshotsViewController.indexOf(screenshot: screenshot) {
-                coder.encode(index, forKey: "screenshotIndex")
-            }
+typealias ScreenshotsNavigationControllerStateRestoration = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerStateRestoration {
+    private var screenshotKey: String {
+        return "screenshotKey"
+    }
+    
+    override func encodeRestorableState(with coder: NSCoder) {
+        if let productsViewController = topViewController as? ProductsViewController {
+            coder.encode(productsViewController.screenshot.objectID.uriRepresentation(), forKey: screenshotKey)
         }
         
         super.encodeRestorableState(with: coder)
     }
     
-    override func decodeRestorableState(with coder: NSCoder){
-        if coder.containsValue(forKey: "screenshotIndex") {
-            self.restoredScreenshotNumber = coder.decodeInteger(forKey: "screenshotIndex")
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        
+        // Below isn't needed until createRestoredProductsViewController is implemented
+        guard "keep the below code alive" == "but make this fail" else {
+            return
         }
         
-        super.decodeRestorableState(with: coder)
+        guard let persistentStoreCoordinator = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
+            return
+        }
+        
+        if coder.containsValue(forKey: screenshotKey),
+            let url = coder.decodeObject(forKey: screenshotKey) as? URL,
+            let objectID = persistentStoreCoordinator.managedObjectID(forURIRepresentation: url),
+            let screenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: objectID)
+        {
+            restoredProductsViewController?.screenshot = screenshot
+        }
     }
-    
 }
