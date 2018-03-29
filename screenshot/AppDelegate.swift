@@ -435,16 +435,7 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("application didReceiveRemoteNotification userInfo:\(userInfo)")
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-
-        if let aps = userInfo["aps"] as? [String : Any],
-            let category = aps["category"] as? String,
-            category == "PRICE_ALERT",
-            let partNumber = userInfo["partNumber"] as? String,
-            !partNumber.isEmpty {
-            ProductViewController.present(with: partNumber)
-        }
 
         // Only spin up a background task if we are already in the background
         if application.applicationState == .background {
@@ -484,13 +475,19 @@ extension AppDelegate {
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("userNotificationCenter:\(center) didReceive response:\(response.description)  userInfo:\(response.notification.request.content.userInfo)")
-        if let userInfo = response.notification.request.content.userInfo as? [String : String],
-          let openingScreen = userInfo[Constants.openingScreenKey],
-          openingScreen == Constants.openingScreenValueScreenshot,
-          let openingAssetId = userInfo[Constants.openingAssetIdKey] {
-            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
-            showScreenshotListTop()
+        if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
+            if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
+                openingScreen == Constants.openingScreenValueScreenshot,
+                let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
+                showScreenshotListTop()
+            } else if let aps = userInfo["aps"] as? [String : Any],
+                let category = aps["category"] as? String,
+                category == "PRICE_ALERT",
+                let partNumber = userInfo["partNumber"] as? String,
+                !partNumber.isEmpty {
+                ProductViewController.present(with: partNumber)
+            }
         }
         
         completionHandler()
@@ -499,8 +496,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        print("userNotificationCenter:\(center) willPresent notification:\(notification.description)")
-        completionHandler([])
+        let category = notification.request.content.categoryIdentifier
+        let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
+        completionHandler(options)
     }
     
 }
