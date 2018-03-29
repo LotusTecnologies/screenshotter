@@ -29,7 +29,7 @@ extension PHAsset {
     
     func image(allowFromICloud:Bool) -> Promise<UIImage>{
         print("processing image \(self.localIdentifier)")
-        return Promise.init(resolvers: { (fulfill, reject) in
+        return Promise { (fulfill, reject) in
             let imageRequestOptions = PHImageRequestOptions()
             imageRequestOptions.version = .current
             imageRequestOptions.deliveryMode = .highQualityFormat
@@ -57,6 +57,6 @@ extension PHAsset {
                     reject(emptyError)
                 }
             })
-        })
+        }
     }
 }
