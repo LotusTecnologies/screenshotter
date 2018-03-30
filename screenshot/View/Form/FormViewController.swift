@@ -8,6 +8,20 @@
 
 import UIKit
 
+extension UIResponder {
+    private weak static var _currentFirstResponder: UIResponder? = nil
+    
+    static var current: UIResponder? {
+        _currentFirstResponder = nil
+        UIApplication.shared.sendAction(#selector(findFirstResponder), to: nil, from: nil, for: nil)
+        return _currentFirstResponder
+    }
+    
+    @objc private func findFirstResponder() {
+        UIResponder._currentFirstResponder = self
+    }
+}
+
 class FormViewController: BaseViewController {
     fileprivate let form: Form
     
@@ -44,6 +58,8 @@ class FormViewController: BaseViewController {
         self.form = form
         
         super.init(nibName: nil, bundle: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChangeFrame(_:)), name: .UIKeyboardWillChangeFrame, object: nil)
     }
     
     override func viewDidLoad() {
@@ -66,8 +82,31 @@ class FormViewController: BaseViewController {
     }
     
     deinit {
+        NotificationCenter.default.removeObserver(self)
         tableView.dataSource = nil
         tableView.delegate = nil
+    }
+    
+    // MARK: Keyboard
+    
+    @objc fileprivate func keyboardWillChangeFrame(_ notification: Notification) {
+        guard let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+            let textField = UIResponder.current as? UITextField
+            else {
+                return
+        }
+        
+        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardRect.height, right: 0)
+        
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
+        
+        var scrollToRect = view.frame
+        scrollToRect.size.height -= contentInsets.bottom
+        
+        if !scrollToRect.contains(textField.frame.origin) {
+            tableView.scrollRectToVisible(textField.frame, animated: true)
+        }
     }
 }
 

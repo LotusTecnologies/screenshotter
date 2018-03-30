@@ -63,6 +63,12 @@ class CheckoutShippingViewController: FormViewController {
         phone.placeholder = "Phone Number"
         formRows.append(phone)
         
+        for _ in 0...10 {
+            let phone = FormRow.Text()
+            phone.placeholder = "Phone Number"
+            formRows.append(phone)
+        }
+        
         let section = FormSection()
         section.rows = formRows
         
