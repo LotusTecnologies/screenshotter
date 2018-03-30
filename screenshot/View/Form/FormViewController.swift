@@ -111,12 +111,12 @@ class FormViewController: BaseViewController {
 }
 
 extension FormViewController: UITableViewDataSource {
-    fileprivate func formSection(at index: Int) -> FormSection? {
+    fileprivate func formSectionAt(_ index: Int) -> FormSection? {
         return form.sections?[index]
     }
     
-    fileprivate func formRow(at indexPath: IndexPath) -> FormRow? {
-        return formSection(at: indexPath.section)?.rows?[indexPath.row]
+    fileprivate func formRowAt(_ indexPath: IndexPath) -> FormRow? {
+        return formSectionAt(indexPath.section)?.rows?[indexPath.row]
     }
     
     fileprivate func tableViewCellOwning(_ view: UIView) -> UITableViewCell? {
@@ -136,46 +136,65 @@ extension FormViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return formSection(at: section)?.rows?.count ?? 0
+        return formSectionAt(section)?.rows?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if let selectionPickerRow = formRow(at: indexPath) as? FormRow.SelectionPicker {
-            return selectionPickerRow.cellHeight
+        let formRow = formRowAt(indexPath)
+        
+        if formRow?.isVisible ?? true {
+            if formRow is FormRow.SelectionPicker {
+                return 200
+            }
+            else {
+                return tableView.rowHeight
+            }
         }
         else {
-            return tableView.rowHeight
+            return 0
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let row = formRow(at: indexPath) else {
+        guard let formRow = formRowAt(indexPath) else {
             return UITableViewCell()
         }
         
-        let identifier = String(describing: type(of: row))
+        let identifier = String(describing: type(of: formRow))
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
 //        cell.selectionStyle = .none
-        cell.textLabel?.text = row.placeholder
+        cell.textLabel?.text = formRow.placeholder
         
-        if let cell = cell as? FormTextTableViewCell, let row = row as? FormRow.Text {
+        if let cell = cell as? FormTextTableViewCell {
             let isLastCell = (indexPath.row > tableView.numberOfRows(inSection: indexPath.section) - 1)
             
             cell.textField.delegate = self
-            cell.textField.text = row.value
+            cell.textField.text = formRow.value
             cell.textField.returnKeyType = isLastCell ? .done : .next
         }
-        else if let cell = cell as? FormSelectionTableViewCell, let row = row as? FormRow.Selection {
-            cell.detailTextLabel?.text = row.value
+        else if let cell = cell as? FormSelectionTableViewCell {
+            cell.detailTextLabel?.text = formRow.value
         }
         else if let cell = cell as? FormSelectionPickerTableViewCell {
             cell.pickerView.dataSource = self
             cell.pickerView.delegate = self
         }
-        else {
-            
-        }
+        
+//        if !formRow.linkedConditions.isEmpty {
+//            formRow.linkedConditions.forEach({ linkCondition in
+//                let isVisible = linkCondition.formRow.isVisible
+//                let willBeVisible = linkCondition.value == formRow.value
+//
+//                if isVisible != willBeVisible {
+//                    linkCondition.formRow.isVisible = willBeVisible
+//
+//                    if let aIndexPath = form.indexPath(for: linkCondition.formRow) {
+//                        tableView.reloadRows(at: [aIndexPath], with: .top)
+//                    }
+//                }
+//            })
+//        }
         
         return cell
     }
@@ -238,8 +257,8 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     private func selectionPickerRow(for pickerView: UIPickerView) -> FormRow.SelectionPicker? {
-        if let indexPath = indexPath(for: pickerView), let row = formRow(at: indexPath) as? FormRow.SelectionPicker {
-            return row
+        if let indexPath = indexPath(for: pickerView), let formRow = formRowAt(indexPath) as? FormRow.SelectionPicker {
+            return formRow
         }
         else {
             return nil
@@ -277,7 +296,7 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         selectionPickerRow.selectionRow.value = options[row]
         
         if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow),
-            let cell = tableViewCellOwning(pickerView) as? FormSelectionTableViewCell
+            let cell = tableViewCellOwning(pickerView) as? FormSelectionTableViewCell // should this be canResignFirstResponderOverride?
         {
             cell.canResignFirstResponderOverride = false
             tableView.reloadRows(at: [indexPath], with: .none)
@@ -290,14 +309,10 @@ extension FormRow {
     class SelectionPicker: FormRow {
         let selectionRow: Selection
         
-        fileprivate var cellHeight: CGFloat = 0
-        fileprivate var isCellVisible: Bool {
-            return cellHeight > 0
-        }
-        
         init(with selectionRow: Selection) {
             self.selectionRow = selectionRow
             super.init()
+            isVisible = false
         }
     }
 }
@@ -307,12 +322,12 @@ extension FormViewTableView {
         let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
         
         guard let viewController = superview?.next as? FormViewController,
-            let selectionPickerRow = viewController.formRow(at: nextIndexPath) as? FormRow.SelectionPicker
+            let selectionPickerRow = viewController.formRowAt(nextIndexPath) as? FormRow.SelectionPicker
             else {
                 return
         }
         
-        selectionPickerRow.cellHeight = (selectionPickerRow.cellHeight > 0) ? 0 : 200
+        selectionPickerRow.isVisible = !selectionPickerRow.isVisible
         
         beginUpdates()
         endUpdates()

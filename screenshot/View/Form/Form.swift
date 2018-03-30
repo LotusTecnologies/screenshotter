@@ -45,6 +45,27 @@ class FormSection {
 
 class FormRow: NSObject {
     var placeholder: String?
+    var value: String?
+    
+    var isVisible = true
+    var condition: FormCondition? {
+        willSet {
+            let index = condition?.formRow.linkedConditions.index(where: { formLinkedCondition -> Bool in
+                return formLinkedCondition.formRow == self
+            })
+            
+            if let index = index {
+                condition?.formRow.linkedConditions.remove(at: index)
+            }
+        }
+        didSet {
+            if let condition = condition {
+                let linkedCondition = FormLinkedCondition(display: self, whenHasValue: condition.value)
+                condition.formRow.linkedConditions.append(linkedCondition)
+            }
+        }
+    }
+    private(set) var linkedConditions: [FormLinkedCondition] = []
 }
 
 extension FormRow {
@@ -53,7 +74,8 @@ extension FormRow {
     }
     
     class Date: FormRow {
-        var value: (month: UInt, year: UInt)?
+        // ???: make a date (month, year) to string func
+//        var value: (month: UInt, year: UInt)?
     }
     
     class Email: Text {
@@ -69,11 +91,30 @@ extension FormRow {
     }
     
     class Selection: FormRow {
-        var value: String?
         var options: [String]?
     }
     
     class Text: FormRow {
-        var value: String?
+        
+    }
+}
+
+struct FormCondition {
+    let formRow: FormRow
+    let value: String
+    
+    init(displayWhen formRow: FormRow, hasValue value: String) {
+        self.formRow = formRow
+        self.value = value
+    }
+}
+
+struct FormLinkedCondition {
+    let formRow: FormRow
+    let value: String
+    
+    init(display formRow: FormRow, whenHasValue value: String) {
+        self.formRow = formRow
+        self.value = value
     }
 }

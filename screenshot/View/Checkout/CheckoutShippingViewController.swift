@@ -42,11 +42,9 @@ class CheckoutShippingViewController: FormViewController {
         ]
         formRows.append(country)
         
-        let zip = FormRow.Number()
-        zip.placeholder = "Zip Code"
-        formRows.append(zip)
-        
         let state = FormRow.Selection()
+        state.condition = FormCondition(displayWhen: country, hasValue: "United States")
+        state.isVisible = false
         state.placeholder = "State"
         state.options = [
             "United States",
@@ -59,13 +57,17 @@ class CheckoutShippingViewController: FormViewController {
         ]
         formRows.append(state)
         
+        let zip = FormRow.Number()
+        zip.placeholder = "Zip Code"
+        formRows.append(zip)
+        
         let phone = FormRow.Phone()
         phone.placeholder = "Phone Number"
         formRows.append(phone)
         
         for _ in 0...10 {
-            let phone = FormRow.Text()
-            phone.placeholder = "Phone Number"
+            let phone = FormRow.Card()
+            phone.placeholder = "Card"
             formRows.append(phone)
         }
         
