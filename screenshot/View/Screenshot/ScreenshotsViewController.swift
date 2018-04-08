@@ -484,13 +484,23 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 }
             }
             if let items =  items {
-                
-                let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: nil)
+                var applicationActivities:[UIActivity] = []
+                if let share = AddToDiscoverActivity.addToDiscoverActivity(screenshot: screenshot) {
+                    applicationActivities.append(share)
+                }
+                let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: applicationActivities)
+                activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
                 activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
                     if (completed) {
                         AnalyticsTrackers.standard.track(.shareCompleted)
                         //TODO: why is this branch tracking here?
                         AnalyticsTrackers.branch.track(.shareCompleted)
+                        
+                        if activityType?.rawValue == AddToDiscoverActivity.activityTypeString {
+                            let thankYou = ThankYouForSharingViewController()
+                            thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
+                            self.present(thankYou, animated: true, completion: nil)
+                        }
                     } else {
                         AnalyticsTrackers.standard.track(.shareIncomplete)
                     }
@@ -500,6 +510,10 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 AnalyticsTrackers.standard.track(.sharedScreenshot)
             }
         }
+    }
+    
+    func thankYouForSharingViewDidClose(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell) {

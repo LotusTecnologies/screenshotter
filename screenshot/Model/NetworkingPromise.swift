@@ -317,6 +317,45 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) {
+        var parameterDict = ["image" : image]
+        if let userName = userName, !userName.isEmpty {
+            parameterDict["userName"] = userName
+        }
+        if let intercomUserId = intercomUserId, !intercomUserId.isEmpty {
+            parameterDict["intercomUserId"] = intercomUserId
+        }
+        if let email = email, !email.isEmpty {
+            parameterDict["email"] = email
+        }
+        do {
+            let parameterData = try JSONSerialization.data(withJSONObject: parameterDict, options: [])
+            
+            guard let url = URL(string: Constants.screenShotLambdaDomain + "matchstick/submit") else {
+                return
+                
+            }
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.httpBody = parameterData
+                request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+                request.setValue("application/json", forHTTPHeaderField:"Content-Type")
+                
+                let session = URLSession.shared
+                let dataTask = session.dataTask(with: request) { data, response, error in
+                    if let data = data, let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] {
+                        print("shared to discover response: \(json)")
+                    }
+                    
+                }
+                dataTask.resume()
+        }catch {
+            print("submitToDiscover JSONSerialization error:\(error)")
+        }
+ 
+        
+    }
+    
     func share(userName: String?, imageURLString: String?, syteJson: String?) -> Promise<(String, String)> {
         guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots?createShare=true") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
