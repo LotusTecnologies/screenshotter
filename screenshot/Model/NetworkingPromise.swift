@@ -319,13 +319,13 @@ class NetworkingPromise : NSObject {
     
     func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) {
         var parameterDict = ["image" : image]
-        if userName != nil && userName != "" {
+        if let userName = userName, !userName.isEmpty {
             parameterDict["userName"] = userName
         }
-        if intercomUserId != nil && intercomUserId != "" {
+        if let intercomUserId = intercomUserId, !intercomUserId.isEmpty {
             parameterDict["intercomUserId"] = intercomUserId
         }
-        if email != nil && email != "" {
+        if let email = email, !email.isEmpty {
             parameterDict["email"] = email
         }
         do {
@@ -350,7 +350,7 @@ class NetworkingPromise : NSObject {
                 }
                 dataTask.resume()
         }catch {
-
+            print("submitToDiscover JSONSerialization error:\(error)")
         }
  
         
