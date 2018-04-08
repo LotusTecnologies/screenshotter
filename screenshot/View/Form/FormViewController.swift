@@ -28,13 +28,16 @@ class FormViewController: BaseViewController {
     fileprivate var previousAttachedVisibileIndexPath: IndexPath?
     fileprivate var needsToSyncTableViewAnimation = false
     
+    private var preservedContentInset: UIEdgeInsets?
+    private var preservedScrollIndicatorInsets: UIEdgeInsets?
+    
     // MARK: View
     
     fileprivate var formView: FormView {
         return view as! FormView
     }
     
-    fileprivate var tableView: UITableView {
+    var tableView: UITableView {
         return formView.tableView
     }
     
@@ -100,10 +103,36 @@ class FormViewController: BaseViewController {
                 return
         }
         
-        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardRect.height, right: 0)
+        if preservedContentInset == nil {
+            preservedContentInset = tableView.contentInset
+            preservedScrollIndicatorInsets = tableView.scrollIndicatorInsets
+        }
+        
+        let bottom = keyboardRect.height
+        let contentInsets: UIEdgeInsets
+        let scrollIndicatorInsets: UIEdgeInsets
+        
+        if bottom > 0 {
+            var _contentInset: UIEdgeInsets = .zero
+            _contentInset.top = preservedContentInset?.top ?? 0
+            _contentInset.bottom = bottom - (preservedContentInset?.bottom ?? 0)
+            contentInsets = _contentInset
+            
+            var _scrollIndicatorInsets: UIEdgeInsets = .zero
+            _scrollIndicatorInsets.top = preservedScrollIndicatorInsets?.top ?? 0
+            _scrollIndicatorInsets.bottom = bottom - (preservedScrollIndicatorInsets?.bottom ?? 0)
+            scrollIndicatorInsets = _scrollIndicatorInsets
+        }
+        else {
+            contentInsets = preservedContentInset ?? .zero
+            scrollIndicatorInsets = preservedScrollIndicatorInsets ?? .zero
+            
+            preservedContentInset = nil
+            preservedScrollIndicatorInsets = nil
+        }
         
         tableView.contentInset = contentInsets
-        tableView.scrollIndicatorInsets = contentInsets
+        tableView.scrollIndicatorInsets = scrollIndicatorInsets
         
         var scrollToRect = view.frame
         scrollToRect.size.height -= contentInsets.bottom

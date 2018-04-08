@@ -9,6 +9,8 @@
 import UIKit
 
 class CheckoutPaymentViewController: FormViewController {
+    let doneButton = MainButton()
+    
     convenience init() {
         var formRows: [FormRow] = []
         
@@ -87,5 +89,22 @@ class CheckoutPaymentViewController: FormViewController {
         
         title = "Add A Card"
         restorationIdentifier = String(describing: type(of: self))
+        
+        var contentInset = tableView.contentInset
+        contentInset.bottom = 20
+        tableView.contentInset = contentInset
+        
+        var tableFooterRect: CGRect = .zero
+        tableFooterRect.size.height = doneButton.intrinsicContentSize.height
+        let tableFooterView = UIView(frame: tableFooterRect)
+        tableView.tableFooterView = tableFooterView
+        
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.backgroundColor = .crazeGreen
+        doneButton.setTitle("Done", for: .normal)
+        tableFooterView.addSubview(doneButton)
+        doneButton.topAnchor.constraint(equalTo: tableFooterView.topAnchor).isActive = true
+        doneButton.bottomAnchor.constraint(equalTo: tableFooterView.bottomAnchor).isActive = true
+        doneButton.centerXAnchor.constraint(equalTo: tableFooterView.centerXAnchor).isActive = true
     }
 }
