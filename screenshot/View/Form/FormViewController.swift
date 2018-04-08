@@ -25,6 +25,9 @@ extension UIResponder {
 class FormViewController: BaseViewController {
     fileprivate let form: Form
     
+    fileprivate var previousAttachedVisibileIndexPath: IndexPath?
+    fileprivate var needsToSyncTableViewAnimation = false
+    
     // MARK: View
     
     fileprivate var formView: FormView {
@@ -181,22 +184,28 @@ extension FormViewController: UITableViewDataSource {
             cell.pickerView.delegate = self
         }
         
-//        if !formRow.linkedConditions.isEmpty {
-//            formRow.linkedConditions.forEach({ linkCondition in
-//                let isVisible = linkCondition.formRow.isVisible
-//                let willBeVisible = linkCondition.value == formRow.value
-//
-//                if isVisible != willBeVisible {
-//                    linkCondition.formRow.isVisible = willBeVisible
-//
-//                    if let aIndexPath = form.indexPath(for: linkCondition.formRow) {
-//                        tableView.reloadRows(at: [aIndexPath], with: .top)
-//                    }
-//                }
-//            })
-//        }
-        
         return cell
+    }
+    
+    fileprivate func syncConditionedCell(at indexPath: IndexPath) {
+        guard let formRow = formRowAt(indexPath) else {
+            return
+        }
+        
+        if !formRow.linkedConditions.isEmpty {
+            formRow.linkedConditions.forEach({ linkCondition in
+                let isVisible = linkCondition.formRow.isVisible
+                let willBeVisible = linkCondition.value == formRow.value
+                
+                if isVisible != willBeVisible {
+                    linkCondition.formRow.isVisible = willBeVisible
+                    
+                    if let aIndexPath = form.indexPath(for: linkCondition.formRow) {
+                        tableView.reloadRows(at: [aIndexPath], with: willBeVisible ? .bottom : .top)
+                    }
+                }
+            })
+        }
     }
 }
 
@@ -206,10 +215,42 @@ extension FormViewController: UITableViewDelegate {
             return
         }
         
+        let formRow = formRowAt(indexPath)
+        
+        func didSelectAttachedIndexPath(yes: ()->(), no: ()->()) {
+            if let formRow = formRow {
+                switch formRow {
+                case is FormRow.Date, is FormRow.Selection:
+                    yes()
+                default:
+                    no()
+                }
+            }
+        }
+        
+        if previousAttachedVisibileIndexPath != nil && previousAttachedVisibileIndexPath != indexPath {
+            didSelectAttachedIndexPath(yes: {
+                needsToSyncTableViewAnimation = true
+            }, no: {
+                needsToSyncTableViewAnimation = false
+            })
+        }
+        
         _ = cell.isFirstResponder ? cell.resignFirstResponder() : cell.becomeFirstResponder()
         
         // Must come after first responder
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        didSelectAttachedIndexPath(yes: {
+            if cell.isFirstResponder {
+                previousAttachedVisibileIndexPath = indexPath
+            }
+            else {
+                previousAttachedVisibileIndexPath = nil
+            }
+        }, no: {
+            previousAttachedVisibileIndexPath = nil
+        })
     }
 }
 
@@ -296,11 +337,10 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         selectionPickerRow.selectionRow.value = options[row]
         
         if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow),
-            let cell = tableViewCellOwning(pickerView) as? FormSelectionTableViewCell // should this be canResignFirstResponderOverride?
+            let cell = tableView.cellForRow(at: indexPath) as? FormSelectionTableViewCell
         {
-            cell.canResignFirstResponderOverride = false
-            tableView.reloadRows(at: [indexPath], with: .none)
-            cell.canResignFirstResponderOverride = nil
+            cell.detailTextLabel?.text = selectionPickerRow.selectionRow.value
+            syncConditionedCell(at: indexPath)
         }
     }
 }
@@ -318,18 +358,24 @@ extension FormRow {
 }
 
 extension FormViewTableView {
-    func toggleSelectionPickerVisibility(for indexPath: IndexPath) {
+    func changeSelectionPicker(visibility: Bool, forAttached indexPath: IndexPath) {
         let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
         
         guard let viewController = superview?.next as? FormViewController,
-            let selectionPickerRow = viewController.formRowAt(nextIndexPath) as? FormRow.SelectionPicker
+            let selectionPickerRow = viewController.formRowAt(nextIndexPath) as? FormRow.SelectionPicker,
+            selectionPickerRow.isVisible != visibility
             else {
                 return
         }
         
-        selectionPickerRow.isVisible = !selectionPickerRow.isVisible
+        selectionPickerRow.isVisible = visibility
         
-        beginUpdates()
-        endUpdates()
+        if viewController.needsToSyncTableViewAnimation {
+            viewController.needsToSyncTableViewAnimation = false
+        }
+        else {
+            beginUpdates()
+            endUpdates()
+        }
     }
 }

@@ -9,11 +9,27 @@
 import UIKit
 
 class FormCardTableViewCell: UITableViewCell {
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        
+        clipsToBounds = true
+    }
 }
 
 class FormDateTableViewCell: UITableViewCell {
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        
+        clipsToBounds = true
+    }
 }
 
 class FormEmailTableViewCell: FormTextTableViewCell {
@@ -60,6 +76,8 @@ class FormSelectionTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         
+        clipsToBounds = true
+        
         let dropDownImageView = UIImageView(image: UIImage(named: "CheckoutDownArrow"))
         dropDownImageView.contentMode = .scaleAspectFit
         accessoryView = dropDownImageView
@@ -67,24 +85,13 @@ class FormSelectionTableViewCell: UITableViewCell {
     
     // MARK: First Responder
     
-    var canResignFirstResponderOverride: Bool?
-    
     override var canBecomeFirstResponder: Bool {
         return next is UITableView
     }
     
-    override var canResignFirstResponder: Bool {
-        if let override = canResignFirstResponderOverride {
-            return override
-        }
-        else {
-            return super.canResignFirstResponder
-        }
-    }
-    
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder {
-            toggleSelectionPickerVisibility()
+            changeSelectionPicker(visibility: true)
         }
         
         return super.becomeFirstResponder()
@@ -92,7 +99,7 @@ class FormSelectionTableViewCell: UITableViewCell {
     
     override func resignFirstResponder() -> Bool {
         if isFirstResponder {
-            toggleSelectionPickerVisibility()
+            changeSelectionPicker(visibility: false)
         }
         
         return super.resignFirstResponder()
@@ -100,9 +107,10 @@ class FormSelectionTableViewCell: UITableViewCell {
     
     // MARK: Selection Picker
     
-    private func toggleSelectionPickerVisibility() {
-        if let tableView = next as? FormViewTableView, let indexPath = tableView.indexPath(for: self) {
-            tableView.toggleSelectionPickerVisibility(for: indexPath)
+    private func changeSelectionPicker(visibility: Bool) {
+        if let tableView = next as? FormViewTableView,
+            let indexPath = tableView.indexPath(for: self) {
+            tableView.changeSelectionPicker(visibility: visibility, forAttached: indexPath)
         }
     }
 }
@@ -116,6 +124,8 @@ class FormSelectionPickerTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        
+        clipsToBounds = true
         
         let containerView = NotifyChangeView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -162,5 +172,7 @@ class FormTextTableViewCell: TextFieldTableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        
+        clipsToBounds = true
     }
 }
