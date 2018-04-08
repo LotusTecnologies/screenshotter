@@ -27,7 +27,8 @@ class CartNavigationController: UINavigationController {
         // !!!: DEBUG
         
         viewControllers = [
-            CheckoutShippingViewController(),
+//            CheckoutShippingViewController(),
+            CheckoutPaymentViewController(),
 //            cartViewController
         ]
     }

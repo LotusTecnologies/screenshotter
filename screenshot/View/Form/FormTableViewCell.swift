@@ -20,6 +20,34 @@ class FormCardTableViewCell: UITableViewCell {
     }
 }
 
+class FormCheckboxTableViewCell: UITableViewCell {
+    private let checkboxImage = UIImage(named: "FormCheckbox")
+    private let checkboxSelectedImage = UIImage(named: "FormCheckboxChecked")
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        
+        clipsToBounds = true
+        
+        imageView?.image = checkboxImage
+    }
+    
+    var isChecked = false {
+        didSet {
+            if isChecked {
+                imageView?.image = checkboxSelectedImage
+            }
+            else {
+                imageView?.image = checkboxImage
+            }
+        }
+    }
+}
+
 class FormDateTableViewCell: UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -78,7 +106,7 @@ class FormSelectionTableViewCell: UITableViewCell {
         
         clipsToBounds = true
         
-        let dropDownImageView = UIImageView(image: UIImage(named: "CheckoutDownArrow"))
+        let dropDownImageView = UIImageView(image: UIImage(named: "FormDownArrow"))
         dropDownImageView.contentMode = .scaleAspectFit
         accessoryView = dropDownImageView
     }

@@ -73,6 +73,17 @@ extension FormRow {
         
     }
     
+    class Checkbox: FormRow {
+        // The value should be stored as a "1" or a "0"
+        static func bool(for value: String?) -> Bool {
+            return NSString(string: value ?? "0").boolValue
+        }
+        
+        static func value(for bool: Bool?) -> String {
+            return NSNumber(value: bool ?? false).stringValue
+        }
+    }
+    
     class Date: FormRow {
         // ???: make a date (month, year) to string func
 //        var value: (month: UInt, year: UInt)?

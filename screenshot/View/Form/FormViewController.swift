@@ -75,6 +75,7 @@ class FormViewController: BaseViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableViewRegister(FormCardTableViewCell.self, for: FormRow.Card.self)
+        tableViewRegister(FormCheckboxTableViewCell.self, for: FormRow.Checkbox.self)
         tableViewRegister(FormDateTableViewCell.self, for: FormRow.Date.self)
         tableViewRegister(FormEmailTableViewCell.self, for: FormRow.Email.self)
         tableViewRegister(FormNumberTableViewCell.self, for: FormRow.Number.self)
@@ -166,25 +167,44 @@ extension FormViewController: UITableViewDataSource {
         let identifier = String(describing: type(of: formRow))
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
-//        cell.selectionStyle = .none
-        cell.textLabel?.text = formRow.placeholder
-        
-        if let cell = cell as? FormTextTableViewCell {
+        if let cell = cell as? FormSelectionPickerTableViewCell {
+            cell.pickerView.dataSource = self
+            cell.pickerView.delegate = self
+        }
+        else if let cell = cell as? FormTextTableViewCell {
             let isLastCell = (indexPath.row > tableView.numberOfRows(inSection: indexPath.section) - 1)
             
             cell.textField.delegate = self
-            cell.textField.text = formRow.value
             cell.textField.returnKeyType = isLastCell ? .done : .next
+        }
+        
+        syncValues(for: cell, at: indexPath)
+        
+        return cell
+    }
+    
+    fileprivate func syncValues(forCellAt indexPath: IndexPath) {
+        if let cell = tableView.cellForRow(at: indexPath) {
+            syncValues(for: cell, at: indexPath)
+        }
+    }
+    
+    fileprivate func syncValues(for cell: UITableViewCell, at indexPath: IndexPath) {
+        guard let formRow = formRowAt(indexPath) else {
+            return
+        }
+        
+        cell.textLabel?.text = formRow.placeholder
+        
+        if let cell = cell as? FormCheckboxTableViewCell {
+            cell.isChecked = NSString(string: formRow.value ?? "0").boolValue
         }
         else if let cell = cell as? FormSelectionTableViewCell {
             cell.detailTextLabel?.text = formRow.value
         }
-        else if let cell = cell as? FormSelectionPickerTableViewCell {
-            cell.pickerView.dataSource = self
-            cell.pickerView.delegate = self
+        else if let cell = cell as? FormTextTableViewCell {
+            cell.textField.text = formRow.value
         }
-        
-        return cell
     }
     
     fileprivate func syncConditionedCell(at indexPath: IndexPath) {
@@ -251,6 +271,12 @@ extension FormViewController: UITableViewDelegate {
         }, no: {
             previousAttachedVisibileIndexPath = nil
         })
+        
+        if let formRow = formRow as? FormRow.Checkbox {
+            let isChecked = FormRow.Checkbox.bool(for: formRow.value)
+            formRow.value = FormRow.Checkbox.value(for: !isChecked)
+            syncValues(for: cell, at: indexPath)
+        }
     }
 }
 
@@ -339,7 +365,8 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow),
             let cell = tableView.cellForRow(at: indexPath) as? FormSelectionTableViewCell
         {
-            cell.detailTextLabel?.text = selectionPickerRow.selectionRow.value
+            syncValues(for: cell, at: indexPath)
+//            cell.detailTextLabel?.text = selectionPickerRow.selectionRow.value
             syncConditionedCell(at: indexPath)
         }
     }
