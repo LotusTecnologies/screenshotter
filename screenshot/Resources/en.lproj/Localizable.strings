@@ -64,6 +64,16 @@
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.title" = "Setup Email";
 
+
+"error.database_cant_load.title" = "Something Went Wrong";
+"error.database_cant_load.message" = "Try clearing some space on your device and reopening the app. If the problem persists, you should reset your app";
+"error.database_cant_load.button.try_again" = "Try Again";
+"error.database_cant_load.button.reset_app" = "Reset App";
+"error.database_cant_load.button.contact_support" = "Contact Support";
+"error.database_cant_load.button.reset_app.title" = "Reset App";
+"error.database_cant_load.button.reset_app.message" = "Are you sure? You'll lose all your screenshots.";
+"error.database_cant_load.button.reset_app.button.reset" = "Reset";
+
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";

@@ -285,7 +285,6 @@ class ShoppingCartModel {
         }
     }
     
-    // TODO: GMK determine if 'from' matters whether Shoppable's hosted checkout redirects to returnToSite or orderComplete url.
     func hostedCompleted(remoteId: String, from: String) {
         print("hostedCompleted remoteId:\(remoteId)  from:\(from)")
         let dataModel = DataModel.sharedInstance
