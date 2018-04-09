@@ -17,8 +17,9 @@ class BorderButton: UIButton {
         super.init(frame: frame)
         
         setTitleColor(.crazeRed, for: .normal)
-        contentEdgeInsets = UIEdgeInsets(top: .padding / 2, left: .padding, bottom: .padding / 2, right: .padding)
+        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.8, left: .padding, bottom: .padding / 1.8, right: .padding)
         adjustsImageWhenHighlighted = false
+        titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.borderWidth = 1
         layer.cornerRadius = .defaultCornerRadius
     }

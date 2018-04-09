@@ -22,7 +22,7 @@ class MainButton: LoadingButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.4, left: .padding, bottom: .padding / 1.4, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
