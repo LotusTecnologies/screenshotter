@@ -8,37 +8,54 @@
 
 import UIKit
 
+enum CheckoutPaymentFormKeys: Int {
+    case addressCity
+    case addressCountry
+    case addressShip
+    case addressState
+    case addressStreet
+    case addressZip
+    
+    case cardCVV
+    case cardExp
+    case cardName
+    case cardNumber
+    
+    case email
+    case phoneNumber
+}
+
 class CheckoutPaymentViewController: FormViewController {
     let doneButton = MainButton()
     
     convenience init() {
         var formRows: [FormRow] = []
         
-        let cardName = FormRow.Text()
+        let cardName = FormRow.Text(CheckoutPaymentFormKeys.cardName.rawValue)
         cardName.placeholder = "Name on Card"
         formRows.append(cardName)
         
-        let cardNumber = FormRow.Card()
+        let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
         cardNumber.placeholder = "Card Number"
         formRows.append(cardNumber)
         
-        let exp = FormRow.Date()
+        let exp = FormRow.Date(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
         formRows.append(exp)
         
-        let cvv = FormRow.Number()
+        let cvv = FormRow.Number(CheckoutPaymentFormKeys.cardCVV.rawValue)
         cvv.placeholder = "CVV"
         formRows.append(cvv)
         
-        let address = FormRow.Text()
-        address.placeholder = "Street Address"
-        formRows.append(address)
+        let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
+        street.placeholder = "Street Address"
+        formRows.append(street)
         
-        let city = FormRow.Text()
+        let city = FormRow.Text(CheckoutPaymentFormKeys.addressCity.rawValue)
         city.placeholder = "City"
         formRows.append(city)
         
-        let country = FormRow.Selection()
+        let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
         country.options = [
             "United States",
@@ -51,7 +68,7 @@ class CheckoutPaymentViewController: FormViewController {
         ]
         formRows.append(country)
         
-        let state = FormRow.Selection()
+        let state = FormRow.Selection(CheckoutPaymentFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
@@ -66,19 +83,19 @@ class CheckoutPaymentViewController: FormViewController {
         ]
         formRows.append(state)
         
-        let zip = FormRow.Number()
+        let zip = FormRow.Number(CheckoutPaymentFormKeys.addressZip.rawValue)
         zip.placeholder = "Zip Code"
         formRows.append(zip)
         
-        let email = FormRow.Email()
+        let email = FormRow.Email(CheckoutPaymentFormKeys.email.rawValue)
         email.placeholder = "Email"
         formRows.append(email)
         
-        let phone = FormRow.Phone()
+        let phone = FormRow.Phone(CheckoutPaymentFormKeys.phoneNumber.rawValue)
         phone.placeholder = "Phone Number"
         formRows.append(phone)
         
-        let ship = FormRow.Checkbox()
+        let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
         ship.placeholder = "Ship to this address"
         formRows.append(ship)
         

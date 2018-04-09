@@ -23,7 +23,7 @@ extension UIResponder {
 }
 
 class FormViewController: BaseViewController {
-    fileprivate let form: Form
+    let form: Form
     
     fileprivate var previousAttachedVisibileIndexPath: IndexPath?
     fileprivate var needsToSyncTableViewAnimation = false

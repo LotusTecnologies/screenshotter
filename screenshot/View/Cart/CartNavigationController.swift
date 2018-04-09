@@ -10,6 +10,7 @@ import UIKit
 
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
+    fileprivate var checkoutPaymentViewController: CheckoutPaymentViewController?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -26,9 +27,13 @@ class CartNavigationController: UINavigationController {
         
         // !!!: DEBUG
         
+        let checkoutPaymentViewController = CheckoutPaymentViewController()
+        checkoutPaymentViewController.doneButton.addTarget(self, action: #selector(paymentDoneAction), for: .touchUpInside)
+        self.checkoutPaymentViewController = checkoutPaymentViewController
+        
         viewControllers = [
 //            CheckoutShippingViewController(),
-            CheckoutPaymentViewController(),
+            checkoutPaymentViewController,
 //            cartViewController
         ]
     }
@@ -37,5 +42,26 @@ class CartNavigationController: UINavigationController {
         super.viewDidLoad()
         
         view.backgroundColor = .background
+    }
+    
+    // MARK:
+    
+    @objc fileprivate func paymentDoneAction() {
+        guard let checkoutPaymentViewController = checkoutPaymentViewController,
+            let shipRow = checkoutPaymentViewController.form.map?[CheckoutPaymentFormKeys.addressShip.rawValue]
+            else {
+                return
+        }
+        
+        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: shipRow.value)
+        
+        if isShipToSameAddressChecked {
+            
+        }
+        else {
+            pushViewController(CheckoutShippingViewController(), animated: true)
+        }
+        
+        //        self.checkoutPaymentViewController = nil // ???: when should the vc be removed
     }
 }

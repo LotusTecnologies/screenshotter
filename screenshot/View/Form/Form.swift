@@ -9,11 +9,18 @@
 import UIKit
 
 class Form {
-    var sections: [FormSection]?
+    var sections: [FormSection]? {
+        didSet {
+            generateMap()
+        }
+    }
+    var map: [Int: FormRow]?
     
     convenience init(with sections: [FormSection]) {
         self.init()
-        self.sections = sections
+        defer {
+            self.sections = sections
+        }
     }
     
     func indexPath(for formRow: FormRow) -> IndexPath? {
@@ -36,6 +43,20 @@ class Form {
         
         return nil
     }
+    
+    private func generateMap() {
+        var map: [Int: FormRow] = [:]
+        
+        sections?.forEach({ section in
+            section.rows?.forEach({ row in
+                if let id = row.id {
+                    map[id] = row
+                }
+            })
+        })
+        
+        self.map = map.isEmpty ? nil : map
+    }
 }
 
 class FormSection {
@@ -44,6 +65,7 @@ class FormSection {
 }
 
 class FormRow: NSObject {
+    var id: Int?
     var placeholder: String?
     var value: String?
     
@@ -66,6 +88,11 @@ class FormRow: NSObject {
         }
     }
     private(set) var linkedConditions: [FormLinkedCondition] = []
+    
+    convenience init(_ id: Int) {
+        self.init()
+        self.id = id
+    }
 }
 
 extension FormRow {
