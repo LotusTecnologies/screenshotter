@@ -15,7 +15,6 @@
 		318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318FE265204C09C500277DD4 /* AsyncOperation.swift */; };
 		319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */; };
 		319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */; };
-		319B03112059020300446054 /* AddToDiscoverActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B03102059020300446054 /* AddToDiscoverActivity.swift */; };
 		31A3374E203D9A6100FFD2F2 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */; };
 		31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
@@ -157,7 +156,6 @@
 		318FE265204C09C500277DD4 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThankYouForSharingViewController.swift; sourceTree = "<group>"; };
 		319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareToDiscoverPrompt.swift; sourceTree = "<group>"; };
-		319B03102059020300446054 /* AddToDiscoverActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToDiscoverActivity.swift; sourceTree = "<group>"; };
 		31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsNavigationController.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
@@ -328,7 +326,6 @@
 			isa = PBXGroup;
 			children = (
 				319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */,
-				319B03102059020300446054 /* AddToDiscoverActivity.swift */,
 				319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */,
 			);
 			path = ShareToDiscoverPrompt;
@@ -1159,7 +1156,6 @@
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,
 				C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */,
 				C54088111FE90C8E00198955 /* TutorialWelcomeSlideView.swift in Sources */,
-				319B03112059020300446054 /* AddToDiscoverActivity.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,
