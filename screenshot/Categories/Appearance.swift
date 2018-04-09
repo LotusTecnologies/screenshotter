@@ -11,8 +11,9 @@ import UIKit
 
 extension UIColor {
     static let background = UIColor(white: 244/255, alpha: 1)
-    static let cellBackground = UIColor(white: 250/255, alpha: 1)
     static let border = UIColor.black.withAlphaComponent(0.3)
+    static let cellBackground = UIColor(white: 250/255, alpha: 1)
+    static let cellBorder = UIColor(red: 216/255, green: 224/255, blue: 227/255, alpha: 1)
     
     static let crazeRed = UIColor(red: 237/255, green: 20/255, blue: 90/255, alpha: 1)
     static let crazeGreen = UIColor(red: 32/255, green: 200/255, blue: 163/255, alpha: 1)

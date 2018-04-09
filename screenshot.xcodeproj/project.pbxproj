@@ -40,6 +40,8 @@
 		C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501412D20623DFD00ABFB5C /* UICollectionView.swift */; };
 		C5014130206283A200ABFB5C /* LoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501412F206283A200ABFB5C /* LoadingButton.swift */; };
 		C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */; };
+		C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */; };
+		C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */; };
@@ -240,6 +242,8 @@
 		C501412D20623DFD00ABFB5C /* UICollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionView.swift; sourceTree = "<group>"; };
 		C501412F206283A200ABFB5C /* LoadingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingButton.swift; sourceTree = "<group>"; };
 		C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollRevealController.swift; path = screenshot/View/Generic/ScrollRevealController.swift; sourceTree = SOURCE_ROOT; };
+		C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOrderViewController.swift; sourceTree = "<group>"; };
+		C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoresizingTableView.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTableViewCell.swift; sourceTree = "<group>"; };
@@ -517,6 +521,7 @@
 			isa = PBXGroup;
 			children = (
 				C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */,
+				C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */,
 				C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentViewController.swift */,
 				C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
@@ -883,6 +888,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D57932203EDD7A00A076FE /* TableView.swift */,
+				C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */,
 			);
 			path = TableView;
 			sourceTree = "<group>";
@@ -1314,6 +1320,7 @@
 				C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54369672046D6FD00599134 /* BaseViewController.swift in Sources */,
+				C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
 				C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
@@ -1410,6 +1417,7 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
+				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
 			);
