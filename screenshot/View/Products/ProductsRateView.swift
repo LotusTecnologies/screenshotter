@@ -70,9 +70,15 @@ class ProductsRateView : UIView {
         talkToYourStylistButton.backgroundColor = .clear
         talkToYourStylistButton.isUserInteractionEnabled = false
         
+        weak var weakSelf = self
         NotificationCenter.default.addObserver(forName: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil, queue: .main) { (notification) in
-                let rating  = self.rating
-                self.setRating(rating)
+            DispatchQueue.main.async {
+                if let strongWeakSelf = weakSelf {
+                    let rating  = strongWeakSelf.rating
+                    strongWeakSelf.setRating(rating)
+                }
+            }
+            
         }
     }
     
