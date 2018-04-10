@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17D102" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17E199" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Address" representedClassName="Address" isAbstract="YES" syncable="YES" codeGenerationType="class">
+        <attribute name="city" attributeType="String" syncable="YES"/>
+        <attribute name="country" attributeType="String" syncable="YES"/>
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="phone" attributeType="String" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="street" attributeType="String" syncable="YES"/>
+        <attribute name="zipCode" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Card" representedClassName="Card" parentEntity="Address" syncable="YES" codeGenerationType="class">
+        <attribute name="cvv" optional="YES" transient="YES" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="expirationMonth" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="expirationYear" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="fullName" attributeType="String" syncable="YES"/>
+        <attribute name="isSaved" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="number" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Cart" representedClassName="Cart" syncable="YES" codeGenerationType="class">
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateSubmitted" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -88,6 +107,10 @@
         <relationship name="favorites" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="screenshot" inverseEntity="Product" syncable="YES"/>
         <relationship name="shoppables" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Shoppable" inverseName="screenshot" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
+    <entity name="ShippingAddress" representedClassName="ShippingAddress" parentEntity="Address" syncable="YES" codeGenerationType="class">
+        <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Shoppable" representedClassName="Shoppable" syncable="YES" codeGenerationType="class">
         <attribute name="b0x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="b0y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -113,12 +136,15 @@
         <relationship name="product" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="availableVariants" inverseEntity="Product" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Cart" positionX="369" positionY="-108" width="128" height="30"/>
-        <element name="CartItem" positionX="540" positionY="27" width="128" height="225"/>
+        <element name="Address" positionX="522" positionY="225" width="128" height="165"/>
+        <element name="Card" positionX="718" positionY="173" width="128" height="150"/>
+        <element name="Cart" positionX="297" positionY="423" width="128" height="118"/>
+        <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="540"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="285"/>
+        <element name="ShippingAddress" positionX="718" positionY="393" width="128" height="75"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
         <element name="Variant" positionX="124" positionY="636" width="128" height="165"/>
     </elements>
