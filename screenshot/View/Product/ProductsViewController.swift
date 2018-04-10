@@ -28,7 +28,7 @@ enum ProductsViewControllerState : Int {
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, ProductCollectionViewCellDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
     var screenshot:Screenshot
-    var screenshotController: FetchedResultsControllerManager<Screenshot>
+    var screenshotController: FetchedResultsControllerManager<Screenshot>?
     
     var products:[Product] = []
     
@@ -41,7 +41,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     var rateView:ProductsRateView!
     var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
     var productsRateNegativeFeedbackTextField:UITextField?
-    
+    var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
     var image:UIImage!
     var state:ProductsViewControllerState = .loading {
@@ -49,14 +49,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
             self.syncViewsAfterStateChange()
         }
     }
+    var shareToDiscoverPrompt:UIView?
     
+    init(screenshot: Screenshot) {
+        self.screenshot = screenshot
     
-    init( screenshot s:Screenshot) {
-        screenshot = s
-        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: nil, screenshot: screenshot)
-
         super.init(nibName: nil, bundle: nil)
-        screenshotController.delegate = self
         
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
@@ -72,6 +70,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
         let toolbar:ShoppablesToolbar = {
             let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
@@ -152,6 +152,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         var height = self.rateView.intrinsicContentSize.height
         
+
         if #available(iOS 11.0, *) {
             height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
         }
@@ -159,13 +160,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
         
         self.syncScreenshotRelatedObjects()
         
-        if self.screenshotController.first?.shoppablesCount == -1  {
+        if self.screenshotController?.first?.shoppablesCount == -1  {
             self.state = .retry
             AnalyticsTrackers.standard.track(.screenshotOpenedWithoutShoppables)
         }
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -184,6 +186,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Produ
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.dismissOptions()
+        hideShareToDiscoverPrompt()
+        
     }
     
     func contentSizeCategoryDidChange(_ notification: Notification) {
@@ -469,7 +473,7 @@ private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if controller == self.screenshotController {
-            if let screenShot = self.screenshotController.first {
+            if let screenShot = self.screenshotController?.first {
                 if screenShot.shoppablesCount == 0 {
                     
                 }else if screenShot.shoppablesCount == -1 {
@@ -641,6 +645,22 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     func productsRatePositiveAction() {
         if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             shoppable.setRating(positive: true)
+            
+            let sharePrompt = ShareToDiscoverPrompt.init()
+            sharePrompt.translatesAutoresizingMaskIntoConstraints = false
+            sharePrompt.alpha = 0
+            self.view.addSubview(sharePrompt)
+            sharePrompt.addButton.addTarget(self, action: #selector(presentThankYouForSharingView), for: .touchUpInside)
+            sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
+            sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+            sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
+            sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
+            self.shareToDiscoverPrompt = sharePrompt
+            
+            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                sharePrompt.alpha = 1
+                self.shamrockButton?.alpha = 0
+            })
         }
     }
     
@@ -706,6 +726,35 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         self.productsRateNegativeFeedbackSubmitAction?.isEnabled = isEnabled
         
         return true
+    }
+}
+
+typealias ProductsViewControllerShareToDiscoverPrompt = ProductsViewController
+extension ProductsViewControllerShareToDiscoverPrompt {
+    func hideShareToDiscoverPrompt (){
+        UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            self.shareToDiscoverPrompt?.alpha = 0
+            self.shamrockButton?.alpha = 1
+        }) { completed in
+            self.shareToDiscoverPrompt?.removeFromSuperview()
+            self.shareToDiscoverPrompt = nil
+        }
+    }
+    
+    func presentThankYouForSharingView() {
+        self.hideShareToDiscoverPrompt()
+        
+        if let image = self.screenshot.uploadedImageURL {
+            NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
+        }
+        
+        let thankYou = ThankYouForSharingViewController()
+        thankYou.closeButton.addTarget(self, action: #selector(thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
+        self.present(thankYou, animated: true, completion: nil)
+    }
+    
+    func thankYouForSharingViewDidClose(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
     }
 }
 

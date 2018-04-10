@@ -43,6 +43,16 @@
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.title" = "Setup Email";
 
+
+"error.database_cant_load.title" = "Something Went Wrong";
+"error.database_cant_load.message" = "Try clearing some space on your device and reopening the app. If the problem persists, you should reset your app";
+"error.database_cant_load.button.try_again" = "Try Again";
+"error.database_cant_load.button.reset_app" = "Reset App";
+"error.database_cant_load.button.contact_support" = "Contact Support";
+"error.database_cant_load.button.reset_app.title" = "Reset App";
+"error.database_cant_load.button.reset_app.message" = "Are you sure? You'll lose all your screenshots.";
+"error.database_cant_load.button.reset_app.button.reset" = "Reset";
+
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
@@ -57,6 +67,7 @@
 
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
+"generic.close" = "Close";
 "generic.continue" = "Continue";
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";
@@ -164,6 +175,17 @@
 "screenshots.share.error.message" = "We could not find similar items to share.";
 "screenshots.share.error.title" = "Sorry";
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
+
+"share_to_discover.add_button" = "Add";
+"share_to_discover.share_icon" = "Post on Discover";
+"share_to_discover.text" = "Add this to Discover so other users can shop your screenshot!";
+"share_to_discover.after_share.text" = "Thanks for sharing! Add your screenshot to discover so other users can shop it, too!";
+"share_to_discover.thank_you_popup.title" = "Your screenshot was added to Discover!";
+"share_to_discover.thank_you_popup.message" = "Thanks for making the world a trendier place.";
+"share_to_discover.action_sheet.social" = "Post on Social";
+"share_to_discover.action_sheet.discover" = "Post on Discover";
+"share_to_discover.action_sheet.title" = "Share";
+"share_to_discover.action_sheet.message" = "Add this to Discover so other users can shop your screenshot!";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.in_app_purchase.restore" = "In app purchases have been restored successfully";

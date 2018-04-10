@@ -28,14 +28,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     // MARK: - Lifecycle
     
     init(delegate:ViewControllerLifeCycle) {
-        
         lifeCycleDelegate = delegate
         screenshotsNavigationController = ScreenshotsNavigationController()
         favoritesNavigationController = FavoritesNavigationController(nibName: nil, bundle: nil)
         discoverNavigationController = DiscoverNavigationController(nibName: nil, bundle: nil)
         settingsNavigationController = SettingsNavigationController(nibName: nil, bundle: nil)
         settingsTabBarItem = settingsNavigationController.tabBarItem
-
+        
+        // Important to note that super.init will call viewDidLoad before completing the init
         super.init(nibName: nil, bundle: nil)
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
@@ -57,10 +57,12 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
         
-        self.viewControllers = [self.screenshotsNavigationController,
-                                self.favoritesNavigationController,
-                                self.discoverNavigationController,
-                                self.settingsNavigationController]
+        self.viewControllers = [
+            self.screenshotsNavigationController,
+            self.favoritesNavigationController,
+            self.discoverNavigationController,
+            self.settingsNavigationController
+        ]
         
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)

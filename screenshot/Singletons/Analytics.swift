@@ -104,11 +104,8 @@ public enum AnalyticsEvent : String {
 
 
 public class AnalyticsUser : NSObject {
-    static var current: AnalyticsUser? {
-        guard let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) else {
-            return nil
-        }
-        
+    static var current: AnalyticsUser {
+        let name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
         let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
         return AnalyticsUser(name: name, email: email)
     }
@@ -121,8 +118,12 @@ public class AnalyticsUser : NSObject {
         self.name = name
         self.email = (email?.count ?? 0 > 0) ? email : nil
         
-        let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID)
-        identifier = persistedID ?? UUID().uuidString
+        let persistedID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? {
+            let id = UUID().uuidString
+            UserDefaults.standard.setValue(id, forKey: UserDefaultsKeys.userID)
+            return id
+        }()
+        identifier = persistedID
     }
     
     var analyticsProperties: [String : String] {
@@ -303,9 +304,7 @@ extension AnalyticsTracker {
     }
     
     func trackUserAge() {
-        guard let current = AnalyticsUser.current else {
-            return
-        }
+        let current = AnalyticsUser.current
         
         track( .userAge, properties: ["age": userAge()])
         identify(current)
@@ -340,10 +339,20 @@ extension AnalyticsTracker {
     }
     
     func trackTappedOnProduct(_ product: Product, onPage page: String) {
+        let screenshot = product.shoppable?.screenshot ?? product.screenshot
         let merchant = product.merchant ?? ""
         let brand = product.brand?.lowercased() ?? ""
         let offer = product.offer ?? ""
         let imageURL = product.imageURL ?? ""
+        let screenshotURL = screenshot?.uploadedImageURL ?? ""
+        let screenshotID: String
+        if let isFromShare = screenshot?.isFromShare,
+          isFromShare,
+          let assetId = screenshot?.assetId {
+            screenshotID = assetId
+        } else {
+            screenshotID =  ""
+        }
         let sale = product.isSale()
 
         track(.tappedOnProduct, properties: [
@@ -351,6 +360,8 @@ extension AnalyticsTracker {
             "brand" : brand,
             "url" : offer,
             "imageUrl" : imageURL,
+            "screenshotURL" : screenshotURL,
+            "screenshotID" : screenshotID,
             "sale" : sale,
             "page" : page
         ])
