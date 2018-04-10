@@ -16,6 +16,9 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
     let paymentControl: UIControl = Control()
     let cardLabel = UILabel()
     let itemsPriceLabel = UILabel()
+    let shippingPriceLabel = UILabel()
+    let beforeTaxPriceLabel = UILabel()
+    let estimateTaxLabel = UILabel()
     let itemsLabel = UILabel()
     let tableView: UITableView = AutoresizingTableView()
     let orderButton = MainButton()
@@ -178,12 +181,27 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         let itemsKeyLabel = createSummaryKeyLabel()
         itemsKeyLabel.text = "Items:"
         itemsKeyLabel.topAnchor.constraint(equalTo: paymentControl.bottomAnchor, constant: summaryView.layoutMargins.top).isActive = true
-        itemsKeyLabel.bottomAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.bottomAnchor).isActive = true
         
         setSummaryValueLabel(itemsPriceLabel, with: itemsKeyLabel)
-        itemsPriceLabel.text = "$117"
         
+        let shippingKeyLabel = createSummaryKeyLabel()
+        shippingKeyLabel.text = "Shipping & handling:"
+        shippingKeyLabel.topAnchor.constraint(equalTo: itemsPriceLabel.bottomAnchor).isActive = true
         
+        setSummaryValueLabel(shippingPriceLabel, with: shippingKeyLabel)
+        
+        let beforeTaxKeyLabel = createSummaryKeyLabel()
+        beforeTaxKeyLabel.text = "Total before tax:"
+        beforeTaxKeyLabel.topAnchor.constraint(equalTo: shippingPriceLabel.bottomAnchor).isActive = true
+        
+        setSummaryValueLabel(beforeTaxPriceLabel, with: beforeTaxKeyLabel)
+        
+        let estimateTaxKeyLabel = createSummaryKeyLabel()
+        estimateTaxKeyLabel.text = "Estimated tax to be collected:"
+        estimateTaxKeyLabel.topAnchor.constraint(equalTo: beforeTaxPriceLabel.bottomAnchor).isActive = true
+        
+        setSummaryValueLabel(estimateTaxLabel, with: estimateTaxKeyLabel)
+        estimateTaxLabel.bottomAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.bottomAnchor).isActive = true
         
         itemsLabel.translatesAutoresizingMaskIntoConstraints = false
         itemsLabel.text = "Items"
@@ -198,11 +216,11 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         itemsLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = .green
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = false
         tableView.separatorInset = .zero
         tableView.separatorColor = .cellBorder
+        tableView.allowsSelection = false
         tableView.layer.borderColor = UIColor.cellBorder.cgColor
         tableView.layer.borderWidth = 1
         tableView.layer.cornerRadius = .defaultCornerRadius
@@ -353,6 +371,10 @@ class CheckoutOrderViewController: BaseViewController {
         _view.nameLabel.text = "Corey Werner"
         _view.addressLabel.text = "326 N. Blaine Ave, Santa Rosa, CA  80002"
         _view.cardLabel.text = "Visa ending in …4568"
+        _view.itemsPriceLabel.text = "$117"
+        _view.shippingPriceLabel.text = "$8.42"
+        _view.beforeTaxPriceLabel.text = "$125.42"
+        _view.estimateTaxLabel.text = "6"
         
         tableView.dataSource = self
         tableView.delegate = self
