@@ -102,6 +102,70 @@ public enum AnalyticsEvent : String {
     case wokeFromSilentPush = "Woke From Silent Push"
 }
 
+class Analytics {
+    func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        
+        
+        return properties
+    }
+    
+    func propertiesFor(_ screenshot:Screenshot) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        if let uploadedImageURL = screenshot.uploadedImageURL {
+            properties["screenshot-imageURL"] = uploadedImageURL
+        }
+        
+        
+        return properties
+    }
+    func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        
+        if let offersURL = shoppable.offersURL {
+            properties["shoppable-offerURL"] = offersURL
+        }
+        if let category = shoppable.label {
+            properties["shoppable-category"] = category
+        }
+        
+        
+        if let screenshot = shoppable.screenshot {
+            propertiesFor(screenshot).forEach { properties[$0] = $1 }
+        }
+        
+        return properties
+    }
+    func propertiesFor(_ product:Product) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        if let brand = product.brand {
+            properties["product-brand"] = brand
+        }
+        if let merchant = product.merchant {
+            properties["product-merchant"] = merchant
+        }
+        properties["product-isSale"] = product.isSale()
+        properties["product-isFavorite"] = product.isFavorite
+        if let offerURL = product.offer {
+            properties["product-offerURL"] = offerURL
+            
+        }
+        
+        let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
+        properties["product-filter-size"] = options.size.analyticsStringValue
+        properties["product-filter-gender"] = options.gender.analyticsStringValue
+        properties["product-filter-category"] = options.category.analyticsStringValue
+        
+        /*  
+         price normalized to USD
+         */
+        if let shoppable = product.shoppable{
+            propertiesFor(shoppable).forEach { properties[$0] = $1 }
+        }
+        
+        return properties
+    }
+}
 
 public class AnalyticsUser : NSObject {
     static var current: AnalyticsUser {
