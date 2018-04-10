@@ -14,22 +14,27 @@ protocol DynamicTypeAccessibilityLayout {
 }
 
 extension DynamicTypeAccessibilityLayout {
-    func adjustDynamicTypeLayout(traitCollection: UITraitCollection, previousTraitCollection: UITraitCollection?) {
-        guard let previousContentSizeCategory = previousTraitCollection?.preferredContentSizeCategory else {
-            return
+    private func adjustConstraints(with isAccessibilityCategory: Bool) {
+        if isAccessibilityCategory {
+            NSLayoutConstraint.deactivate(fontSizeStandardRangeConstraints)
+            NSLayoutConstraint.activate(fontSizeAccessibilityRangeConstraints)
         }
-        
+        else {
+            NSLayoutConstraint.deactivate(fontSizeAccessibilityRangeConstraints)
+            NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
+        }
+    }
+    
+    func adjustDynamicTypeLayout(traitCollection: UITraitCollection, previousTraitCollection: UITraitCollection?) {
         let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
         
-        if previousContentSizeCategory.isAccessibilityCategory != isAccessibilityCategory {
-            if isAccessibilityCategory {
-                NSLayoutConstraint.deactivate(fontSizeStandardRangeConstraints)
-                NSLayoutConstraint.activate(fontSizeAccessibilityRangeConstraints)
+        if let previousContentSizeCategory = previousTraitCollection?.preferredContentSizeCategory {
+            if previousContentSizeCategory.isAccessibilityCategory != isAccessibilityCategory {
+                adjustConstraints(with: isAccessibilityCategory)
             }
-            else {
-                NSLayoutConstraint.deactivate(fontSizeAccessibilityRangeConstraints)
-                NSLayoutConstraint.activate(fontSizeStandardRangeConstraints)
-            }
+        }
+        else {
+            adjustConstraints(with: isAccessibilityCategory)
         }
     }
 }

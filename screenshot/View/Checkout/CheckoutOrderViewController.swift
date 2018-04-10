@@ -8,16 +8,22 @@
 
 import UIKit
 
-class CheckoutOrderView: UIScrollView {
+class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
     let orderLabel = UILabel()
     let shippingControl: UIControl = Control()
     let nameLabel = UILabel()
     let addressLabel = UILabel()
+    let paymentControl: UIControl = Control()
+    let cardLabel = UILabel()
+    let itemsPriceLabel = UILabel()
     let itemsLabel = UILabel()
     let tableView: UITableView = AutoresizingTableView()
     let orderButton = MainButton()
     let cancelButton = BorderButton()
     let legalTextView = UITextView()
+    
+    var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
+    var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
     
     // MARK: View
     
@@ -44,6 +50,8 @@ class CheckoutOrderView: UIScrollView {
         orderLabel.textColor = .gray3
         orderLabel.font = .screenshopFont(.hindLight, textStyle: .title2)
         orderLabel.adjustsFontForContentSizeCategory = true
+        orderLabel.minimumScaleFactor = 0.7
+        orderLabel.adjustsFontSizeToFitWidth = true
         addSubview(orderLabel)
         orderLabel.topAnchor.constraint(equalTo: topAnchor, constant: layoutMargins.top).isActive = true
         orderLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -62,28 +70,39 @@ class CheckoutOrderView: UIScrollView {
         summaryView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         summaryView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        shippingControl.translatesAutoresizingMaskIntoConstraints = false
-        summaryView.addSubview(shippingControl)
-        shippingControl.topAnchor.constraint(equalTo: summaryView.topAnchor).isActive = true
-        shippingControl.leadingAnchor.constraint(equalTo: summaryView.leadingAnchor).isActive = true
-        shippingControl.bottomAnchor.constraint(equalTo: summaryView.bottomAnchor).isActive = true
-        shippingControl.trailingAnchor.constraint(equalTo: summaryView.trailingAnchor).isActive = true
+        func setLabeledControl(_ control: UIControl) -> UILabel {
+            control.translatesAutoresizingMaskIntoConstraints = false
+            summaryView.addSubview(control)
+            control.leadingAnchor.constraint(equalTo: summaryView.leadingAnchor).isActive = true
+            control.trailingAnchor.constraint(equalTo: summaryView.trailingAnchor).isActive = true
+            
+            let borderView = BorderView(edge: .bottom)
+            borderView.backgroundColor = .cellBorder
+            control.addSubview(borderView)
+            
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.font = .screenshopFont(.hindSemibold, textStyle: .body)
+            label.adjustsFontForContentSizeCategory = true
+            label.minimumScaleFactor = 0.7
+            label.adjustsFontSizeToFitWidth = true
+            label.textColor = .gray3
+            control.addSubview(label)
+            label.topAnchor.constraint(equalTo: control.topAnchor, constant: summaryView.layoutMargins.top).isActive = true
+            label.leadingAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.leadingAnchor).isActive = true
+            label.trailingAnchor.constraint(equalTo: control.layoutMarginsGuide.trailingAnchor).isActive = true
+            return label
+        }
         
-        let shippingLabel = UILabel()
-        shippingLabel.translatesAutoresizingMaskIntoConstraints = false
-        shippingLabel.font = .screenshopFont(.hindSemibold, textStyle: .body)
-        shippingLabel.adjustsFontForContentSizeCategory = true
-        shippingLabel.textColor = .gray3
+        let shippingLabel = setLabeledControl(shippingControl)
         shippingLabel.text = "Shipping to:"
-        shippingControl.addSubview(shippingLabel)
-        shippingLabel.topAnchor.constraint(equalTo: shippingControl.topAnchor, constant: summaryView.layoutMargins.top).isActive = true
-        shippingLabel.leadingAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.leadingAnchor).isActive = true
-        shippingLabel.trailingAnchor.constraint(equalTo: shippingControl.layoutMarginsGuide.trailingAnchor).isActive = true
+        shippingControl.topAnchor.constraint(equalTo: summaryView.topAnchor).isActive = true
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textColor = .gray3
         nameLabel.font = .screenshopFont(.hindLight, textStyle: .callout)
         nameLabel.adjustsFontForContentSizeCategory = true
+        nameLabel.baselineAdjustment = .alignCenters
         shippingControl.addSubview(nameLabel)
         nameLabel.topAnchor.constraint(equalTo: shippingLabel.bottomAnchor).isActive = true
         nameLabel.leadingAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -93,6 +112,7 @@ class CheckoutOrderView: UIScrollView {
         addressLabel.textColor = .gray3
         addressLabel.font = .screenshopFont(.hindLight, textStyle: .callout)
         addressLabel.adjustsFontForContentSizeCategory = true
+        addressLabel.baselineAdjustment = .alignCenters
         addressLabel.numberOfLines = 0
         shippingControl.addSubview(addressLabel)
         addressLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor).isActive = true
@@ -100,11 +120,78 @@ class CheckoutOrderView: UIScrollView {
         addressLabel.bottomAnchor.constraint(equalTo: shippingControl.bottomAnchor, constant: -summaryView.layoutMargins.bottom).isActive = true
         addressLabel.trailingAnchor.constraint(equalTo: shippingControl.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        let paymentLabel = setLabeledControl(paymentControl)
+        paymentLabel.text = "Payment Method:"
+        paymentControl.topAnchor.constraint(equalTo: shippingControl.bottomAnchor).isActive = true
+        
+        cardLabel.translatesAutoresizingMaskIntoConstraints = false
+        cardLabel.textColor = .gray3
+        cardLabel.font = .screenshopFont(.hindLight, textStyle: .callout)
+        cardLabel.adjustsFontForContentSizeCategory = true
+        cardLabel.baselineAdjustment = .alignCenters
+        cardLabel.lineBreakMode = .byTruncatingMiddle // Card type and number should always be shown
+        paymentControl.addSubview(cardLabel)
+        cardLabel.topAnchor.constraint(equalTo: paymentLabel.bottomAnchor).isActive = true
+        cardLabel.leadingAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.leadingAnchor).isActive = true
+        cardLabel.bottomAnchor.constraint(equalTo: paymentControl.bottomAnchor, constant: -summaryView.layoutMargins.bottom).isActive = true
+        cardLabel.trailingAnchor.constraint(equalTo: paymentControl.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        func createSummaryKeyLabel() -> UILabel {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.textColor = .gray3
+            label.font = .screenshopFont(.hindLight, textStyle: .callout)
+            label.adjustsFontForContentSizeCategory = true
+            label.minimumScaleFactor = 0.7
+            label.adjustsFontSizeToFitWidth = true
+            label.baselineAdjustment = .alignCenters
+            summaryView.addSubview(label)
+            label.leadingAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.leadingAnchor).isActive = true
+            
+            fontSizeAccessibilityRangeConstraints += [
+                label.trailingAnchor.constraint(lessThanOrEqualTo: summaryView.layoutMarginsGuide.trailingAnchor)
+            ]
+            
+            return label
+        }
+        
+        func setSummaryValueLabel(_ label: UILabel, with keyLabel: UILabel) {
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.textColor = .gray3
+            label.font = .screenshopFont(.hindLight, textStyle: .callout)
+            label.adjustsFontForContentSizeCategory = true
+            label.baselineAdjustment = .alignCenters
+            summaryView.addSubview(label)
+            
+            fontSizeStandardRangeConstraints += [
+                label.topAnchor.constraint(equalTo: keyLabel.topAnchor),
+                label.leadingAnchor.constraint(greaterThanOrEqualTo: keyLabel.trailingAnchor, constant: .padding),
+                label.trailingAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.trailingAnchor)
+            ]
+            fontSizeAccessibilityRangeConstraints += [
+                label.topAnchor.constraint(equalTo: keyLabel.bottomAnchor),
+                label.leadingAnchor.constraint(equalTo: keyLabel.leadingAnchor),
+                label.trailingAnchor.constraint(lessThanOrEqualTo: summaryView.layoutMarginsGuide.trailingAnchor)
+            ]
+        }
+        
+        let itemsKeyLabel = createSummaryKeyLabel()
+        itemsKeyLabel.text = "Items:"
+        itemsKeyLabel.topAnchor.constraint(equalTo: paymentControl.bottomAnchor, constant: summaryView.layoutMargins.top).isActive = true
+        itemsKeyLabel.bottomAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.bottomAnchor).isActive = true
+        
+        setSummaryValueLabel(itemsPriceLabel, with: itemsKeyLabel)
+        itemsPriceLabel.text = "$117"
+        
+        
+        
         itemsLabel.translatesAutoresizingMaskIntoConstraints = false
         itemsLabel.text = "Items"
         itemsLabel.textColor = .gray3
         itemsLabel.font = .screenshopFont(.hindLight, textStyle: .title2)
         itemsLabel.adjustsFontForContentSizeCategory = true
+        itemsLabel.minimumScaleFactor = 0.7
+        itemsLabel.adjustsFontSizeToFitWidth = true
         addSubview(itemsLabel)
         itemsLabel.topAnchor.constraint(equalTo: summaryView.bottomAnchor, constant: .padding).isActive = true
         itemsLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -202,6 +289,12 @@ class CheckoutOrderView: UIScrollView {
         legalTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -layoutMargins.bottom).isActive = true
         legalTextView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        adjustDynamicTypeLayout(traitCollection: traitCollection, previousTraitCollection: previousTraitCollection)
+    }
 }
 
 fileprivate extension CheckoutOrderView {
@@ -259,6 +352,7 @@ class CheckoutOrderViewController: BaseViewController {
         
         _view.nameLabel.text = "Corey Werner"
         _view.addressLabel.text = "326 N. Blaine Ave, Santa Rosa, CA  80002"
+        _view.cardLabel.text = "Visa ending in …4568"
         
         tableView.dataSource = self
         tableView.delegate = self
