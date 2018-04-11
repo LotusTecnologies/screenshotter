@@ -239,6 +239,17 @@ class ShoppingCartModel {
                                 didChange = true
                             }
                         }
+                        // Save subtotal and shippingTotal to Cart object.
+                        if let cartObject = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
+                            cartObject.subtotal =  cart["subtotal"] as? Float
+                                                ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
+                            cartObject.shippingTotal = cart["shipping_total"] as? Float ?? 0
+                            print("Subtotal:\(cartObject.subtotal)  shippingTotal:\(cartObject.shippingTotal)")
+                            didChange = true
+                        } else {
+                            print("Failed to update subtotal and shippingTotal for cart remoteId:\(remoteId)")
+                        }
+                        
                         let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
                         if didChange {
                             managedObjectContext.saveIfNeeded()
