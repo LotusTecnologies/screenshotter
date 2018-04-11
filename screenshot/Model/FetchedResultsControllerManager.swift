@@ -85,8 +85,8 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
                 for index in indexPathsForSelectedItems {
                     if let cell = collectionView.cellForItem(at: index) {
                         cell.isSelected = true
-                        collectionView.selectItem(at: index, animated: false, scrollPosition: [])
                     }
+                    collectionView.selectItem(at: index, animated: false, scrollPosition: [])
                 }
             }
             
