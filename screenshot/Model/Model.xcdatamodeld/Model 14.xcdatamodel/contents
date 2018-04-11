@@ -25,6 +25,8 @@
         <attribute name="dateSubmitted" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isPastOrder" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="remoteId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shippingTotal" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="subtotal" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CartItem" inverseName="cart" inverseEntity="CartItem" syncable="YES"/>
     </entity>
     <entity name="CartItem" representedClassName="CartItem" syncable="YES" codeGenerationType="class">
@@ -139,7 +141,7 @@
     <elements>
         <element name="Address" positionX="522" positionY="225" width="128" height="165"/>
         <element name="Card" positionX="718" positionY="173" width="128" height="165"/>
-        <element name="Cart" positionX="297" positionY="423" width="128" height="118"/>
+        <element name="Cart" positionX="297" positionY="423" width="128" height="150"/>
         <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="540"/>
