@@ -260,14 +260,14 @@ extension AssetSyncModel {
                         return Promise(error: imageURLError)
                 }
                 return when(fulfilled:  NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURLString), Promise.init(value: screenshotDict))
-            }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
+            }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise<(NSManagedObject, [String : Any])> in
                 // Save screenshot to db.
                 return DataModel.sharedInstance.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: shareId,
                                                     createdAt: Date(),
                                                     isRecognized: true,
-                                                    isFromShare: true,
+                                                    source: .share,
                                                     isHidden: false,
                                                     imageData: imageData,
                                                     classification: nil)
@@ -425,7 +425,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 assetId: asset.localIdentifier,
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
-                                                                                isFromShare: false,
+                                                                                source: .gallery,
                                                                                 isHidden: isHidden,
                                                                                 imageData: imageData,
                                                                                 classification: classification)
@@ -963,7 +963,7 @@ extension AssetSyncModel {
                                                                  assetId: Constants.tutorialScreenshotAssetId,
                                                                  createdAt: Date(),
                                                                  isRecognized: true,
-                                                                 isFromShare: false,
+                                                                 source: .tutorial,
                                                                  isHidden: false,
                                                                  imageData: imageData,
                                                                  classification: nil)

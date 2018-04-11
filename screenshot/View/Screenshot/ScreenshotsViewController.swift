@@ -850,6 +850,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         cell.delegate = self
         cell.contentView.backgroundColor = collectionView.backgroundColor
         cell.isShamrock = screenshot?.isShamrockVersion ?? false
+        cell.likes = (arc4random_uniform(3) == 1) ? nil : Int(arc4random_uniform(120))
         cell.screenshot = screenshot
         cell.isBadgeEnabled = screenshot?.isNew ?? false
         cell.isEditing = self.isEditing

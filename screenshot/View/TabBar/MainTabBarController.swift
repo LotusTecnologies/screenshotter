@@ -187,6 +187,10 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            UserFeedback.shared.postNotifcation()
+        }
+
         return true
     }
     
