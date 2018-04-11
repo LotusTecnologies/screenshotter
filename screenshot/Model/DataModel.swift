@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import PromiseKit
+import SwiftKeychainWrapper
 
 
 class DataModel: NSObject {
@@ -759,7 +760,12 @@ extension DataModel {
             cardToSave.dateModified = now
             do {
                 try managedObjectContext.save()
-                // TODO: GMK Save number to keychain.
+                let key = cardToSave.cardNumberKeychainKey()
+                DispatchQueue.global(qos: .utility).async {
+                    let startKeychain = Date()
+                    let didSetCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
+                    print("GMK didSetCardNumber:\(didSetCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
             }
@@ -1578,6 +1584,19 @@ extension CartItem {
 
 extension Card {
     
+    func cardNumberKeychainKey() -> String {
+        return objectID.uriRepresentation().absoluteString
+    }
+    
+    func retrieveCardNumber() -> String? {
+        let key = cardNumberKeychainKey()
+        let startKeychain = Date()
+        let cardNumber = KeychainWrapper.standard.string(forKey: key)
+        let hasValue = cardNumber != nil && cardNumber?.isEmpty == false
+        print("GMK retrieveCardNumber hasValue:\(hasValue) took \(-startKeychain.timeIntervalSinceNow) seconds")
+        return cardNumber
+    }
+    
     func edit(fullName: String,
               number: String,
               expirationMonth: Int16,
@@ -1610,7 +1629,12 @@ extension Card {
             card.dateModified = NSDate()
             do {
                 try managedObjectContext.save()
-                // TODO: GMK Save number to keychain.
+                let key = self.cardNumberKeychainKey()
+                DispatchQueue.global(qos: .utility).async {
+                    let startKeychain = Date()
+                    let didUpdateCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
+                    print("GMK didUpdateCardNumber:\(didUpdateCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
             }
@@ -1624,10 +1648,15 @@ extension Card {
                 print("Card.delete failed to retrieve object with oid:\(oid)")
                 return
             }
+            let key = self.cardNumberKeychainKey()
             managedObjectContext.delete(card)
             do {
                 try managedObjectContext.save()
-                // TODO: GMK Delete number from keychain.
+                DispatchQueue.global(qos: .utility).async {
+                    let startKeychain = Date()
+                    let didDeleteCardNumber: Bool = KeychainWrapper.standard.removeObject(forKey: key)
+                    print("GMK didDeleteCardNumber:\(didDeleteCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
             }
