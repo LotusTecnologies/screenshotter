@@ -12,9 +12,11 @@
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		31518644203477DB001BD8D6 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518642203477DB001BD8D6 /* ProductsViewController.swift */; };
 		31518645203477DB001BD8D6 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */; };
+		317BFBB2207DFCD300E61D7C /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317BFBB1207DFCD300E61D7C /* Random.swift */; };
 		318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318FE265204C09C500277DD4 /* AsyncOperation.swift */; };
 		319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */; };
 		319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */; };
+		31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A0781A207E182100D70DC3 /* URL+craze.swift */; };
 		31A3374E203D9A6100FFD2F2 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */; };
 		31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
@@ -155,9 +157,11 @@
 		31518642203477DB001BD8D6 /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		31518643203477DB001BD8D6 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		3162AEDD207DD5B6008A746B /* Model 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 13.xcdatamodel"; sourceTree = "<group>"; };
+		317BFBB1207DFCD300E61D7C /* Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
 		318FE265204C09C500277DD4 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		319B030C2057AFCC00446054 /* ThankYouForSharingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThankYouForSharingViewController.swift; sourceTree = "<group>"; };
 		319B030D2057AFCC00446054 /* ShareToDiscoverPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareToDiscoverPrompt.swift; sourceTree = "<group>"; };
+		31A0781A207E182100D70DC3 /* URL+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+craze.swift"; sourceTree = "<group>"; };
 		31A3374D203D9A6100FFD2F2 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsNavigationController.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
@@ -744,6 +748,8 @@
 				52E547431FE2487B00627D6D /* ScreenshotHelper.swift */,
 				314C4889205E86E700B8381D /* PHAsset+craze.swift */,
 				E49261D5206A704C006FE84E /* UIImage+craze.swift */,
+				317BFBB1207DFCD300E61D7C /* Random.swift */,
+				31A0781A207E182100D70DC3 /* URL+craze.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -1095,6 +1101,7 @@
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
+				31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */,
 				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
@@ -1127,6 +1134,7 @@
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
+				317BFBB2207DFCD300E61D7C /* Random.swift in Sources */,
 				E4351D702031957800193657 /* MainTabBarController.swift in Sources */,
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,

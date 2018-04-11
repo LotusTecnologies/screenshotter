@@ -30,7 +30,7 @@ class UserFeedback  {
     }
     func postNotifcation(){
         if let viewController = AppDelegate.shared.window?.rootViewController {
-            let announcement = Announcement(title: "Betty White from conneticut", subtitle: "Liked a screenshot you shared", image: UIImage(named: "ShareToMatchsticksThumbsUp"))
+            let announcement = Announcement(title: "\(String.randomName()) from \(String.randomCity())", subtitle: "Liked a screenshot you shared", image: UIImage(named: "ShareToMatchsticksThumbsUp"))
             Whisper.show(shout: announcement, to: viewController, completion: {
                 print("The shout was silent.")
             })
@@ -53,18 +53,16 @@ class UserFeedback  {
             if let screenshot = context.screenshotWith(objectId: screenshotObjectId) {
                 context.saveIfNeeded()
                 DispatchQueue.main.async {
-                    if let viewController = AppDelegate.shared.window?.rootViewController {
-                        let announcement = Announcement(title: "Betty White from conneticut", subtitle: "Liked a screenshot you shared", image: UIImage(named: "ShareToMatchsticksThumbsUp"))
-                        Whisper.show(shout: announcement, to: viewController, completion: {
-                            print("The shout was silent.")
-                        })
-                    }
+                    self.postNotifcation()
+                   
                 }
             }
             
            
         }
-        
     }
-    
+
 }
+
+
+

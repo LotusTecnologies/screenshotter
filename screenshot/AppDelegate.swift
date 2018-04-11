@@ -109,8 +109,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
         }
         
+        
+        if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
+            let string = url.absoluteString
+            if string.contains("sendDebugInfo") {
+                sendDebugDataToDebugApp()
+            }
+        }
+
+        
         return true
     }
+    
+    func sendDebugDataToDebugApp(){
+        var paramsToSend:[String:String] = [:]
+        let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData
+        if let pushToken = pushTokenData?.description.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
+            paramsToSend["pushToken"] = pushToken
+        }
+        var screenshots:[String] = []
+        let screenShotsFrc = DataModel.sharedInstance.screenshotFrc(delegate: nil)
+        screenShotsFrc.fetchedObjects.forEach { (s) in
+            if s.submittedDate != nil {
+                if let screenshotId = s.screenshotId {
+                    screenshots.append("\(screenshotId)|\(s.submittedFeedbackCountGoal )")
+                }
+            }
+            
+        }
+        paramsToSend["screenshots"] = screenshots.joined(separator: ",")
+        
+        if let url = URL.urlWith(string: "crazeDebugApp://sendDebugInfo", queryParameters: paramsToSend) {
+        
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    
     var lastPresentedLowDiskSpaceWarning:Date?
     func presentLowDiskSpaceWarning(){
         
@@ -169,11 +205,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        
+        if url.absoluteString.contains("sendDebugInfo") {
+            sendDebugDataToDebugApp()
+            return true
+        }
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
+        
+        
         
         return handled
     }

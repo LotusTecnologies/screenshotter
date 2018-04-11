@@ -262,7 +262,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     var likes : Int?  = nil {
         didSet{
-            if let likesCount = likes {
+            if let likesCount = likes, likesCount > 0 {
                 self.createLikeCountViewIfNeeded()
                 self.likesCountView?.isHidden = false
                 if let label = self.likesCountView?.viewWithTag(100) as? UILabel{
