@@ -731,6 +731,7 @@ extension DataModel {
     
     func saveCard(fullName: String,
                   number: String,
+                  displayNumber: String,
                   expirationMonth: Int16,
                   expirationYear: Int16,
 //                cvv: Int16,
@@ -745,6 +746,7 @@ extension DataModel {
         performBackgroundTask { (managedObjectContext) in
             let cardToSave = Card(context: managedObjectContext)
             cardToSave.fullName = fullName
+            cardToSave.displayNumber = displayNumber
             cardToSave.expirationMonth = expirationMonth
             cardToSave.expirationYear = expirationYear
             cardToSave.street = street
@@ -1599,6 +1601,7 @@ extension Card {
     
     func edit(fullName: String,
               number: String,
+              displayNumber: String,
               expirationMonth: Int16,
               expirationYear: Int16,
 //              cvv: Int16,
@@ -1616,6 +1619,7 @@ extension Card {
                 return
             }
             card.fullName = fullName
+            card.displayNumber = displayNumber
             card.expirationMonth = expirationMonth
             card.expirationYear = expirationYear
             card.street = street
