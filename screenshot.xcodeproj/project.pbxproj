@@ -51,6 +51,8 @@
 		C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */; };
 		C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */; };
 		C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */; };
+		C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */; };
+		C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */; };
@@ -262,6 +264,8 @@
 		C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentListViewController.swift; sourceTree = "<group>"; };
 		C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutCreditCardTableViewCell.swift; sourceTree = "<group>"; };
 		C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCardValidator.swift; sourceTree = "<group>"; };
+		C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingListViewController.swift; sourceTree = "<group>"; };
+		C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingTableViewCell.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTableViewCell.swift; sourceTree = "<group>"; };
@@ -555,6 +559,8 @@
 				C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */,
 				C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */,
 				C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentViewController.swift */,
+				C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */,
+				C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */,
 				C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
 			);
@@ -1314,6 +1320,7 @@
 				C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				319B031320592A7700446054 /* ShowProduct.swift in Sources */,
+				C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */,
@@ -1388,6 +1395,7 @@
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
 				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,
 				C528006020516293004DD7A3 /* CheckoutWebViewController.swift in Sources */,
+				C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
 				C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */,

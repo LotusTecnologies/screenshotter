@@ -32,7 +32,8 @@ class CartNavigationController: UINavigationController {
         self.checkoutPaymentViewController = checkoutPaymentViewController
         
         viewControllers = [
-            CheckoutPaymentListViewController(),
+//            CheckoutPaymentListViewController(),
+            CheckoutShippingListViewController(),
 //            checkoutPaymentViewController,
 //            cartViewController
         ]

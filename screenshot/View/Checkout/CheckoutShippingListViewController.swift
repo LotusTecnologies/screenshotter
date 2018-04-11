@@ -1,15 +1,14 @@
 //
-//  CheckoutPaymentListViewController.swift
+//  CheckoutShippingListViewController.swift
 //  screenshot
 //
-//  Created by Corey Werner on 4/10/18.
+//  Created by Corey Werner on 4/11/18.
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
-import CreditCardValidator
 import UIKit
 
-class CheckoutPaymentListViewController: BaseViewController {
+class CheckoutShippingListViewController: BaseViewController {
     
     // MARK: View
     
@@ -28,7 +27,7 @@ class CheckoutPaymentListViewController: BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        title = "Payment Methods"
+        title = "Shipping Addresses"
         restorationIdentifier = String(describing: type(of: self))
     }
     
@@ -38,11 +37,11 @@ class CheckoutPaymentListViewController: BaseViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorInset = .zero
-        tableView.register(CheckoutCreditCardTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(CheckoutShippingTableViewCell.self, forCellReuseIdentifier: "cell")
         
         let addButton = UIButton()
         addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-        addButton.setTitle("Add a new card", for: .normal)
+        addButton.setTitle("Add a new shipping address", for: .normal)
         addButton.setTitleColor(.gray3, for: .normal)
         addButton.addTarget(self, action: #selector(addCreditCardAction), for: .touchUpInside)
         addButton.sizeToFit()
@@ -59,7 +58,7 @@ class CheckoutPaymentListViewController: BaseViewController {
     }
 }
 
-extension CheckoutPaymentListViewController: UITableViewDataSource {
+extension CheckoutShippingListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 2
     }
@@ -69,25 +68,28 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
         cell.backgroundColor = view.backgroundColor
         cell.selectionStyle = .none
         
-        if let cell = cell as? CheckoutCreditCardTableViewCell {
+        if let cell = cell as? CheckoutShippingTableViewCell {
             if indexPath.row == 0 {
                 cell.nameLabel.text = "Corey Werner"
+                cell.addressLabel.text = """
+                2337 S Broadway St
+                Apt 303
+                New York, NY 15522
+                """
             }
             else {
                 cell.nameLabel.text = "Herbert Neninger"
+                cell.addressLabel.text = """
+                455 Plummers Lane
+                New Haven, CT 65520
+                """
             }
-            
-            let month = 3
-            let year = 2019
-            
-            cell.setExpiration(month: month, year: year)
-            cell.isExpired = CreditCardValidator.shared.isExpired(month: month, year: year)
         }
         
         return cell
     }
 }
 
-extension CheckoutPaymentListViewController: UITableViewDelegate {
+extension CheckoutShippingListViewController: UITableViewDelegate {
     
 }
