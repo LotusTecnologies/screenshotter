@@ -149,6 +149,8 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         cartButtonShowConstraints = cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding)
         cartButtonShowConstraints?.isActive = true
+        
+        adjustDynamicTypeLayout(traitCollection: traitCollection)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

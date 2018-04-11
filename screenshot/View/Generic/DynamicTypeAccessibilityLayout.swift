@@ -25,15 +25,18 @@ extension DynamicTypeAccessibilityLayout {
         }
     }
     
+    func adjustDynamicTypeLayout(traitCollection: UITraitCollection) {
+        adjustConstraints(with: traitCollection.preferredContentSizeCategory.isAccessibilityCategory)
+    }
+    
     func adjustDynamicTypeLayout(traitCollection: UITraitCollection, previousTraitCollection: UITraitCollection?) {
+        guard let previousContentSizeCategory = previousTraitCollection?.preferredContentSizeCategory else {
+            return
+        }
+        
         let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
         
-        if let previousContentSizeCategory = previousTraitCollection?.preferredContentSizeCategory {
-            if previousContentSizeCategory.isAccessibilityCategory != isAccessibilityCategory {
-                adjustConstraints(with: isAccessibilityCategory)
-            }
-        }
-        else {
+        if previousContentSizeCategory.isAccessibilityCategory != isAccessibilityCategory {
             adjustConstraints(with: isAccessibilityCategory)
         }
     }

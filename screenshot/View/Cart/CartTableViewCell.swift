@@ -248,6 +248,8 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         removeButton.trailingAnchor.constraint(lessThanOrEqualTo: actionView.trailingAnchor).isActive = true
         removeButton.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
         removeButton.widthAnchor.constraint(greaterThanOrEqualTo: actionView.widthAnchor, multiplier: 0.5).isActive = true
+        
+        adjustDynamicTypeLayout(traitCollection: traitCollection)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
