@@ -49,18 +49,28 @@ class CheckoutOrderViewController: BaseViewController {
         _view.estimateTaxLabel.text = "6%"
         _view.totalPriceLabel.text = "$134.62"
         
+        _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
+        _view.shippingControl.addTarget(self, action: #selector(navigateToShippingList), for: .touchUpInside)
+        
+        // TODO: remove the tableview since its not being used for it reuse functionality. insert normal views
         tableView.dataSource = self
         tableView.register(CheckoutOrderItemTableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        _view.legalTextView.text = """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis risus eget urna mollis ornare vel eu leo. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-        
-        Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-        """
     }
     
     deinit {
         tableView.dataSource = nil
+    }
+    
+    // MARK: Navigation
+    
+    @objc fileprivate func navigateToPaymentList() {
+        let paymentListViewController = CheckoutPaymentListViewController()
+        navigationController?.pushViewController(paymentListViewController, animated: true)
+    }
+    
+    @objc fileprivate func navigateToShippingList() {
+        let shippingListViewController = CheckoutShippingListViewController()
+        navigationController?.pushViewController(shippingListViewController, animated: true)
     }
 }
 

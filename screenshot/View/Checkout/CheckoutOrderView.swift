@@ -313,6 +313,11 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         legalTextView.textColor = .gray3
         legalTextView.font = .screenshopFont(.hindLight, textStyle: .footnote)
         legalTextView.adjustsFontForContentSizeCategory = true
+        legalTextView.text = """
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis risus eget urna mollis ornare vel eu leo. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+        
+        Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+        """
         addSubview(legalTextView)
         legalTextView.topAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: .padding).isActive = true
         legalTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
