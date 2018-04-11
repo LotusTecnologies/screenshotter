@@ -1,7 +1,7 @@
 PODS:
   - Amplitude-iOS (4.1.0)
   - Analytics (3.6.9)
-  - Appsee (2.3.6)
+  - Appsee (2.4.1)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -12,6 +12,7 @@ PODS:
     - Branch/Core (= 0.24.1)
   - Branch/Core (0.24.1)
   - Clarifai-Apple-SDK (3.0.0-beta14)
+  - CreditCardValidator (0.4)
   - EggRating (0.1.5):
     - RateView
   - FBSDKCoreKit (4.31.1):
@@ -40,6 +41,7 @@ DEPENDENCIES:
   - Appsee
   - Branch
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
+  - CreditCardValidator
   - EggRating
   - FBSDKCoreKit
   - FBSDKLoginKit
@@ -51,13 +53,34 @@ DEPENDENCIES:
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Amplitude-iOS
+    - Analytics
+    - Appsee
+    - Bolts
+    - Branch
+    - Clarifai-Apple-SDK
+    - CreditCardValidator
+    - EggRating
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - FBSDKShareKit
+    - Intercom
+    - lottie-ios
+    - PromiseKit
+    - RateView
+    - SDWebImage
+    - Segment-Amplitude
+
 SPEC CHECKSUMS:
   Amplitude-iOS: c923c4a576698083c1cd05e45072c92d41e206bd
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
-  Appsee: 8b3eab549f4701befe537cab4aefd175421f6328
+  Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 8b59411a12867bde4fe8c9d3c0f107c5811e303e
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
+  CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
   FBSDKCoreKit: e08ccfcefa7bc1347a07c276dac9bf6c7fe57024
   FBSDKLoginKit: 99797ac39252fef6f72600b886f6ee60b4b29cab
@@ -69,6 +92,6 @@ SPEC CHECKSUMS:
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
 
-PODFILE CHECKSUM: c4ded11963e31cbf32336339e68e9aff2100faab
+PODFILE CHECKSUM: f10fec960fa4a33070b4c97678ac89ddfea0e2b2
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.0

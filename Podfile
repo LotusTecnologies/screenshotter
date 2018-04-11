@@ -19,6 +19,7 @@ def shared_pods
     pod 'Intercom'
     pod 'lottie-ios'
     pod 'Segment-Amplitude'
+    pod 'CreditCardValidator'
 end
 
 target 'screenshot' do

@@ -6,6 +6,7 @@
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
+import CreditCardValidator
 import UIKit
 
 class CheckoutPaymentListViewController: BaseViewController {
@@ -34,21 +35,6 @@ class CheckoutPaymentListViewController: BaseViewController {
         tableView.dataSource = nil
         tableView.delegate = nil
     }
-    
-    // MARK: Expiration
-    
-    let calendar = Calendar(identifier: .gregorian)
-    
-    /// month = xx; year = xxxx
-    func isExpired(month: Int, year: Int) -> Bool {
-        let current = calendar.dateComponents([.year, .month], from: Date())
-        
-        guard let currentMonth = current.month, let currentYear = current.year else {
-            return false
-        }
-        
-        return currentYear > year || (currentYear == year && currentMonth >= month)
-    }
 }
 
 extension CheckoutPaymentListViewController: UITableViewDataSource {
@@ -71,8 +57,9 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
             
             let month = 3
             let year = 2019
+            
             cell.setExpiration(month: month, year: year)
-            cell.isExpired = isExpired(month: month, year: year)
+            cell.isExpired = CreditCardValidator.shared.isExpired(month: month, year: year)
         }
         
         return cell
