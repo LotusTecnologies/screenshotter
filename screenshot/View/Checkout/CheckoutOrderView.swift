@@ -253,10 +253,17 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         orderButton.setTitle("Place Your Order", for: .normal)
         addSubview(orderButton)
         orderButton.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        orderButton.bottomAnchor.constraint(lessThanOrEqualTo: orderButtonHeightGuide.bottomAnchor).isActive = true
-        orderButton.bottomAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.bottomAnchor).isActive = true
         orderButton.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         orderButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        
+        if #available(iOS 11.0, *) {
+            orderButton.bottomAnchor.constraint(lessThanOrEqualTo: orderButtonHeightGuide.bottomAnchor).isActive = true
+            orderButton.bottomAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        }
+        else {
+            // iOS 10 will need more work to support this
+            orderButton.bottomAnchor.constraint(equalTo: orderButtonHeightGuide.bottomAnchor).isActive = true
+        }
         
         orderButtonHeightGuide.heightAnchor.constraint(equalTo: orderButton.heightAnchor).isActive = true
         

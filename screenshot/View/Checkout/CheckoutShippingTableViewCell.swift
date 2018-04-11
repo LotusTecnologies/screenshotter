@@ -19,8 +19,6 @@ class CheckoutShippingTableViewCell: CardTableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-//        cardView.heightAnchor.constraint(greaterThanOrEqualToConstant: 100).isActive = true
-        
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textColor = .gray3
         nameLabel.font = .screenshopFont(.hindLight, size: 16)

@@ -15,7 +15,7 @@ class ProductNextStepViewController: UIViewController {
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {

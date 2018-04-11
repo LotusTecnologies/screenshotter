@@ -9,6 +9,8 @@
 import UIKit
 
 class CheckoutOrderViewController: BaseViewController {
+    /// Remains valid through the checkout session.
+    var hasEnteredCVV = false
     
     // MARK: View
     
@@ -51,6 +53,8 @@ class CheckoutOrderViewController: BaseViewController {
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
         _view.shippingControl.addTarget(self, action: #selector(navigateToShippingList), for: .touchUpInside)
+        _view.orderButton.addTarget(self, action: #selector(orderAction), for: .touchUpInside)
+        _view.cancelButton.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
         
         // TODO: remove the tableview since its not being used for it reuse functionality. insert normal views
         tableView.dataSource = self
@@ -71,6 +75,32 @@ class CheckoutOrderViewController: BaseViewController {
     @objc fileprivate func navigateToShippingList() {
         let shippingListViewController = CheckoutShippingListViewController()
         navigationController?.pushViewController(shippingListViewController, animated: true)
+    }
+    
+    // MARK: Order
+    
+    @objc fileprivate func orderAction() {
+        if hasEnteredCVV {
+            
+        }
+        else {
+            let confirmPaymentViewController = CheckoutConfirmPaymentViewController()
+            confirmPaymentViewController.orderButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
+            confirmPaymentViewController.cancelButton.addTarget(self, action: #selector(confirmCancelAction), for: .touchUpInside)
+            present(confirmPaymentViewController, animated: true, completion: nil)
+        }
+    }
+    
+    @objc fileprivate func cancelAction() {
+        
+    }
+    
+    @objc fileprivate func confirmOrderAction() {
+        
+    }
+    
+    @objc fileprivate func confirmCancelAction() {
+        dismiss(animated: true, completion: nil)
     }
 }
 

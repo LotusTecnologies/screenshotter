@@ -162,8 +162,8 @@ class ShoppingCartModel {
                       let remoteId = cart["id"] as? String,
                       //let total = cart["total"] as? Float,
                       !remoteId.isEmpty else {
-                        print("ShoppingCartModel clearCart failed to extract cart id or merchants from dict:\(dict)")
-                        let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to extract cart id and total"])
+                        print("ShoppingCartModel validateCart failed to extract cart id from dict:\(dict)")
+                        let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel validateCart failed to extract cart id"])
                         reject(error)
                         return
                     }
@@ -171,8 +171,8 @@ class ShoppingCartModel {
                     dataModel.performBackgroundTask { managedObjectContext in
                         guard let cartItems = dataModel.retrieveItems(managedObjectContext: managedObjectContext, remoteId: remoteId),
                           cartItems.count > 0 else {
-                            print("ShoppingCartModel clearCart failed to retrieve items for cart remoteId:\(remoteId)")
-                            let error = NSError(domain: "Craze", code: 46, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to retrieve items"])
+                            print("ShoppingCartModel validateCart failed to retrieve items for cart remoteId:\(remoteId)")
+                            let error = NSError(domain: "Craze", code: 46, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel validateCart failed to retrieve items"])
                             reject(error)
                             return
                         }

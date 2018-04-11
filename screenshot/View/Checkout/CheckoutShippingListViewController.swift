@@ -37,6 +37,7 @@ class CheckoutShippingListViewController: BaseViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorInset = .zero
+        tableView.estimatedRowHeight = 120
         tableView.register(CheckoutShippingTableViewCell.self, forCellReuseIdentifier: "cell")
         
         let addButton = UIButton()

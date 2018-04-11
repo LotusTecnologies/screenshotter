@@ -38,6 +38,7 @@ class CheckoutPaymentListViewController: BaseViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorInset = .zero
+        tableView.estimatedRowHeight = 150
         tableView.register(CheckoutCreditCardTableViewCell.self, forCellReuseIdentifier: "cell")
         
         let addButton = UIButton()
