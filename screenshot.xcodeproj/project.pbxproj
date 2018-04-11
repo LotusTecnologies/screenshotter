@@ -47,6 +47,9 @@
 		C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */; };
 		C50DBB8A207CA36600BB206E /* CheckoutOrderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */; };
 		C50DBB8C207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */; };
+		C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */; };
+		C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */; };
+		C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */; };
@@ -254,6 +257,9 @@
 		C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoresizingTableView.swift; sourceTree = "<group>"; };
 		C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOrderView.swift; sourceTree = "<group>"; };
 		C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOrderItemTableViewCell.swift; sourceTree = "<group>"; };
+		C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardTableViewCell.swift; sourceTree = "<group>"; };
+		C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentListViewController.swift; sourceTree = "<group>"; };
+		C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutCreditCardTableViewCell.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTableViewCell.swift; sourceTree = "<group>"; };
@@ -541,9 +547,11 @@
 			isa = PBXGroup;
 			children = (
 				C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */,
+				C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */,
 				C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */,
 				C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */,
 				C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */,
+				C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */,
 				C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentViewController.swift */,
 				C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
@@ -782,6 +790,7 @@
 		C54088441FE90E2200198955 /* TableViewCell */ = {
 			isa = PBXGroup;
 			children = (
+				C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */,
 				C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */,
 			);
 			path = TableViewCell;
@@ -1297,6 +1306,7 @@
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
+				C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				319B031320592A7700446054 /* ShowProduct.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
@@ -1315,6 +1325,7 @@
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
+				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
@@ -1329,6 +1340,7 @@
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
+				C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
