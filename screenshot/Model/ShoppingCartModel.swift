@@ -153,9 +153,9 @@ class ShoppingCartModel {
         }
         // Wait for network to add items to remoteId.
             .then { jsonObject -> Promise<[String : Any]> in
-                return NetworkingPromise.sharedInstance.checkoutCart(jsonObject: jsonObject)
+                return NetworkingPromise.sharedInstance.validateCart(jsonObject: jsonObject)
         }
-        // Process cart checkout network response.
+        // Process cart validation network response.
             .then { dict -> Promise<Bool> in
                 return Promise { fulfill, reject in
                     guard let cart = dict["cart"] as? [String : Any],
