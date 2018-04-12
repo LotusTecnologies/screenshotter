@@ -13,6 +13,8 @@ class CheckoutConfirmPaymentViewController: UIViewController {
     let orderButton = MainButton()
     let cancelButton = UIButton()
     
+    fileprivate let cvvBorderColor: UIColor = .gray3
+    
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
     
     required init?(coder aDecoder: NSCoder) {
@@ -60,7 +62,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cvvTextField.font = .monospacedDigitSystemFont(ofSize: 20, weight: UIFontWeightMedium)
         cvvTextField.textColor = .gray3
         cvvTextField.delegate = self
-        cvvTextField.layer.borderColor = UIColor.gray3.cgColor
+        cvvTextField.layer.borderColor = cvvBorderColor.cgColor
         cvvTextField.layer.borderWidth = 1
         cvvTextField.layer.cornerRadius = .defaultCornerRadius
         cvvTextField.layer.masksToBounds = true
@@ -107,7 +109,6 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cancelButton.setTitleColor(.gray3, for: .normal)
         cancelButton.titleLabel?.font = .screenshopFont(.hindMedium, size: UIFont.buttonFontSize)
         cancelButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 0, bottom: 6, right: 0)
-        cancelButton.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
         view.addSubview(cancelButton)
         cancelButton.topAnchor.constraint(equalTo: orderButton.bottomAnchor, constant: .padding).isActive = true
         cancelButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
@@ -115,17 +116,30 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cancelButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        cvvTextField.resignFirstResponder()
+    }
+    
     @objc fileprivate func presentCVVExplanation() {
         // TODO:
     }
     
-    @objc fileprivate func cancelAction() {
-        cvvTextField.resignFirstResponder()
+    func displayCVVError() {
+        cvvTextField.text = nil
+        cvvTextField.layer.borderColor = UIColor.crazeRed.cgColor
+        
+        TapticHelper.nope()
     }
 }
 
 extension CheckoutConfirmPaymentViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if range.location == 0 && range.length == 0 {
+            cvvTextField.layer.borderColor = cvvBorderColor.cgColor
+        }
+        
         let length = (textField.text ?? "").count - range.length + string.count
         let cvvMaxLength = 4
         let isReturnKey = string.range(of: "\n") != nil

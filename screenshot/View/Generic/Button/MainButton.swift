@@ -65,7 +65,7 @@ class MainButton: LoadingButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
-                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter().withAlphaComponent(0.7)
+                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter()
             }
         }
     }

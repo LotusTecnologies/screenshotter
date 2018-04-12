@@ -12,6 +12,8 @@ class CheckoutOrderViewController: BaseViewController {
     /// Remains valid through the checkout session.
     var hasEnteredCVV = false
     
+    var confirmPaymentViewController: CheckoutConfirmPaymentViewController?
+    
     // MARK: View
     
     fileprivate var _view: CheckoutOrderView {
@@ -81,13 +83,14 @@ class CheckoutOrderViewController: BaseViewController {
     
     @objc fileprivate func orderAction() {
         if hasEnteredCVV {
-            
+            validateOrder()
         }
         else {
             let confirmPaymentViewController = CheckoutConfirmPaymentViewController()
             confirmPaymentViewController.orderButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
             confirmPaymentViewController.cancelButton.addTarget(self, action: #selector(confirmCancelAction), for: .touchUpInside)
             present(confirmPaymentViewController, animated: true, completion: nil)
+            self.confirmPaymentViewController = confirmPaymentViewController
         }
     }
     
@@ -96,11 +99,57 @@ class CheckoutOrderViewController: BaseViewController {
     }
     
     @objc fileprivate func confirmOrderAction() {
+        guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
+            confirmPaymentViewController?.displayCVVError()
+            return
+        }
         
+        // TODO: make model request to confirm pin matches the database
+        func pseudoValidateSelectedCreditCard(with cvv: String, _ callback: (Bool)->()) {
+            callback(true)
+        }
+        
+        if let cvv = confirmPaymentViewController?.cvvTextField.text {
+            pseudoValidateSelectedCreditCard(with: cvv) { isMatchingCVV in
+                if isMatchingCVV {
+                    dismiss(animated: true, completion: nil)
+                    confirmPaymentViewController = nil
+                    hasEnteredCVV = true
+                    validateOrder()
+                }
+                else {
+                    confirmPaymentViewController?.displayCVVError()
+                }
+            }
+        }
     }
     
     @objc fileprivate func confirmCancelAction() {
         dismiss(animated: true, completion: nil)
+    }
+    
+    fileprivate func validateOrder() {
+        _view.orderButton.isLoading = true
+        _view.orderButton.isEnabled = false
+        
+        // TODO: make model request to validate card.
+        func pseudoModelRequest(_ callback: @escaping (Bool)->()) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                callback(true)
+            }
+        }
+        
+        pseudoModelRequest { [weak self] isValid in
+            self?._view.orderButton.isLoading = false
+            self?._view.orderButton.isEnabled = true
+            
+            if isValid {
+                
+            }
+            else {
+                
+            }
+        }
     }
 }
 
