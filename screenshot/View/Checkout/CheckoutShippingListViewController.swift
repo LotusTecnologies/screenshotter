@@ -44,6 +44,9 @@ class CheckoutShippingListViewController: BaseViewController {
         addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         addButton.setTitle("Add a new shipping address", for: .normal)
         addButton.setTitleColor(.gray3, for: .normal)
+        addButton.setTitleColor(.black, for: .highlighted)
+        addButton.setImage(UIImage(named: "CheckoutLocation"), for: .normal)
+        addButton.adjustInsetsForImage(withPadding: 6)
         addButton.addTarget(self, action: #selector(addCreditCardAction), for: .touchUpInside)
         addButton.sizeToFit()
         tableView.tableFooterView = addButton

@@ -80,15 +80,6 @@ class MainButton: LoadingButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
-        
-        let imagePadding: CGFloat = 6
-        
-        imageEdgeInsets = UIEdgeInsets(top: 0, left: -imagePadding, bottom: 0, right: imagePadding / 2.0)
-        titleEdgeInsets = UIEdgeInsets(top: 0, left: imagePadding / 2.0, bottom: 0, right: -imagePadding)
-        
-        var contentInsets = contentEdgeInsets
-        contentInsets.left += imageEdgeInsets.right
-        contentInsets.right += titleEdgeInsets.left
-        contentEdgeInsets = contentInsets
+        adjustInsetsForImage(withPadding: 6)
     }
 }
