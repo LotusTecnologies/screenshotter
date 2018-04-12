@@ -313,6 +313,26 @@ class ShoppingCartModel {
         }
     }
     
+    func nativeCheckout(card: Card, shippingAddress: ShippingAddress) -> Promise<Bool> {
+        // Get cart remoteId, or error.
+        var rememberRemoteId = ""
+        let dataModel = DataModel.sharedInstance
+        return firstly {
+            dataModel.retrieveForNativeCheckout()
+            }
+            // Wait for network to return response for processing nativeCheckout.
+            .then { remoteId -> Promise<[String : Any]> in
+                rememberRemoteId = remoteId
+                return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, shippingAddress: shippingAddress)
+            }
+            //
+            .then { nativeCheckoutResponseDict -> Promise<Bool> in
+                print("nativeCheckoutResponseDict:\(nativeCheckoutResponseDict)")
+                self.hostedCompleted(remoteId: rememberRemoteId, from: "nativeCheckout")
+                return Promise(value: true) // TODO: GMK Change to Void? True if saved?
+        }
+    }
+    
     // MARK: Helper
     
     // Deletes variants if older than, say, an hour.

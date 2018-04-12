@@ -666,6 +666,22 @@ extension DataModel {
         }
     }
     
+    // Errors if cart has no remoteId.
+    func retrieveForNativeCheckout() -> Promise<String> {
+        return Promise { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                if let cart = self.retrieveAddableCart(managedObjectContext: managedObjectContext),
+                  let remoteId = cart.remoteId,
+                  !remoteId.isEmpty {
+                    fulfill(remoteId)
+                } else {
+                    let error = NSError(domain: "Craze", code: 80, userInfo: [NSLocalizedDescriptionKey : "nativeCheckout with no remoteId"])
+                    reject(error)
+                }
+            }
+        }
+    }
+    
     func add(remoteId: String, toCartOID: NSManagedObjectID) {
         performBackgroundTask { (managedObjectContext) in
             do {
