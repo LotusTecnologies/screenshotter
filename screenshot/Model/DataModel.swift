@@ -10,6 +10,14 @@ import UIKit
 import CoreData
 import PromiseKit
 
+enum ScreenshotSource : String {
+    case unknown
+    case discover
+    case gallery
+    case shuffle
+    case share
+    case tutorial
+}
 
 class DataModel: NSObject {
     
@@ -142,6 +150,23 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func screenshotBySourceFrc(sourse:ScreenshotSource, delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
+        let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
+        let notHidden = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
+        let fromSource:NSPredicate = {
+            if sourse == .unknown {
+                return NSPredicate.init(format: "sourseString == nil || sourceString == %@", sourse.rawValue)
+            }else {
+                return NSPredicate.init(format: "sourceString == %@", sourse.rawValue)
+            }
+        }()
+        request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [notHidden, fromSource])
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
     func singleScreenshotFrc(delegate:FetchedResultsControllerManagerDelegate?, screenshot:Screenshot) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
@@ -198,7 +223,7 @@ extension DataModel {
                         assetId: String,
                         createdAt: Date?,
                         isRecognized: Bool,
-                        isFromShare: Bool,
+                        source: ScreenshotSource,
                         isHidden: Bool,
                         imageData: Data?,
                         classification: String?) -> Screenshot {
@@ -208,7 +233,7 @@ extension DataModel {
             screenshotToSave.createdAt = nsDate
         }
         screenshotToSave.isRecognized = isRecognized
-        screenshotToSave.isFromShare = isFromShare
+        screenshotToSave.source = source
         screenshotToSave.isHidden = isHidden
         screenshotToSave.isNew = true
         if let nsData = imageData as NSData? {
@@ -239,35 +264,7 @@ extension DataModel {
     func retrieveHiddenAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
         return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isHidden == TRUE"))
     }
-    
-    func retrieveLastScreenshotAssetId(managedObjectContext: NSManagedObjectContext) -> String? {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
-        fetchRequest.predicate = NSPredicate(format: "isRecognized == TRUE AND isFromShare == FALSE AND isHidden == TRUE") // match uploadScreenshotWithClarifai
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        fetchRequest.fetchLimit = 1
-        fetchRequest.includesSubentities = false
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.includesPendingChanges = false
-        fetchRequest.propertiesToFetch = ["assetId"]
-        fetchRequest.returnsDistinctResults = true
-        fetchRequest.includesPropertyValues = true
-        fetchRequest.shouldRefreshRefetchedObjects = false
-        fetchRequest.returnsObjectsAsFaults = false
-        
-        do {
-            guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]],
-                let result = results.first,
-                let assetId = result["assetId"] else {
-                    print("retrieveLastScreenshotAssetId failed to fetch dictionaries")
-                    return nil
-            }
-            return assetId
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveAllAssetIds results with error:\(error)")
-        }
-        return nil
-    }
+ 
     
     func retrieveAssetIds(assetIds:[String], managedObjectContext: NSManagedObjectContext) -> Set<String> {
         let predicate = NSPredicate(format: "assetId IN %@", assetIds)
@@ -598,18 +595,6 @@ extension DataModel {
     }
     
     // Must be called on main.
-    public func countShared() -> Int {
-        let predicate = NSPredicate(format: "isFromShare == TRUE AND shoppablesCount > 0")
-        return countScreenshotWorkhorse(predicate: predicate)
-    }
-    
-    // Must be called on main.
-    public func countScreenshotted() -> Int {
-        let predicate = NSPredicate(format: "isFromShare == FALSE AND shoppablesCount > 0")
-        return countScreenshotWorkhorse(predicate: predicate)
-    }
-    
-    // Must be called on main.
     public func countTotalScreenshots() -> Int {
         let predicate = NSPredicate(format: "shoppablesCount > 0")
         return countScreenshotWorkhorse(predicate: predicate)
@@ -814,6 +799,18 @@ extension DataModel {
 
 extension Screenshot {
 
+    var source:ScreenshotSource {
+        get {
+            if let sourceString = self.sourceString,  let source = ScreenshotSource.init(rawValue: sourceString) {
+                return source
+            }else{
+                return .unknown
+            }
+        }
+        set (newValue){
+            self.sourceString = newValue.rawValue
+        }
+    }
     var isShamrockVersion:Bool {
         return self.assetId?.hasPrefix("shamrock") ?? false
     }
@@ -1227,7 +1224,7 @@ extension Matchstick {
                                                                    assetId: assetId,
                                                                    createdAt: Date(),
                                                                    isRecognized: true,
-                                                                   isFromShare: true,
+                                                                   source: .discover,
                                                                    isHidden: false,
                                                                    imageData: matchstick.imageData as Data?,
                                                                    classification: nil)
@@ -1332,6 +1329,22 @@ extension NSManagedObjectContext {
         screenshot.lastModified = NSDate()
         return screenshot
         
+    }
+    
+    func screenshotWith(screenshotId:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "screenshotId == %@", screenshotId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot screenshotId:\(screenshotId) results with error:\(error)")
+        }
+        return nil
     }
     func screenshotWith(assetId:String) -> Screenshot? {
         let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()

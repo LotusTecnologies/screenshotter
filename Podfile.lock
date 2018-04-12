@@ -34,6 +34,7 @@ PODS:
   - Segment-Amplitude (2.0.0):
     - Amplitude-iOS (~> 4.0)
     - Analytics (~> 3.6)
+  - Whisper (6.0.2)
 
 DEPENDENCIES:
   - Analytics (~> 3.0)
@@ -50,6 +51,7 @@ DEPENDENCIES:
   - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
+  - Whisper
 
 SPEC CHECKSUMS:
   Amplitude-iOS: c923c4a576698083c1cd05e45072c92d41e206bd
@@ -68,7 +70,8 @@ SPEC CHECKSUMS:
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
+  Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: c4ded11963e31cbf32336339e68e9aff2100faab
+PODFILE CHECKSUM: ba072fb252ce1babf919b36e83529452e10ccb17
 
 COCOAPODS: 1.4.0

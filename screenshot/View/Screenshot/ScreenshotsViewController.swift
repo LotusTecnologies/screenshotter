@@ -501,13 +501,12 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 self.present(alertController, animated: true, completion: nil)
                 return
             }
-            if let image = screenshot.uploadedImageURL {
+            if let image = screenshot.uploadedImageURL, screenshot.canSubmitToDiscover {
                 
                 let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
                 
                 alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
-                    NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
-                    
+                    screenshot.submitToDiscover()
                     let thankYou = ThankYouForSharingViewController()
                     thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
                     self.present(thankYou, animated: true, completion: nil)
@@ -850,6 +849,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         cell.delegate = self
         cell.contentView.backgroundColor = collectionView.backgroundColor
         cell.isShamrock = screenshot?.isShamrockVersion ?? false
+        cell.likes = Int(screenshot?.submittedFeedbackCount ?? 0)
         cell.screenshot = screenshot
         cell.isBadgeEnabled = screenshot?.isNew ?? false
         cell.isEditing = self.isEditing

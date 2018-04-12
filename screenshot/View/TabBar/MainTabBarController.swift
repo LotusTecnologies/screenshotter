@@ -187,6 +187,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
         }
+
         return true
     }
     

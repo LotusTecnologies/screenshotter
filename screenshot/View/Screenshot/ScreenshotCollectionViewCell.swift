@@ -28,6 +28,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     private let badge = UIView()
     private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
     private var shamrockView:UIView?
+    private var likesCountView:UIView?
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -111,6 +112,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         isBadgeEnabled = false
         selectedState = .none
         isShamrock = false
+        likes = nil
     }
     
     // MARK: Screenshot
@@ -158,6 +160,45 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         }
     }
     
+    private func createLikeCountViewIfNeeded() {
+        if self.likesCountView == nil {
+            let view = UIView.init()
+            view.backgroundColor = .white
+            view.layer.cornerRadius = 15
+            view.layer.borderColor = UIColor.gray6.cgColor
+            view.layer.borderWidth = .halfPoint
+            view.translatesAutoresizingMaskIntoConstraints = false
+            self.mainView.addSubview(view)
+            view.topAnchor.constraint(equalTo: mainView.topAnchor, constant:8).isActive = true
+            view.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant:10).isActive = true
+            view.heightAnchor.constraint(equalToConstant: 32).isActive = true
+            
+            let imageView = UIImageView.init(image: UIImage.init(named: "likeButtonSmallGreen"))
+            imageView.contentMode = .scaleAspectFit
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(imageView)
+            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant:10).isActive = true
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            imageView.widthAnchor.constraint(equalToConstant: 20.0).isActive = true
+            imageView.heightAnchor.constraint(equalToConstant: 18).isActive = true
+            
+            let label = UILabel.init()
+            label.textColor = .crazeGreen
+            label.tag = 100
+            label.textAlignment = .center
+            label.text = ""
+            label.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(label)
+            label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant:5).isActive = true
+            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:-10).isActive = true
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            
+            self.likesCountView = view
+            
+        }
+        
+    }
+    
     var selectedState: ScreenshotCollectionViewCellSelectedState = .none {
         didSet {
             syncSelectedState()
@@ -168,6 +209,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         imageView.alpha = 1
         badge.alpha = 1
         toolbar.alpha = isEditing ? 0 : 1
+        likesCountView?.alpha = isEditing ? 0 : 1
         checkImageView.alpha = 0
         isUserInteractionEnabled = true
     }
@@ -187,6 +229,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             imageView.alpha = 0.5
             badge.alpha = 0.5
             toolbar.alpha = toolbarAlpha
+            likesCountView?.alpha = toolbarAlpha
             checkImageView.alpha = 1
             isUserInteractionEnabled = true
             
@@ -194,6 +237,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             imageView.alpha = 0.5
             badge.alpha = 0.5
             toolbar.alpha = toolbarAlpha
+            likesCountView?.alpha = toolbarAlpha
             checkImageView.alpha = 0
             isUserInteractionEnabled = false
         }
@@ -216,6 +260,22 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     var isEditing = false {
         didSet {
             toolbar.alpha = isEditing ? 0 : 1
+            likesCountView?.alpha = isEditing ? 0 : 1
+        }
+    }
+    
+    var likes : Int?  = nil {
+        didSet{
+            if let likesCount = likes, likesCount > 0 {
+                self.createLikeCountViewIfNeeded()
+                self.likesCountView?.isHidden = false
+                if let label = self.likesCountView?.viewWithTag(100) as? UILabel{
+                    label.text = String(likesCount)
+                }
+                
+            }else{
+                self.likesCountView?.isHidden = true
+            }
         }
     }
     
