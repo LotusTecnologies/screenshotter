@@ -111,34 +111,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
-            let string = url.absoluteString
-            if string.contains("sendDebugInfo") {
-                sendDebugDataToDebugApp()
+            
+            if self.isSendToDebugURL(url) {
+                self.sendDebugDataToDebugApp(url:url)
+                return true
             }
         }
 
         
         return true
     }
-    
-    func sendDebugDataToDebugApp(){
+    func isSendToDebugURL(_ url:URL) -> Bool{
+        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other thrid parties
+        return url.absoluteString.contains("sendDebugInfo-b32963e7-ad86-4f80-8f2a-131d76ece793")
+
+    }
+    func sendDebugDataToDebugApp(url:URL){
+        let urlAbsoluteString = url.absoluteString
+
         var paramsToSend:[String:String] = [:]
         let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData
-        if let pushToken = pushTokenData?.description.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
-            paramsToSend["pushToken"] = pushToken
+        
+        if urlAbsoluteString.contains("pushToken") {
+            if let pushToken = pushTokenData?.description.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
+                paramsToSend["pushToken"] = pushToken
+            }
         }
-        var screenshots:[String] = []
-        let screenShotsFrc = DataModel.sharedInstance.screenshotFrc(delegate: nil)
-        screenShotsFrc.fetchedObjects.forEach { (s) in
-            if s.submittedDate != nil {
-                if let screenshotId = s.screenshotId {
-                    screenshots.append("\(screenshotId)|\(s.submittedFeedbackCountGoal )")
+        if urlAbsoluteString.contains("sharedScreenshots") {
+            var screenshots:[String] = []
+            let screenShotsFrc = DataModel.sharedInstance.screenshotFrc(delegate: nil)
+            screenShotsFrc.fetchedObjects.forEach { (s) in
+                if s.submittedDate != nil {
+                    if let screenshotId = s.screenshotId {
+                        screenshots.append("\(screenshotId)|\(s.submittedFeedbackCountGoal )")
+                    }
                 }
             }
-            
+            paramsToSend["sharedScreenshots"] = screenshots.joined(separator: ",")
         }
-        paramsToSend["screenshots"] = screenshots.joined(separator: ",")
-        
         if let url = URL.urlWith(string: "crazeDebugApp://sendDebugInfo", queryParameters: paramsToSend) {
         
             if UIApplication.shared.canOpenURL(url) {
@@ -206,10 +216,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         
-        if url.absoluteString.contains("sendDebugInfo") {
-            sendDebugDataToDebugApp()
+        if self.isSendToDebugURL(url) {
+            self.sendDebugDataToDebugApp(url:url)
             return true
         }
+        
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {

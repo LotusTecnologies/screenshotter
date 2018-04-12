@@ -264,35 +264,7 @@ extension DataModel {
     func retrieveHiddenAssetIds(managedObjectContext: NSManagedObjectContext) -> Set<String> {
         return retrieveAssetIds(managedObjectContext: managedObjectContext, predicate: NSPredicate(format: "isHidden == TRUE"))
     }
-    
-    func retrieveLastScreenshotAssetId(managedObjectContext: NSManagedObjectContext) -> String? {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest<NSFetchRequestResult>(entityName: "Screenshot")
-        fetchRequest.predicate = NSPredicate(format: "isRecognized == TRUE AND isFromShare == FALSE AND isHidden == TRUE") // match uploadScreenshotWithClarifai
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-        fetchRequest.fetchLimit = 1
-        fetchRequest.includesSubentities = false
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.includesPendingChanges = false
-        fetchRequest.propertiesToFetch = ["assetId"]
-        fetchRequest.returnsDistinctResults = true
-        fetchRequest.includesPropertyValues = true
-        fetchRequest.shouldRefreshRefetchedObjects = false
-        fetchRequest.returnsObjectsAsFaults = false
-        
-        do {
-            guard let results = try managedObjectContext.fetch(fetchRequest) as? [[String : String]],
-                let result = results.first,
-                let assetId = result["assetId"] else {
-                    print("retrieveLastScreenshotAssetId failed to fetch dictionaries")
-                    return nil
-            }
-            return assetId
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveAllAssetIds results with error:\(error)")
-        }
-        return nil
-    }
+ 
     
     func retrieveAssetIds(assetIds:[String], managedObjectContext: NSManagedObjectContext) -> Set<String> {
         let predicate = NSPredicate(format: "assetId IN %@", assetIds)
@@ -620,12 +592,6 @@ extension DataModel {
                 print("setNoShoppables assetId:\(assetId) results with error:\(error)")
             }
         }
-    }
-    
-    // Must be called on main.
-    public func countShared() -> Int {
-        let predicate = NSPredicate(format: "isFromShare == TRUE AND shoppablesCount > 0")
-        return countScreenshotWorkhorse(predicate: predicate)
     }
     
     // Must be called on main.

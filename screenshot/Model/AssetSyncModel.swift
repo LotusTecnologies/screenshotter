@@ -223,7 +223,6 @@ extension AssetSyncModel {
                             screenshot.isNew = true
                             screenshot.lastModified = now
                             screenshot.isRecognized = true
-                            screenshot.isFromShare = false
                             screenshot.isHidden = false
                             screenshot.imageData = imageData as NSData?
                             screenshot.source = .gallery

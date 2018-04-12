@@ -345,14 +345,8 @@ extension AnalyticsTracker {
         let offer = product.offer ?? ""
         let imageURL = product.imageURL ?? ""
         let screenshotURL = screenshot?.uploadedImageURL ?? ""
-        let screenshotID: String
-        if let isFromShare = screenshot?.isFromShare,
-          isFromShare,
-          let assetId = screenshot?.assetId {
-            screenshotID = assetId
-        } else {
-            screenshotID =  ""
-        }
+        let screenshotID = screenshot?.screenshotId ?? ""
+        
         let sale = product.isSale()
 
         track(.tappedOnProduct, properties: [
