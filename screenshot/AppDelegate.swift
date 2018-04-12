@@ -216,8 +216,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
-        
-        
         return handled
     }
     
