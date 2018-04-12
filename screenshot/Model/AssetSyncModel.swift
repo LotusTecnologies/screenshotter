@@ -1063,6 +1063,7 @@ extension Screenshot {
                         if let sucess = dictionary["success"] as? Bool, sucess, let matchstick =  dictionary["matchstick"] as? NSDictionary, let screenshotId = matchstick["screenshotId"] as? String {
                             screenshot.screenshotId = screenshotId
                             screenshot.submittedDate = now
+                            screenshot.submittedFeedbackCountDate = now
                             context.saveIfNeeded()
                             
                         }
