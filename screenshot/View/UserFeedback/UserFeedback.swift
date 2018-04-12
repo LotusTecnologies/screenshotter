@@ -87,7 +87,7 @@ class UserFeedback  {
                             if amountToShowOverTime > 0 {
                                 let toShowTimePeriod = d2.timeIntervalSinceReferenceDate - now.timeIntervalSinceReferenceDate
                                 if toShowTimePeriod > 0 {
-                                    eventsPerHour += Int(ceil((toShowTimePeriod / 60.0*60.0) / Double(amountToShowOverTime)))
+                                    eventsPerHour += Int(ceil(  (Double(amountToShowOverTime)*60*60)/toShowTimePeriod   ))
                                 }
                             }
                         }
