@@ -97,12 +97,14 @@ class UserFeedback  {
                 if eventsPerHour > 0 {
                     DispatchQueue.main.async {
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
-                            self.timerTriggered()
-                        })
                         let timerPeriod = min(60*5, max(5, 60*60/TimeInterval(eventsPerHour)))
                         self.timer = Timer.scheduledTimer(timeInterval:timerPeriod, target: self, selector: #selector(self.timerTriggered), userInfo: nil, repeats: true)
-                        
+                        if timerPeriod > 20 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+                                self.timerTriggered()
+                            })
+
+                        }
                     }
                 }
             }
