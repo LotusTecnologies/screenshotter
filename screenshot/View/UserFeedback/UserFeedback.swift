@@ -85,7 +85,10 @@ class UserFeedback  {
                             s.submittedFeedbackCount = c1 + amountToAdd
                             s.submittedFeedbackCountDate = now
                             if amountToShowOverTime > 0 {
-                                eventsPerHour += Int(ceil(Double(amountToShowOverTime) / (timePeriod / 60.0*60.0)))
+                                let toShowTimePeriod = d2.timeIntervalSinceReferenceDate - now.timeIntervalSinceReferenceDate
+                                if toShowTimePeriod > 0 {
+                                    eventsPerHour += Int(ceil((toShowTimePeriod / 60.0*60.0) / Double(amountToShowOverTime)))
+                                }
                             }
                         }
                     }
@@ -97,7 +100,7 @@ class UserFeedback  {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
                             self.timerTriggered()
                         })
-                        let timerPeriod = min(5, max(60*5, TimeInterval(eventsPerHour)/60*60))
+                        let timerPeriod = min(60*5, max(5, 60*60/TimeInterval(eventsPerHour)))
                         self.timer = Timer.scheduledTimer(timeInterval:timerPeriod, target: self, selector: #selector(self.timerTriggered), userInfo: nil, repeats: true)
                         
                     }
