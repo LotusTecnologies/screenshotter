@@ -10,7 +10,13 @@ import UIKit
 import CoreData
 import SDWebImage
 
+protocol CartViewControllerDelegate: NSObjectProtocol {
+    func cartViewControllerDidValidateCart(_ viewController: CartViewController)
+}
+
 class CartViewController: BaseViewController {
+    weak var delegate: CartViewControllerDelegate?
+    
     fileprivate let tableView = TableView(frame: .zero, style: .grouped)
     fileprivate let itemCountView = CartItemCountView()
     fileprivate let emptyListView = HelperView()
@@ -278,7 +284,7 @@ fileprivate extension CartViewControllerCheckout {
                     }
                     
                     strongSelf.dismissCheckoutLoader()
-                    strongSelf.pushCheckoutViewController()
+                    strongSelf.delegate?.cartViewControllerDidValidateCart(strongSelf)
                     
                     // TODO: coordinate the removal from model
 //                    ShoppingCartModel.shared.hostedUrl()
@@ -318,19 +324,6 @@ fileprivate extension CartViewControllerCheckout {
     }
     
     func pushCheckoutViewController() {
-        let hasPrimaryCard = true // TODO:
-        
-        if hasPrimaryCard {
-            let checkoutOrderViewController = CheckoutOrderViewController()
-            checkoutOrderViewController.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(checkoutOrderViewController, animated: true)
-        }
-        else {
-            let checkoutPaymentViewController = CheckoutPaymentViewController()
-            checkoutPaymentViewController.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(checkoutPaymentViewController, animated: true)
-        }
-        
         
         // TODO: remove relevant code
 //        let checkoutWebViewController = CheckoutWebViewController()
