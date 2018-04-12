@@ -81,7 +81,7 @@ class CartNavigationController: UINavigationController {
     }
     
     fileprivate func navigateToCheckoutShippingForm() {
-        pushViewController(CheckoutShippingViewController(), animated: true)
+        pushViewController(CheckoutShippingFormViewController(), animated: true)
     }
     
     fileprivate func navigateToCheckoutOrder() {

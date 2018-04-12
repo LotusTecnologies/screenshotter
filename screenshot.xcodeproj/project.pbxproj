@@ -83,7 +83,7 @@
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
 		C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */; };
 		C5406A83206B6858002977CE /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A82206B6858002977CE /* UIApplication.swift */; };
-		C5406A85206B7D85002977CE /* CheckoutShippingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */; };
+		C5406A85206B7D85002977CE /* CheckoutShippingFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A84206B7D85002977CE /* CheckoutShippingFormViewController.swift */; };
 		C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */; };
 		C540880D1FE90C8E00198955 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C21FE90C8D00198955 /* Loader.swift */; };
 		C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C31FE90C8D00198955 /* LoadingViewController.swift */; };
@@ -298,7 +298,7 @@
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
 		C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWebViewController.swift; sourceTree = "<group>"; };
 		C5406A82206B6858002977CE /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
-		C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingViewController.swift; sourceTree = "<group>"; };
+		C5406A84206B7D85002977CE /* CheckoutShippingFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingFormViewController.swift; sourceTree = "<group>"; };
 		C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTypeAccessibilityLayout.swift; sourceTree = "<group>"; };
 		C54087C21FE90C8D00198955 /* Loader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C54087C31FE90C8D00198955 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
@@ -562,11 +562,11 @@
 				C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */,
 				C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */,
 				C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */,
-				C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */,
 				C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */,
+				C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */,
+				C5406A84206B7D85002977CE /* CheckoutShippingFormViewController.swift */,
 				C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */,
 				C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */,
-				C5406A84206B7D85002977CE /* CheckoutShippingViewController.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
 			);
 			path = Checkout;
@@ -1462,7 +1462,7 @@
 				31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
-				C5406A85206B7D85002977CE /* CheckoutShippingViewController.swift in Sources */,
+				C5406A85206B7D85002977CE /* CheckoutShippingFormViewController.swift in Sources */,
 				C5E9241A2069149000D44FF9 /* FormView.swift in Sources */,
 				E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */,
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,

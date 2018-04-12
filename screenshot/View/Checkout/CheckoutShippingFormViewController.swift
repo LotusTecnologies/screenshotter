@@ -1,5 +1,5 @@
 //
-//  CheckoutShippingViewController.swift
+//  CheckoutShippingFormViewController.swift
 //  screenshot
 //
 //  Created by Corey Werner on 3/28/18.
@@ -20,7 +20,7 @@ enum CheckoutShippingFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutShippingViewController: FormViewController {
+class CheckoutShippingFormViewController: FormViewController {
     convenience init() {
         var formRows: [FormRow] = []
         
