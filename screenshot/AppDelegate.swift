@@ -67,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
-        UserFeedback.shared // only setups up notification for did enter foreground. does nothing now
+        UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
 
         return true
     }

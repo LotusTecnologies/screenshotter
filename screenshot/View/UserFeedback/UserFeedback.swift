@@ -21,6 +21,10 @@ class UserFeedback  {
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
     }
     
+    func applicationDidFinishLaunching() {
+        
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
