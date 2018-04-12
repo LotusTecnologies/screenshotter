@@ -29,31 +29,32 @@ class CheckoutPaymentFormViewController: FormViewController {
     let doneButton = MainButton()
     
     convenience init() {
-        var formRows: [FormRow] = []
+        var cardRows: [FormRow] = []
+        var billingRows: [FormRow] = []
         
         let cardName = FormRow.Text(CheckoutPaymentFormKeys.cardName.rawValue)
         cardName.placeholder = "Name on Card"
-        formRows.append(cardName)
+        cardRows.append(cardName)
         
         let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
         cardNumber.placeholder = "Card Number"
-        formRows.append(cardNumber)
+        cardRows.append(cardNumber)
         
         let exp = FormRow.Date(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
-        formRows.append(exp)
+        cardRows.append(exp)
         
-        let cvv = FormRow.Number(CheckoutPaymentFormKeys.cardCVV.rawValue)
+        let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
         cvv.placeholder = "CVV"
-        formRows.append(cvv)
+        cardRows.append(cvv)
         
         let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
         street.placeholder = "Street Address"
-        formRows.append(street)
+        billingRows.append(street)
         
         let city = FormRow.Text(CheckoutPaymentFormKeys.addressCity.rawValue)
         city.placeholder = "City"
-        formRows.append(city)
+        billingRows.append(city)
         
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
@@ -66,7 +67,7 @@ class CheckoutPaymentFormViewController: FormViewController {
             "Categat",
             "Pangea"
         ]
-        formRows.append(country)
+        billingRows.append(country)
         
         let state = FormRow.Selection(CheckoutPaymentFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
@@ -81,28 +82,32 @@ class CheckoutPaymentFormViewController: FormViewController {
             "Categat",
             "Pangea"
         ]
-        formRows.append(state)
+        billingRows.append(state)
         
         let zip = FormRow.Number(CheckoutPaymentFormKeys.addressZip.rawValue)
         zip.placeholder = "Zip Code"
-        formRows.append(zip)
+        billingRows.append(zip)
         
         let email = FormRow.Email(CheckoutPaymentFormKeys.email.rawValue)
         email.placeholder = "Email"
-        formRows.append(email)
+        billingRows.append(email)
         
         let phone = FormRow.Phone(CheckoutPaymentFormKeys.phoneNumber.rawValue)
         phone.placeholder = "Phone Number"
-        formRows.append(phone)
+        billingRows.append(phone)
         
         let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
         ship.placeholder = "Ship to this address"
-        formRows.append(ship)
+        billingRows.append(ship)
         
-        let section = FormSection()
-        section.rows = formRows
+        let cardSection = FormSection()
+        cardSection.rows = cardRows
         
-        self.init(with: Form(with: [section]))
+        let billingSection = FormSection()
+        billingSection.title = "BILLING ADDRESS"
+        billingSection.rows = billingRows
+        
+        self.init(with: Form(with: [cardSection, billingSection]))
         
         title = "Add A Card"
         restorationIdentifier = String(describing: type(of: self))

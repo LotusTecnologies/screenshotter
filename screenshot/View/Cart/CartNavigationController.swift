@@ -75,9 +75,9 @@ class CartNavigationController: UINavigationController {
         let checkoutPaymentFormViewController = CheckoutPaymentFormViewController()
         checkoutPaymentFormViewController.hidesBottomBarWhenPushed = true
         checkoutPaymentFormViewController.doneButton.addTarget(self, action: #selector(paymentFormCompleted), for: .touchUpInside)
-        self.checkoutPaymentFormViewController = checkoutPaymentFormViewController
-        
         pushViewController(checkoutPaymentFormViewController, animated: true)
+        
+        self.checkoutPaymentFormViewController = checkoutPaymentFormViewController
     }
     
     fileprivate func navigateToCheckoutShippingForm() {
@@ -86,8 +86,11 @@ class CartNavigationController: UINavigationController {
     
     fileprivate func navigateToCheckoutOrder() {
         let checkoutOrderViewController = CheckoutOrderViewController()
+        checkoutOrderViewController.cvv = cvv
         checkoutOrderViewController.hidesBottomBarWhenPushed = true
         pushViewController(checkoutOrderViewController, animated: true)
+        
+        cvv = nil
     }
 }
 

@@ -62,6 +62,11 @@ class Form {
 class FormSection {
     var title: String?
     var rows: [FormRow]?
+    
+    convenience init(with formRows: [FormRow]) {
+        self.init()
+        rows = formRows
+    }
 }
 
 class FormRow: NSObject {
@@ -109,6 +114,10 @@ extension FormRow {
         static func value(for bool: Bool?) -> String {
             return NSNumber(value: bool ?? false).stringValue
         }
+    }
+    
+    class CVV: Number {
+        
     }
     
     class Date: FormRow {

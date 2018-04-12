@@ -13,6 +13,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
     let orderButton = MainButton()
     let cancelButton = UIButton()
     
+    fileprivate let cvvTextFieldController = CreditCardTextFieldController(with: .cvv)
     fileprivate let cvvBorderColor: UIColor = .gray3
     
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
@@ -140,10 +141,6 @@ extension CheckoutConfirmPaymentViewController: UITextFieldDelegate {
             cvvTextField.layer.borderColor = cvvBorderColor.cgColor
         }
         
-        let length = (textField.text ?? "").count - range.length + string.count
-        let cvvMaxLength = 4
-        let isReturnKey = string.range(of: "\n") != nil
-        
-        return length <= cvvMaxLength || isReturnKey
+        return cvvTextFieldController.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
     }
 }

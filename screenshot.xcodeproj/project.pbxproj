@@ -55,6 +55,7 @@
 		C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */; };
 		C50E25F0207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */; };
 		C50E2614207F4B71003C8D24 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E2613207F4B71003C8D24 /* Button.swift */; };
+		C50E2617207F6703003C8D24 /* CreditCardTextFieldController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E2616207F6703003C8D24 /* CreditCardTextFieldController.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */; };
@@ -270,6 +271,7 @@
 		C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingTableViewCell.swift; sourceTree = "<group>"; };
 		C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmPaymentViewController.swift; sourceTree = "<group>"; };
 		C50E2613207F4B71003C8D24 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		C50E2616207F6703003C8D24 /* CreditCardTextFieldController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCardTextFieldController.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTableViewCell.swift; sourceTree = "<group>"; };
@@ -951,6 +953,7 @@
 		C5D57934203F043200A076FE /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				C50E2616207F6703003C8D24 /* CreditCardTextFieldController.swift */,
 				C5D57935203F044B00A076FE /* EmptyListController.swift */,
 			);
 			path = Controller;
@@ -1318,6 +1321,7 @@
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
+				C50E2617207F6703003C8D24 /* CreditCardTextFieldController.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,

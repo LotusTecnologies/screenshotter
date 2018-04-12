@@ -48,6 +48,24 @@ class FormCheckboxTableViewCell: UITableViewCell {
     }
 }
 
+class FormCVVTableViewCell: FormNumberTableViewCell, UITextFieldDelegate {
+    private let cvvTextFieldController = CreditCardTextFieldController(with: .cvv)
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        textField.delegate = self
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        return cvvTextFieldController.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+    }
+}
+
 class FormDateTableViewCell: UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

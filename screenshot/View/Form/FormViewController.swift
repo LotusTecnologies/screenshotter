@@ -53,7 +53,10 @@ class FormViewController: BaseViewController {
     
     init(with form: Form) {
         form.sections?.forEach({ section in
-            for index in (section.rows?.startIndex ?? 0)...(section.rows?.endIndex ?? 0) {
+            let startIndex = section.rows?.startIndex ?? 0
+            let endIndex = section.rows?.endIndex ?? 0
+            
+            for index in startIndex..<endIndex {
                 if let selectionRow = section.rows?[index] as? FormRow.Selection {
                     let selectionPickerRow = FormRow.SelectionPicker(with: selectionRow)
                     section.rows?.insert(selectionPickerRow, at: index + 1)
@@ -64,6 +67,8 @@ class FormViewController: BaseViewController {
         self.form = form
         
         super.init(nibName: nil, bundle: nil)
+        
+        restorationIdentifier = String(describing: type(of: self))
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChangeFrame(_:)), name: .UIKeyboardWillChangeFrame, object: nil)
     }
@@ -79,6 +84,7 @@ class FormViewController: BaseViewController {
         tableView.delegate = self
         tableViewRegister(FormCardTableViewCell.self, for: FormRow.Card.self)
         tableViewRegister(FormCheckboxTableViewCell.self, for: FormRow.Checkbox.self)
+        tableViewRegister(FormCVVTableViewCell.self, for: FormRow.CVV.self)
         tableViewRegister(FormDateTableViewCell.self, for: FormRow.Date.self)
         tableViewRegister(FormEmailTableViewCell.self, for: FormRow.Email.self)
         tableViewRegister(FormNumberTableViewCell.self, for: FormRow.Number.self)
@@ -115,12 +121,12 @@ class FormViewController: BaseViewController {
         if bottom > 0 {
             var _contentInset: UIEdgeInsets = .zero
             _contentInset.top = preservedContentInset?.top ?? 0
-            _contentInset.bottom = bottom - (preservedContentInset?.bottom ?? 0)
+            _contentInset.bottom = bottom + (preservedContentInset?.bottom ?? 0)
             contentInsets = _contentInset
             
             var _scrollIndicatorInsets: UIEdgeInsets = .zero
             _scrollIndicatorInsets.top = preservedScrollIndicatorInsets?.top ?? 0
-            _scrollIndicatorInsets.bottom = bottom - (preservedScrollIndicatorInsets?.bottom ?? 0)
+            _scrollIndicatorInsets.bottom = bottom + (preservedScrollIndicatorInsets?.bottom ?? 0)
             scrollIndicatorInsets = _scrollIndicatorInsets
         }
         else {
@@ -168,8 +174,16 @@ extension FormViewController: UITableViewDataSource {
         return cell
     }
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return form.sections?.count ?? 0
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return formSectionAt(section)?.rows?.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return formSectionAt(section)?.title
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -319,13 +333,23 @@ extension FormViewController: UITextFieldDelegate {
         }
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let indexPath = indexPath(for: textField) {
+            if let cell = tableView.cellForRow(at: indexPath) as? FormCVVTableViewCell {
+                return cell.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+            }
+        }
+        
+        return true
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField.returnKeyType == .next, let indexPath = indexPath(for: textField) {
             let total = tableView.numberOfRows(inSection: indexPath.section)
             let start = indexPath.row + 1
             
             if total > start {
-                for next in start...total {
+                for next in start..<total {
                     let nextIndexPath = IndexPath(row: next, section: indexPath.section)
                     
                     if let cell = tableView.cellForRow(at: nextIndexPath), cell.canBecomeFirstResponder {
