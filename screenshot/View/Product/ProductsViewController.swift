@@ -646,21 +646,23 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             shoppable.setRating(positive: true)
             
-            let sharePrompt = ShareToDiscoverPrompt.init()
-            sharePrompt.translatesAutoresizingMaskIntoConstraints = false
-            sharePrompt.alpha = 0
-            self.view.addSubview(sharePrompt)
-            sharePrompt.addButton.addTarget(self, action: #selector(presentThankYouForSharingView), for: .touchUpInside)
-            sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
-            sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-            sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
-            sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
-            self.shareToDiscoverPrompt = sharePrompt
-            
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
-                sharePrompt.alpha = 1
-                self.shamrockButton?.alpha = 0
-            })
+            if self.screenshot.canSubmitToDiscover {
+                let sharePrompt = ShareToDiscoverPrompt.init()
+                sharePrompt.translatesAutoresizingMaskIntoConstraints = false
+                sharePrompt.alpha = 0
+                self.view.addSubview(sharePrompt)
+                sharePrompt.addButton.addTarget(self, action: #selector(submitToDiscoverAndPresentThankYouForSharingView), for: .touchUpInside)
+                sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
+                sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+                sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
+                sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
+                self.shareToDiscoverPrompt = sharePrompt
+                
+                UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    sharePrompt.alpha = 1
+                    self.shamrockButton?.alpha = 0
+                })
+            }
         }
     }
     
@@ -741,12 +743,10 @@ extension ProductsViewControllerShareToDiscoverPrompt {
         }
     }
     
-    func presentThankYouForSharingView() {
+    func submitToDiscoverAndPresentThankYouForSharingView() {
         self.hideShareToDiscoverPrompt()
         
-        if let image = self.screenshot.uploadedImageURL {
-            NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
-        }
+        self.screenshot.submitToDiscover()
         
         let thankYou = ThankYouForSharingViewController()
         thankYou.closeButton.addTarget(self, action: #selector(thankYouForSharingViewDidClose(_:)), for: .touchUpInside)

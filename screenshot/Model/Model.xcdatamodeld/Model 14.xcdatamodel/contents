@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17D102" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17E199" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Cart" representedClassName="Cart" syncable="YES" codeGenerationType="class">
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateSubmitted" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -81,9 +81,18 @@
         <attribute name="isRecognized" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" elementID="isFashion" syncable="YES"/>
         <attribute name="lastFavorited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="screenshotId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shareLink" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shoppablesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sourceString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="submittedDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="submittedFeedbackCount" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="submittedFeedbackCountDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="submittedFeedbackCountGoal" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="submittedFeedbackCountGoalDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="syteJson" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="trackingInfo" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uploadedImageURL" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="favorites" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="screenshot" inverseEntity="Product" syncable="YES"/>
         <relationship name="shoppables" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Shoppable" inverseName="screenshot" inverseEntity="Shoppable" syncable="YES"/>
@@ -118,7 +127,7 @@
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="540"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
-        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="285"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="420"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="225"/>
         <element name="Variant" positionX="124" positionY="636" width="128" height="165"/>
     </elements>

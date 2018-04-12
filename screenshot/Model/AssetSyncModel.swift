@@ -1046,4 +1046,30 @@ extension Screenshot {
         return AnyPromise(share())
     }
     
+    public func submitToDiscover(){
+        let screenshot = self
+        let now = NSDate()
+        if let image = screenshot.uploadedImageURL {
+            let objectId = screenshot.objectID
+            let promise = NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
+            
+            promise.then { (dictionary) -> Void in
+                DataModel.sharedInstance.performBackgroundTask { (context) in
+                    if let screenshot = context.screenshotWith(objectId:objectId) {
+                        if let screenshotId = dictionary["screenshotId"] as? String {
+                            
+                            screenshot.screenshotId = screenshotId
+                        }
+                        screenshot.submittedDate = now
+                    }
+                }
+            }
+        }
+    }
+    var canSubmitToDiscover:Bool {
+        get{
+            return (source == .gallery || source == .share) && submittedDate == nil
+        }
+    }
+    
 }

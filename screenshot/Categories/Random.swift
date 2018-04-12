@@ -443,7 +443,8 @@ extension String {
         }
     }
     static func randomCity() -> String{
-        let cities = ["Los Angeles, California",
+        let cities = ["New York, New York",
+                      "Los Angeles, California",
                       "Chicago, Illinois",
                       "Houston, Texas",
                       "Philadelphia, Pennsylvania",
@@ -608,9 +609,9 @@ extension String {
                       "Rotherham",
                       "São Paulo, Brazil",
                       "Bombay, India",
-                      "JAKARTA, Indonesia",
+                      "Jakarta, Indonesia",
                       "Karachi, Pakistan",
-                      "MOSKVA (Moscow), Russia",
+                      "Moscow, Russia",
                       "Istanbul, Turkey",
                       "(Mexico City), Mexico",
                       "Shanghai, China",
@@ -638,7 +639,7 @@ extension String {
                       "Guangzhou, China",
                       "Singapore",
                       "Madras, India",
-                      "BAGHDAD, Iraq",
+                      "Baghdad, Iraq",
                       "Pusan, South Korea",
                       "Yokohama, Japan",
                       "Dhaka, Bangladesh",

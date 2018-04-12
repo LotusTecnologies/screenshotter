@@ -30,7 +30,9 @@ class UserFeedback  {
     }
     func postNotifcation(){
         if let viewController = AppDelegate.shared.window?.rootViewController {
-            let announcement = Announcement(title: "\(String.randomName()) from \(String.randomCity())", subtitle: "Liked a screenshot you shared", image: UIImage(named: "ShareToMatchsticksThumbsUp"))
+            let announcement = Announcement(title: "\(String.randomName()) from \(String.randomCity())", subtitle: "Added a screenshot you shared", image: UIImage(named: "ShareToMatchsticksThumbsUp"), duration:10.0, action:{
+                //notification was tapped
+            })
             Whisper.show(shout: announcement, to: viewController, completion: {
                 print("The shout was silent.")
             })
