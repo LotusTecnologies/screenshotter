@@ -209,6 +209,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         imageView.alpha = 1
         badge.alpha = 1
         toolbar.alpha = isEditing ? 0 : 1
+        likesCountView?.alpha = isEditing ? 0 : 1
         checkImageView.alpha = 0
         isUserInteractionEnabled = true
     }
@@ -228,6 +229,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             imageView.alpha = 0.5
             badge.alpha = 0.5
             toolbar.alpha = toolbarAlpha
+            likesCountView?.alpha = toolbarAlpha
             checkImageView.alpha = 1
             isUserInteractionEnabled = true
             
@@ -235,6 +237,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             imageView.alpha = 0.5
             badge.alpha = 0.5
             toolbar.alpha = toolbarAlpha
+            likesCountView?.alpha = toolbarAlpha
             checkImageView.alpha = 0
             isUserInteractionEnabled = false
         }
@@ -257,6 +260,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     var isEditing = false {
         didSet {
             toolbar.alpha = isEditing ? 0 : 1
+            likesCountView?.alpha = isEditing ? 0 : 1
         }
     }
     

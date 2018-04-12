@@ -47,8 +47,8 @@ extension Sequence {
 
 extension String {
     static func randomFemaleName() -> String{
-        let femaleNames = ["Aaliyah",",
-            ""Abby",
+        let femaleNames = ["Aaliyah",
+            "Abby",
             "Abigail",
             "Abril",
             "Ada",
@@ -141,7 +141,6 @@ extension String {
             "Amiya",
             "Amiyah",
             "Amy",
-            "Amy",
             "Amya",
             "Ana",
             "Anabella",
@@ -175,7 +174,6 @@ extension String {
             "Ansley",
             "Antonia",
             "Anya",
-            "April",
             "April",
             "Arabella",
             "Aranza",
@@ -347,7 +345,6 @@ extension String {
             "Coraline",
             "Cordelia",
             "Corinne",
-            "Courtney",
             "Courtney",
             "Crystal",
             "Cynthia",
