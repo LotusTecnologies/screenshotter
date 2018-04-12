@@ -200,7 +200,13 @@ extension AssetSyncModel {
                             screenshot.isHidden = false
                             screenshot.isRecognized = true
                             screenshot.lastModified = NSDate()
-
+                            screenshot.source = .gallery
+                            screenshot.submittedDate = nil
+                            screenshot.submittedFeedbackCount = 0
+                            screenshot.submittedFeedbackCountDate = nil
+                            screenshot.submittedFeedbackCountGoal = 0
+                            screenshot.submittedFeedbackCountDate = nil
+                            
                             managedObjectContext.saveIfNeeded()
                             fulfill((imageClassification, imageData))
                         }else{
@@ -220,6 +226,7 @@ extension AssetSyncModel {
                             screenshot.isFromShare = false
                             screenshot.isHidden = false
                             screenshot.imageData = imageData as NSData?
+                            screenshot.source = .gallery
                             
                             managedObjectContext.saveIfNeeded()
                             fulfill(ClarifaiModel.ImageClassification.human, imageData)
@@ -1010,23 +1017,21 @@ extension Screenshot {
         if let shareLink = self.shareLink {
             return Promise(value: shareLink)
         }
-        guard let assetId = self.assetId else {
-            let error = NSError(domain: "Craze", code: 14, userInfo: [NSLocalizedDescriptionKey: "share with no assetId"])
-            print(error)
-            return Promise(error: error)
-        }
         let dataModel = DataModel.sharedInstance
         let assetSyncModel = AssetSyncModel.sharedInstance
+        let objectId = self.objectID
+
         return firstly { _ -> Promise<(String, String)> in
             // Post to Craze server, which returns deep share link.
             return self.shareOrReshare()
             }.then(on: assetSyncModel.processingQ) { shareId, shareLink -> Promise<String> in
                 // Return the promise as soon as we have the shareLink, and concurrently or afterwards save shareLink to DB.
                 NSLog("shareId:\(shareId)  shareLink:\(shareLink)")
-                dataModel.performBackgroundTask { (managedObjectContext) in
-                    if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
+                dataModel.performBackgroundTask { (context) in
+                    if let screenshot = context.screenshotWith(objectId:objectId) {
                         screenshot.shareLink = shareLink
-                        managedObjectContext.saveIfNeeded()
+                        screenshot.shareId = shareId
+                        context.saveIfNeeded()
                     }
                 }
                 return Promise(value: shareLink)
@@ -1035,8 +1040,8 @@ extension Screenshot {
     
     private func shareOrReshare() -> Promise<(String, String)> {
         let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
-        if self.isFromShare {
-            return NetworkingPromise.sharedInstance.reshare(userName: userName, shareId: self.assetId)
+        if let shareId = self.shareId {
+            return NetworkingPromise.sharedInstance.reshare(userName: userName, shareId: shareId)
         } else {
             return NetworkingPromise.sharedInstance.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
         }
@@ -1056,19 +1061,21 @@ extension Screenshot {
             promise.then { (dictionary) -> Void in
                 DataModel.sharedInstance.performBackgroundTask { (context) in
                     if let screenshot = context.screenshotWith(objectId:objectId) {
-                        if let screenshotId = dictionary["screenshotId"] as? String {
-                            
+                        if let sucess = dictionary["success"] as? Bool, sucess, let matchstick =  dictionary["matchstick"] as? NSDictionary, let screenshotId = matchstick["screenshotId"] as? String {
                             screenshot.screenshotId = screenshotId
+                            screenshot.submittedDate = now
+                            context.saveIfNeeded()
+                            
                         }
-                        screenshot.submittedDate = now
                     }
                 }
             }
         }
     }
+    
     var canSubmitToDiscover:Bool {
         get{
-            return (source == .gallery || source == .share) && submittedDate == nil
+            return (source == .gallery || source == .share || source == .unknown) && submittedDate == nil
         }
     }
     

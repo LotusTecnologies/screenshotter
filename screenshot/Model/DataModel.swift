@@ -1364,6 +1364,22 @@ extension NSManagedObjectContext {
         return screenshot
         
     }
+    
+    func screenshotWith(screenshotId:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "screenshotId == %@", screenshotId)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot screenshotId:\(screenshotId) results with error:\(error)")
+        }
+        return nil
+    }
     func screenshotWith(assetId:String) -> Screenshot? {
         let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)

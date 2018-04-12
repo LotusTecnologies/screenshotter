@@ -481,26 +481,75 @@ extension AppDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
 
-        // Only spin up a background task if we are already in the background
-        if application.applicationState == .background {
-            if bgTask != UIBackgroundTaskInvalid {
-                application.endBackgroundTask(self.bgTask)
+        if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+            
+                likeUpdates.forEach({ (dict) in
+                    let period:TimeInterval? = {
+                        if let p = dict["periodS"] as? Double {
+                            return TimeInterval(p)
+                        }else if let p = dict["periodS"] as? Int {
+                            return TimeInterval(p)
+                        }else if let p = dict["periodS"] as? String {
+                            return TimeInterval(p)
+                        }
+                        return nil
+                    }()
+                    let likes:Int64? = {
+                        if let l = dict["likes"] as? Double {
+                            return Int64(l)
+                        }else if let l = dict["likes"] as? Int {
+                            return Int64(l)
+                        }else if let l = dict["likes"] as? String {
+                            return Int64(l)
+                        }
+                        return nil
+                    }()
+                    if let period = period,
+                        let screenshotId = dict["screenshotId"] as? String,
+                        let likes = likes {
+                        
+                        if let screenshot = context.screenshotWith(screenshotId: screenshotId){
+                            if screenshot.submittedDate != nil {
+                                screenshot.submittedFeedbackCountGoal = max(screenshot.submittedFeedbackCountGoal, likes)
+                                screenshot.submittedFeedbackCountGoalDate =  NSDate.init(timeIntervalSinceNow: period)
+                            }
+                        }
+                    }
+                })
+                
+                context.saveIfNeeded()
+                DispatchQueue.main.async {
+                    if UIApplication.shared.applicationState == .active {
+                        UserFeedback.shared.cancelNotifications()
+                        UserFeedback.shared.scheduleNotifications()
+                    }
+                   completionHandler(.newData)
+                }
+            }
+        }else{
+            
+            // Only spin up a background task if we are already in the background
+            if application.applicationState == .background {
+                if bgTask != UIBackgroundTaskInvalid {
+                    application.endBackgroundTask(self.bgTask)
+                }
+                
+                bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+                    // TODO: Call the completion handler when the sync is done.
+                    // TODO: Provide the correct background fetch result to the completionHandler.
+                    application.endBackgroundTask(self.bgTask)
+                    self.bgTask = UIBackgroundTaskInvalid
+                    
+                    completionHandler(.newData)
+                })
+            } else {
+                completionHandler(.noData)
             }
             
-            bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
-                // TODO: Call the completion handler when the sync is done.
-                // TODO: Provide the correct background fetch result to the completionHandler.
-                application.endBackgroundTask(self.bgTask)
-                self.bgTask = UIBackgroundTaskInvalid
-                
-                completionHandler(.newData)
-            })
-        } else {
-            completionHandler(.noData)
+            IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
+            Branch.getInstance().handlePushNotification(userInfo)
         }
-        
-        IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
-        Branch.getInstance().handlePushNotification(userInfo)
     }
 }
 
