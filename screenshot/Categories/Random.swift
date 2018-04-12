@@ -1281,7 +1281,7 @@ extension String {
 
     }
     static func randomName() -> String{
-        let percentFemale:Double = 0.8
+        let percentFemale:Double = 0.9
         let max = 10000
         
         let isFemale = (arc4random_uniform(10000) < Int(Double(max) * percentFemale))
