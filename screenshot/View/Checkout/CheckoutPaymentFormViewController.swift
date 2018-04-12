@@ -1,5 +1,5 @@
 //
-//  CheckoutPaymentViewController.swift
+//  CheckoutPaymentFormViewController.swift
 //  screenshot
 //
 //  Created by Corey Werner on 4/8/18.
@@ -25,7 +25,7 @@ enum CheckoutPaymentFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutPaymentViewController: FormViewController {
+class CheckoutPaymentFormViewController: FormViewController {
     let doneButton = MainButton()
     
     convenience init() {

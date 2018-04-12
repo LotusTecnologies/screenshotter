@@ -10,7 +10,7 @@ import UIKit
 
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
-    fileprivate var checkoutPaymentViewController: CheckoutPaymentViewController?
+    fileprivate var checkoutPaymentFormViewController: CheckoutPaymentFormViewController?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -47,13 +47,13 @@ class CartNavigationController: UINavigationController {
     private var cvv: String?
     
     @objc fileprivate func paymentFormCompleted() {
-        guard let checkoutPaymentViewController = checkoutPaymentViewController,
-            let shipRow = checkoutPaymentViewController.form.map?[CheckoutPaymentFormKeys.addressShip.rawValue]
+        guard let checkoutPaymentFormViewController = checkoutPaymentFormViewController,
+            let shipRow = checkoutPaymentFormViewController.form.map?[CheckoutPaymentFormKeys.addressShip.rawValue]
             else {
                 return
         }
         
-        if let cvvRow = checkoutPaymentViewController.form.map?[CheckoutPaymentFormKeys.cardCVV.rawValue] {
+        if let cvvRow = checkoutPaymentFormViewController.form.map?[CheckoutPaymentFormKeys.cardCVV.rawValue] {
             cvv = cvvRow.value
         }
         
@@ -66,18 +66,18 @@ class CartNavigationController: UINavigationController {
             navigateToCheckoutShippingForm()
         }
         
-        //        self.checkoutPaymentViewController = nil // ???: when should the vc be removed
+        //        checkoutPaymentFormViewController = nil // ???: when should the vc be removed
     }
     
     // MARK: Navigation
     
     fileprivate func navigateToCheckoutPaymentForm() {
-        let checkoutPaymentViewController = CheckoutPaymentViewController()
-        checkoutPaymentViewController.hidesBottomBarWhenPushed = true
-        checkoutPaymentViewController.doneButton.addTarget(self, action: #selector(paymentFormCompleted), for: .touchUpInside)
-        self.checkoutPaymentViewController = checkoutPaymentViewController
+        let checkoutPaymentFormViewController = CheckoutPaymentFormViewController()
+        checkoutPaymentFormViewController.hidesBottomBarWhenPushed = true
+        checkoutPaymentFormViewController.doneButton.addTarget(self, action: #selector(paymentFormCompleted), for: .touchUpInside)
+        self.checkoutPaymentFormViewController = checkoutPaymentFormViewController
         
-        pushViewController(checkoutPaymentViewController, animated: true)
+        pushViewController(checkoutPaymentFormViewController, animated: true)
     }
     
     fileprivate func navigateToCheckoutShippingForm() {
