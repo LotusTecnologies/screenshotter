@@ -501,7 +501,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 self.present(alertController, animated: true, completion: nil)
                 return
             }
-            if let image = screenshot.uploadedImageURL, screenshot.canSubmitToDiscover {
+            if let _ = screenshot.uploadedImageURL, screenshot.canSubmitToDiscover {
                 
                 let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
                 

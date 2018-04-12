@@ -46,8 +46,10 @@ extension Sequence {
 }
 
 extension String {
-    static func randomFemaleName() -> String{
-        let femaleNames = ["Aaliyah",
+    static func randomFemaleName() -> String {
+        return femaleNames.randomElement() ?? "Molly"
+    }
+    static let femaleNames: [String] = ["Aaliyah",
             "Abby",
             "Abigail",
             "Abril",
@@ -1169,8 +1171,7 @@ extension String {
             "Zoey",
             "Zoie",
             "Zuri"]
-        return femaleNames.randomElement() ?? "Molly"
-    }
+        
     static func randomMaleName() -> String{
         let maleNames = [
             "John",
