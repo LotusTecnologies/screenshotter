@@ -162,11 +162,11 @@ extension UIApplication {
     }
 }
 
-extension UIBarItem {
-    func titleTextAttributesWithAttributeKeys(for state: UIControlState) -> [NSAttributedStringKey : Any]? {
-        if let attributes = self.titleTextAttributes(for: state) {
+extension NSAttributedStringKey {
+    static func convertStringAnyToNSAttributedStringKeyAny(_ dict:[String:Any]?) -> [NSAttributedStringKey : Any]? {
+        if let dict = dict {
             var toReturn:[NSAttributedStringKey:Any] = [:]
-            attributes.forEach { (key, value) in
+            dict.forEach { (key, value) in
                 let newKey = NSAttributedStringKey.init(String.init(key))
                 toReturn[newKey] = value
             }

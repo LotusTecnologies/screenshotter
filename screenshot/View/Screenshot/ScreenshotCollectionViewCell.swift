@@ -54,9 +54,9 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         // Even though this is set globally, it is possible to hit a race condition
         // where the first cell has the wrong font. This will force the font.
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
-        let titleTextAttributesNormal = toolbarButtonItem.titleTextAttributesWithAttributeKeys(for: .normal)
-        let titleTextAttributesHighlighted = toolbarButtonItem.titleTextAttributesWithAttributeKeys(for: .highlighted)
-        let titleTextAttributesDisabled = toolbarButtonItem.titleTextAttributesWithAttributeKeys(for: .disabled)
+        let titleTextAttributesNormal = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny( toolbarButtonItem.titleTextAttributes(for: .normal) )
+        let titleTextAttributesHighlighted = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .highlighted) )
+        let titleTextAttributesDisabled = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny( toolbarButtonItem.titleTextAttributes(for: .disabled) )
         
         shareButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
         shareButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
