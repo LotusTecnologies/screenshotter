@@ -8,20 +8,6 @@
 
 import UIKit
 
-extension UIResponder {
-    private weak static var _currentFirstResponder: UIResponder? = nil
-    
-    static var current: UIResponder? {
-        _currentFirstResponder = nil
-        UIApplication.shared.sendAction(#selector(findFirstResponder), to: nil, from: nil, for: nil)
-        return _currentFirstResponder
-    }
-    
-    @objc private func findFirstResponder() {
-        UIResponder._currentFirstResponder = self
-    }
-}
-
 class FormViewController: BaseViewController {
     let form: Form
     
