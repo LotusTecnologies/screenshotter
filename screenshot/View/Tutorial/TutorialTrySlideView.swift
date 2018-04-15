@@ -30,9 +30,9 @@ public class TutorialTrySlideView : HelperView {
         }
         
         let attributes = [
-            [NSFontAttributeName: boldFont],
-            [NSFontAttributeName: font, NSForegroundColorAttributeName: UIColor.crazeRed],
-            [NSFontAttributeName: font]
+            [NSAttributedStringKey.font: boldFont],
+            [NSAttributedStringKey.font: font, NSAttributedStringKey.foregroundColor: UIColor.crazeRed],
+            [NSAttributedStringKey.font: font]
         ]
         
         if UIDevice.isHomeButtonless {

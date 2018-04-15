@@ -140,7 +140,7 @@ class AssetSyncModel: NSObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    func applicationDidBecomeActive(){
+    @objc func applicationDidBecomeActive(){
         self.lastDidBecomeActiveDate = Date()
         self.processingQ.async {
             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
@@ -228,7 +228,7 @@ extension AssetSyncModel {
                             screenshot.source = .gallery
                             
                             managedObjectContext.saveIfNeeded()
-                            fulfill(ClarifaiModel.ImageClassification.human, imageData)
+                            fulfill((ClarifaiModel.ImageClassification.human, imageData))
                         }
                     }
                 }
@@ -246,7 +246,7 @@ extension AssetSyncModel {
     //From share
     public func downloadScreenshot(shareId: String) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            firstly { _ -> Promise<[String : Any]> in
+            let networkRequest:Promise<[String : Any]> = {
                 // Get screenshot dict from Craze server.
                 // See end https://docs.google.com/document/d/16WsJMepl0Z3YrsRKxcFqkASUieRLKy_Aei8lmbpD2bo
                 guard let encoded = shareId.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
@@ -256,7 +256,8 @@ extension AssetSyncModel {
                 }
                 print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
                 return NetworkingPromise.sharedInstance.downloadInfo(url: screenshotInfoUrl)
-            }.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
+            }()
+            networkRequest.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
                 guard let share = jsonDict["share"] as? [String : Any],
                     let screenshotDict = share["screenshot"] as? [String : Any],
@@ -397,7 +398,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }
     }
     
-     func applicationUserDidTakeScreenshot() {
+     @objc func applicationUserDidTakeScreenshot() {
         print("AssetSyncModel applicationUserDidTakeScreenshot")
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
@@ -646,10 +647,10 @@ extension AssetSyncModel {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
-            firstly { _ -> Promise<(String, [[String : Any]])> in
+            firstly { 
                 return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
+                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
                     AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
@@ -954,15 +955,16 @@ extension AssetSyncModel {
             let dataModel = DataModel.sharedInstance
             
             self.processingQ.async {
-                firstly { _ -> Promise<Data?> in
+                let getData:Promise<Data?> = Promise.init(resolvers: { (fulfill, reject) in
                     let imageData: Data?
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-                        imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
-#else
-                        imageData = self.data(for: image)
-#endif
-                    return Promise(value: imageData)
-                    }.then(on: self.processingQ) { imageData -> Promise<Data?> in
+                    #if STORE_NEW_TUTORIAL_SCREENSHOT
+                    imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                    #else
+                    imageData = self.data(for: image)
+                    #endif
+                    fulfill(imageData)
+                })
+                getData.then(on: self.processingQ) { imageData -> Promise<Data?> in
                         return Promise { fulfill, reject in
                             dataModel.performBackgroundTask { (managedObjectContext) in
                                 let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
@@ -971,9 +973,9 @@ extension AssetSyncModel {
                                                                  isRecognized: true,
                                                                  source: .tutorial,
                                                                  isHidden: false,
-                                                                 imageData: imageData,
+                                                                 imageData: imageData as! Data,
                                                                  classification: nil)
-                                fulfill(imageData)
+                                fulfill(imageData as! Data)
                             }
                         }
                     }.then (on: self.processingQ) { imageData -> Void in
@@ -1020,7 +1022,7 @@ extension Screenshot {
         let assetSyncModel = AssetSyncModel.sharedInstance
         let objectId = self.objectID
 
-        return firstly { _ -> Promise<(String, String)> in
+        return firstly { 
             // Post to Craze server, which returns deep share link.
             return self.shareOrReshare()
             }.then(on: assetSyncModel.processingQ) { shareId, shareLink -> Promise<String> in

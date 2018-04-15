@@ -67,7 +67,7 @@ extension ScreenshotsNavigationController {
         return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
     }
     
-    func presentPickerViewController() {
+    @objc func presentPickerViewController() {
         self.dismissPickerClipView()
         
         let picker = self.createScreenshotPickerNavigationController()
@@ -79,14 +79,14 @@ extension ScreenshotsNavigationController {
         AnalyticsTrackers.standard.track(.openedPicker)
     }
     
-    func pickerViewControllerDidCancel() {
+    @objc func pickerViewControllerDidCancel() {
         self.dismiss(animated: true) {
             if self.needsToPresentPushAlert() {
                 self.presentPushAlert()
             }
         }
     }
-    func pickerViewControllerDidFinish(){
+    @objc func pickerViewControllerDidFinish(){
         self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
     }

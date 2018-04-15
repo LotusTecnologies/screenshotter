@@ -63,16 +63,16 @@ class ClarifaiModel: NSObject {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func modelDownloadStarted() {
+    @objc func modelDownloadStarted() {
         AnalyticsTrackers.standard.track(.startedDownloadingClarifaiModel)
     }
     
-    func modelDownloadFinished() {
+    @objc func modelDownloadFinished() {
         modelDownloaded()
         AnalyticsTrackers.standard.track(.finishedDownloadingClarifaiModel)
     }
     
-    func modelAvailable() {
+    @objc func modelAvailable() {
         modelDownloaded()
     }
     func modelDownloaded() {

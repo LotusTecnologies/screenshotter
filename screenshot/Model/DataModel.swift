@@ -515,7 +515,7 @@ extension DataModel {
         
         do {
             let results = try managedObjectContext.fetch(fetchRequest)
-            if let imageUrls = results.flatMap({$0.imageUrl}).flatMap({$0.copy()}) as? [String] {
+            if let imageUrls = results.compactMap({$0.imageUrl}).compactMap({$0.copy()}) as? [String] {
                 return imageUrls
             }
         } catch {
@@ -543,7 +543,7 @@ extension DataModel {
             self.dbQ.addOperation {
                 let managedObjectContext = self.persistentContainer.newBackgroundContext()
                 managedObjectContext.perform {
-                    fulfill(block(managedObjectContext), dict)
+                    fulfill((block(managedObjectContext), dict))
                 }
             }
         }
