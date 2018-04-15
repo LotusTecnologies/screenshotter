@@ -357,8 +357,7 @@ fileprivate extension ProductViewControllerCart {
             dismiss(animated: true, completion: nil)
         }
         
-        let navigationController = ModalNavigationController(rootViewController: CartViewController())
-        present(navigationController, animated: true, completion: nil)
+        present(CartNavigationController(), animated: true, completion: nil)
     }
     
     func syncCartItemCount() {
