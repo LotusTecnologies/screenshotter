@@ -156,7 +156,7 @@ class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsCo
             DataModel.sharedInstance.receivedCoreDataError(error: error)
             print("Failed to fetch in fetchedResultsControllerManager from core data:\(error)")
         }
-        self.arrayOfArrays = self.fetchedResultsController.sections?.flatMap({$0.objects as? [ResultType]}).flatMap {Section($0)} ?? []
+        self.arrayOfArrays = self.fetchedResultsController.sections?.compactMap({$0.objects as? [ResultType]}).compactMap {Section($0)} ?? []
     }
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {

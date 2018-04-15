@@ -53,7 +53,7 @@ class UserFeedback  {
         DataModel.sharedInstance.performBackgroundTask { (context) in
             let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
             request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE && submittedDate != nil")
-            let now = NSDate()
+            let now = Date()
             if let results = try? context.fetch(request) {
                 var eventsPerHour:Int = 0
                 results.forEach({ (s) in
@@ -62,7 +62,7 @@ class UserFeedback  {
                             s.submittedFeedbackCountGoalDate = now
                         }
                         if s.submittedFeedbackCountDate == nil {
-                            s.submittedFeedbackCountDate = NSDate.init(timeIntervalSince1970: 0)
+                            s.submittedFeedbackCountDate = Date.init(timeIntervalSince1970: 0)
                         }
                        
                         

@@ -196,10 +196,10 @@ extension AssetSyncModel {
                                 screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                             }
                             screenshot.shoppablesCount = 0
-                            screenshot.imageData = imageData as NSData?
+                            screenshot.imageData = imageData
                             screenshot.isHidden = false
                             screenshot.isRecognized = true
-                            screenshot.lastModified = NSDate()
+                            screenshot.lastModified = Date()
                             screenshot.source = .gallery
                             screenshot.submittedDate = nil
                             screenshot.submittedFeedbackCount = 0
@@ -212,8 +212,8 @@ extension AssetSyncModel {
                         }else{
                             let screenshot = Screenshot(context: managedObjectContext)
                             screenshot.assetId = asset.localIdentifier
-                            let now = NSDate()
-                            if let date =  asset.creationDate as NSDate? {
+                            let now = Date()
+                            if let date =  asset.creationDate  {
                                 screenshot.createdAt = date
                             }else{
                                 screenshot.createdAt = now
@@ -224,7 +224,7 @@ extension AssetSyncModel {
                             screenshot.lastModified = now
                             screenshot.isRecognized = true
                             screenshot.isHidden = false
-                            screenshot.imageData = imageData as NSData?
+                            screenshot.imageData = imageData
                             screenshot.source = .gallery
                             
                             managedObjectContext.saveIfNeeded()
@@ -609,10 +609,10 @@ extension AssetSyncModel {
                         screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                     }
                     screenshot.shoppablesCount = 0
-                    screenshot.imageData = imageData as NSData?
+                    screenshot.imageData = imageData
                     screenshot.isHidden = false
                     screenshot.isRecognized = true
-                    screenshot.lastModified = NSDate()
+                    screenshot.lastModified = Date()
                     managedObjectContext.saveIfNeeded()
                     fulfill((imageData, imageClassification))
                 } else {
@@ -973,9 +973,9 @@ extension AssetSyncModel {
                                                                  isRecognized: true,
                                                                  source: .tutorial,
                                                                  isHidden: false,
-                                                                 imageData: imageData as! Data,
+                                                                 imageData: imageData,
                                                                  classification: nil)
-                                fulfill(imageData as! Data)
+                                fulfill(imageData)
                             }
                         }
                     }.then (on: self.processingQ) { imageData -> Void in
@@ -1054,7 +1054,7 @@ extension Screenshot {
     
     public func submitToDiscover(){
         let screenshot = self
-        let now = NSDate()
+        let now = Date()
         if let image = screenshot.uploadedImageURL {
             let objectId = screenshot.objectID
             let promise = NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)

@@ -17,9 +17,9 @@ class FavoritesTableViewCell : UITableViewCell {
     fileprivate let shoppableContainerView = UIView()
     let activityBadgeView = ActivityBadgeView()
     
-    var imageData: NSData? {
+    var imageData: Data? {
         didSet {
-            screenshotView.setImage(withNSData: imageData)
+            screenshotView.setImage(withData: imageData)
             updateScreenshotImageViewSize()
         }
     }
