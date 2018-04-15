@@ -90,10 +90,8 @@ class FormViewController: BaseViewController {
     // MARK: Keyboard
     
     @objc fileprivate func keyboardWillChangeFrame(_ notification: Notification) {
-        guard let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-            let textField = UIResponder.current as? UITextField
-            else {
-                return
+        guard let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
+            return
         }
         
         if preservedContentInset == nil {
@@ -105,7 +103,7 @@ class FormViewController: BaseViewController {
         let contentInsets: UIEdgeInsets
         let scrollIndicatorInsets: UIEdgeInsets
         
-        if bottom > 0 {
+        if bottom > 0 && view.bounds.height > keyboardRect.origin.y {
             var _contentInset: UIEdgeInsets = .zero
             _contentInset.top = preservedContentInset?.top ?? 0
             _contentInset.bottom = bottom + (preservedContentInset?.bottom ?? 0)
@@ -130,7 +128,7 @@ class FormViewController: BaseViewController {
         var scrollToRect = view.frame
         scrollToRect.size.height -= contentInsets.bottom
         
-        if !scrollToRect.contains(textField.frame.origin) {
+        if let textField = UIResponder.current as? UITextField, !scrollToRect.contains(textField.frame.origin) {
             tableView.scrollRectToVisible(textField.frame, animated: true)
         }
     }
