@@ -38,6 +38,17 @@ class CartNavigationController: UINavigationController {
         view.backgroundColor = .background
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if presentingViewController != nil {
+            let dismissBarButtonItem = UIBarButtonItem(title: "generic.cancel".localized, style: .plain, target: nil, action: nil)
+            dismissBarButtonItem.target = self
+            dismissBarButtonItem.action = #selector(dismissViewController)
+            cartViewController.navigationItem.leftBarButtonItem = dismissBarButtonItem
+        }
+    }
+    
     deinit {
         cartViewController.delegate = nil
     }
@@ -70,6 +81,10 @@ class CartNavigationController: UINavigationController {
     }
     
     // MARK: Navigation
+    
+    @objc private func dismissViewController() {
+        presentingViewController?.dismiss(animated: true, completion: nil)
+    }
     
     fileprivate func navigateToCheckoutPaymentForm() {
         let checkoutPaymentFormViewController = CheckoutPaymentFormViewController()
