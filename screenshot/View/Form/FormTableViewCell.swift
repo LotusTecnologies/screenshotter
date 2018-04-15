@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FormCardTableViewCell: UITableViewCell {
+class FormCardTableViewCell: FormTextTableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -17,6 +17,8 @@ class FormCardTableViewCell: UITableViewCell {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         
         clipsToBounds = true
+        
+        // TODO: block field entry from appsee. also cvv and exp?
     }
 }
 
@@ -34,6 +36,8 @@ class FormCheckboxTableViewCell: UITableViewCell {
         clipsToBounds = true
         
         imageView?.image = checkboxImage
+        
+        textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
     }
     
     var isChecked = false {
@@ -75,6 +79,8 @@ class FormDateTableViewCell: UITableViewCell {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         
         clipsToBounds = true
+        
+        textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
     }
 }
 
@@ -124,9 +130,25 @@ class FormSelectionTableViewCell: UITableViewCell {
         
         clipsToBounds = true
         
+        textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+        
         let dropDownImageView = UIImageView(image: UIImage(named: "FormDownArrow"))
         dropDownImageView.contentMode = .scaleAspectFit
-        accessoryView = dropDownImageView
+        dropDownImageView.sizeToFit()
+        dropDownImageView.frame = {
+            var rect = dropDownImageView.frame
+            rect.origin.x = .padding
+            return rect
+        }()
+        
+        let imageViewContainer = UIView()
+        imageViewContainer.frame = {
+            var rect = dropDownImageView.bounds
+            rect.size.width = dropDownImageView.frame.maxX
+            return rect
+        }()
+        imageViewContainer.addSubview(dropDownImageView)
+        accessoryView = imageViewContainer
     }
     
     // MARK: First Responder

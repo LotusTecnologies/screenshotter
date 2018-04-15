@@ -33,7 +33,7 @@ class TextFieldTableViewCell : UITableViewCell {
         textField.font = .screenshopFont(.hindLight, textStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
         textField.tintColor = .crazeGreen
-//        textField.isUserInteractionEnabled = false // Activate through the cells becomeFirstResponder
+        textField.isUserInteractionEnabled = false // Activate through the cells becomeFirstResponder
         contentView.addSubview(textField)
         textField.setContentCompressionResistancePriority(1, for: .vertical)
         
