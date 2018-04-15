@@ -13,7 +13,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
     let orderButton = MainButton()
     let cancelButton = UIButton()
     
-    fileprivate let cvvTextFieldController = CreditCardTextFieldController(with: .cvv)
+    fileprivate let cvvTextFieldController = TextFieldFormatter(with: .cvv)
     fileprivate let cvvBorderColor: UIColor = .gray3
     
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)

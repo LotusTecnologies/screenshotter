@@ -7,18 +7,20 @@
 //
 
 import UIKit
+import Appsee
 
-class FormCardTableViewCell: FormTextTableViewCell {
+class FormCardTableViewCell: FormNumberTableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        clipsToBounds = true
+        textFieldController = TextFieldFormatter(with: .card)
+//        textField.isSecureTextEntry = true
         
-        // TODO: block field entry from appsee. also cvv and exp?
+        Appsee.markView(asSensitive: textField)
     }
 }
 
@@ -60,7 +62,7 @@ class FormCVVTableViewCell: FormNumberTableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        textFieldController = CreditCardTextFieldController(with: .cvv)
+        textFieldController = TextFieldFormatter(with: .cvv)
     }
 }
 
@@ -87,6 +89,7 @@ class FormEmailTableViewCell: FormTextTableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         textField.keyboardType = .emailAddress
+        textField.autocapitalizationType = .none
     }
 }
 
@@ -228,7 +231,7 @@ class FormSelectionPickerTableViewCell: UITableViewCell {
 }
 
 class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate {
-    fileprivate var textFieldController: CreditCardTextFieldController?
+    fileprivate var textFieldController: TextFieldFormatter?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -240,6 +243,9 @@ class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate {
         clipsToBounds = true
         
         textField.delegate = self
+        textField.autocapitalizationType = .words
+        textField.autocorrectionType = .no
+        textField.spellCheckingType = .no
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -260,7 +266,7 @@ class FormZipTableViewCell: FormNumberTableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        textFieldController = CreditCardTextFieldController(with: .zip)
+        textFieldController = TextFieldFormatter(with: .zip)
         textField.delegate = self
     }
 }
