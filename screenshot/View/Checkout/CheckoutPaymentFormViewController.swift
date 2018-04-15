@@ -84,7 +84,7 @@ class CheckoutPaymentFormViewController: FormViewController {
         ]
         billingRows.append(state)
         
-        let zip = FormRow.Number(CheckoutPaymentFormKeys.addressZip.rawValue)
+        let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
         zip.placeholder = "Zip Code"
         billingRows.append(zip)
         

@@ -92,6 +92,7 @@ class FormViewController: BaseViewController {
         tableViewRegister(FormSelectionTableViewCell.self, for: FormRow.Selection.self)
         tableViewRegister(FormSelectionPickerTableViewCell.self, for: FormRow.SelectionPicker.self)
         tableViewRegister(FormTextTableViewCell.self, for: FormRow.Text.self)
+        tableViewRegister(FormZipTableViewCell.self, for: FormRow.Zip.self)
     }
     
     deinit {
@@ -335,7 +336,7 @@ extension FormViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if let indexPath = indexPath(for: textField) {
-            if let cell = tableView.cellForRow(at: indexPath) as? FormCVVTableViewCell {
+            if let cell = tableView.cellForRow(at: indexPath) as? FormTextTableViewCell {
                 return cell.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
             }
         }

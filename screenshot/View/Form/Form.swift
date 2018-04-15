@@ -144,6 +144,10 @@ extension FormRow {
     class Text: FormRow {
         
     }
+    
+    class Zip: Number {
+        
+    }
 }
 
 struct FormCondition {

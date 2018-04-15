@@ -52,9 +52,7 @@ class FormCheckboxTableViewCell: UITableViewCell {
     }
 }
 
-class FormCVVTableViewCell: FormNumberTableViewCell, UITextFieldDelegate {
-    private let cvvTextFieldController = CreditCardTextFieldController(with: .cvv)
-    
+class FormCVVTableViewCell: FormNumberTableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -62,11 +60,7 @@ class FormCVVTableViewCell: FormNumberTableViewCell, UITextFieldDelegate {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        textField.delegate = self
-    }
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        return cvvTextFieldController.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+        textFieldController = CreditCardTextFieldController(with: .cvv)
     }
 }
 
@@ -233,7 +227,9 @@ class FormSelectionPickerTableViewCell: UITableViewCell {
     }
 }
 
-class FormTextTableViewCell: TextFieldTableViewCell {
+class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate {
+    fileprivate var textFieldController: CreditCardTextFieldController?
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -242,5 +238,29 @@ class FormTextTableViewCell: TextFieldTableViewCell {
         super.init(style: .value1, reuseIdentifier: reuseIdentifier)
         
         clipsToBounds = true
+        
+        textField.delegate = self
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let textFieldController = textFieldController {
+            return textFieldController.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+        }
+        else {
+            return true
+        }
+    }
+}
+
+class FormZipTableViewCell: FormNumberTableViewCell {
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        textFieldController = CreditCardTextFieldController(with: .zip)
+        textField.delegate = self
     }
 }

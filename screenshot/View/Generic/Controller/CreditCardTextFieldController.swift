@@ -12,6 +12,7 @@ class CreditCardTextFieldController {
     enum Field {
         case card
         case cvv
+        case zip
     }
     
     let field: Field
@@ -26,14 +27,24 @@ class CreditCardTextFieldController {
             return true
         case .cvv:
             return cvv(textField: textField, shouldChangeCharactersIn: range, replacementString: string)
+        case .zip:
+            return zip(textField: textField, shouldChangeCharactersIn: range, replacementString: string)
         }
     }
     
     fileprivate func cvv(textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let length = (textField.text ?? "").count - range.length + string.count
-        let cvvMaxLength = 4
+        let maxLength = 4
         let isReturnKey = string.range(of: "\n") != nil
         
-        return length <= cvvMaxLength || isReturnKey
+        return length <= maxLength || isReturnKey
+    }
+    
+    fileprivate func zip(textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let length = (textField.text ?? "").count - range.length + string.count
+        let maxLength = 9
+        let isReturnKey = string.range(of: "\n") != nil
+        
+        return length <= maxLength || isReturnKey
     }
 }
