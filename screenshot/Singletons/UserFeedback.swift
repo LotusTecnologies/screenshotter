@@ -102,7 +102,8 @@ class UserFeedback  {
                         let showAtleast = 60.0*5.0 /// 5 minutes
                         let showAtMost = 30.0 // 30 seconds
                         let timerPeriod = min(showAtleast, max(showAtMost, 60*60/TimeInterval(eventsPerHour)))
-                        print("timer period for fake notification \(timerPeriod)");                        self.timer = Timer.scheduledTimer(timeInterval:timerPeriod, target: self, selector: #selector(self.timerTriggered), userInfo: nil, repeats: true)
+                        print("timer period for fake notification \(timerPeriod)");
+                        self.timer = Timer.scheduledTimer(timeInterval:timerPeriod, target: self, selector: #selector(self.timerTriggered), userInfo: nil, repeats: true)
                         if timerPeriod > 20 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
                                 self.timerTriggered()
