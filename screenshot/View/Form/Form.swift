@@ -121,8 +121,28 @@ extension FormRow {
     }
     
     class Date: FormRow {
-        // ???: make a date (month, year) to string func
-//        var value: (month: UInt, year: UInt)?
+        typealias Expiration = (month: Int, year: Int)
+        
+        // The value should be stored as "mm/yyyy"
+        static func date(for value: String?) -> Expiration? {
+            guard let components = value?.split(separator: "/"),
+                components.count == 2,
+                let month = Int(components[0]),
+                let year = Int(components[1])
+                else {
+                    return nil
+            }
+            
+            return Expiration(month: month, year: year)
+        }
+        
+        static func value(for date: Expiration?) -> String? {
+            guard let month = date?.month, let year = date?.year else {
+                return nil
+            }
+            
+            return String(format: "%02d/%d", month, year)
+        }
     }
     
     class Email: Text {

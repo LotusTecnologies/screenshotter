@@ -58,19 +58,37 @@ class CartNavigationController: UINavigationController {
     private var cvv: String?
     
     @objc fileprivate func paymentFormCompleted() {
-        guard let checkoutPaymentFormViewController = checkoutPaymentFormViewController,
-            let shipRow = checkoutPaymentFormViewController.form.map?[CheckoutPaymentFormKeys.addressShip.rawValue]
+        guard let checkout = checkoutPaymentFormViewController,
+            let cardName = checkout.formRow(.cardName)?.value,
+            let cardNumber = checkout.formRow(.cardNumber)?.value,
+            let cardExp = checkout.formRow(.cardExp)?.value,
+            let cardCVV = checkout.formRow(.cardCVV)?.value,
+            let addressStreet = checkout.formRow(.addressStreet)?.value,
+            let addressCity = checkout.formRow(.addressCity)?.value,
+            let addressCountry = checkout.formRow(.addressCountry)?.value,
+            let addressState = checkout.formRow(.addressState)?.value,
+            let addressZip = checkout.formRow(.addressZip)?.value,
+            let addressShip = checkout.formRow(.addressShip)?.value,
+            let email = checkout.formRow(.email)?.value,
+            let phone = checkout.formRow(.phoneNumber)?.value,
+            let cardExpDate = FormRow.Date.date(for: cardExp)
             else {
                 return
         }
         
-        if let cvvRow = checkoutPaymentFormViewController.form.map?[CheckoutPaymentFormKeys.cardCVV.rawValue] {
-            cvv = cvvRow.value
-        }
+        cvv = cardCVV
         
-        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: shipRow.value)
+        let shouldSaveCard = true // TODO:
+        let lastDigits = "0234" // last 4 digits of credit card or last 5 for amex
+        
+        DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: lastDigits, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: shouldSaveCard)
+        
+        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
         if isShipToSameAddressChecked {
+            // TODO: maybe gershon can make a fullName convience func
+            DataModel.sharedInstance.saveShippingAddress(firstName: cardName, lastName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+            
             navigateToCheckoutOrder()
         }
         else {
@@ -78,6 +96,10 @@ class CartNavigationController: UINavigationController {
         }
         
         //        checkoutPaymentFormViewController = nil // ???: when should the vc be removed
+    }
+    
+    @objc fileprivate func shippingFormCompleted() {
+//        DataModel.sharedInstance.saveShippingAddress(firstName: <#T##String?#>, lastName: <#T##String?#>, street: <#T##String#>, city: <#T##String#>, country: <#T##String#>, zipCode: <#T##String#>, state: <#T##String?#>, phone: <#T##String#>)
     }
     
     // MARK: Navigation
@@ -96,7 +118,9 @@ class CartNavigationController: UINavigationController {
     }
     
     fileprivate func navigateToCheckoutShippingForm() {
-        pushViewController(CheckoutShippingFormViewController(), animated: true)
+        let checkoutShippingFormViewController = CheckoutShippingFormViewController()
+        checkoutShippingFormViewController.doneButton.addTarget(self, action: #selector(shippingFormCompleted), for: .touchUpInside)
+        pushViewController(checkoutShippingFormViewController, animated: true)
     }
     
     fileprivate func navigateToCheckoutOrder() {
