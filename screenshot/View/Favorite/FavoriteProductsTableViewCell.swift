@@ -64,7 +64,7 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         priceLabel.font = .screenshopFont(.hindMedium, textStyle: .body)
         priceLabel.adjustsFontForContentSizeCategory = true
         labelsContainerView.addSubview(priceLabel)
-        priceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        priceLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         priceLabel.trailingAnchor.constraint(equalTo: labelsContainerView.trailingAnchor).isActive = true
         
         fontSizeStandardRangeConstraints += [

@@ -58,8 +58,8 @@ public class HelperView : UIView {
         titleLabel.numberOfLines = 0
         titleLabel.adjustsFontForContentSizeCategory = true
         scrollContentView.addSubview(titleLabel)
-        titleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        titleLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        titleLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         titleLabel.topAnchor.constraint(equalTo: scrollContentView.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: scrollContentView.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: scrollContentView.trailingAnchor).isActive = true
@@ -72,8 +72,8 @@ public class HelperView : UIView {
         subtitleLabel.adjustsFontForContentSizeCategory = true
         subtitleLabel.layoutMargins = UIEdgeInsets(top: -.padding, left: 0, bottom: 0, right: 0)
         scrollContentView.addSubview(subtitleLabel)
-        subtitleLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        subtitleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        subtitleLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        subtitleLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         subtitleLabel.layoutMarginsGuide.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         subtitleLabel.leadingAnchor.constraint(equalTo: scrollContentView.leadingAnchor).isActive = true
         subtitleLabel.trailingAnchor.constraint(equalTo: scrollContentView.trailingAnchor).isActive = true
@@ -131,7 +131,7 @@ public class HelperView : UIView {
         }
     }
     
-    func contentSizeCategoryDidChange(_ notification: Notification) {
+    @objc func contentSizeCategoryDidChange(_ notification: Notification) {
         if let userInfo = notification.userInfo, let contentSizeCategoryString = userInfo[UIContentSizeCategoryNewValueKey] as? String {
             let contentSizeCategory = UIContentSizeCategory(rawValue: contentSizeCategoryString)
             scrollContentViewMaxHeightConstraint.isActive = !isScrollable(contentSizeCategory: contentSizeCategory)
@@ -153,7 +153,7 @@ public class HelperView : UIView {
                     imageView.translatesAutoresizingMaskIntoConstraints = false
                     imageView.contentMode = .scaleAspectFit
                     contentView.addSubview(imageView)
-                    imageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .vertical)
+                    imageView.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .vertical)
                     imageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
                     imageView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
                     imageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true

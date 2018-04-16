@@ -138,8 +138,8 @@ extension UIApplication {
         navigationBar.barTintColor = .white
         navigationBar.tintColor = .gray3
         navigationBar.titleTextAttributes = [
-            NSFontAttributeName: UIFont.screenshopFont(.futuraMedium, size: 20),
-            NSForegroundColorAttributeName: UIColor.gray3
+            NSAttributedStringKey.font: UIFont.screenshopFont(.futuraMedium, size: 20),
+            NSAttributedStringKey.foregroundColor: UIColor.gray3
         ]
         
         // Tab Bar
@@ -154,18 +154,18 @@ extension UIApplication {
         let toolbar = UIToolbar.appearance()
         toolbar.tintColor = crazeRedColor
         
-        var barButtonItemTitleTextAttributes: [String:Any] = [
-            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 16)
+        var barButtonItemTitleTextAttributes: [NSAttributedStringKey:Any] = [
+            NSAttributedStringKey.font: UIFont.screenshopFont(.futura, size: 16)
         ]
         let navigationBarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
         
-        barButtonItemTitleTextAttributes[NSForegroundColorAttributeName] = UIColor.gray7
+        barButtonItemTitleTextAttributes[NSAttributedStringKey.foregroundColor] = UIColor.gray7
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         barButtonItemTitleTextAttributes = [
-            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 12)
+            NSAttributedStringKey.font: UIFont.screenshopFont(.futura, size: 12)
         ]
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
@@ -177,8 +177,8 @@ extension UIApplication {
         // Segmented Control
         
         let segmentedControlTitleTextAttributes: [String: Any] = [
-            NSFontAttributeName: UIFont.screenshopFont(.hind, size: 13),
-            NSBaselineOffsetAttributeName: -1
+            NSAttributedStringKey.font.rawValue: UIFont.screenshopFont(.hind, size: 13),
+            NSAttributedStringKey.baselineOffset.rawValue: -1
         ]
         
         let segmentedControl = UISegmentedControl.appearance()
@@ -186,7 +186,20 @@ extension UIApplication {
     }
 }
 
-
+// TODO: move to better location
+extension NSAttributedStringKey {
+    static func convertStringAnyToNSAttributedStringKeyAny(_ dict:[String:Any]?) -> [NSAttributedStringKey : Any]? {
+        if let dict = dict {
+            var toReturn:[NSAttributedStringKey:Any] = [:]
+            dict.forEach { (key, value) in
+                let newKey = NSAttributedStringKey.init(String.init(key))
+                toReturn[newKey] = value
+            }
+            return toReturn
+        }
+        return nil
+    }
+}
 
 extension UIImage {
     func shamrock() -> UIImage? {

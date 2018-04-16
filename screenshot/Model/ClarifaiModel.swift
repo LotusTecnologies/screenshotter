@@ -63,16 +63,16 @@ class ClarifaiModel: NSObject {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func modelDownloadStarted() {
+    @objc func modelDownloadStarted() {
         AnalyticsTrackers.standard.track(.startedDownloadingClarifaiModel)
     }
     
-    func modelDownloadFinished() {
+    @objc func modelDownloadFinished() {
         modelDownloaded()
         AnalyticsTrackers.standard.track(.finishedDownloadingClarifaiModel)
     }
     
-    func modelAvailable() {
+    @objc func modelAvailable() {
         modelDownloaded()
     }
     func modelDownloaded() {
@@ -101,7 +101,7 @@ class ClarifaiModel: NSObject {
                         if let error = error {
                             reject(error)
                         } else if let outputs = outputs {
-                            let conceptNamesArray = outputs.flatMap({$0.dataAsset.concepts}).flatMap({$0}).flatMap({$0.name})
+                            let conceptNamesArray = outputs.compactMap({$0.dataAsset.concepts}).flatMap({$0}).compactMap({$0.name})
                             let conceptNames = Set<String>(conceptNamesArray)
                             
                             if !conceptNames.isDisjoint(with: ["woman", "man", "child", "jewelry", "fashion"  ]) {

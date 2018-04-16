@@ -103,8 +103,8 @@ fileprivate extension ProductViewControllerProductView {
         if let text = price {
             productView.priceLabel.textColor = .crazeRed
             productView.originalPriceLabel.attributedText = NSAttributedString(string: text, attributes: [
-                NSStrikethroughStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-                NSStrikethroughColorAttributeName: productView.originalPriceLabel.textColor
+                NSAttributedStringKey.strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue,
+                NSAttributedStringKey.strikethroughColor: productView.originalPriceLabel.textColor
                 ])
         }
         else {
@@ -229,10 +229,10 @@ fileprivate extension ProductViewControllerProductView {
             let color = productView.websiteButton.titleColor(for: .normal) ?? .crazeGreen
             
             let title = NSAttributedString(string: "product.website".localized(withFormat: name), attributes: [
-                NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-                NSUnderlineColorAttributeName: color,
-                NSForegroundColorAttributeName: color,
-                NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFontWeightBold)
+                NSAttributedStringKey.underlineStyle: NSUnderlineStyle.styleSingle.rawValue,
+                NSAttributedStringKey.underlineColor: color,
+                NSAttributedStringKey.foregroundColor: color,
+                NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFont.Weight.bold)
                 ])
             
             productView.websiteButton.setAttributedTitle(title, for: .normal)

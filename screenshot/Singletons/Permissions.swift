@@ -54,7 +54,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     func permissionStatus(for type: PermissionType) -> PermissionStatus {
         switch type {
         case .camera:
-            return permissionStatus(forCamera: AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo))
+            return permissionStatus(forCamera: AVCaptureDevice.authorizationStatus(for: AVMediaType.video))
         case .photo:
             return permissionStatus(forPhoto: PHPhotoLibrary.authorizationStatus())
         case .push:
@@ -167,10 +167,10 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     fileprivate func requestCameraPermission(with response: PermissionBlock?) {
-        let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
+        let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
         
         if status == .notDetermined {
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: response)
+            AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: response!)
             
         } else {
             if let response = response {

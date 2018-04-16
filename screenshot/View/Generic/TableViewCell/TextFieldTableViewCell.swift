@@ -35,8 +35,8 @@ class TextFieldTableViewCell : UITableViewCell {
         textField.tintColor = .crazeGreen
         textField.isUserInteractionEnabled = false // Activate through the cells becomeFirstResponder
         contentView.addSubview(textField)
-        textField.setContentCompressionResistancePriority(1, for: .vertical)
-        
+        textField.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1), for: .vertical)
+
         if style == .value1 {
             // Needed for positioning the constraints
             detailTextLabel?.textColor = .clear

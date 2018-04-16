@@ -46,8 +46,8 @@ class ProductNextStepViewController: UIViewController {
         label.text = "product.next_step.added".localized
         label.numberOfLines = 0
         view.addSubview(label)
-        label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        label.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         label.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
         label.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
         
@@ -64,8 +64,8 @@ class ProductNextStepViewController: UIViewController {
         cartButton.backgroundColor = .crazeGreen
         cartButton.setTitle("product.next_step.cart".localized, for: .normal)
         view.addSubview(cartButton)
-        cartButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        cartButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        cartButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        cartButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         cartButton.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
         cartButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         cartButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
@@ -74,8 +74,8 @@ class ProductNextStepViewController: UIViewController {
         continueButton.backgroundColor = .crazeGreen
         continueButton.setTitle("product.next_step.continue".localized, for: .normal)
         view.addSubview(continueButton)
-        continueButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        continueButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        continueButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        continueButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         continueButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         continueButton.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true

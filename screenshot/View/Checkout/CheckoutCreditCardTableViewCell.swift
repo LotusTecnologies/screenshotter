@@ -45,7 +45,7 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         expirationLabel.translatesAutoresizingMaskIntoConstraints = false
         expirationLabel.font = .screenshopFont(.hindMedium, size: 14)
         cardView.addSubview(expirationLabel)
-        expirationLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        expirationLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         expirationLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor).isActive = true
         expirationLabel.leadingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.leadingAnchor).isActive = true
         expirationLabel.firstBaselineAnchor.constraint(equalTo: cardView.layoutMarginsGuide.bottomAnchor).isActive = true

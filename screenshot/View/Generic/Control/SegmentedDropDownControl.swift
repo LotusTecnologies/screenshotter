@@ -302,15 +302,15 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         let item = items[itemIndex(pickerView: pickerView)]
         let title = item.pickerItems[row]
-        var attributes: [String : Any]?
+        var attributes: [NSAttributedStringKey : Any]?
         
         if isItemDisabled(item, withTitle: title) {
             let color: UIColor = .gray5
             
             attributes = [
-                NSForegroundColorAttributeName: color,
-                NSStrikethroughColorAttributeName: color,
-                NSStrikethroughStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue
+                NSAttributedStringKey.foregroundColor: color,
+                NSAttributedStringKey.strikethroughColor: color,
+                NSAttributedStringKey.strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue
             ]
         }
         
@@ -370,7 +370,7 @@ fileprivate class DropDownControl : UIControl {
         imageView.image = image
         imageView.contentMode = .scaleAspectFit
         addSubview(imageView)
-        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         imageView.topAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.topAnchor).isActive = true
         imageView.bottomAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.bottomAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true

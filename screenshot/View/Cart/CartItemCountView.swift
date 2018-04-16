@@ -22,7 +22,7 @@ class CartItemCountView: UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "cart.header.title".localized
         titleLabel.textColor = .gray3
-        titleLabel.font = UIFont.systemFont(ofSize: 28, weight: UIFontWeightLight)
+        titleLabel.font = UIFont.systemFont(ofSize: 28, weight: UIFont.Weight.light)
         titleLabel.minimumScaleFactor = 0.7
         titleLabel.baselineAdjustment = .alignCenters
         titleLabel.adjustsFontSizeToFitWidth = true
@@ -35,8 +35,8 @@ class CartItemCountView: UIView {
         itemCountLabel.translatesAutoresizingMaskIntoConstraints = false
         itemCountLabel.textColor = .gray3
         addSubview(itemCountLabel)
-        itemCountLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
-        itemCountLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        itemCountLabel.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
+        itemCountLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         itemCountLabel.firstBaselineAnchor.constraint(equalTo: titleLabel.firstBaselineAnchor).isActive = true
         itemCountLabel.topAnchor.constraint(greaterThanOrEqualTo: topAnchor).isActive = true
         itemCountLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor).isActive = true
@@ -57,13 +57,13 @@ class CartItemCountView: UIView {
         let text = "cart.header.item_count".localized(withFormat: count)
         let countRange = NSString(string: text).range(of: "\(count)")
         
-        let fontLight = UIFont.systemFont(ofSize: 16, weight: UIFontWeightLight)
-        let fontMedium = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
+        let fontLight = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.light)
+        let fontMedium = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.medium)
         
         let attributedString = NSMutableAttributedString(string: text, attributes: [
-            NSFontAttributeName: fontMedium
+            NSAttributedStringKey.font: fontMedium
             ])
-        attributedString.addAttribute(NSFontAttributeName, value: fontLight, range: countRange)
+        attributedString.addAttribute(NSAttributedStringKey.font, value: fontLight, range: countRange)
         
         itemCountLabel.attributedText = attributedString
     }

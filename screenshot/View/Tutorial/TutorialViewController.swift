@@ -86,7 +86,7 @@ class TutorialViewController : BaseViewController {
         }, completion: nil)
     }
     
-    func contentSizeCategoryDidChange(_ notification: Notification) {
+    @objc func contentSizeCategoryDidChange(_ notification: Notification) {
         slides.forEach { slide in
             slide.layoutMargins = slideLayoutMargins(slide)
         }

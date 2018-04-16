@@ -369,8 +369,8 @@ class NetworkingPromise : NSObject {
         let lastName: String
         if let fullName = fullName?.trimmingCharacters(in: .whitespacesAndNewlines),
             let lastSpaceRange = fullName.range(of: " ", options: .backwards) {
-            firstName = fullName.substring(to: lastSpaceRange.lowerBound)
-            lastName = fullName.substring(from: lastSpaceRange.upperBound)
+            firstName = String(fullName[..<lastSpaceRange.lowerBound])
+            lastName = String(fullName[lastSpaceRange.upperBound...])
         } else {
             firstName = fullName ?? ""
             lastName = ""
@@ -558,7 +558,7 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) {
+    func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) -> Promise<NSDictionary>{
         var parameterDict = ["image" : image]
         if let userName = userName, !userName.isEmpty {
             parameterDict["userName"] = userName
@@ -573,7 +573,8 @@ class NetworkingPromise : NSObject {
             let parameterData = try JSONSerialization.data(withJSONObject: parameterDict, options: [])
             
             guard let url = URL(string: Constants.screenShotLambdaDomain + "matchstick/submit") else {
-                return
+                let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create URL"])
+                return Promise.init(error: error)
                 
             }
                 var request = URLRequest(url: url)
@@ -582,16 +583,10 @@ class NetworkingPromise : NSObject {
                 request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
                 request.setValue("application/json", forHTTPHeaderField:"Content-Type")
                 
-                let session = URLSession.shared
-                let dataTask = session.dataTask(with: request) { data, response, error in
-                    if let data = data, let json = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] {
-                        print("shared to discover response: \(json)")
-                    }
-                    
-                }
-                dataTask.resume()
+                return URLSession.shared.dataTask(with: request).asDictionary()
         }catch {
-            print("submitToDiscover JSONSerialization error:\(error)")
+            let error = NSError(domain: "Craze", code: 10, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize params"])
+            return Promise.init(error: error)
         }
         
     }

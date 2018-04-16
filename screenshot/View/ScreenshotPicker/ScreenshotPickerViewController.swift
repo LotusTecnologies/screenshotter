@@ -46,7 +46,7 @@ class ScreenshotPickerNavigationController : UINavigationController {
         navigationBar.shadowImage = UIImage()
     }
     
-    func doneAction() {
+    @objc func doneAction() {
         let assets = screenshotPickerViewController.selectedAssets()
         AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets)
         
@@ -313,7 +313,7 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
         AnalyticsTrackers.standard.track(.canceledPhotoCreation)
     }
     
-    func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
         if let error = error {
             dismiss(animated: true, completion: nil)
             

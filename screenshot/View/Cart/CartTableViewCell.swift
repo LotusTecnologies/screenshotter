@@ -66,7 +66,7 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 0
         mainView.addSubview(titleLabel)
-        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        titleLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         titleLabel.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
         
         fontSizeStandardRangeConstraints += [
@@ -85,7 +85,7 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         priceLabel.adjustsFontSizeToFitWidth = true
         priceLabel.adjustsFontForContentSizeCategory = true
         mainView.addSubview(priceLabel)
-        priceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        priceLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         
         fontSizeStandardRangeConstraints += [
             priceLabel.topAnchor.constraint(equalTo: mainView.topAnchor),
@@ -138,11 +138,11 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
             label.adjustsFontSizeToFitWidth = true
             label.adjustsFontForContentSizeCategory = true
             variantDataContainerView.addSubview(label)
-            label.setContentHuggingPriority(UILayoutPriorityDefaultHigh, for: .horizontal)
-            label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+            label.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: .horizontal)
+            label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
             label.widthAnchor.constraint(lessThanOrEqualTo: variantDataPositionGuide.widthAnchor, multiplier: 0.4).isActive = true
             let heightConstraint = label.heightAnchor.constraint(greaterThanOrEqualToConstant: quantityStepper.intrinsicContentSize.height)
-            heightConstraint.priority = UILayoutPriorityDefaultHigh
+            heightConstraint.priority = UILayoutPriority.defaultHigh
             heightConstraint.isActive = true
             return label
         }

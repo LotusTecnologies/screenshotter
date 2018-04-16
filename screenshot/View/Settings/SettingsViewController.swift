@@ -119,7 +119,7 @@ class SettingsViewController : BaseViewController {
             imageView.contentMode = .scaleAspectFit
             imageView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -.padding)
             tableHeaderContentView.addSubview(imageView)
-            imageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
+            imageView.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
             imageView.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
             imageView.leftAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.leftAnchor).isActive = true
             imageView.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
@@ -131,7 +131,7 @@ class SettingsViewController : BaseViewController {
             screenshotsCountLabel.minimumScaleFactor = 0.7
             screenshotsCountLabel.baselineAdjustment = .alignCenters
             tableHeaderContentView.addSubview(screenshotsCountLabel)
-            screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
+            screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .horizontal)
             screenshotsCountLabel.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
             screenshotsCountLabel.leftAnchor.constraint(equalTo: imageView.layoutMarginsGuide.rightAnchor).isActive = true
             screenshotsCountLabel.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
@@ -154,8 +154,8 @@ class SettingsViewController : BaseViewController {
         tableFooterTextView.adjustsFontForContentSizeCategory = true
         tableFooterTextView.text = "settings.contact".localized
         tableFooterTextView.linkTextAttributes = [
-            NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-            NSUnderlineColorAttributeName: UIColor.gray7
+            NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
+            NSAttributedStringKey.underlineColor.rawValue: UIColor.gray7
         ]
         tableFooterTextView.frame = rectForTableFooterTextView()
         

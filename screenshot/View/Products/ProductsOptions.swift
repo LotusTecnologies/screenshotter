@@ -441,8 +441,8 @@ class ProductsOptionsView : UIView {
         categoryControl.tintColor = .crazeGreen
         categoryControl.isExclusiveTouch = true
         addSubview(categoryControl)
-        categoryControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        categoryControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        categoryControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        categoryControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         categoryControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
         categoryControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         categoryControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -452,8 +452,8 @@ class ProductsOptionsView : UIView {
         genderControl.tintColor = .crazeGreen
         genderControl.isExclusiveTouch = true
         addSubview(genderControl)
-        genderControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        genderControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        genderControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        genderControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         genderControl.topAnchor.constraint(equalTo: categoryControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -463,8 +463,8 @@ class ProductsOptionsView : UIView {
         sizeControl.tintColor = .crazeGreen
         sizeControl.isExclusiveTouch = true
         addSubview(sizeControl)
-        sizeControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        sizeControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        sizeControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        sizeControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
         sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -473,8 +473,8 @@ class ProductsOptionsView : UIView {
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.tintColor = .crazeGreen
         addSubview(saleControl)
-        saleControl.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        saleControl.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        saleControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        saleControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         saleControl.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
         saleControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         saleControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -485,15 +485,15 @@ class ProductsOptionsView : UIView {
         sortLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         sortLabel.adjustsFontForContentSizeCategory = true
         addSubview(sortLabel)
-        sortLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        sortLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        sortLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        sortLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         sortLabel.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .extendedPadding).isActive = true
         sortLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         sortLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         sortPickerView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(sortPickerView)
-        sortPickerView.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        sortPickerView.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         sortPickerView.topAnchor.constraint(equalTo: sortLabel.bottomAnchor).isActive = true
         sortPickerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         sortPickerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
@@ -503,8 +503,8 @@ class ProductsOptionsView : UIView {
         doneButton.backgroundColor = .gray3
         doneButton.setTitle("generic.done".localized, for: .normal)
         addSubview(doneButton)
-        doneButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        doneButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        doneButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        doneButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         doneButton.topAnchor.constraint(equalTo: sortPickerView.bottomAnchor, constant: .padding).isActive = true
         doneButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
