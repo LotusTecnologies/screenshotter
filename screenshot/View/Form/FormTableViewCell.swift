@@ -81,6 +81,17 @@ class FormDateTableViewCell: UITableViewCell {
 }
 
 class FormDatePickerTableViewCell: FormSelectionPickerTableViewCell, UIPickerViewDataSource, UIPickerViewDelegate {
+    enum DateComponent: Int {
+        case month
+        case year
+    }
+    
+    let currentYear: String = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy"
+        return formatter.string(from: Date())
+    }()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -102,11 +113,20 @@ class FormDatePickerTableViewCell: FormSelectionPickerTableViewCell, UIPickerVie
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if component == 0 {
+        if component == DateComponent.month.rawValue {
             return 12
         }
         else {
             return 21 // 20 years in advance
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        if component == DateComponent.month.rawValue {
+            return String(format: "%02d", row)
+        }
+        else {
+            return currentYear // TODO: increment year
         }
     }
 }
