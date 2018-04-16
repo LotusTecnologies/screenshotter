@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 9/4/17.
-//  Copyright Â© 2017 crazeapp. All rights reserved.
+//  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -162,6 +162,7 @@ extension UIApplication {
     }
 }
 
+// TODO: move to better location
 extension NSAttributedStringKey {
     static func convertStringAnyToNSAttributedStringKeyAny(_ dict:[String:Any]?) -> [NSAttributedStringKey : Any]? {
         if let dict = dict {
