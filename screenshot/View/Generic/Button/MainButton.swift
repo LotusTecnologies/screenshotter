@@ -22,7 +22,7 @@ class MainButton: LoadingButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.4, left: .padding, bottom: .padding / 1.4, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
@@ -65,7 +65,7 @@ class MainButton: LoadingButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
-                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter().withAlphaComponent(0.7)
+                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter()
             }
         }
     }
@@ -80,15 +80,6 @@ class MainButton: LoadingButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
-        
-        let imagePadding: CGFloat = 6
-        
-        imageEdgeInsets = UIEdgeInsets(top: 0, left: -imagePadding, bottom: 0, right: imagePadding / 2.0)
-        titleEdgeInsets = UIEdgeInsets(top: 0, left: imagePadding / 2.0, bottom: 0, right: -imagePadding)
-        
-        var contentInsets = contentEdgeInsets
-        contentInsets.left += imageEdgeInsets.right
-        contentInsets.right += titleEdgeInsets.left
-        contentEdgeInsets = contentInsets
+        adjustInsetsForImage(withPadding: 6)
     }
 }

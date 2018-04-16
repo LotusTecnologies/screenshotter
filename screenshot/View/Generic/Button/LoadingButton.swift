@@ -13,37 +13,52 @@ class LoadingButton: UIButton {
         didSet {
             if isLoading {
                 imageView?.isHidden = true
-                activityIndicator?.isHidden = false
-                activityIndicator?.startAnimating()
+                activityIndicator.isHidden = false
+                activityIndicator.startAnimating()
                 syncActivityIndicatorColor()
             }
             else {
                 imageView?.isHidden = false
-                activityIndicator?.stopAnimating()
-                activityIndicator?.isHidden = true
+                activityIndicator.stopAnimating()
+                activityIndicator.isHidden = true
             }
         }
     }
     
-    fileprivate lazy var activityIndicator: UIActivityIndicatorView? = {
-        guard let imageView = self.imageView else {
-            return nil
-        }
+    private var hasActivityIndicator = false
+    
+    fileprivate lazy var activityIndicator: UIActivityIndicatorView = {
+        self.hasActivityIndicator = true
         
         let activity = UIActivityIndicatorView(activityIndicatorStyle: .white)
         activity.translatesAutoresizingMaskIntoConstraints = false
         activity.isHidden = true
         activity.color = self.titleColor(for: self.state)
         self.addSubview(activity)
-        activity.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
-        activity.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
-        activity.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
-        activity.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
+        
+        if let imageView = self.imageView, imageView.image != nil {
+            activity.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
+            activity.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
+            activity.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
+            activity.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
+        }
+        else {
+            activity.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+            activity.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+            
+            self.setTitleColor(.clear, for: .disabled)
+        }
+        
         return activity
     }()
     
     fileprivate func syncActivityIndicatorColor() {
-        activityIndicator?.color = titleColor(for: state)
+        guard hasActivityIndicator &&
+            state != .disabled else {
+            return
+        }
+        
+        activityIndicator.color = titleColor(for: state)
     }
     
     override func layoutSubviews() {

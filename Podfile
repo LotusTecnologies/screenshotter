@@ -20,6 +20,7 @@ def shared_pods
     pod 'lottie-ios'
     pod 'Segment-Amplitude'
     pod 'SwiftKeychainWrapper'
+    pod 'CreditCardValidator'
 end
 
 target 'screenshot' do

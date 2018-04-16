@@ -161,19 +161,18 @@ class ShoppingCartModel {
                     guard let cart = dict["cart"] as? [String : Any],
                       let remoteId = cart["id"] as? String,
                       //let total = cart["total"] as? Float,
-                      let merchants = dict["merchants"] as? [[String : Any]],
-                      merchants.count > 0,
                       !remoteId.isEmpty else {
-                        print("ShoppingCartModel clearCart failed to extract code or merchants from dict:\(dict)")
-                        let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to extract cart id and total"])
+                        print("ShoppingCartModel validateCart failed to extract cart id from dict:\(dict)")
+                        let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel validateCart failed to extract cart id"])
                         reject(error)
                         return
                     }
+                    let merchants = dict["merchants"] as? [[String : Any]] ?? []
                     dataModel.performBackgroundTask { managedObjectContext in
                         guard let cartItems = dataModel.retrieveItems(managedObjectContext: managedObjectContext, remoteId: remoteId),
                           cartItems.count > 0 else {
-                            print("ShoppingCartModel clearCart failed to retrieve items for cart remoteId:\(remoteId)")
-                            let error = NSError(domain: "Craze", code: 46, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel clearCart failed to retrieve items"])
+                            print("ShoppingCartModel validateCart failed to retrieve items for cart remoteId:\(remoteId)")
+                            let error = NSError(domain: "Craze", code: 46, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel validateCart failed to retrieve items"])
                             reject(error)
                             return
                         }

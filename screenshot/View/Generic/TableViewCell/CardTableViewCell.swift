@@ -1,0 +1,70 @@
+//
+//  CardTableViewCell.swift
+//  screenshot
+//
+//  Created by Corey Werner on 4/10/18.
+//  Copyright © 2018 crazeapp. All rights reserved.
+//
+
+import UIKit
+
+class CardTableViewCell: UITableViewCell {
+    fileprivate let checkImageView = UIImageView()
+    let cardView = UIView()
+    let editButton = UIButton()
+    
+    private let checkImage = UIImage(named: "CardCellCheck")
+    private let checkPlaceholderImage = UIImage(named: "CardCellCheckPlaceholder")
+    
+    // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        var layoutMargins = contentView.layoutMargins
+        layoutMargins.top = .padding
+        layoutMargins.bottom = .padding
+        contentView.layoutMargins = layoutMargins
+        
+        checkImageView.translatesAutoresizingMaskIntoConstraints = false
+        checkImageView.image = checkPlaceholderImage
+        checkImageView.contentMode = .scaleAspectFit
+        contentView.addSubview(checkImageView)
+        checkImageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
+        checkImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        checkImageView.centerYAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerYAnchor).isActive = true
+        
+        cardView.translatesAutoresizingMaskIntoConstraints = false
+        cardView.backgroundColor = .white
+        cardView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        cardView.layer.borderColor = UIColor.cellBorder.cgColor
+        cardView.layer.borderWidth = 2
+        cardView.layer.cornerRadius = 8
+        cardView.layer.masksToBounds = true
+        contentView.addSubview(cardView)
+        cardView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        cardView.leadingAnchor.constraint(equalTo: checkImageView.trailingAnchor, constant: .padding).isActive = true
+        cardView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        cardView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        editButton.translatesAutoresizingMaskIntoConstraints = false
+        editButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        editButton.setTitle("generic.edit".localized, for: .normal)
+        editButton.setTitleColor(.crazeGreen, for: .normal)
+        cardView.addSubview(editButton)
+        editButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        editButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
+        editButton.topAnchor.constraint(equalTo: cardView.topAnchor).isActive = true
+        editButton.trailingAnchor.constraint(equalTo: cardView.trailingAnchor).isActive = true
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        
+        checkImageView.image = selected ? checkImage : checkPlaceholderImage
+    }
+}

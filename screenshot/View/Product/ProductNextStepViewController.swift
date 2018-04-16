@@ -15,7 +15,7 @@ class ProductNextStepViewController: UIViewController {
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -30,57 +30,55 @@ class ProductNextStepViewController: UIViewController {
         
         view.backgroundColor = .white
         
+        let layoutGuide = UIView()
+        layoutGuide.translatesAutoresizingMaskIntoConstraints = false
+        layoutGuide.isHidden = true
+        view.addSubview(layoutGuide)
+        layoutGuide.topAnchor.constraint(equalTo: view.topAnchor, constant: .padding).isActive = true
+        layoutGuide.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .padding).isActive = true
+        layoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -.padding).isActive = true
+        layoutGuide.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
+        
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .gray3
-        label.font = UIFont.preferredFont(forTextStyle: .title2)
-        label.adjustsFontForContentSizeCategory = true // TODO: test this
+        label.font = .screenshopFont(.hindMedium, textStyle: .title2, staticSize: true)
         label.text = "product.next_step.added".localized
         label.numberOfLines = 0
         view.addSubview(label)
         label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        label.topAnchor.constraint(equalTo: view.topAnchor, constant: .padding).isActive = true
-        label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
+        label.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
+        label.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
         
         let imageView = UIImageView(image: UIImage(named: "ProductCheck"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         view.addSubview(imageView)
-        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        imageView.topAnchor.constraint(greaterThanOrEqualTo: view.topAnchor, constant: .padding).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .padding).isActive = true
+        imageView.topAnchor.constraint(greaterThanOrEqualTo: layoutGuide.topAnchor).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -.padding).isActive = true
         imageView.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
         
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.backgroundColor = .crazeGreen
         cartButton.setTitle("product.next_step.cart".localized, for: .normal)
-        cartButton.titleLabel?.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize * 0.8)
-        cartButton.titleLabel?.minimumScaleFactor = 0.7
-        cartButton.titleLabel?.baselineAdjustment = .alignCenters
-        cartButton.titleLabel?.adjustsFontSizeToFitWidth = true
         view.addSubview(cartButton)
         cartButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         cartButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
         cartButton.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
-        cartButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .padding).isActive = true
-        cartButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -.padding).isActive = true
+        cartButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
+        cartButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
         continueButton.setTitle("product.next_step.continue".localized, for: .normal)
-        continueButton.titleLabel?.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize * 0.8)
-        continueButton.titleLabel?.minimumScaleFactor = 0.7
-        continueButton.titleLabel?.baselineAdjustment = .alignCenters
-        continueButton.titleLabel?.adjustsFontSizeToFitWidth = true
         view.addSubview(continueButton)
         continueButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         continueButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        continueButton.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
-        continueButton.leadingAnchor.constraint(equalTo: cartButton.trailingAnchor, constant: 10).isActive = true
-        continueButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -.padding).isActive = true
-        continueButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
+        continueButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
+        continueButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
+        continueButton.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
+        continueButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
     }
 }

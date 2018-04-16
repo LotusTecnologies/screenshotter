@@ -12,14 +12,15 @@ PODS:
     - Branch/Core (= 0.24.1)
   - Branch/Core (0.24.1)
   - Clarifai-Apple-SDK (3.0.0-beta14)
+  - CreditCardValidator (0.4)
   - EggRating (0.1.5):
     - RateView
-  - FBSDKCoreKit (4.31.1):
+  - FBSDKCoreKit (4.32.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.31.1):
+  - FBSDKLoginKit (4.32.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.31.1):
-    - FBSDKCoreKit (~> 4.31.1)
+  - FBSDKShareKit (4.32.0):
+    - FBSDKCoreKit (~> 4.32.0)
   - Intercom (4.1.9)
   - lottie-ios (2.5.0)
   - PromiseKit/CorePromise (4.5.2)
@@ -41,6 +42,7 @@ DEPENDENCIES:
   - Appsee
   - Branch
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
+  - CreditCardValidator
   - EggRating
   - FBSDKCoreKit
   - FBSDKLoginKit
@@ -53,6 +55,27 @@ DEPENDENCIES:
   - Segment-Amplitude
   - SwiftKeychainWrapper
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Amplitude-iOS
+    - Analytics
+    - Appsee
+    - Bolts
+    - Branch
+    - Clarifai-Apple-SDK
+    - CreditCardValidator
+    - EggRating
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - FBSDKShareKit
+    - Intercom
+    - lottie-ios
+    - PromiseKit
+    - RateView
+    - SDWebImage
+    - Segment-Amplitude
+    - SwiftKeychainWrapper
+
 SPEC CHECKSUMS:
   Amplitude-iOS: c923c4a576698083c1cd05e45072c92d41e206bd
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
@@ -60,10 +83,11 @@ SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 8b59411a12867bde4fe8c9d3c0f107c5811e303e
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
+  CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
-  FBSDKCoreKit: e08ccfcefa7bc1347a07c276dac9bf6c7fe57024
-  FBSDKLoginKit: 99797ac39252fef6f72600b886f6ee60b4b29cab
-  FBSDKShareKit: e640c41c9fcd61929eeb3d0c21ad335103e7cb62
+  FBSDKCoreKit: 55d7f2ac45d9c4b9b6119f4e43900fe84b9b7b1b
+  FBSDKLoginKit: 32ac05c2a59952c363c2e85aafa8f73ba93bcbad
+  FBSDKShareKit: 658780d0d108b8ad590a54afb5ac1427bdc8de28
   Intercom: c69c28474ffc9bf99cce5a7c25f515aad3796944
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
@@ -72,6 +96,6 @@ SPEC CHECKSUMS:
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
 
-PODFILE CHECKSUM: b242c0a4a703b963e597292a5392ea7f42d83a92
+PODFILE CHECKSUM: 2a3449d5424e3fda6e3ec695c721ef3d6fe57871
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.0

@@ -43,6 +43,19 @@
 		C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501412D20623DFD00ABFB5C /* UICollectionView.swift */; };
 		C5014130206283A200ABFB5C /* LoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C501412F206283A200ABFB5C /* LoadingButton.swift */; };
 		C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */; };
+		C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */; };
+		C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */; };
+		C50DBB8A207CA36600BB206E /* CheckoutOrderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */; };
+		C50DBB8C207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */; };
+		C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */; };
+		C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */; };
+		C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */; };
+		C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */; };
+		C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */; };
+		C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */; };
+		C50E25F0207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */; };
+		C50E2614207F4B71003C8D24 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E2613207F4B71003C8D24 /* Button.swift */; };
+		C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */; };
@@ -70,6 +83,9 @@
 		C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */; };
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
 		C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */; };
+		C5406A83206B6858002977CE /* UIApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A82206B6858002977CE /* UIApplication.swift */; };
+		C5406A85206B7D85002977CE /* CheckoutShippingFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A84206B7D85002977CE /* CheckoutShippingFormViewController.swift */; };
+		C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */; };
 		C540880D1FE90C8E00198955 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C21FE90C8D00198955 /* Loader.swift */; };
 		C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C31FE90C8D00198955 /* LoadingViewController.swift */; };
 		C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087C71FE90C8D00198955 /* SettingsViewController.swift */; };
@@ -126,7 +142,7 @@
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
-		C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E641FFA2D2600F491C0 /* Size.swift */; };
+		C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB87EC208382EF00E2CB98 /* UIResponder.swift */; };
 		C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E661FFA363500F491C0 /* EmbossedView.swift */; };
 		C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5BE7C1E20186309000DB8A0 /* DiscoverNavigationController.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
@@ -142,7 +158,12 @@
 		C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5D98CCA1FFA642300CC1A97 /* GameScene.sks */; };
 		C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCB1FFA642300CC1A97 /* GameScene.swift */; };
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
+		C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
+		C5E92416206901D200D44FF9 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E92415206901D200D44FF9 /* FormViewController.swift */; };
+		C5E9241820690B6100D44FF9 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E9241720690B6100D44FF9 /* Form.swift */; };
+		C5E9241A2069149000D44FF9 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E924192069149000D44FF9 /* FormView.swift */; };
+		C5E9241C206914C100D44FF9 /* FormTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E9241B206914C100D44FF9 /* FormTableViewCell.swift */; };
 		C5F37C95205505690072FE1D /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37C94205505690072FE1D /* ProductsViewController.swift */; };
 		C5F37C9F20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37C9E20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift */; };
 		C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F37CA020555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift */; };
@@ -239,6 +260,19 @@
 		C501412D20623DFD00ABFB5C /* UICollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionView.swift; sourceTree = "<group>"; };
 		C501412F206283A200ABFB5C /* LoadingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingButton.swift; sourceTree = "<group>"; };
 		C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScrollRevealController.swift; path = screenshot/View/Generic/ScrollRevealController.swift; sourceTree = SOURCE_ROOT; };
+		C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOrderViewController.swift; sourceTree = "<group>"; };
+		C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoresizingTableView.swift; sourceTree = "<group>"; };
+		C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOrderView.swift; sourceTree = "<group>"; };
+		C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOrderItemTableViewCell.swift; sourceTree = "<group>"; };
+		C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardTableViewCell.swift; sourceTree = "<group>"; };
+		C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentListViewController.swift; sourceTree = "<group>"; };
+		C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutCreditCardTableViewCell.swift; sourceTree = "<group>"; };
+		C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCardValidator.swift; sourceTree = "<group>"; };
+		C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingListViewController.swift; sourceTree = "<group>"; };
+		C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingTableViewCell.swift; sourceTree = "<group>"; };
+		C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmPaymentViewController.swift; sourceTree = "<group>"; };
+		C50E2613207F4B71003C8D24 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldFormatter.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTableViewCell.swift; sourceTree = "<group>"; };
@@ -266,6 +300,9 @@
 		C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterKeys.swift; sourceTree = "<group>"; };
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
 		C53EAF8F2019B68B000E4544 /* ProductWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductWebViewController.swift; sourceTree = "<group>"; };
+		C5406A82206B6858002977CE /* UIApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.swift; sourceTree = "<group>"; };
+		C5406A84206B7D85002977CE /* CheckoutShippingFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingFormViewController.swift; sourceTree = "<group>"; };
+		C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicTypeAccessibilityLayout.swift; sourceTree = "<group>"; };
 		C54087C21FE90C8D00198955 /* Loader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
 		C54087C31FE90C8D00198955 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		C54087C71FE90C8D00198955 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -322,7 +359,7 @@
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
-		C5AC7E641FFA2D2600F491C0 /* Size.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size.swift; sourceTree = "<group>"; };
+		C5AB87EC208382EF00E2CB98 /* UIResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIResponder.swift; sourceTree = "<group>"; };
 		C5AC7E661FFA363500F491C0 /* EmbossedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbossedView.swift; sourceTree = "<group>"; };
 		C5BE7C1E20186309000DB8A0 /* DiscoverNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverNavigationController.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
@@ -338,7 +375,12 @@
 		C5D98CCA1FFA642300CC1A97 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C5D98CCB1FFA642300CC1A97 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
+		C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentFormViewController.swift; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
+		C5E92415206901D200D44FF9 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
+		C5E9241720690B6100D44FF9 /* Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
+		C5E924192069149000D44FF9 /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
+		C5E9241B206914C100D44FF9 /* FormTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormTableViewCell.swift; sourceTree = "<group>"; };
 		C5F37C94205505690072FE1D /* ProductsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		C5F37C9E20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerTransitioningDelegate.swift; sourceTree = "<group>"; };
 		C5F37CA020555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerAnimatedTransitioning.swift; sourceTree = "<group>"; };
@@ -520,6 +562,16 @@
 			isa = PBXGroup;
 			children = (
 				C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */,
+				C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */,
+				C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */,
+				C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */,
+				C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */,
+				C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */,
+				C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */,
+				C50DBB8F207CD53E00BB206E /* CheckoutPaymentListViewController.swift */,
+				C5406A84206B7D85002977CE /* CheckoutShippingFormViewController.swift */,
+				C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */,
+				C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
 			);
 			path = Checkout;
@@ -565,6 +617,7 @@
 				C54087DA1FE90C8D00198955 /* Currency */,
 				C54087F61FE90C8E00198955 /* Discover */,
 				C54087F31FE90C8E00198955 /* Favorite */,
+				C5E92414206901AA00D44FF9 /* Form */,
 				C5D98CC91FFA642300CC1A97 /* Game */,
 				C54087F81FE90C8E00198955 /* Generic */,
 				C5F53D8C2014A57F003A57EC /* Legal */,
@@ -720,6 +773,7 @@
 				C54088471FE90E2200198955 /* CollectionViewCell */,
 				C543696020468C2F00599134 /* Control */,
 				C5D57934203F043200A076FE /* Controller */,
+				C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */,
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
 				C54088501FE90E2200198955 /* HelperView.swift */,
@@ -754,6 +808,7 @@
 		C54088441FE90E2200198955 /* TableViewCell */ = {
 			isa = PBXGroup;
 			children = (
+				C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */,
 				C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */,
 			);
 			path = TableViewCell;
@@ -842,10 +897,12 @@
 			children = (
 				C5DDC0DB2015C6D900B009BF /* AttributedString.swift */,
 				C5336D22203D553400A7B4B0 /* BarItem.swift */,
+				C50E2613207F4B71003C8D24 /* Button.swift */,
 				C501410A205E702B00ABFB5C /* Font.swift */,
 				C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */,
-				C5AC7E641FFA2D2600F491C0 /* Size.swift */,
+				C5406A82206B6858002977CE /* UIApplication.swift */,
 				C501412D20623DFD00ABFB5C /* UICollectionView.swift */,
+				C5AB87EC208382EF00E2CB98 /* UIResponder.swift */,
 				C501412B2061101100ABFB5C /* UITableView.swift */,
 			);
 			path = Extension;
@@ -865,6 +922,7 @@
 			children = (
 				C53B46501FBC396900A8C886 /* Appearance.swift */,
 				C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */,
+				C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */,
 				C553563B1F8369DE00849E64 /* DeviceHelper.swift */,
 				C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */,
 				C53B46521FBC397700A8C886 /* Geometry.swift */,
@@ -883,6 +941,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D57932203EDD7A00A076FE /* TableView.swift */,
+				C50DBB7E207B4A8B00BB206E /* AutoresizingTableView.swift */,
 			);
 			path = TableView;
 			sourceTree = "<group>";
@@ -899,6 +958,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D57935203F044B00A076FE /* EmptyListController.swift */,
+				C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -911,6 +971,17 @@
 				C5336D24203D9AC800A7B4B0 /* GameViewController.swift */,
 			);
 			path = Game;
+			sourceTree = "<group>";
+		};
+		C5E92414206901AA00D44FF9 /* Form */ = {
+			isa = PBXGroup;
+			children = (
+				C5E9241720690B6100D44FF9 /* Form.swift */,
+				C5E9241B206914C100D44FF9 /* FormTableViewCell.swift */,
+				C5E924192069149000D44FF9 /* FormView.swift */,
+				C5E92415206901D200D44FF9 /* FormViewController.swift */,
+			);
+			path = Form;
 			sourceTree = "<group>";
 		};
 		C5F37C9D20555C0C0072FE1D /* ViewControllerTransitioning */ = {
@@ -1157,6 +1228,7 @@
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/Branch/Branch.framework",
 				"${PODS_ROOT}/Clarifai-Apple-SDK/Clarifai_Apple_SDK.framework",
+				"${BUILT_PRODUCTS_DIR}/CreditCardValidator/CreditCardValidator.framework",
 				"${BUILT_PRODUCTS_DIR}/EggRating/EggRating.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -1175,6 +1247,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Branch.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Clarifai_Apple_SDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CreditCardValidator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EggRating.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -1254,17 +1327,21 @@
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
+				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
 				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
+				C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				319B031320592A7700446054 /* ShowProduct.swift in Sources */,
+				C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
+				C50E25F0207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift in Sources */,
 				C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */,
 				31CE1111203BF055000156EE /* ProductsBarCollectionViewCell.swift in Sources */,
 				C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */,
@@ -1277,9 +1354,10 @@
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
+				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
-				C5AC7E651FFA2D2600F491C0 /* Size.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
+				C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
 				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
@@ -1292,6 +1370,8 @@
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
+				C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */,
+				C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
@@ -1307,6 +1387,7 @@
 				C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54369672046D6FD00599134 /* BaseViewController.swift in Sources */,
+				C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
 				C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C54088181FE90C8E00198955 /* TutorialVideoViewController.swift in Sources */,
@@ -1317,6 +1398,7 @@
 				C501412C2061101100ABFB5C /* UITableView.swift in Sources */,
 				C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
+				C5E9241C206914C100D44FF9 /* FormTableViewCell.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,
 				C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */,
@@ -1331,8 +1413,10 @@
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
 				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,
 				C528006020516293004DD7A3 /* CheckoutWebViewController.swift in Sources */,
+				C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
+				C50E2614207F4B71003C8D24 /* Button.swift in Sources */,
 				C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */,
 				C54088511FE90E2200198955 /* NotifyChangeView.swift in Sources */,
 				C54088121FE90C8E00198955 /* TutorialEmailSlideView.swift in Sources */,
@@ -1341,6 +1425,7 @@
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
+				C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
 				C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,
 				31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
@@ -1351,6 +1436,7 @@
 				C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */,
+				C5E92416206901D200D44FF9 /* FormViewController.swift in Sources */,
 				31CE1107203BEF36000156EE /* SaleView.swift in Sources */,
 				31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
@@ -1362,6 +1448,7 @@
 				C501410B205E702C00ABFB5C /* Font.swift in Sources */,
 				C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */,
 				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
+				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
 				C572FEE6205A53600046BFEB /* ProductsCollectionView.swift in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
@@ -1375,6 +1462,8 @@
 				319B03112059020300446054 /* AddToDiscoverActivity.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
+				C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */,
+				C50DBB8A207CA36600BB206E /* CheckoutOrderView.swift in Sources */,
 				C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */,
 				C5F37C9F20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,
@@ -1384,11 +1473,15 @@
 				31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5F8D63F1FA0DF420067C26A /* TapticHelper.swift in Sources */,
+				C5406A85206B7D85002977CE /* CheckoutShippingFormViewController.swift in Sources */,
+				C5E9241A2069149000D44FF9 /* FormView.swift in Sources */,
 				E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */,
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
 				C5014130206283A200ABFB5C /* LoadingButton.swift in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
+				C50DBB8C207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift in Sources */,
+				C5406A83206B6858002977CE /* UIApplication.swift in Sources */,
 				E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C543696B2046D74100599134 /* ModalNavigationController.swift in Sources */,
@@ -1397,6 +1490,7 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
+				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
 			);

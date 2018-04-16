@@ -10,7 +10,13 @@ import UIKit
 import CoreData
 import SDWebImage
 
+protocol CartViewControllerDelegate: NSObjectProtocol {
+    func cartViewControllerDidValidateCart(_ viewController: CartViewController)
+}
+
 class CartViewController: BaseViewController {
+    weak var delegate: CartViewControllerDelegate?
+    
     fileprivate let tableView = TableView(frame: .zero, style: .grouped)
     fileprivate let itemCountView = CartItemCountView()
     fileprivate let emptyListView = HelperView()
@@ -273,28 +279,33 @@ fileprivate extension CartViewControllerCheckout {
         ShoppingCartModel.shared.checkout()
             .then { [weak self] success -> Void in
                 if success {
-                    guard let _ = self else {
+                    guard let strongSelf = self else {
                         return
                     }
                     
-                    ShoppingCartModel.shared.hostedUrl()
-                        .then { url -> Void in
-                            guard let strongSelf = self else {
-                                return
-                            }
-                            
-                            strongSelf.dismissCheckoutLoader()
-                            strongSelf.pushCheckoutViewController(with: url)
-                        }
-                        .catch(execute: { error in
-                            self?.dismissCheckoutLoader()
-                        })
+                    strongSelf.dismissCheckoutLoader()
+                    strongSelf.delegate?.cartViewControllerDidValidateCart(strongSelf)
+                    
+                    // TODO: coordinate the removal from model
+//                    ShoppingCartModel.shared.hostedUrl()
+//                        .then { url -> Void in
+//                            guard let strongSelf = self else {
+//                                return
+//                            }
+//
+//                            strongSelf.dismissCheckoutLoader()
+//                            strongSelf.pushCheckoutViewController(with: url)
+//                        }
+//                        .catch(execute: { error in
+//                            self?.dismissCheckoutLoader()
+//                        })
                 }
                 else {
                     self?.dismissCheckoutLoader()
                 }
             }
             .catch { [weak self] error in
+                // TODO: need to handle this
                 print("checkout error:\(error)")
                 self?.dismissCheckoutLoader()
         }
@@ -312,19 +323,21 @@ fileprivate extension CartViewControllerCheckout {
         loaderView.stopAnimation()
     }
     
-    func pushCheckoutViewController(with url: URL) {
-        let checkoutWebViewController = CheckoutWebViewController()
-        checkoutWebViewController.hidesBottomBarWhenPushed = true
-        checkoutWebViewController.title = "checkout.title".localized
-        checkoutWebViewController.loadURL(url)
-        checkoutWebViewController.isToolbarEnabled = false
+    func pushCheckoutViewController() {
         
-        if let navigationController = navigationController {
-            navigationController.pushViewController(checkoutWebViewController, animated: true)
-        }
-        else {
-            let navigationController = ModalNavigationController(rootViewController: checkoutWebViewController)
-            present(navigationController, animated: true, completion: nil)
-        }
+        // TODO: remove relevant code
+//        let checkoutWebViewController = CheckoutWebViewController()
+//        checkoutWebViewController.hidesBottomBarWhenPushed = true
+//        checkoutWebViewController.title = "checkout.title".localized
+//        checkoutWebViewController.loadURL(url)
+//        checkoutWebViewController.isToolbarEnabled = false
+//
+//        if let navigationController = navigationController {
+//            navigationController.pushViewController(checkoutWebViewController, animated: true)
+//        }
+//        else {
+//            let navigationController = ModalNavigationController(rootViewController: checkoutWebViewController)
+//            present(navigationController, animated: true, completion: nil)
+//        }
     }
 }
