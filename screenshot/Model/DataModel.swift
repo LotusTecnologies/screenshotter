@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import PromiseKit
+import SwiftKeychainWrapper
 
 
 class DataModel: NSObject {
@@ -206,6 +207,24 @@ extension DataModel {
         request.sortDescriptors = [NSSortDescriptor(key: "errorMask", ascending: false), NSSortDescriptor(key: "dateModified", ascending: false)]
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
+    func cardFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Card>  {
+        let request: NSFetchRequest<Card> = Card.fetchRequest()
+        request.predicate = NSPredicate(format: "isSaved == TRUE")
+        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<Card>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
+    func shippingAddressFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<ShippingAddress>  {
+        let request: NSFetchRequest<ShippingAddress> = ShippingAddress.fetchRequest()
+        request.predicate = nil
+        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<ShippingAddress>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
 }
@@ -647,6 +666,22 @@ extension DataModel {
         }
     }
     
+    // Errors if cart has no remoteId.
+    func retrieveForNativeCheckout() -> Promise<String> {
+        return Promise { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                if let cart = self.retrieveAddableCart(managedObjectContext: managedObjectContext),
+                  let remoteId = cart.remoteId,
+                  !remoteId.isEmpty {
+                    fulfill(remoteId)
+                } else {
+                    let error = NSError(domain: "Craze", code: 80, userInfo: [NSLocalizedDescriptionKey : "nativeCheckout with no remoteId"])
+                    reject(error)
+                }
+            }
+        }
+    }
+    
     func add(remoteId: String, toCartOID: NSManagedObjectID) {
         performBackgroundTask { (managedObjectContext) in
             do {
@@ -710,6 +745,80 @@ extension DataModel {
         return []
     }
     
+    func saveCard(fullName: String,
+                  number: String,
+                  displayNumber: String,
+                  expirationMonth: Int16,
+                  expirationYear: Int16,
+//                cvv: Int16,
+                  street: String,
+                  city: String,
+                  country: String,
+                  zipCode: String,
+                  state: String?,
+                  email: String?,
+                  phone: String,
+                  isSaved: Bool) {
+        performBackgroundTask { (managedObjectContext) in
+            let cardToSave = Card(context: managedObjectContext)
+            cardToSave.fullName = fullName
+            cardToSave.displayNumber = displayNumber
+            cardToSave.expirationMonth = expirationMonth
+            cardToSave.expirationYear = expirationYear
+            cardToSave.street = street
+            cardToSave.city = city
+            cardToSave.country = country
+            cardToSave.zipCode = zipCode
+            cardToSave.state = state
+            cardToSave.email = email
+            cardToSave.phone = phone
+            cardToSave.isSaved = isSaved
+            let now = NSDate()
+            cardToSave.dateAdded = now
+            cardToSave.dateModified = now
+            do {
+                try managedObjectContext.save()
+                let key = cardToSave.cardNumberKeychainKey()
+                DispatchQueue.global(qos: .utility).async {
+                    let startKeychain = Date()
+                    let didSetCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
+                    print("GMK didSetCardNumber:\(didSetCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                }
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+
+    func saveShippingAddress(firstName: String?,
+                  lastName: String?,
+                  street: String,
+                  city: String,
+                  country: String,
+                  zipCode: String,
+                  state: String?,
+                  phone: String) {
+        performBackgroundTask { (managedObjectContext) in
+            let shippingAddressToSave = ShippingAddress(context: managedObjectContext)
+            shippingAddressToSave.firstName = firstName
+            shippingAddressToSave.lastName = lastName
+            shippingAddressToSave.street = street
+            shippingAddressToSave.city = city
+            shippingAddressToSave.country = country
+            shippingAddressToSave.zipCode = zipCode
+            shippingAddressToSave.state = state
+            shippingAddressToSave.phone = phone
+            let now = NSDate()
+            shippingAddressToSave.dateAdded = now
+            shippingAddressToSave.dateModified = now
+            do {
+                try managedObjectContext.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
@@ -1487,6 +1596,142 @@ extension CartItem {
     
     func productTitle() -> String? {
         return productDescription?.productTitle()
+    }
+    
+}
+
+extension Card {
+    
+    func cardNumberKeychainKey() -> String {
+        return objectID.uriRepresentation().absoluteString
+    }
+    
+    func retrieveCardNumber() -> String? {
+        let key = cardNumberKeychainKey()
+        let startKeychain = Date()
+        let cardNumber = KeychainWrapper.standard.string(forKey: key)
+        let hasValue = cardNumber != nil && cardNumber?.isEmpty == false
+        print("GMK retrieveCardNumber hasValue:\(hasValue) took \(-startKeychain.timeIntervalSinceNow) seconds")
+        return cardNumber
+    }
+    
+    func edit(fullName: String,
+              number: String,
+              displayNumber: String,
+              expirationMonth: Int16,
+              expirationYear: Int16,
+//              cvv: Int16,
+              street: String,
+              city: String,
+              country: String,
+              zipCode: String,
+              state: String?,
+              email: String?,
+              phone: String) {
+        let oid = objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            guard let card = managedObjectContext.object(with: oid) as? Card else {
+                print("Card.edit failed to retrieve object with oid:\(oid)")
+                return
+            }
+            card.fullName = fullName
+            card.displayNumber = displayNumber
+            card.expirationMonth = expirationMonth
+            card.expirationYear = expirationYear
+            card.street = street
+            card.city = city
+            card.country = country
+            card.zipCode = zipCode
+            card.state = state
+            card.email = email
+            card.phone = phone
+            card.isSaved = true
+            card.dateModified = NSDate()
+            do {
+                try managedObjectContext.save()
+                let key = self.cardNumberKeychainKey()
+                DispatchQueue.global(qos: .utility).async {
+                    let startKeychain = Date()
+                    let didUpdateCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
+                    print("GMK didUpdateCardNumber:\(didUpdateCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                }
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+    
+    func delete() {
+        let oid = objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            guard let card = managedObjectContext.object(with: oid) as? Card else {
+                print("Card.delete failed to retrieve object with oid:\(oid)")
+                return
+            }
+            let key = self.cardNumberKeychainKey()
+            managedObjectContext.delete(card)
+            do {
+                try managedObjectContext.save()
+                DispatchQueue.global(qos: .utility).async {
+                    let startKeychain = Date()
+                    let didDeleteCardNumber: Bool = KeychainWrapper.standard.removeObject(forKey: key)
+                    print("GMK didDeleteCardNumber:\(didDeleteCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                }
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+    
+}
+
+extension ShippingAddress {
+    
+    func edit(firstName: String?,
+              lastName: String?,
+              street: String,
+              city: String,
+              country: String,
+              zipCode: String,
+              state: String?,
+              phone: String) {
+        let oid = objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            guard let shippingAddress = managedObjectContext.object(with: oid) as? ShippingAddress else {
+                print("ShippingAddress.edit failed to retrieve object with oid:\(oid)")
+                return
+            }
+            shippingAddress.firstName = firstName
+            shippingAddress.lastName = lastName
+            shippingAddress.street = street
+            shippingAddress.city = city
+            shippingAddress.country = country
+            shippingAddress.zipCode = zipCode
+            shippingAddress.state = state
+            shippingAddress.phone = phone
+            shippingAddress.dateModified = NSDate()
+            do {
+                try managedObjectContext.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+    }
+    
+    func delete() {
+        let oid = objectID
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            guard let shippingAddress = managedObjectContext.object(with: oid) as? ShippingAddress else {
+                print("ShippingAddress.delete failed to retrieve object with oid:\(oid)")
+                return
+            }
+            managedObjectContext.delete(shippingAddress)
+            do {
+                try managedObjectContext.save()
+            } catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
     }
     
 }

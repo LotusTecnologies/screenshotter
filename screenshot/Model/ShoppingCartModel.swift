@@ -153,9 +153,9 @@ class ShoppingCartModel {
         }
         // Wait for network to add items to remoteId.
             .then { jsonObject -> Promise<[String : Any]> in
-                return NetworkingPromise.sharedInstance.checkoutCart(jsonObject: jsonObject)
+                return NetworkingPromise.sharedInstance.validateCart(jsonObject: jsonObject)
         }
-        // Process cart checkout network response.
+        // Process cart validation network response.
             .then { dict -> Promise<Bool> in
                 return Promise { fulfill, reject in
                     guard let cart = dict["cart"] as? [String : Any],
@@ -238,6 +238,17 @@ class ShoppingCartModel {
                                 didChange = true
                             }
                         }
+                        // Save subtotal and shippingTotal to Cart object.
+                        if let cartObject = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
+                            cartObject.subtotal =  cart["subtotal"] as? Float
+                                                ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
+                            cartObject.shippingTotal = cart["shipping_total"] as? Float ?? 0
+                            print("Subtotal:\(cartObject.subtotal)  shippingTotal:\(cartObject.shippingTotal)")
+                            didChange = true
+                        } else {
+                            print("Failed to update subtotal and shippingTotal for cart remoteId:\(remoteId)")
+                        }
+                        
                         let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
                         if didChange {
                             managedObjectContext.saveIfNeeded()
@@ -298,6 +309,26 @@ class ShoppingCartModel {
             } else {
                 print("hostedCompleted failed to retrieve cart")
             }
+        }
+    }
+    
+    func nativeCheckout(card: Card, shippingAddress: ShippingAddress) -> Promise<Bool> {
+        // Get cart remoteId, or error.
+        var rememberRemoteId = ""
+        let dataModel = DataModel.sharedInstance
+        return firstly {
+            dataModel.retrieveForNativeCheckout()
+            }
+            // Wait for network to return response for processing nativeCheckout.
+            .then { remoteId -> Promise<[String : Any]> in
+                rememberRemoteId = remoteId
+                return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, shippingAddress: shippingAddress)
+            }
+            //
+            .then { nativeCheckoutResponseDict -> Promise<Bool> in
+                print("nativeCheckoutResponseDict:\(nativeCheckoutResponseDict)")
+                self.hostedCompleted(remoteId: rememberRemoteId, from: "nativeCheckout")
+                return Promise(value: true) // TODO: GMK Change to Void? True if saved?
         }
     }
     

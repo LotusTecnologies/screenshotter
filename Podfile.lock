@@ -15,12 +15,12 @@ PODS:
   - CreditCardValidator (0.4)
   - EggRating (0.1.5):
     - RateView
-  - FBSDKCoreKit (4.31.1):
+  - FBSDKCoreKit (4.32.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.31.1):
+  - FBSDKLoginKit (4.32.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.31.1):
-    - FBSDKCoreKit (~> 4.31.1)
+  - FBSDKShareKit (4.32.0):
+    - FBSDKCoreKit (~> 4.32.0)
   - Intercom (4.1.9)
   - lottie-ios (2.5.0)
   - PromiseKit/CorePromise (4.5.2)
@@ -35,6 +35,7 @@ PODS:
   - Segment-Amplitude (2.0.0):
     - Amplitude-iOS (~> 4.0)
     - Analytics (~> 3.6)
+  - SwiftKeychainWrapper (3.0.1)
 
 DEPENDENCIES:
   - Analytics (~> 3.0)
@@ -52,6 +53,7 @@ DEPENDENCIES:
   - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
+  - SwiftKeychainWrapper
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -72,6 +74,7 @@ SPEC REPOS:
     - RateView
     - SDWebImage
     - Segment-Amplitude
+    - SwiftKeychainWrapper
 
 SPEC CHECKSUMS:
   Amplitude-iOS: c923c4a576698083c1cd05e45072c92d41e206bd
@@ -82,16 +85,17 @@ SPEC CHECKSUMS:
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
   CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
-  FBSDKCoreKit: e08ccfcefa7bc1347a07c276dac9bf6c7fe57024
-  FBSDKLoginKit: 99797ac39252fef6f72600b886f6ee60b4b29cab
-  FBSDKShareKit: e640c41c9fcd61929eeb3d0c21ad335103e7cb62
+  FBSDKCoreKit: 55d7f2ac45d9c4b9b6119f4e43900fe84b9b7b1b
+  FBSDKLoginKit: 32ac05c2a59952c363c2e85aafa8f73ba93bcbad
+  FBSDKShareKit: 658780d0d108b8ad590a54afb5ac1427bdc8de28
   Intercom: c69c28474ffc9bf99cce5a7c25f515aad3796944
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
+  SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
 
-PODFILE CHECKSUM: f10fec960fa4a33070b4c97678ac89ddfea0e2b2
+PODFILE CHECKSUM: 2a3449d5424e3fda6e3ec695c721ef3d6fe57871
 
 COCOAPODS: 1.5.0
