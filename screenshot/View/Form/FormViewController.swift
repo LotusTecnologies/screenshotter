@@ -44,7 +44,7 @@ class FormViewController: BaseViewController {
             
             for index in startIndex..<endIndex {
                 if let selectionRow = section.rows?[index] as? FormRow.Selection {
-                    let selectionPickerRow = FormRow.SelectionPicker(with: selectionRow)
+                    let selectionPickerRow = FormRow.Picker(with: selectionRow)
                     section.rows?.insert(selectionPickerRow, at: index + 1)
                 }
             }
@@ -76,7 +76,7 @@ class FormViewController: BaseViewController {
         tableViewRegister(FormNumberTableViewCell.self, for: FormRow.Number.self)
         tableViewRegister(FormPhoneTableViewCell.self, for: FormRow.Phone.self)
         tableViewRegister(FormSelectionTableViewCell.self, for: FormRow.Selection.self)
-        tableViewRegister(FormSelectionPickerTableViewCell.self, for: FormRow.SelectionPicker.self)
+        tableViewRegister(FormSelectionPickerTableViewCell.self, for: FormRow.Picker.self)
         tableViewRegister(FormTextTableViewCell.self, for: FormRow.Text.self)
         tableViewRegister(FormZipTableViewCell.self, for: FormRow.Zip.self)
     }
@@ -175,7 +175,7 @@ extension FormViewController: UITableViewDataSource {
         let formRow = formRowAt(indexPath)
         
         if formRow?.isVisible ?? true {
-            if formRow is FormRow.SelectionPicker {
+            if formRow is FormRow.Picker {
                 return 200
             }
             else {
@@ -361,8 +361,8 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         }
     }
     
-    private func selectionPickerRow(for pickerView: UIPickerView) -> FormRow.SelectionPicker? {
-        if let indexPath = indexPath(for: pickerView), let formRow = formRowAt(indexPath) as? FormRow.SelectionPicker {
+    private func pickerRow(for pickerView: UIPickerView) -> FormRow.Picker? {
+        if let indexPath = indexPath(for: pickerView), let formRow = formRowAt(indexPath) as? FormRow.Picker {
             return formRow
         }
         else {
@@ -375,8 +375,8 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if let selectionPickerRow = selectionPickerRow(for: pickerView) {
-            return selectionPickerRow.selectionRow.options?.count ?? 0
+        if let pickerRow = pickerRow(for: pickerView) {
+            return pickerRow.attachedRow.options?.count ?? 0
         }
         else {
             return 0
@@ -384,7 +384,7 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if let options = selectionPickerRow(for: pickerView)?.selectionRow.options {
+        if let options = pickerRow(for: pickerView)?.attachedRow.options {
             return options[row]
         }
         else {
@@ -393,29 +393,29 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let selectionPickerRow = selectionPickerRow(for: pickerView),
-            let options = selectionPickerRow.selectionRow.options else {
+        guard let pickerRow = pickerRow(for: pickerView),
+            let options = pickerRow.attachedRow.options else {
                 return
         }
         
-        selectionPickerRow.selectionRow.value = options[row]
+        pickerRow.attachedRow.value = options[row]
         
-        if let indexPath = form.indexPath(for: selectionPickerRow.selectionRow),
+        if let indexPath = form.indexPath(for: pickerRow.attachedRow),
             let cell = tableView.cellForRow(at: indexPath) as? FormSelectionTableViewCell
         {
             syncValues(for: cell, at: indexPath)
-//            cell.detailTextLabel?.text = selectionPickerRow.selectionRow.value
+//            cell.detailTextLabel?.text = pickerRow.attachedRow.value
             syncConditionedCell(at: indexPath)
         }
     }
 }
 
 extension FormRow {
-    class SelectionPicker: FormRow {
-        let selectionRow: Selection
+    class Picker: FormRow {
+        let attachedRow: Selection
         
         init(with selectionRow: Selection) {
-            self.selectionRow = selectionRow
+            self.attachedRow = selectionRow
             super.init()
             isVisible = false
         }
@@ -423,17 +423,17 @@ extension FormRow {
 }
 
 extension FormViewTableView {
-    func changeSelectionPicker(visibility: Bool, forAttached indexPath: IndexPath) {
+    func changePicker(visibility: Bool, forAttached indexPath: IndexPath) {
         let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
         
         guard let viewController = superview?.next as? FormViewController,
-            let selectionPickerRow = viewController.formRowAt(nextIndexPath) as? FormRow.SelectionPicker,
-            selectionPickerRow.isVisible != visibility
+            let pickerRow = viewController.formRowAt(nextIndexPath) as? FormRow.Picker,
+            pickerRow.isVisible != visibility
             else {
                 return
         }
         
-        selectionPickerRow.isVisible = visibility
+        pickerRow.isVisible = visibility
         
         if viewController.needsToSyncTableViewAnimation {
             viewController.needsToSyncTableViewAnimation = false
