@@ -44,8 +44,12 @@ class FormViewController: BaseViewController {
             
             for index in startIndex..<endIndex {
                 if let selectionRow = section.rows?[index] as? FormRow.Selection {
-                    let selectionPickerRow = FormRow.Picker(with: selectionRow)
+                    let selectionPickerRow = FormRow.SelectionPicker(with: selectionRow)
                     section.rows?.insert(selectionPickerRow, at: index + 1)
+                }
+                else if let expirationRow = section.rows?[index] as? FormRow.Expiration {
+                    let expirationPickerRow = FormRow.ExpirationPicker(with: expirationRow)
+                    section.rows?.insert(expirationPickerRow, at: index + 1)
                 }
             }
         })
@@ -71,12 +75,13 @@ class FormViewController: BaseViewController {
         tableViewRegister(FormCardTableViewCell.self, for: FormRow.Card.self)
         tableViewRegister(FormCheckboxTableViewCell.self, for: FormRow.Checkbox.self)
         tableViewRegister(FormCVVTableViewCell.self, for: FormRow.CVV.self)
-        tableViewRegister(FormDateTableViewCell.self, for: FormRow.Date.self)
         tableViewRegister(FormEmailTableViewCell.self, for: FormRow.Email.self)
+        tableViewRegister(FormExpirationTableViewCell.self, for: FormRow.Expiration.self)
+        tableViewRegister(FormExpirationPickerTableViewCell.self, for: FormRow.ExpirationPicker.self)
         tableViewRegister(FormNumberTableViewCell.self, for: FormRow.Number.self)
         tableViewRegister(FormPhoneTableViewCell.self, for: FormRow.Phone.self)
         tableViewRegister(FormSelectionTableViewCell.self, for: FormRow.Selection.self)
-        tableViewRegister(FormSelectionPickerTableViewCell.self, for: FormRow.Picker.self)
+        tableViewRegister(FormSelectionPickerTableViewCell.self, for: FormRow.SelectionPicker.self)
         tableViewRegister(FormTextTableViewCell.self, for: FormRow.Text.self)
         tableViewRegister(FormZipTableViewCell.self, for: FormRow.Zip.self)
     }
@@ -132,6 +137,14 @@ class FormViewController: BaseViewController {
             tableView.scrollRectToVisible(textField.frame, animated: true)
         }
     }
+    
+    // MARK: Expiration
+    
+    fileprivate let currentYear: String = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy"
+        return formatter.string(from: Date())
+    }()
 }
 
 extension FormViewController: UITableViewDataSource {
@@ -195,9 +208,15 @@ extension FormViewController: UITableViewDataSource {
         let identifier = String(describing: type(of: formRow))
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
-        if let cell = cell as? FormSelectionPickerTableViewCell {
+        if let cell = cell as? FormExpirationPickerTableViewCell {
             cell.pickerView.dataSource = self
             cell.pickerView.delegate = self
+            cell.pickerView.tag = FormRow.ExpirationPicker.tag
+        }
+        else if let cell = cell as? FormSelectionPickerTableViewCell {
+            cell.pickerView.dataSource = self
+            cell.pickerView.delegate = self
+            cell.pickerView.tag = FormRow.SelectionPicker.tag
         }
         else if let cell = cell as? FormTextTableViewCell {
             let isLastCell = (indexPath.row > tableView.numberOfRows(inSection: indexPath.section) - 1)
@@ -268,7 +287,7 @@ extension FormViewController: UITableViewDelegate {
         func didSelectAttachedIndexPath(yes: ()->(), no: ()->()) {
             if let formRow = formRow {
                 switch formRow {
-                case is FormRow.Date, is FormRow.Selection:
+                case is FormRow.Expiration, is FormRow.Selection:
                     yes()
                 default:
                     no()
@@ -352,6 +371,11 @@ extension FormViewController: UITextFieldDelegate {
 }
 
 extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    private enum DateComponent: Int {
+        case month
+        case year
+    }
+    
     private func indexPath(for pickerView: UIPickerView) -> IndexPath? {
         if let cell = tableViewCellOwning(pickerView) {
             return tableView.indexPath(for: cell)
@@ -361,8 +385,17 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         }
     }
     
-    private func pickerRow(for pickerView: UIPickerView) -> FormRow.Picker? {
-        if let indexPath = indexPath(for: pickerView), let formRow = formRowAt(indexPath) as? FormRow.Picker {
+    private func selectionPickerRow(for pickerView: UIPickerView) -> FormRow.SelectionPicker? {
+        if let indexPath = indexPath(for: pickerView), let formRow = formRowAt(indexPath) as? FormRow.SelectionPicker {
+            return formRow
+        }
+        else {
+            return nil
+        }
+    }
+    
+    private func expirationPickerRow(for pickerView: UIPickerView) -> FormRow.ExpirationPicker? {
+        if let indexPath = indexPath(for: pickerView), let formRow = formRowAt(indexPath) as? FormRow.ExpirationPicker {
             return formRow
         }
         else {
@@ -371,53 +404,108 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if let pickerRow = pickerRow(for: pickerView) {
-            return pickerRow.attachedRow.options?.count ?? 0
-        }
-        else {
+        switch pickerView.tag {
+        case FormRow.SelectionPicker.tag:
+            return 1
+        case FormRow.ExpirationPicker.tag:
+            return 2
+        default:
             return 0
         }
     }
     
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        switch pickerView.tag {
+        case FormRow.SelectionPicker.tag:
+            if let selectionPickerRow = selectionPickerRow(for: pickerView) {
+                return selectionPickerRow.attachedRow.options?.count ?? 0
+            }
+        case FormRow.ExpirationPicker.tag:
+            if component == DateComponent.month.rawValue {
+                return 12
+            }
+            else {
+                return 21 // 20 years in advance
+            }
+        default:
+            break
+        }
+        
+        return 0
+    }
+    
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if let options = pickerRow(for: pickerView)?.attachedRow.options {
-            return options[row]
+        switch pickerView.tag {
+        case FormRow.SelectionPicker.tag:
+            if let options = selectionPickerRow(for: pickerView)?.attachedRow.options {
+                return options[row]
+            }
+        case FormRow.ExpirationPicker.tag:
+            if component == DateComponent.month.rawValue {
+                return String(format: "%02d", row + 1)
+            }
+            else {
+                return currentYear // TODO: increment year
+            }
+        default:
+            break
         }
-        else {
-            return nil
-        }
+        
+        return nil
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let pickerRow = pickerRow(for: pickerView),
-            let options = pickerRow.attachedRow.options else {
-                return
-        }
-        
-        pickerRow.attachedRow.value = options[row]
-        
-        if let indexPath = form.indexPath(for: pickerRow.attachedRow),
-            let cell = tableView.cellForRow(at: indexPath) as? FormSelectionTableViewCell
-        {
-            syncValues(for: cell, at: indexPath)
-//            cell.detailTextLabel?.text = pickerRow.attachedRow.value
-            syncConditionedCell(at: indexPath)
+        switch pickerView.tag {
+        case FormRow.SelectionPicker.tag:
+            guard let selectionPickerRow = selectionPickerRow(for: pickerView),
+                let options = selectionPickerRow.attachedRow.options else {
+                    return
+            }
+            
+            selectionPickerRow.attachedRow.value = options[row]
+            
+            if let indexPath = form.indexPath(for: selectionPickerRow.attachedRow),
+                let cell = tableView.cellForRow(at: indexPath) as? FormSelectionTableViewCell
+            {
+                syncValues(for: cell, at: indexPath)
+//                cell.detailTextLabel?.text = selectionPickerRow.attachedRow.value
+                syncConditionedCell(at: indexPath)
+            }
+        case FormRow.ExpirationPicker.tag:
+            break
+        default:
+            break
         }
     }
 }
 
 extension FormRow {
     class Picker: FormRow {
+        override init() {
+            super.init()
+            isVisible = false
+        }
+    }
+    
+    class SelectionPicker: Picker {
+        static let tag = 1
+        
         let attachedRow: Selection
         
         init(with selectionRow: Selection) {
             self.attachedRow = selectionRow
             super.init()
-            isVisible = false
+        }
+    }
+    
+    class ExpirationPicker: Picker {
+        static let tag = 2
+        
+        let attachedRow: Expiration
+        
+        init(with selectionRow: Expiration) {
+            self.attachedRow = selectionRow
+            super.init()
         }
     }
 }

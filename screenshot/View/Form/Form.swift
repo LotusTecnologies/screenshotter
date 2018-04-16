@@ -120,11 +120,15 @@ extension FormRow {
         
     }
     
-    class Date: FormRow {
-        typealias Expiration = (month: Int, year: Int)
+    class Email: Text {
+        
+    }
+    
+    class Expiration: FormRow {
+        typealias Date = (month: Int, year: Int)
         
         // The value should be stored as "mm/yyyy"
-        static func date(for value: String?) -> Expiration? {
+        static func date(for value: String?) -> Date? {
             guard let components = value?.split(separator: "/"),
                 components.count == 2,
                 let month = Int(components[0]),
@@ -133,20 +137,16 @@ extension FormRow {
                     return nil
             }
             
-            return Expiration(month: month, year: year)
+            return Date(month: month, year: year)
         }
         
-        static func value(for date: Expiration?) -> String? {
+        static func value(for date: Date?) -> String? {
             guard let month = date?.month, let year = date?.year else {
                 return nil
             }
             
             return String(format: "%02d/%d", month, year)
         }
-    }
-    
-    class Email: Text {
-        
     }
     
     class Number: Text {

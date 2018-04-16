@@ -71,7 +71,7 @@ class CartNavigationController: UINavigationController {
             let addressShip = checkout.formRow(.addressShip)?.value,
             let email = checkout.formRow(.email)?.value,
             let phone = checkout.formRow(.phoneNumber)?.value,
-            let cardExpDate = FormRow.Date.date(for: cardExp)
+            let cardExpDate = FormRow.Expiration.date(for: cardExp)
             else {
                 return
         }

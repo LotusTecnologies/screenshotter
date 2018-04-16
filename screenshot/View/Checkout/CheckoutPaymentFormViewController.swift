@@ -40,7 +40,7 @@ class CheckoutPaymentFormViewController: FormViewController {
         cardNumber.placeholder = "Card Number"
         cardRows.append(cardNumber)
         
-        let exp = FormRow.Date(CheckoutPaymentFormKeys.cardExp.rawValue)
+        let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
         exp.value = "04/2020" // !!!: DEBUG
         cardRows.append(exp)
