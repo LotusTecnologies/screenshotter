@@ -819,6 +819,24 @@ extension DataModel {
         }
     }
 
+    func saveShippingAddress(fullName: String,
+                             street: String,
+                             city: String,
+                             country: String,
+                             zipCode: String,
+                             state: String?,
+                             phone: String) {
+        let tuple = NetworkingPromise.sharedInstance.divideByLastSpace(fullName: fullName)
+        saveShippingAddress(firstName: tuple.0,
+                            lastName: tuple.1,
+                            street: street,
+                            city: city,
+                            country: country,
+                            zipCode: zipCode,
+                            state: state,
+                            phone: phone)
+    }
+    
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.

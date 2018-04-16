@@ -364,6 +364,20 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func divideByLastSpace(fullName: String?) -> (String, String) {
+        let firstName: String
+        let lastName: String
+        if let fullName = fullName?.trimmingCharacters(in: .whitespacesAndNewlines),
+            let lastSpaceRange = fullName.range(of: " ", options: .backwards) {
+            firstName = fullName.substring(to: lastSpaceRange.lowerBound)
+            lastName = fullName.substring(from: lastSpaceRange.upperBound)
+        } else {
+            firstName = fullName ?? ""
+            lastName = ""
+        }
+        return (firstName, lastName)
+    }
+    
     func nativeCheckout(remoteId: String, card: Card, shippingAddress: ShippingAddress) -> Promise<[String : Any]> {
         guard let url = URL(string: Constants.shoppableDomain + "/token/\(Constants.shoppableToken)/checkout") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableDomain:\(Constants.shoppableDomain)"])
@@ -375,16 +389,9 @@ class NetworkingPromise : NSObject {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("http://screenshopit.com", forHTTPHeaderField: "Referer")
         request.addValue("no-cache", forHTTPHeaderField: "Cache-Control")
-        let billingFirstName: String
-        let billingLastName: String
-        if let fullName = card.fullName?.trimmingCharacters(in: .whitespacesAndNewlines),
-          let lastSpaceRange = fullName.range(of: " ", options: .backwards) {
-            billingFirstName = fullName.substring(to: lastSpaceRange.lowerBound)
-            billingLastName = fullName.substring(from: lastSpaceRange.upperBound)
-        } else {
-            billingFirstName = card.fullName ?? ""
-            billingLastName = ""
-        }
+        let tuple = divideByLastSpace(fullName: card.fullName)
+        let billingFirstName = tuple.0
+        let billingLastName = tuple.1
         let jsonObject: [String : Any] = [
             "billing_city" : card.city ?? "",
             "billing_country" : card.country ?? "",
