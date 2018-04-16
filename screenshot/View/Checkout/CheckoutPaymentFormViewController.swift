@@ -40,8 +40,9 @@ class CheckoutPaymentFormViewController: FormViewController {
         cardNumber.placeholder = "Card Number"
         cardRows.append(cardNumber)
         
-        let exp = FormRow.Date(CheckoutPaymentFormKeys.cardExp.rawValue)
+        let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
+        exp.value = "04/2020" // !!!: DEBUG
         cardRows.append(exp)
         
         let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
@@ -74,7 +75,7 @@ class CheckoutPaymentFormViewController: FormViewController {
         state.isVisible = false
         state.placeholder = "State"
         state.options = [
-            "United States",
+            "Maryland",
             "Agartha",
             "Antartica",
             "Atlantis",
@@ -128,5 +129,9 @@ class CheckoutPaymentFormViewController: FormViewController {
         doneButton.topAnchor.constraint(equalTo: tableFooterView.topAnchor).isActive = true
         doneButton.bottomAnchor.constraint(equalTo: tableFooterView.bottomAnchor).isActive = true
         doneButton.centerXAnchor.constraint(equalTo: tableFooterView.centerXAnchor).isActive = true
+    }
+    
+    func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
+        return form.map?[key.rawValue]
     }
 }

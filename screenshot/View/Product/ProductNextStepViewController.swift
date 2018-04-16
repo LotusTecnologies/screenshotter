@@ -55,6 +55,8 @@ class ProductNextStepViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         view.addSubview(imageView)
+        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         imageView.topAnchor.constraint(greaterThanOrEqualTo: layoutGuide.topAnchor).isActive = true
         imageView.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -.padding).isActive = true

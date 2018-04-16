@@ -66,20 +66,6 @@ class FormCVVTableViewCell: FormNumberTableViewCell {
     }
 }
 
-class FormDateTableViewCell: UITableViewCell {
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
-        
-        clipsToBounds = true
-        
-        textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
-    }
-}
-
 class FormEmailTableViewCell: FormTextTableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -91,6 +77,14 @@ class FormEmailTableViewCell: FormTextTableViewCell {
         textField.keyboardType = .emailAddress
         textField.autocapitalizationType = .none
     }
+}
+
+class FormExpirationTableViewCell: FormSelectionTableViewCell {
+    
+}
+
+class FormExpirationPickerTableViewCell: FormSelectionPickerTableViewCell {
+    
 }
 
 class FormNumberTableViewCell: FormTextTableViewCell {
@@ -156,7 +150,7 @@ class FormSelectionTableViewCell: UITableViewCell {
     
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder {
-            changeSelectionPicker(visibility: true)
+            changePicker(visibility: true)
         }
         
         return super.becomeFirstResponder()
@@ -164,18 +158,18 @@ class FormSelectionTableViewCell: UITableViewCell {
     
     override func resignFirstResponder() -> Bool {
         if isFirstResponder {
-            changeSelectionPicker(visibility: false)
+            changePicker(visibility: false)
         }
         
         return super.resignFirstResponder()
     }
     
-    // MARK: Selection Picker
+    // MARK: Picker
     
-    private func changeSelectionPicker(visibility: Bool) {
+    private func changePicker(visibility: Bool) {
         if let tableView = next as? FormViewTableView,
             let indexPath = tableView.indexPath(for: self) {
-            tableView.changeSelectionPicker(visibility: visibility, forAttached: indexPath)
+            tableView.changePicker(visibility: visibility, forAttached: indexPath)
         }
     }
 }
@@ -188,7 +182,7 @@ class FormSelectionPickerTableViewCell: UITableViewCell {
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         clipsToBounds = true
         

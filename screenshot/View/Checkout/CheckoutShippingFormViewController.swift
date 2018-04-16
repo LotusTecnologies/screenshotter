@@ -21,6 +21,8 @@ enum CheckoutShippingFormKeys: Int {
 }
 
 class CheckoutShippingFormViewController: FormViewController {
+    let doneButton = MainButton()
+    
     convenience init() {
         var formRows: [FormRow] = []
         
@@ -81,5 +83,9 @@ class CheckoutShippingFormViewController: FormViewController {
         section.rows = formRows
         
         self.init(with: Form(with: [section]))
+    }
+    
+    func formRow(_ key: CheckoutShippingFormKeys) -> FormRow? {
+        return form.map?[key.rawValue]
     }
 }
