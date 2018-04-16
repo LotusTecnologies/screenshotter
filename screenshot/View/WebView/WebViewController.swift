@@ -99,7 +99,7 @@ class WebViewController : BaseViewController {
         updateLoadingCoverLayoutMargins()
     }
     
-    func applicationDidEnterBackground(_ notification: Notification) {
+    @objc func applicationDidEnterBackground(_ notification: Notification) {
         if view.window != nil {
             loader?.stopAnimation()
             
@@ -111,7 +111,7 @@ class WebViewController : BaseViewController {
         }
     }
     
-    func applicationWillEnterForeground(_ notification: Notification) {
+    @objc func applicationWillEnterForeground(_ notification: Notification) {
         if view.window != nil {
             loader?.startAnimation()
             

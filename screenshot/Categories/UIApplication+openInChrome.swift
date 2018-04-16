@@ -21,25 +21,27 @@ extension UIApplication {
     }
     
     func chomeURLFor(url:URL) -> URL? {
-        let scheme = url.scheme?.lowercased()
-        
-        let chromeScheme:String? = {
-            if (scheme == "http") {
-                return  UIApplication.kGoogleChromeHTTPScheme
-            } else if (scheme == "https") {
-                return UIApplication.kGoogleChromeHTTPSScheme
-            }
+        guard let scheme = url.scheme?.lowercased() else {
             return nil
-        }()
+        }
         
-        if let chromeScheme = chromeScheme {
-            let rangeForScheme = url.absoluteString.range(of: ":")
-            if let endOfColon = rangeForScheme?.upperBound {
-                let urlNoScheme = url.absoluteString.substring(from: endOfColon)
-                let chromeURLString = chromeScheme.appending(urlNoScheme)
-                let chromeURL = URL.init(string: chromeURLString)
-                return chromeURL
-            }
+        let chromeScheme:String?
+        switch scheme {
+        case "http":
+            chromeScheme = UIApplication.kGoogleChromeHTTPScheme
+        case "https":
+            chromeScheme = UIApplication.kGoogleChromeHTTPSScheme
+        default:
+            chromeScheme = nil
+        }
+        
+        if let chromeScheme = chromeScheme,
+          let rangeForScheme = url.absoluteString.range(of: ":") {
+            let endOfColon = rangeForScheme.upperBound
+            let urlNoScheme = url.absoluteString[endOfColon...]
+            let chromeURLString = chromeScheme.appending(urlNoScheme)
+            let chromeURL = URL.init(string: chromeURLString)
+            return chromeURL
         }
         return nil
     }

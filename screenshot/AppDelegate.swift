@@ -521,7 +521,7 @@ extension AppDelegate {
                         if let screenshot = context.screenshotWith(screenshotId: screenshotId){
                             if screenshot.submittedDate != nil {
                                 screenshot.submittedFeedbackCountGoal = max(screenshot.submittedFeedbackCountGoal, likes)
-                                screenshot.submittedFeedbackCountGoalDate =  NSDate.init(timeIntervalSinceNow: period)
+                                screenshot.submittedFeedbackCountGoalDate =  Date.init(timeIntervalSinceNow: period)
                             }
                         }
                     }

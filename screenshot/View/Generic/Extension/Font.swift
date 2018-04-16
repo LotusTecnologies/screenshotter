@@ -38,22 +38,22 @@ extension UIFont {
             }
         }
         
-        var weight: UIFontWeight {
+        var weight: UIFont.Weight {
             switch self {
             case .hindLight:
-                return UIFontWeightLight
+                return UIFont.Weight.light
             case .futura,
                  .hind:
-                return UIFontWeightRegular
+                return UIFont.Weight.regular
             case .futuraMedium,
                  .hindMedium:
-                return UIFontWeightMedium
+                return UIFont.Weight.medium
             case .hindSemibold:
-                return UIFontWeightSemibold
+                return UIFont.Weight.semibold
             case .dinCondensedBold,
                  .futuraBold,
                  .hindBold:
-                return UIFontWeightBold
+                return UIFont.Weight.bold
             }
         }
         
@@ -130,14 +130,13 @@ extension UIFont {
 }
 
 extension UIFont {
-    // TODO: after swift 4 update, change to NSAttributedStringKey
-    var attributes: [String: Any] {
-        var attributes: [String: Any] = [NSFontAttributeName: self]
+    var attributes: [NSAttributedStringKey: Any] {
+        var attributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: self]
         
         if let lineHeightMultiple = screenshopFontName?.lineHeightMultiple {
             let paragraph = NSMutableParagraphStyle()
             paragraph.lineHeightMultiple = lineHeightMultiple
-            attributes[NSParagraphStyleAttributeName] = paragraph
+            attributes[NSAttributedStringKey.paragraphStyle] = paragraph
         }
         
         return attributes

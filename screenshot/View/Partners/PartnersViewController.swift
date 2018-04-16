@@ -26,8 +26,8 @@ class PartnersViewController : BaseViewController {
             
             let text = "partners.content".localized(withFormat: syteVisualString)
             if let range = text.range(of: syteVisualString), let url = URL(string: syteDestinationString) {
-                let attribute: [String : Any] = [
-                    NSLinkAttributeName: url
+                let attribute: [NSAttributedStringKey : Any] = [
+                    NSAttributedStringKey.link: url
                 ]
                 let mutableString = NSMutableAttributedString.init(string: text)
                 mutableString.addAttributes(attribute, range: NSRange(range, in: text))

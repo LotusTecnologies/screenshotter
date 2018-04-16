@@ -115,13 +115,13 @@ extension ScreenshotsViewController {
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
     }
     
-    func applicationDidEnterBackground(_ notification:Notification){
+    @objc func applicationDidEnterBackground(_ notification:Notification){
         if self.isViewLoaded && self.view.window != nil {
             self.removeScreenshotHelperView()
         }
     }
     
-    func applicationWillEnterForeground(_ notification:Notification) {
+    @objc func applicationWillEnterForeground(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             syncEmptyListView()
             self.updateHasNewScreenshot()
@@ -129,7 +129,7 @@ extension ScreenshotsViewController {
         }
     }
     
-    func contentSizeCategoryDidChange(_ notification:Notification) {
+    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
                 self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ScreenshotsSection.notification.rawValue)])
@@ -197,7 +197,7 @@ extension ScreenshotsViewController {
         
     }
     
-    func refreshControlAction(_ refreshControl:UIRefreshControl){
+    @objc func refreshControlAction(_ refreshControl:UIRefreshControl){
         
         if (refreshControl.isRefreshing) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
@@ -206,7 +206,7 @@ extension ScreenshotsViewController {
         }
     }
     
-    func emptyListViewAllowAccessAction() {
+    @objc func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
             self.syncEmptyListView()
         }
@@ -301,7 +301,7 @@ extension ScreenshotsViewController {
                 let titleLabel = UILabel()
                 titleLabel.translatesAutoresizingMaskIntoConstraints = false
                 titleLabel.text = "screenshots.helper.title".localized
-                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightSemibold)
+                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.semibold)
                 titleLabel.numberOfLines = 0
                 contentView.addSubview(titleLabel)
                 titleLabel.topAnchor.constraint(equalTo:contentView.topAnchor).isActive = true
@@ -312,7 +312,7 @@ extension ScreenshotsViewController {
                 let descriptionLabel = UILabel()
                 descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
                 descriptionLabel.text = "screenshots.helper.byline".localized
-                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
+                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.light)
                 
                 descriptionLabel.numberOfLines = 0
                 contentView.addSubview(descriptionLabel)
@@ -344,7 +344,7 @@ extension ScreenshotsViewController {
 
 //Edit actions
 extension ScreenshotsViewController {
-    func editButtonAction() {
+    @objc func editButtonAction() {
         let isEditing = !self.isEditing
         
         if !isEditing {
@@ -447,7 +447,7 @@ extension ScreenshotsViewController {
         self.deleteButton?.deleteCount = self.toHideFromProductBarObjectIDs.count + self.deleteScreenshotObjectIDs.count
     }
     
-    func deleteButtonAction() {
+    @objc func deleteButtonAction() {
         setEditing(false, animated: true)
         
         if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
@@ -534,7 +534,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         
     }
         
-    func thankYouForSharingViewDidClose(_ sender: Any) {
+    @objc func thankYouForSharingViewDidClose(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -656,7 +656,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         
     }
     
-    func accumulatorModelNumberDidChange( _ notification: Notification) {
+    @objc func accumulatorModelNumberDidChange( _ notification: Notification) {
         
         if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)

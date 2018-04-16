@@ -54,9 +54,9 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         // Even though this is set globally, it is possible to hit a race condition
         // where the first cell has the wrong font. This will force the font.
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
-        let titleTextAttributesNormal = toolbarButtonItem.titleTextAttributes(for: .normal)
-        let titleTextAttributesHighlighted = toolbarButtonItem.titleTextAttributes(for: .highlighted)
-        let titleTextAttributesDisabled = toolbarButtonItem.titleTextAttributes(for: .disabled)
+        let titleTextAttributesNormal = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny( toolbarButtonItem.titleTextAttributes(for: .normal) )
+        let titleTextAttributesHighlighted = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .highlighted) )
+        let titleTextAttributesDisabled = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny( toolbarButtonItem.titleTextAttributes(for: .disabled) )
         
         shareButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
         shareButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
@@ -292,11 +292,11 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     // MARK: Actions
     
-    func shareAction() {
+    @objc func shareAction() {
         delegate?.screenshotCollectionViewCellDidTapShare(self)
     }
     
-    func deleteAction() {
+    @objc func deleteAction() {
         delegate?.screenshotCollectionViewCellDidTapDelete(self)
     }
 }

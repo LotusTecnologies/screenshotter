@@ -160,7 +160,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             if let badgeFont = UIFont(name: "Optima-ExtraBlack", size: 14) {
                 // Remove the previous value so UIKit recognizes the update.
                 self.settingsTabBarItem.setBadgeTextAttributes(nil, for: .normal)
-                self.settingsTabBarItem.setBadgeTextAttributes([NSFontAttributeName : badgeFont], for: .normal)
+                self.settingsTabBarItem.setBadgeTextAttributes([NSAttributedStringKey.font.rawValue : badgeFont], for: .normal)
             }
         } else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)

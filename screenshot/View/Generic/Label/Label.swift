@@ -29,12 +29,12 @@ class Label: UILabel {
                 let attributedText = NSMutableAttributedString(attributedString: newValue)
                 let range = NSMakeRange(0, attributedText.string.count)
                 
-                attributedText.addAttribute(NSFontAttributeName, value: font, range: range)
+                attributedText.addAttribute(NSAttributedStringKey.font, value: font, range: range)
                 
                 let paragraph = NSMutableParagraphStyle()
                 paragraph.lineHeightMultiple = screenshopFontName.lineHeightMultiple
                 paragraph.alignment = textAlignment
-                attributedText.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: range)
+                attributedText.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraph, range: range)
                 
                 super.attributedText = attributedText
             }
