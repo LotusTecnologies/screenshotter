@@ -65,8 +65,9 @@ class UserFeedback  {
                             s.submittedFeedbackCountDate = Date.init(timeIntervalSince1970: 0)
                         }
                        
-                        
-                        if let d1 = s.submittedFeedbackCountDate, let d2 = s.submittedFeedbackCountGoalDate {
+                        if let submittedFeedbackCountDate = s.submittedFeedbackCountDate, let d2 = s.submittedFeedbackCountGoalDate {
+                            //if submittedFeedbackCountDate is very old. change it to be equidistant to submittedFeedbackCountGoalDate
+                            let d1 = submittedFeedbackCountDate.laterDate(Date.init(timeIntervalSinceNow: -1 * d2.timeIntervalSinceNow))
                             let c2 = max(s.submittedFeedbackCountGoal, s.submittedFeedbackCount)
                             let c1 = s.submittedFeedbackCount
                             
@@ -98,9 +99,11 @@ class UserFeedback  {
                 
                 if eventsPerHour > 0 {
                     DispatchQueue.main.async {
-                        
-                        let timerPeriod = min(60*5, max(5, 60*60/TimeInterval(eventsPerHour)))
-                        print("timer period for fake notification \(timerPeriod)");                        self.timer = Timer.scheduledTimer(timeInterval:timerPeriod, target: self, selector: #selector(self.timerTriggered), userInfo: nil, repeats: true)
+                        let showAtleast = 60.0*5.0 /// 5 minutes
+                        let showAtMost = 30.0 // 30 seconds
+                        let timerPeriod = min(showAtleast, max(showAtMost, 60*60/TimeInterval(eventsPerHour)))
+                        print("timer period for fake notification \(timerPeriod)");
+                        self.timer = Timer.scheduledTimer(timeInterval:timerPeriod, target: self, selector: #selector(self.timerTriggered), userInfo: nil, repeats: true)
                         if timerPeriod > 20 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
                                 self.timerTriggered()
