@@ -361,6 +361,16 @@ extension FormViewController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        guard let indexPath = indexPath(for: textField) else {
+            return
+        }
+        
+        if let formRow = formRowAt(indexPath) as? FormRow.Text {
+            formRow.value = textField.text
+        }
+    }
 }
 
 extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {

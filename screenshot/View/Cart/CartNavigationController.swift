@@ -73,6 +73,7 @@ class CartNavigationController: UINavigationController {
             let phone = checkout.formRow(.phoneNumber)?.value,
             let cardExpDate = FormRow.Expiration.date(for: cardExp)
             else {
+                // TODO: highlight error fields
                 return
         }
         
@@ -86,8 +87,7 @@ class CartNavigationController: UINavigationController {
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
         if isShipToSameAddressChecked {
-            // TODO: maybe gershon can make a fullName convience func
-            DataModel.sharedInstance.saveShippingAddress(firstName: cardName, lastName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+            DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
             
             navigateToCheckoutOrder()
         }
