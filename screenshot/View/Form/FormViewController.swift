@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CreditCardValidator
 
 class FormViewController: BaseViewController {
     let form: Form
@@ -137,14 +138,6 @@ class FormViewController: BaseViewController {
             tableView.scrollRectToVisible(textField.frame, animated: true)
         }
     }
-    
-    // MARK: Expiration
-    
-    fileprivate let currentYear: String = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy"
-        return formatter.string(from: Date())
-    }()
 }
 
 extension FormViewController: UITableViewDataSource {
@@ -371,11 +364,6 @@ extension FormViewController: UITextFieldDelegate {
 }
 
 extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
-    private enum DateComponent: Int {
-        case month
-        case year
-    }
-    
     private func indexPath(for pickerView: UIPickerView) -> IndexPath? {
         if let cell = tableViewCellOwning(pickerView) {
             return tableView.indexPath(for: cell)
@@ -403,6 +391,30 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         }
     }
     
+    private func expirationValue(forRow row: Int, inComponent component: Int) -> Int? {
+        if let dateComponent = FormExpirationPickerTableViewCell.DateComponent(rawValue: component) {
+            return FormExpirationPickerTableViewCell.dateMap[dateComponent]?[row]
+        }
+        else {
+            return nil
+        }
+    }
+    
+    private func expirationValue(forValue value: Int, inComponent component: Int) -> String? {
+        var month = 0
+        var year = 0
+        
+        if component == FormExpirationPickerTableViewCell.DateComponent.month.rawValue {
+            month = value
+        }
+        else {
+            year = value
+        }
+        
+        let date = FormRow.Expiration.Date(month: month, year: year)
+        return FormRow.Expiration.value(for: date)
+    }
+    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         switch pickerView.tag {
         case FormRow.SelectionPicker.tag:
@@ -421,11 +433,8 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
                 return selectionPickerRow.attachedRow.options?.count ?? 0
             }
         case FormRow.ExpirationPicker.tag:
-            if component == DateComponent.month.rawValue {
-                return 12
-            }
-            else {
-                return 21 // 20 years in advance
+            if let dateComponent = FormExpirationPickerTableViewCell.DateComponent(rawValue: component) {
+                return FormExpirationPickerTableViewCell.dateMap[dateComponent]?.count ?? 0
             }
         default:
             break
@@ -441,11 +450,8 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
                 return options[row]
             }
         case FormRow.ExpirationPicker.tag:
-            if component == DateComponent.month.rawValue {
-                return String(format: "%02d", row + 1)
-            }
-            else {
-                return currentYear // TODO: increment year
+            if let value = expirationValue(forRow: row, inComponent: component) {
+                return expirationValue(forValue: value, inComponent: component)
             }
         default:
             break
@@ -458,25 +464,77 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         switch pickerView.tag {
         case FormRow.SelectionPicker.tag:
             guard let selectionPickerRow = selectionPickerRow(for: pickerView),
-                let options = selectionPickerRow.attachedRow.options else {
+                let options = selectionPickerRow.attachedRow.options
+                else {
                     return
             }
             
             selectionPickerRow.attachedRow.value = options[row]
+            syncPickerRow(selectionPickerRow)
             
-            if let indexPath = form.indexPath(for: selectionPickerRow.attachedRow),
-                let cell = tableView.cellForRow(at: indexPath) as? FormSelectionTableViewCell
-            {
-                syncValues(for: cell, at: indexPath)
-//                cell.detailTextLabel?.text = selectionPickerRow.attachedRow.value
-                syncConditionedCell(at: indexPath)
-            }
         case FormRow.ExpirationPicker.tag:
-            break
+            guard let expirationPickerRow = expirationPickerRow(for: pickerView),
+                let value = expirationValue(forRow: row, inComponent: component)
+                else {
+                    return
+            }
+            
+            func setFormRowValue(with date: FormRow.Expiration.Date) {
+                var date = date
+                
+                if component == FormExpirationPickerTableViewCell.DateComponent.month.rawValue {
+                    date.month = value
+                }
+                else {
+                    date.year = value
+                }
+                
+                expirationPickerRow.attachedRow.value = FormRow.Expiration.value(for: date)
+            }
+            
+            if let date = FormRow.Expiration.date(for: expirationPickerRow.attachedRow.value) {
+                setFormRowValue(with: date)
+            }
+            else if let currentValueString = expirationPickerRow.attachedRow.value,
+                let currentValue = Int(currentValueString)
+            {
+                var date = FormRow.Expiration.Date(month: 0, year: 0)
+                
+                if FormRow.Expiration.isYear(currentValue) {
+                    date.year = currentValue
+                }
+                else {
+                    date.month = currentValue
+                }
+                
+                setFormRowValue(with: date)
+            }
+            else {
+                expirationPickerRow.attachedRow.value = expirationValue(forValue: value, inComponent: component)
+            }
+            
+            syncPickerRow(expirationPickerRow)
+            
         default:
             break
         }
     }
+    
+    private func syncPickerRow<T: FormPickerRowProtocol>(_ pickerRow: T) {
+        if let indexPath = form.indexPath(for: pickerRow.attachedRow),
+            let cell = tableView.cellForRow(at: indexPath)
+        {
+            syncValues(for: cell, at: indexPath)
+            syncConditionedCell(at: indexPath)
+        }
+    }
+}
+
+protocol FormPickerRowProtocol {
+    static var tag: Int { get }
+    
+    associatedtype T: FormRow
+    var attachedRow: T { get }
 }
 
 extension FormRow {
@@ -487,7 +545,7 @@ extension FormRow {
         }
     }
     
-    class SelectionPicker: Picker {
+    class SelectionPicker: Picker, FormPickerRowProtocol {
         static let tag = 1
         
         let attachedRow: Selection
@@ -498,7 +556,7 @@ extension FormRow {
         }
     }
     
-    class ExpirationPicker: Picker {
+    class ExpirationPicker: Picker, FormPickerRowProtocol {
         static let tag = 2
         
         let attachedRow: Expiration

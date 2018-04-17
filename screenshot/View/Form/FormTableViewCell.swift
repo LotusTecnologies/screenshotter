@@ -8,6 +8,7 @@
 
 import UIKit
 import Appsee
+import CreditCardValidator
 
 class FormCardTableViewCell: FormNumberTableViewCell {
     required init?(coder aDecoder: NSCoder) {
@@ -84,7 +85,18 @@ class FormExpirationTableViewCell: FormSelectionTableViewCell {
 }
 
 class FormExpirationPickerTableViewCell: FormSelectionPickerTableViewCell {
+    enum DateComponent: Int {
+        // Don't change order
+        case month
+        case year
+    }
     
+    private static let currentYear = CreditCardValidator.currentYear
+    
+    static let dateMap = [
+        DateComponent.month: [Int](1...12),
+        DateComponent.year: [Int](currentYear...(currentYear + 20))
+    ]
 }
 
 class FormNumberTableViewCell: FormTextTableViewCell {

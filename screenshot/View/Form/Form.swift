@@ -145,7 +145,19 @@ extension FormRow {
                 return nil
             }
             
-            return String(format: "%02d/%d", month, year)
+            if month > 0 && year > 0 {
+                return String(format: "%02d/%d", month, year)
+            }
+            else if month > 0 {
+                return String(format: "%02d", month)
+            }
+            else {
+                return "\(year)"
+            }
+        }
+        
+        static func isYear(_ value: Int) -> Bool {
+            return value / 1000 > 1
         }
     }
     

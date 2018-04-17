@@ -42,7 +42,6 @@ class CheckoutPaymentFormViewController: FormViewController {
         
         let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
-        exp.value = "04/2020" // !!!: DEBUG
         cardRows.append(exp)
         
         let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)

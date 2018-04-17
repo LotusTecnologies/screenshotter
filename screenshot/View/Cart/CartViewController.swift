@@ -301,12 +301,12 @@ fileprivate extension CartViewControllerCheckout {
 //                        })
                 }
                 else {
+                    self?.presentErrorAlert()
                     self?.dismissCheckoutLoader()
                 }
             }
             .catch { [weak self] error in
-                // TODO: need to handle this
-                print("checkout error:\(error)")
+                self?.presentErrorAlert()
                 self?.dismissCheckoutLoader()
         }
     }
@@ -339,5 +339,12 @@ fileprivate extension CartViewControllerCheckout {
 //            let navigationController = ModalNavigationController(rootViewController: checkoutWebViewController)
 //            present(navigationController, animated: true, completion: nil)
 //        }
+    }
+    
+    func presentErrorAlert() {
+        // TODO: get correct copy
+        let alertController = UIAlertController(title: "That's strange", message: "You tried to give us money but we missed it. Try again, now.", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
     }
 }
