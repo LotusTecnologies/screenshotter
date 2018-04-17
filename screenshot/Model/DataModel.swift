@@ -784,6 +784,25 @@ extension DataModel {
         }
     }
 
+    // Must be run from main thread!!
+    func hasSavedCards() -> Bool {
+        let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isSaved == TRUE")
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        fetchRequest.includesSubentities = false
+        fetchRequest.includesPropertyValues = false
+        
+        do {
+            let count = try mainMoc().count(for: fetchRequest)
+            return count > 0
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("hasSavedCards results with error:\(error)")
+        }
+        return false
+    }
+    
     func saveShippingAddress(firstName: String?,
                   lastName: String?,
                   street: String,
