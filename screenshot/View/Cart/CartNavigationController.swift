@@ -79,21 +79,33 @@ class CartNavigationController: UINavigationController {
         
         cvv = cardCVV
         
-        let shouldSaveCard = true // TODO:
-        let lastDigits = "0234" // last 4 digits of credit card or last 5 for amex
-        
-        DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: lastDigits, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: shouldSaveCard)
-        
-        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
-        
-        if isShipToSameAddressChecked {
-            DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        func performAction(withSavingCard saveCard: Bool) {
+            let lastDigits = "0234" // last 4 digits of credit card or last 5 for amex
             
-            navigateToCheckoutOrder()
+            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: lastDigits, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
+            
+            let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
+            
+            if isShipToSameAddressChecked {
+                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+                
+                navigateToCheckoutOrder()
+            }
+            else {
+                navigateToCheckoutShippingForm()
+            }
         }
-        else {
-            navigateToCheckoutShippingForm()
+        
+        let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
+        let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
+            performAction(withSavingCard: true)
         }
+        alertController.addAction(saveAlertAction)
+        alertController.addAction(UIAlertAction(title: "Don't Save", style: .cancel, handler: { alertAction in
+            performAction(withSavingCard: false)
+        }))
+        alertController.preferredAction = saveAlertAction
+        present(alertController, animated: true, completion: nil)
         
         //        checkoutPaymentFormViewController = nil // ???: when should the vc be removed
     }
@@ -135,9 +147,7 @@ class CartNavigationController: UINavigationController {
 
 extension CartNavigationController: CartViewControllerDelegate {
     func cartViewControllerDidValidateCart(_ viewController: CartViewController) {
-        let hasPrimaryCard = false // TODO:
-        
-        if hasPrimaryCard {
+        if DataModel.sharedInstance.hasSavedCards() {
             navigateToCheckoutOrder()
         }
         else {
