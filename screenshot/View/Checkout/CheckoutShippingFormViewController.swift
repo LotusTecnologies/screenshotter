@@ -20,10 +20,8 @@ enum CheckoutShippingFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutShippingFormViewController: FormViewController {
-    let doneButton = MainButton()
-    
-    convenience init() {
+class CheckoutShippingFormViewController: CheckoutFormViewController {
+    convenience init(withEditLayout isEditLayout: Bool = false) {
         var formRows: [FormRow] = []
         
         let firstName = FormRow.Text(CheckoutShippingFormKeys.nameFirst.rawValue)
@@ -83,6 +81,8 @@ class CheckoutShippingFormViewController: FormViewController {
         section.rows = formRows
         
         self.init(with: Form(with: [section]))
+        
+        generateButtons(withEditLayout: isEditLayout)
     }
     
     func formRow(_ key: CheckoutShippingFormKeys) -> FormRow? {

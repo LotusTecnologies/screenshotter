@@ -25,39 +25,46 @@ enum CheckoutPaymentFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutPaymentFormViewController: FormViewController {
-    let doneButton = MainButton()
-    
-    convenience init() {
+class CheckoutPaymentFormViewController: CheckoutFormViewController {
+    convenience init(withDefaultValues defaultValues: [CheckoutPaymentFormKeys: String?]? = nil) {
+        let isEditLayout = defaultValues?.isEmpty == false
+        
         var cardRows: [FormRow] = []
         var billingRows: [FormRow] = []
         
         let cardName = FormRow.Text(CheckoutPaymentFormKeys.cardName.rawValue)
         cardName.placeholder = "Name on Card"
+        cardName.value = defaultValues?[.cardName] ?? nil
         cardRows.append(cardName)
         
         let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
         cardNumber.placeholder = "Card Number"
+        cardNumber.value = defaultValues?[.cardNumber] ?? nil
         cardRows.append(cardNumber)
         
         let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
+        exp.value = defaultValues?[.cardExp] ?? nil
         cardRows.append(exp)
         
         let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
         cvv.placeholder = "CVV"
+        cvv.value = defaultValues?[.cardCVV] ?? nil
         cardRows.append(cvv)
         
         let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
         street.placeholder = "Street Address"
+        street.value = defaultValues?[.addressStreet] ?? nil
         billingRows.append(street)
         
         let city = FormRow.Text(CheckoutPaymentFormKeys.addressCity.rawValue)
         city.placeholder = "City"
+        city.value = defaultValues?[.addressCity] ?? nil
         billingRows.append(city)
         
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
+        country.value = defaultValues?[.addressCountry] ?? nil
         country.options = [
             "United States",
             "Agartha",
@@ -73,6 +80,7 @@ class CheckoutPaymentFormViewController: FormViewController {
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
+        state.value = defaultValues?[.addressState] ?? nil
         state.options = [
             "Maryland",
             "Agartha",
@@ -86,19 +94,25 @@ class CheckoutPaymentFormViewController: FormViewController {
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
         zip.placeholder = "Zip Code"
+        zip.value = defaultValues?[.addressZip] ?? nil
         billingRows.append(zip)
         
         let email = FormRow.Email(CheckoutPaymentFormKeys.email.rawValue)
         email.placeholder = "Email"
+        email.value = defaultValues?[.email] ?? nil
         billingRows.append(email)
         
         let phone = FormRow.Phone(CheckoutPaymentFormKeys.phoneNumber.rawValue)
         phone.placeholder = "Phone Number"
+        phone.value = defaultValues?[.phoneNumber] ?? nil
         billingRows.append(phone)
         
-        let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
-        ship.placeholder = "Ship to this address"
-        billingRows.append(ship)
+        if !isEditLayout {
+            let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
+            ship.placeholder = "Ship to this address"
+            ship.value = defaultValues?[.addressShip] ?? nil
+            billingRows.append(ship)
+        }
         
         let cardSection = FormSection()
         cardSection.rows = cardRows
@@ -109,25 +123,12 @@ class CheckoutPaymentFormViewController: FormViewController {
         
         self.init(with: Form(with: [cardSection, billingSection]))
         
-        title = "Add A Card"
+        title = isEditLayout ? "Add Card" : "Edit Card"
         restorationIdentifier = String(describing: type(of: self))
         
-        var contentInset = tableView.contentInset
-        contentInset.bottom = 20
-        tableView.contentInset = contentInset
-        
-        var tableFooterRect: CGRect = .zero
-        tableFooterRect.size.height = doneButton.intrinsicContentSize.height
-        let tableFooterView = UIView(frame: tableFooterRect)
-        tableView.tableFooterView = tableFooterView
-        
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.backgroundColor = .crazeGreen
-        doneButton.setTitle("Done", for: .normal)
-        tableFooterView.addSubview(doneButton)
-        doneButton.topAnchor.constraint(equalTo: tableFooterView.topAnchor).isActive = true
-        doneButton.bottomAnchor.constraint(equalTo: tableFooterView.bottomAnchor).isActive = true
-        doneButton.centerXAnchor.constraint(equalTo: tableFooterView.centerXAnchor).isActive = true
+        generateButtons(withEditLayout: isEditLayout)
+        continueButton.setTitle("Done", for: .normal)
+        deleteButton?.setTitle("Delete", for: .normal)
     }
     
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
