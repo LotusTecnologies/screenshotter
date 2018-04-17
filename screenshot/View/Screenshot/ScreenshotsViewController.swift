@@ -86,7 +86,11 @@ extension ScreenshotsViewController{
     }
 }
 
-extension ScreenshotsViewController {
+extension ScreenshotsViewController: TutorialVideoViewControllerDelegate {
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController?) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
@@ -103,7 +107,15 @@ extension ScreenshotsViewController {
         super.viewWillAppear(animated)
         syncEmptyListView()
         self.updateHasNewScreenshot()
+        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.sawVideoForCampaign_2018_04_20) {
+            let campain = CampainPromotionViewController(modal:true)
+            campain.willDisplayInPopover = true
+            campain.delegate = self
+            self.present(campain, animated: true, completion: nil)
+            AnalyticsTrackers.branch.track(.shareCompleted)
+        }
     }
+    
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)

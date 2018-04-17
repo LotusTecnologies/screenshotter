@@ -19,11 +19,28 @@ class CampainPromotionViewController: UIViewController {
     var imageView:UIImageView?
     
     weak var delegate: TutorialVideoViewControllerDelegate?
+    private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
+    
+    init(modal:Bool) {
+        super.init(nibName: nil, bundle: nil)
+        if modal {
+            transitioningDelegate = transitioning
+            modalPresentationStyle = .custom
 
+        }
+
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let container:UIView = {
             if willDisplayInPopover {
+                self.view.layer.masksToBounds = true
+                self.view.layer.cornerRadius = 8
                 self.view.backgroundColor = .white
                 return self.view
             }else{
@@ -147,6 +164,7 @@ class CampainPromotionViewController: UIViewController {
     }
     
     @objc func tappedButton() {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.sawVideoForCampaign_2018_04_20)
         self.delegate?.tutorialVideoViewControllerDidTapDone(nil)
     }
     @objc func tappedVideo(){
@@ -163,6 +181,7 @@ class CampainPromotionViewController: UIViewController {
                 layer.frame = imageView.bounds
                 imageView.layer.addSublayer(layer)
             }
+            beginObserving(playerItem: playerItem)
         }
         if let player = self.player {
             if player.playbackState == .paused {
@@ -174,7 +193,20 @@ class CampainPromotionViewController: UIViewController {
             }
         }        
     }
-    
+    private func beginObserving(playerItem item:AVPlayerItem) {
+        NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: item)
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    @objc private func playerDidFinishPlaying() {
+        
+        self.playerLayer?.removeFromSuperlayer()
+        self.playerLayer = nil
+        self.player = nil
+        showReplayButton()
+    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()

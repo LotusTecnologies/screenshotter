@@ -210,7 +210,7 @@ extension TutorialViewController : UIScrollViewDelegate {
 
 extension TutorialViewController : TutorialVideoViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
     @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
-        let viewController = CampainPromotionViewController()
+        let viewController = CampainPromotionViewController(modal:false)
         viewController.modalTransitionStyle = .crossDissolve
         viewController.delegate = self
         present(viewController, animated: true, completion: nil)
