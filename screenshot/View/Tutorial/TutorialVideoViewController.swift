@@ -15,7 +15,7 @@ import AVFoundation
     @objc optional func tutorialVideoViewControllerDidPlay(_ viewController:TutorialVideoViewController)
     @objc optional func tutorialVideoViewControllerDidEnd(_ viewController:TutorialVideoViewController)
     
-    func tutorialVideoViewControllerDidTapDone(_ viewController:TutorialVideoViewController)
+    func tutorialVideoViewControllerDidTapDone(_ viewController:TutorialVideoViewController?)
 }
 
 class TutorialVideoViewController : BaseViewController {

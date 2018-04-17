@@ -216,8 +216,8 @@ extension TutorialViewController : TutorialVideoViewControllerDelegate, Tutorial
         present(viewController, animated: true, completion: nil)
     }
     
-    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
-        viewController.delegate = nil
+    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController?) {
+        viewController?.delegate = nil
         dismissViewController()
         scrollToNextSlide()
     }
