@@ -52,8 +52,8 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         label.adjustsFontSizeToFitWidth = true
         label.text = "Enter your CVV"
         view.addSubview(label)
-        label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        label.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         label.topAnchor.constraint(equalTo: layoutGuide.topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         label.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
@@ -62,7 +62,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cvvTextField.placeholder = "CVV"
         cvvTextField.keyboardType = .numberPad
         cvvTextField.textAlignment = .center
-        cvvTextField.font = .monospacedDigitSystemFont(ofSize: 20, weight: UIFontWeightMedium)
+        cvvTextField.font = .monospacedDigitSystemFont(ofSize: 20, weight: UIFont.Weight.medium)
         cvvTextField.textColor = .gray3
         cvvTextField.delegate = self
         cvvTextField.layer.borderColor = cvvBorderColor.cgColor
@@ -70,8 +70,8 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cvvTextField.layer.cornerRadius = .defaultCornerRadius
         cvvTextField.layer.masksToBounds = true
         view.addSubview(cvvTextField)
-        cvvTextField.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        cvvTextField.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        cvvTextField.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        cvvTextField.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         cvvTextField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
         cvvTextField.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         cvvTextField.trailingAnchor.constraint(equalTo: layoutGuide.centerXAnchor).isActive = true
@@ -105,8 +105,8 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         orderButton.backgroundColor = .crazeGreen
         orderButton.setTitle("Place Your Order", for: .normal)
         view.addSubview(orderButton)
-        orderButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        orderButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        orderButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        orderButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         orderButton.topAnchor.constraint(equalTo: cvvTextField.bottomAnchor, constant: .padding).isActive = true
         orderButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         orderButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
@@ -117,8 +117,8 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cancelButton.titleLabel?.font = .screenshopFont(.hindMedium, size: UIFont.buttonFontSize)
         cancelButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: 0, bottom: 6, right: 0)
         view.addSubview(cancelButton)
-        cancelButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        cancelButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        cancelButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        cancelButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         cancelButton.topAnchor.constraint(equalTo: orderButton.bottomAnchor, constant: .padding).isActive = true
         cancelButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
         cancelButton.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true

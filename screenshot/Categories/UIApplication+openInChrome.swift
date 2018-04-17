@@ -35,14 +35,13 @@ extension UIApplication {
             chromeScheme = nil
         }
         
-        if let chromeScheme = chromeScheme {
-            let rangeForScheme = url.absoluteString.range(of: ":")
-            if let endOfColon = rangeForScheme?.upperBound {
-                let urlNoScheme = url.absoluteString.substring(from: endOfColon)
-                let chromeURLString = chromeScheme.appending(urlNoScheme)
-                let chromeURL = URL.init(string: chromeURLString)
-                return chromeURL
-            }
+        if let chromeScheme = chromeScheme,
+          let rangeForScheme = url.absoluteString.range(of: ":") {
+            let endOfColon = rangeForScheme.upperBound
+            let urlNoScheme = url.absoluteString[endOfColon...]
+            let chromeURLString = chromeScheme.appending(urlNoScheme)
+            let chromeURL = URL.init(string: chromeURLString)
+            return chromeURL
         }
         return nil
     }

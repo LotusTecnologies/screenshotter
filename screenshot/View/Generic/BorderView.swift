@@ -22,10 +22,10 @@ class BorderView: UIView {
         
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .border
-        setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
-        setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
+        setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
+        setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         
         switch edge {
         case .top, .bottom:

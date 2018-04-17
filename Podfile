@@ -21,6 +21,7 @@ def shared_pods
     pod 'Segment-Amplitude'
     pod 'SwiftKeychainWrapper'
     pod 'CreditCardValidator'
+    pod 'Whisper'
 end
 
 target 'screenshot' do

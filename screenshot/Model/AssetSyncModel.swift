@@ -140,7 +140,7 @@ class AssetSyncModel: NSObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    func applicationDidBecomeActive(){
+    @objc func applicationDidBecomeActive(){
         self.lastDidBecomeActiveDate = Date()
         self.processingQ.async {
             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
@@ -196,18 +196,24 @@ extension AssetSyncModel {
                                 screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                             }
                             screenshot.shoppablesCount = 0
-                            screenshot.imageData = imageData as NSData?
+                            screenshot.imageData = imageData
                             screenshot.isHidden = false
                             screenshot.isRecognized = true
-                            screenshot.lastModified = NSDate()
-
+                            screenshot.lastModified = Date()
+                            screenshot.source = .gallery
+                            screenshot.submittedDate = nil
+                            screenshot.submittedFeedbackCount = 0
+                            screenshot.submittedFeedbackCountDate = nil
+                            screenshot.submittedFeedbackCountGoal = 0
+                            screenshot.submittedFeedbackCountDate = nil
+                            
                             managedObjectContext.saveIfNeeded()
                             fulfill((imageClassification, imageData))
                         }else{
                             let screenshot = Screenshot(context: managedObjectContext)
                             screenshot.assetId = asset.localIdentifier
-                            let now = NSDate()
-                            if let date =  asset.creationDate as NSDate? {
+                            let now = Date()
+                            if let date =  asset.creationDate  {
                                 screenshot.createdAt = date
                             }else{
                                 screenshot.createdAt = now
@@ -217,12 +223,12 @@ extension AssetSyncModel {
                             screenshot.isNew = true
                             screenshot.lastModified = now
                             screenshot.isRecognized = true
-                            screenshot.isFromShare = false
                             screenshot.isHidden = false
-                            screenshot.imageData = imageData as NSData?
+                            screenshot.imageData = imageData
+                            screenshot.source = .gallery
                             
                             managedObjectContext.saveIfNeeded()
-                            fulfill(ClarifaiModel.ImageClassification.human, imageData)
+                            fulfill((ClarifaiModel.ImageClassification.human, imageData))
                         }
                     }
                 }
@@ -240,7 +246,7 @@ extension AssetSyncModel {
     //From share
     public func downloadScreenshot(shareId: String) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
-            firstly { _ -> Promise<[String : Any]> in
+            let networkRequest:Promise<[String : Any]> = {
                 // Get screenshot dict from Craze server.
                 // See end https://docs.google.com/document/d/16WsJMepl0Z3YrsRKxcFqkASUieRLKy_Aei8lmbpD2bo
                 guard let encoded = shareId.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
@@ -250,7 +256,8 @@ extension AssetSyncModel {
                 }
                 print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
                 return NetworkingPromise.sharedInstance.downloadInfo(url: screenshotInfoUrl)
-            }.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
+            }()
+            networkRequest.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
                 // Download image from Syte S3.
                 guard let share = jsonDict["share"] as? [String : Any],
                     let screenshotDict = share["screenshot"] as? [String : Any],
@@ -260,14 +267,14 @@ extension AssetSyncModel {
                         return Promise(error: imageURLError)
                 }
                 return when(fulfilled:  NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURLString), Promise.init(value: screenshotDict))
-            }.then(on: self.processingQ) { imageData, screenshotDict -> Promise<(NSManagedObject, [String : Any])> in
+            }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise<(NSManagedObject, [String : Any])> in
                 // Save screenshot to db.
                 return DataModel.sharedInstance.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
                     return DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
                                                     assetId: shareId,
                                                     createdAt: Date(),
                                                     isRecognized: true,
-                                                    isFromShare: true,
+                                                    source: .share,
                                                     isHidden: false,
                                                     imageData: imageData,
                                                     classification: nil)
@@ -391,7 +398,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }
     }
     
-     func applicationUserDidTakeScreenshot() {
+     @objc func applicationUserDidTakeScreenshot() {
         print("AssetSyncModel applicationUserDidTakeScreenshot")
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
@@ -425,7 +432,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 assetId: asset.localIdentifier,
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
-                                                                                isFromShare: false,
+                                                                                source: .gallery,
                                                                                 isHidden: isHidden,
                                                                                 imageData: imageData,
                                                                                 classification: classification)
@@ -602,10 +609,10 @@ extension AssetSyncModel {
                         screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
                     }
                     screenshot.shoppablesCount = 0
-                    screenshot.imageData = imageData as NSData?
+                    screenshot.imageData = imageData
                     screenshot.isHidden = false
                     screenshot.isRecognized = true
-                    screenshot.lastModified = NSDate()
+                    screenshot.lastModified = Date()
                     managedObjectContext.saveIfNeeded()
                     fulfill((imageData, imageClassification))
                 } else {
@@ -640,7 +647,7 @@ extension AssetSyncModel {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
-            firstly { _ -> Promise<Bool> in
+            firstly { // _ -> Promise<Bool> in
                 let userDefaults = UserDefaults.standard
                 if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
                     print("UserDefaultsKeys.isUSC not set. geoLocating.")
@@ -653,7 +660,7 @@ extension AssetSyncModel {
             }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
                 return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).flatMap({$0}).joined(separator: ",")
+                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
                     AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
@@ -969,22 +976,23 @@ extension AssetSyncModel {
             let dataModel = DataModel.sharedInstance
             
             self.processingQ.async {
-                firstly { _ -> Promise<Data?> in
+                let getData:Promise<Data?> = Promise.init(resolvers: { (fulfill, reject) in
                     let imageData: Data?
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-                        imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
-#else
-                        imageData = self.data(for: image)
-#endif
-                    return Promise(value: imageData)
-                    }.then(on: self.processingQ) { imageData -> Promise<Data?> in
+                    #if STORE_NEW_TUTORIAL_SCREENSHOT
+                    imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                    #else
+                    imageData = self.data(for: image)
+                    #endif
+                    fulfill(imageData)
+                })
+                getData.then(on: self.processingQ) { imageData -> Promise<Data?> in
                         return Promise { fulfill, reject in
                             dataModel.performBackgroundTask { (managedObjectContext) in
                                 let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                  assetId: Constants.tutorialScreenshotAssetId,
                                                                  createdAt: Date(),
                                                                  isRecognized: true,
-                                                                 isFromShare: false,
+                                                                 source: .tutorial,
                                                                  isHidden: false,
                                                                  imageData: imageData,
                                                                  classification: nil)
@@ -1031,23 +1039,21 @@ extension Screenshot {
         if let shareLink = self.shareLink {
             return Promise(value: shareLink)
         }
-        guard let assetId = self.assetId else {
-            let error = NSError(domain: "Craze", code: 14, userInfo: [NSLocalizedDescriptionKey: "share with no assetId"])
-            print(error)
-            return Promise(error: error)
-        }
         let dataModel = DataModel.sharedInstance
         let assetSyncModel = AssetSyncModel.sharedInstance
-        return firstly { _ -> Promise<(String, String)> in
+        let objectId = self.objectID
+
+        return firstly { 
             // Post to Craze server, which returns deep share link.
             return self.shareOrReshare()
             }.then(on: assetSyncModel.processingQ) { shareId, shareLink -> Promise<String> in
                 // Return the promise as soon as we have the shareLink, and concurrently or afterwards save shareLink to DB.
                 NSLog("shareId:\(shareId)  shareLink:\(shareLink)")
-                dataModel.performBackgroundTask { (managedObjectContext) in
-                    if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
+                dataModel.performBackgroundTask { (context) in
+                    if let screenshot = context.screenshotWith(objectId:objectId) {
                         screenshot.shareLink = shareLink
-                        managedObjectContext.saveIfNeeded()
+                        screenshot.shareId = shareId
+                        context.saveIfNeeded()
                     }
                 }
                 return Promise(value: shareLink)
@@ -1056,8 +1062,8 @@ extension Screenshot {
     
     private func shareOrReshare() -> Promise<(String, String)> {
         let userName = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
-        if self.isFromShare {
-            return NetworkingPromise.sharedInstance.reshare(userName: userName, shareId: self.assetId)
+        if let shareId = self.shareId {
+            return NetworkingPromise.sharedInstance.reshare(userName: userName, shareId: shareId)
         } else {
             return NetworkingPromise.sharedInstance.share(userName: userName, imageURLString: self.uploadedImageURL, syteJson: self.syteJson)
         }
@@ -1065,6 +1071,35 @@ extension Screenshot {
     
      public func shareViaLink() -> AnyPromise {
         return AnyPromise(share())
+    }
+    
+    public func submitToDiscover(){
+        let screenshot = self
+        let now = Date()
+        if let image = screenshot.uploadedImageURL {
+            let objectId = screenshot.objectID
+            let promise = NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
+            
+            promise.then { (dictionary) -> Void in
+                DataModel.sharedInstance.performBackgroundTask { (context) in
+                    if let screenshot = context.screenshotWith(objectId:objectId) {
+                        if let sucess = dictionary["success"] as? Bool, sucess, let matchstick =  dictionary["matchstick"] as? NSDictionary, let screenshotId = matchstick["screenshotId"] as? String {
+                            screenshot.screenshotId = screenshotId
+                            screenshot.submittedDate = now
+                            screenshot.submittedFeedbackCountDate = now
+                            context.saveIfNeeded()
+                            
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    var canSubmitToDiscover:Bool {
+        get{
+            return (source == .gallery || source == .share || source == .unknown) && submittedDate == nil
+        }
     }
     
 }

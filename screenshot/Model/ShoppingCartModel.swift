@@ -71,7 +71,7 @@ class ShoppingCartModel {
             cartItem.url = variantToCopy.url
             cartItem.productDescription = variantToCopy.product?.productDescription
             cartItem.quantity = quantity
-            cartItem.dateModified = NSDate()
+            cartItem.dateModified = Date()
             cartItem.product = variantToCopy.product
             cartItem.cart = cart
             managedObjectContext.saveIfNeeded()
@@ -301,7 +301,7 @@ class ShoppingCartModel {
         dataModel.performBackgroundTask { managedObjectContext in
             if let cart = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
                 cart.isPastOrder = true
-                cart.dateSubmitted = NSDate()
+                cart.dateSubmitted = Date()
                 // Write to items without changing anything, so the cartItemFrc is updated.
                 (cart.items?.sortedArray(using: []) as? [CartItem])?.forEach { $0.errorMask = $0.errorMask }
                 managedObjectContext.saveIfNeeded()

@@ -191,7 +191,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
     }
     
-    func contentSizeCategoryDidChange(_ notification: Notification) {
+    @objc func contentSizeCategoryDidChange(_ notification: Notification) {
         if self.view.window != nil && self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
             self.collectionView?.reloadItems(at: [IndexPath(item: 0, section: ProductsSection.tooltip.section)])
         }
@@ -203,7 +203,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         NotificationCenter.default.removeObserver(self)
     }
     
-    func displayScreenshotAction() {
+    @objc func displayScreenshotAction() {
         let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
         navigationController.screenshotDisplayViewController.image = self.image
         navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
@@ -402,7 +402,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         }
     }
     
-    func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+    @objc func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
         guard let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
@@ -426,12 +426,12 @@ extension ProductsViewControllerOptionsView {
                 label.minimumScaleFactor = 0.7
                 
                 var attributes = UINavigationBar.appearance().titleTextAttributes
-                attributes?[NSForegroundColorAttributeName] = UIColor.crazeGreen
+                attributes?[NSAttributedStringKey.foregroundColor] = UIColor.crazeGreen
                 
                 let attributedString = NSMutableAttributedString(string: "products.options.title".localized, attributes: attributes)
                 
                 let offset:CGFloat = 3
-                attributes?[NSBaselineOffsetAttributeName] = offset
+                attributes?[NSAttributedStringKey.baselineOffset] = offset
                 
                 let arrowString = NSAttributedString(string: "⌄", attributes: attributes)
                 attributedString.append(arrowString)
@@ -454,7 +454,7 @@ extension ProductsViewControllerOptionsView {
         }
     }
     
-    func presentOptions(_ control:ProductsViewControllerControl) {
+    @objc func presentOptions(_ control:ProductsViewControllerControl) {
         
         if control.isFirstResponder {
             control.resignFirstResponder()
@@ -652,36 +652,38 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    func productsRatePositiveAction() {
+    @objc func productsRatePositiveAction() {
         if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             shoppable.setRating(positive: true)
             
-            let sharePrompt = ShareToDiscoverPrompt.init()
-            sharePrompt.translatesAutoresizingMaskIntoConstraints = false
-            sharePrompt.alpha = 0
-            self.view.addSubview(sharePrompt)
-            sharePrompt.addButton.addTarget(self, action: #selector(presentThankYouForSharingView), for: .touchUpInside)
-            sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
-            sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-            sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
-            sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
-            self.shareToDiscoverPrompt = sharePrompt
-            
-            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                sharePrompt.alpha = 1
-                self.shamrockButton?.alpha = 0
-            })
+            if self.screenshot.canSubmitToDiscover {
+                let sharePrompt = ShareToDiscoverPrompt.init()
+                sharePrompt.translatesAutoresizingMaskIntoConstraints = false
+                sharePrompt.alpha = 0
+                self.view.addSubview(sharePrompt)
+                sharePrompt.addButton.addTarget(self, action: #selector(submitToDiscoverAndPresentThankYouForSharingView), for: .touchUpInside)
+                sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
+                sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+                sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
+                sharePrompt.bottomAnchor.constraint(equalTo: self.rateView.topAnchor, constant: 0).isActive = true
+                self.shareToDiscoverPrompt = sharePrompt
+                
+                UIView.animate(withDuration: .defaultAnimationDuration, animations: {
+                    sharePrompt.alpha = 1
+                    self.shamrockButton?.alpha = 0
+                })
+            }
         }
     }
     
-    func productsRateNegativeAction() {
+    @objc func productsRateNegativeAction() {
         if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             shoppable.setRating(positive: false)
             self.presentProductsRateNegativeAlert()
         }
     }
     
-    func talkToYourStylistAction() {
+    @objc func talkToYourStylistAction() {
         IntercomHelper.sharedInstance.presentMessagingUI()
     }
     
@@ -741,7 +743,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
 
 typealias ProductsViewControllerShareToDiscoverPrompt = ProductsViewController
 extension ProductsViewControllerShareToDiscoverPrompt {
-    func hideShareToDiscoverPrompt (){
+    @objc func hideShareToDiscoverPrompt (){
         UIView.animate(withDuration: .defaultAnimationDuration, animations: {
             self.shareToDiscoverPrompt?.alpha = 0
             self.shamrockButton?.alpha = 1
@@ -751,19 +753,17 @@ extension ProductsViewControllerShareToDiscoverPrompt {
         }
     }
     
-    func presentThankYouForSharingView() {
+    @objc func submitToDiscoverAndPresentThankYouForSharingView() {
         self.hideShareToDiscoverPrompt()
         
-        if let image = self.screenshot.uploadedImageURL {
-            NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
-        }
+        self.screenshot.submitToDiscover()
         
         let thankYou = ThankYouForSharingViewController()
         thankYou.closeButton.addTarget(self, action: #selector(thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
         self.present(thankYou, animated: true, completion: nil)
     }
     
-    func thankYouForSharingViewDidClose(_ sender: Any) {
+    @objc func thankYouForSharingViewDidClose(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
 }
@@ -889,7 +889,7 @@ extension ProductsViewControllerNoItemsHelperView{
         self.noItemsHelperView = nil
     }
     
-    func noItemsRetryAction() {
+    @objc func noItemsRetryAction() {
         let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
             AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")

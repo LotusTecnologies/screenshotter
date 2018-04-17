@@ -34,7 +34,7 @@ class CardTableViewCell: UITableViewCell {
         checkImageView.image = checkPlaceholderImage
         checkImageView.contentMode = .scaleAspectFit
         contentView.addSubview(checkImageView)
-        checkImageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
+        checkImageView.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
         checkImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         checkImageView.centerYAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerYAnchor).isActive = true
         
@@ -56,8 +56,8 @@ class CardTableViewCell: UITableViewCell {
         editButton.setTitle("generic.edit".localized, for: .normal)
         editButton.setTitleColor(.crazeGreen, for: .normal)
         cardView.addSubview(editButton)
-        editButton.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
-        editButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
+        editButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
+        editButton.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
         editButton.topAnchor.constraint(equalTo: cardView.topAnchor).isActive = true
         editButton.trailingAnchor.constraint(equalTo: cardView.trailingAnchor).isActive = true
     }

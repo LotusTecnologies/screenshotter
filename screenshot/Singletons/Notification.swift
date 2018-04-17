@@ -45,7 +45,7 @@ final class NotificationManager: NSObject {
         notificationView.heightAnchor.constraint(greaterThanOrEqualToConstant: 64).isActive = true
         
         let bottomConstraint = notificationView.bottomAnchor.constraint(equalTo: window.topAnchor)
-        bottomConstraint.priority = UILayoutPriorityDefaultLow
+        bottomConstraint.priority = UILayoutPriority.defaultLow
         bottomConstraint.isActive = true
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAction(tapGesture:)))
@@ -279,7 +279,7 @@ private class NotificationView: UIView {
         imageView.tintColor = .crazeRed
         imageView.isHidden = true
         addSubview(imageView)                   // TODO: less padding for the image
-        imageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         imageView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: padding).isActive = true
         imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding).isActive = true
         imageView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -padding).isActive = true
@@ -293,8 +293,8 @@ private class NotificationView: UIView {
         label.textColor = .gray3
         label.numberOfLines = 0
         addSubview(label)
-        label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        label.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        label.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         label.topAnchor.constraint(equalTo: topAnchor, constant: padding).isActive = true
         label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding).isActive = true
         label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding).isActive = true
@@ -303,7 +303,7 @@ private class NotificationView: UIView {
         labelLeadingConstraint.isActive = true
         
         let labelToImageViewLeadingConstraint = label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: padding)
-        labelToImageViewLeadingConstraint.priority = UILayoutPriorityDefaultHigh
+        labelToImageViewLeadingConstraint.priority = UILayoutPriority.defaultHigh
         labelToImageViewLeadingConstraint.isActive = true
     }
     

@@ -48,13 +48,13 @@ class ProductsRateView : UIView {
         label.minimumScaleFactor = 0.7
         label.baselineAdjustment = .alignCenters
         contentView.addSubview(label)
-        label.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
+        label.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .horizontal)
         label.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: .padding).isActive = true
         label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
         let labelToVoteTrailingConstraint = label.trailingAnchor.constraint(equalTo: voteUpButton.leadingAnchor)
-        labelToVoteTrailingConstraint.priority = UILayoutPriorityDefaultHigh
+        labelToVoteTrailingConstraint.priority = UILayoutPriority.defaultHigh
         labelToVoteTrailingConstraint.isActive = true
         
         labelTrailingConstraint = label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.padding)
@@ -150,7 +150,7 @@ class ProductsRateView : UIView {
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         button.addTarget(self, action: #selector(selectButton(_:)), for: .touchUpInside)
         contentView.addSubview(button)
-        button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        button.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
     }
     
     @objc private func selectButton(_ button: UIButton) {

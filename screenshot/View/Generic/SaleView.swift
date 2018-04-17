@@ -34,7 +34,7 @@ class SaleView: UIImageView {
         label.textAlignment = .center
         label.text = "generic.sale".localized
         addSubview(label)
-        label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         label.topAnchor.constraint(equalTo: topAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         label.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true

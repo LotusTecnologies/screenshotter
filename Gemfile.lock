@@ -54,7 +54,7 @@ GEM
     declarative-option (0.1.0)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (2.2.1)
+    dotenv (2.2.2)
     escape (0.0.4)
     excon (0.62.0)
     faraday (0.14.0)

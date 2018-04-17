@@ -35,7 +35,7 @@ class IntrinsicContentSizePresentationController: DimmedPresentationController {
             let maxHeight = rect.size.height - (max(.padding, statusBarHeight) * 2)
             let width = (intrinsicContentSize.width > 0) ? intrinsicContentSize.width : maxWidth
             
-            intrinsicContentSize = presentedView.systemLayoutSizeFitting(CGSize(width: width, height: maxHeight), withHorizontalFittingPriority: UILayoutPriorityRequired, verticalFittingPriority: UILayoutPriorityDefaultLow)
+            intrinsicContentSize = presentedView.systemLayoutSizeFitting(CGSize(width: width, height: maxHeight), withHorizontalFittingPriority: UILayoutPriority.required, verticalFittingPriority: UILayoutPriority.defaultLow)
             
             intrinsicContentSize.width = min(maxWidth, intrinsicContentSize.width)
             intrinsicContentSize.height = min(maxHeight, intrinsicContentSize.height)

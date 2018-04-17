@@ -56,7 +56,7 @@ class FavoriteControl: UIControl {
         }
     }
     
-    func touchUpInsideAction() {
+    @objc func touchUpInsideAction() {
         animate = true
         isSelected = !isSelected
         animate = false

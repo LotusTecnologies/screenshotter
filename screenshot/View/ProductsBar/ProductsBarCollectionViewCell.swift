@@ -55,7 +55,7 @@ class ProductsBarCollectionViewCell: UICollectionViewCell {
         buyLabel.textColor = .crazeGreen
         buyLabel.text = "generic.buy".localized
         buyLabel.textAlignment = .center
-        buyLabel.font = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize, weight: UIFontWeightSemibold)
+        buyLabel.font = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize, weight: UIFont.Weight.semibold)
         mainView.addSubview(buyLabel)
         buyLabel.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
         buyLabel.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true

@@ -114,7 +114,7 @@ class ProductView: UIView {
         priceLabel.adjustsFontSizeToFitWidth = true
         priceLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(priceLabel)
-        priceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        priceLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         priceLabel.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
         priceLabel.trailingAnchor.constraint(equalTo: labelContainerView.trailingAnchor).isActive = true
         priceLabel.widthAnchor.constraint(lessThanOrEqualTo: labelContainerView.widthAnchor, multiplier: 0.4).isActive = true
@@ -127,7 +127,7 @@ class ProductView: UIView {
         originalPriceLabel.adjustsFontSizeToFitWidth = true
         originalPriceLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(originalPriceLabel)
-        originalPriceLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        originalPriceLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         originalPriceLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor).isActive = true
         originalPriceLabel.bottomAnchor.constraint(lessThanOrEqualTo: labelContainerView.bottomAnchor).isActive = true
         originalPriceLabel.trailingAnchor.constraint(equalTo: labelContainerView.trailingAnchor).isActive = true
@@ -139,7 +139,7 @@ class ProductView: UIView {
         titleLabel.numberOfLines = 0
         titleLabel.adjustsFontForContentSizeCategory = true
         labelContainerView.addSubview(titleLabel)
-        titleLabel.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
+        titleLabel.setContentHuggingPriority(UILayoutPriority.defaultLow, for: .horizontal)
         titleLabel.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: labelContainerView.leadingAnchor).isActive = true
         titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: labelContainerView.bottomAnchor).isActive = true

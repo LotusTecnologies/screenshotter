@@ -73,7 +73,7 @@ class DiscoverScreenshotHelperView : UIView {
         divider.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: padding).isActive = true
         divider.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         let dividerWidthConstraint = divider.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.3)
-        dividerWidthConstraint.priority = UILayoutPriorityDefaultHigh
+        dividerWidthConstraint.priority = UILayoutPriority.defaultHigh
         dividerWidthConstraint.isActive = true
         divider.widthAnchor.constraint(greaterThanOrEqualToConstant: 100).isActive = true
         divider.heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
@@ -81,7 +81,7 @@ class DiscoverScreenshotHelperView : UIView {
         let swipeLabelContainer = DefinedHeightView()
         swipeLabelContainer.translatesAutoresizingMaskIntoConstraints = false
         addSubview(swipeLabelContainer)
-        swipeLabelContainer.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        swipeLabelContainer.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         swipeLabelContainer.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: padding).isActive = true
         swipeLabelContainer.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         swipeLabelContainer.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -119,7 +119,7 @@ class DiscoverScreenshotHelperView : UIView {
         leftImageView.translatesAutoresizingMaskIntoConstraints = false
         leftImageView.contentMode = .scaleAspectFit
         addSubview(leftImageView)
-        leftImageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .vertical)
+        leftImageView.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .vertical)
         leftImageView.topAnchor.constraint(equalTo: swipeLabelContainer.bottomAnchor, constant: padding).isActive = true
         leftImageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         leftImageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor, constant: -padding).isActive = true
@@ -129,7 +129,7 @@ class DiscoverScreenshotHelperView : UIView {
         rightImageView.translatesAutoresizingMaskIntoConstraints = false
         rightImageView.contentMode = .scaleAspectFit
         addSubview(rightImageView)
-        rightImageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .vertical)
+        rightImageView.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .vertical)
         rightImageView.topAnchor.constraint(equalTo: leftImageView.topAnchor).isActive = true
         rightImageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor, constant: padding).isActive = true
         rightImageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -151,7 +151,7 @@ class DiscoverScreenshotHelperView : UIView {
         tapImageView.translatesAutoresizingMaskIntoConstraints = false
         tapImageView.contentMode = .scaleAspectFit
         addSubview(tapImageView)
-        tapImageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .vertical)
+        tapImageView.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .vertical)
         tapImageView.topAnchor.constraint(equalTo: tapLabel.bottomAnchor, constant: padding).isActive = true
         tapImageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         tapImageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true

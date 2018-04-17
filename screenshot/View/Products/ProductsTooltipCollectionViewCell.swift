@@ -40,7 +40,7 @@ class ProductsTooltipCollectionViewCell : UICollectionViewCell {
         arrowImageView.translatesAutoresizingMaskIntoConstraints = false
         arrowImageView.contentMode = .scaleAspectFit
         centerView.addSubview(arrowImageView)
-        arrowImageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        arrowImageView.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         arrowImageView.topAnchor.constraint(equalTo: centerView.topAnchor).isActive = true
         arrowImageView.centerXAnchor.constraint(equalTo: centerView.centerXAnchor).isActive = true
         
@@ -82,7 +82,7 @@ extension ProductsTooltipCollectionViewCell {
         let contentWidth = width - contentInset.left - contentInset.right
         let constraintRect = CGSize(width: contentWidth, height: .greatestFiniteMagnitude)
         
-        let boundingBox = text.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
+        let boundingBox = text.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSAttributedStringKey.font: labelFont], context: nil)
         let arrowImageHeight = (arrowImage?.size.height ?? 0)
         return contentInset.top + arrowImageHeight + imageToLabelPadding + ceil(boundingBox.height) + contentInset.bottom
     }

@@ -37,10 +37,10 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             
             let color: UIColor = .gray6
             
-            let attributes: [String: Any] = [
-                NSForegroundColorAttributeName: color,
-                NSStrikethroughStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-                NSStrikethroughColorAttributeName: color
+            let attributes: [NSAttributedStringKey: Any] = [
+                NSAttributedStringKey.foregroundColor: color,
+                NSAttributedStringKey.strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue,
+                NSAttributedStringKey.strikethroughColor: color
             ]
             
             self.originalPriceLabel?.attributedText = NSAttributedString.init(string: newString, attributes: attributes)
@@ -136,7 +136,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         externalPreviewImageView.isHidden = true
         externalPreviewImageView.contentMode = .scaleAspectFit
         topLabelContainerView.addSubview(externalPreviewImageView)
-        externalPreviewImageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        externalPreviewImageView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         externalPreviewImageView.topAnchor.constraint(equalTo: topLabelContainerView.topAnchor).isActive = true
         externalPreviewImageView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor).isActive = true
         externalPreviewImageView.bottomAnchor.constraint(equalTo: topLabelContainerView.bottomAnchor).isActive = true
@@ -169,7 +169,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.adjustsFontSizeToFitWidth = true
             label.layoutMargins = ProductsCollectionViewCell.priceLabelLayoutMargins
             self.contentView.addSubview(label)
-            label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+            label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
             
             label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductsCollectionViewCell.priceLabelHeight))
             
@@ -229,7 +229,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.text = "generic.buy".localized
             label.textColor = .crazeGreen
             label.textAlignment = .center
-            label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFontWeightMedium)
+            label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFont.Weight.medium)
             return label
         }()
         

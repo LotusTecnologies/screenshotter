@@ -56,13 +56,13 @@ class CartCheckoutView: UIView {
             let text = "cart.checkout.total".localized(withFormat: price)
             let countRange = NSString(string: text).range(of: "\(price)")
             
-            let fontLight = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
-            let fontMedium = UIFont.systemFont(ofSize: 22, weight: UIFontWeightMedium)
+            let fontLight = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.light)
+            let fontMedium = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.medium)
             
             let attributedString = NSMutableAttributedString(string: text, attributes: [
-                NSFontAttributeName: fontMedium
+                NSAttributedStringKey.font: fontMedium
                 ])
-            attributedString.addAttribute(NSFontAttributeName, value: fontLight, range: countRange)
+            attributedString.addAttribute(NSAttributedStringKey.font, value: fontLight, range: countRange)
             
             priceLabel.attributedText = attributedString
         }

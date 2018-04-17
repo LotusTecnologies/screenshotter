@@ -36,6 +36,7 @@ PODS:
     - Amplitude-iOS (~> 4.0)
     - Analytics (~> 3.6)
   - SwiftKeychainWrapper (3.0.1)
+  - Whisper (6.0.2)
 
 DEPENDENCIES:
   - Analytics (~> 3.0)
@@ -54,6 +55,7 @@ DEPENDENCIES:
   - SDWebImage (~> 4.0)
   - Segment-Amplitude
   - SwiftKeychainWrapper
+  - Whisper
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -75,6 +77,7 @@ SPEC REPOS:
     - SDWebImage
     - Segment-Amplitude
     - SwiftKeychainWrapper
+    - Whisper
 
 SPEC CHECKSUMS:
   Amplitude-iOS: c923c4a576698083c1cd05e45072c92d41e206bd
@@ -95,7 +98,8 @@ SPEC CHECKSUMS:
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
   Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
+  Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 2a3449d5424e3fda6e3ec695c721ef3d6fe57871
+PODFILE CHECKSUM: 9d84628e0494ee7aa93a0eebefddeda902a75439
 
 COCOAPODS: 1.5.0
