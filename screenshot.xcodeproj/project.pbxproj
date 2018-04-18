@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		310E307A2085DC2C00C6EDE9 /* Date+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E30792085DC2C00C6EDE9 /* Date+craze.swift */; };
 		310E307E2085EABC00C6EDE9 /* CampainPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307D2085EABC00C6EDE9 /* CampainPromotionViewController.swift */; };
+		310E308020870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */; };
 		3130FF6F203040F200AA881A /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
@@ -155,6 +156,7 @@
 /* Begin PBXFileReference section */
 		310E30792085DC2C00C6EDE9 /* Date+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+craze.swift"; sourceTree = "<group>"; };
 		310E307D2085EABC00C6EDE9 /* CampainPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampainPromotionViewController.swift; sourceTree = "<group>"; };
+		310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
 		3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
@@ -514,6 +516,7 @@
 				C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */,
 				C54087CD1FE90C8D00198955 /* TutorialViewController.swift */,
 				C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */,
+				310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -1095,6 +1098,7 @@
 				C51D363F2010B66400943257 /* ProductsTooltipCollectionViewCell.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C54088551FE90E2200198955 /* ClipView.swift in Sources */,
+				310E308020870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C54088151FE90C8E00198955 /* TutorialViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,

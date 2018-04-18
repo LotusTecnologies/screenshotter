@@ -86,8 +86,8 @@ extension ScreenshotsViewController{
     }
 }
 
-extension ScreenshotsViewController: TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController?) {
+extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
+    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
         self.dismiss(animated: true, completion: nil)
     }
     

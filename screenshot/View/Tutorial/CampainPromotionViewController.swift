@@ -18,7 +18,7 @@ class CampainPromotionViewController: UIViewController {
 
     var imageView:UIImageView?
     
-    weak var delegate: TutorialVideoViewControllerDelegate?
+    weak var delegate: VideoDisplayingViewControllerDelegate?
     private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
     
     init(modal:Bool) {
@@ -165,8 +165,9 @@ class CampainPromotionViewController: UIViewController {
     
     @objc func tappedButton() {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.sawVideoForCampaign_2018_04_20)
-        self.delegate?.tutorialVideoViewControllerDidTapDone(nil)
+        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
+    
     @objc func tappedVideo(){
         if self.player == nil {
             let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: "Craze_Video", withExtension: "mp4")!)
