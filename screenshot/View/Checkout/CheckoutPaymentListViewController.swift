@@ -52,7 +52,7 @@ class CheckoutPaymentListViewController: BaseViewController {
         addButton.setTitleColor(.black, for: .highlighted)
         addButton.setImage(UIImage(named: "CheckoutCreditCard"), for: .normal)
         addButton.adjustInsetsForImage(withPadding: 6)
-        addButton.addTarget(self, action: #selector(addCreditCardAction), for: .touchUpInside)
+        addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
         addButton.sizeToFit()
         tableView.tableFooterView = addButton
     }
@@ -62,9 +62,34 @@ class CheckoutPaymentListViewController: BaseViewController {
         tableView.delegate = nil
     }
     
-    @objc fileprivate func addCreditCardAction() {
+    @objc fileprivate func addButtonAction() {
         let paymentFormViewController = CheckoutPaymentFormViewController()
+        paymentFormViewController.continueButton.addTarget(self, action: #selector(addCardAction), for: .touchUpInside)
         navigationController?.pushViewController(paymentFormViewController, animated: true)
+    }
+    
+    @objc fileprivate func addCardAction() {
+        guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
+            return
+        }
+        // TODO: should the request to save alert be apart of this method?
+        paymentFormViewController.addCard(shouldSave: true)
+    }
+    
+    @objc fileprivate func updateCardAction() {
+        guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
+            return
+        }
+        
+        paymentFormViewController.updateCard()
+    }
+    
+    @objc fileprivate func deleteCardAction() {
+        guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
+            return
+        }
+        
+        paymentFormViewController.deleteCard()
     }
 }
 
@@ -92,29 +117,14 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
     }
     
     @objc fileprivate func editButtonAction(_ button: UIButton, event: UIEvent) {
-        guard let indexPath = tableView.indexPath(for: event),
-            let card = cardFrc?.object(at: indexPath)
-            else {
-                return
+        guard let indexPath = tableView.indexPath(for: event) else {
+            return
         }
         
-        let expirationDate = FormRow.Expiration.Date(month: Int(card.expirationMonth), year: Int(card.expirationYear))
-        
-        let formDefaultValues: [CheckoutPaymentFormKeys: String?] = [
-            .addressCity: card.city,
-            .addressCountry: card.country,
-            .addressState: card.state,
-            .addressStreet: card.street,
-            .addressZip: card.zipCode,
-//            .cardCVV: card.cvv,
-            .cardExp: FormRow.Expiration.value(for: expirationDate),
-            .cardName: card.fullName,
-            .cardNumber: card.number,
-            .email: card.email,
-            .phoneNumber: card.phone
-        ]
-        
-        let paymentFormViewController = CheckoutPaymentFormViewController(withDefaultValues: formDefaultValues)
+        let card = cardFrc?.object(at: indexPath)
+        let paymentFormViewController = CheckoutPaymentFormViewController(withCard: card)
+        paymentFormViewController.continueButton.addTarget(self, action: #selector(updateCardAction), for: .touchUpInside)
+        paymentFormViewController.deleteButton?.addTarget(self, action: #selector(deleteCardAction), for: .touchUpInside)
         navigationController?.pushViewController(paymentFormViewController, animated: true)
     }
 }

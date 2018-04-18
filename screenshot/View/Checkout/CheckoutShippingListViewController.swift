@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import CoreData
 
 class CheckoutShippingListViewController: BaseViewController {
+    fileprivate var shippingFrc: FetchedResultsControllerManager<ShippingAddress>?
     
     // MARK: View
     
@@ -29,6 +31,8 @@ class CheckoutShippingListViewController: BaseViewController {
         
         title = "Shipping Addresses"
         restorationIdentifier = String(describing: type(of: self))
+        
+        shippingFrc = DataModel.sharedInstance.shippingAddressFrc(delegate: self)
     }
     
     override func viewDidLoad() {
@@ -47,7 +51,7 @@ class CheckoutShippingListViewController: BaseViewController {
         addButton.setTitleColor(.black, for: .highlighted)
         addButton.setImage(UIImage(named: "CheckoutLocation"), for: .normal)
         addButton.adjustInsetsForImage(withPadding: 6)
-        addButton.addTarget(self, action: #selector(addCreditCardAction), for: .touchUpInside)
+        addButton.addTarget(self, action: #selector(addShippingAddressAction), for: .touchUpInside)
         addButton.sizeToFit()
         tableView.tableFooterView = addButton
     }
@@ -57,14 +61,15 @@ class CheckoutShippingListViewController: BaseViewController {
         tableView.delegate = nil
     }
     
-    @objc fileprivate func addCreditCardAction() {
-        
+    @objc fileprivate func addShippingAddressAction() {
+        let shippingFormViewController = CheckoutShippingFormViewController()
+        navigationController?.pushViewController(shippingFormViewController, animated: true)
     }
 }
 
 extension CheckoutShippingListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return shippingFrc?.fetchedObjectsCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -72,28 +77,34 @@ extension CheckoutShippingListViewController: UITableViewDataSource {
         cell.backgroundColor = view.backgroundColor
         cell.selectionStyle = .none
         
-        if let cell = cell as? CheckoutShippingTableViewCell {
-            if indexPath.row == 0 {
-                cell.nameLabel.text = "Corey Werner"
-                cell.addressLabel.text = """
-                2337 S Broadway St
-                Apt 303
-                New York, NY 15522
-                """
-            }
-            else {
-                cell.nameLabel.text = "Herbert Neninger"
-                cell.addressLabel.text = """
-                455 Plummers Lane
-                New Haven, CT 65520
-                """
-            }
+        if let cell = cell as? CheckoutShippingTableViewCell, let shipping = shippingFrc?.object(at: indexPath) {
+            cell.nameLabel.text = shipping.fullName
+            cell.addressLabel.text = shipping.readableAddress
+            cell.editButton.addTarget(self, action: #selector(editButtonAction(_:event:)), for: .touchUpInside)
         }
         
         return cell
+    }
+    
+    @objc fileprivate func editButtonAction(_ button: UIButton, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event) else {
+            return
+        }
+        
+        let shippingAddress = shippingFrc?.object(at: indexPath)
+        let shippingFormViewController = CheckoutShippingFormViewController(withShippingAddress: shippingAddress)
+        navigationController?.pushViewController(shippingFormViewController, animated: true)
     }
 }
 
 extension CheckoutShippingListViewController: UITableViewDelegate {
     
+}
+
+extension CheckoutShippingListViewController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        if isViewLoaded {
+            change.applyChanges(tableView: tableView)
+        }
+    }
 }

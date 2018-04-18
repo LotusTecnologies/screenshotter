@@ -32,6 +32,7 @@ class CheckoutFormViewController: FormViewController {
             deleteButton.translatesAutoresizingMaskIntoConstraints = false
             deleteButton.backgroundColor = .white
             deleteButton.setTitleColor(.gray6, for: .normal)
+            deleteButton.setTitle("generic.delete".localized, for: .normal)
             tableFooterView.addSubview(deleteButton)
             deleteButton.topAnchor.constraint(equalTo: tableFooterView.topAnchor).isActive = true
             deleteButton.leadingAnchor.constraint(equalTo: tableFooterView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -39,12 +40,14 @@ class CheckoutFormViewController: FormViewController {
             deleteButton.trailingAnchor.constraint(equalTo: tableFooterView.layoutMarginsGuide.centerXAnchor, constant: -.padding / 2).isActive = true
             self.deleteButton = deleteButton
             
+            continueButton.setTitle("generic.save".localized, for: .normal)
             continueButton.topAnchor.constraint(equalTo: tableFooterView.topAnchor).isActive = true
             continueButton.leadingAnchor.constraint(equalTo: deleteButton.trailingAnchor, constant: .padding).isActive = true
             continueButton.bottomAnchor.constraint(equalTo: tableFooterView.bottomAnchor).isActive = true
             continueButton.trailingAnchor.constraint(equalTo: tableFooterView.layoutMarginsGuide.trailingAnchor).isActive = true
         }
         else {
+            continueButton.setTitle("generic.done".localized, for: .normal)
             continueButton.topAnchor.constraint(equalTo: tableFooterView.topAnchor).isActive = true
             continueButton.leadingAnchor.constraint(greaterThanOrEqualTo: tableFooterView.layoutMarginsGuide.leadingAnchor).isActive = true
             continueButton.bottomAnchor.constraint(equalTo: tableFooterView.bottomAnchor).isActive = true

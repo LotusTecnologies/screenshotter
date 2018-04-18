@@ -73,6 +73,7 @@ class FormViewController: BaseViewController {
         
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.backgroundColor = view.backgroundColor
         tableViewRegister(FormCardTableViewCell.self, for: FormRow.Card.self)
         tableViewRegister(FormCheckboxTableViewCell.self, for: FormRow.Checkbox.self)
         tableViewRegister(FormCVVTableViewCell.self, for: FormRow.CVV.self)

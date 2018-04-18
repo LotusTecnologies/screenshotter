@@ -71,6 +71,7 @@ class FormSection {
 
 class FormRow: NSObject {
     var id: Int?
+    var isRequired = true
     var placeholder: String?
     var value: String?
     

@@ -86,14 +86,7 @@ class TextFieldFormatter {
             cardNumberWithoutSpaces = removeNonDigits(string: text, andPreserveCursorPosition: &targetCursorPosition)
         }
         
-        let isAmex: Bool = {
-            for cardType in CreditCardValidator.shared.types {
-                if cardType.name == "Amex" {
-                    return CreditCardValidator.shared.validate(string: cardNumberWithoutSpaces, forType: cardType)
-                }
-            }
-            return false
-        }()
+        let isAmex = CreditCardValidator.shared.isAmex(cardNumber: cardNumberWithoutSpaces)
         
         if (isAmex && cardNumberWithoutSpaces.count > 15) || cardNumberWithoutSpaces.count > 19 {
             textField.text = previousTextFieldContent
@@ -127,31 +120,17 @@ class TextFieldFormatter {
     }
     
     fileprivate func insertCreditCardSpaces(_ string: String, preserveCursorPosition cursorPosition: inout Int) -> String {
-        var isAmex = false
-        var stringWithAddedSpaces = ""
         let cursorPositionInSpacelessString = cursorPosition
+        var excapingCursorPosition = cursorPosition
         
-        for i in 0..<string.count {
-            let needsAmexSpacing = (isAmex && (i == 4 || i == 10 || i == 15))
-            let needsNormalSpacing = (!isAmex && i > 0 && (i % 4) == 0)
-            
-            if needsAmexSpacing || needsNormalSpacing {
-                stringWithAddedSpaces.append(" ")
-                
-                if i < cursorPositionInSpacelessString {
-                    cursorPosition += 1
-                }
-            }
-            
-            let characterToAdd = string[string.index(string.startIndex, offsetBy:i)]
-            stringWithAddedSpaces.append(characterToAdd)
-            
-            // https://baymard.com/checkout-usability/credit-card-patterns
-            if i == 1 && (stringWithAddedSpaces == "34" || stringWithAddedSpaces == "37") {
-                isAmex = true
+        let formattedNumber = CreditCardValidator.shared.formatNumber(string) { i in
+            if i < cursorPositionInSpacelessString {
+                excapingCursorPosition += 1
             }
         }
         
-        return stringWithAddedSpaces
+        cursorPosition = excapingCursorPosition
+        
+        return formattedNumber
     }
 }

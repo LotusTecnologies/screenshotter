@@ -102,6 +102,7 @@
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
 "generic.sale" = "SALE";
+"generic.save" = "Save";
 "generic.setup" = "Setup";
 "generic.submit" = "Submit";
 "generic.update" = "Update";

@@ -1765,6 +1765,25 @@ extension ShippingAddress {
         }
     }
     
+    var fullName: String? {
+        if let names = [firstName, lastName].filter({ $0?.isEmpty == false }) as? [String] {
+            return names.joined(separator: " ")
+        }
+        return nil
+    }
+    
+    var readableAddress: String? {
+        guard let street = street, let city = city, let state = state, let zip = zipCode, let country = country else {
+            return nil
+        }
+        
+        return """
+        \(street)
+        \(city), \(state) \(zip)
+        \(country)
+        """
+    }
+    
 }
 
 extension NSFetchedResultsController {

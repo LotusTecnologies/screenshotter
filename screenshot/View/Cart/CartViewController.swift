@@ -342,8 +342,7 @@ fileprivate extension CartViewControllerCheckout {
     }
     
     func presentErrorAlert() {
-        // TODO: get correct copy
-        let alertController = UIAlertController(title: "That's strange", message: "You tried to give us money but we missed it. Try again, now.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Something Went Wrong", message: "We were unable to complete your transaction. Please check your connection and try again.", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
     }

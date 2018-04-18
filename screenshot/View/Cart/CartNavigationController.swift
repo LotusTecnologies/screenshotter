@@ -59,19 +59,9 @@ class CartNavigationController: UINavigationController {
     
     @objc fileprivate func paymentFormCompleted() {
         guard let checkout = checkoutPaymentFormViewController,
-            let cardName = checkout.formRow(.cardName)?.value,
-            let cardNumber = checkout.formRow(.cardNumber)?.value,
-            let cardExp = checkout.formRow(.cardExp)?.value,
+            checkout.hasRequiredFields,
             let cardCVV = checkout.formRow(.cardCVV)?.value,
-            let addressStreet = checkout.formRow(.addressStreet)?.value,
-            let addressCity = checkout.formRow(.addressCity)?.value,
-            let addressCountry = checkout.formRow(.addressCountry)?.value,
-            let addressState = checkout.formRow(.addressState)?.value,
-            let addressZip = checkout.formRow(.addressZip)?.value,
-            let addressShip = checkout.formRow(.addressShip)?.value,
-            let email = checkout.formRow(.email)?.value,
-            let phone = checkout.formRow(.phoneNumber)?.value,
-            let cardExpDate = FormRow.Expiration.date(for: cardExp)
+            let addressShip = checkout.formRow(.addressShip)?.value
             else {
                 // TODO: highlight error fields
                 return
@@ -80,15 +70,11 @@ class CartNavigationController: UINavigationController {
         cvv = cardCVV
         
         func performAction(withSavingCard saveCard: Bool) {
-            let lastDigits = "0234" // last 4 digits of credit card or last 5 for amex
-            
-            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: lastDigits, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
+            checkout.addCard(shouldSave: saveCard)
             
             let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
             
             if isShipToSameAddressChecked {
-                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
-                
                 navigateToCheckoutOrder()
             }
             else {

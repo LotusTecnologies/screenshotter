@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CreditCardValidator
 
 enum CheckoutPaymentFormKeys: Int {
     case addressCity
@@ -26,45 +27,53 @@ enum CheckoutPaymentFormKeys: Int {
 }
 
 class CheckoutPaymentFormViewController: CheckoutFormViewController {
-    convenience init(withDefaultValues defaultValues: [CheckoutPaymentFormKeys: String?]? = nil) {
-        let isEditLayout = defaultValues?.isEmpty == false
+    fileprivate var card: Card?
+    
+    convenience init(withCard card: Card? = nil) {
+        let isEditLayout = card != nil
         
         var cardRows: [FormRow] = []
         var billingRows: [FormRow] = []
         
         let cardName = FormRow.Text(CheckoutPaymentFormKeys.cardName.rawValue)
         cardName.placeholder = "Name on Card"
-        cardName.value = defaultValues?[.cardName] ?? nil
+        cardName.value = card?.fullName
         cardRows.append(cardName)
         
         let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
         cardNumber.placeholder = "Card Number"
-        cardNumber.value = defaultValues?[.cardNumber] ?? nil
+        cardNumber.value = card?.number
         cardRows.append(cardNumber)
         
         let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
         exp.placeholder = "Exp"
-        exp.value = defaultValues?[.cardExp] ?? nil
+        exp.value = {
+            guard let card = card else {
+                return nil
+            }
+            
+            let date = FormRow.Expiration.Date(month: Int(card.expirationMonth), year: Int(card.expirationYear))
+            return FormRow.Expiration.value(for: date)
+        }()
         cardRows.append(exp)
         
         let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
         cvv.placeholder = "CVV"
-        cvv.value = defaultValues?[.cardCVV] ?? nil
         cardRows.append(cvv)
         
         let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
         street.placeholder = "Street Address"
-        street.value = defaultValues?[.addressStreet] ?? nil
+        street.value = card?.street
         billingRows.append(street)
         
         let city = FormRow.Text(CheckoutPaymentFormKeys.addressCity.rawValue)
         city.placeholder = "City"
-        city.value = defaultValues?[.addressCity] ?? nil
+        city.value = card?.city
         billingRows.append(city)
         
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
-        country.value = defaultValues?[.addressCountry] ?? nil
+        country.value = card?.country
         country.options = [
             "United States",
             "Agartha",
@@ -80,7 +89,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
-        state.value = defaultValues?[.addressState] ?? nil
+        state.value = card?.state
         state.options = [
             "Maryland",
             "Agartha",
@@ -94,23 +103,23 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
         zip.placeholder = "Zip Code"
-        zip.value = defaultValues?[.addressZip] ?? nil
+        zip.value = card?.zipCode
         billingRows.append(zip)
         
         let email = FormRow.Email(CheckoutPaymentFormKeys.email.rawValue)
         email.placeholder = "Email"
-        email.value = defaultValues?[.email] ?? nil
+        email.value = card?.email
+        email.isRequired = false
         billingRows.append(email)
         
         let phone = FormRow.Phone(CheckoutPaymentFormKeys.phoneNumber.rawValue)
         phone.placeholder = "Phone Number"
-        phone.value = defaultValues?[.phoneNumber] ?? nil
+        phone.value = card?.phone
         billingRows.append(phone)
         
         if !isEditLayout {
             let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
             ship.placeholder = "Ship to this address"
-            ship.value = defaultValues?[.addressShip] ?? nil
             billingRows.append(ship)
         }
         
@@ -122,16 +131,93 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         billingSection.rows = billingRows
         
         self.init(with: Form(with: [cardSection, billingSection]))
+        self.card = card
         
-        title = isEditLayout ? "Add Card" : "Edit Card"
+        title = isEditLayout ? "Edit Card" : "Add Card"
         restorationIdentifier = String(describing: type(of: self))
         
         generateButtons(withEditLayout: isEditLayout)
-        continueButton.setTitle("Done", for: .normal)
-        deleteButton?.setTitle("Delete", for: .normal)
+        
+        if isEditLayout {
+            
+        }
     }
     
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
+    }
+    
+    var hasRequiredFields: Bool {
+        if let sections = form.sections {
+            for section in sections {
+                guard let rows = section.rows else {
+                    continue
+                }
+                
+                for row in rows {
+                    if row.isRequired && (row.value == nil || row.value!.isEmpty) {
+                        return false
+                    }
+                }
+            }
+        }
+        
+        return true
+    }
+    
+    func addCard(shouldSave: Bool) {
+        guard let cardName = formRow(.cardName)?.value,
+            let cardNumber = formRow(.cardNumber)?.value,
+            let cardExp = formRow(.cardExp)?.value,
+//            let cardCVV = formRow(.cardCVV)?.value,
+            let addressStreet = formRow(.addressStreet)?.value,
+            let addressCity = formRow(.addressCity)?.value,
+            let addressCountry = formRow(.addressCountry)?.value,
+            let addressState = formRow(.addressState)?.value,
+            let addressZip = formRow(.addressZip)?.value,
+            let addressShip = formRow(.addressShip)?.value,
+            let phone = formRow(.phoneNumber)?.value,
+            let cardExpDate = FormRow.Expiration.date(for: cardExp),
+            let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
+            else {
+                // TODO: highlight fields with errors
+                return
+        }
+        
+        let email = formRow(.email)?.value
+        
+        DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: shouldSave)
+        
+        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
+        
+        if isShipToSameAddressChecked {
+            DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        }
+    }
+    
+    func updateCard() {
+        guard let cardName = formRow(.cardName)?.value,
+            let cardNumber = formRow(.cardNumber)?.value,
+            let cardExp = formRow(.cardExp)?.value,
+            let addressStreet = formRow(.addressStreet)?.value,
+            let addressCity = formRow(.addressCity)?.value,
+            let addressCountry = formRow(.addressCountry)?.value,
+            let addressState = formRow(.addressState)?.value,
+            let addressZip = formRow(.addressZip)?.value,
+            let phone = formRow(.phoneNumber)?.value,
+            let cardExpDate = FormRow.Expiration.date(for: cardExp),
+            let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
+            else {
+                // TODO: highlight fields with errors
+                return
+        }
+        
+        let email = formRow(.email)?.value
+        
+        card?.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
+    }
+    
+    func deleteCard() {
+        card?.delete()
     }
 }
