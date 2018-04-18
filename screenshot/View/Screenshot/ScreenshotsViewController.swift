@@ -107,7 +107,7 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
         super.viewWillAppear(animated)
         syncEmptyListView()
         self.updateHasNewScreenshot()
-        if (UserDefaults.standard.bool(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
+        if (UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
             let campaign = CampaignPromotionViewController(modal:true)
             campaign.willDisplayInPopover = true
             campaign.delegate = self
