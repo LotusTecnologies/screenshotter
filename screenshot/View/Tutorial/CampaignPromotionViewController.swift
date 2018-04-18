@@ -176,7 +176,7 @@ class CampaignPromotionViewController: UIViewController {
     }
     
     @objc func tappedButton() {
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.sawVideoForCampaign_2018_04_20)
+        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
     
