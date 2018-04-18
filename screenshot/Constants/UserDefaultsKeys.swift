@@ -37,7 +37,7 @@ class UserDefaultsKeys  {
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
-    static let lastCampaignCompleted = "campaign"  //in here is stored CampaignCompleted.rawValue
+    static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // Kim video to push users to do purchases
     }
