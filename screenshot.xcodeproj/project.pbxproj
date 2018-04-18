@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		310E307A2085DC2C00C6EDE9 /* Date+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E30792085DC2C00C6EDE9 /* Date+craze.swift */; };
-		310E307E2085EABC00C6EDE9 /* CampainPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307D2085EABC00C6EDE9 /* CampainPromotionViewController.swift */; };
+		310E307E2085EABC00C6EDE9 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307D2085EABC00C6EDE9 /* CampaignPromotionViewController.swift */; };
 		310E308020870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */; };
 		3130FF6F203040F200AA881A /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
@@ -155,7 +155,7 @@
 
 /* Begin PBXFileReference section */
 		310E30792085DC2C00C6EDE9 /* Date+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+craze.swift"; sourceTree = "<group>"; };
-		310E307D2085EABC00C6EDE9 /* CampainPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampainPromotionViewController.swift; sourceTree = "<group>"; };
+		310E307D2085EABC00C6EDE9 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
 		3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
@@ -508,7 +508,7 @@
 		C54087C81FE90C8D00198955 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
-				310E307D2085EABC00C6EDE9 /* CampainPromotionViewController.swift */,
+				310E307D2085EABC00C6EDE9 /* CampaignPromotionViewController.swift */,
 				C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */,
 				C5FF4141200F299D00342DEC /* TutorialSlideView.swift */,
 				C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */,
@@ -1085,7 +1085,7 @@
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
-				310E307E2085EABC00C6EDE9 /* CampainPromotionViewController.swift in Sources */,
+				310E307E2085EABC00C6EDE9 /* CampaignPromotionViewController.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
 				C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */,
 				31CE1111203BF055000156EE /* ProductsBarCollectionViewCell.swift in Sources */,

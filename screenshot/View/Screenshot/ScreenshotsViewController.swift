@@ -108,10 +108,10 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
         syncEmptyListView()
         self.updateHasNewScreenshot()
         if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.sawVideoForCampaign_2018_04_20) {
-            let campain = CampainPromotionViewController(modal:true)
-            campain.willDisplayInPopover = true
-            campain.delegate = self
-            self.present(campain, animated: true, completion: nil)
+            let campaign = CampaignPromotionViewController(modal:true)
+            campaign.willDisplayInPopover = true
+            campaign.delegate = self
+            self.present(campaign, animated: true, completion: nil)
             AnalyticsTrackers.branch.track(.shareCompleted)
         }
     }

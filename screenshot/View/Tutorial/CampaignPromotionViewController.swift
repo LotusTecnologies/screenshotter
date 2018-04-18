@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class CampainPromotionViewController: UIViewController {
+class CampaignPromotionViewController: UIViewController {
     var showsReplayButtonUponFinishing: Bool = true
     var willDisplayInPopover:Bool = false
     private(set) var playPauseButton = UIButton()
@@ -72,7 +72,7 @@ class CampainPromotionViewController: UIViewController {
         soundsGoodButton.backgroundColor = .crazeRed
         soundsGoodButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         container.addSubview(soundsGoodButton)
-        soundsGoodButton.setTitle("2018_04_20_campain.button".localized, for: .normal)
+        soundsGoodButton.setTitle("2018_04_20_campaign.button".localized, for: .normal)
         soundsGoodButton.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
         soundsGoodButton.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
         soundsGoodButton.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -25).isActive = true
@@ -80,7 +80,7 @@ class CampainPromotionViewController: UIViewController {
         
         let explainationLabel = UILabel()
         explainationLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        explainationLabel.text = "2018_04_20_campain.body".localized
+        explainationLabel.text = "2018_04_20_campaign.body".localized
         explainationLabel.translatesAutoresizingMaskIntoConstraints = false
         explainationLabel.textAlignment = .center
         explainationLabel.numberOfLines = 0
@@ -91,7 +91,7 @@ class CampainPromotionViewController: UIViewController {
         
         let headlineLabel = UILabel()
         headlineLabel.font = UIFont.preferredFont(forTextStyle: .title2)
-        headlineLabel.text = "2018_04_20_campain.headline".localized
+        headlineLabel.text = "2018_04_20_campaign.headline".localized
         headlineLabel.translatesAutoresizingMaskIntoConstraints = false
         headlineLabel.textAlignment = .center
         headlineLabel.numberOfLines = 0
