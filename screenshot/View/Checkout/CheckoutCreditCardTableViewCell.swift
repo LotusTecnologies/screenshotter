@@ -9,7 +9,7 @@
 import UIKit
 
 class CheckoutCreditCardTableViewCell: CardTableViewCell {
-    fileprivate let cardNumberLabel = UILabel()
+    let cardNumberLabel = UILabel()
     let nameLabel = UILabel()
     fileprivate let expirationLabel = UILabel()
     
@@ -23,7 +23,6 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         cardView.heightAnchor.constraint(greaterThanOrEqualToConstant: 150).isActive = true
         
         cardNumberLabel.translatesAutoresizingMaskIntoConstraints = false
-        cardNumberLabel.text = "**** **** **** 9876"
         cardNumberLabel.font = .screenshopFont(.hindLight, size: 22)
         cardNumberLabel.minimumScaleFactor = 0.7
         cardNumberLabel.adjustsFontSizeToFitWidth = true

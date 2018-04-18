@@ -73,7 +73,11 @@ class CheckoutPaymentListViewController: BaseViewController {
             return
         }
         // TODO: should the request to save alert be apart of this method?
-        paymentFormViewController.addCard(shouldSave: true)
+        let didAddCard = paymentFormViewController.addCard(shouldSave: true)
+        
+        if didAddCard {
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc fileprivate func updateCardAction() {
@@ -81,7 +85,11 @@ class CheckoutPaymentListViewController: BaseViewController {
             return
         }
         
-        paymentFormViewController.updateCard()
+        let didUpdateCard = paymentFormViewController.updateCard()
+        
+        if didUpdateCard {
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc fileprivate func deleteCardAction() {
@@ -89,7 +97,11 @@ class CheckoutPaymentListViewController: BaseViewController {
             return
         }
         
-        paymentFormViewController.deleteCard()
+        let didDeleteCard = paymentFormViewController.deleteCard()
+        
+        if didDeleteCard {
+            navigationController?.popViewController(animated: true)
+        }
     }
 }
 
@@ -105,6 +117,7 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
         
         if let cell = cell as? CheckoutCreditCardTableViewCell, let card = cardFrc?.object(at: indexPath) {
             cell.nameLabel.text = card.fullName
+            cell.cardNumberLabel.text = card.displayNumber
             cell.editButton.addTarget(self, action: #selector(editButtonAction(_:event:)), for: .touchUpInside)
             
             let month = Int(card.expirationMonth)

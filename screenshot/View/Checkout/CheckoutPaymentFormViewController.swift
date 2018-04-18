@@ -42,7 +42,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
         cardNumber.placeholder = "Card Number"
-        cardNumber.value = card?.number
+        cardNumber.value = card?.displayNumber
         cardRows.append(cardNumber)
         
         let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
@@ -165,7 +165,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         return true
     }
     
-    func addCard(shouldSave: Bool) {
+    @discardableResult func addCard(shouldSave: Bool) -> Bool {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
@@ -180,7 +180,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             else {
                 // TODO: highlight fields with errors
-                return
+                return false
         }
         
         let email = formRow(.email)?.value
@@ -193,9 +193,11 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         if isShipToSameAddressChecked {
             DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
         }
+        
+        return true
     }
     
-    func updateCard() {
+    @discardableResult func updateCard() -> Bool {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
@@ -206,18 +208,27 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let addressZip = formRow(.addressZip)?.value,
             let phone = formRow(.phoneNumber)?.value,
             let cardExpDate = FormRow.Expiration.date(for: cardExp),
-            let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
+            let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber),
+            let card = card
             else {
                 // TODO: highlight fields with errors
-                return
+                return false
         }
         
         let email = formRow(.email)?.value
         
-        card?.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
+        card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
+        
+        return true
     }
     
-    func deleteCard() {
-        card?.delete()
+    @discardableResult func deleteCard() -> Bool {
+        guard let card = card else {
+            return false
+        }
+        
+        card.delete()
+        
+        return true
     }
 }
