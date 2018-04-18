@@ -72,11 +72,9 @@ class CheckoutPaymentListViewController: BaseViewController {
         guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
             return
         }
-        // TODO: should the request to save alert be apart of this method?
-        let didAddCard = paymentFormViewController.addCard(shouldSave: true)
         
-        if didAddCard {
-            navigationController?.popViewController(animated: true)
+        paymentFormViewController.addCard { [weak self] didSave in
+            self?.navigationController?.popViewController(animated: true)
         }
     }
     

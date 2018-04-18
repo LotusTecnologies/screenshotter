@@ -137,35 +137,13 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         restorationIdentifier = String(describing: type(of: self))
         
         generateButtons(withEditLayout: isEditLayout)
-        
-        if isEditLayout {
-            
-        }
     }
     
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
     }
     
-    var hasRequiredFields: Bool {
-        if let sections = form.sections {
-            for section in sections {
-                guard let rows = section.rows else {
-                    continue
-                }
-                
-                for row in rows {
-                    if row.isRequired && (row.value == nil || row.value!.isEmpty) {
-                        return false
-                    }
-                }
-            }
-        }
-        
-        return true
-    }
-    
-    @discardableResult func addCard(shouldSave: Bool) -> Bool {
+    func addCard(withAlertCallback alertCallback: @escaping (_ didSave: Bool)->()) {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
@@ -180,21 +158,33 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             else {
                 // TODO: highlight fields with errors
-                return false
+                return
         }
         
         let email = formRow(.email)?.value
-        
-        DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: shouldSave)
-        
         let addressShip = formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
-        if isShipToSameAddressChecked {
-            DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        func performAction(withSavingCard saveCard: Bool) {
+            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
+            
+            if isShipToSameAddressChecked {
+                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+            }
+            
+            alertCallback(saveCard)
         }
         
-        return true
+        let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
+        let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
+            performAction(withSavingCard: true)
+        }
+        alertController.addAction(saveAlertAction)
+        alertController.addAction(UIAlertAction(title: "Don't Save", style: .cancel, handler: { alertAction in
+            performAction(withSavingCard: false)
+        }))
+        alertController.preferredAction = saveAlertAction
+        present(alertController, animated: true, completion: nil)
     }
     
     @discardableResult func updateCard() -> Bool {

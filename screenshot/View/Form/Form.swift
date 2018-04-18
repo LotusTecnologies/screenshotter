@@ -57,6 +57,24 @@ class Form {
         
         self.map = map.isEmpty ? nil : map
     }
+    
+    var hasRequiredFields: Bool {
+        if let sections = sections {
+            for section in sections {
+                guard let rows = section.rows else {
+                    continue
+                }
+                
+                for row in rows {
+                    if row.isRequired && (row.value == nil || row.value!.isEmpty) {
+                        return false
+                    }
+                }
+            }
+        }
+        
+        return true
+    }
 }
 
 class FormSection {

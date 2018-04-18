@@ -59,9 +59,8 @@ class CartNavigationController: UINavigationController {
     
     @objc fileprivate func paymentFormCompleted() {
         guard let checkout = checkoutPaymentFormViewController,
-            checkout.hasRequiredFields,
-            let cardCVV = checkout.formRow(.cardCVV)?.value,
-            let addressShip = checkout.formRow(.addressShip)?.value
+            checkout.form.hasRequiredFields,
+            let cardCVV = checkout.formRow(.cardCVV)?.value
             else {
                 // TODO: highlight error fields
                 return
@@ -69,29 +68,17 @@ class CartNavigationController: UINavigationController {
         
         cvv = cardCVV
         
-        func performAction(withSavingCard saveCard: Bool) {
-            checkout.addCard(shouldSave: saveCard)
-            
-            let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
-            
+        let addressShip = checkout.formRow(.addressShip)?.value
+        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
+        
+        checkout.addCard { [weak self] didSave in
             if isShipToSameAddressChecked {
-                navigateToCheckoutOrder()
+                self?.navigateToCheckoutOrder()
             }
             else {
-                navigateToCheckoutShippingForm()
+                self?.navigateToCheckoutShippingForm()
             }
         }
-        
-        let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
-        let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
-            performAction(withSavingCard: true)
-        }
-        alertController.addAction(saveAlertAction)
-        alertController.addAction(UIAlertAction(title: "Don't Save", style: .cancel, handler: { alertAction in
-            performAction(withSavingCard: false)
-        }))
-        alertController.preferredAction = saveAlertAction
-        present(alertController, animated: true, completion: nil)
         
         //        checkoutPaymentFormViewController = nil // ???: when should the vc be removed
     }

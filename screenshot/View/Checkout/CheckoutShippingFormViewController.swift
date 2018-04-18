@@ -21,6 +21,8 @@ enum CheckoutShippingFormKeys: Int {
 }
 
 class CheckoutShippingFormViewController: CheckoutFormViewController {
+    fileprivate var shippingAddress: ShippingAddress?
+    
     convenience init(withShippingAddress shippingAddress: ShippingAddress? = nil) {
         let isEditLayout = shippingAddress != nil
         
@@ -90,6 +92,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         section.rows = formRows
         
         self.init(with: Form(with: [section]))
+        self.shippingAddress = shippingAddress
         
         title = isEditLayout ? "Edit Address" : "Add Address"
         restorationIdentifier = String(describing: type(of: self))
@@ -99,5 +102,54 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     
     func formRow(_ key: CheckoutShippingFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
+    }
+    
+    @discardableResult func addShippingAddress() -> Bool {
+        guard let addressCity = formRow(.addressCity)?.value,
+            let addressCountry = formRow(.addressCountry)?.value,
+            let addressState = formRow(.addressState)?.value,
+            let addressStreet = formRow(.addressStreet)?.value,
+            let addressZip = formRow(.addressZip)?.value,
+            let nameFirst = formRow(.nameFirst)?.value,
+            let nameLast = formRow(.nameLast)?.value,
+            let phone = formRow(.phoneNumber)?.value
+            else {
+                // TODO: highlight fields with errors
+                return false
+        }
+        
+        DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        
+        return true
+    }
+    
+    @discardableResult func updateShippingAddress() -> Bool {
+        guard let addressCity = formRow(.addressCity)?.value,
+            let addressCountry = formRow(.addressCountry)?.value,
+            let addressState = formRow(.addressState)?.value,
+            let addressStreet = formRow(.addressStreet)?.value,
+            let addressZip = formRow(.addressZip)?.value,
+            let nameFirst = formRow(.nameFirst)?.value,
+            let nameLast = formRow(.nameLast)?.value,
+            let phone = formRow(.phoneNumber)?.value,
+            let shippingAddress = shippingAddress
+            else {
+                // TODO: highlight fields with errors
+                return false
+        }
+        
+        shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        
+        return true
+    }
+    
+    @discardableResult func deleteShippingAddress() -> Bool {
+        guard let shippingAddress = shippingAddress else {
+            return false
+        }
+        
+        shippingAddress.delete()
+        
+        return true
     }
 }
