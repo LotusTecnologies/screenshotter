@@ -87,6 +87,7 @@ class CampainPromotionViewController: UIViewController {
         container.addSubview(explainationLabel)
         explainationLabel.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
         explainationLabel.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
+        explainationLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         
         let headlineLabel = UILabel()
         headlineLabel.font = UIFont.preferredFont(forTextStyle: .title2)
@@ -97,7 +98,7 @@ class CampainPromotionViewController: UIViewController {
         container.addSubview(headlineLabel)
         headlineLabel.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
         headlineLabel.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
-
+        headlineLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         
         let imageView = UIImageView.init()
         imageView.isUserInteractionEnabled = true
@@ -110,11 +111,16 @@ class CampainPromotionViewController: UIViewController {
         imageView.leftAnchor.constraint(equalTo: container.leftAnchor).isActive = true
         imageView.rightAnchor.constraint(equalTo: container.rightAnchor).isActive = true
         imageView.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
-        imageView.heightAnchor.constraint(lessThanOrEqualTo: container.heightAnchor, multiplier: 0.6).isActive = true
+        imageView.heightAnchor.constraint(greaterThanOrEqualTo: container.heightAnchor, multiplier: 0.5).isActive = true
+        imageView.heightAnchor.constraint(lessThanOrEqualTo: container.heightAnchor, multiplier: 0.75).isActive = true
         
         let asBigAsPossible = imageView.heightAnchor.constraint(equalTo: container.heightAnchor)
         asBigAsPossible.priority = .defaultLow
         asBigAsPossible.isActive = true
+
+        let ratio = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1920.0 / 1080.0 )
+        ratio.priority = .init(800)
+        ratio.isActive = true
         
         self.imageView = imageView
         
@@ -138,7 +144,7 @@ class CampainPromotionViewController: UIViewController {
         pad1.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad1.topAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
         pad1.bottomAnchor.constraint(equalTo: headlineLabel.topAnchor).isActive = true
-        pad1.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
+//        pad1.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         let pad2 = UIView.init()
         pad2.translatesAutoresizingMaskIntoConstraints = false
@@ -147,7 +153,7 @@ class CampainPromotionViewController: UIViewController {
         pad2.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad2.topAnchor.constraint(equalTo: headlineLabel.bottomAnchor).isActive = true
         pad2.bottomAnchor.constraint(equalTo: explainationLabel.topAnchor).isActive = true
-        pad2.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
+//        pad2.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         let pad3 = UIView.init()
         pad3.translatesAutoresizingMaskIntoConstraints = false
@@ -156,10 +162,18 @@ class CampainPromotionViewController: UIViewController {
         pad3.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad3.topAnchor.constraint(equalTo: explainationLabel.bottomAnchor).isActive = true
         pad3.bottomAnchor.constraint(equalTo: soundsGoodButton.topAnchor).isActive = true
-        pad3.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
+        
         
         pad1.heightAnchor.constraint(equalTo: pad2.heightAnchor).isActive = true
         pad3.heightAnchor.constraint(equalTo: pad2.heightAnchor).isActive = true
+        
+        let idealSpacing = pad3.heightAnchor.constraint(greaterThanOrEqualToConstant: 25)
+        idealSpacing.priority = .init(700)  //would rather the correct ratio over this spacing
+        idealSpacing.isActive = true
+    
+        let requiredSpacing = pad3.heightAnchor.constraint(greaterThanOrEqualToConstant: 5)
+        requiredSpacing.priority = .init(900)  
+        requiredSpacing.isActive = true
         
     }
     
