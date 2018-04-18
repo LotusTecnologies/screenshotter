@@ -37,7 +37,7 @@ class UserDefaultsKeys  {
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
-    static let sawVideoForCampaign_2018_04_20 = "campaign-2018-04-20"  // This is Kim's video about getting $100 for making first purchace
+    static let sawVideoForCampaign_2018_04_20 = "Campaign_2018_04_20_saw_video"  // This is Kim's video about getting $100 for making first purchace
 
     
     // Device / Version

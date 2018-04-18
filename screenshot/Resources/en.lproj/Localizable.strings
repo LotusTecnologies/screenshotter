@@ -12,6 +12,11 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
+"2018_04_20_campain.headline" = "Shop and Win!";
+"2018_04_20_campain.body" = "100 people who make their first purchase on Screenshop will win $1,000!";
+"2018_04_20_campain.button" = "Sounds Good!";
+
+
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 

@@ -72,7 +72,7 @@ class CampainPromotionViewController: UIViewController {
         soundsGoodButton.backgroundColor = .crazeRed
         soundsGoodButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         container.addSubview(soundsGoodButton)
-        soundsGoodButton.setTitle("Sound Good".localized, for: .normal)
+        soundsGoodButton.setTitle("2018_04_20_campain.button".localized, for: .normal)
         soundsGoodButton.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
         soundsGoodButton.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
         soundsGoodButton.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -25).isActive = true
@@ -80,7 +80,7 @@ class CampainPromotionViewController: UIViewController {
         
         let explainationLabel = UILabel()
         explainationLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        explainationLabel.text = "100 people who make their first purchase on Screenshop will win $1,000!"
+        explainationLabel.text = "2018_04_20_campain.body".localized
         explainationLabel.translatesAutoresizingMaskIntoConstraints = false
         explainationLabel.textAlignment = .center
         explainationLabel.numberOfLines = 0
@@ -91,7 +91,7 @@ class CampainPromotionViewController: UIViewController {
         
         let headlineLabel = UILabel()
         headlineLabel.font = UIFont.preferredFont(forTextStyle: .title2)
-        headlineLabel.text = "Shop And Win!"
+        headlineLabel.text = "2018_04_20_campain.headline".localized
         headlineLabel.translatesAutoresizingMaskIntoConstraints = false
         headlineLabel.textAlignment = .center
         headlineLabel.numberOfLines = 0
@@ -128,9 +128,9 @@ class CampainPromotionViewController: UIViewController {
         playPauseButton.adjustsImageWhenHighlighted = true
         playPauseButton.isUserInteractionEnabled = false
         playPauseButton.imageView?.contentMode = .scaleAspectFit
-        playPauseButton.setImage(UIImage(named: "PlayerPlay"), for: .normal)
-        playPauseButton.setImage(UIImage(named: "PlayerPause"), for: .selected)
-        playPauseButton.setImage(UIImage(named: "PlayerPause"), for: [.highlighted, .selected])
+        playPauseButton.setImage(UIImage(named: "playCircle"), for: .normal)
+        playPauseButton.setImage(UIImage(named: "pauseCircle"), for: .selected)
+        playPauseButton.setImage(UIImage(named: "pauseCircle"), for: [.highlighted, .selected])
         playPauseButton.alpha = 1.0
         container.addSubview(playPauseButton)
         playPauseButton.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
@@ -144,7 +144,6 @@ class CampainPromotionViewController: UIViewController {
         pad1.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad1.topAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
         pad1.bottomAnchor.constraint(equalTo: headlineLabel.topAnchor).isActive = true
-//        pad1.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         let pad2 = UIView.init()
         pad2.translatesAutoresizingMaskIntoConstraints = false
@@ -153,7 +152,6 @@ class CampainPromotionViewController: UIViewController {
         pad2.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad2.topAnchor.constraint(equalTo: headlineLabel.bottomAnchor).isActive = true
         pad2.bottomAnchor.constraint(equalTo: explainationLabel.topAnchor).isActive = true
-//        pad2.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
         
         let pad3 = UIView.init()
         pad3.translatesAutoresizingMaskIntoConstraints = false
