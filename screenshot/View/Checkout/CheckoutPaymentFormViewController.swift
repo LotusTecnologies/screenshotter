@@ -175,7 +175,6 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let addressCountry = formRow(.addressCountry)?.value,
             let addressState = formRow(.addressState)?.value,
             let addressZip = formRow(.addressZip)?.value,
-            let addressShip = formRow(.addressShip)?.value,
             let phone = formRow(.phoneNumber)?.value,
             let cardExpDate = FormRow.Expiration.date(for: cardExp),
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
@@ -188,6 +187,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: shouldSave)
         
+        let addressShip = formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
         if isShipToSameAddressChecked {

@@ -107,6 +107,11 @@ extension FormRow {
     }
     
     class Checkbox: FormRow {
+        override init() {
+            super.init()
+            value = Checkbox.value(for: false)
+        }
+        
         // The value should be stored as a "1" or a "0"
         static func bool(for value: String?) -> Bool {
             return NSString(string: value ?? "0").boolValue
