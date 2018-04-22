@@ -98,15 +98,22 @@ class CheckoutOrderViewController: BaseViewController {
             _view.nameLabel.text = shipping.fullName
             _view.addressLabel.text = shipping.readableAddress
         }
+        else {
+            _view.nameLabel.text = nil
+            _view.addressLabel.text = nil
+        }
         
         if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
             let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL),
             let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID),
             let displayNumber = card.displayNumber,
-            let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber)
+            let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber),
+            let brand = card.brand
         {
-            let brand = "Visa" // TODO:
             _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
+        }
+        else {
+            _view.cardLabel.text = nil
         }
     }
     

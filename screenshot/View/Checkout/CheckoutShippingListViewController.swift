@@ -51,7 +51,7 @@ class CheckoutShippingListViewController: BaseViewController {
         addButton.setTitleColor(.black, for: .highlighted)
         addButton.setImage(UIImage(named: "CheckoutLocation"), for: .normal)
         addButton.adjustInsetsForImage(withPadding: 6)
-        addButton.addTarget(self, action: #selector(addShippingAddressAction), for: .touchUpInside)
+        addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
         addButton.sizeToFit()
         tableView.tableFooterView = addButton
     }
@@ -73,9 +73,60 @@ class CheckoutShippingListViewController: BaseViewController {
         tableView.delegate = nil
     }
     
-    @objc fileprivate func addShippingAddressAction() {
+    // MARK: Actions
+    
+    @objc fileprivate func addButtonAction() {
         let shippingFormViewController = CheckoutShippingFormViewController()
+        shippingFormViewController.continueButton.addTarget(self, action: #selector(addAddressAction), for: .touchUpInside)
         navigationController?.pushViewController(shippingFormViewController, animated: true)
+    }
+    
+    @objc fileprivate func editButtonAction(_ button: UIButton, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event) else {
+            return
+        }
+        
+        let shippingAddress = shippingFrc?.object(at: indexPath)
+        let shippingFormViewController = CheckoutShippingFormViewController(withShippingAddress: shippingAddress)
+        shippingFormViewController.continueButton.addTarget(self, action: #selector(updateAddressAction), for: .touchUpInside)
+        shippingFormViewController.deleteButton?.addTarget(self, action: #selector(deleteAddressAction), for: .touchUpInside)
+        navigationController?.pushViewController(shippingFormViewController, animated: true)
+    }
+    
+    @objc fileprivate func addAddressAction() {
+        guard let shippingFormViewController = navigationController?.topViewController as? CheckoutShippingFormViewController else {
+            return
+        }
+        
+        let didAddAddress = shippingFormViewController.addShippingAddress()
+        
+        if didAddAddress {
+            navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    @objc fileprivate func updateAddressAction() {
+        guard let shippingFormViewController = navigationController?.topViewController as? CheckoutShippingFormViewController else {
+            return
+        }
+        
+        let didUpdateAddress = shippingFormViewController.updateShippingAddress()
+        
+        if didUpdateAddress {
+            navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    @objc fileprivate func deleteAddressAction() {
+        guard let shippingFormViewController = navigationController?.topViewController as? CheckoutShippingFormViewController else {
+            return
+        }
+        
+        let didDeleteAddress = shippingFormViewController.deleteShippingAddress()
+        
+        if didDeleteAddress {
+            navigationController?.popViewController(animated: true)
+        }
     }
 }
 
@@ -96,16 +147,6 @@ extension CheckoutShippingListViewController: UITableViewDataSource {
         }
         
         return cell
-    }
-    
-    @objc fileprivate func editButtonAction(_ button: UIButton, event: UIEvent) {
-        guard let indexPath = tableView.indexPath(for: event) else {
-            return
-        }
-        
-        let shippingAddress = shippingFrc?.object(at: indexPath)
-        let shippingFormViewController = CheckoutShippingFormViewController(withShippingAddress: shippingAddress)
-        navigationController?.pushViewController(shippingFormViewController, animated: true)
     }
 }
 

@@ -74,9 +74,23 @@ class CheckoutPaymentListViewController: BaseViewController {
         tableView.delegate = nil
     }
     
+    // MARK: Actions
+    
     @objc fileprivate func addButtonAction() {
         let paymentFormViewController = CheckoutPaymentFormViewController()
         paymentFormViewController.continueButton.addTarget(self, action: #selector(addCardAction), for: .touchUpInside)
+        navigationController?.pushViewController(paymentFormViewController, animated: true)
+    }
+    
+    @objc fileprivate func editButtonAction(_ button: UIButton, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event) else {
+            return
+        }
+        
+        let card = cardFrc?.object(at: indexPath)
+        let paymentFormViewController = CheckoutPaymentFormViewController(withCard: card)
+        paymentFormViewController.continueButton.addTarget(self, action: #selector(updateCardAction), for: .touchUpInside)
+        paymentFormViewController.deleteButton?.addTarget(self, action: #selector(deleteCardAction), for: .touchUpInside)
         navigationController?.pushViewController(paymentFormViewController, animated: true)
     }
     
@@ -135,23 +149,15 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
             cell.setExpiration(month: month, year: year)
             cell.isExpired = CreditCardValidator.shared.isExpired(month: month, year: year)
             
-            // TODO: gershon needs to allow for saving card brand in db
-            cell.setBrandImage(.JCB)
+            if let brandString = card.brand, let brand = CreditCardBrand(rawValue: brandString) {
+                cell.setBrandImage(brand)
+            }
+            else {
+                cell.setBrandImage(.unknown)
+            }
         }
         
         return cell
-    }
-    
-    @objc fileprivate func editButtonAction(_ button: UIButton, event: UIEvent) {
-        guard let indexPath = tableView.indexPath(for: event) else {
-            return
-        }
-        
-        let card = cardFrc?.object(at: indexPath)
-        let paymentFormViewController = CheckoutPaymentFormViewController(withCard: card)
-        paymentFormViewController.continueButton.addTarget(self, action: #selector(updateCardAction), for: .touchUpInside)
-        paymentFormViewController.deleteButton?.addTarget(self, action: #selector(deleteCardAction), for: .touchUpInside)
-        navigationController?.pushViewController(paymentFormViewController, animated: true)
     }
 }
 

@@ -167,11 +167,20 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
         
         func performAction(withSavingCard saveCard: Bool) {
-            // TODO: add 
             DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
+                .then { card -> Void in
+                    let cardURL = card.objectID.uriRepresentation()
+                    UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
+                    UserDefaults.standard.synchronize()
+            }
             
             if isShipToSameAddressChecked {
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+                    .then { shippingAddress -> Void in
+                        let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
+                        UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
+                        UserDefaults.standard.synchronize()
+                }
             }
             
             alertCallback(saveCard)

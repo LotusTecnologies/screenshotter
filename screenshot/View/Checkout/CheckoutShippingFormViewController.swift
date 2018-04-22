@@ -119,6 +119,11 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         }
         
         DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+            .then { shippingAddress -> Void in
+                let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
+                UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
+                UserDefaults.standard.synchronize()
+        }
         
         return true
     }
