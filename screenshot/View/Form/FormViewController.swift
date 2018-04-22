@@ -553,6 +553,7 @@ extension FormRow {
         override init() {
             super.init()
             isVisible = false
+            isRequired = false
         }
     }
     

@@ -109,6 +109,8 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
             brandImageView.image = UIImage(named: "CheckoutCardMastercard")
         case .Visa:
             brandImageView.image = UIImage(named: "CheckoutCardVisa")
+        case .unknown:
+            brandImageView.image = nil
         }
     }
 }

@@ -8,13 +8,28 @@
 
 import CreditCardValidator
 
-enum CreditCardBrand {
-    case Amex
-    case DinersClub
-    case Discover
-    case JCB
-    case Mastercard
-    case Visa
+enum CreditCardBrand: String {
+    case Amex       = "Amex"
+    case DinersClub = "Diners Club"
+    case Discover   = "Discover"
+    case JCB        = "JCB"
+    case Mastercard = "Mastercard"
+    case Visa       = "Visa"
+    case unknown    = "unknown"
+    
+    init(withTypeName typeName: String) {
+        switch typeName {
+        case "MasterCard":
+            self = .Mastercard
+        default:
+            if let brand = CreditCardBrand(rawValue: typeName) {
+                self = brand
+            }
+            else {
+                self = .unknown
+            }
+        }
+    }
 }
 
 extension CreditCardValidator {
@@ -25,6 +40,13 @@ extension CreditCardValidator {
     func isAmex(cardNumber: String) -> Bool {
         // https://baymard.com/checkout-usability/credit-card-patterns
         return ["34", "37"].contains(cardNumber.prefix(2))
+    }
+    
+    func brand(forNumber number: String) -> CreditCardBrand {
+        if let type = type(from: number) {
+            return CreditCardBrand(withTypeName: type.name)
+        }
+        return .unknown
     }
     
     // MARK: Expiration
