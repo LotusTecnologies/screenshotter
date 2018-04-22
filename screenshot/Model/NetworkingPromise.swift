@@ -447,7 +447,7 @@ class NetworkingPromise : NSObject {
     }
     
     func geoLocateIsUSC() -> Promise<Bool> {
-        guard let url = URL(string: "https://freegeoip.net/json/") else {
+        guard let url = URL(string: "http://www.geoplugin.net/json.gp?jsoncallback=") else {
             let error = NSError(domain: "Craze", code: 49, userInfo: [NSLocalizedDescriptionKey: "Cannot form geoLocate url"])
             return Promise(error: error)
         }
@@ -455,7 +455,7 @@ class NetworkingPromise : NSObject {
         sessionConfiguration.timeoutIntervalForResource = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { dict -> Promise<Bool> in
             var isUsc = false
-            if let countryCode = dict["country_code"] as? String,
+            if let countryCode = dict["geoplugin_countryCode"] as? String,
               countryCode == "US" || countryCode == "IL" {
                 isUsc = true
             }
