@@ -71,18 +71,25 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
                 layer.cornerRadius = 8
                 c.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(c)
-                c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 34).isActive = true
-                c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -34).isActive = true
-                c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 40).isActive = true
-                c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40).isActive = true
+                if UIDevice.is320w {
+                    c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 15).isActive = true
+                    c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -15).isActive = true
+                    c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 20).isActive = true
+                    c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -20).isActive = true
+                }else{
+                    c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 34).isActive = true
+                    c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -34).isActive = true
+                    c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 40).isActive = true
+                    c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40).isActive = true
+                }
                 return c
             }
         }()
-        
-        container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
-        
-        
-       
+        if UIDevice.is320w {
+            container.layoutMargins = UIEdgeInsets(top: 25, left: 20, bottom: 15, right: 20)
+        }else{
+            container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
+        }
         
         
         let skipButton = UIButton.init()
@@ -95,7 +102,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         skipButton.setTitle("generic.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
-        skipButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
+        skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
         skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
         skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
@@ -108,7 +115,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         mainButton.setTitle(self.campaign.buttonText, for: .normal)
         mainButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         mainButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
-        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-5).isActive = true
+        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-3).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         
@@ -216,21 +223,17 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
                 self.flashPauseOverlay()
             }
         }
-        self.present(explain, animated: true, completion: nil)
+        self.present(explain, animated: false, completion: nil)
     }
     
-    func campaignPromotionExplanationViewControllerDidPressClose(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+    func campaignPromotionExplanationViewControllerDidPressSkip(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+        self.dismiss(animated: false, completion: nil)
         UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.videoDisplayingViewControllerDidTapDone(self)
-        
-        self.dismiss(animated: false, completion: nil)
-
     }
     
     func campaignPromotionExplanationViewControllerDidPressMainButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
         self.dismiss(animated: false, completion: nil)
-        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
         
     }
     

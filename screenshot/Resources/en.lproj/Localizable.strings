@@ -12,8 +12,8 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
-"2018_04_20_campaign.headline" = "Win up to $1000";
-"2018_04_20_campaign.body" = "Every week we are announcing new winners. Submit your favorite looks to discover, Submit as many times as you like.";
+"2018_04_20_campaign.headline" = "Win up to $1,000";
+"2018_04_20_campaign.body" = "Every week we are announcing new winners. Submit your favorite looks to discover. Submit as many times as you like.";
 "2018_04_20_campaign.button" = "Learn More";
 "2018_04_20_campaign.instructions.headline" = "Share and Win!";
 "2018_04_20_campaign.instructions.step_1" = "Make sure you have notifications enabled and a valid email address";
@@ -21,11 +21,8 @@
 "2018_04_20_campaign.instructions.step_3" = "Tap Share - Share to Discover";
 "2018_04_20_campaign.instructions.step_4" = "Submit as many images as you like";
 "2018_04_20_campaign.instructions.step_5" = "Follow us on Instagram to see when we announce the winners";
-"2018_04_20_campaign.instructions.button" = "Got it";
+"2018_04_20_campaign.instructions.button" = "Video Explanation";
 
-"campaign.instructions.footer.0" = "By submitting images you agree to our ";
-"campaign.instructions.footer.1" = "Terms and Conditions";
-"campaign.instructions.footer.2" = " ";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";

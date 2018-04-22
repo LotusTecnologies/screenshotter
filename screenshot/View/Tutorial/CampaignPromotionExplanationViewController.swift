@@ -9,20 +9,18 @@
 import UIKit
 
 protocol CampaignPromotionExplanationViewControllerDelegate : class {
-    func campaignPromotionExplanationViewControllerDidPressClose(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
+    func campaignPromotionExplanationViewControllerDidPressSkip(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
     func campaignPromotionExplanationViewControllerDidPressMainButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
 
 }
 
-class CampaignPromotionExplanationViewController: UIViewController, UITextViewDelegate{
+class CampaignPromotionExplanationViewController: UIViewController{
 
     var delegate:CampaignPromotionExplanationViewControllerDelegate?
     
     var campaign = CampaignPromotionExplanation(
         headline: "2018_04_20_campaign.instructions.headline".localized,
-        footer: "2018_04_20_campaign.instructions.footer".localized,
         buttonText: "2018_04_20_campaign.instructions.button".localized,
-        campaignNameForAnalytics: "2018_04_20 campaign agree button pushed",
         instructions: ["2018_04_20_campaign.instructions.step_1".localized,
                        "2018_04_20_campaign.instructions.step_2".localized,
                        "2018_04_20_campaign.instructions.step_3".localized,
@@ -33,13 +31,9 @@ class CampaignPromotionExplanationViewController: UIViewController, UITextViewDe
     
     struct CampaignPromotionExplanation {
         var headline:String
-        var footer:String
         var buttonText:String
-        var campaignNameForAnalytics:String
         var instructions:[String]
     }
-    fileprivate let legalLinkTOS = "TOS"
-    fileprivate let legalLinkPP = "PP"
     
     var willPresentInModal:Bool = false
     
@@ -80,27 +74,40 @@ class CampaignPromotionExplanationViewController: UIViewController, UITextViewDe
                 layer.cornerRadius = 8
                 c.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(c)
-                c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 34).isActive = true
-                c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -34).isActive = true
-                c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 40).isActive = true
-                c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40).isActive = true
+                if UIDevice.is320w {
+                    c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 15).isActive = true
+                    c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -15).isActive = true
+                    c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 20).isActive = true
+                    c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -20).isActive = true
+                }else{
+                    c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 34).isActive = true
+                    c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -34).isActive = true
+                    c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 40).isActive = true
+                    c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40).isActive = true
+                }
                 return c
             }
         }()
+        if UIDevice.is320w {
+            container.layoutMargins = UIEdgeInsets(top: 25, left: 20, bottom: 15, right: 20)
+        }else{
+            container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
+        }
         
-        container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
-
         
-        let closeButton = UIButton()
-        closeButton.setImage(UIImage(named:"ShareToMatchsticksClose"), for: .normal)
-        closeButton.showsTouchWhenHighlighted = true
-        closeButton.translatesAutoresizingMaskIntoConstraints = false
-        closeButton.addTarget(self, action: #selector(closeButtonPressed), for: .touchUpInside)
-        container.addSubview(closeButton)
-        closeButton.topAnchor.constraint(equalTo: container.topAnchor, constant:3.0).isActive = true
-        closeButton.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant:-3.0).isActive = true
-
+        let skipButton = UIButton.init()
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.titleLabel?.textAlignment = .center
         
+        skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+        skipButton.addTarget(self, action: #selector(tappedSkipButton), for: .touchUpInside)
+        container.addSubview(skipButton)
+        skipButton.setTitle("generic.skip".localized, for: .normal)
+        skipButton.setTitleColor(.gray3, for: .normal)
+        skipButton.setTitleColor(.gray5, for: .highlighted)
+        skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
+        skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
        
         
         let headline = UILabel()
@@ -186,50 +193,7 @@ class CampaignPromotionExplanationViewController: UIViewController, UITextViewDe
         mainButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         mainButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
-        
-        
-        let footer = UITextView()
-        footer.isEditable = false
-        footer.textAlignment = .center
-        footer.isScrollEnabled = false
-        footer.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-        footer.textColor = .gray2
-        footer.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(footer)
-        footer.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
-        footer.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
-        footer.topAnchor.constraint(equalTo: mainButton.bottomAnchor).isActive = true
-        footer.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
-        footer.setContentHuggingPriority(.required, for: .vertical)
-        footer.delegate = self
-        footer.attributedText = {
-            let textViewFont: UIFont = .preferredFont(forTextStyle: .footnote)
-            
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.alignment = .center
-            
-            func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
-                var attributes: [NSAttributedStringKey : Any] = [
-                    NSAttributedStringKey.font: textViewFont,
-                    NSAttributedStringKey.paragraphStyle: paragraph
-                ]
-                
-                if let link = link {
-                    attributes[NSAttributedStringKey.link] = link
-                }
-                
-                return attributes
-            }
-            
-            return NSMutableAttributedString(segmentedString: "campaign.instructions.footer", attributes: [
-                attributes(),
-                attributes(legalLinkTOS),
-                attributes(),
-                ])
-        }()
-        
-        
-        
+        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-3).isActive = true
         
         
         var last:UIView?
@@ -270,31 +234,13 @@ class CampaignPromotionExplanationViewController: UIViewController, UITextViewDe
         }
     }
     
-    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+    
+    @objc func tappedSkipButton() {
         
-        switch URL.absoluteString {
-        case legalLinkTOS:
-            if let viewController = LegalViewControllerFactory.termsOfServiceViewController(withDoneTarget: self, action: #selector(dismissViewController)) {
-                present(viewController, animated: true, completion: nil)
-            }
-            break;
-
-        default:
-            break
-        }
-        
-        return false
-    }
-    @objc func dismissViewController(){
-        self.dismiss(animated: true, completion: nil)
+        self.delegate?.campaignPromotionExplanationViewControllerDidPressSkip(self)
     }
     
     @objc func agreeButtonPressed(){
         self.delegate?.campaignPromotionExplanationViewControllerDidPressMainButton(self)
-    }
-    
-    @objc func closeButtonPressed(){
-        self.delegate?.campaignPromotionExplanationViewControllerDidPressClose(self)
-
     }
 }
