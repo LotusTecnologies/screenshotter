@@ -285,8 +285,8 @@ extension ScreenshotsNavigationControllerStateRestoration {
         
         if coder.containsValue(forKey: screenshotKey),
             let url = coder.decodeObject(forKey: screenshotKey) as? URL,
-            let objectID = persistentStoreCoordinator.managedObjectID(forURIRepresentation: url),
-            let screenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: objectID)
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
+            let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectID)
         {
             restoredProductsViewController?.screenshot = screenshot
         }

@@ -10,8 +10,7 @@ import Foundation
 
 class Constants {
 
-    
-    //Product decisions
+    // Product decisions
     static let notificationProductToImportCountLimit = 4
     
     // Local notification constants.
@@ -26,6 +25,10 @@ class Constants {
     
     // Cart
     static let cartItemMaxQuantity = 10
+    
+    // Checkout
+    static let checkoutPrimaryCardURL = "checkoutPrimaryCardURL"
+    static let checkoutPrimaryAddressURL = "checkoutPrimaryAddressURL"
     
     // Syte
     static let syteAccountId = 6677

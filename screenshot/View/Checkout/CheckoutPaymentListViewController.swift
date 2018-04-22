@@ -57,6 +57,18 @@ class CheckoutPaymentListViewController: BaseViewController {
         tableView.tableFooterView = addButton
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL),
+            let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID),
+            let indexPath = cardFrc?.indexPath(forObject: card)
+        {
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        }
+    }
+    
     deinit {
         tableView.dataSource = nil
         tableView.delegate = nil
@@ -144,7 +156,13 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
 }
 
 extension CheckoutPaymentListViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let card = cardFrc?.object(at: indexPath) {
+            let cardURL = card.objectID.uriRepresentation()
+            UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
+            UserDefaults.standard.synchronize()
+        }
+    }
 }
 
 extension CheckoutPaymentListViewController: FetchedResultsControllerManagerDelegate {

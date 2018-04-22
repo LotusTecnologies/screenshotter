@@ -96,8 +96,15 @@ extension CreditCardValidator {
         return formattedNumberComponents.joined(separator: " ")
     }
     
-    /// Only diplsay the last digits of a card
-    func lastComponentNumber(_ number: String) -> String {
-        return ""
+    /// Only diplsay the last digits of a card. Accepts a formatted or secure card.
+    func lastComponentNumber(_ number: String) -> String? {
+        var components = number.split(separator: " ")
+        
+        if let lastComponent = components.popLast() {
+            return String(lastComponent)
+        }
+        else {
+            return nil
+        }
     }
 }

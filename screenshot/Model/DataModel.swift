@@ -344,23 +344,6 @@ extension DataModel {
         return nil
     }
     
-    func retrieveScreenshot(objectId: NSManagedObjectID) -> Screenshot? {
-        let managedObjectContext = mainMoc()
-        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "SELF == %@", objectId)
-        fetchRequest.sortDescriptors = nil
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            return results.first
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveScreenshot objectId:\(objectId) results with error:\(error)")
-        }
-        return nil
-    }
-    
     public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
         performBackgroundTask { (managedObjectContext) in
             do {
@@ -1818,11 +1801,41 @@ extension NSManagedObjectContext {
         }
     }
     
+    func objectId(for objectIdUrl:URL) -> NSManagedObjectID? {
+        return self.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: objectIdUrl)
+    }
+    
     func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? {
         if let screenshot = self.object(with: objectId) as? Screenshot {
             do{
                 try screenshot.validateForUpdate()
                 return screenshot
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
+    }
+    
+    func cardWith(objectId:NSManagedObjectID) -> Card? {
+        if let card = self.object(with: objectId) as? Card {
+            do{
+                try card.validateForUpdate()
+                return card
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
+    }
+    
+    func shippingAddressWith(objectId:NSManagedObjectID) -> ShippingAddress? {
+        if let shippingAddress = self.object(with: objectId) as? ShippingAddress {
+            do{
+                try shippingAddress.validateForUpdate()
+                return shippingAddress
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
                 

@@ -56,6 +56,18 @@ class CheckoutShippingListViewController: BaseViewController {
         tableView.tableFooterView = addButton
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let shippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: shippingURL),
+            let shipping = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID),
+            let indexPath = shippingFrc?.indexPath(forObject: shipping)
+        {
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        }
+    }
+    
     deinit {
         tableView.dataSource = nil
         tableView.delegate = nil
@@ -98,7 +110,13 @@ extension CheckoutShippingListViewController: UITableViewDataSource {
 }
 
 extension CheckoutShippingListViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let shipping = shippingFrc?.object(at: indexPath) {
+            let shippingURL = shipping.objectID.uriRepresentation()
+            UserDefaults.standard.set(shippingURL, forKey: Constants.checkoutPrimaryAddressURL)
+            UserDefaults.standard.synchronize()
+        }
+    }
 }
 
 extension CheckoutShippingListViewController: FetchedResultsControllerManagerDelegate {

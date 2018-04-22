@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CreditCardValidator
 
 class CheckoutOrderViewController: BaseViewController {
     var cvv: String?
@@ -42,9 +43,6 @@ class CheckoutOrderViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _view.nameLabel.text = "Corey Werner"
-        _view.addressLabel.text = "326 N. Blaine Ave, Santa Rosa, CA  80002"
-        _view.cardLabel.text = "Visa ending in …4568"
         _view.itemsPriceLabel.text = "$117"
         _view.shippingPriceLabel.text = "$8.42"
         _view.beforeTaxPriceLabel.text = "$125.42"
@@ -59,6 +57,28 @@ class CheckoutOrderViewController: BaseViewController {
         // TODO: remove the tableview since its not being used for it reuse functionality. insert normal views
         tableView.dataSource = self
         tableView.register(CheckoutOrderItemTableViewCell.self, forCellReuseIdentifier: "cell")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let shippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: shippingURL),
+            let shipping = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID)
+        {
+            _view.nameLabel.text = shipping.fullName
+            _view.addressLabel.text = shipping.readableAddress
+        }
+        
+        if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL),
+            let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID),
+            let displayNumber = card.displayNumber,
+            let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber)
+        {
+            let brand = "Visa" // TODO:
+            _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
+        }
     }
     
     deinit {
