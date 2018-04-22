@@ -86,7 +86,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             }
         }()
         if UIDevice.is320w {
-            container.layoutMargins = UIEdgeInsets(top: 25, left: 20, bottom: 15, right: 20)
+            container.layoutMargins = UIEdgeInsets(top: 5, left: 15, bottom: 5, right: 15)
         }else{
             container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
         }

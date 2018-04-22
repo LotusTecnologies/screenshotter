@@ -89,7 +89,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
             }
         }()
         if UIDevice.is320w {
-            container.layoutMargins = UIEdgeInsets(top: 25, left: 20, bottom: 15, right: 20)
+            container.layoutMargins = UIEdgeInsets(top: 5, left: 15, bottom: 5, right: 15)
         }else{
             container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
         }
@@ -98,7 +98,6 @@ class CampaignPromotionExplanationViewController: UIViewController{
         let skipButton = UIButton.init()
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.titleLabel?.textAlignment = .center
-        
         skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
         skipButton.addTarget(self, action: #selector(tappedSkipButton), for: .touchUpInside)
         container.addSubview(skipButton)
@@ -150,7 +149,11 @@ class CampaignPromotionExplanationViewController: UIViewController{
             instructionLabel.numberOfLines = 0
             instructionLabel.textColor = .gray2
             instructionLabel.text = instruction
-            instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+            if UIDevice.is320w {
+                instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+            }else{
+                instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .footnote, staticSize: true)
+            }
             instructionLabel.translatesAutoresizingMaskIntoConstraints = false
             instructionsContainer.addSubview(instructionLabel)
             instructionLabel.trailingAnchor.constraint(equalTo: instructionsContainer.trailingAnchor).isActive = true
@@ -227,7 +230,11 @@ class CampaignPromotionExplanationViewController: UIViewController{
                 }
                 
             }
-            first.heightAnchor.constraint(greaterThanOrEqualToConstant: 3.0);
+            if UIDevice.is320w {
+                first.heightAnchor.constraint(greaterThanOrEqualToConstant: 3.0);
+            }else{
+                first.heightAnchor.constraint(greaterThanOrEqualToConstant: 1.0);
+            }
             let asBigAsPossible = first.heightAnchor.constraint(equalToConstant: 100)
             asBigAsPossible.priority = UILayoutPriority.init(rawValue: 2)
             asBigAsPossible.isActive = true
