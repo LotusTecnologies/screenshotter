@@ -722,13 +722,13 @@ extension DataModel {
         return []
     }
     
+    // Returns a Promise of the saved Card that should be used only on the main thread.
     func saveCard(fullName: String,
                   number: String,
                   displayNumber: String,
                   brand: String,
                   expirationMonth: Int16,
                   expirationYear: Int16,
-//                cvv: Int16,
                   street: String,
                   city: String,
                   country: String,
@@ -736,36 +736,46 @@ extension DataModel {
                   state: String?,
                   email: String?,
                   phone: String,
-                  isSaved: Bool) {
-        performBackgroundTask { (managedObjectContext) in
-            let cardToSave = Card(context: managedObjectContext)
-            cardToSave.fullName = fullName
-            cardToSave.displayNumber = displayNumber
-            cardToSave.brand = brand
-            cardToSave.expirationMonth = expirationMonth
-            cardToSave.expirationYear = expirationYear
-            cardToSave.street = street
-            cardToSave.city = city
-            cardToSave.country = country
-            cardToSave.zipCode = zipCode
-            cardToSave.state = state
-            cardToSave.email = email
-            cardToSave.phone = phone
-            cardToSave.isSaved = isSaved
-            let now = Date()
-            cardToSave.dateAdded = now
-            cardToSave.dateModified = now
-            do {
-                try managedObjectContext.save()
-                let key = cardToSave.cardNumberKeychainKey()
-                DispatchQueue.global(qos: .utility).async {
-                    let startKeychain = Date()
-                    let didSetCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
-                    print("GMK didSetCardNumber:\(didSetCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                  isSaved: Bool) -> Promise<Card> {
+        return Promise<NSManagedObjectID> { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                let cardToSave = Card(context: managedObjectContext)
+                cardToSave.fullName = fullName
+                cardToSave.displayNumber = displayNumber
+                cardToSave.brand = brand
+                cardToSave.expirationMonth = expirationMonth
+                cardToSave.expirationYear = expirationYear
+                cardToSave.street = street
+                cardToSave.city = city
+                cardToSave.country = country
+                cardToSave.zipCode = zipCode
+                cardToSave.state = state
+                cardToSave.email = email
+                cardToSave.phone = phone
+                cardToSave.isSaved = isSaved
+                let now = Date()
+                cardToSave.dateAdded = now
+                cardToSave.dateModified = now
+                do {
+                    try managedObjectContext.save()
+                    let key = cardToSave.cardNumberKeychainKey()
+                    DispatchQueue.global(qos: .utility).async {
+                        let startKeychain = Date()
+                        let didSetCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
+                        print("GMK didSetCardNumber:\(didSetCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                    }
+                    fulfill(cardToSave.objectID)
+                } catch {
+                    DataModel.sharedInstance.receivedCoreDataError(error: error)
+                    reject(error)
                 }
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
             }
+            }.then { cardOID -> Promise<Card> in // Defaults to executing on main thread. Good.
+                guard let savedCard = self.mainMoc().object(with: cardOID) as? Card else {
+                    let error = NSError(domain: "Craze", code: 90, userInfo: [NSLocalizedDescriptionKey: "Cannot retrieve recent savedCard oid:\(cardOID)"])
+                    return Promise(error: error)
+                }
+                return Promise(value: savedCard)
         }
     }
 
@@ -788,32 +798,43 @@ extension DataModel {
         return false
     }
     
+    // Returns a Promise of the saved ShippingAddress that should be used only on the main thread.
     func saveShippingAddress(firstName: String?,
-                  lastName: String?,
-                  street: String,
-                  city: String,
-                  country: String,
-                  zipCode: String,
-                  state: String?,
-                  phone: String) {
-        performBackgroundTask { (managedObjectContext) in
-            let shippingAddressToSave = ShippingAddress(context: managedObjectContext)
-            shippingAddressToSave.firstName = firstName
-            shippingAddressToSave.lastName = lastName
-            shippingAddressToSave.street = street
-            shippingAddressToSave.city = city
-            shippingAddressToSave.country = country
-            shippingAddressToSave.zipCode = zipCode
-            shippingAddressToSave.state = state
-            shippingAddressToSave.phone = phone
-            let now = Date()
-            shippingAddressToSave.dateAdded = now
-            shippingAddressToSave.dateModified = now
-            do {
-                try managedObjectContext.save()
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                             lastName: String?,
+                             street: String,
+                             city: String,
+                             country: String,
+                             zipCode: String,
+                             state: String?,
+                             phone: String) -> Promise<ShippingAddress> {
+        return Promise<NSManagedObjectID> { fulfill, reject in
+            performBackgroundTask { (managedObjectContext) in
+                let shippingAddressToSave = ShippingAddress(context: managedObjectContext)
+                shippingAddressToSave.firstName = firstName
+                shippingAddressToSave.lastName = lastName
+                shippingAddressToSave.street = street
+                shippingAddressToSave.city = city
+                shippingAddressToSave.country = country
+                shippingAddressToSave.zipCode = zipCode
+                shippingAddressToSave.state = state
+                shippingAddressToSave.phone = phone
+                let now = Date()
+                shippingAddressToSave.dateAdded = now
+                shippingAddressToSave.dateModified = now
+                do {
+                    try managedObjectContext.save()
+                    fulfill(shippingAddressToSave.objectID)
+                } catch {
+                    DataModel.sharedInstance.receivedCoreDataError(error: error)
+                    reject(error)
+                }
             }
+            }.then { shippingAddressOID -> Promise<ShippingAddress> in // Defaults to executing on main thread. Good.
+                guard let savedShippingAddress = self.mainMoc().object(with: shippingAddressOID) as? ShippingAddress else {
+                    let error = NSError(domain: "Craze", code: 91, userInfo: [NSLocalizedDescriptionKey: "Cannot retrieve recent savedShippingAddress oid:\(shippingAddressOID)"])
+                    return Promise(error: error)
+                }
+                return Promise(value: savedShippingAddress)
         }
     }
 
@@ -823,16 +844,16 @@ extension DataModel {
                              country: String,
                              zipCode: String,
                              state: String?,
-                             phone: String) {
+                             phone: String) -> Promise<ShippingAddress> {
         let tuple = NetworkingPromise.sharedInstance.divideByLastSpace(fullName: fullName)
-        saveShippingAddress(firstName: tuple.0,
-                            lastName: tuple.1,
-                            street: street,
-                            city: city,
-                            country: country,
-                            zipCode: zipCode,
-                            state: state,
-                            phone: phone)
+        return saveShippingAddress(firstName: tuple.0,
+                                   lastName: tuple.1,
+                                   street: street,
+                                   city: city,
+                                   country: country,
+                                   zipCode: zipCode,
+                                   state: state,
+                                   phone: phone)
     }
     
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
@@ -1637,7 +1658,6 @@ extension Card {
               brand: String,
               expirationMonth: Int16,
               expirationYear: Int16,
-//              cvv: Int16,
               street: String,
               city: String,
               country: String,
