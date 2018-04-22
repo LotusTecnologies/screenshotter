@@ -122,6 +122,9 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
             let year = Int(card.expirationYear)
             cell.setExpiration(month: month, year: year)
             cell.isExpired = CreditCardValidator.shared.isExpired(month: month, year: year)
+            
+            // TODO: gershon needs to allow for saving card brand in db
+            cell.setBrandImage(.JCB)
         }
         
         return cell

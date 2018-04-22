@@ -12,6 +12,7 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
     let cardNumberLabel = UILabel()
     let nameLabel = UILabel()
     fileprivate let expirationLabel = UILabel()
+    fileprivate let brandImageView = UIImageView()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -33,13 +34,27 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         cardNumberLabel.leadingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.leadingAnchor).isActive = true
         cardNumberLabel.trailingAnchor.constraint(equalTo: editButton.leadingAnchor).isActive = true
         
+        brandImageView.translatesAutoresizingMaskIntoConstraints = false
+        brandImageView.contentMode = .scaleAspectFit
+        brandImageView.setContentHuggingPriority(.required, for: .horizontal)
+        brandImageView.setContentHuggingPriority(.required, for: .vertical)
+        brandImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        brandImageView.setContentCompressionResistancePriority(.required, for: .vertical)
+        cardView.addSubview(brandImageView)
+        brandImageView.bottomAnchor.constraint(lessThanOrEqualTo: cardView.layoutMarginsGuide.bottomAnchor).isActive = true
+        brandImageView.trailingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textColor = .gray3
         nameLabel.font = .screenshopFont(.hindLight, size: 16)
         cardView.addSubview(nameLabel)
         nameLabel.topAnchor.constraint(greaterThanOrEqualTo: cardNumberLabel.bottomAnchor, constant: .padding).isActive = true
         nameLabel.leadingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.leadingAnchor).isActive = true
-        nameLabel.trailingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.trailingAnchor).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: brandImageView.leadingAnchor, constant: -.padding).isActive = true
+        
+        let brandImageViewTopConstraint = brandImageView.topAnchor.constraint(equalTo: nameLabel.topAnchor)
+        brandImageViewTopConstraint.priority = .defaultHigh
+        brandImageViewTopConstraint.isActive = true
         
         expirationLabel.translatesAutoresizingMaskIntoConstraints = false
         expirationLabel.font = .screenshopFont(.hindMedium, size: 14)
@@ -48,7 +63,7 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         expirationLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor).isActive = true
         expirationLabel.leadingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.leadingAnchor).isActive = true
         expirationLabel.firstBaselineAnchor.constraint(equalTo: cardView.layoutMarginsGuide.bottomAnchor).isActive = true
-        expirationLabel.trailingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.trailingAnchor).isActive = true
+        expirationLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
     }
     
     // MARK: Expiration
@@ -75,6 +90,25 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         else {
             expirationLabel.text = "EXPIRES \(expirationString)"
             expirationLabel.textColor = .gray7
+        }
+    }
+    
+    // MARK: Brand
+    
+    func setBrandImage(_ brand: CreditCardBrand) {
+        switch brand {
+        case .Amex:
+            brandImageView.image = UIImage(named: "CheckoutCardAmex")
+        case .DinersClub:
+            brandImageView.image = UIImage(named: "CheckoutCardDiners")
+        case .Discover:
+            brandImageView.image = UIImage(named: "CheckoutCardDiscover")
+        case .JCB:
+            brandImageView.image = UIImage(named: "CheckoutCardJCB")
+        case .Mastercard:
+            brandImageView.image = UIImage(named: "CheckoutCardMastercard")
+        case .Visa:
+            brandImageView.image = UIImage(named: "CheckoutCardVisa")
         }
     }
 }

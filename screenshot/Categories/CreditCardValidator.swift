@@ -8,6 +8,15 @@
 
 import CreditCardValidator
 
+enum CreditCardBrand {
+    case Amex
+    case DinersClub
+    case Discover
+    case JCB
+    case Mastercard
+    case Visa
+}
+
 extension CreditCardValidator {
     static let shared = CreditCardValidator()
     
