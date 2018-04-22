@@ -504,41 +504,46 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            if screenshot.shoppablesCount <= 0 {
-                //TODO: fix this when there is a better indciator of failure to load
-                let alertController = UIAlertController.init(title: "screenshots.share.error.title".localized, message: "screenshots.share.error.message".localized, preferredStyle: .alert)
-                alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
-                self.present(alertController, animated: true, completion: nil)
-                return
-            }
-            if let _ = screenshot.uploadedImageURL, screenshot.canSubmitToDiscover {
+            let source = screenshot.source
+            let submittedDate = screenshot.submittedDate
+            let screenshotObjectId = screenshot.objectID
+            let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
+                    if !(source == .gallery || source == .share || source == .unknown) || submittedDate != nil {
+                        let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
+                        
+                        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
+                            AnalyticsTrackers.standard.track(.shareIncomplete)
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                    }else {
+                        screenshot.submitToDiscover()
+                        let thankYou = ThankYouForSharingViewController()
+                        thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
+                        self.present(thankYou, animated: true, completion: nil)
+                        AnalyticsTrackers.branch.track(.shareCompleted)
+                    }
+                }
                 
-                let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
-                
-                alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
-                    screenshot.submitToDiscover()
-                    let thankYou = ThankYouForSharingViewController()
-                    thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
-                    self.present(thankYou, animated: true, completion: nil)
-                    AnalyticsTrackers.branch.track(.shareCompleted)
-                    
-                }))
-                alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.social".localized, style: .default, handler: { (a) in
+            }))
+            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.social".localized, style: .default, handler: { (a) in
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
                     self.presentSocailShare(screenshot: screenshot)
-                    
-                }))
-                alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
-                    AnalyticsTrackers.standard.track(.shareIncomplete)
-                }))
-                alert.popoverPresentationController?.sourceView = self.view
+                }
                 
-                self.present(alert, animated: true, completion: nil)
-                
-            }else{
-                self.presentSocailShare(screenshot: screenshot)
-            }
+            }))
+            alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
+                AnalyticsTrackers.standard.track(.shareIncomplete)
+            }))
+            alert.popoverPresentationController?.sourceView = self.view
+            
+            self.present(alert, animated: true, completion: nil)
+            
+            
             AnalyticsTrackers.standard.track(.sharedScreenshot)
-        
+            
     
         }
         

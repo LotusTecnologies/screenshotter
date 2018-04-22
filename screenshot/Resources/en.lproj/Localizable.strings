@@ -202,6 +202,7 @@
 "share_to_discover.action_sheet.discover" = "Post on Discover";
 "share_to_discover.action_sheet.title" = "Share";
 "share_to_discover.action_sheet.message" = "Add this to Discover so other users can shop your screenshot!";
+"share_to_discover.action_sheet.error.alread_shared" = "This screenshot is already on Discover";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
