@@ -149,11 +149,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
             instructionLabel.numberOfLines = 0
             instructionLabel.textColor = .gray2
             instructionLabel.text = instruction
-            if UIDevice.is320w {
-                instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-            }else{
-                instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .footnote, staticSize: true)
-            }
+            instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
             instructionLabel.translatesAutoresizingMaskIntoConstraints = false
             instructionsContainer.addSubview(instructionLabel)
             instructionLabel.trailingAnchor.constraint(equalTo: instructionsContainer.trailingAnchor).isActive = true
