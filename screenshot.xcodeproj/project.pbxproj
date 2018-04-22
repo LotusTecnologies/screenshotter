@@ -10,6 +10,8 @@
 		310E307A2085DC2C00C6EDE9 /* Date+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E30792085DC2C00C6EDE9 /* Date+craze.swift */; };
 		310E307E2085EABC00C6EDE9 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307D2085EABC00C6EDE9 /* CampaignPromotionViewController.swift */; };
 		310E308020870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */; };
+		310E3090208C4F2500C6EDE9 /* campaign_video_2018_04_20.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 310E308F208C4B5000C6EDE9 /* campaign_video_2018_04_20.mp4 */; };
+		310E3092208C522100C6EDE9 /* campaign_thumb_2018_04_20.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 310E3091208C522100C6EDE9 /* campaign_thumb_2018_04_20.jpg */; };
 		3130FF6F203040F200AA881A /* ProductCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
@@ -157,6 +159,8 @@
 		310E30792085DC2C00C6EDE9 /* Date+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+craze.swift"; sourceTree = "<group>"; };
 		310E307D2085EABC00C6EDE9 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		310E307F20870B2A00C6EDE9 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
+		310E308F208C4B5000C6EDE9 /* campaign_video_2018_04_20.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = campaign_video_2018_04_20.mp4; sourceTree = "<group>"; };
+		310E3091208C522100C6EDE9 /* campaign_thumb_2018_04_20.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = campaign_thumb_2018_04_20.jpg; sourceTree = "<group>"; };
 		3130FF6E203040F200AA881A /* ProductCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewCell.swift; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
@@ -362,6 +366,8 @@
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				527F17491FA21CA6008082BC /* Craze_Video.mp4 */,
+				310E3091208C522100C6EDE9 /* campaign_thumb_2018_04_20.jpg */,
+				310E308F208C4B5000C6EDE9 /* campaign_video_2018_04_20.mp4 */,
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
 			);
@@ -956,10 +962,12 @@
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
+				310E3090208C4F2500C6EDE9 /* campaign_video_2018_04_20.mp4 in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
+				310E3092208C522100C6EDE9 /* campaign_thumb_2018_04_20.jpg in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
 				C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */,
 			);

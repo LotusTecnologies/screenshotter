@@ -9,7 +9,21 @@
 import UIKit
 import AVFoundation
 
+
+
 class CampaignPromotionViewController: UIViewController {
+    /*
+        To re-use this viewController change the CampaignDescription
+     */
+    let campaign = CampaignDescription.init(
+            headline: "2018_04_20_campaign.headline".localized,
+            byline: "2018_04_20_campaign.body".localized,
+            buttonText: "2018_04_20_campaign.button".localized,
+            videoName: "campaign_video_2018_04_20",
+            thumbName: "campaign_thumb_2018_04_20.jpg",
+            videoRatio: 1280.0 / 720.0,
+            userDefaultsKey: UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue)
+    
     var showsReplayButtonUponFinishing: Bool = true
     var willDisplayInPopover:Bool = false
     private(set) var playPauseButton = UIButton()
@@ -55,61 +69,62 @@ class CampaignPromotionViewController: UIViewController {
                 layer.cornerRadius = 8
                 c.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(c)
-                c.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 34).isActive = true
-                c.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -34).isActive = true
+                c.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 34).isActive = true
+                c.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -34).isActive = true
                 c.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 40).isActive = true
                 c.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40).isActive = true
                 return c
             }
         }()
         
+        container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
         
-        
-      
         
         let soundsGoodButton = MainButton.init()
         soundsGoodButton.translatesAutoresizingMaskIntoConstraints = false
         soundsGoodButton.backgroundColor = .crazeRed
         soundsGoodButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         container.addSubview(soundsGoodButton)
-        soundsGoodButton.setTitle("2018_04_20_campaign.button".localized, for: .normal)
-        soundsGoodButton.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
-        soundsGoodButton.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
-        soundsGoodButton.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -25).isActive = true
-        soundsGoodButton.heightAnchor.constraint(equalToConstant: 46).isActive = true
+        soundsGoodButton.setTitle(self.campaign.buttonText, for: .normal)
+        soundsGoodButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
+        soundsGoodButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
+        soundsGoodButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
+        soundsGoodButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         let explainationLabel = UILabel()
-        explainationLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        explainationLabel.text = "2018_04_20_campaign.body".localized
+        explainationLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+        explainationLabel.text = self.campaign.byline
         explainationLabel.translatesAutoresizingMaskIntoConstraints = false
         explainationLabel.textAlignment = .center
         explainationLabel.numberOfLines = 0
         container.addSubview(explainationLabel)
-        explainationLabel.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
-        explainationLabel.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
+        explainationLabel.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
+        explainationLabel.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         explainationLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         
         let headlineLabel = UILabel()
-        headlineLabel.font = UIFont.preferredFont(forTextStyle: .title2)
-        headlineLabel.text = "2018_04_20_campaign.headline".localized
+        headlineLabel.font = UIFont.screenshopFont(.hind, textStyle: .title3, staticSize: true)
+        headlineLabel.text = self.campaign.headline
         headlineLabel.translatesAutoresizingMaskIntoConstraints = false
         headlineLabel.textAlignment = .center
         headlineLabel.numberOfLines = 0
         container.addSubview(headlineLabel)
-        headlineLabel.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 25).isActive = true
-        headlineLabel.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -25).isActive = true
+        headlineLabel.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
+        headlineLabel.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         headlineLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         
         let imageView = UIImageView.init()
         imageView.isUserInteractionEnabled = true
+        imageView.clipsToBounds = true
+        imageView.image = UIImage.init(named: self.campaign.thumbName)
         let gesture = UITapGestureRecognizer.init(target: self, action: #selector(tappedVideo))
         imageView.addGestureRecognizer(gesture)
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.backgroundColor = .black
         container.addSubview(imageView)
-        imageView.leftAnchor.constraint(equalTo: container.leftAnchor).isActive = true
-        imageView.rightAnchor.constraint(equalTo: container.rightAnchor).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
+        imageView.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
         imageView.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
         imageView.heightAnchor.constraint(greaterThanOrEqualTo: container.heightAnchor, multiplier: 0.5).isActive = true
         imageView.heightAnchor.constraint(lessThanOrEqualTo: container.heightAnchor, multiplier: 0.75).isActive = true
@@ -118,7 +133,7 @@ class CampaignPromotionViewController: UIViewController {
         asBigAsPossible.priority = .defaultLow
         asBigAsPossible.isActive = true
 
-        let ratio = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1920.0 / 1080.0 )
+        let ratio = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: self.campaign.videoRatio )
         ratio.priority = .init(800)
         ratio.isActive = true
         
@@ -138,29 +153,25 @@ class CampaignPromotionViewController: UIViewController {
         
         
         let pad1 = UIView.init()
+        pad1.isHidden = true
         pad1.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(pad1)
-        pad1.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
-        pad1.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad1.topAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
         pad1.bottomAnchor.constraint(equalTo: headlineLabel.topAnchor).isActive = true
         
         let pad2 = UIView.init()
+        pad2.isHidden = true
         pad2.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(pad2)
-        pad2.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
-        pad2.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad2.topAnchor.constraint(equalTo: headlineLabel.bottomAnchor).isActive = true
         pad2.bottomAnchor.constraint(equalTo: explainationLabel.topAnchor).isActive = true
         
         let pad3 = UIView.init()
+        pad3.isHidden = true
         pad3.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(pad3)
-        pad3.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
-        pad3.widthAnchor.constraint(equalToConstant: 100).isActive = true
         pad3.topAnchor.constraint(equalTo: explainationLabel.bottomAnchor).isActive = true
         pad3.bottomAnchor.constraint(equalTo: soundsGoodButton.topAnchor).isActive = true
-        
         
         pad1.heightAnchor.constraint(equalTo: pad2.heightAnchor).isActive = true
         pad3.heightAnchor.constraint(equalTo: pad2.heightAnchor).isActive = true
@@ -176,13 +187,14 @@ class CampaignPromotionViewController: UIViewController {
     }
     
     @objc func tappedButton() {
-        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
+       
+        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
     
     @objc func tappedVideo(){
         if self.player == nil {
-            let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: "Craze_Video", withExtension: "mp4")!)
+            let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mp4")!)
             let player = AVPlayer(playerItem: playerItem)
             player.allowsExternalPlayback = false
             
@@ -264,6 +276,14 @@ class CampaignPromotionViewController: UIViewController {
         }
     }
     
-    
 
+    struct CampaignDescription {
+        var headline:String
+        var byline:String
+        var buttonText:String
+        var videoName:String
+        var thumbName:String
+        var videoRatio:CGFloat
+        var userDefaultsKey:String
+    }
 }
