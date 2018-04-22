@@ -933,12 +933,12 @@ extension SettingsViewController : UITextFieldDelegate {
 
 // MARK: - Tutorial
 
-extension SettingsViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
+extension SettingsViewController : VideoDisplayingViewControllerDelegate {
+    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
         dismiss(animated: true, completion: nil)
     }
     
-    func tutorialVideoViewControllerDidEnd(_ viewController: TutorialVideoViewController) {
+    func videoDisplayingViewControllerDidEnd(_ viewController: UIViewController) {
         dismiss(animated: true, completion: nil)
         
         AnalyticsTrackers.standard.track(.automaticallyExitedTutorialVideo)
