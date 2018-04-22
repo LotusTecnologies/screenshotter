@@ -43,11 +43,32 @@ class CheckoutOrderViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _view.itemsPriceLabel.text = "$117"
-        _view.shippingPriceLabel.text = "$8.42"
-        _view.beforeTaxPriceLabel.text = "$125.42"
-        _view.estimateTaxLabel.text = "6%"
-        _view.totalPriceLabel.text = "$134.62"
+        guard let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc()) else {
+            return
+        }
+        
+        let localeIdentifier = Locale.identifier(fromComponents: [
+            NSLocale.Key.currencyCode.rawValue: "USD",
+            NSLocale.Key.languageCode.rawValue: "en"
+            ])
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale(identifier: localeIdentifier)
+        
+        func formattedPrice(_ price: Float) -> String? {
+            return formatter.string(from: NSNumber(value: price))
+        }
+        
+        let shippingAndSubtotal = cart.subtotal + cart.shippingTotal
+        let tax: Float = 6
+        let taxTotal = (tax / 100) * shippingAndSubtotal
+        
+        _view.itemsPriceLabel.text = formattedPrice(cart.subtotal)
+        _view.shippingPriceLabel.text = formattedPrice(cart.shippingTotal)
+        _view.beforeTaxPriceLabel.text = formattedPrice(shippingAndSubtotal)
+        _view.estimateTaxLabel.text = "\(tax)%"
+        _view.totalPriceLabel.text = formattedPrice(shippingAndSubtotal + taxTotal)
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
         _view.shippingControl.addTarget(self, action: #selector(navigateToShippingList), for: .touchUpInside)
@@ -57,6 +78,9 @@ class CheckoutOrderViewController: BaseViewController {
         // TODO: remove the tableview since its not being used for it reuse functionality. insert normal views
         tableView.dataSource = self
         tableView.register(CheckoutOrderItemTableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
