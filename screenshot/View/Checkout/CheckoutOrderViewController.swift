@@ -12,6 +12,7 @@ import CreditCardValidator
 class CheckoutOrderViewController: BaseViewController {
     var cvv: String?
     var confirmPaymentViewController: CheckoutConfirmPaymentViewController?
+    fileprivate var cartItems: [CartItem]?
     
     // MARK: View
     
@@ -47,6 +48,13 @@ class CheckoutOrderViewController: BaseViewController {
             return
         }
         
+        cartItems = (cart.items as? Set<CartItem>)?.sorted(by: { (a, b) -> Bool in
+            guard let aDate = a.dateModified, let bDate = b.dateModified else {
+                return false
+            }
+            return aDate > bDate
+        })
+        
         let localeIdentifier = Locale.identifier(fromComponents: [
             NSLocale.Key.currencyCode.rawValue: "USD",
             NSLocale.Key.languageCode.rawValue: "en"
@@ -78,9 +86,6 @@ class CheckoutOrderViewController: BaseViewController {
         // TODO: remove the tableview since its not being used for it reuse functionality. insert normal views
         tableView.dataSource = self
         tableView.register(CheckoutOrderItemTableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -204,17 +209,31 @@ class CheckoutOrderViewController: BaseViewController {
 
 extension CheckoutOrderViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return cartItems?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? CheckoutOrderItemTableViewCell {
-            cell.titleLabel.text = "Huchie PuffySleeve Gold Edition"
-            cell.detailLabel.text = "Qty: 1, Color: Brown, Size: Med"
+        if let cell = cell as? CheckoutOrderItemTableViewCell, let cartItem = cartItems?[indexPath.row] {
+            cell.productImageView.setImage(withURLString: cartItem.imageURL)
+            cell.titleLabel.text = cartItem.productTitle()
+            cell.detailLabel.text = productDescription(cartItem)
         }
         
         return cell
+    }
+    
+    private func productDescription(_ cartItem: CartItem) -> String {
+        var description = "Qty: \(Int(cartItem.quantity))"
+        
+        if let color = cartItem.color {
+            description += ", Color: \(color)"
+        }
+        if let size = cartItem.size {
+            description += ", Size: \(size)"
+        }
+        
+        return description
     }
 }
