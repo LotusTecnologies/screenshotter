@@ -725,6 +725,7 @@ extension DataModel {
     func saveCard(fullName: String,
                   number: String,
                   displayNumber: String,
+                  brand: String,
                   expirationMonth: Int16,
                   expirationYear: Int16,
 //                cvv: Int16,
@@ -740,6 +741,7 @@ extension DataModel {
             let cardToSave = Card(context: managedObjectContext)
             cardToSave.fullName = fullName
             cardToSave.displayNumber = displayNumber
+            cardToSave.brand = brand
             cardToSave.expirationMonth = expirationMonth
             cardToSave.expirationYear = expirationYear
             cardToSave.street = street
@@ -1632,6 +1634,7 @@ extension Card {
     func edit(fullName: String,
               number: String,
               displayNumber: String,
+              brand: String,
               expirationMonth: Int16,
               expirationYear: Int16,
 //              cvv: Int16,
@@ -1650,6 +1653,7 @@ extension Card {
             }
             card.fullName = fullName
             card.displayNumber = displayNumber
+            card.brand = brand
             card.expirationMonth = expirationMonth
             card.expirationYear = expirationYear
             card.street = street
