@@ -11,7 +11,7 @@ import AVFoundation
 
 
 
-class CampaignPromotionViewController: UIViewController {
+class CampaignPromotionViewController: UIViewController, CampaignPromotionExplanationViewControllerDelegate {
     /*
         To re-use this viewController change the CampaignDescription
      */
@@ -25,7 +25,7 @@ class CampaignPromotionViewController: UIViewController {
             userDefaultsKey: UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue)
     
     var showsReplayButtonUponFinishing: Bool = true
-    var willDisplayInPopover:Bool = false
+    var willPresentInModal:Bool = false
     private(set) var playPauseButton = UIButton()
     private var playerLayer: AVPlayerLayer?
     private var player: AVPlayer?
@@ -37,6 +37,8 @@ class CampaignPromotionViewController: UIViewController {
     
     init(modal:Bool) {
         super.init(nibName: nil, bundle: nil)
+        self.willPresentInModal = modal
+
         if modal {
             transitioningDelegate = transitioning
             modalPresentationStyle = .custom
@@ -52,7 +54,7 @@ class CampaignPromotionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let container:UIView = {
-            if willDisplayInPopover {
+            if willPresentInModal {
                 self.view.layer.masksToBounds = true
                 self.view.layer.cornerRadius = 8
                 self.view.backgroundColor = .white
@@ -80,16 +82,35 @@ class CampaignPromotionViewController: UIViewController {
         container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
         
         
-        let soundsGoodButton = MainButton.init()
-        soundsGoodButton.translatesAutoresizingMaskIntoConstraints = false
-        soundsGoodButton.backgroundColor = .crazeRed
-        soundsGoodButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
-        container.addSubview(soundsGoodButton)
-        soundsGoodButton.setTitle(self.campaign.buttonText, for: .normal)
-        soundsGoodButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
-        soundsGoodButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
-        soundsGoodButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
-        soundsGoodButton.setContentCompressionResistancePriority(.required, for: .vertical)
+       
+        
+        
+        let skipButton = UIButton.init()
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.titleLabel?.textAlignment = .center
+        
+        skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+        skipButton.addTarget(self, action: #selector(tappedSkipButton), for: .touchUpInside)
+        container.addSubview(skipButton)
+        skipButton.setTitle("generic.skip".localized, for: .normal)
+        skipButton.setTitleColor(.gray3, for: .normal)
+        skipButton.setTitleColor(.gray5, for: .highlighted)
+        skipButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
+        skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
+        
+        
+        let mainButton = MainButton.init()
+        mainButton.translatesAutoresizingMaskIntoConstraints = false
+        mainButton.backgroundColor = .crazeRed
+        mainButton.addTarget(self, action: #selector(tappedLearnMoreButton), for: .touchUpInside)
+        container.addSubview(mainButton)
+        mainButton.setTitle(self.campaign.buttonText, for: .normal)
+        mainButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
+        mainButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
+        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-5).isActive = true
+        mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
+        
         
         let explainationLabel = UILabel()
         explainationLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
@@ -171,7 +192,7 @@ class CampaignPromotionViewController: UIViewController {
         pad3.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(pad3)
         pad3.topAnchor.constraint(equalTo: explainationLabel.bottomAnchor).isActive = true
-        pad3.bottomAnchor.constraint(equalTo: soundsGoodButton.topAnchor).isActive = true
+        pad3.bottomAnchor.constraint(equalTo: mainButton.topAnchor).isActive = true
         
         pad1.heightAnchor.constraint(equalTo: pad2.heightAnchor).isActive = true
         pad3.heightAnchor.constraint(equalTo: pad2.heightAnchor).isActive = true
@@ -186,8 +207,29 @@ class CampaignPromotionViewController: UIViewController {
         
     }
     
-    @objc func tappedButton() {
-       
+    @objc func tappedLearnMoreButton() {
+        let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
+        explain.delegate = self
+        self.present(explain, animated: true, completion: nil)
+    }
+    
+    func campaignPromotionExplanationViewControllerDidPressClose(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
+        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
+        
+        self.dismiss(animated: false, completion: nil)
+
+    }
+    
+    func campaignPromotionExplanationViewControllerDidPressMainButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+        self.dismiss(animated: false, completion: nil)
+        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
+        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
+        
+    }
+    
+    @objc func tappedSkipButton() {
+        
         UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
