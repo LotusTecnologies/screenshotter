@@ -121,12 +121,17 @@ class CheckoutOrderViewController: BaseViewController {
     // MARK: Order
     
     @objc fileprivate func orderAction() {
-        if let cvv = card?.cvv, !cvv.isEmpty {
-            guard let card = card, let shippingAddress = shippingAddress else {
-                // TODO: present alert saying to select card or shipping address
-                return
-            }
-            
+        guard let card = card else {
+            presentNeedsPrimaryCardAlert()
+            return
+        }
+        
+        guard let shippingAddress = shippingAddress else {
+            presentNeedsPrimaryShippingAddressAlert()
+            return
+        }
+        
+        if let cvv = card.cvv, !cvv.isEmpty {
             _view.orderButton.isLoading = true
             _view.orderButton.isEnabled = false
             
@@ -166,11 +171,17 @@ class CheckoutOrderViewController: BaseViewController {
             return
         }
         
-        guard let card = card, let shippingAddress = shippingAddress else {
+        guard let card = card else {
             dismiss(animated: true, completion: nil)
             confirmPaymentViewController = nil
-            
-            // TODO: present alert saying to select card or shipping address
+            presentNeedsPrimaryCardAlert()
+            return
+        }
+        
+        guard let shippingAddress = shippingAddress else {
+            dismiss(animated: true, completion: nil)
+            confirmPaymentViewController = nil
+            presentNeedsPrimaryShippingAddressAlert()
             return
         }
         
@@ -261,6 +272,22 @@ class CheckoutOrderViewController: BaseViewController {
             _view.nameLabel.text = shippingAddress.fullName
             _view.addressLabel.text = shippingAddress.readableAddress
         }
+    }
+    
+    // MARK: Alerts
+    
+    fileprivate func presentNeedsPrimaryCardAlert() {
+        // TODO: get copy from coren
+        let alertController = UIAlertController(title: "No Payment Method", message: "Please add a payment method.", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    fileprivate func presentNeedsPrimaryShippingAddressAlert() {
+        // TODO: get copy from coren
+        let alertController = UIAlertController(title: "No Shipping Address", message: "Please add a shipping address.", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
+        present(alertController, animated: true, completion: nil)
     }
 }
 

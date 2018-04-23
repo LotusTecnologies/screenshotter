@@ -58,6 +58,7 @@ class CartNavigationController: UINavigationController {
     // MARK: Form
     
     @objc fileprivate func paymentFormCompleted() {
+        // TODO: instead of using a target as the callback, make the validation happen within the class that way theres only one file needed to manage when to display the field error. then use a delegate to get to here saying it was successful
         guard let checkout = checkoutPaymentFormViewController,
             checkout.form.hasRequiredFields
             else {
