@@ -14,7 +14,7 @@ extension NSMutableAttributedString {
     /// SegmentedString is a localized string combination, all appending
     /// with an incremental index starting from 0. The attributes count
     /// represents the segmented string count.
-    convenience init(segmentedString string: String, attributes: [[String : Any]]) {
+    convenience init(segmentedString string: String, attributes: [[NSAttributedStringKey : Any]]) {
         guard attributes.count > 1 else {
             self.init(string: string, attributes: attributes.first)
             return
@@ -24,7 +24,7 @@ extension NSMutableAttributedString {
             return "\(string).\(index)".localized
         }
         
-        func nextAttributes(_ index: Int) -> [String : Any] {
+        func nextAttributes(_ index: Int) -> [NSAttributedStringKey : Any] {
             return attributes[index]
         }
         

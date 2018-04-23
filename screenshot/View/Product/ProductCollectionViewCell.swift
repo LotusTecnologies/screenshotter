@@ -37,10 +37,10 @@ class ProductCollectionViewCell : UICollectionViewCell {
         }
         set(newOriginalPrice){
             if let newString = newOriginalPrice, newString.lengthOfBytes(using: .utf8) > 0 {
-                let attributes: [String: Any] = [
-                    NSForegroundColorAttributeName : UIColor.gray6,
-                    NSStrikethroughStyleAttributeName : NSUnderlineStyle.styleSingle.rawValue,
-                    NSStrikethroughColorAttributeName:UIColor.gray6
+                let attributes: [NSAttributedStringKey: Any] = [
+                    NSAttributedStringKey.foregroundColor : UIColor.gray6,
+                    NSAttributedStringKey.strikethroughStyle : NSUnderlineStyle.styleSingle.rawValue,
+                    NSAttributedStringKey.strikethroughColor:UIColor.gray6
                 ]
                 self.originalPriceLabel?.attributedText = NSAttributedString.init(string: newString, attributes: attributes)
                 
@@ -159,7 +159,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             label.adjustsFontSizeToFitWidth = true
             label.layoutMargins = ProductCollectionViewCell.priceLabelLayoutMargins
             self.contentView.addSubview(label)
-            label.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+            label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
             
             label.addConstraint( NSLayoutConstraint.init(item: label, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: ProductCollectionViewCell.priceLabelHeight))
             
@@ -224,7 +224,7 @@ class ProductCollectionViewCell : UICollectionViewCell {
             label.text = "generic.buy".localized
             label.textColor = .crazeGreen
             label.textAlignment = .center
-            label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFontWeightMedium)
+            label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFont.Weight.medium)
             return label
         }()
         

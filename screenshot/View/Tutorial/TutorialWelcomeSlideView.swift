@@ -63,7 +63,7 @@ class TutorialWelcomeSlideView : HelperView {
 //            ])
         
         mutableString.append(attachmentString)
-        mutableString.addAttributes([NSForegroundColorAttributeName: UIColor.crazeRed], range: attachmentRange)
+        mutableString.addAttributes([NSAttributedStringKey.foregroundColor: UIColor.crazeRed], range: attachmentRange)
         
         return mutableString
     }

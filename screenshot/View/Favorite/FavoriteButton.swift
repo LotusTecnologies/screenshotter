@@ -56,7 +56,7 @@ class FavoriteButton: UIButton {
         }
     }
     
-    func selectAction() {
+    @objc func selectAction() {
         animate = true
         isSelected = !isSelected
         animate = false

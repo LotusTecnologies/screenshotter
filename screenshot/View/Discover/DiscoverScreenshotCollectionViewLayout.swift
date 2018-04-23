@@ -46,13 +46,13 @@ class DiscoverScreenshotCollectionViewLayout : UICollectionViewLayout {
     override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
         deletedItems = updateItems.filter({ collectionViewUpdateItem -> Bool in
             return collectionViewUpdateItem.updateAction == .delete
-        }).flatMap({ collectionViewUpdateItem -> IndexPath? in
+        }).compactMap({ collectionViewUpdateItem -> IndexPath? in
             return collectionViewUpdateItem.indexPathBeforeUpdate
         })
         
         insertedItems = updateItems.filter({ collectionViewUpdateItem -> Bool in
             return collectionViewUpdateItem.updateAction == .insert
-        }).flatMap({ collectionViewUpdateItem -> IndexPath? in
+        }).compactMap({ collectionViewUpdateItem -> IndexPath? in
             return collectionViewUpdateItem.indexPathAfterUpdate
         })
     }

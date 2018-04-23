@@ -59,7 +59,7 @@ class TappableTextView : UITextView {
             let range = NSRange(location: 0, length: attributedText.length)
             tappableLinks.removeAll()
             
-            attributedText.enumerateAttribute(NSLinkAttributeName, in: range, options: .longestEffectiveRangeNotRequired) { value, range, stop in
+            attributedText.enumerateAttribute(NSAttributedStringKey.link, in: range, options: .longestEffectiveRangeNotRequired) { value, range, stop in
                 guard let value = value else {
                     return
                 }

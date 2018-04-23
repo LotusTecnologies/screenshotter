@@ -86,7 +86,11 @@ extension ScreenshotsViewController{
     }
 }
 
-extension ScreenshotsViewController {
+extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
+    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
@@ -103,7 +107,13 @@ extension ScreenshotsViewController {
         super.viewWillAppear(animated)
         syncEmptyListView()
         self.updateHasNewScreenshot()
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
+            let campaign = CampaignPromotionViewController(modal:true)
+            campaign.delegate = self
+            self.present(campaign, animated: true, completion: nil)
+        }
     }
+    
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -115,13 +125,13 @@ extension ScreenshotsViewController {
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
     }
     
-    func applicationDidEnterBackground(_ notification:Notification){
+    @objc func applicationDidEnterBackground(_ notification:Notification){
         if self.isViewLoaded && self.view.window != nil {
             self.removeScreenshotHelperView()
         }
     }
     
-    func applicationWillEnterForeground(_ notification:Notification) {
+    @objc func applicationWillEnterForeground(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             syncEmptyListView()
             self.updateHasNewScreenshot()
@@ -129,7 +139,7 @@ extension ScreenshotsViewController {
         }
     }
     
-    func contentSizeCategoryDidChange(_ notification:Notification) {
+    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
                 self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ScreenshotsSection.notification.rawValue)])
@@ -197,7 +207,7 @@ extension ScreenshotsViewController {
         
     }
     
-    func refreshControlAction(_ refreshControl:UIRefreshControl){
+    @objc func refreshControlAction(_ refreshControl:UIRefreshControl){
         
         if (refreshControl.isRefreshing) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
@@ -206,7 +216,7 @@ extension ScreenshotsViewController {
         }
     }
     
-    func emptyListViewAllowAccessAction() {
+    @objc func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
             self.syncEmptyListView()
         }
@@ -301,7 +311,7 @@ extension ScreenshotsViewController {
                 let titleLabel = UILabel()
                 titleLabel.translatesAutoresizingMaskIntoConstraints = false
                 titleLabel.text = "screenshots.helper.title".localized
-                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightSemibold)
+                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.semibold)
                 titleLabel.numberOfLines = 0
                 contentView.addSubview(titleLabel)
                 titleLabel.topAnchor.constraint(equalTo:contentView.topAnchor).isActive = true
@@ -312,7 +322,7 @@ extension ScreenshotsViewController {
                 let descriptionLabel = UILabel()
                 descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
                 descriptionLabel.text = "screenshots.helper.byline".localized
-                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
+                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.light)
                 
                 descriptionLabel.numberOfLines = 0
                 contentView.addSubview(descriptionLabel)
@@ -344,7 +354,7 @@ extension ScreenshotsViewController {
 
 //Edit actions
 extension ScreenshotsViewController {
-    func editButtonAction() {
+    @objc func editButtonAction() {
         let isEditing = !self.isEditing
         
         if !isEditing {
@@ -447,7 +457,7 @@ extension ScreenshotsViewController {
         self.deleteButton?.deleteCount = self.toHideFromProductBarObjectIDs.count + self.deleteScreenshotObjectIDs.count
     }
     
-    func deleteButtonAction() {
+    @objc func deleteButtonAction() {
         setEditing(false, animated: true)
         
         if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
@@ -494,48 +504,52 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            if screenshot.shoppablesCount <= 0 {
-                //TODO: fix this when there is a better indciator of failure to load
-                let alertController = UIAlertController.init(title: "screenshots.share.error.title".localized, message: "screenshots.share.error.message".localized, preferredStyle: .alert)
-                alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
-                self.present(alertController, animated: true, completion: nil)
-                return
-            }
-            if let image = screenshot.uploadedImageURL {
+            let source = screenshot.source
+            let submittedDate = screenshot.submittedDate
+            let screenshotObjectId = screenshot.objectID
+            let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
+                    if !(source == .gallery || source == .share || source == .unknown) || submittedDate != nil {
+                        let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
+                        
+                        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
+                            AnalyticsTrackers.standard.track(.shareIncomplete)
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                    }else {
+                        screenshot.submitToDiscover()
+                        let thankYou = ThankYouForSharingViewController()
+                        thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
+                        self.present(thankYou, animated: true, completion: nil)
+                        AnalyticsTrackers.branch.track(.shareCompleted)
+                    }
+                }
                 
-                let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
-                
-                alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
-                    NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
-                    
-                    let thankYou = ThankYouForSharingViewController()
-                    thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
-                    self.present(thankYou, animated: true, completion: nil)
-                    AnalyticsTrackers.branch.track(.shareCompleted)
-                    
-                }))
-                alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.social".localized, style: .default, handler: { (a) in
+            }))
+            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.social".localized, style: .default, handler: { (a) in
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
                     self.presentSocailShare(screenshot: screenshot)
-                    
-                }))
-                alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
-                    AnalyticsTrackers.standard.track(.shareIncomplete)
-                }))
-                alert.popoverPresentationController?.sourceView = self.view
+                }
                 
-                self.present(alert, animated: true, completion: nil)
-                
-            }else{
-                self.presentSocailShare(screenshot: screenshot)
-            }
+            }))
+            alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
+                AnalyticsTrackers.standard.track(.shareIncomplete)
+            }))
+            alert.popoverPresentationController?.sourceView = self.view
+            
+            self.present(alert, animated: true, completion: nil)
+            
+            
             AnalyticsTrackers.standard.track(.sharedScreenshot)
-        
+            
     
         }
         
     }
         
-    func thankYouForSharingViewDidClose(_ sender: Any) {
+    @objc func thankYouForSharingViewDidClose(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -657,7 +671,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         
     }
     
-    func accumulatorModelNumberDidChange( _ notification: Notification) {
+    @objc func accumulatorModelNumberDidChange( _ notification: Notification) {
         
         if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
@@ -850,6 +864,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         cell.delegate = self
         cell.contentView.backgroundColor = collectionView.backgroundColor
         cell.isShamrock = screenshot?.isShamrockVersion ?? false
+        cell.likes = Int(screenshot?.submittedFeedbackCount ?? 0)
         cell.screenshot = screenshot
         cell.isBadgeEnabled = screenshot?.isNew ?? false
         cell.isEditing = self.isEditing

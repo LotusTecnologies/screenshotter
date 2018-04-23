@@ -27,7 +27,7 @@ class TextFieldTableViewCell : UITableViewCell {
         textField.adjustsFontForContentSizeCategory = true
         textField.tintColor = .crazeGreen
         contentView.addSubview(textField)
-        textField.setContentCompressionResistancePriority(1, for: .vertical)
+        textField.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1), for: .vertical)
         textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         textField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         textField.centerYAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerYAnchor).isActive = true

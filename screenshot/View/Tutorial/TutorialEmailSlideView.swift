@@ -43,7 +43,7 @@ public class TutorialEmailSlideView : HelperView {
         contentView.addSubview(paddingView1)
         paddingView1.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         let paddingView1HeightConstraint = paddingView1.heightAnchor.constraint(equalToConstant: .extendedPadding)
-        paddingView1HeightConstraint.priority = UILayoutPriorityDefaultLow
+        paddingView1HeightConstraint.priority = UILayoutPriority.defaultLow
         paddingView1HeightConstraint.isActive = true
         
         setupTextField(nameTextField)
@@ -74,15 +74,15 @@ public class TutorialEmailSlideView : HelperView {
         contentView.addSubview(paddingView2)
         paddingView2.topAnchor.constraint(equalTo: emailTextField.bottomAnchor).isActive = true
         let paddingView2HeightConstraint = paddingView2.heightAnchor.constraint(equalToConstant: .extendedPadding)
-        paddingView2HeightConstraint.priority = UILayoutPriorityDefaultLow
+        paddingView2HeightConstraint.priority = UILayoutPriority.defaultLow
         paddingView2HeightConstraint.isActive = true
         
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("generic.submit".localized, for: .normal)
         button.addTarget(self, action: #selector(submitEmail), for: .touchUpInside)
         contentView.addSubview(button)
-        button.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        button.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        button.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
+        button.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         button.topAnchor.constraint(equalTo: paddingView2.bottomAnchor, constant: .extendedPadding).isActive = true
         button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor).isActive = true
         button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
@@ -98,9 +98,9 @@ public class TutorialEmailSlideView : HelperView {
         textView.isScrollEnabled = false
         textView.scrollsToTop = false
         textView.linkTextAttributes = [
-            NSForegroundColorAttributeName: linkTextColor,
-            NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-            NSUnderlineColorAttributeName: linkTextColor
+            NSAttributedStringKey.foregroundColor.rawValue: linkTextColor,
+            NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
+            NSAttributedStringKey.underlineColor.rawValue: linkTextColor
         ]
         textView.attributedText = {
             let textViewFont: UIFont = .preferredFont(forTextStyle: .footnote)
@@ -108,14 +108,14 @@ public class TutorialEmailSlideView : HelperView {
             let paragraph = NSMutableParagraphStyle()
             paragraph.alignment = .center
             
-            func attributes(_ link: String? = nil) -> [String : Any] {
-                var attributes: [String : Any] = [
-                    NSFontAttributeName: textViewFont,
-                    NSParagraphStyleAttributeName: paragraph
+            func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
+                var attributes: [NSAttributedStringKey : Any] = [
+                    NSAttributedStringKey.font: textViewFont,
+                    NSAttributedStringKey.paragraphStyle: paragraph
                 ]
                 
                 if let link = link {
-                    attributes[NSLinkAttributeName] = link
+                    attributes[NSAttributedStringKey.link] = link
                 }
                 
                 return attributes
@@ -130,7 +130,7 @@ public class TutorialEmailSlideView : HelperView {
                 ])
         }()
         contentView.addSubview(textView)
-        textView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        textView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         textView.topAnchor.constraint(greaterThanOrEqualTo:button.bottomAnchor, constant: .extendedPadding).isActive = true
         textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
@@ -158,8 +158,8 @@ public class TutorialEmailSlideView : HelperView {
         textField.borderStyle = .none
         textField.spellCheckingType = .no
         textField.autocorrectionType = .no
-        textField.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .vertical)
-        textField.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        textField.setContentHuggingPriority(UILayoutPriority.defaultLow, for: .vertical)
+        textField.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false

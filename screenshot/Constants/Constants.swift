@@ -25,7 +25,7 @@ class Constants {
     static let defaultAnimationDuration = 0.25
     
     // DB
-    static let currentMomVersion = 12
+    static let currentMomVersion = 14
     
     // Syte
     static let syteAccountId = 6677

@@ -12,6 +12,18 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
+"2018_04_20_campaign.headline" = "Win up to $1,000";
+"2018_04_20_campaign.body" = "Every week we are announcing new winners. Submit your favorite looks to discover. Submit as many times as you like.";
+"2018_04_20_campaign.button" = "Learn More";
+"2018_04_20_campaign.instructions.headline" = "Share and Win!";
+"2018_04_20_campaign.instructions.step_1" = "Make sure you have notifications enabled and a valid email address";
+"2018_04_20_campaign.instructions.step_2" = "Add a fashion photo from your Gallery to your Screenshop Homescreen";
+"2018_04_20_campaign.instructions.step_3" = "Tap Share -> Share to Discover";
+"2018_04_20_campaign.instructions.step_4" = "Submit as many images as you like";
+"2018_04_20_campaign.instructions.step_5" = "Follow us on Instagram to see when we announce the winners";
+"2018_04_20_campaign.instructions.button" = "Video Explanation";
+
+
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
@@ -79,6 +91,7 @@
 "generic.ok" = "OK";
 "generic.sale" = "SALE";
 "generic.setup" = "Setup";
+"generic.skip" = "skip";
 "generic.submit" = "Submit";
 "generic.update" = "Update";
 "generic.yes" = "Yes";
@@ -186,6 +199,7 @@
 "share_to_discover.action_sheet.discover" = "Post on Discover";
 "share_to_discover.action_sheet.title" = "Share";
 "share_to_discover.action_sheet.message" = "Add this to Discover so other users can shop your screenshot!";
+"share_to_discover.action_sheet.error.alread_shared" = "This screenshot is already on Discover";
 
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.in_app_purchase.restore" = "In app purchases have been restored successfully";
