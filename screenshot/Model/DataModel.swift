@@ -797,7 +797,26 @@ extension DataModel {
         }
         return false
     }
-    
+
+    // Must be run from main thread!!
+    func hasShippingAddresses() -> Bool {
+        let fetchRequest: NSFetchRequest<ShippingAddress> = ShippingAddress.fetchRequest()
+        fetchRequest.predicate = nil
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        fetchRequest.includesSubentities = false
+        fetchRequest.includesPropertyValues = false
+        
+        do {
+            let count = try mainMoc().count(for: fetchRequest)
+            return count > 0
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("hasShippingAddresses results with error:\(error)")
+        }
+        return false
+    }
+
     // Returns a Promise of the saved ShippingAddress that should be used only on the main thread.
     func saveShippingAddress(firstName: String?,
                              lastName: String?,
