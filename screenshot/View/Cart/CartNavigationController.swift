@@ -69,7 +69,7 @@ class CartNavigationController: UINavigationController {
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
         let canSave = checkout.addCard { [weak self] didSave in
-            if isShipToSameAddressChecked {
+            if isShipToSameAddressChecked || DataModel.sharedInstance.hasShippingAddresses() {
                 self?.navigateToCheckoutOrder()
             }
             else {
@@ -171,7 +171,7 @@ extension CartNavigationController: UINavigationControllerDelegate {
 extension CartNavigationController: CartViewControllerDelegate {
     func cartViewControllerDidValidateCart(_ viewController: CartViewController) {
         let hasCard = DataModel.sharedInstance.hasSavedCards()
-        let hasAddress = true // TODO:
+        let hasAddress = DataModel.sharedInstance.hasShippingAddresses()
         
         if hasCard && hasAddress {
             navigateToCheckoutOrder()
