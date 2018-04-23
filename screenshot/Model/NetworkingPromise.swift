@@ -378,8 +378,8 @@ class NetworkingPromise : NSObject {
         return (firstName, lastName)
     }
     
-    func nativeCheckout(remoteId: String, card: Card, shippingAddress: ShippingAddress) -> Promise<[String : Any]> {
-        guard let url = URL(string: Constants.shoppableDomain + "/token/\(Constants.shoppableToken)/checkout") else {
+    func nativeCheckout(remoteId: String, card: Card, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
+        guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableDomain:\(Constants.shoppableDomain)"])
             return Promise(error: error)
         }
@@ -394,31 +394,31 @@ class NetworkingPromise : NSObject {
         let billingLastName = tuple.1
         let jsonObject: [String : Any] = [
             "billing_city" : card.city ?? "",
-            "billing_country" : card.country ?? "",
+            "billing_country" : card.country ?? "", //TODO: "US"
             "billing_email" : card.email ?? "",
             "billing_first_name" : billingFirstName,
             "billing_last_name" : billingLastName,
             "billing_phone" : card.phone ?? "",
             "billing_postal_code" : card.zipCode ?? "",
-            "billing_state" : card.state ?? "",
+            "billing_state" : card.state ?? "", //TODO: "GA"
             "billing_street1" : card.street ?? "",
             "billing_street2" : "",
             "card_name" : card.fullName ?? "",
-            "card_number" : card.number ?? "",
+            "card_number" : card.retrieveCardNumber() ?? "",
             "cartId" : remoteId,
             "currency" : "USD",
-            "expiry_month" : card.expirationMonth,
-            "expiry_year" : card.expirationYear,
+            "expiry_month" : "\(card.expirationMonth)",
+            "expiry_year" : "\(card.expirationYear)",
             "referer" : "http://screenshopit.com",
             "security_code" : card.cvv ?? "",
             "shipping_city" : shippingAddress.city ?? "",
-            "shipping_country" : shippingAddress.country ?? "",
-            "shipping_email" : "",
+            "shipping_country" : shippingAddress.country ?? "", //TODO: "US"
+            "shipping_email" : card.email ?? "",
             "shipping_first_name" : shippingAddress.firstName ?? "",
             "shipping_last_name" : shippingAddress.lastName ?? "",
             "shipping_phone" : shippingAddress.phone ?? "",
             "shipping_postal_code" : shippingAddress.zipCode ?? "",
-            "shipping_state" : shippingAddress.state ?? "",
+            "shipping_state" : shippingAddress.state ?? "", //TODO: "NY"
             "shipping_street1" : shippingAddress.street ?? "",
             "shipping_street2" : ""
         ]
@@ -426,23 +426,57 @@ class NetworkingPromise : NSObject {
         print("nativeCheckout requesting url:\(url)  headers:\(String(describing: request.allHTTPHeaderFields))  data:\(String(data: request.httpBody!, encoding: .utf8) ?? "-")")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<[String : Any]> in
-            print("nativeCheckout received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
-            guard let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode >= 200,
-                httpResponse.statusCode <  300 else {
-                    let error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "nativeCheckout invalid http statusCode for url:\(url)"])
-                    print("nativeCheckout httpResponse.statusCode error")
-                    return Promise(error: error)
-            }
-            if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                print("GMK nativeCheckout received jsonObject:\(jsonObject)")
-                return Promise(value: jsonObject)
-            } else {
-                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "nativeCheckout JSONSerialize failed for url:\(url)"])
-                print("nativeCheckout failed to JSONSerialize data.count:\(data.count)")
-                return Promise(error: error)
-            }
+        return sendAndParseNativeCheckout(request: request)
+    }
+    
+    func sendAndParseNativeCheckout(request: URLRequest) -> Promise<[[String : Any]]> {
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForResource = 60
+        return Promise<[[String : Any]]> { fulfill, reject in
+            let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request, completionHandler: { (data, response, error) in
+                var dataContentString = ""
+                var dataContentCount = 0
+                if let dataContent = data, let contentString = String(data: dataContent, encoding: .utf8) {
+                    dataContentString = contentString
+                    dataContentCount = dataContent.count
+                }
+                print("sendAndParseNativeCheckout dataCount:\(dataContentCount)  dataString:\(dataContentString)  response:\(String(describing: response))  error:\(String(describing: error))")
+                if let error = error {
+                    print("sendAndParseNativeCheckout received error:\(error)")
+                    reject(error)
+                    return
+                }
+                guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode >= 200,
+                  httpResponse.statusCode <  300 else {
+                    let error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout invalid http statusCode for url:\(String(describing: request.url))"])
+                    print("sendAndParseNativeCheckout httpResponse.statusCode error")
+                    reject(error)
+                    return
+                }
+                guard let data = data else {
+                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout empty data for url:\(String(describing: request.url))"])
+                    print("sendAndParseNativeCheckout empty data")
+                    reject(error)
+                    return
+                }
+                do {
+                    guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [[String : Any]] else {
+                        let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize failed for url:\(String(describing: request.url))"])
+                        print("sendAndParseNativeCheckout failed to JSONSerialize")
+                        reject(error)
+                        return
+                    }
+                    print("GMK sendAndParseNativeCheckout successfully parsed jsonObject:\(jsonObject)")
+                    fulfill(jsonObject)
+                } catch {
+                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize exception for url:\(String(describing: request.url))"])
+                    print("sendAndParseNativeCheckout exception on JSONSerialize")
+                    reject(error)
+                }
+                
+            })
+            dataTask.resume()
         }
     }
     

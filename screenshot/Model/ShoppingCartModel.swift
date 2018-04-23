@@ -330,7 +330,7 @@ class ShoppingCartModel {
             dataModel.retrieveForNativeCheckout()
             }
             // Wait for network to return response for processing nativeCheckout.
-            .then { remoteId -> Promise<[String : Any]> in
+            .then { remoteId -> Promise<[[String : Any]]> in
                 rememberRemoteId = remoteId
                 return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, shippingAddress: shippingAddress)
             }
