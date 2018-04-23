@@ -153,6 +153,12 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
             return false
         }
         
+        if let primaryShippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL) {
+            if primaryShippingURL == shippingAddress.objectID.uriRepresentation() {
+                UserDefaults.standard.set(nil, forKey: Constants.checkoutPrimaryAddressURL)
+            }
+        }
+        
         shippingAddress.delete()
         
         return true

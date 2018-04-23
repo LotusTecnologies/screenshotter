@@ -15,7 +15,7 @@ enum CreditCardBrand: String {
     case JCB        = "JCB"
     case Mastercard = "Mastercard"
     case Visa       = "Visa"
-    case unknown    = "unknown"
+    case unknown    = ""
     
     init(withTypeName typeName: String) {
         switch typeName {

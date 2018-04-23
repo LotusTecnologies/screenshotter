@@ -57,24 +57,19 @@ class CartNavigationController: UINavigationController {
     
     // MARK: Form
     
-    private var cvv: String?
-    
     @objc fileprivate func paymentFormCompleted() {
         guard let checkout = checkoutPaymentFormViewController,
-            checkout.form.hasRequiredFields,
-            let cardCVV = checkout.formRow(.cardCVV)?.value
+            checkout.form.hasRequiredFields
             else {
                 // TODO: highlight error fields
                 return
         }
         
-        cvv = cardCVV
-        
         let addressShip = checkout.formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
         let canSave = checkout.addCard { [weak self] didSave in
-            if isShipToSameAddressChecked {
+            if isShipToSameAddressChecked || DataModel.sharedInstance.hasShippingAddresses() {
                 self?.navigateToCheckoutOrder()
             }
             else {
@@ -137,11 +132,8 @@ class CartNavigationController: UINavigationController {
     
     fileprivate func navigateToCheckoutOrder() {
         let checkoutOrderViewController = CheckoutOrderViewController()
-        checkoutOrderViewController.cvv = cvv
         checkoutOrderViewController.hidesBottomBarWhenPushed = true
         pushViewController(checkoutOrderViewController, animated: true)
-        
-        cvv = nil
     }
 }
 
@@ -179,7 +171,7 @@ extension CartNavigationController: UINavigationControllerDelegate {
 extension CartNavigationController: CartViewControllerDelegate {
     func cartViewControllerDidValidateCart(_ viewController: CartViewController) {
         let hasCard = DataModel.sharedInstance.hasSavedCards()
-        let hasAddress = true // TODO:
+        let hasAddress = DataModel.sharedInstance.hasShippingAddresses()
         
         if hasCard && hasAddress {
             navigateToCheckoutOrder()
