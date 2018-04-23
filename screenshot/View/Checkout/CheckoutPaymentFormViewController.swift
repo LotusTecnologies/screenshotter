@@ -137,13 +137,21 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         restorationIdentifier = String(describing: type(of: self))
         
         generateButtons(withEditLayout: isEditLayout)
+        
+        if isEditLayout {
+            continueButton.addTarget(self, action: #selector(updateCard), for: .touchUpInside)
+            deleteButton?.addTarget(self, action: #selector(removeCard), for: .touchUpInside)
+        }
+        else {
+            continueButton.addTarget(self, action: #selector(addCard), for: .touchUpInside)
+        }
     }
     
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
     }
     
-    func addCard(withAlertCallback alertCallback: @escaping (_ didSave: Bool)->()) -> Bool {
+    @objc fileprivate func addCard() {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
@@ -158,7 +166,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             else {
                 // TODO: highlight fields with errors
-                return false
+                return
         }
         
         let email = formRow(.email)?.value
@@ -185,7 +193,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                 }
             }
             
-            alertCallback(saveCard)
+            delegate?.checkoutFormViewControllerDidAdd(self)
         }
         
         let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
@@ -198,11 +206,9 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         }))
         alertController.preferredAction = saveAlertAction
         present(alertController, animated: true, completion: nil)
-        
-        return true
     }
     
-    @discardableResult func updateCard() -> Bool {
+    @objc fileprivate func updateCard() {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
@@ -218,7 +224,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let card = card
             else {
                 // TODO: highlight fields with errors
-                return false
+                return
         }
         
         let email = formRow(.email)?.value
@@ -227,12 +233,12 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
         card.cvv = cardCVV
         
-        return true
+        delegate?.checkoutFormViewControllerDidEdit(self)
     }
     
-    @discardableResult func deleteCard() -> Bool {
+    @objc fileprivate func removeCard() {
         guard let card = card else {
-            return false
+            return
         }
         
         if let primaryCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL) {
@@ -243,6 +249,6 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         card.delete()
         
-        return true
+        delegate?.checkoutFormViewControllerDidRemove(self)
     }
 }

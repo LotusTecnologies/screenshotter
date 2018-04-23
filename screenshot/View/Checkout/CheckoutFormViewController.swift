@@ -8,7 +8,20 @@
 
 import UIKit
 
+protocol CheckoutFormViewControllerDelegate: NSObjectProtocol {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController)
+    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController)
+    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController)
+}
+
+extension CheckoutFormViewControllerDelegate {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {}
+    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {}
+    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {}
+}
+
 class CheckoutFormViewController: FormViewController {
+    weak var delegate: CheckoutFormViewControllerDelegate?
     let continueButton = MainButton()
     private(set) var deleteButton: MainButton?
     

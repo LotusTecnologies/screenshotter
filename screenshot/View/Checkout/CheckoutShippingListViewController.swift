@@ -77,7 +77,7 @@ class CheckoutShippingListViewController: BaseViewController {
     
     @objc fileprivate func addButtonAction() {
         let shippingFormViewController = CheckoutShippingFormViewController()
-        shippingFormViewController.continueButton.addTarget(self, action: #selector(addAddressAction), for: .touchUpInside)
+        shippingFormViewController.delegate = self
         navigationController?.pushViewController(shippingFormViewController, animated: true)
     }
     
@@ -88,45 +88,22 @@ class CheckoutShippingListViewController: BaseViewController {
         
         let shippingAddress = shippingFrc?.object(at: indexPath)
         let shippingFormViewController = CheckoutShippingFormViewController(withShippingAddress: shippingAddress)
-        shippingFormViewController.continueButton.addTarget(self, action: #selector(updateAddressAction), for: .touchUpInside)
-        shippingFormViewController.deleteButton?.addTarget(self, action: #selector(deleteAddressAction), for: .touchUpInside)
+        shippingFormViewController.delegate = self
         navigationController?.pushViewController(shippingFormViewController, animated: true)
     }
-    
-    @objc fileprivate func addAddressAction() {
-        guard let shippingFormViewController = navigationController?.topViewController as? CheckoutShippingFormViewController else {
-            return
-        }
-        
-        let didAddAddress = shippingFormViewController.addShippingAddress()
-        
-        if didAddAddress {
-            navigationController?.popViewController(animated: true)
-        }
+}
+
+extension CheckoutShippingListViewController: CheckoutFormViewControllerDelegate {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
+        navigationController?.popViewController(animated: true)
     }
     
-    @objc fileprivate func updateAddressAction() {
-        guard let shippingFormViewController = navigationController?.topViewController as? CheckoutShippingFormViewController else {
-            return
-        }
-        
-        let didUpdateAddress = shippingFormViewController.updateShippingAddress()
-        
-        if didUpdateAddress {
-            navigationController?.popViewController(animated: true)
-        }
+    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {
+        navigationController?.popViewController(animated: true)
     }
     
-    @objc fileprivate func deleteAddressAction() {
-        guard let shippingFormViewController = navigationController?.topViewController as? CheckoutShippingFormViewController else {
-            return
-        }
-        
-        let didDeleteAddress = shippingFormViewController.deleteShippingAddress()
-        
-        if didDeleteAddress {
-            navigationController?.popViewController(animated: true)
-        }
+    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {
+        navigationController?.popViewController(animated: true)
     }
 }
 

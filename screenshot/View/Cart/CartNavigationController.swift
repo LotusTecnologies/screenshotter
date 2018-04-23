@@ -10,8 +10,6 @@ import UIKit
 
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
-    fileprivate var checkoutPaymentFormViewController: CheckoutPaymentFormViewController?
-    fileprivate var checkoutShippingFormViewController: CheckoutShippingFormViewController?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -55,50 +53,6 @@ class CartNavigationController: UINavigationController {
         cartViewController.delegate = nil
     }
     
-    // MARK: Form
-    
-    @objc fileprivate func paymentFormCompleted() {
-        // TODO: instead of using a target as the callback, make the validation happen within the class that way theres only one file needed to manage when to display the field error. then use a delegate to get to here saying it was successful
-        guard let checkout = checkoutPaymentFormViewController,
-            checkout.form.hasRequiredFields
-            else {
-                // TODO: highlight error fields
-                return
-        }
-        
-        let addressShip = checkout.formRow(.addressShip)?.value
-        let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
-        
-        let canSave = checkout.addCard { [weak self] didSave in
-            if isShipToSameAddressChecked || DataModel.sharedInstance.hasShippingAddresses() {
-                self?.navigateToCheckoutOrder()
-            }
-            else {
-                self?.navigateToCheckoutShippingForm()
-            }
-        }
-        
-        if canSave {
-            checkoutPaymentFormViewController = nil
-        }
-    }
-    
-    @objc fileprivate func shippingFormCompleted() {
-        guard let shipping = checkoutShippingFormViewController,
-            shipping.form.hasRequiredFields
-            else {
-                // TODO: highlight error fields
-                return
-        }
-        
-        let didSave = shipping.addShippingAddress()
-        
-        if didSave {
-            navigateToCheckoutOrder()
-            checkoutShippingFormViewController = nil
-        }
-    }
-    
     // MARK: Navigation
     
     @objc private func dismissViewController() {
@@ -110,12 +64,10 @@ class CartNavigationController: UINavigationController {
         backBarButtonItem.title = cartViewController.title
         
         let checkoutPaymentFormViewController = CheckoutPaymentFormViewController()
+        checkoutPaymentFormViewController.delegate = self
         checkoutPaymentFormViewController.hidesBottomBarWhenPushed = true
         checkoutPaymentFormViewController.navigationItem.backBarButtonItem = backBarButtonItem
-        checkoutPaymentFormViewController.continueButton.addTarget(self, action: #selector(paymentFormCompleted), for: .touchUpInside)
         pushViewController(checkoutPaymentFormViewController, animated: true)
-        
-        self.checkoutPaymentFormViewController = checkoutPaymentFormViewController
     }
     
     fileprivate func navigateToCheckoutShippingForm() {
@@ -123,18 +75,35 @@ class CartNavigationController: UINavigationController {
         backBarButtonItem.title = cartViewController.title
         
         let checkoutShippingFormViewController = CheckoutShippingFormViewController()
+        checkoutShippingFormViewController.delegate = self
         checkoutShippingFormViewController.hidesBottomBarWhenPushed = true
         checkoutShippingFormViewController.navigationItem.backBarButtonItem = backBarButtonItem
-        checkoutShippingFormViewController.continueButton.addTarget(self, action: #selector(shippingFormCompleted), for: .touchUpInside)
         pushViewController(checkoutShippingFormViewController, animated: true)
-        
-        self.checkoutShippingFormViewController = checkoutShippingFormViewController
     }
     
     fileprivate func navigateToCheckoutOrder() {
         let checkoutOrderViewController = CheckoutOrderViewController()
         checkoutOrderViewController.hidesBottomBarWhenPushed = true
         pushViewController(checkoutOrderViewController, animated: true)
+    }
+}
+
+extension CartNavigationController: CheckoutFormViewControllerDelegate {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
+        if let checkout = viewController as? CheckoutPaymentFormViewController {
+            let addressShip = checkout.formRow(.addressShip)?.value
+            let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
+            
+            if isShipToSameAddressChecked || DataModel.sharedInstance.hasShippingAddresses() {
+                navigateToCheckoutOrder()
+            }
+            else {
+                navigateToCheckoutShippingForm()
+            }
+        }
+        else if let _ = viewController as? CheckoutShippingFormViewController {
+            navigateToCheckoutOrder()
+        }
     }
 }
 
