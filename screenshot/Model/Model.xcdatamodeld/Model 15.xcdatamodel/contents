@@ -12,7 +12,7 @@
     </entity>
     <entity name="Card" representedClassName="Card" parentEntity="Address" syncable="YES" codeGenerationType="class">
         <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="cvv" optional="YES" transient="YES" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="cvv" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateLastSuccessfulUse" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="displayNumber" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
