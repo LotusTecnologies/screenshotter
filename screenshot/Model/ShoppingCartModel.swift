@@ -295,15 +295,24 @@ class ShoppingCartModel {
         }
     }
     
-    func hostedCompleted(remoteId: String, from: String) {
+    func hostedCompleted(remoteId: String, from: String, cardOID: NSManagedObjectID? = nil) {
         print("hostedCompleted remoteId:\(remoteId)  from:\(from)")
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { managedObjectContext in
             if let cart = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
                 cart.isPastOrder = true
-                cart.dateSubmitted = Date()
+                let now = Date()
+                cart.dateSubmitted = now
                 // Write to items without changing anything, so the cartItemFrc is updated.
                 (cart.items?.sortedArray(using: []) as? [CartItem])?.forEach { $0.errorMask = $0.errorMask }
+                if let cardOID = cardOID,
+                  let card = managedObjectContext.object(with: cardOID) as? Card {
+                    if card.isSaved {
+                        card.dateLastSuccessfulUse = now
+                    } else {
+                        card.delete()
+                    }
+                }
                 managedObjectContext.saveIfNeeded()
                 print("hostedCompleted cart:\(cart)")
             } else {
@@ -315,6 +324,7 @@ class ShoppingCartModel {
     func nativeCheckout(card: Card, shippingAddress: ShippingAddress) -> Promise<Bool> {
         // Get cart remoteId, or error.
         var rememberRemoteId = ""
+        let cardOID = card.objectID
         let dataModel = DataModel.sharedInstance
         return firstly {
             dataModel.retrieveForNativeCheckout()
@@ -327,7 +337,7 @@ class ShoppingCartModel {
             //
             .then { nativeCheckoutResponseDict -> Promise<Bool> in
                 print("nativeCheckoutResponseDict:\(nativeCheckoutResponseDict)")
-                self.hostedCompleted(remoteId: rememberRemoteId, from: "nativeCheckout")
+                self.hostedCompleted(remoteId: rememberRemoteId, from: "nativeCheckout", cardOID: cardOID)
                 return Promise(value: true) // TODO: GMK Change to Void? True if saved?
         }
     }
