@@ -147,7 +147,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
-//            let cardCVV = formRow(.cardCVV)?.value,
+            let cardCVV = formRow(.cardCVV)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressCity = formRow(.addressCity)?.value,
             let addressCountry = formRow(.addressCountry)?.value,
@@ -169,6 +169,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         func performAction(withSavingCard saveCard: Bool) {
             DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
                 .then { card -> Void in
+                    card.cvv = cardCVV
+                    
                     let cardURL = card.objectID.uriRepresentation()
                     UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
                     UserDefaults.standard.synchronize()
