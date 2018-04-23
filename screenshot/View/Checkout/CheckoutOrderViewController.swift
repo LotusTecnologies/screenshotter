@@ -8,12 +8,15 @@
 
 import UIKit
 import CreditCardValidator
+import CoreData
 
 class CheckoutOrderViewController: BaseViewController {
     fileprivate var card: Card?
     fileprivate var shippingAddress: ShippingAddress?
     fileprivate var confirmPaymentViewController: CheckoutConfirmPaymentViewController?
     fileprivate var cartItems: [CartItem]?
+    fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
+    fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
     
     // MARK: View
     
@@ -40,6 +43,9 @@ class CheckoutOrderViewController: BaseViewController {
         
         title = "Place Your Order"
         restorationIdentifier = String(describing: type(of: self))
+        
+        cardFrc = DataModel.sharedInstance.cardFrc(delegate: self)
+        shippingAddressFrc = DataModel.sharedInstance.shippingAddressFrc(delegate: self)
     }
     
     override func viewDidLoad() {
@@ -92,35 +98,8 @@ class CheckoutOrderViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        card = nil
-        shippingAddress = nil
-        
-        _view.nameLabel.text = nil
-        _view.addressLabel.text = nil
-        _view.cardLabel.text = nil
-        
-        if let shippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
-            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: shippingURL),
-            let shippingAddress = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID)
-        {
-            self.shippingAddress = shippingAddress
-            _view.nameLabel.text = shippingAddress.fullName
-            _view.addressLabel.text = shippingAddress.readableAddress
-        }
-        
-        if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
-            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL),
-            let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID)
-        {
-            self.card = card
-            
-            if let displayNumber = card.displayNumber,
-                let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber),
-                let brand = card.brand
-            {
-                _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
-            }
-        }
+        syncPrimaryCard()
+        syncPrimaryShippingAddress()
     }
     
     deinit {
@@ -142,7 +121,7 @@ class CheckoutOrderViewController: BaseViewController {
     // MARK: Order
     
     @objc fileprivate func orderAction() {
-        if card?.cvv != 0 {
+        if let cvv = card?.cvv, !cvv.isEmpty {
             guard let card = card, let shippingAddress = shippingAddress else {
                 // TODO: present alert saying to select card or shipping address
                 return
@@ -182,12 +161,9 @@ class CheckoutOrderViewController: BaseViewController {
     }
     
     @objc fileprivate func confirmOrderAction() {
-        guard let cvvString = confirmPaymentViewController?.cvvTextField.text,
-            !cvvString.isEmpty,
-            let cvv = Int16(cvvString)
-            else {
-                confirmPaymentViewController?.displayCVVError()
-                return
+        guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
+            confirmPaymentViewController?.displayCVVError()
+            return
         }
         
         guard let card = card, let shippingAddress = shippingAddress else {
@@ -224,6 +200,68 @@ class CheckoutOrderViewController: BaseViewController {
         
         // TODO: analytics
     }
+    
+    // MARK: Primary Selection
+    
+    fileprivate func syncPrimaryCard() {
+        self.card = nil
+        _view.cardLabel.text = nil
+        
+        // There is a race condition with savign the first card and the view appearing.
+        // If the FRC has only one item, use that as the primary.
+        var card: Card?
+        
+        if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL)
+        {
+            card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID)
+        }
+        else if cardFrc?.fetchedObjectsCount == 1 {
+            card = cardFrc?.fetchedObjects.first
+        }
+        
+        if let card = card {
+            self.card = card
+            
+            if let displayNumber = card.displayNumber,
+                let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber)
+            {
+                let brand: String
+                
+                if let b = card.brand, !b.isEmpty {
+                    brand = b
+                }
+                else {
+                    brand = "Card"
+                }
+                
+                _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
+            }
+        }
+    }
+    
+    fileprivate func syncPrimaryShippingAddress() {
+        self.shippingAddress = nil
+        _view.nameLabel.text = nil
+        _view.addressLabel.text = nil
+        
+        var shippingAddress: ShippingAddress?
+        
+        if let shippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: shippingURL)
+        {
+            shippingAddress = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID)
+        }
+        else if shippingAddressFrc?.fetchedObjectsCount == 1 {
+            shippingAddress = shippingAddressFrc?.fetchedObjects.first
+        }
+        
+        if let shippingAddress = shippingAddress {
+            self.shippingAddress = shippingAddress
+            _view.nameLabel.text = shippingAddress.fullName
+            _view.addressLabel.text = shippingAddress.readableAddress
+        }
+    }
 }
 
 extension CheckoutOrderViewController: UITableViewDataSource {
@@ -254,5 +292,18 @@ extension CheckoutOrderViewController: UITableViewDataSource {
         }
         
         return description
+    }
+}
+
+extension CheckoutOrderViewController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        if isViewLoaded {
+            if controller == cardFrc {
+                syncPrimaryCard()
+            }
+            else if controller == shippingAddressFrc {
+                syncPrimaryShippingAddress()
+            }
+        }
     }
 }

@@ -231,6 +231,12 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             return false
         }
         
+        if let primaryCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL) {
+            if primaryCardURL == card.objectID.uriRepresentation() {
+                UserDefaults.standard.set(nil, forKey: Constants.checkoutPrimaryCardURL)
+            }
+        }
+        
         card.delete()
         
         return true
