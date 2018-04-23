@@ -98,13 +98,21 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         restorationIdentifier = String(describing: type(of: self))
         
         generateButtons(withEditLayout: isEditLayout)
+        
+        if isEditLayout {
+            continueButton.addTarget(self, action: #selector(updateShippingAddress), for: .touchUpInside)
+            deleteButton?.addTarget(self, action: #selector(removeShippingAddress), for: .touchUpInside)
+        }
+        else {
+            continueButton.addTarget(self, action: #selector(addShippingAddress), for: .touchUpInside)
+        }
     }
     
     func formRow(_ key: CheckoutShippingFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
     }
     
-    @discardableResult func addShippingAddress() -> Bool {
+    @objc fileprivate func addShippingAddress() {
         guard let addressCity = formRow(.addressCity)?.value,
             let addressCountry = formRow(.addressCountry)?.value,
             let addressState = formRow(.addressState)?.value,
@@ -115,7 +123,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
             let phone = formRow(.phoneNumber)?.value
             else {
                 // TODO: highlight fields with errors
-                return false
+                return
         }
         
         DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
@@ -125,10 +133,10 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 UserDefaults.standard.synchronize()
         }
         
-        return true
+        delegate?.checkoutFormViewControllerDidAdd(self)
     }
     
-    @discardableResult func updateShippingAddress() -> Bool {
+    @objc fileprivate func updateShippingAddress() {
         guard let addressCity = formRow(.addressCity)?.value,
             let addressCountry = formRow(.addressCountry)?.value,
             let addressState = formRow(.addressState)?.value,
@@ -140,17 +148,17 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
             let shippingAddress = shippingAddress
             else {
                 // TODO: highlight fields with errors
-                return false
+                return
         }
         
         shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
         
-        return true
+        delegate?.checkoutFormViewControllerDidEdit(self)
     }
     
-    @discardableResult func deleteShippingAddress() -> Bool {
+    @objc fileprivate func removeShippingAddress() {
         guard let shippingAddress = shippingAddress else {
-            return false
+            return
         }
         
         if let primaryShippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL) {
@@ -161,6 +169,6 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         
         shippingAddress.delete()
         
-        return true
+        delegate?.checkoutFormViewControllerDidRemove(self)
     }
 }

@@ -78,7 +78,7 @@ class CheckoutPaymentListViewController: BaseViewController {
     
     @objc fileprivate func addButtonAction() {
         let paymentFormViewController = CheckoutPaymentFormViewController()
-        paymentFormViewController.continueButton.addTarget(self, action: #selector(addCardAction), for: .touchUpInside)
+        paymentFormViewController.delegate = self
         navigationController?.pushViewController(paymentFormViewController, animated: true)
     }
     
@@ -89,43 +89,22 @@ class CheckoutPaymentListViewController: BaseViewController {
         
         let card = cardFrc?.object(at: indexPath)
         let paymentFormViewController = CheckoutPaymentFormViewController(withCard: card)
-        paymentFormViewController.continueButton.addTarget(self, action: #selector(updateCardAction), for: .touchUpInside)
-        paymentFormViewController.deleteButton?.addTarget(self, action: #selector(deleteCardAction), for: .touchUpInside)
+        paymentFormViewController.delegate = self
         navigationController?.pushViewController(paymentFormViewController, animated: true)
     }
-    
-    @objc fileprivate func addCardAction() {
-        guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
-            return
-        }
-        
-        paymentFormViewController.addCard { [weak self] didSave in
-            self?.navigationController?.popViewController(animated: true)
-        }
+}
+
+extension CheckoutPaymentListViewController: CheckoutFormViewControllerDelegate {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
+        navigationController?.popViewController(animated: true)
     }
     
-    @objc fileprivate func updateCardAction() {
-        guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
-            return
-        }
-        
-        let didUpdateCard = paymentFormViewController.updateCard()
-        
-        if didUpdateCard {
-            navigationController?.popViewController(animated: true)
-        }
+    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {
+        navigationController?.popViewController(animated: true)
     }
     
-    @objc fileprivate func deleteCardAction() {
-        guard let paymentFormViewController = navigationController?.topViewController as? CheckoutPaymentFormViewController else {
-            return
-        }
-        
-        let didDeleteCard = paymentFormViewController.deleteCard()
-        
-        if didDeleteCard {
-            navigationController?.popViewController(animated: true)
-        }
+    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {
+        navigationController?.popViewController(animated: true)
     }
 }
 
