@@ -143,7 +143,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         return form.map?[key.rawValue]
     }
     
-    func addCard(withAlertCallback alertCallback: @escaping (_ didSave: Bool)->()) {
+    func addCard(withAlertCallback alertCallback: @escaping (_ didSave: Bool)->()) -> Bool {
         guard let cardName = formRow(.cardName)?.value,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
@@ -158,7 +158,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             else {
                 // TODO: highlight fields with errors
-                return
+                return false
         }
         
         let email = formRow(.email)?.value
@@ -196,6 +196,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         }))
         alertController.preferredAction = saveAlertAction
         present(alertController, animated: true, completion: nil)
+        
+        return true
     }
     
     @discardableResult func updateCard() -> Bool {

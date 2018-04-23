@@ -11,6 +11,7 @@ import UIKit
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
     fileprivate var checkoutPaymentFormViewController: CheckoutPaymentFormViewController?
+    fileprivate var checkoutShippingFormViewController: CheckoutShippingFormViewController?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -24,6 +25,7 @@ class CartNavigationController: UINavigationController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         restorationIdentifier = String(describing: type(of: self))
+        delegate = self
         
         cartViewController.delegate = self
         
@@ -71,7 +73,7 @@ class CartNavigationController: UINavigationController {
         let addressShip = checkout.formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         
-        checkout.addCard { [weak self] didSave in
+        let canSave = checkout.addCard { [weak self] didSave in
             if isShipToSameAddressChecked {
                 self?.navigateToCheckoutOrder()
             }
@@ -80,11 +82,25 @@ class CartNavigationController: UINavigationController {
             }
         }
         
-        //        checkoutPaymentFormViewController = nil // ???: when should the vc be removed
+        if canSave {
+            checkoutPaymentFormViewController = nil
+        }
     }
     
     @objc fileprivate func shippingFormCompleted() {
-//        DataModel.sharedInstance.saveShippingAddress(firstName: <#T##String?#>, lastName: <#T##String?#>, street: <#T##String#>, city: <#T##String#>, country: <#T##String#>, zipCode: <#T##String#>, state: <#T##String?#>, phone: <#T##String#>)
+        guard let shipping = checkoutShippingFormViewController,
+            shipping.form.hasRequiredFields
+            else {
+                // TODO: highlight error fields
+                return
+        }
+        
+        let didSave = shipping.addShippingAddress()
+        
+        if didSave {
+            navigateToCheckoutOrder()
+            checkoutShippingFormViewController = nil
+        }
     }
     
     // MARK: Navigation
@@ -94,8 +110,12 @@ class CartNavigationController: UINavigationController {
     }
     
     fileprivate func navigateToCheckoutPaymentForm() {
+        let backBarButtonItem = UIBarButtonItem()
+        backBarButtonItem.title = cartViewController.title
+        
         let checkoutPaymentFormViewController = CheckoutPaymentFormViewController()
         checkoutPaymentFormViewController.hidesBottomBarWhenPushed = true
+        checkoutPaymentFormViewController.navigationItem.backBarButtonItem = backBarButtonItem
         checkoutPaymentFormViewController.continueButton.addTarget(self, action: #selector(paymentFormCompleted), for: .touchUpInside)
         pushViewController(checkoutPaymentFormViewController, animated: true)
         
@@ -103,9 +123,16 @@ class CartNavigationController: UINavigationController {
     }
     
     fileprivate func navigateToCheckoutShippingForm() {
+        let backBarButtonItem = UIBarButtonItem()
+        backBarButtonItem.title = cartViewController.title
+        
         let checkoutShippingFormViewController = CheckoutShippingFormViewController()
+        checkoutShippingFormViewController.hidesBottomBarWhenPushed = true
+        checkoutShippingFormViewController.navigationItem.backBarButtonItem = backBarButtonItem
         checkoutShippingFormViewController.continueButton.addTarget(self, action: #selector(shippingFormCompleted), for: .touchUpInside)
         pushViewController(checkoutShippingFormViewController, animated: true)
+        
+        self.checkoutShippingFormViewController = checkoutShippingFormViewController
     }
     
     fileprivate func navigateToCheckoutOrder() {
@@ -118,10 +145,47 @@ class CartNavigationController: UINavigationController {
     }
 }
 
+extension CartNavigationController: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        if viewController.isKind(of: CheckoutShippingFormViewController.self) {
+            removeFormViewControllerFromStack([
+                CheckoutPaymentFormViewController.self
+                ])
+        }
+        else if viewController.isKind(of: CheckoutOrderViewController.self) {
+            removeFormViewControllerFromStack([
+                CheckoutPaymentFormViewController.self,
+                CheckoutShippingFormViewController.self
+                ])
+        }
+    }
+    
+    private func removeFormViewControllerFromStack(_ formViewControllerTypes: [CheckoutFormViewController.Type]) {
+        for i in viewControllers.startIndex..<viewControllers.endIndex {
+            let viewController = viewControllers[i]
+            
+            for formViewControllerType in formViewControllerTypes {
+                if viewController.isKind(of: formViewControllerType) {
+                    var vcs = viewControllers
+                    vcs.remove(at: i)
+                    setViewControllers(vcs, animated: false)
+                    break
+                }
+            }
+        }
+    }
+}
+
 extension CartNavigationController: CartViewControllerDelegate {
     func cartViewControllerDidValidateCart(_ viewController: CartViewController) {
-        if DataModel.sharedInstance.hasSavedCards() {
+        let hasCard = DataModel.sharedInstance.hasSavedCards()
+        let hasAddress = true // TODO:
+        
+        if hasCard && hasAddress {
             navigateToCheckoutOrder()
+        }
+        else if hasCard {
+            navigateToCheckoutShippingForm()
         }
         else {
             navigateToCheckoutPaymentForm()
