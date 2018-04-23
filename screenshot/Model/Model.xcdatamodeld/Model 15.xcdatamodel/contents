@@ -13,6 +13,7 @@
     <entity name="Card" representedClassName="Card" parentEntity="Address" syncable="YES" codeGenerationType="class">
         <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="cvv" optional="YES" transient="YES" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="dateLastSuccessfulUse" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="displayNumber" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="expirationMonth" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
@@ -150,7 +151,7 @@
     </entity>
     <elements>
         <element name="Address" positionX="522" positionY="225" width="128" height="165"/>
-        <element name="Card" positionX="718" positionY="173" width="128" height="178"/>
+        <element name="Card" positionX="718" positionY="173" width="128" height="195"/>
         <element name="Cart" positionX="297" positionY="423" width="128" height="150"/>
         <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
