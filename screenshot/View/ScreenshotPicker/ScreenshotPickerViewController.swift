@@ -304,6 +304,8 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
             UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
             
             AnalyticsTrackers.standard.track(.createdPhoto)
+        }else{
+            self.image(nil, didFinishSavingWithError: nil, contextInfo: nil)
         }
     }
     
@@ -313,13 +315,19 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
         AnalyticsTrackers.standard.track(.canceledPhotoCreation)
     }
     
-    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if let error = error {
+    @objc func image(_ image: UIImage?, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer?) {
+        
+        if error != nil || image == nil {
+            //Sometimes error might be nil, but still not have an image:
+            //https://stackoverflow.com/questions/38735590/use-uiimagewritetosavedphotosalbum-to-save-image-but-the-memory-is-full-how-c
             dismiss(animated: true, completion: nil)
             
-            let alertController = UIAlertController(title: "picker.save.error".localized, message: error.localizedDescription, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default))
-            present(alertController, animated: true)
+            if  let error = error {
+                
+                let alertController = UIAlertController(title: "picker.save.error".localized, message: error.localizedDescription, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default))
+                present(alertController, animated: true)
+            }
             
         } else {
             let selectedIndexPaths = collectionView.indexPathsForSelectedItems
@@ -346,8 +354,10 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
     
     private func selectItem(at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
-        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
-        collectionView(collectionView, didSelectItemAt: indexPath)
+        if collectionView.numberOfSections > indexPath.section && collectionView.numberOfItems(inSection: indexPath.section) > indexPath.row {
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+            collectionView(collectionView, didSelectItemAt: indexPath)
+        }
     }
 }
 
