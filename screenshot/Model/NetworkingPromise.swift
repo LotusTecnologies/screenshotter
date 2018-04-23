@@ -410,7 +410,7 @@ class NetworkingPromise : NSObject {
             "expiry_month" : card.expirationMonth,
             "expiry_year" : card.expirationYear,
             "referer" : "http://screenshopit.com",
-            "security_code" : card.cvv,
+            "security_code" : card.cvv ?? "",
             "shipping_city" : shippingAddress.city ?? "",
             "shipping_country" : shippingAddress.country ?? "",
             "shipping_email" : "",
