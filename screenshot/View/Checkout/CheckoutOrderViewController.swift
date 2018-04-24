@@ -82,7 +82,7 @@ class CheckoutOrderViewController: BaseViewController {
         _view.itemsPriceLabel.text = formattedPrice(cart.subtotal)
         _view.shippingPriceLabel.text = formattedPrice(cart.shippingTotal)
         _view.beforeTaxPriceLabel.text = formattedPrice(shippingAndSubtotal)
-        _view.estimateTaxLabel.text = "\(tax)%"
+        _view.estimateTaxLabel.text = "\(tax)%" // TODO: use $ value
         _view.totalPriceLabel.text = formattedPrice(shippingAndSubtotal + taxTotal)
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
@@ -277,15 +277,13 @@ class CheckoutOrderViewController: BaseViewController {
     // MARK: Alerts
     
     fileprivate func presentNeedsPrimaryCardAlert() {
-        // TODO: get copy from coren
-        let alertController = UIAlertController(title: "No Payment Method", message: "Please add a payment method.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Add A Card", message: "Select a credit card to complete your purchase.", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)
     }
     
     fileprivate func presentNeedsPrimaryShippingAddressAlert() {
-        // TODO: get copy from coren
-        let alertController = UIAlertController(title: "No Shipping Address", message: "Please add a shipping address.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Add A Shipping Address", message: "Let us know where to send your items!", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)
     }
