@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CardTableViewCell: UITableViewCell {
+class CardTableViewCell: TableViewCell {
     fileprivate let checkImageView = UIImageView()
     let cardView = UIView()
     let editButton = UIButton()

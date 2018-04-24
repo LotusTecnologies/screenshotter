@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TextFieldTableViewCell : UITableViewCell {
+class TextFieldTableViewCell : TableViewCell {
     fileprivate let style: UITableViewCellStyle
     
     let textField: UITextField = TextField()

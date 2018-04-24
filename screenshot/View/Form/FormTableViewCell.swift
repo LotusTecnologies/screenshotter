@@ -25,7 +25,7 @@ class FormCardTableViewCell: FormNumberTableViewCell {
     }
 }
 
-class FormCheckboxTableViewCell: UITableViewCell {
+class FormCheckboxTableViewCell: TableViewCell {
     private let checkboxImage = UIImage(named: "FormCheckbox")
     private let checkboxSelectedImage = UIImage(named: "FormCheckboxChecked")
     
@@ -123,7 +123,7 @@ class FormPhoneTableViewCell: FormTextTableViewCell {
     }
 }
 
-class FormSelectionTableViewCell: UITableViewCell {
+class FormSelectionTableViewCell: TableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -186,7 +186,7 @@ class FormSelectionTableViewCell: UITableViewCell {
     }
 }
 
-class FormSelectionPickerTableViewCell: UITableViewCell {
+class FormSelectionPickerTableViewCell: TableViewCell {
     let pickerView = UIPickerView()
     
     required init?(coder aDecoder: NSCoder) {

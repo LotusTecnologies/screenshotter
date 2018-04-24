@@ -165,6 +165,7 @@
 		C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */; };
 		C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */; };
 		C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */; };
+		C5E6C31C208F46A5006E9C54 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C31B208F46A5006E9C54 /* TableViewCell.swift */; };
 		C5E92416206901D200D44FF9 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E92415206901D200D44FF9 /* FormViewController.swift */; };
 		C5E9241820690B6100D44FF9 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E9241720690B6100D44FF9 /* Form.swift */; };
 		C5E9241A2069149000D44FF9 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E924192069149000D44FF9 /* FormView.swift */; };
@@ -390,6 +391,7 @@
 		C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutSupportedLocationModel.swift; sourceTree = "<group>"; };
 		C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedStates.plist; sourceTree = "<group>"; };
 		C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedCountries.plist; sourceTree = "<group>"; };
+		C5E6C31B208F46A5006E9C54 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		C5E92415206901D200D44FF9 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
 		C5E9241720690B6100D44FF9 /* Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
 		C5E924192069149000D44FF9 /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
@@ -826,6 +828,7 @@
 			isa = PBXGroup;
 			children = (
 				C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */,
+				C5E6C31B208F46A5006E9C54 /* TableViewCell.swift */,
 				C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */,
 			);
 			path = TableViewCell;
@@ -1498,6 +1501,7 @@
 				C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */,
 				C50DBB8A207CA36600BB206E /* CheckoutOrderView.swift in Sources */,
 				C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */,
+				C5E6C31C208F46A5006E9C54 /* TableViewCell.swift in Sources */,
 				C5F37C9F20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,
 				C543695020453CDF00599134 /* ProductView.swift in Sources */,
