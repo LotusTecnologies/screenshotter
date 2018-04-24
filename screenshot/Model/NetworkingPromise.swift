@@ -394,13 +394,13 @@ class NetworkingPromise : NSObject {
         let billingLastName = tuple.1
         let jsonObject: [String : Any] = [
             "billing_city" : card.city ?? "",
-            "billing_country" : card.country ?? "", //TODO: "US"
+            "billing_country" : card.country ?? "",
             "billing_email" : card.email ?? "",
             "billing_first_name" : billingFirstName,
             "billing_last_name" : billingLastName,
             "billing_phone" : card.phone ?? "",
             "billing_postal_code" : card.zipCode ?? "",
-            "billing_state" : card.state ?? "", //TODO: "NY"
+            "billing_state" : card.state ?? "",
             "billing_street1" : card.street ?? "",
             "billing_street2" : "",
             "card_name" : card.fullName ?? "",
@@ -412,13 +412,13 @@ class NetworkingPromise : NSObject {
             "referer" : "http://screenshopit.com",
             "security_code" : card.cvv ?? "",
             "shipping_city" : shippingAddress.city ?? "",
-            "shipping_country" : shippingAddress.country ?? "", //TODO: "US"
+            "shipping_country" : shippingAddress.country ?? "",
             "shipping_email" : card.email ?? "",
             "shipping_first_name" : shippingAddress.firstName ?? "",
             "shipping_last_name" : shippingAddress.lastName ?? "",
             "shipping_phone" : shippingAddress.phone ?? "",
             "shipping_postal_code" : shippingAddress.zipCode ?? "",
-            "shipping_state" : shippingAddress.state ?? "", //TODO: "NY"
+            "shipping_state" : shippingAddress.state ?? "",
             "shipping_street1" : shippingAddress.street ?? "",
             "shipping_street2" : ""
         ]

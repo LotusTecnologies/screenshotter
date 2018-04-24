@@ -237,7 +237,7 @@ extension DataModel {
     
     func cardFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Card>  {
         let request: NSFetchRequest<Card> = Card.fetchRequest()
-        request.predicate = NSPredicate(format: "isSaved == TRUE")
+        request.predicate = nil
         request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<Card>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
