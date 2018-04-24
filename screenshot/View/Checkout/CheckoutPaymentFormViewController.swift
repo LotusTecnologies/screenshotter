@@ -90,15 +90,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         state.isVisible = false
         state.placeholder = "State"
         state.value = card?.state
-        state.options = [
-            "Maryland",
-            "Agartha",
-            "Antartica",
-            "Atlantis",
-            "Bermuda",
-            "Categat",
-            "Pangea"
-        ]
+        state.options = USStatesMap().states.keys.sorted()
         billingRows.append(state)
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)

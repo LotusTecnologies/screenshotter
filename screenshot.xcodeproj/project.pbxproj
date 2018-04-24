@@ -163,6 +163,7 @@
 		C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
 		C5E6C312208F0864006E9C54 /* USStates.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C311208F0864006E9C54 /* USStates.plist */; };
+		C5E6C314208F0E4B006E9C54 /* TerritoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C313208F0E4B006E9C54 /* TerritoryModel.swift */; };
 		C5E92416206901D200D44FF9 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E92415206901D200D44FF9 /* FormViewController.swift */; };
 		C5E9241820690B6100D44FF9 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E9241720690B6100D44FF9 /* Form.swift */; };
 		C5E9241A2069149000D44FF9 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E924192069149000D44FF9 /* FormView.swift */; };
@@ -386,6 +387,7 @@
 		C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentFormViewController.swift; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
 		C5E6C311208F0864006E9C54 /* USStates.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = USStates.plist; sourceTree = "<group>"; };
+		C5E6C313208F0E4B006E9C54 /* TerritoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerritoryModel.swift; sourceTree = "<group>"; };
 		C5E92415206901D200D44FF9 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
 		C5E9241720690B6100D44FF9 /* Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
 		C5E924192069149000D44FF9 /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
@@ -551,6 +553,7 @@
 				31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */,
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 				E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */,
+				C5E6C313208F0E4B006E9C54 /* TerritoryModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1420,6 +1423,7 @@
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
+				C5E6C314208F0E4B006E9C54 /* TerritoryModel.swift in Sources */,
 				C501412C2061101100ABFB5C /* UITableView.swift in Sources */,
 				C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,

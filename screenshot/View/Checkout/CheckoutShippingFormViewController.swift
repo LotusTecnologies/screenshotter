@@ -67,15 +67,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         state.isVisible = false
         state.placeholder = "State"
         state.value = shippingAddress?.state
-        state.options = [
-            "United States",
-            "Agartha",
-            "Antartica",
-            "Atlantis",
-            "Bermuda",
-            "Categat",
-            "Pangea"
-        ]
+        state.options = USStatesMap().states.keys.sorted()
         formRows.append(state)
         
         let zip = FormRow.Number(CheckoutShippingFormKeys.addressZip.rawValue)
