@@ -150,8 +150,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let cardCVV = formRow(.cardCVV)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressCity = formRow(.addressCity)?.value,
-            let addressCountry = formRow(.addressCountry)?.value,
-            let addressState = formRow(.addressState)?.value,
+            var addressCountry = formRow(.addressCountry)?.value,
+            var addressState = formRow(.addressState)?.value,
             let addressZip = formRow(.addressZip)?.value,
             let phone = formRow(.phoneNumber)?.value,
             let cardExpDate = FormRow.Expiration.date(for: cardExp),
@@ -166,11 +166,11 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         let addressShip = formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
-        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        let state = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.states[addressState] ?? addressState
         
         func performAction(withSavingCard saveCard: Bool) {
-            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, email: email, phone: phone, isSaved: saveCard)
+            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
                 .then { card -> Void in
                     card.cvv = cardCVV
                     
@@ -180,7 +180,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             }
             
             if isShipToSameAddressChecked {
-                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: state, phone: phone)
+                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
                         let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
                         UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
@@ -205,13 +205,13 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     
     @objc fileprivate func updateCard() {
         guard let cardName = formRow(.cardName)?.value,
-            let cardNumber = formRow(.cardNumber)?.value,
+            var cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
             let cardCVV = formRow(.cardCVV)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressCity = formRow(.addressCity)?.value,
-            let addressCountry = formRow(.addressCountry)?.value,
-            let addressState = formRow(.addressState)?.value,
+            var addressCountry = formRow(.addressCountry)?.value,
+            var addressState = formRow(.addressState)?.value,
             let addressZip = formRow(.addressZip)?.value,
             let phone = formRow(.phoneNumber)?.value,
             let cardExpDate = FormRow.Expiration.date(for: cardExp),
@@ -222,12 +222,13 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                 return
         }
         
+        cardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
         let email = formRow(.email)?.value
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
-        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        let state = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.states[addressState] ?? addressState
         
-        card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, email: email, phone: phone)
+        card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
         card.cvv = cardCVV
         
         delegate?.checkoutFormViewControllerDidEdit(self)
