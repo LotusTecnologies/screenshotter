@@ -106,8 +106,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     
     @objc fileprivate func addShippingAddress() {
         guard let addressCity = formRow(.addressCity)?.value,
-            let addressCountry = formRow(.addressCountry)?.value,
-            let addressState = formRow(.addressState)?.value,
+            var addressCountry = formRow(.addressCountry)?.value,
+            var addressState = formRow(.addressState)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressZip = formRow(.addressZip)?.value,
             let nameFirst = formRow(.nameFirst)?.value,
@@ -118,10 +118,10 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 return
         }
         
-        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        let state = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.states[addressState] ?? addressState
         
-        DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, phone: phone)
+        DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
             .then { shippingAddress -> Void in
                 let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
                 UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
@@ -133,8 +133,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     
     @objc fileprivate func updateShippingAddress() {
         guard let addressCity = formRow(.addressCity)?.value,
-            let addressCountry = formRow(.addressCountry)?.value,
-            let addressState = formRow(.addressState)?.value,
+            var addressCountry = formRow(.addressCountry)?.value,
+            var addressState = formRow(.addressState)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressZip = formRow(.addressZip)?.value,
             let nameFirst = formRow(.nameFirst)?.value,
@@ -146,10 +146,10 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 return
         }
         
-        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        let state = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.states[addressState] ?? addressState
         
-        shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, phone: phone)
+        shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
         
         delegate?.checkoutFormViewControllerDidEdit(self)
     }
