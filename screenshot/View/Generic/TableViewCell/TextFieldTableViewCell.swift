@@ -36,13 +36,22 @@ class TextFieldTableViewCell : UITableViewCell {
         textField.isUserInteractionEnabled = false // Activate through the cells becomeFirstResponder
         contentView.addSubview(textField)
         textField.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1), for: .vertical)
-
+        textField.setContentCompressionResistancePriority(.required, for: .horizontal)
+        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        
         if style == .value1 {
             // Needed for positioning the constraints
             detailTextLabel?.textColor = .clear
             detailTextLabel?.text = " "
             
-            applyTextFieldConstraints()
+            if UIView.userInterfaceLayoutDirection(for: textField.semanticContentAttribute) == .rightToLeft {
+                textField.textAlignment = .left
+            }
+            else {
+                textField.textAlignment = .right
+            }
+            
+            applyValue1TextFieldConstraints()
         }
         else {
             textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -59,7 +68,7 @@ class TextFieldTableViewCell : UITableViewCell {
         textLabel?.text = " "
         
         if style == .value1 {
-            applyTextFieldConstraints()
+            applyValue1TextFieldConstraints()
         }
     }
     
@@ -74,7 +83,7 @@ class TextFieldTableViewCell : UITableViewCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         if previousTraitCollection?.preferredContentSizeCategory == .unspecified && style == .value1 {
-            applyTextFieldConstraints()
+            applyValue1TextFieldConstraints()
         }
     }
     
@@ -84,7 +93,7 @@ class TextFieldTableViewCell : UITableViewCell {
     
     // MARK: Text Field
     
-    fileprivate func applyTextFieldConstraints() {
+    fileprivate func applyValue1TextFieldConstraints() {
         // Because these constraints are attached to the cell's labels, they need to be reapplied every time the dynamic type changes.
         
         guard let textLabel = textLabel, let detailTextLabel = detailTextLabel else {
@@ -101,7 +110,7 @@ class TextFieldTableViewCell : UITableViewCell {
             textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         }
         else {
-            textField.leadingAnchor.constraint(greaterThanOrEqualTo: textLabel.trailingAnchor, constant: .padding).isActive = true
+            textField.leadingAnchor.constraint(equalTo: textLabel.trailingAnchor, constant: .padding).isActive = true
         }
     }
     
