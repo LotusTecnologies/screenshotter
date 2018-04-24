@@ -301,7 +301,6 @@ fileprivate extension CartViewControllerCheckout {
 //                        })
                 }
                 else {
-                    self?.presentErrorAlert()
                     self?.dismissCheckoutLoader()
                 }
             }
