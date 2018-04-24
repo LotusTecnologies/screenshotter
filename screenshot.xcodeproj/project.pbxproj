@@ -162,8 +162,9 @@
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
 		C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
-		C5E6C312208F0864006E9C54 /* USStates.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C311208F0864006E9C54 /* USStates.plist */; };
-		C5E6C314208F0E4B006E9C54 /* TerritoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C313208F0E4B006E9C54 /* TerritoryModel.swift */; };
+		C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */; };
+		C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */; };
+		C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */; };
 		C5E92416206901D200D44FF9 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E92415206901D200D44FF9 /* FormViewController.swift */; };
 		C5E9241820690B6100D44FF9 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E9241720690B6100D44FF9 /* Form.swift */; };
 		C5E9241A2069149000D44FF9 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E924192069149000D44FF9 /* FormView.swift */; };
@@ -386,8 +387,9 @@
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
 		C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentFormViewController.swift; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
-		C5E6C311208F0864006E9C54 /* USStates.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = USStates.plist; sourceTree = "<group>"; };
-		C5E6C313208F0E4B006E9C54 /* TerritoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerritoryModel.swift; sourceTree = "<group>"; };
+		C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutSupportedLocationModel.swift; sourceTree = "<group>"; };
+		C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedStates.plist; sourceTree = "<group>"; };
+		C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedCountries.plist; sourceTree = "<group>"; };
 		C5E92415206901D200D44FF9 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
 		C5E9241720690B6100D44FF9 /* Form.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
 		C5E924192069149000D44FF9 /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
@@ -486,12 +488,13 @@
 			isa = PBXGroup;
 			children = (
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
+				C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */,
+				C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */,
 				527F17491FA21CA6008082BC /* Craze_Video.mp4 */,
 				C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */,
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
-				C5E6C311208F0864006E9C54 /* USStates.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -553,7 +556,7 @@
 				31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */,
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 				E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */,
-				C5E6C313208F0E4B006E9C54 /* TerritoryModel.swift */,
+				C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1216,7 +1219,6 @@
 			files = (
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
-				C5E6C312208F0864006E9C54 /* USStates.plist in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
@@ -1225,7 +1227,9 @@
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
+				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
+				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
 				C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1423,7 +1427,6 @@
 				E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */,
 				314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
-				C5E6C314208F0E4B006E9C54 /* TerritoryModel.swift in Sources */,
 				C501412C2061101100ABFB5C /* UITableView.swift in Sources */,
 				C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
@@ -1472,6 +1475,7 @@
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C5F37C95205505690072FE1D /* ProductsViewController.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
+				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
 				C5014110205E7BF200ABFB5C /* Label.swift in Sources */,

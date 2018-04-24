@@ -28,6 +28,8 @@ enum CheckoutPaymentFormKeys: Int {
 
 class CheckoutPaymentFormViewController: CheckoutFormViewController {
     fileprivate var card: Card?
+    fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
+    fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
     
     convenience init(withCard card: Card? = nil) {
         let isEditLayout = card != nil
@@ -71,26 +73,22 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         city.value = card?.city
         billingRows.append(city)
         
+        let supportedCountriesMap = CheckoutSupportedCountriesMap()
+        
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
-        country.value = card?.country
-        country.options = [
-            "United States",
-            "Agartha",
-            "Antartica",
-            "Atlantis",
-            "Bermuda",
-            "Categat",
-            "Pangea"
-        ]
+        country.value = card?.country ?? "United States"
+        country.options = supportedCountriesMap.countries.keys.sorted()
         billingRows.append(country)
+        
+        let supportedStatesMap = CheckoutSupportedStatesMap()
         
         let state = FormRow.Selection(CheckoutPaymentFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
         state.value = card?.state
-        state.options = USStatesMap().states.keys.sorted()
+        state.options = supportedStatesMap.states.keys.sorted()
         billingRows.append(state)
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
@@ -124,6 +122,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         self.init(with: Form(with: [cardSection, billingSection]))
         self.card = card
+        self.supportedCountriesMap = supportedCountriesMap
+        self.supportedStatesMap = supportedStatesMap
         
         title = isEditLayout ? "Edit Card" : "Add Card"
         restorationIdentifier = String(describing: type(of: self))
@@ -165,9 +165,11 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         let addressShip = formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
+        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        let state = supportedStatesMap?.states[addressState] ?? addressState
         
         func performAction(withSavingCard saveCard: Bool) {
-            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
+            DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, email: email, phone: phone, isSaved: saveCard)
                 .then { card -> Void in
                     card.cvv = cardCVV
                     
@@ -177,7 +179,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             }
             
             if isShipToSameAddressChecked {
-                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+                DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: state, phone: phone)
                     .then { shippingAddress -> Void in
                         let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
                         UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
@@ -221,8 +223,10 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         let email = formRow(.email)?.value
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
+        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        let state = supportedStatesMap?.states[addressState] ?? addressState
         
-        card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
+        card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, email: email, phone: phone)
         card.cvv = cardCVV
         
         delegate?.checkoutFormViewControllerDidEdit(self)

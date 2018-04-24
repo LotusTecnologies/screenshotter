@@ -22,6 +22,8 @@ enum CheckoutShippingFormKeys: Int {
 
 class CheckoutShippingFormViewController: CheckoutFormViewController {
     fileprivate var shippingAddress: ShippingAddress?
+    fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
+    fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
     
     convenience init(withShippingAddress shippingAddress: ShippingAddress? = nil) {
         let isEditLayout = shippingAddress != nil
@@ -48,26 +50,22 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         city.value = shippingAddress?.city
         formRows.append(city)
         
+        let supportedCountriesMap = CheckoutSupportedCountriesMap()
+        
         let country = FormRow.Selection(CheckoutShippingFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
-        country.value = shippingAddress?.country
-        country.options = [
-            "United States",
-            "Agartha",
-            "Antartica",
-            "Atlantis",
-            "Bermuda",
-            "Categat",
-            "Pangea"
-        ]
+        country.value = shippingAddress?.country ?? "United States"
+        country.options = supportedCountriesMap.countries.keys.sorted()
         formRows.append(country)
+        
+        let supportedStatesMap = CheckoutSupportedStatesMap()
         
         let state = FormRow.Selection(CheckoutShippingFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
         state.value = shippingAddress?.state
-        state.options = USStatesMap().states.keys.sorted()
+        state.options = supportedStatesMap.states.keys.sorted()
         formRows.append(state)
         
         let zip = FormRow.Number(CheckoutShippingFormKeys.addressZip.rawValue)
@@ -85,6 +83,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         
         self.init(with: Form(with: [section]))
         self.shippingAddress = shippingAddress
+        self.supportedCountriesMap = supportedCountriesMap
+        self.supportedStatesMap = supportedStatesMap
         
         title = isEditLayout ? "Edit Address" : "Add Address"
         restorationIdentifier = String(describing: type(of: self))
@@ -118,7 +118,10 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 return
         }
         
-        DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        let state = supportedStatesMap?.states[addressState] ?? addressState
+        
+        DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, phone: phone)
             .then { shippingAddress -> Void in
                 let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
                 UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
@@ -143,7 +146,10 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 return
         }
         
-        shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
+        let country = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
+        let state = supportedStatesMap?.states[addressState] ?? addressState
+        
+        shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: country, zipCode: addressZip, state: state, phone: phone)
         
         delegate?.checkoutFormViewControllerDidEdit(self)
     }

@@ -220,6 +220,7 @@ extension FormViewController: UITableViewDataSource {
         }
         
         syncValues(for: cell, at: indexPath)
+        syncConditionedCell(at: indexPath)
         
         return cell
     }
