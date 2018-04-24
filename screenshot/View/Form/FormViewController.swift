@@ -272,6 +272,31 @@ extension FormViewController: UITableViewDataSource {
 }
 
 extension FormViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+        // TODO: when scrolling a picker cell off screen there are issues with the first responder
+        // the below code does not work. a cell which is first responder does not call this delete function.
+        // figure out the best way to resign first responder without doing it on immediate scroll.
+        
+//        if cell.isKind(of: FormSelectionTableViewCell.self) {
+//            let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
+//
+//            if let pickerRow = formRowAt(nextIndexPath) as? FormRow.Picker, pickerRow.isVisible {
+//                tableView.endEditing(true)
+//            }
+//        }
+//        else if cell.isKind(of: FormSelectionPickerTableViewCell.self) {
+//            let prevIndexPath = IndexPath(row: indexPath.row - 1, section: indexPath.section)
+//
+//            if let prevCell = tableView.cellForRow(at: prevIndexPath) {
+//                if prevCell.isFirstResponder {
+//                    prevCell.resignFirstResponder()
+//                }
+//            }
+//        }
+        
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = tableView.cellForRow(at: indexPath) else {
             return

@@ -179,8 +179,7 @@ class FormSelectionTableViewCell: TableViewCell {
     // MARK: Picker
     
     private func changePicker(visibility: Bool) {
-        if let tableView = next as? FormViewTableView,
-            let indexPath = tableView.indexPath(for: self) {
+        if let tableView = next as? FormViewTableView, let indexPath = tableView.indexPath(for: self) {
             tableView.changePicker(visibility: visibility, forAttached: indexPath)
         }
     }
