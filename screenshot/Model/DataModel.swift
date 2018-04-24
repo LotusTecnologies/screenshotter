@@ -535,17 +535,6 @@ extension DataModel {
         }
     }
     
-    func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
-        return Promise { fulfill, reject in
-            self.dbQ.addOperation {
-                let managedObjectContext = self.persistentContainer.newBackgroundContext()
-                managedObjectContext.perform {
-                    fulfill((block(managedObjectContext), dict))
-                }
-            }
-        }
-    }
-    
     public func unfavorite(favoriteArray: [Product]) {
         let moiArray = favoriteArray.map { $0.objectID }
         self.performBackgroundTask { (managedObjectContext) in
