@@ -99,13 +99,17 @@ extension CreditCardValidator {
         return formattedNumber
     }
     
+    func unformatNumber(_ number: String) -> String {
+        return number.replacingOccurrences(of: " ", with: "")
+    }
+    
     /// Create a number which replaces all digits but the last component with a *
     func secureNumber(_ number: String?) -> String? {
         guard let number = number, !number.isEmpty else {
             return nil
         }
         
-        let formattedNumber = formatNumber(number.replacingOccurrences(of: " ", with: ""))
+        let formattedNumber = formatNumber(unformatNumber(number))
         var formattedNumberComponents = formattedNumber.split(separator: " ")
         let secureComponentsCount = formattedNumberComponents.count - 1
         

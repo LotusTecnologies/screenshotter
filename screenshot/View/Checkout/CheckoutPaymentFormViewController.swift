@@ -145,7 +145,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     
     @objc fileprivate func addCard() {
         guard let cardName = formRow(.cardName)?.value,
-            let cardNumber = formRow(.cardNumber)?.value,
+            var cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
             let cardCVV = formRow(.cardCVV)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
@@ -161,6 +161,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                 return
         }
         
+        cardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
         let email = formRow(.email)?.value
         let addressShip = formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
