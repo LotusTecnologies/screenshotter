@@ -193,7 +193,7 @@ extension AssetSyncModel {
                             }
                             
                             if screenshot.shoppablesCount > 0 {
-                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                                screenshot.hideWorkhorse()
                             }
                             screenshot.shoppablesCount = 0
                             screenshot.imageData = imageData
@@ -608,7 +608,7 @@ extension AssetSyncModel {
                         imageClassification = .human
                     }
                     if screenshot.shoppablesCount > 0 {
-                        screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                        screenshot.hideWorkhorse()
                     }
                     screenshot.shoppablesCount = 0
                     screenshot.imageData = imageData
