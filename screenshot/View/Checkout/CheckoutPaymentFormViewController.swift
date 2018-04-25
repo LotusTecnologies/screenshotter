@@ -258,6 +258,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         if let primaryCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL) {
             if primaryCardURL == card.objectID.uriRepresentation() {
                 UserDefaults.standard.set(nil, forKey: Constants.checkoutPrimaryCardURL)
+                UserDefaults.standard.synchronize()
             }
         }
         

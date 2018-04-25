@@ -12,6 +12,7 @@ import CoreData
 
 class CheckoutPaymentListViewController: BaseViewController {
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
+    fileprivate var isPoppingViewController = false
     
     // MARK: View
     
@@ -59,14 +60,12 @@ class CheckoutPaymentListViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
-            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL),
-            let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID),
-            let indexPath = cardFrc?.indexPath(forObject: card)
-        {
-            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        // Allow the sync to come from the FRC when popping
+        if !isPoppingViewController {
+            syncSelectedCell()
         }
+        
+        isPoppingViewController = false
     }
     
     deinit {
@@ -92,18 +91,47 @@ class CheckoutPaymentListViewController: BaseViewController {
         paymentFormViewController.delegate = self
         navigationController?.pushViewController(paymentFormViewController, animated: true)
     }
+    
+    // MARK: Selection
+    
+    fileprivate func syncSelectedCell() {
+        let card: Card? = {
+            if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+                let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
+                let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID)
+            {
+                return card
+            }
+            
+            if let card = cardFrc?.fetchedObjects.first {
+                let url = card.objectID.uriRepresentation()
+                UserDefaults.standard.set(url, forKey: Constants.checkoutPrimaryCardURL)
+                UserDefaults.standard.synchronize()
+                return card
+            }
+            
+            return nil
+        }()
+        
+        if let card = card, let indexPath = cardFrc?.indexPath(forObject: card) {
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        }
+    }
 }
 
 extension CheckoutPaymentListViewController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
+        isPoppingViewController = true
         navigationController?.popViewController(animated: true)
     }
     
     func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {
+        isPoppingViewController = true
         navigationController?.popViewController(animated: true)
     }
     
     func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {
+        isPoppingViewController = true
         navigationController?.popViewController(animated: true)
     }
 }
@@ -154,6 +182,7 @@ extension CheckoutPaymentListViewController: FetchedResultsControllerManagerDele
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
             change.applyChanges(tableView: tableView)
+            syncSelectedCell()
         }
     }
 }
