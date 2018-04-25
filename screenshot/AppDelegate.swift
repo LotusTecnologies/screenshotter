@@ -15,7 +15,6 @@ import Branch
 import PromiseKit
 import Segment_Amplitude
 
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // We are purposely initalizing this immediately since it observes for app launch notifications.

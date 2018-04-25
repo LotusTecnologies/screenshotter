@@ -273,13 +273,44 @@ class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
     }
 }
 
+class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
+    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
+        
+        if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
+            kEvent.nameString = event
+            kEvent.payloadDictionary = properties
+            kEvent.userIdString = AnalyticsUser.current.identifier
+            kEvent.userNameString = AnalyticsUser.current.name
+            KochavaTracker.shared.send(kEvent)
+            
+        }
+        SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
+    }
+    
+    func identify(_ user: AnalyticsUser) {
+    }
+    
+    func error(withDescription description: String) {
+        
+        if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
+            kEvent.nameString = "Error"
+            kEvent.payloadDictionary = ["description":description]
+            kEvent.userIdString = AnalyticsUser.current.identifier
+            kEvent.userNameString = AnalyticsUser.current.name
+            KochavaTracker.shared.send(kEvent)
+            
+        }
+    }
+}
+
 public class AnalyticsTrackers : NSObject {
     static let appsee = AppseeAnalyticsTracker()
     static let segment = SegmentAnalyticsTracker()
     static let intercom = IntercomAnalyticsTracker()
     static let branch = BranchAnalyticsTracker()
-    
-    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom])
+    static let kochava = KochavaAnalyticsTracker()
+
+    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom, kochava])
 }
 
 fileprivate let marketingBrands = [
