@@ -364,7 +364,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductCollectionViewCell {
                 cell.delegate = self
                 cell.contentView.backgroundColor = collectionView.backgroundColor
-                cell.title = product.displayTitle
+                cell.title = product.calculatedDisplayTitle
                 cell.price = product.price
                 cell.originalPrice = product.originalPrice
                 cell.imageUrl = product.imageURL
@@ -541,7 +541,7 @@ extension ProductsViewControllerProducts{
         case .priceDes :
             descriptors = [NSSortDescriptor(key: "floatPrice", ascending: false)]
         case .brands :
-            descriptors = [NSSortDescriptor(key: "displayTitle", ascending: true, selector:#selector(NSString.localizedCaseInsensitiveCompare(_:) ) ), NSSortDescriptor(key: "order", ascending: true)]
+            descriptors = [NSSortDescriptor(key: "calculatedDisplayTitle", ascending: true, selector:#selector(NSString.localizedCaseInsensitiveCompare(_:) ) ), NSSortDescriptor(key: "order", ascending: true)]
         }
         
         if let mask = shoppable.getLast()?.rawValue,

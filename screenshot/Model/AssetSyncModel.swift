@@ -193,7 +193,7 @@ extension AssetSyncModel {
                             }
                             
                             if screenshot.shoppablesCount > 0 {
-                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                                screenshot.hideWorkhorse()
                             }
                             screenshot.shoppablesCount = 0
                             screenshot.imageData = imageData
@@ -267,19 +267,21 @@ extension AssetSyncModel {
                         return Promise(error: imageURLError)
                 }
                 return when(fulfilled:  NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURLString), Promise.init(value: screenshotDict))
-            }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise<(NSManagedObject, [String : Any])> in
-                // Save screenshot to db.
-                return DataModel.sharedInstance.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
-                    return DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                    assetId: shareId,
-                                                    createdAt: Date(),
-                                                    isRecognized: true,
-                                                    source: .share,
-                                                    isHidden: false,
-                                                    imageData: imageData,
-                                                    classification: nil)
-                }
-            }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
+            }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise< [String : Any]> in
+                return Promise(resolvers: { (fulfil, reject) in
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
+                                                                assetId: shareId,
+                                                                createdAt: Date(),
+                                                                isRecognized: true,
+                                                                source: .share,
+                                                                isHidden: false,
+                                                                imageData: imageData,
+                                                                classification: nil)
+                        fulfil(screenshotDict)
+                    })
+                })
+            }.then(on: self.processingQ) { screenshotDict -> Void in
                 // Save shoppables to db.
                 guard let syteJsonString = screenshotDict["syteJson"] as? String,
                     let segments = NetworkingPromise.sharedInstance.jsonDestringify(string: syteJsonString),
@@ -606,7 +608,7 @@ extension AssetSyncModel {
                         imageClassification = .human
                     }
                     if screenshot.shoppablesCount > 0 {
-                        screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                        screenshot.hideWorkhorse()
                     }
                     screenshot.shoppablesCount = 0
                     screenshot.imageData = imageData
