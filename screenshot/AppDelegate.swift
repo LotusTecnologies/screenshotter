@@ -15,6 +15,7 @@ import Branch
 import PromiseKit
 import Segment_Amplitude
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // We are purposely initalizing this immediately since it observes for app launch notifications.
@@ -355,9 +356,19 @@ extension AppDelegate : ViewControllerLifeCycle {
 
 // MARK: - Framework Setup
 
-extension AppDelegate {
+extension AppDelegate : KochavaTrackerDelegate {
+    func tracker(_ tracker: KochavaTracker, didRetrieveAttributionDictionary attributionDictionary: [AnyHashable : Any]) {
+    }
+    
     fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
         frameworkSetupLaunchOptions = launchOptions
+        
+        var trackerParametersDictionary: [AnyHashable: Any] = [:]
+        trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
+        trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
+        
+        KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
+        
         
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
