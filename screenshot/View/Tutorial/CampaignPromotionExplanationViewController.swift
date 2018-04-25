@@ -9,8 +9,8 @@
 import UIKit
 
 protocol CampaignPromotionExplanationViewControllerDelegate : class {
-    func campaignPromotionExplanationViewControllerDidPressSkip(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
-    func campaignPromotionExplanationViewControllerDidPressMainButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
+    func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
+    func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController)
 
 }
 
@@ -21,6 +21,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
     var campaign = CampaignPromotionExplanation(
         headline: "2018_04_20_campaign.instructions.headline".localized,
         buttonText: "2018_04_20_campaign.instructions.button".localized,
+        secondButtonText: "2018_04_20_campaign.instructions.secondButton".localized,
         instructions: ["2018_04_20_campaign.instructions.step_1".localized,
                        "2018_04_20_campaign.instructions.step_2".localized,
                        "2018_04_20_campaign.instructions.step_3".localized,
@@ -32,6 +33,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
     struct CampaignPromotionExplanation {
         var headline:String
         var buttonText:String
+        var secondButtonText:String
         var instructions:[String]
     }
     
@@ -95,18 +97,18 @@ class CampaignPromotionExplanationViewController: UIViewController{
         }
         
         
-        let skipButton = UIButton.init()
-        skipButton.translatesAutoresizingMaskIntoConstraints = false
-        skipButton.titleLabel?.textAlignment = .center
-        skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-        skipButton.addTarget(self, action: #selector(tappedSkipButton), for: .touchUpInside)
-        container.addSubview(skipButton)
-        skipButton.setTitle("generic.skip".localized, for: .normal)
-        skipButton.setTitleColor(.gray3, for: .normal)
-        skipButton.setTitleColor(.gray5, for: .highlighted)
-        skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
-        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
-        skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
+        let secondButton = UIButton.init()
+        secondButton.translatesAutoresizingMaskIntoConstraints = false
+        secondButton.titleLabel?.textAlignment = .center
+        secondButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+        secondButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
+        container.addSubview(secondButton)
+        secondButton.setTitle(self.campaign.secondButtonText, for: .normal)
+        secondButton.setTitleColor(.gray3, for: .normal)
+        secondButton.setTitleColor(.gray5, for: .highlighted)
+        secondButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
+        secondButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
+        secondButton.setContentCompressionResistancePriority(.required, for: .vertical)
        
         
         let headline = UILabel()
@@ -135,21 +137,33 @@ class CampaignPromotionExplanationViewController: UIViewController{
             instructionsContainers.append(instructionsContainer)
             
             let countLabel = UILabel()
-            countLabel.text = String(index + 1)
+            countLabel.text = String(index + 1).appending(".")
             countLabel.textAlignment = .center
-            countLabel.font = UIFont.screenshopFont(.hind, textStyle: .title3, staticSize: true)
-            countLabel.textColor = .crazeRed
+            if UIDevice.is320w {
+                countLabel.font = UIFont.screenshopFont(.hind, size: 15)
+            }else if UIDevice.is375w{
+                countLabel.font = UIFont.screenshopFont(.hind, size: 16)
+            }else{
+                countLabel.font = UIFont.screenshopFont(.hind, size: 18)
+            }
+            countLabel.textColor = .gray2
             countLabel.translatesAutoresizingMaskIntoConstraints = false
             instructionsContainer.addSubview(countLabel)
             countLabel.leadingAnchor.constraint(equalTo: instructionsContainer.leadingAnchor).isActive = true
-            countLabel.topAnchor.constraint(equalTo: instructionsContainer.topAnchor, constant:-3.0).isActive = true
+            countLabel.topAnchor.constraint(equalTo: instructionsContainer.topAnchor, constant:0).isActive = true
             countLabels.append(countLabel)
             
             let instructionLabel = UILabel()
             instructionLabel.numberOfLines = 0
             instructionLabel.textColor = .gray2
             instructionLabel.text = instruction
-            instructionLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
+            if UIDevice.is320w {
+                instructionLabel.font = UIFont.screenshopFont(.hind, size: 15)
+            }else if UIDevice.is375w{
+                instructionLabel.font = UIFont.screenshopFont(.hind, size: 16)
+            }else{
+                instructionLabel.font = UIFont.screenshopFont(.hind, size: 18)
+            }
             instructionLabel.translatesAutoresizingMaskIntoConstraints = false
             instructionsContainer.addSubview(instructionLabel)
             instructionLabel.trailingAnchor.constraint(equalTo: instructionsContainer.trailingAnchor).isActive = true
@@ -192,7 +206,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
         mainButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         mainButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
-        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-3).isActive = true
+        mainButton.bottomAnchor.constraint(equalTo: secondButton.topAnchor, constant:-3).isActive = true
         
         
         var last:UIView?
@@ -238,12 +252,13 @@ class CampaignPromotionExplanationViewController: UIViewController{
     }
     
     
-    @objc func tappedSkipButton() {
-        
-        self.delegate?.campaignPromotionExplanationViewControllerDidPressSkip(self)
+    @objc func tappedSecondaryButton() {
+        self.delegate?.campaignPromotionExplanationViewControllerDidPressBackButton(self)
+
     }
     
     @objc func agreeButtonPressed(){
-        self.delegate?.campaignPromotionExplanationViewControllerDidPressMainButton(self)
+        self.delegate?.campaignPromotionExplanationViewControllerDidPressDoneButton(self)
+
     }
 }
