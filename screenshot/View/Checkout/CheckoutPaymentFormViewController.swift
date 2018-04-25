@@ -77,8 +77,16 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
-        country.value = card?.country ?? "United States"
-        country.options = supportedCountriesMap.countries.keys.sorted()
+        country.value = {
+            var value: String?
+            
+            if let countryCode = card?.country {
+                value = supportedCountriesMap.countryNames[countryCode]
+            }
+            
+            return value ?? "United States"
+        }()
+        country.options = supportedCountriesMap.countryCodes.keys.sorted()
         billingRows.append(country)
         
         let supportedStatesMap = CheckoutSupportedStatesMap()
@@ -87,8 +95,16 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
-        state.value = card?.state
-        state.options = supportedStatesMap.states.keys.sorted()
+        state.value = { // TODO: value should auto select the correct picker index
+            var value: String?
+            
+            if let stateCode = card?.state {
+                value = supportedStatesMap.stateNames[stateCode]
+            }
+            
+            return value
+        }()
+        state.options = supportedStatesMap.stateCodes.keys.sorted()
         billingRows.append(state)
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
@@ -157,7 +173,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let cardExpDate = FormRow.Expiration.date(for: cardExp),
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             else {
-                // TODO: highlight fields with errors
+                highlightErrorFields()
                 return
         }
         
@@ -166,8 +182,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         let addressShip = formRow(.addressShip)?.value
         let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
-        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        addressState = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countryCodes[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
         func performAction(withSavingCard saveCard: Bool) {
             DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
@@ -225,8 +241,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         cardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
         let email = formRow(.email)?.value
         let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
-        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        addressState = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countryCodes[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
         card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
         card.cvv = cardCVV

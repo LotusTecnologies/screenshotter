@@ -89,9 +89,32 @@ class FormSection {
 
 class FormRow: NSObject {
     var id: Int?
-    var isRequired = true
     var placeholder: String?
     var value: String?
+    
+    var isRequired = true
+    var isValid: Bool {
+        guard isRequired else {
+            return true
+        }
+        
+        guard let value = value, !value.isEmpty, let validRegex = validRegex else {
+            return false
+        }
+        
+        do {
+            let regex = try NSRegularExpression(pattern: validRegex)
+            let results = regex.matches(in: value, range: NSRange(value.startIndex..., in: value))
+            return results.count > 0
+        }
+        catch let error {
+            print("invalid regex: \(error.localizedDescription)")
+            return false
+        }
+    }
+    fileprivate var validRegex: String? {
+        return nil
+    }
     
     var isVisible = true
     var condition: FormCondition? {
@@ -121,7 +144,9 @@ class FormRow: NSObject {
 
 extension FormRow {
     class Card: Text {
-        
+        fileprivate override var validRegex: String? {
+            return "[\\d ]{15,19}"
+        }
     }
     
     class Checkbox: FormRow {
@@ -138,14 +163,22 @@ extension FormRow {
         static func value(for bool: Bool?) -> String {
             return NSNumber(value: bool ?? false).stringValue
         }
+        
+        fileprivate override var validRegex: String? {
+            return ".+"
+        }
     }
     
     class CVV: Number {
-        
+        fileprivate override var validRegex: String? {
+            return "[\\d]{3,4}"
+        }
     }
     
     class Email: Text {
-        
+        fileprivate override var validRegex: String? {
+            return "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        }
     }
     
     class Expiration: FormRow {
@@ -183,26 +216,42 @@ extension FormRow {
         static func isYear(_ value: Int) -> Bool {
             return value / 1000 > 1
         }
+        
+        fileprivate override var validRegex: String? {
+            return "[\\d]{2}\\/[\\d]{4}"
+        }
     }
     
     class Number: Text {
-        
+        fileprivate override var validRegex: String? {
+            return "[\\d]+"
+        }
     }
     
     class Phone: Text {
-        
+        fileprivate override var validRegex: String? {
+            return "\\+?[\\d-]{10,14}"
+        }
     }
     
     class Selection: FormRow {
         var options: [String]?
+        
+        fileprivate override var validRegex: String? {
+            return ".+"
+        }
     }
     
     class Text: FormRow {
-        
+        fileprivate override var validRegex: String? {
+            return ".+"
+        }
     }
     
     class Zip: Number {
-        
+        fileprivate override var validRegex: String? {
+            return "[\\d]{5,9}"
+        }
     }
 }
 

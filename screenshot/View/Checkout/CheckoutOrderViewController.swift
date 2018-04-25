@@ -82,7 +82,7 @@ class CheckoutOrderViewController: BaseViewController {
         _view.itemsPriceLabel.text = formattedPrice(cart.subtotal)
         _view.shippingPriceLabel.text = formattedPrice(cart.shippingTotal)
         _view.beforeTaxPriceLabel.text = formattedPrice(shippingAndSubtotal)
-        _view.estimateTaxLabel.text = "\(tax)%" // TODO: use $ value
+        _view.estimateTaxLabel.text = formattedPrice(taxTotal)
         _view.totalPriceLabel.text = formattedPrice(shippingAndSubtotal + taxTotal)
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)

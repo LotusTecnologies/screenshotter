@@ -54,8 +54,16 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         
         let country = FormRow.Selection(CheckoutShippingFormKeys.addressCountry.rawValue)
         country.placeholder = "Country"
-        country.value = shippingAddress?.country ?? "United States"
-        country.options = supportedCountriesMap.countries.keys.sorted()
+        country.value = {
+            var value: String?
+            
+            if let countryCode = shippingAddress?.country {
+                value = supportedCountriesMap.countryNames[countryCode]
+            }
+            
+            return value ?? "United States"
+        }()
+        country.options = supportedCountriesMap.countryCodes.keys.sorted()
         formRows.append(country)
         
         let supportedStatesMap = CheckoutSupportedStatesMap()
@@ -64,8 +72,16 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.placeholder = "State"
-        state.value = shippingAddress?.state
-        state.options = supportedStatesMap.states.keys.sorted()
+        state.value = {
+            var value: String?
+            
+            if let stateCode = shippingAddress?.state {
+                value = supportedStatesMap.stateNames[stateCode]
+            }
+            
+            return value
+        }()
+        state.options = supportedStatesMap.stateCodes.keys.sorted()
         formRows.append(state)
         
         let zip = FormRow.Number(CheckoutShippingFormKeys.addressZip.rawValue)
@@ -118,8 +134,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 return
         }
         
-        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        addressState = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countryCodes[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
         DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
             .then { shippingAddress -> Void in
@@ -146,8 +162,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
                 return
         }
         
-        addressCountry = supportedCountriesMap?.countries[addressCountry] ?? addressCountry
-        addressState = supportedStatesMap?.states[addressState] ?? addressState
+        addressCountry = supportedCountriesMap?.countryCodes[addressCountry] ?? addressCountry
+        addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
         shippingAddress.edit(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
         

@@ -12,25 +12,43 @@ typealias CheckoutSupportedName = String
 typealias CheckoutSupportedCode = String
 
 class CheckoutSupportedCountriesMap {
-    private(set) var countries: [CheckoutSupportedName: CheckoutSupportedCode] = [:]
+    private(set) var countryNames = [CheckoutSupportedCode: CheckoutSupportedName]()
+    private(set) var countryCodes = [CheckoutSupportedName: CheckoutSupportedCode]()
     
     init() {
         if let path = Bundle.main.path(forResource: "CheckoutSupportedCountries", ofType: "plist"),
             let data = NSDictionary(contentsOfFile: path) as? [CheckoutSupportedName: CheckoutSupportedCode]
         {
-            countries = data
+            countryCodes = data
+            
+            var tempCountryNames = [CheckoutSupportedCode: CheckoutSupportedName]()
+            
+            for country in data {
+                tempCountryNames[country.value] = country.key
+            }
+            
+            countryNames = tempCountryNames
         }
     }
 }
 
 class CheckoutSupportedStatesMap {
-    private(set) var states: [CheckoutSupportedName: CheckoutSupportedCode] = [:]
+    private(set) var stateNames = [CheckoutSupportedCode: CheckoutSupportedName]()
+    private(set) var stateCodes = [CheckoutSupportedName: CheckoutSupportedCode]()
     
     init() {
         if let path = Bundle.main.path(forResource: "CheckoutSupportedStates", ofType: "plist"),
             let data = NSDictionary(contentsOfFile: path) as? [CheckoutSupportedName: CheckoutSupportedCode]
         {
-            states = data
+            stateCodes = data
+            
+            var tempStateNames = [CheckoutSupportedCode: CheckoutSupportedName]()
+            
+            for state in data {
+                tempStateNames[state.value] = state.key
+            }
+            
+            stateNames = tempStateNames
         }
     }
 }

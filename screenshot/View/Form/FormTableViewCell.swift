@@ -254,7 +254,13 @@ class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate {
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let textFieldController = textFieldController {
+        if range.location == 0 && string == " " {
+            return false
+        }
+        else if range.location > 0 && string == " " && textField.text?.last == " " {
+            return false
+        }
+        else if let textFieldController = textFieldController {
             return textFieldController.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
         }
         else {
