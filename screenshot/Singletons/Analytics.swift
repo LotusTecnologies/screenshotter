@@ -278,6 +278,7 @@ class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
         
         if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
             kEvent.nameString = event
+            kEvent.customEventNameString = event
             kEvent.payloadDictionary = properties
             kEvent.userIdString = AnalyticsUser.current.identifier
             kEvent.userNameString = AnalyticsUser.current.name
