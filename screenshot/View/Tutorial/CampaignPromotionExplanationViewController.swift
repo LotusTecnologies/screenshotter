@@ -124,6 +124,17 @@ class CampaignPromotionExplanationViewController: UIViewController{
         headline.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         
         
+        let fontSize:CGFloat = {
+            if UIDevice.is320w {
+              return 15
+            }else if UIDevice.is375w{
+              return 16
+            }else if UIDevice.is736h {
+                return 30
+            }else{
+                return 18
+            }
+        }()
         var countLabels:[UILabel] = []
         var instructionLabels:[UILabel] = []
         var instructionsContainers:[UIView] = []
@@ -139,13 +150,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
             let countLabel = UILabel()
             countLabel.text = String(index + 1).appending(".")
             countLabel.textAlignment = .center
-            if UIDevice.is320w {
-                countLabel.font = UIFont.screenshopFont(.hind, size: 15)
-            }else if UIDevice.is375w{
-                countLabel.font = UIFont.screenshopFont(.hind, size: 16)
-            }else{
-                countLabel.font = UIFont.screenshopFont(.hind, size: 18)
-            }
+            countLabel.font = UIFont.screenshopFont(.hind, size: fontSize)
             countLabel.textColor = .gray2
             countLabel.translatesAutoresizingMaskIntoConstraints = false
             instructionsContainer.addSubview(countLabel)
@@ -157,13 +162,7 @@ class CampaignPromotionExplanationViewController: UIViewController{
             instructionLabel.numberOfLines = 0
             instructionLabel.textColor = .gray2
             instructionLabel.text = instruction
-            if UIDevice.is320w {
-                instructionLabel.font = UIFont.screenshopFont(.hind, size: 15)
-            }else if UIDevice.is375w{
-                instructionLabel.font = UIFont.screenshopFont(.hind, size: 16)
-            }else{
-                instructionLabel.font = UIFont.screenshopFont(.hind, size: 18)
-            }
+            instructionLabel.font = UIFont.screenshopFont(.hind, size: fontSize)
             instructionLabel.translatesAutoresizingMaskIntoConstraints = false
             instructionsContainer.addSubview(instructionLabel)
             instructionLabel.trailingAnchor.constraint(equalTo: instructionsContainer.trailingAnchor).isActive = true
