@@ -160,6 +160,15 @@ class FormViewController: BaseViewController {
             self.errorIndexPaths = errorIndexPaths
             tableView.reloadData()
             tableView.scrollToRow(at: firstIndexPath, at: .top, animated: true)
+            
+            TapticHelper.nope()
+        }
+    }
+    
+    fileprivate func removeErrorField(at indexPath: IndexPath, with cell: UITableViewCell) {
+        if let index = errorIndexPaths?.index(of: indexPath) {
+            errorIndexPaths?.remove(at: index)
+            syncError(for: cell, at: indexPath)
         }
     }
 }
@@ -242,15 +251,9 @@ extension FormViewController: UITableViewDataSource {
             cell.textField.returnKeyType = isLastCell ? .done : .next
         }
         
+        syncError(for: cell, at: indexPath)
         syncValues(for: cell, at: indexPath)
         syncConditionedCell(at: indexPath)
-        
-        if let errorIndexPaths = errorIndexPaths, errorIndexPaths.contains(indexPath) {
-            cell.textLabel?.textColor = .crazeRed
-        }
-        else {
-            cell.textLabel?.textColor = .gray3
-        }
         
         return cell
     }
@@ -297,6 +300,17 @@ extension FormViewController: UITableViewDataSource {
                     }
                 }
             })
+        }
+    }
+    
+    fileprivate func syncError(for cell: UITableViewCell, at indexPath: IndexPath) {
+        if var cell = cell as? FormErrorTableViewCellProtocol {
+            if let errorIndexPaths = errorIndexPaths, errorIndexPaths.contains(indexPath) {
+                cell.hasInvalidValue = true
+            }
+            else {
+                cell.hasInvalidValue = false
+            }
         }
     }
 }
@@ -362,6 +376,8 @@ extension FormViewController: UITableViewDelegate {
         // Must come after first responder
         tableView.deselectRow(at: indexPath, animated: true)
         
+        removeErrorField(at: indexPath, with: cell)
+        
         didSelectAttachedIndexPath(yes: {
             if cell.isFirstResponder {
                 previousAttachedVisibileIndexPath = indexPath
@@ -388,6 +404,14 @@ extension FormViewController: UITextFieldDelegate {
         }
         else {
             return nil
+        }
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if let indexPath = indexPath(for: textField),
+            let cell = tableView.cellForRow(at: indexPath) as? FormTextTableViewCell
+        {
+            removeErrorField(at: indexPath, with: cell)
         }
     }
     

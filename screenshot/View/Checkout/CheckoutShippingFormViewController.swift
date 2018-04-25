@@ -130,7 +130,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
             let nameLast = formRow(.nameLast)?.value,
             let phone = formRow(.phoneNumber)?.value
             else {
-                // TODO: highlight fields with errors
+                highlightErrorFields()
                 return
         }
         
@@ -158,7 +158,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
             let phone = formRow(.phoneNumber)?.value,
             let shippingAddress = shippingAddress
             else {
-                // TODO: highlight fields with errors
+                highlightErrorFields()
                 return
         }
         

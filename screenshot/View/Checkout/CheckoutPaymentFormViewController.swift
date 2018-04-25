@@ -234,7 +234,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber),
             let card = card
             else {
-                // TODO: highlight fields with errors
+                highlightErrorFields()
                 return
         }
         

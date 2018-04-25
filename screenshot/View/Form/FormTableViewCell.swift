@@ -25,9 +25,14 @@ class FormCardTableViewCell: FormNumberTableViewCell {
     }
 }
 
-class FormCheckboxTableViewCell: TableViewCell {
+class FormCheckboxTableViewCell: TableViewCell, FormErrorTableViewCellProtocol {
     private let checkboxImage = UIImage(named: "FormCheckbox")
     private let checkboxSelectedImage = UIImage(named: "FormCheckboxChecked")
+    var hasInvalidValue = false {
+        didSet {
+            highlightError()
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -123,7 +128,13 @@ class FormPhoneTableViewCell: FormTextTableViewCell {
     }
 }
 
-class FormSelectionTableViewCell: TableViewCell {
+class FormSelectionTableViewCell: TableViewCell, FormErrorTableViewCellProtocol {
+    var hasInvalidValue = false {
+        didSet {
+            highlightError()
+        }
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -185,8 +196,13 @@ class FormSelectionTableViewCell: TableViewCell {
     }
 }
 
-class FormSelectionPickerTableViewCell: TableViewCell {
+class FormSelectionPickerTableViewCell: TableViewCell, FormErrorTableViewCellProtocol {
     let pickerView = UIPickerView()
+    var hasInvalidValue = false {
+        didSet {
+            highlightError()
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -235,8 +251,13 @@ class FormSelectionPickerTableViewCell: TableViewCell {
     }
 }
 
-class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate {
+class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate, FormErrorTableViewCellProtocol {
     fileprivate var textFieldController: TextFieldFormatter?
+    var hasInvalidValue = false {
+        didSet {
+            highlightError()
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -281,3 +302,19 @@ class FormZipTableViewCell: FormNumberTableViewCell {
         textField.delegate = self
     }
 }
+
+protocol FormErrorTableViewCellProtocol {
+    var hasInvalidValue: Bool { get set }
+}
+
+extension FormErrorTableViewCellProtocol where Self: UITableViewCell {
+    func highlightError() {
+        if hasInvalidValue {
+            textLabel?.textColor = .crazeRed
+        }
+        else {
+            textLabel?.textColor = .gray3
+        }
+    }
+}
+
