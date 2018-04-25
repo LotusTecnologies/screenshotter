@@ -208,18 +208,6 @@ class ShoppingCartModel {
                                         (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = toPayPrice
                                         didChange = true
                                     }
-//                                    if let color = item["color"] as? String,
-//                                      cartItem.color != color {
-//                                        cartItem.color = color
-//                                        errorMask.insert(.color)
-//                                        didChange = true
-//                                    }
-//                                    if let size = item["size"] as? String,
-//                                      cartItem.size != size {
-//                                        cartItem.size = size
-//                                        errorMask.insert(.size)
-//                                        didChange = true
-//                                    }
                                     if cartItem.errorMask != errorMask.rawValue {
                                         cartItem.errorMask = errorMask.rawValue
                                         didChange = true
@@ -396,10 +384,9 @@ class ShoppingCartModel {
                 rootProduct.detailedDescription = dict["description"] as? String
                 rootProduct.name = dict["name"] as? String
                 rootProduct.url = dict["url"] as? String
-                if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["retail_price"]) {
+                if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["discount_price"]) ?? self.parseFloat(dict["retail_price"]) {
                     rootProduct.fallbackPrice = dictPrice
                 }
-                print("populateVariants altImageURLs:\(rootProduct.altImageURLs ?? "-")")
                 
                 var hasVariants = false
                 let colors = dict["colors"] as? [[String : Any]]
@@ -408,30 +395,28 @@ class ShoppingCartModel {
                     let colorSalePrice = self.parseFloat(color["sale_price"])
                     let colorRetailPrice = self.parseFloat(color["retail_price"])
                     let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-                    print(" colorString:\(colorString ?? "-")  colorSalePrice:\(String(describing: colorSalePrice))  colorRetailPrice:\(String(describing: colorRetailPrice))  colorImageURLs:\(colorImageURLs ?? "-")")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
                           !sku.isEmpty {
                             let sizePrice = self.parseFloat(size["price"])
+                            let sizeDiscountPrice = self.parseFloat(size["discount_price"])
                             let sizeRetailPrice = self.parseFloat(size["retail_price"])
-                            let variant = dataModel.saveVariant(managedObjectContext: managedObjectContext,
-                                                                product: rootProduct,
-                                                                color: colorString,
-                                                                size: size["size"] as? String,
-                                                                price: sizePrice ?? sizeRetailPrice ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
-                                                                sku: sku,
-                                                                url: size["url"] as? String,
-                                                                imageURLs: colorImageURLs)
+                            let _ = dataModel.saveVariant(managedObjectContext: managedObjectContext,
+                                                          product: rootProduct,
+                                                          color: colorString,
+                                                          size: size["size"] as? String,
+                                                          price: sizePrice ?? sizeDiscountPrice ?? sizeRetailPrice ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
+                                                          sku: sku,
+                                                          url: size["url"] as? String,
+                                                          imageURLs: colorImageURLs)
                             hasVariants = true
                             if rootProduct.sku == sku,
                               let updatedColor = colorString,
                               !updatedColor.isEmpty,
                               rootProduct.color != updatedColor {
                                 rootProduct.color = updatedColor
-                                print("updated product color string:\(updatedColor)")
                             }
-                            print("  sizeString:\(variant.size ?? "-")  sku:\(variant.sku ?? "-")  sizePrice:\(String(describing: sizePrice))  sizeRetailPrice:\(String(describing: sizeRetailPrice))  price:\(variant.price)  imageURLs:\(variant.imageURLs ?? "-")")
                         }
                     }
                 }
@@ -471,9 +456,15 @@ class ShoppingCartModel {
     }
     
     func parseFloat(_ anyValueOptional: Any?) -> Float? {
-        if let anyValue = anyValueOptional,
-          let float = anyValue as? Float {
+        guard let anyValue = anyValueOptional else {
+            return nil
+        }
+        if let float = anyValue as? Float {
             return float
+        } else if let nsNumber = anyValue as? NSNumber {
+            return nsNumber.floatValue
+        } else {
+            print("parseFloat received anyValue type:\(type(of: anyValue))")
         }
         return nil
     }
@@ -489,8 +480,6 @@ extension CartItem {
         static let unavailable  = ErrorMaskOptions(rawValue: 1 << 0)
         static let quantity     = ErrorMaskOptions(rawValue: 1 << 1)
         static let price        = ErrorMaskOptions(rawValue: 1 << 2)
-//        static let color        = ErrorMaskOptions(rawValue: 1 << 3)
-//        static let size         = ErrorMaskOptions(rawValue: 1 << 4)
     }
     
 }
