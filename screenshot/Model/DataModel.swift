@@ -1672,8 +1672,8 @@ extension Card {
     }
     
     func edit(fullName: String,
-              number: String,
-              displayNumber: String,
+              number: String?,
+              displayNumber: String?,
               brand: String,
               expirationMonth: Int16,
               expirationYear: Int16,
@@ -1691,7 +1691,9 @@ extension Card {
                 return
             }
             card.fullName = fullName
-            card.displayNumber = displayNumber
+            if let displayNumber = displayNumber {
+                card.displayNumber = displayNumber
+            }
             card.brand = brand
             card.expirationMonth = expirationMonth
             card.expirationYear = expirationYear
@@ -1705,11 +1707,13 @@ extension Card {
             card.dateModified = Date()
             do {
                 try managedObjectContext.save()
-                let key = self.cardNumberKeychainKey()
-                DispatchQueue.global(qos: .utility).async {
-                    let startKeychain = Date()
-                    let didUpdateCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
-                    print("GMK didUpdateCardNumber:\(didUpdateCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                if let number = number {
+                    let key = self.cardNumberKeychainKey()
+                    DispatchQueue.global(qos: .utility).async {
+                        let startKeychain = Date()
+                        let didUpdateCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
+                        print("GMK didUpdateCardNumber:\(didUpdateCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                    }
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
