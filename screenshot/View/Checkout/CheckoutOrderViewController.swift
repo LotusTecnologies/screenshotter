@@ -141,6 +141,7 @@ class CheckoutOrderViewController: BaseViewController {
                 }
                 .catch { [weak self] error in
                     // TODO: handle this
+                    TapticHelper.nope()
                 }
                 .always { [weak self] in
                     self?._view.orderButton.isLoading = false
@@ -198,6 +199,7 @@ class CheckoutOrderViewController: BaseViewController {
             }
             .catch { [weak self] error in
                 // TODO: handle this
+                TapticHelper.nope()
             }
             .always { [weak self] in
                 self?.confirmPaymentViewController?.orderButton.isLoading = false
@@ -237,14 +239,14 @@ class CheckoutOrderViewController: BaseViewController {
             if let displayNumber = card.displayNumber,
                 let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber)
             {
-                let brand: String
-                
-                if let b = card.brand, !b.isEmpty {
-                    brand = b
-                }
-                else {
-                    brand = "Card"
-                }
+                let brand: String = {
+                    if let brand = card.brand, !brand.isEmpty {
+                        return brand
+                    }
+                    else {
+                        return "Card"
+                    }
+                }()
                 
                 _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
             }
