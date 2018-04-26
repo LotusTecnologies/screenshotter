@@ -94,12 +94,23 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
-
+ 
+        
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
         self.syncEmptyListView()
         NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
+        
+        
+        let productsBarController = ProductsBarController()
+        productsBarController.setup()
+        productsBarController.delegate = self
+        self.productsBarController = productsBarController
+        UIView.performWithoutAnimation {
+            self.productBarContentChanged(productsBarController)
+        }
+        
 
     }
     

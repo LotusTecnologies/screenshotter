@@ -13,16 +13,16 @@
 
 
 "2018_04_20_campaign.headline" = "Win up to $1,000";
-"2018_04_20_campaign.body" = "Every week we are announcing new winners. Submit your favorite looks to discover. Submit as many times as you like.";
+"2018_04_20_campaign.body" = "New winners every week! Send your favorite looks to Discover to enter, submit as many times as you’d like!";
 "2018_04_20_campaign.button" = "Learn More";
 "2018_04_20_campaign.instructions.headline" = "Share and Win!";
-"2018_04_20_campaign.instructions.step_1" = "Make sure you have notifications enabled and a valid email address";
-"2018_04_20_campaign.instructions.step_2" = "Add a fashion photo from your Gallery to your Screenshop Homescreen";
-"2018_04_20_campaign.instructions.step_3" = "Tap Share -> Share to Discover";
-"2018_04_20_campaign.instructions.step_4" = "Submit as many images as you like";
+"2018_04_20_campaign.instructions.step_1" = "Make sure you have notifications enabled and a valid email address (in Settings)";
+"2018_04_20_campaign.instructions.step_2" = "Add a fashion photo from your phone’s gallery to your Screenshop Homescreen";
+"2018_04_20_campaign.instructions.step_3" = "Tap Share, then Share to Discover";
+"2018_04_20_campaign.instructions.step_4" = "Submit as many images as you want, they each count as an entry";
 "2018_04_20_campaign.instructions.step_5" = "Follow us on Instagram to see when we announce the winners";
-"2018_04_20_campaign.instructions.button" = "Video Explanation";
-
+"2018_04_20_campaign.instructions.button" = "Got it!";
+"2018_04_20_campaign.instructions.secondButton" = "back to video";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";

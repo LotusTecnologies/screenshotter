@@ -514,7 +514,10 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
     }
     
     func matchstickAt(index:IndexPath) -> Matchstick? {
-        return self.matchsticks[index.item]
+        if self.matchsticks.count > index.item {
+            return self.matchsticks[index.item]
+        }
+        return nil
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -527,6 +530,8 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
             
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
+            }else{
+                cell.image = nil
             }
         }
         
@@ -562,8 +567,8 @@ extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDele
             if change.insertedRows.count > 0 {
                 self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
                 self.collectionView.reloadData()
-                syncEmptyListViews()
             }
+            syncEmptyListViews()
         }
     }
 }
