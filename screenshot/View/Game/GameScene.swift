@@ -8,13 +8,13 @@
 
 import SpriteKit
 
-@objc protocol GameSceneDelegate {
+@objc protocol GameSceneDelegate : class {
     func gameSceneDidStartGame(_ gameScene: GameScene)
     func gameSceneDidEndGame(_ gameScene: GameScene)
 }
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    public var gameDelegate: GameSceneDelegate?
+    weak var gameDelegate: GameSceneDelegate?
     
     let verticalPipeGap = 150.0
     

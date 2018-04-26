@@ -378,7 +378,7 @@ class NetworkingPromise : NSObject {
         return (firstName, lastName)
     }
     
-    func nativeCheckout(remoteId: String, card: Card, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
+    func nativeCheckout(remoteId: String, card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
         guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableDomain:\(Constants.shoppableDomain)"])
             return Promise(error: error)
@@ -410,7 +410,7 @@ class NetworkingPromise : NSObject {
             "expiry_month" : "\(card.expirationMonth)",
             "expiry_year" : "\(card.expirationYear)",
             "referer" : "http://screenshopit.com",
-            "security_code" : card.cvv ?? "",
+            "security_code" : cvv,
             "shipping_city" : shippingAddress.city ?? "",
             "shipping_country" : shippingAddress.country ?? "",
             "shipping_email" : card.email ?? "",
