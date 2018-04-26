@@ -14,6 +14,7 @@ import FBSDKLoginKit
 import Branch
 import PromiseKit
 import Segment_Amplitude
+import AdSupport
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -230,6 +231,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return handled
     }
     
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+        let handled = Branch.getInstance().continue(userActivity)
+        return handled
+    }
+    
     // MARK: State Restoration
     
     fileprivate var restorationViewControllers: [String : UIViewController] = [:]
@@ -382,6 +388,10 @@ extension AppDelegate : KochavaTrackerDelegate {
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
+        }
+        
+        if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+            Branch.setTrackingDisabled(true)
         }
         
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
