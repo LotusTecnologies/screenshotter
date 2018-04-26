@@ -13,6 +13,7 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
     let nameLabel = UILabel()
     fileprivate let expirationLabel = UILabel()
     fileprivate let brandImageView = UIImageView()
+    fileprivate let tempCardLabel = UILabel()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -64,6 +65,17 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         expirationLabel.leadingAnchor.constraint(equalTo: cardView.layoutMarginsGuide.leadingAnchor).isActive = true
         expirationLabel.firstBaselineAnchor.constraint(equalTo: cardView.layoutMarginsGuide.bottomAnchor).isActive = true
         expirationLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
+        
+        tempCardLabel.translatesAutoresizingMaskIntoConstraints = false
+        tempCardLabel.text = "This card will not be saved after purchase"
+        tempCardLabel.textColor = .gray4
+        tempCardLabel.textAlignment = .center
+        tempCardLabel.font = UIFont.screenshopFont(.hindLight, textStyle: .callout)
+        tempCardLabel.adjustsFontForContentSizeCategory = true
+        tempCardLabel.minimumScaleFactor = 0.7
+        tempCardLabel.adjustsFontSizeToFitWidth = true
+        tempCardLabel.baselineAdjustment = .alignCenters
+        tempCardLabel.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     // MARK: Expiration
@@ -111,6 +123,23 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
             brandImageView.image = UIImage(named: "CheckoutCardVisa")
         case .unknown:
             brandImageView.image = nil
+        }
+    }
+    
+    // MARK: Temp Card
+    
+    var isTempCard = false {
+        didSet {
+            if isTempCard {
+                bottomView.addSubview(tempCardLabel)
+                tempCardLabel.topAnchor.constraint(equalTo: bottomView.layoutMarginsGuide.topAnchor).isActive = true
+                tempCardLabel.leadingAnchor.constraint(equalTo: bottomView.layoutMarginsGuide.leadingAnchor).isActive = true
+                tempCardLabel.bottomAnchor.constraint(equalTo: bottomView.layoutMarginsGuide.bottomAnchor).isActive = true
+                tempCardLabel.trailingAnchor.constraint(equalTo: bottomView.layoutMarginsGuide.trailingAnchor).isActive = true
+            }
+            else {
+                tempCardLabel.removeFromSuperview()
+            }
         }
     }
 }
