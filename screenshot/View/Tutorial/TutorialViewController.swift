@@ -202,16 +202,18 @@ extension TutorialViewController : UIScrollViewDelegate {
     }
 }
 
-extension TutorialViewController : TutorialVideoViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
+extension TutorialViewController : VideoDisplayingViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
     @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
-        let viewController = TutorialVideoViewController()
+        let viewController = CampaignPromotionViewController(modal:false)
         viewController.modalTransitionStyle = .crossDissolve
         viewController.delegate = self
         present(viewController, animated: true, completion: nil)
     }
     
-    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
-        viewController.delegate = nil
+    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
+        if let viewController = viewController as? TutorialViewController {
+            viewController.delegate = nil
+        }
         dismiss(animated: true, completion: nil)
         scrollToNextSlide()
     }
