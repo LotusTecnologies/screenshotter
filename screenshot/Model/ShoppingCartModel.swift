@@ -392,21 +392,20 @@ class ShoppingCartModel {
                 let colors = dict["colors"] as? [[String : Any]]
                 colors?.forEach { color in
                     let colorString = color["color"] as? String
-                    let colorSalePrice = self.parseFloat(color["sale_price"])
-                    let colorRetailPrice = self.parseFloat(color["retail_price"])
+                    let colorPrice = self.parseFloat(color["sale_price"]) ?? self.parseFloat(color["retail_price"]) ?? rootProduct.fallbackPrice
                     let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
                           !sku.isEmpty {
-                            let sizePrice = self.parseFloat(size["price"])
-                            let sizeDiscountPrice = self.parseFloat(size["discount_price"])
-                            let sizeRetailPrice = self.parseFloat(size["retail_price"])
                             let _ = dataModel.saveVariant(managedObjectContext: managedObjectContext,
                                                           product: rootProduct,
                                                           color: colorString,
                                                           size: size["size"] as? String,
-                                                          price: sizePrice ?? sizeDiscountPrice ?? sizeRetailPrice ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
+                                                          price: self.parseFloat(size["price"])
+                                                                ?? self.parseFloat(size["discount_price"])
+                                                                ?? self.parseFloat(size["retail_price"])
+                                                                ?? colorPrice,
                                                           sku: sku,
                                                           url: size["url"] as? String,
                                                           imageURLs: colorImageURLs)
