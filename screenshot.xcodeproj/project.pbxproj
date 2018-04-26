@@ -205,6 +205,8 @@
 		E4DBC7742091E2E20019DE6E /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DBC7712091E2E20019DE6E /* CampaignPromotionViewController.swift */; };
 		E4DBC7752091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DBC7722091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift */; };
 		E4DBC7762091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DBC7732091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift */; };
+		E4DBC77920921B3C0019DE6E /* campaign_video_2018_04_20.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E4DBC77720921B3B0019DE6E /* campaign_video_2018_04_20.mp4 */; };
+		E4DBC77A20921B3C0019DE6E /* campaign_thumb_2018_04_20.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E4DBC77820921B3B0019DE6E /* campaign_thumb_2018_04_20.jpg */; };
 		E4F124C4205FBA670026D91B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F124C3205FBA670026D91B /* NotificationService.swift */; };
 		E4F124C8205FBA670026D91B /* productAlert.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E4F124C1205FBA670026D91B /* productAlert.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -450,6 +452,8 @@
 		E4DBC7712091E2E20019DE6E /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		E4DBC7722091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
 		E4DBC7732091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
+		E4DBC77720921B3B0019DE6E /* campaign_video_2018_04_20.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = campaign_video_2018_04_20.mp4; sourceTree = "<group>"; };
+		E4DBC77820921B3B0019DE6E /* campaign_thumb_2018_04_20.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = campaign_thumb_2018_04_20.jpg; sourceTree = "<group>"; };
 		E4E990D4200E01AE00B85505 /* Model 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 9.xcdatamodel"; sourceTree = "<group>"; };
 		E4F124C1205FBA670026D91B /* productAlert.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = productAlert.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4F124C3205FBA670026D91B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -502,6 +506,8 @@
 			isa = PBXGroup;
 			children = (
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
+				E4DBC77820921B3B0019DE6E /* campaign_thumb_2018_04_20.jpg */,
+				E4DBC77720921B3B0019DE6E /* campaign_video_2018_04_20.mp4 */,
 				C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */,
 				C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */,
 				527F17491FA21CA6008082BC /* Craze_Video.mp4 */,
@@ -1240,11 +1246,13 @@
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
+				E4DBC77920921B3C0019DE6E /* campaign_video_2018_04_20.mp4 in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
+				E4DBC77A20921B3C0019DE6E /* campaign_thumb_2018_04_20.jpg in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
