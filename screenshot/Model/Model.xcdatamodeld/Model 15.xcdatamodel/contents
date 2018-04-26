@@ -12,7 +12,6 @@
     </entity>
     <entity name="Card" representedClassName="Card" parentEntity="Address" syncable="YES" codeGenerationType="class">
         <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="cvv" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateLastSuccessfulUse" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="displayNumber" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
@@ -20,7 +19,6 @@
         <attribute name="expirationYear" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="fullName" attributeType="String" syncable="YES"/>
         <attribute name="isSaved" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="number" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Cart" representedClassName="Cart" syncable="YES" codeGenerationType="class">
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -62,7 +60,6 @@
         <attribute name="dateSortProductBar" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateViewed" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="detailedDescription" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="displayTitle" optional="YES" transient="YES" attributeType="String" syncable="YES"/>
         <attribute name="fallbackPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="floatOriginalPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="floatPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -151,11 +148,11 @@
     </entity>
     <elements>
         <element name="Address" positionX="522" positionY="225" width="128" height="165"/>
-        <element name="Card" positionX="718" positionY="173" width="128" height="195"/>
+        <element name="Card" positionX="718" positionY="173" width="128" height="165"/>
         <element name="Cart" positionX="297" positionY="423" width="128" height="150"/>
         <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="120"/>
-        <element name="Product" positionX="-101" positionY="396" width="128" height="540"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="525"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="420"/>
         <element name="ShippingAddress" positionX="718" positionY="393" width="128" height="75"/>
