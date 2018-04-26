@@ -10,18 +10,10 @@ import UIKit
 import AVFoundation
 
 
-@objc protocol TutorialVideoViewControllerDelegate {
-    @objc optional func tutorialVideoViewControllerDidPause(_ viewController:TutorialVideoViewController)
-    @objc optional func tutorialVideoViewControllerDidPlay(_ viewController:TutorialVideoViewController)
-    @objc optional func tutorialVideoViewControllerDidEnd(_ viewController:TutorialVideoViewController)
-    
-    func tutorialVideoViewControllerDidTapDone(_ viewController:TutorialVideoViewController)
-}
-
 class TutorialVideoViewController : BaseViewController {
     var showsReplayButtonUponFinishing: Bool = true
     
-    weak var delegate: TutorialVideoViewControllerDelegate?
+    weak var delegate: VideoDisplayingViewControllerDelegate?
     
     private let playerLayer: AVPlayerLayer!
     private let player: AVPlayer!
@@ -91,7 +83,7 @@ class TutorialVideoViewController : BaseViewController {
         
         if player.playbackState == .paused {
             player.play()
-            delegate?.tutorialVideoViewControllerDidPlay?(self)
+            delegate?.videoDisplayingViewControllerDidPlay(self)
             
             AnalyticsTrackers.standard.track(.startedTutorialVideo)
         }
@@ -155,13 +147,13 @@ class TutorialVideoViewController : BaseViewController {
         }
         
         AnalyticsTrackers.standard.track(.replayedTutorialVideo)
-        delegate?.tutorialVideoViewControllerDidPlay?(self)
+        delegate?.videoDisplayingViewControllerDidPlay(self)
     }
     
     @objc private func doneButtonTapped() {
         AnalyticsTrackers.standard.track(.userExitedTutorialVideo, properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
         
-        delegate?.tutorialVideoViewControllerDidTapDone(self)
+        delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
     
     @objc private func volumeToggleButtonTapped() {
@@ -189,11 +181,11 @@ class TutorialVideoViewController : BaseViewController {
             overlayView.flashPauseOverlay()
             
             AnalyticsTrackers.standard.track(.pausedTutorialVideo)
-            delegate?.tutorialVideoViewControllerDidPause?(self)
+            delegate?.videoDisplayingViewControllerDidPause(self)
             
         } else {
             AnalyticsTrackers.standard.track(.continuedTutorialVideo)
-            delegate?.tutorialVideoViewControllerDidPlay?(self)
+            delegate?.videoDisplayingViewControllerDidPlay(self)
         }
     }
     
@@ -207,7 +199,7 @@ class TutorialVideoViewController : BaseViewController {
         overlayView.hideVolumeToggleButton()
         
         AnalyticsTrackers.standard.track(.completedTutorialVideo)
-        delegate?.tutorialVideoViewControllerDidEnd?(self)
+        delegate?.videoDisplayingViewControllerDidEnd(self)
     }
 }
 
