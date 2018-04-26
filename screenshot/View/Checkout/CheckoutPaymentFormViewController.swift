@@ -193,6 +193,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                     let cardURL = card.objectID.uriRepresentation()
                     UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
                     UserDefaults.standard.synchronize()
+                    
+                    self.delegate?.checkoutFormViewControllerDidAdd(self)
             }
             
             if isShipToSameAddressChecked {
@@ -203,8 +205,6 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                         UserDefaults.standard.synchronize()
                 }
             }
-            
-            delegate?.checkoutFormViewControllerDidAdd(self)
         }
         
         let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)

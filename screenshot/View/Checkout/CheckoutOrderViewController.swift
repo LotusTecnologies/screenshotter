@@ -17,6 +17,7 @@ class CheckoutOrderViewController: BaseViewController {
     fileprivate var cartItems: [CartItem]?
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
     fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
+    var cvvMap: (url: URL, cvv: String)?
     
     // MARK: View
     
@@ -131,7 +132,9 @@ class CheckoutOrderViewController: BaseViewController {
             return
         }
         
-        if let cvv = card.cvv, !cvv.isEmpty {
+        let selectedCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL)
+        
+        if let cvvMap = cvvMap, cvvMap.url == selectedCardURL {
             _view.orderButton.isLoading = true
             _view.orderButton.isEnabled = false
             
