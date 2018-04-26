@@ -160,7 +160,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func addCard() {
-        guard let cardName = formRow(.cardName)?.value,
+        guard form.hasValidFields,
+            let cardName = formRow(.cardName)?.value,
             var cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
             let cardCVV = formRow(.cardCVV)?.value,
@@ -218,7 +219,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func updateCard() {
-        guard let cardName = formRow(.cardName)?.value,
+        guard form.hasValidFields,
+            let cardName = formRow(.cardName)?.value,
             var cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
             let cardCVV = formRow(.cardCVV)?.value,

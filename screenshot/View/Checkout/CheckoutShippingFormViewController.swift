@@ -121,7 +121,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func addShippingAddress() {
-        guard let addressCity = formRow(.addressCity)?.value,
+        guard form.hasValidFields,
+            let addressCity = formRow(.addressCity)?.value,
             var addressCountry = formRow(.addressCountry)?.value,
             var addressState = formRow(.addressState)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
@@ -148,7 +149,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func updateShippingAddress() {
-        guard let addressCity = formRow(.addressCity)?.value,
+        guard form.hasValidFields,
+            let addressCity = formRow(.addressCity)?.value,
             var addressCountry = formRow(.addressCountry)?.value,
             var addressState = formRow(.addressState)?.value,
             let addressStreet = formRow(.addressStreet)?.value,

@@ -58,7 +58,7 @@ class Form {
         self.map = map.isEmpty ? nil : map
     }
     
-    var hasRequiredFields: Bool {
+    var hasValidFields: Bool {
         if let sections = sections {
             for section in sections {
                 guard let rows = section.rows else {
@@ -66,7 +66,7 @@ class Form {
                 }
                 
                 for row in rows {
-                    if row.isRequired && (row.value == nil || row.value!.isEmpty) {
+                    if row.isRequired && (row.value == nil || row.value!.isEmpty || !row.isValid) {
                         return false
                     }
                 }
