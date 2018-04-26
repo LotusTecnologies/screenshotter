@@ -16,7 +16,7 @@ protocol CampaignPromotionExplanationViewControllerDelegate : class {
 
 class CampaignPromotionExplanationViewController: UIViewController{
 
-    var delegate:CampaignPromotionExplanationViewControllerDelegate?
+    weak var delegate:CampaignPromotionExplanationViewControllerDelegate?
     
     var campaign = CampaignPromotionExplanation(
         headline: "2018_04_20_campaign.instructions.headline".localized,
