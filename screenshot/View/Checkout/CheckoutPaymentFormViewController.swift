@@ -59,9 +59,11 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         }()
         cardRows.append(exp)
         
-        let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
-        cvv.placeholder = "CVV"
-        cardRows.append(cvv)
+        if !isEditLayout {
+            let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
+            cvv.placeholder = "CVV"
+            cardRows.append(cvv)
+        }
         
         let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
         street.placeholder = "Street Address"
@@ -220,31 +222,37 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     
     @objc fileprivate func updateCard() {
         guard form.hasValidFields,
+            let card = card,
             let cardName = formRow(.cardName)?.value,
-            var cardNumber = formRow(.cardNumber)?.value,
+            let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
-            let cardCVV = formRow(.cardCVV)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressCity = formRow(.addressCity)?.value,
             var addressCountry = formRow(.addressCountry)?.value,
             var addressState = formRow(.addressState)?.value,
             let addressZip = formRow(.addressZip)?.value,
             let phone = formRow(.phoneNumber)?.value,
-            let cardExpDate = FormRow.Expiration.date(for: cardExp),
-            let secureNumber = CreditCardValidator.shared.secureNumber(cardNumber),
-            let card = card
+            let cardExpDate = FormRow.Expiration.date(for: cardExp)
             else {
                 highlightErrorFields()
                 return
         }
         
-        cardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
+        var newCardNumber: String?
+        var newSecureNumber: String?
+        var newBrand: String?
+        
+        if cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
+            newCardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
+            newSecureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
+            newBrand = CreditCardValidator.shared.brand(forNumber: cardNumber).rawValue
+        }
+        
         let email = formRow(.email)?.value
-        let brand = CreditCardValidator.shared.brand(forNumber: cardNumber)
         addressCountry = supportedCountriesMap?.countryCodes[addressCountry] ?? addressCountry
         addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
-        card.edit(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
+        card.edit(fullName: cardName, number: newCardNumber, displayNumber: newSecureNumber, brand: newBrand, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone)
         
         delegate?.checkoutFormViewControllerDidEdit(self)
     }

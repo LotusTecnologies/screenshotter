@@ -145,7 +145,7 @@ class FormRow: NSObject {
 extension FormRow {
     class Card: Text {
         fileprivate override var validRegex: String? {
-            return "[\\d ]{15,19}"
+            return "[0-9* ]{15,19}"
         }
     }
     
@@ -171,7 +171,7 @@ extension FormRow {
     
     class CVV: Number {
         fileprivate override var validRegex: String? {
-            return "[\\d]{3,4}"
+            return "[0-9]{3,4}"
         }
     }
     
@@ -218,19 +218,19 @@ extension FormRow {
         }
         
         fileprivate override var validRegex: String? {
-            return "[\\d]{2}\\/[\\d]{4}"
+            return "[0-9]{2}\\/[0-9]{4}"
         }
     }
     
     class Number: Text {
         fileprivate override var validRegex: String? {
-            return "[\\d]+"
+            return "[0-9]+"
         }
     }
     
     class Phone: Text {
         fileprivate override var validRegex: String? {
-            return "\\+?[\\d-]{10,14}"
+            return "\\+?[0-9-]{10,14}"
         }
     }
     
@@ -250,7 +250,7 @@ extension FormRow {
     
     class Zip: Number {
         fileprivate override var validRegex: String? {
-            return "[\\d]{5,9}"
+            return "[0-9]{5,9}"
         }
     }
 }
