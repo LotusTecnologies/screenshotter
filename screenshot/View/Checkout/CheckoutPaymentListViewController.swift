@@ -39,6 +39,7 @@ class CheckoutPaymentListViewController: CheckoutListViewController {
         addButton.setTitle("Add a new card", for: .normal)
         addButton.setImage(UIImage(named: "CheckoutCreditCard"), for: .normal)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
+        addButton.sizeToFit()
     }
     
     deinit {

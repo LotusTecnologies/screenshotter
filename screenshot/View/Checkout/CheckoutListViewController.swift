@@ -28,6 +28,7 @@ class CheckoutListViewController: BaseViewController {
         tableView.separatorInset = .zero
         
         addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        addButton.imageView?.contentMode = .scaleAspectFit
         addButton.setTitleColor(.gray3, for: .normal)
         addButton.setTitleColor(.black, for: .highlighted)
         addButton.adjustInsetsForImage(withPadding: 6)

@@ -38,6 +38,7 @@ class CheckoutShippingListViewController: CheckoutListViewController {
         addButton.setTitle("Add a new shipping address", for: .normal)
         addButton.setImage(UIImage(named: "CheckoutLocation"), for: .normal)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
+        addButton.sizeToFit()
     }
     
     deinit {
