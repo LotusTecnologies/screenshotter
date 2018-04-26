@@ -309,7 +309,7 @@ class ShoppingCartModel {
         }
     }
     
-    func nativeCheckout(card: Card, shippingAddress: ShippingAddress) -> Promise<Bool> {
+    func nativeCheckout(card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<Bool> {
         // Get cart remoteId, or error.
         var rememberRemoteId = ""
         let cardOID = card.objectID
@@ -320,7 +320,7 @@ class ShoppingCartModel {
             // Wait for network to return response for processing nativeCheckout.
             .then { remoteId -> Promise<[[String : Any]]> in
                 rememberRemoteId = remoteId
-                return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, shippingAddress: shippingAddress)
+                return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, cvv: cvv, shippingAddress: shippingAddress)
             }
             //
             .then { nativeCheckoutResponseDict -> Promise<Bool> in
