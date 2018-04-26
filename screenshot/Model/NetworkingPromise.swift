@@ -354,7 +354,6 @@ class NetworkingPromise : NSObject {
                     return Promise(error: error)
             }
             if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                print("GMK validateCart received jsonObject:\(jsonObject)")
                 return Promise(value: jsonObject)
             } else {
                 let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "validateCart JSONSerialize failed for url:\(url)"])
@@ -467,7 +466,6 @@ class NetworkingPromise : NSObject {
                         reject(error)
                         return
                     }
-                    print("GMK sendAndParseNativeCheckout successfully parsed jsonObject:\(jsonObject)")
                     fulfill(jsonObject)
                 } catch {
                     let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize exception for url:\(String(describing: request.url))"])

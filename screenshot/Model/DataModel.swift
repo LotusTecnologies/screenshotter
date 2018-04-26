@@ -760,9 +760,7 @@ extension DataModel {
                     try managedObjectContext.save()
                     let key = cardToSave.cardNumberKeychainKey()
                     DispatchQueue.global(qos: .utility).async {
-                        let startKeychain = Date()
-                        let didSetCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
-                        print("GMK didSetCardNumber:\(didSetCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                        KeychainWrapper.standard.set(number, forKey: key)
                     }
                     fulfill(cardToSave.objectID)
                 } catch {
@@ -873,6 +871,29 @@ extension DataModel {
                                    zipCode: zipCode,
                                    state: state,
                                    phone: phone)
+    }
+    
+    func deleteTemporaryCards(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isSaved == FALSE")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for card in results {
+                managedObjectContext.delete(card)
+            }
+            try managedObjectContext.save()
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("deleteTemporaryCards results with error:\(error)")
+        }
+    }
+    
+    func deleteAllTemporaryCards() {
+        performBackgroundTask { (managedObjectContext) in
+            self.deleteTemporaryCards(managedObjectContext: managedObjectContext)
+        }
     }
     
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
@@ -1655,12 +1676,7 @@ extension Card {
     }
     
     func retrieveCardNumber() -> String? {
-        let key = cardNumberKeychainKey()
-        let startKeychain = Date()
-        let cardNumber = KeychainWrapper.standard.string(forKey: key)
-        let hasValue = cardNumber != nil && cardNumber?.isEmpty == false
-        print("GMK retrieveCardNumber hasValue:\(hasValue) took \(-startKeychain.timeIntervalSinceNow) seconds")
-        return cardNumber
+        return KeychainWrapper.standard.string(forKey: cardNumberKeychainKey())
     }
     
     func edit(fullName: String,
@@ -1702,9 +1718,7 @@ extension Card {
                 if let number = number {
                     let key = self.cardNumberKeychainKey()
                     DispatchQueue.global(qos: .utility).async {
-                        let startKeychain = Date()
-                        let didUpdateCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
-                        print("GMK didUpdateCardNumber:\(didUpdateCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                        KeychainWrapper.standard.set(number, forKey: key)
                     }
                 }
             } catch {
@@ -1725,9 +1739,7 @@ extension Card {
             do {
                 try managedObjectContext.save()
                 DispatchQueue.global(qos: .utility).async {
-                    let startKeychain = Date()
-                    let didDeleteCardNumber: Bool = KeychainWrapper.standard.removeObject(forKey: key)
-                    print("GMK didDeleteCardNumber:\(didDeleteCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                    KeychainWrapper.standard.removeObject(forKey: key)
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
