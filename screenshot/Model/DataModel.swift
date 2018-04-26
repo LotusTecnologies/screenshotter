@@ -1702,7 +1702,6 @@ extension Card {
             card.state = state
             card.email = email
             card.phone = phone
-            card.isSaved = true
             card.dateModified = Date()
             do {
                 try managedObjectContext.save()
