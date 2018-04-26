@@ -105,6 +105,7 @@ class CheckoutOrderViewController: BaseViewController {
     
     deinit {
         tableView.dataSource = nil
+        // TODO: remove all temp cards
     }
     
     // MARK: Navigation

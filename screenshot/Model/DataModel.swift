@@ -1682,7 +1682,7 @@ extension Card {
     func edit(fullName: String,
               number: String?,
               displayNumber: String?,
-              brand: String,
+              brand: String?,
               expirationMonth: Int16,
               expirationYear: Int16,
               street: String,
@@ -1702,7 +1702,9 @@ extension Card {
             if let displayNumber = displayNumber {
                 card.displayNumber = displayNumber
             }
-            card.brand = brand
+            if let brand = brand {
+                card.brand = brand
+            }
             card.expirationMonth = expirationMonth
             card.expirationYear = expirationYear
             card.street = street
