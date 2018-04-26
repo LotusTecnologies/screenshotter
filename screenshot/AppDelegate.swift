@@ -361,14 +361,7 @@ extension AppDelegate : KochavaTrackerDelegate {
     
     fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
         frameworkSetupLaunchOptions = launchOptions
-        
-        var trackerParametersDictionary: [AnyHashable: Any] = [:]
-        trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
-        trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
-        
-        KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
-        
-        
+                
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
@@ -379,6 +372,13 @@ extension AppDelegate : KochavaTrackerDelegate {
         configuration.trackPushNotifications = true
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
         SEGAnalytics.setup(with: configuration)
+        
+        var trackerParametersDictionary: [AnyHashable: Any] = [:]
+        trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
+        trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
+        
+        KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
+        
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
