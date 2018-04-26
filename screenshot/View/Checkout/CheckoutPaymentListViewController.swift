@@ -10,17 +10,8 @@ import CreditCardValidator
 import UIKit
 import CoreData
 
-class CheckoutPaymentListViewController: BaseViewController {
+class CheckoutPaymentListViewController: CheckoutListViewController {
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
-    fileprivate var isPoppingViewController = false
-    
-    // MARK: View
-    
-    fileprivate let tableView = UITableView()
-    
-    override func loadView() {
-        view = tableView
-    }
     
     // MARK: Life Cycle
     
@@ -42,30 +33,12 @@ class CheckoutPaymentListViewController: BaseViewController {
         
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.separatorInset = .zero
         tableView.estimatedRowHeight = 150
         tableView.register(CheckoutCreditCardTableViewCell.self, forCellReuseIdentifier: "cell")
         
-        let addButton = UIButton()
-        addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         addButton.setTitle("Add a new card", for: .normal)
-        addButton.setTitleColor(.gray3, for: .normal)
-        addButton.setTitleColor(.black, for: .highlighted)
         addButton.setImage(UIImage(named: "CheckoutCreditCard"), for: .normal)
-        addButton.adjustInsetsForImage(withPadding: 6)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
-        addButton.sizeToFit()
-        tableView.tableFooterView = addButton
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // Allow the sync to come from the FRC when popping
-        if !isPoppingViewController {
-            syncSelectedCell()
-        }
-        
-        isPoppingViewController = false
     }
     
     deinit {
@@ -94,7 +67,7 @@ class CheckoutPaymentListViewController: BaseViewController {
     
     // MARK: Selection
     
-    fileprivate func syncSelectedCell() {
+    override func indexPathForSelectedCell() -> IndexPath? {
         let card: Card? = {
             if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
                 let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
@@ -113,26 +86,12 @@ class CheckoutPaymentListViewController: BaseViewController {
             return nil
         }()
         
-        if let card = card, let indexPath = cardFrc?.indexPath(forObject: card) {
-            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        if let card = card {
+            return cardFrc?.indexPath(forObject: card)
         }
-    }
-}
-
-extension CheckoutPaymentListViewController: CheckoutFormViewControllerDelegate {
-    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
-        isPoppingViewController = true
-        navigationController?.popViewController(animated: true)
-    }
-    
-    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {
-        isPoppingViewController = true
-        navigationController?.popViewController(animated: true)
-    }
-    
-    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {
-        isPoppingViewController = true
-        navigationController?.popViewController(animated: true)
+        else {
+            return nil
+        }
     }
 }
 
@@ -174,15 +133,6 @@ extension CheckoutPaymentListViewController: UITableViewDelegate {
             let cardURL = card.objectID.uriRepresentation()
             UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
             UserDefaults.standard.synchronize()
-        }
-    }
-}
-
-extension CheckoutPaymentListViewController: FetchedResultsControllerManagerDelegate {
-    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if isViewLoaded {
-            change.applyChanges(tableView: tableView)
-            syncSelectedCell()
         }
     }
 }

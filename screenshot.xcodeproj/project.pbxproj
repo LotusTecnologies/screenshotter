@@ -162,6 +162,7 @@
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
 		C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
+		C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */; };
 		C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */; };
 		C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */; };
 		C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */; };
@@ -388,6 +389,7 @@
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
 		C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentFormViewController.swift; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
+		C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutListViewController.swift; sourceTree = "<group>"; };
 		C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutSupportedLocationModel.swift; sourceTree = "<group>"; };
 		C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedStates.plist; sourceTree = "<group>"; };
 		C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedCountries.plist; sourceTree = "<group>"; };
@@ -583,6 +585,7 @@
 				C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */,
 				C50E25E5207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift */,
 				C5CF974D20861B17004F5F41 /* CheckoutFormViewController.swift */,
+				C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */,
 				C50DBB8B207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift */,
 				C50DBB89207CA36600BB206E /* CheckoutOrderView.swift */,
 				C50DBB7C207B398100BB206E /* CheckoutOrderViewController.swift */,
@@ -1412,6 +1415,7 @@
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
+				C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
 				C54088171FE90C8E00198955 /* TutorialTrySlideView.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,

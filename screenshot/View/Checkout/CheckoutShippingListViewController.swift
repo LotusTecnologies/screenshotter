@@ -9,16 +9,8 @@
 import UIKit
 import CoreData
 
-class CheckoutShippingListViewController: BaseViewController {
+class CheckoutShippingListViewController: CheckoutListViewController {
     fileprivate var shippingFrc: FetchedResultsControllerManager<ShippingAddress>?
-    
-    // MARK: View
-    
-    fileprivate let tableView = UITableView()
-    
-    override func loadView() {
-        view = tableView
-    }
     
     // MARK: Life Cycle
     
@@ -40,32 +32,12 @@ class CheckoutShippingListViewController: BaseViewController {
         
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.separatorInset = .zero
         tableView.estimatedRowHeight = 120
         tableView.register(CheckoutShippingTableViewCell.self, forCellReuseIdentifier: "cell")
         
-        let addButton = UIButton()
-        addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         addButton.setTitle("Add a new shipping address", for: .normal)
-        addButton.setTitleColor(.gray3, for: .normal)
-        addButton.setTitleColor(.black, for: .highlighted)
         addButton.setImage(UIImage(named: "CheckoutLocation"), for: .normal)
-        addButton.adjustInsetsForImage(withPadding: 6)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
-        addButton.sizeToFit()
-        tableView.tableFooterView = addButton
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        if let shippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
-            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: shippingURL),
-            let shipping = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID),
-            let indexPath = shippingFrc?.indexPath(forObject: shipping)
-        {
-            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-        }
     }
     
     deinit {
@@ -91,19 +63,34 @@ class CheckoutShippingListViewController: BaseViewController {
         shippingFormViewController.delegate = self
         navigationController?.pushViewController(shippingFormViewController, animated: true)
     }
-}
-
-extension CheckoutShippingListViewController: CheckoutFormViewControllerDelegate {
-    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
-        navigationController?.popViewController(animated: true)
-    }
     
-    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {
-        navigationController?.popViewController(animated: true)
-    }
+    // MARK: Selection
     
-    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {
-        navigationController?.popViewController(animated: true)
+    override func indexPathForSelectedCell() -> IndexPath? {
+        let shippingAddress: ShippingAddress? = {
+            if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
+                let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
+                let shippingAddress = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID)
+            {
+                return shippingAddress
+            }
+            
+            if let shippingAddress = shippingFrc?.fetchedObjects.first {
+                let url = shippingAddress.objectID.uriRepresentation()
+                UserDefaults.standard.set(url, forKey: Constants.checkoutPrimaryAddressURL)
+                UserDefaults.standard.synchronize()
+                return shippingAddress
+            }
+            
+            return nil
+        }()
+        
+        if let shippingAddress = shippingAddress {
+            return shippingFrc?.indexPath(forObject: shippingAddress)
+        }
+        else {
+            return nil
+        }
     }
 }
 
@@ -133,14 +120,6 @@ extension CheckoutShippingListViewController: UITableViewDelegate {
             let shippingURL = shipping.objectID.uriRepresentation()
             UserDefaults.standard.set(shippingURL, forKey: Constants.checkoutPrimaryAddressURL)
             UserDefaults.standard.synchronize()
-        }
-    }
-}
-
-extension CheckoutShippingListViewController: FetchedResultsControllerManagerDelegate {
-    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if isViewLoaded {
-            change.applyChanges(tableView: tableView)
         }
     }
 }
