@@ -138,7 +138,7 @@ class CheckoutOrderViewController: BaseViewController {
             _view.orderButton.isLoading = true
             _view.orderButton.isEnabled = false
             
-            ShoppingCartModel.shared.nativeCheckout(card: card, shippingAddress: shippingAddress)
+            ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress)
                 .then { [weak self] someBool -> Void in
                     self?.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
                 }
@@ -192,9 +192,7 @@ class CheckoutOrderViewController: BaseViewController {
         confirmPaymentViewController?.orderButton.isLoading = true
         confirmPaymentViewController?.orderButton.isEnabled = false
         
-        card.cvv = cvv
-        
-        ShoppingCartModel.shared.nativeCheckout(card: card, shippingAddress: shippingAddress)
+        ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { [weak self] someBool -> Void in
                 self?.dismiss(animated: true, completion: nil)
                 self?.confirmPaymentViewController = nil
