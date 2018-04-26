@@ -160,7 +160,7 @@ class ShoppingCartModel {
                 return Promise { fulfill, reject in
                     guard let cart = dict["cart"] as? [String : Any],
                       let remoteId = cart["id"] as? String,
-                      //let total = cart["total"] as? Float,
+                      //let total = self.parseFloat(cart["total"]),
                       !remoteId.isEmpty else {
                         print("ShoppingCartModel validateCart failed to extract cart id from dict:\(dict)")
                         let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel validateCart failed to extract cart id"])
@@ -228,9 +228,9 @@ class ShoppingCartModel {
                         }
                         // Save subtotal and shippingTotal to Cart object.
                         if let cartObject = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
-                            cartObject.subtotal =  cart["subtotal"] as? Float
+                            cartObject.subtotal =  self.parseFloat(cart["subtotal"])
                                                 ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
-                            cartObject.shippingTotal = cart["shipping_total"] as? Float ?? 0
+                            cartObject.shippingTotal = self.parseFloat(cart["shipping_total"]) ?? 0
                             print("Subtotal:\(cartObject.subtotal)  shippingTotal:\(cartObject.shippingTotal)")
                             didChange = true
                         } else {
@@ -455,15 +455,18 @@ class ShoppingCartModel {
     }
     
     func parseFloat(_ anyValueOptional: Any?) -> Float? {
-        guard let anyValue = anyValueOptional else {
+        if anyValueOptional == nil {
             return nil
-        }
-        if let float = anyValue as? Float {
-            return float
-        } else if let nsNumber = anyValue as? NSNumber {
+        } else if let floatVal = anyValueOptional as? Float {
+            return floatVal
+        } else if let intVal = anyValueOptional as? Int {
+            return Float(intVal)
+        } else if let stringVal = anyValueOptional as? String {
+            return Float(stringVal)
+        } else if let nsNumber = anyValueOptional as? NSNumber {
             return nsNumber.floatValue
-        } else {
-            print("parseFloat received anyValue type:\(type(of: anyValue))")
+        } else if let anyValue = anyValueOptional {
+            print("parseFloat received anyValueOptional:\(String(describing: anyValueOptional))  anyValue:\(anyValue) type:\(type(of: anyValueOptional))")
         }
         return nil
     }

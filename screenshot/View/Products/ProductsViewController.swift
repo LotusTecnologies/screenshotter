@@ -542,26 +542,35 @@ extension ProductsViewControllerProducts{
     }
     
     func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
-        let descriptors: [NSSortDescriptor]
-        switch self.productsOptions.sort {
-        case .similar :
-            descriptors = [NSSortDescriptor(key: "order", ascending: true)]
-        case .priceAsc :
-            descriptors = [NSSortDescriptor(key: "floatPrice", ascending: true)]
-        case .priceDes :
-            descriptors = [NSSortDescriptor(key: "floatPrice", ascending: false)]
-        case .brands :
-            descriptors = [NSSortDescriptor(key: "calculatedDisplayTitle", ascending: true, selector:#selector(NSString.localizedCaseInsensitiveCompare(_:) ) ), NSSortDescriptor(key: "order", ascending: true)]
-        }
-        
         if let mask = shoppable.getLast()?.rawValue,
-          var products:Set = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
+          var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
             self.productsUnfilteredCount = products.count
             if self.productsOptions.sale == .sale {
-                let filtered = (products as NSSet).filtered(using: NSPredicate(format: "floatPrice < floatOriginalPrice"))
-                products = filtered as! Set<Product>
+                products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }
-            return  (((products as NSSet).allObjects as NSArray).sortedArray(using: descriptors) as? [Product]) ?? []
+            let productArray: [Product]
+            switch self.productsOptions.sort {
+            case .similar :
+                productArray = products.sorted { $0.order < $1.order }
+            case .priceAsc :
+                productArray = products.sorted { $0.floatPrice < $1.floatPrice }
+            case .priceDes :
+                productArray = products.sorted(by: { $0.floatPrice > $1.floatPrice })
+            case .brands :
+                productArray = products.sorted { (a, b) -> Bool in
+                    if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
+                      let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
+                      aDisplayTitle != bDisplayTitle {
+                        return aDisplayTitle < bDisplayTitle
+                    } else if a.calculatedDisplayTitle == nil && b.calculatedDisplayTitle != nil {
+                        return false // Empty brands at end
+                    } else if a.calculatedDisplayTitle != nil && b.calculatedDisplayTitle == nil {
+                        return true // Empty brands at end
+                    }
+                    return a.order < b.order // Secondary sort
+                }
+            }
+            return productArray
         }
         
         return []
