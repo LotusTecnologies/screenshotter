@@ -412,7 +412,7 @@ extension AnalyticsTracker {
             let uploadedImageURL = product.screenshot?.uploadedImageURL ?? ""
             let merchant = product.merchant ?? ""
             let brand = product.brand ?? ""
-            let displayTitle = product.displayTitle ?? ""
+            let displayTitle = product.calculatedDisplayTitle ?? ""
             let offer = product.offer ?? ""
             let imageURL = product.imageURL ?? ""
             let price = product.price ?? ""

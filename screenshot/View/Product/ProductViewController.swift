@@ -80,7 +80,7 @@ class ProductViewController : BaseViewController {
     
     convenience init(product: Product) {
         self.init(productOID: product.objectID)
-        title = product.displayTitle
+        title = product.calculatedDisplayTitle
         setup(with: product)
     }
     

@@ -94,7 +94,7 @@ extension ProductsCollectionView: UICollectionViewDataSource {
         
         if let cell = cell as? ProductsCollectionViewCell, let product = products?[indexPath.item] {
             cell.contentView.backgroundColor = collectionView.backgroundColor
-            cell.title = product.displayTitle
+            cell.title = product.calculatedDisplayTitle
             cell.price = product.price
             cell.originalPrice = product.originalPrice
             cell.imageUrl = product.imageURL
