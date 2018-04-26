@@ -166,6 +166,8 @@ fileprivate extension ProductViewControllerProductView {
                 errorItems.forEach { item in
                     item.setBorderErrorColor()
                 }
+                
+                TapticHelper.nope()
             }
             
             let adjustedContentInsetTop: CGFloat
