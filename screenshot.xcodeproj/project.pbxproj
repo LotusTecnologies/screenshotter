@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3125446B2091C3A0009410D5 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312544682091C39F009410D5 /* CampaignPromotionExplanationViewController.swift */; };
-		3125446C2091C3A0009410D5 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312544692091C3A0009410D5 /* VideoDisplayingViewControllerDelegate.swift */; };
-		3125446D2091C3A0009410D5 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125446A2091C3A0009410D5 /* CampaignPromotionViewController.swift */; };
-		3125446F2091C727009410D5 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125446E2091C727009410D5 /* GiftCardCampaignViewController.swift */; };
-		312544712091F446009410D5 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312544702091F446009410D5 /* GiftCardDoneViewController.swift */; };
+		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125447420959714009410D5 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447220959712009410D5 /* GiftCardCampaignViewController.swift */; };
+		3125447520959714009410D5 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447320959713009410D5 /* GiftCardDoneViewController.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		317BFBB2207DFCD300E61D7C /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317BFBB1207DFCD300E61D7C /* Random.swift */; };
@@ -204,6 +204,11 @@
 		E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */; };
 		E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */; };
 		E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */; };
+		E4DBC7742091E2E20019DE6E /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DBC7712091E2E20019DE6E /* CampaignPromotionViewController.swift */; };
+		E4DBC7752091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DBC7722091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift */; };
+		E4DBC7762091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DBC7732091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift */; };
+		E4DBC77920921B3C0019DE6E /* campaign_video_2018_04_20.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E4DBC77720921B3B0019DE6E /* campaign_video_2018_04_20.mp4 */; };
+		E4DBC77A20921B3C0019DE6E /* campaign_thumb_2018_04_20.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E4DBC77820921B3B0019DE6E /* campaign_thumb_2018_04_20.jpg */; };
 		E4F124C4205FBA670026D91B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F124C3205FBA670026D91B /* NotificationService.swift */; };
 		E4F124C8205FBA670026D91B /* productAlert.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E4F124C1205FBA670026D91B /* productAlert.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -233,11 +238,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		312544682091C39F009410D5 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
-		312544692091C3A0009410D5 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
-		3125446A2091C3A0009410D5 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
-		3125446E2091C727009410D5 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
-		312544702091F446009410D5 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
+		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
+		3125447220959712009410D5 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
+		3125447320959713009410D5 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		3162AEDD207DD5B6008A746B /* Model 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 13.xcdatamodel"; sourceTree = "<group>"; };
@@ -450,6 +453,11 @@
 		E4D6D8A61F61B047009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
 		E4D7B6F92057C8C800F7AE9A /* Model 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 11.xcdatamodel"; sourceTree = "<group>"; };
 		E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E4DBC7712091E2E20019DE6E /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
+		E4DBC7722091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
+		E4DBC7732091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
+		E4DBC77720921B3B0019DE6E /* campaign_video_2018_04_20.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = campaign_video_2018_04_20.mp4; sourceTree = "<group>"; };
+		E4DBC77820921B3B0019DE6E /* campaign_thumb_2018_04_20.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = campaign_thumb_2018_04_20.jpg; sourceTree = "<group>"; };
 		E4E990D4200E01AE00B85505 /* Model 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 9.xcdatamodel"; sourceTree = "<group>"; };
 		E4F124C1205FBA670026D91B /* productAlert.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = productAlert.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4F124C3205FBA670026D91B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -502,6 +510,8 @@
 			isa = PBXGroup;
 			children = (
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
+				E4DBC77820921B3B0019DE6E /* campaign_thumb_2018_04_20.jpg */,
+				E4DBC77720921B3B0019DE6E /* campaign_video_2018_04_20.mp4 */,
 				C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */,
 				C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */,
 				527F17491FA21CA6008082BC /* Craze_Video.mp4 */,
@@ -692,9 +702,11 @@
 		C54087C81FE90C8D00198955 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
-				312544682091C39F009410D5 /* CampaignPromotionExplanationViewController.swift */,
-				3125446A2091C3A0009410D5 /* CampaignPromotionViewController.swift */,
-				312544692091C3A0009410D5 /* VideoDisplayingViewControllerDelegate.swift */,
+				E4DBC7722091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift */,
+				E4DBC7712091E2E20019DE6E /* CampaignPromotionViewController.swift */,
+				3125447220959712009410D5 /* GiftCardCampaignViewController.swift */,
+				3125447320959713009410D5 /* GiftCardDoneViewController.swift */,
+				E4DBC7732091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift */,
 				C54087CA1FE90C8D00198955 /* TutorialEmailSlideView.swift */,
 				C5FF4141200F299D00342DEC /* TutorialSlideView.swift */,
 				C54087CF1FE90C8D00198955 /* TutorialTrySlideView.swift */,
@@ -702,8 +714,6 @@
 				C54087D01FE90C8D00198955 /* TutorialVideoViewController.swift */,
 				C54087CD1FE90C8D00198955 /* TutorialViewController.swift */,
 				C54087C91FE90C8D00198955 /* TutorialWelcomeSlideView.swift */,
-				3125446E2091C727009410D5 /* GiftCardCampaignViewController.swift */,
-				312544702091F446009410D5 /* GiftCardDoneViewController.swift */,
 			);
 			path = Tutorial;
 			sourceTree = "<group>";
@@ -1077,6 +1087,7 @@
 				C54087461FE90C3A00198955 /* View */,
 				E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */,
 				E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */,
+				31254460209079C7009410D5 /* screenshot-Bridging-Header.h */,
 				E4139D431F09083B00E8A53B /* Supporting Files */,
 			);
 			path = screenshot;
@@ -1241,11 +1252,13 @@
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
+				E4DBC77920921B3C0019DE6E /* campaign_video_2018_04_20.mp4 in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
+				E4DBC77A20921B3C0019DE6E /* campaign_thumb_2018_04_20.jpg in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
@@ -1376,9 +1389,9 @@
 			files = (
 				C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */,
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
-				3125446F2091C727009410D5 /* GiftCardCampaignViewController.swift in Sources */,
+				E4DBC7742091E2E20019DE6E /* CampaignPromotionViewController.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
-				3125446C2091C3A0009410D5 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
+				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
@@ -1391,6 +1404,7 @@
 				319B031320592A7700446054 /* ShowProduct.swift in Sources */,
 				C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
+				E4DBC7752091E2E20019DE6E /* CampaignPromotionExplanationViewController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
@@ -1421,6 +1435,7 @@
 				C543695920453FE300599134 /* ProductsOptions.swift in Sources */,
 				C543695D20453FE300599134 /* ProductsCollectionViewCell.swift in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
+				3125447520959714009410D5 /* GiftCardDoneViewController.swift in Sources */,
 				C540880D1FE90C8E00198955 /* Loader.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
@@ -1430,12 +1445,12 @@
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C54088161FE90C8E00198955 /* TutorialVideoOverlayView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
-				312544712091F446009410D5 /* GiftCardDoneViewController.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
 				C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
 				C54088171FE90C8E00198955 /* TutorialTrySlideView.swift in Sources */,
+				3125447420959714009410D5 /* GiftCardCampaignViewController.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
 				C5D57933203EDD7A00A076FE /* TableView.swift in Sources */,
@@ -1480,7 +1495,7 @@
 				C54088121FE90C8E00198955 /* TutorialEmailSlideView.swift in Sources */,
 				319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
-				3125446D2091C3A0009410D5 /* CampaignPromotionViewController.swift in Sources */,
+				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
@@ -1511,7 +1526,7 @@
 				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
 				C572FEE6205A53600046BFEB /* ProductsCollectionView.swift in Sources */,
-				3125446B2091C3A0009410D5 /* CampaignPromotionExplanationViewController.swift in Sources */,
+				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
@@ -1529,6 +1544,7 @@
 				C5F37C9F20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift in Sources */,
 				C54088101FE90C8E00198955 /* SettingsViewController.swift in Sources */,
 				C543695020453CDF00599134 /* ProductView.swift in Sources */,
+				E4DBC7762091E2E20019DE6E /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */,
 				31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */,
@@ -1711,7 +1727,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 127;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1721,7 +1737,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEV";
-				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1741,7 +1757,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 127;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1752,7 +1768,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "RELEASE DEV";
-				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "Apple Generic";
@@ -1829,7 +1845,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 127;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1839,7 +1855,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG PRD";
-				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1912,7 +1928,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 127;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1922,7 +1938,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "RELEASE PRD";
-				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "Apple Generic";
@@ -1984,7 +2000,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev.alert;
+				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.alert;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -2043,7 +2059,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev.alert;
+				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.alert;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -2102,7 +2118,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev.alert;
+				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.alert;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -2161,7 +2177,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev.alert;
+				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.alert;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;

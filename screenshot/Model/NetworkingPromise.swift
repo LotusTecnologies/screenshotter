@@ -354,7 +354,6 @@ class NetworkingPromise : NSObject {
                     return Promise(error: error)
             }
             if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                print("GMK validateCart received jsonObject:\(jsonObject)")
                 return Promise(value: jsonObject)
             } else {
                 let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "validateCart JSONSerialize failed for url:\(url)"])
@@ -378,7 +377,7 @@ class NetworkingPromise : NSObject {
         return (firstName, lastName)
     }
     
-    func nativeCheckout(remoteId: String, card: Card, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
+    func nativeCheckout(remoteId: String, card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
         guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableDomain:\(Constants.shoppableDomain)"])
             return Promise(error: error)
@@ -410,7 +409,7 @@ class NetworkingPromise : NSObject {
             "expiry_month" : "\(card.expirationMonth)",
             "expiry_year" : "\(card.expirationYear)",
             "referer" : "http://screenshopit.com",
-            "security_code" : card.cvv ?? "",
+            "security_code" : cvv,
             "shipping_city" : shippingAddress.city ?? "",
             "shipping_country" : shippingAddress.country ?? "",
             "shipping_email" : card.email ?? "",
@@ -467,7 +466,6 @@ class NetworkingPromise : NSObject {
                         reject(error)
                         return
                     }
-                    print("GMK sendAndParseNativeCheckout successfully parsed jsonObject:\(jsonObject)")
                     fulfill(jsonObject)
                 } catch {
                     let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize exception for url:\(String(describing: request.url))"])

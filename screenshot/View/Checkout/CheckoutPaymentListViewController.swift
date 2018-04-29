@@ -110,6 +110,7 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
             cell.nameLabel.text = card.fullName
             cell.cardNumberLabel.text = card.displayNumber
             cell.editButton.addTarget(self, action: #selector(editButtonAction(_:event:)), for: .touchUpInside)
+            cell.isTempCard = !card.isSaved
             
             let month = Int(card.expirationMonth)
             let year = Int(card.expirationYear)

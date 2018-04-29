@@ -160,7 +160,7 @@ class ShoppingCartModel {
                 return Promise { fulfill, reject in
                     guard let cart = dict["cart"] as? [String : Any],
                       let remoteId = cart["id"] as? String,
-                      //let total = cart["total"] as? Float,
+                      //let total = self.parseFloat(cart["total"]),
                       !remoteId.isEmpty else {
                         print("ShoppingCartModel validateCart failed to extract cart id from dict:\(dict)")
                         let error = NSError(domain: "Craze", code: 45, userInfo: [NSLocalizedDescriptionKey : "ShoppingCartModel validateCart failed to extract cart id"])
@@ -228,9 +228,9 @@ class ShoppingCartModel {
                         }
                         // Save subtotal and shippingTotal to Cart object.
                         if let cartObject = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
-                            cartObject.subtotal =  cart["subtotal"] as? Float
+                            cartObject.subtotal =  self.parseFloat(cart["subtotal"])
                                                 ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
-                            cartObject.shippingTotal = cart["shipping_total"] as? Float ?? 0
+                            cartObject.shippingTotal = self.parseFloat(cart["shipping_total"]) ?? 0
                             print("Subtotal:\(cartObject.subtotal)  shippingTotal:\(cartObject.shippingTotal)")
                             didChange = true
                         } else {
@@ -309,7 +309,7 @@ class ShoppingCartModel {
         }
     }
     
-    func nativeCheckout(card: Card, shippingAddress: ShippingAddress) -> Promise<Bool> {
+    func nativeCheckout(card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<Bool> {
         // Get cart remoteId, or error.
         var rememberRemoteId = ""
         let cardOID = card.objectID
@@ -320,7 +320,7 @@ class ShoppingCartModel {
             // Wait for network to return response for processing nativeCheckout.
             .then { remoteId -> Promise<[[String : Any]]> in
                 rememberRemoteId = remoteId
-                return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, shippingAddress: shippingAddress)
+                return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, cvv: cvv, shippingAddress: shippingAddress)
             }
             //
             .then { nativeCheckoutResponseDict -> Promise<Bool> in
@@ -392,21 +392,20 @@ class ShoppingCartModel {
                 let colors = dict["colors"] as? [[String : Any]]
                 colors?.forEach { color in
                     let colorString = color["color"] as? String
-                    let colorSalePrice = self.parseFloat(color["sale_price"])
-                    let colorRetailPrice = self.parseFloat(color["retail_price"])
+                    let colorPrice = self.parseFloat(color["sale_price"]) ?? self.parseFloat(color["retail_price"]) ?? rootProduct.fallbackPrice
                     let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
                     let sizes = color["sizes"] as? [[String : Any]]
                     sizes?.forEach { size in
                         if let sku = size["id"] as? String,
                           !sku.isEmpty {
-                            let sizePrice = self.parseFloat(size["price"])
-                            let sizeDiscountPrice = self.parseFloat(size["discount_price"])
-                            let sizeRetailPrice = self.parseFloat(size["retail_price"])
                             let _ = dataModel.saveVariant(managedObjectContext: managedObjectContext,
                                                           product: rootProduct,
                                                           color: colorString,
                                                           size: size["size"] as? String,
-                                                          price: sizePrice ?? sizeDiscountPrice ?? sizeRetailPrice ?? colorSalePrice ?? colorRetailPrice ?? rootProduct.fallbackPrice,
+                                                          price: self.parseFloat(size["price"])
+                                                                ?? self.parseFloat(size["discount_price"])
+                                                                ?? self.parseFloat(size["retail_price"])
+                                                                ?? colorPrice,
                                                           sku: sku,
                                                           url: size["url"] as? String,
                                                           imageURLs: colorImageURLs)
@@ -456,15 +455,18 @@ class ShoppingCartModel {
     }
     
     func parseFloat(_ anyValueOptional: Any?) -> Float? {
-        guard let anyValue = anyValueOptional else {
+        if anyValueOptional == nil {
             return nil
-        }
-        if let float = anyValue as? Float {
-            return float
-        } else if let nsNumber = anyValue as? NSNumber {
+        } else if let floatVal = anyValueOptional as? Float {
+            return floatVal
+        } else if let intVal = anyValueOptional as? Int {
+            return Float(intVal)
+        } else if let stringVal = anyValueOptional as? String {
+            return Float(stringVal)
+        } else if let nsNumber = anyValueOptional as? NSNumber {
             return nsNumber.floatValue
-        } else {
-            print("parseFloat received anyValue type:\(type(of: anyValue))")
+        } else if let anyValue = anyValueOptional {
+            print("parseFloat received anyValueOptional:\(String(describing: anyValueOptional))  anyValue:\(anyValue) type:\(type(of: anyValueOptional))")
         }
         return nil
     }

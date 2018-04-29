@@ -97,7 +97,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         skipButton.titleLabel?.textAlignment = .center
         
         skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-        skipButton.addTarget(self, action: #selector(tappedSkipButton), for: .touchUpInside)
+        skipButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
         container.addSubview(skipButton)
         skipButton.setTitle("generic.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
@@ -213,6 +213,14 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         requiredSpacing.isActive = true
         
     }
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
+        } catch let error as NSError {
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+        }
+    }
     
     @objc func tappedLearnMoreButton() {
         let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
@@ -226,18 +234,18 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         self.present(explain, animated: false, completion: nil)
     }
     
-    func campaignPromotionExplanationViewControllerDidPressSkip(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+    func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
         self.dismiss(animated: false, completion: nil)
         UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
     
-    func campaignPromotionExplanationViewControllerDidPressMainButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+    func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
         self.dismiss(animated: false, completion: nil)
         
     }
     
-    @objc func tappedSkipButton() {
+    @objc func tappedSecondaryButton() {
         
         UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.videoDisplayingViewControllerDidTapDone(self)
@@ -248,7 +256,11 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mp4")!)
             let player = AVPlayer(playerItem: playerItem)
             player.allowsExternalPlayback = false
-            
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            } catch let error as NSError {
+                AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            }
             player.actionAtItemEnd = .pause
             self.player = player
             let layer = AVPlayerLayer(player: player)

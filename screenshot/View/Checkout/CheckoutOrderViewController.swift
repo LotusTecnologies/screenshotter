@@ -17,6 +17,7 @@ class CheckoutOrderViewController: BaseViewController {
     fileprivate var cartItems: [CartItem]?
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
     fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
+    var cvvMap: (url: URL, cvv: String)?
     
     // MARK: View
     
@@ -104,6 +105,7 @@ class CheckoutOrderViewController: BaseViewController {
     
     deinit {
         tableView.dataSource = nil
+        // TODO: remove all temp cards
     }
     
     // MARK: Navigation
@@ -131,16 +133,19 @@ class CheckoutOrderViewController: BaseViewController {
             return
         }
         
-        if let cvv = card.cvv, !cvv.isEmpty {
+        let selectedCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL)
+        
+        if let cvvMap = cvvMap, cvvMap.url == selectedCardURL {
             _view.orderButton.isLoading = true
             _view.orderButton.isEnabled = false
             
-            ShoppingCartModel.shared.nativeCheckout(card: card, shippingAddress: shippingAddress)
+            ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress)
                 .then { [weak self] someBool -> Void in
                     self?.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
                 }
                 .catch { [weak self] error in
                     // TODO: handle this
+                    TapticHelper.nope()
                 }
                 .always { [weak self] in
                     self?._view.orderButton.isLoading = false
@@ -188,9 +193,7 @@ class CheckoutOrderViewController: BaseViewController {
         confirmPaymentViewController?.orderButton.isLoading = true
         confirmPaymentViewController?.orderButton.isEnabled = false
         
-        card.cvv = cvv
-        
-        ShoppingCartModel.shared.nativeCheckout(card: card, shippingAddress: shippingAddress)
+        ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { [weak self] someBool -> Void in
                 self?.dismiss(animated: true, completion: nil)
                 self?.confirmPaymentViewController = nil
@@ -198,6 +201,7 @@ class CheckoutOrderViewController: BaseViewController {
             }
             .catch { [weak self] error in
                 // TODO: handle this
+                TapticHelper.nope()
             }
             .always { [weak self] in
                 self?.confirmPaymentViewController?.orderButton.isLoading = false
@@ -237,14 +241,14 @@ class CheckoutOrderViewController: BaseViewController {
             if let displayNumber = card.displayNumber,
                 let cardNumber = CreditCardValidator.shared.lastComponentNumber(displayNumber)
             {
-                let brand: String
-                
-                if let b = card.brand, !b.isEmpty {
-                    brand = b
-                }
-                else {
-                    brand = "Card"
-                }
+                let brand: String = {
+                    if let brand = card.brand, !brand.isEmpty {
+                        return brand
+                    }
+                    else {
+                        return "Card"
+                    }
+                }()
                 
                 _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
             }

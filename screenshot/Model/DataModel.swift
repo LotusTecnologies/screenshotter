@@ -375,7 +375,7 @@ extension DataModel {
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
-                            screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                            screenshot.hideWorkhorse()
                         } catch{
                             
                         }
@@ -760,9 +760,7 @@ extension DataModel {
                     try managedObjectContext.save()
                     let key = cardToSave.cardNumberKeychainKey()
                     DispatchQueue.global(qos: .utility).async {
-                        let startKeychain = Date()
-                        let didSetCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
-                        print("GMK didSetCardNumber:\(didSetCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                        KeychainWrapper.standard.set(number, forKey: key)
                     }
                     fulfill(cardToSave.objectID)
                 } catch {
@@ -875,6 +873,29 @@ extension DataModel {
                                    phone: phone)
     }
     
+    func deleteTemporaryCards(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isSaved == FALSE")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            for card in results {
+                managedObjectContext.delete(card)
+            }
+            try managedObjectContext.save()
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("deleteTemporaryCards results with error:\(error)")
+        }
+    }
+    
+    func deleteAllTemporaryCards() {
+        performBackgroundTask { (managedObjectContext) in
+            self.deleteTemporaryCards(managedObjectContext: managedObjectContext)
+        }
+    }
+    
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
@@ -884,17 +905,6 @@ extension DataModel {
             let managedObjectContext = self.persistentContainer.newBackgroundContext()
             managedObjectContext.performAndWait {
                 block(managedObjectContext)
-            }
-        }
-    }
-    
-    func backgroundPromise(dict: [String : Any], block: @escaping (NSManagedObjectContext) -> NSManagedObject) -> Promise<(NSManagedObject, [String : Any])> {
-        return Promise { fulfill, reject in
-            self.dbQ.addOperation {
-                let managedObjectContext = self.persistentContainer.newBackgroundContext()
-                managedObjectContext.perform {
-                    fulfill((block(managedObjectContext), dict))
-                }
             }
         }
     }
@@ -1100,7 +1110,7 @@ extension DataModel {
         do {
             let results = try managedObjectContext.fetch(fetchRequest)
             for screenshot in results {
-                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                screenshot.hideWorkhorse()
             }
             try managedObjectContext.save()
         } catch {
@@ -1168,24 +1178,26 @@ extension Screenshot {
     // hideWorkhorse is not meant to be called from UI code,
     // but may be called on the main queue, even if generally called on a background queue.
     // It does not actually hide the screenshot.
-    func hideWorkhorse(managedObjectContext: NSManagedObjectContext, deleteImage: Bool = true) {
-        if let favoriteSet = favorites as? Set<Product>,
-            favoriteSet.count > 0 {
-            favoriteSet.forEach { $0.shoppable = nil }
-        } else if deleteImage {
-            if isFromShare {
-                managedObjectContext.delete(self)
-                return
+    func hideWorkhorse(deleteImage: Bool = true) {
+        if let context = self.managedObjectContext {
+            if let favoriteSet = favorites as? Set<Product>,
+                favoriteSet.count > 0 {
+                favoriteSet.forEach { $0.shoppable = nil }
+            } else if deleteImage {
+                if isFromShare {
+                    context.delete(self)
+                    return
+                }
+                imageData = nil
             }
-            imageData = nil
+            if let shoppablesSet = shoppables as? Set<Shoppable> {
+                shoppablesSet.forEach { context.delete($0) }
+            }
+            shoppablesCount = -1
+            syteJson = nil
+            shareLink = nil
+            uploadedImageURL = nil
         }
-        if let shoppablesSet = shoppables as? Set<Shoppable> {
-            shoppablesSet.forEach { managedObjectContext.delete($0) }
-        }
-        shoppablesCount = -1
-        syteJson = nil
-        shareLink = nil
-        uploadedImageURL = nil
     }
     
     public func setHide() {
@@ -1197,7 +1209,7 @@ extension Screenshot {
                         return
                 }
                 screenshot.isHidden = true
-                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                screenshot.hideWorkhorse()
                 try managedObjectContext.save()
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
@@ -1338,7 +1350,7 @@ extension Shoppable {
                     if let lastSetMask = shoppable.getLast(),
                         lastSetMask.rawValue & 0x01C0 != optionsMaskInt & 0x01C0 { // Category bits
                         if let screenshot = shoppable.screenshot {
-                            screenshot.hideWorkhorse(managedObjectContext: managedObjectContext, deleteImage: false)
+                            screenshot.hideWorkhorse(deleteImage: false)
                             screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
                             AssetSyncModel.sharedInstance.processingQ.async {
                                 AssetSyncModel.sharedInstance.rescanClassification(assetId: screenshot.assetId!, imageData: screenshot.imageData as Data?, optionsMask: optionsMask)
@@ -1542,13 +1554,14 @@ extension Product {
         }
     }
     
-    override public func awakeFromFetch() {
-        super.awakeFromFetch()
-        if let displayBrand = brand,
-            !displayBrand.isEmpty {
-            displayTitle = displayBrand
-        } else {
-            displayTitle = merchant
+    @objc dynamic var calculatedDisplayTitle:String? {
+        get {
+            if let displayBrand = brand,
+                !displayBrand.isEmpty {
+                return displayBrand
+            } else {
+                return merchant
+            }
         }
     }
     
@@ -1663,18 +1676,13 @@ extension Card {
     }
     
     func retrieveCardNumber() -> String? {
-        let key = cardNumberKeychainKey()
-        let startKeychain = Date()
-        let cardNumber = KeychainWrapper.standard.string(forKey: key)
-        let hasValue = cardNumber != nil && cardNumber?.isEmpty == false
-        print("GMK retrieveCardNumber hasValue:\(hasValue) took \(-startKeychain.timeIntervalSinceNow) seconds")
-        return cardNumber
+        return KeychainWrapper.standard.string(forKey: cardNumberKeychainKey())
     }
     
     func edit(fullName: String,
-              number: String,
-              displayNumber: String,
-              brand: String,
+              number: String?,
+              displayNumber: String?,
+              brand: String?,
               expirationMonth: Int16,
               expirationYear: Int16,
               street: String,
@@ -1691,8 +1699,12 @@ extension Card {
                 return
             }
             card.fullName = fullName
-            card.displayNumber = displayNumber
-            card.brand = brand
+            if let displayNumber = displayNumber {
+                card.displayNumber = displayNumber
+            }
+            if let brand = brand {
+                card.brand = brand
+            }
             card.expirationMonth = expirationMonth
             card.expirationYear = expirationYear
             card.street = street
@@ -1702,15 +1714,14 @@ extension Card {
             card.state = state
             card.email = email
             card.phone = phone
-            card.isSaved = true
             card.dateModified = Date()
             do {
                 try managedObjectContext.save()
-                let key = self.cardNumberKeychainKey()
-                DispatchQueue.global(qos: .utility).async {
-                    let startKeychain = Date()
-                    let didUpdateCardNumber: Bool = KeychainWrapper.standard.set(number, forKey: key)
-                    print("GMK didUpdateCardNumber:\(didUpdateCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                if let number = number {
+                    let key = self.cardNumberKeychainKey()
+                    DispatchQueue.global(qos: .utility).async {
+                        KeychainWrapper.standard.set(number, forKey: key)
+                    }
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
@@ -1730,9 +1741,7 @@ extension Card {
             do {
                 try managedObjectContext.save()
                 DispatchQueue.global(qos: .utility).async {
-                    let startKeychain = Date()
-                    let didDeleteCardNumber: Bool = KeychainWrapper.standard.removeObject(forKey: key)
-                    print("GMK didDeleteCardNumber:\(didDeleteCardNumber) took \(-startKeychain.timeIntervalSinceNow) seconds")
+                    KeychainWrapper.standard.removeObject(forKey: key)
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)

@@ -36,7 +36,12 @@ class TutorialVideoViewController : BaseViewController {
         player.allowsExternalPlayback = false
         player.actionAtItemEnd = .pause
         player.isMuted = true
-
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        } catch let error as NSError {
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+        }
+        
         playerLayer = AVPlayerLayer(player: player)
         
         super.init(nibName: nil, bundle: nil)
@@ -107,6 +112,12 @@ class TutorialVideoViewController : BaseViewController {
         super.viewWillDisappear(animated)
       
         player.pause()
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
+        } catch let error as NSError {
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -170,7 +181,9 @@ class TutorialVideoViewController : BaseViewController {
         
         button.isSelected = !button.isSelected
         player.isMuted = button.isSelected
+        
     }
+    
     
     @objc private func handleTap() {
         guard ended == false else {

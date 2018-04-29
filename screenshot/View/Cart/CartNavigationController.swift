@@ -10,6 +10,7 @@ import UIKit
 
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
+    fileprivate var cvvMap: (url: URL, cvv: String)?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -83,8 +84,11 @@ class CartNavigationController: UINavigationController {
     
     fileprivate func navigateToCheckoutOrder() {
         let checkoutOrderViewController = CheckoutOrderViewController()
+        checkoutOrderViewController.cvvMap = cvvMap
         checkoutOrderViewController.hidesBottomBarWhenPushed = true
         pushViewController(checkoutOrderViewController, animated: true)
+        
+        cvvMap = nil
     }
 }
 
@@ -93,6 +97,12 @@ extension CartNavigationController: CheckoutFormViewControllerDelegate {
         if let checkout = viewController as? CheckoutPaymentFormViewController {
             let addressShip = checkout.formRow(.addressShip)?.value
             let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
+            
+            if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+                let cvv = checkout.formRow(.cardCVV)?.value
+            {
+                cvvMap = (url: url, cvv: cvv)
+            }
             
             if isShipToSameAddressChecked || DataModel.sharedInstance.hasShippingAddresses() {
                 navigateToCheckoutOrder()
