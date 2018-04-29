@@ -8,7 +8,12 @@
 
 import UIKit
 
+protocol GiftCardDoneViewControllerProtocol : class {
+    func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController)
+}
+
 class GiftCardDoneViewController: UIViewController {
+    weak var delegate:GiftCardDoneViewControllerProtocol?
     let campaign = CampaignDescription(
         headline: "2018_05_01_campaign.done.headline".localized,
         message: "2018_05_01_campaign.done.message".localized,
@@ -54,7 +59,7 @@ class GiftCardDoneViewController: UIViewController {
         let button = MainButton()
         button.setTitle(self.campaign.buttonText, for: .normal)
         button.backgroundColor = .crazeGreen
-        
+        button.addTarget(self, action: #selector(doneAction(_:)), for: .touchUpInside)
         
         let container = self.view!
 
@@ -138,11 +143,9 @@ class GiftCardDoneViewController: UIViewController {
         
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @objc func doneAction(_ sender:Any){
+        self.delegate?.giftCardDoneViewControllerDidPressDone(self)
     }
-    
 
     struct CampaignDescription {
         var headline:String

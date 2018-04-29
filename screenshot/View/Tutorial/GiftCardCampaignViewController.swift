@@ -7,9 +7,16 @@
 //
 
 import UIKit
+protocol GiftCardCampaignViewControllerDelegate : class {
+    func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController)
+    func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController);
+}
+
 
 class GiftCardCampaignViewController: UIViewController {
 
+    weak var delegate:GiftCardCampaignViewControllerDelegate?
+    
     let campaign = CampaignDescription(
         headline: "2018_05_01_campaign.headline".localized,
         message: "2018_05_01_campaign.message".localized,
@@ -91,7 +98,7 @@ class GiftCardCampaignViewController: UIViewController {
         let button = MainButton()
         button.setTitle(self.campaign.buttonText, for: .normal)
         button.backgroundColor = .crazeGreen
-        
+        button.addTarget(self, action: #selector(continueAction(_:)), for: .touchUpInside)
         
         let skip = UIButton()
         let underlineString = NSAttributedString.init(string: self.campaign.skipText, attributes:
@@ -100,6 +107,7 @@ class GiftCardCampaignViewController: UIViewController {
              NSAttributedStringKey.foregroundColor: UIColor.gray4])
         skip.titleLabel?.font = UIFont.screenshopFont(.hind, size: sizes.skipTextFontSize)
         skip.setAttributedTitle(underlineString, for: .normal)
+        skip.addTarget(self, action: #selector(skipAction(_:)), for: .touchUpInside)
         button.backgroundColor = .crazeGreen
         
         
@@ -164,6 +172,13 @@ class GiftCardCampaignViewController: UIViewController {
     }
     
 
+    @objc func skipAction(_ sender:Any){
+        self.delegate?.giftCardCampaignViewControllerDidSkip(self)
+    }
+    @objc func continueAction(_ sender:Any){
+        self.delegate?.giftCardCampaignViewControllerDidContinue(self)
+    }
+    
     struct CampaignDescription {
         var headline:String
         var message:String

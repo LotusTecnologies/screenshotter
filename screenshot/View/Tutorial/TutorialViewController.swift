@@ -202,12 +202,44 @@ extension TutorialViewController : UIScrollViewDelegate {
     }
 }
 
+extension TutorialViewController: GiftCardCampaignViewControllerDelegate, CheckoutFormViewControllerDelegate {
+    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
+        dismiss(animated: true) {
+         
+            let viewController = CampaignPromotionViewController(modal: false)
+            viewController.modalTransitionStyle = .crossDissolve
+            viewController.delegate = self
+            self.present(viewController, animated: true, completion: nil)
+        }
+    }
+    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
+        let cardInfo = CheckoutPaymentFormViewController()
+        cardInfo.delegate = self
+        viewController.navigationController?.isNavigationBarHidden = false
+        viewController.title = "Payment"
+        viewController.navigationController?.pushViewController(cardInfo, animated: true)
+        
+    }
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
+        
+    }
+    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController){
+        
+    }
+    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController){
+        
+    }
+
+}
+
 extension TutorialViewController : VideoDisplayingViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
     @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
-        let viewController = GiftCardDoneViewController()//(modal:false)
+        let viewController = GiftCardCampaignViewController()
         viewController.modalTransitionStyle = .crossDissolve
-//        viewController.delegate = self
-        present(viewController, animated: true, completion: nil)
+        viewController.delegate = self
+        let navVC = UINavigationController.init(rootViewController: viewController)
+        navVC.isNavigationBarHidden = true
+        present(navVC, animated: true, completion: nil)
     }
     
     func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
