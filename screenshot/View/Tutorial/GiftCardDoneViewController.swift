@@ -16,8 +16,19 @@ class GiftCardDoneViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let sizes:ElementSizes = {
+            if UIDevice.is320w {
+                return ElementSizes(headlineFontSize: 25, messageFontSize: 20)
+            }else{
+                return ElementSizes(headlineFontSize: 30, messageFontSize: 23)
+            }
+        }()
+        
         self.view.backgroundColor = .white
 
+        
+        
         let topLine = UIImageView.init(image: UIImage(named: "redgradientTopLine"))
         topLine.contentMode = .scaleToFill
 
@@ -27,7 +38,7 @@ class GiftCardDoneViewController: UIViewController {
         headline.text = self.campaign.headline
         headline.textAlignment = .center
         headline.textColor = .gray4
-        headline.font = UIFont.screenshopFont(.hindBold, size: 30)
+        headline.font = UIFont.screenshopFont(.hindBold, size: sizes.headlineFontSize)
         headline.numberOfLines = 0
         
         let giftCardImage = UIImageView.init(image: UIImage.init(named: "giftCard25USD"))
@@ -36,7 +47,7 @@ class GiftCardDoneViewController: UIViewController {
         message.text = self.campaign.message
         message.textAlignment = .center
         message.textColor = .gray4
-        message.font = UIFont.screenshopFont(.hindBold, size: 23)
+        message.font = UIFont.screenshopFont(.hindBold, size: sizes.messageFontSize)
         message.minimumScaleFactor = 0.5
         message.numberOfLines = 0
         
@@ -73,28 +84,32 @@ class GiftCardDoneViewController: UIViewController {
         container.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-[topLine(6)][background]|", options: [], metrics: nil, views: views))
 
 
-        message.centerYAnchor.constraint(equalTo: container.centerYAnchor).isActive = true
+        let centerMessage = message.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+        centerMessage.priority = UILayoutPriority.init(500)
+        centerMessage.isActive = true
         button.topAnchor.constraint(greaterThanOrEqualTo: message.bottomAnchor).isActive = true
         giftCardImage.bottomAnchor.constraint(lessThanOrEqualTo: message.topAnchor).isActive = true
         headline.bottomAnchor.constraint(lessThanOrEqualTo: giftCardImage.topAnchor).isActive = true
 
         
+        
+        //center headline in area above imageView
         let guide1 = UIView()
         guide1.translatesAutoresizingMaskIntoConstraints = false
         guide1.isHidden = true
         container.addSubview(guide1)
         guide1.topAnchor.constraint(equalTo: topLine.bottomAnchor).isActive = true
         guide1.bottomAnchor.constraint(equalTo: giftCardImage.topAnchor).isActive = true
-        
         headline.centerYAnchor.constraint(equalTo: guide1.centerYAnchor).isActive = true
-
+        guide1.heightAnchor.constraint(greaterThanOrEqualToConstant: 100).isActive = true
+        
+        
         let guide2 = UIView()
         guide2.translatesAutoresizingMaskIntoConstraints = false
         guide2.isHidden = true
         container.addSubview(guide2)
         guide2.topAnchor.constraint(equalTo: giftCardImage.bottomAnchor).isActive = true
         guide2.bottomAnchor.constraint(equalTo: button.topAnchor).isActive = true
-        
         
         
         let position = guide2.heightAnchor.constraint(equalTo: container.heightAnchor, multiplier:0.3)
@@ -118,6 +133,7 @@ class GiftCardDoneViewController: UIViewController {
         
         guide3.heightAnchor.constraint(equalTo: guide4.heightAnchor).isActive = true
         
+        guide3.heightAnchor.constraint(greaterThanOrEqualToConstant: 40.0).isActive = true
         
         
     }
@@ -133,5 +149,9 @@ class GiftCardDoneViewController: UIViewController {
         var message:String
         var buttonText:String
     }
-
+    
+    struct ElementSizes {
+        var headlineFontSize:CGFloat
+        var messageFontSize:CGFloat
+    }
 }
