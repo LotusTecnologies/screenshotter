@@ -8,11 +8,13 @@
 
 import UIKit
 import CreditCardValidator
+import PhoneNumberKit
 
 class TextFieldFormatter {
     enum Field {
         case card
         case cvv
+        case phone
         case zip
     }
     
@@ -46,7 +48,7 @@ class TextFieldFormatter {
         case .card:
             if !isObserving {
                 isObserving = true
-                NotificationCenter.default.addObserver(self, selector: #selector(textFieldTextDidChange(_:)), name: .UITextFieldTextDidChange, object: textField)
+                NotificationCenter.default.addObserver(self, selector: #selector(cardTextFieldTextDidChange(_:)), name: .UITextFieldTextDidChange, object: textField)
             }
             
             maxLength = 19 // 16 digits + 3 spaces
@@ -54,6 +56,15 @@ class TextFieldFormatter {
             
         case .cvv:
             maxLength = 4
+            allowedCharacters = .decimalDigits
+            
+        case .phone:
+            if !isObserving {
+                isObserving = true
+                NotificationCenter.default.addObserver(self, selector: #selector(phoneTextFieldTextDidChange(_:)), name: .UITextFieldTextDidChange, object: textField)
+            }
+            
+            maxLength = 14 // 10 digits + 4 extra characters
             allowedCharacters = .decimalDigits
             
         case .zip:
@@ -64,15 +75,15 @@ class TextFieldFormatter {
         return length <= maxLength && allowedCharacters.isSuperset(of: CharacterSet(charactersIn: string))
     }
     
-    @objc fileprivate func textFieldTextDidChange(_ notification: Notification) {
+    // MARK: Credit Card Formatting
+    
+    @objc fileprivate func cardTextFieldTextDidChange(_ notification: Notification) {
         guard let textField = notification.object as? UITextField else {
             return
         }
         
         reformatAsCardNumber(textField: textField)
     }
-    
-    // MARK: Credit Card Formatting
     
     fileprivate func reformatAsCardNumber(textField: UITextField) {
         var targetCursorPosition = 0
@@ -132,5 +143,15 @@ class TextFieldFormatter {
         cursorPosition = excapingCursorPosition
         
         return formattedNumber
+    }
+    
+    // MARK: Phone Number Formatting
+    
+    @objc fileprivate func phoneTextFieldTextDidChange(_ notification: Notification) {
+        guard let textField = notification.object as? UITextField, let text = textField.text else {
+            return
+        }
+        
+        textField.text = PartialFormatter().formatPartial(text)
     }
 }

@@ -23,6 +23,7 @@ def shared_pods
     pod 'SwiftKeychainWrapper'
     pod 'CreditCardValidator'
     pod 'Whisper'
+    pod 'PhoneNumberKit'
 end
 
 target 'screenshot' do
