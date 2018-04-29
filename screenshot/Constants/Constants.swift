@@ -26,10 +26,6 @@ class Constants {
     // Cart
     static let cartItemMaxQuantity = 10
     
-    // Checkout
-    static let checkoutPrimaryCardURL = "checkoutPrimaryCardURL"
-    static let checkoutPrimaryAddressURL = "checkoutPrimaryAddressURL"
-    
     // Syte
     static let syteAccountId = 6677
     static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="

@@ -98,7 +98,7 @@ extension CartNavigationController: CheckoutFormViewControllerDelegate {
             let addressShip = checkout.formRow(.addressShip)?.value
             let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
             
-            if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+            if let url = DataModel.sharedInstance.selectedCardURL,
                 let cvv = checkout.formRow(.cardCVV)?.value
             {
                 cvvMap = (url: url, cvv: cvv)

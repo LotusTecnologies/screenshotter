@@ -69,7 +69,7 @@ class CheckoutShippingListViewController: CheckoutListViewController {
     
     override func indexPathForSelectedCell() -> IndexPath? {
         let shippingAddress: ShippingAddress? = {
-            if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
+            if let url = DataModel.sharedInstance.selectedShippingAddressURL,
                 let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
                 let shippingAddress = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID)
             {
@@ -77,9 +77,7 @@ class CheckoutShippingListViewController: CheckoutListViewController {
             }
             
             if let shippingAddress = shippingFrc?.fetchedObjects.first {
-                let url = shippingAddress.objectID.uriRepresentation()
-                UserDefaults.standard.set(url, forKey: Constants.checkoutPrimaryAddressURL)
-                UserDefaults.standard.synchronize()
+                DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()
                 return shippingAddress
             }
             
@@ -118,9 +116,7 @@ extension CheckoutShippingListViewController: UITableViewDataSource {
 extension CheckoutShippingListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let shipping = shippingFrc?.object(at: indexPath) {
-            let shippingURL = shipping.objectID.uriRepresentation()
-            UserDefaults.standard.set(shippingURL, forKey: Constants.checkoutPrimaryAddressURL)
-            UserDefaults.standard.synchronize()
+            DataModel.sharedInstance.selectedShippingAddressURL = shipping.objectID.uriRepresentation()
         }
     }
 }

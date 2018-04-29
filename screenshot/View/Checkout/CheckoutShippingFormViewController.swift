@@ -138,14 +138,14 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         addressCountry = supportedCountriesMap?.countryCodes[addressCountry] ?? addressCountry
         addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
+        DataModel.sharedInstance.selectedShippingAddressURL = nil
+        
         DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
             .then { shippingAddress -> Void in
-                let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
-                UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
-                UserDefaults.standard.synchronize()
+                DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()
+                
+                self.delegate?.checkoutFormViewControllerDidAdd(self)
         }
-        
-        delegate?.checkoutFormViewControllerDidAdd(self)
     }
     
     @objc fileprivate func updateShippingAddress() {
@@ -177,9 +177,9 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
             return
         }
         
-        if let primaryShippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL) {
+        if let primaryShippingURL = DataModel.sharedInstance.selectedShippingAddressURL {
             if primaryShippingURL == shippingAddress.objectID.uriRepresentation() {
-                UserDefaults.standard.set(nil, forKey: Constants.checkoutPrimaryAddressURL)
+                DataModel.sharedInstance.selectedShippingAddressURL = nil
             }
         }
         
