@@ -139,7 +139,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cvvTextField.text = nil
         cvvTextField.layer.borderColor = UIColor.crazeRed.cgColor
         
-        TapticHelper.nope()
+        UINotificationFeedbackGenerator().notificationOccurred(.error)
     }
 }
 

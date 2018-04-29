@@ -139,13 +139,16 @@ class CheckoutOrderViewController: BaseViewController {
             _view.orderButton.isLoading = true
             _view.orderButton.isEnabled = false
             
+            let feedbackGenerator = UINotificationFeedbackGenerator()
+            feedbackGenerator.prepare()
+            
             ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress)
                 .then { [weak self] someBool -> Void in
                     self?.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
                 }
                 .catch { [weak self] error in
                     // TODO: handle this
-                    TapticHelper.nope()
+                    feedbackGenerator.notificationOccurred(.error)
                 }
                 .always { [weak self] in
                     self?._view.orderButton.isLoading = false
@@ -193,6 +196,9 @@ class CheckoutOrderViewController: BaseViewController {
         confirmPaymentViewController?.orderButton.isLoading = true
         confirmPaymentViewController?.orderButton.isEnabled = false
         
+        let feedbackGenerator = UINotificationFeedbackGenerator()
+        feedbackGenerator.prepare()
+        
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { [weak self] someBool -> Void in
                 self?.dismiss(animated: true, completion: nil)
@@ -201,7 +207,7 @@ class CheckoutOrderViewController: BaseViewController {
             }
             .catch { [weak self] error in
                 // TODO: handle this
-                TapticHelper.nope()
+                feedbackGenerator.notificationOccurred(.error)
             }
             .always { [weak self] in
                 self?.confirmPaymentViewController?.orderButton.isLoading = false

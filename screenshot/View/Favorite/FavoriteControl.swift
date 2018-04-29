@@ -61,6 +61,6 @@ class FavoriteControl: UIControl {
         isSelected = !isSelected
         animate = false
         
-        TapticHelper.peek()
+        ActionFeedbackGenerator().actionOccurred(.peek)
     }
 }

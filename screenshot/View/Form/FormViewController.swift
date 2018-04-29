@@ -161,7 +161,7 @@ class FormViewController: BaseViewController {
             tableView.reloadData()
             tableView.scrollToRow(at: firstIndexPath, at: .top, animated: true)
             
-            TapticHelper.nope()
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
         }
     }
     
