@@ -71,14 +71,18 @@ class TutorialViewController : UINavigationController {
 }
 extension TutorialViewController : UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool){
-        if let _ = viewController as? CheckoutPaymentFormViewController {
-            self.isNavigationBarHidden = false
-        }else{
-            self.isNavigationBarHidden = true
+        if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
+            self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
+        }
+    }
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool){
+        if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
+            self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
         }
     }
 
 }
+
 
 
 extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
@@ -87,9 +91,6 @@ extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
     }
-
-    
-    
 }
 extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
     func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
