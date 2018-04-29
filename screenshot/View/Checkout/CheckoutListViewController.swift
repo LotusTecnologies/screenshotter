@@ -38,6 +38,7 @@ class CheckoutListViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         // Allow the sync to come from the FRC when popping
         if !isPoppingViewController {
             syncSelectedCell()

@@ -24,6 +24,12 @@ PODS:
   - Intercom (5.0.0)
   - KochavaTrackeriOS (3.4.1)
   - lottie-ios (2.5.0)
+  - PhoneNumberKit (2.1.0):
+    - PhoneNumberKit/PhoneNumberKitCore (= 2.1.0)
+    - PhoneNumberKit/UIKit (= 2.1.0)
+  - PhoneNumberKit/PhoneNumberKitCore (2.1.0)
+  - PhoneNumberKit/UIKit (2.1.0):
+    - PhoneNumberKit/PhoneNumberKitCore
   - PromiseKit/CorePromise (4.5.2)
   - PromiseKit/Foundation (4.5.2):
     - PromiseKit/CorePromise
@@ -52,6 +58,7 @@ DEPENDENCIES:
   - Intercom
   - KochavaTrackeriOS
   - lottie-ios
+  - PhoneNumberKit
   - PromiseKit/Foundation (= 4.5.2)
   - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
@@ -75,6 +82,7 @@ SPEC REPOS:
     - Intercom
     - KochavaTrackeriOS
     - lottie-ios
+    - PhoneNumberKit
     - PromiseKit
     - RateView
     - SDWebImage
@@ -97,6 +105,7 @@ SPEC CHECKSUMS:
   Intercom: 235c91e8c38bdf97c5a825078a07050362e556e7
   KochavaTrackeriOS: 29e81e9d36a2426efa5b806a5f0bd77421f8d507
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
+  PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
@@ -104,6 +113,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 21e7c31779dbd4944ea5bb47fc4a84cbfd694579
+PODFILE CHECKSUM: a54d3fdc5ad50ce98c478e10a00e86f77a400d6a
 
 COCOAPODS: 1.5.0

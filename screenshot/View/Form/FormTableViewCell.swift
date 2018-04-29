@@ -9,6 +9,7 @@
 import UIKit
 import Appsee
 import CreditCardValidator
+import PhoneNumberKit
 
 class FormCardTableViewCell: FormNumberTableViewCell {
     required init?(coder aDecoder: NSCoder) {
@@ -125,6 +126,8 @@ class FormPhoneTableViewCell: FormTextTableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         textField.keyboardType = .phonePad
+        
+        textFieldController = TextFieldFormatter(with: .phone)
     }
 }
 
