@@ -20,7 +20,30 @@ class GiftCardCampaignViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        
+        let sizes:ElementSizes = {
+            if UIDevice.is320w {
+                return ElementSizes(
+                    headlineFontSize: 20,
+                    messageFontSize: 15,
+                    messageDetailFontSize: 15,
+                    skipTextFontSize: 14,
+                    aboveSkipPad: 10,
+                    belowSkipPad: 20)
+            }else{
+                return ElementSizes(
+                    headlineFontSize: 30,
+                    messageFontSize: 23,
+                    messageDetailFontSize: 23,
+                    skipTextFontSize: 20,
+                    aboveSkipPad: 30,
+                    belowSkipPad: 60)
+            }
+          
+        }()
+        
+        
         self.view.backgroundColor = .white
         
         let topBackground = UIView()
@@ -40,7 +63,7 @@ class GiftCardCampaignViewController: UIViewController {
         headline.text = self.campaign.headline
         headline.textAlignment = .center
         headline.textColor = .gray4
-        headline.font = UIFont.screenshopFont(.hindBold, size: 30)
+        headline.font = UIFont.screenshopFont(.hindBold, size: sizes.headlineFontSize)
         headline.numberOfLines = 0
         
         
@@ -48,8 +71,8 @@ class GiftCardCampaignViewController: UIViewController {
         message.text = self.campaign.message
         message.textAlignment = .center
         message.textColor = .gray4
-        message.font = UIFont.screenshopFont(.hindBold, size: 23)
-        message.minimumScaleFactor = 0.5
+        message.font = UIFont.screenshopFont(.hindBold, size: sizes.messageFontSize)
+        message.minimumScaleFactor = 0.1
         message.numberOfLines = 0
         
         let separatorLine = UIView()
@@ -59,8 +82,8 @@ class GiftCardCampaignViewController: UIViewController {
         messageDetail.text = self.campaign.messageDetail
         messageDetail.textAlignment = .center
         messageDetail.textColor = .gray6
-        messageDetail.font = UIFont.screenshopFont(.hindBold, size: 23)
-        messageDetail.minimumScaleFactor = 0.5
+        messageDetail.font = UIFont.screenshopFont(.hindBold, size: sizes.messageDetailFontSize)
+        messageDetail.minimumScaleFactor = 0.1
         messageDetail.numberOfLines = 0
         
         
@@ -75,6 +98,7 @@ class GiftCardCampaignViewController: UIViewController {
             [NSAttributedStringKey.underlineStyle : NSUnderlineStyle.styleSingle.rawValue,
              NSAttributedStringKey.underlineColor : UIColor.gray4,
              NSAttributedStringKey.foregroundColor: UIColor.gray4])
+        skip.titleLabel?.font = UIFont.screenshopFont(.hind, size: sizes.skipTextFontSize)
         skip.setAttributedTitle(underlineString, for: .normal)
         button.backgroundColor = .crazeGreen
         
@@ -123,7 +147,7 @@ class GiftCardCampaignViewController: UIViewController {
         
         
         //forground V layout:
-        container.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[giftCardImage][message][separatorLine(2)][messageDetail(==message)][button]-30-[skip]-60-|", options: [], metrics: nil, views: views))
+        container.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[giftCardImage][message][separatorLine(2)][messageDetail(==message)][button]-aboveSkipPad-[skip]-belowSkipPad-|", options: [], metrics: ["aboveSkipPad":sizes.aboveSkipPad, "belowSkipPad":sizes.belowSkipPad], views: views))
 
         let guide = UIView()
         guide.translatesAutoresizingMaskIntoConstraints = false
@@ -146,6 +170,15 @@ class GiftCardCampaignViewController: UIViewController {
         var messageDetail:String
         var buttonText:String
         var skipText:String
+    }
+    
+    struct ElementSizes {
+        var headlineFontSize:CGFloat
+        var messageFontSize:CGFloat
+        var messageDetailFontSize:CGFloat
+        var skipTextFontSize:CGFloat
+        var aboveSkipPad:CGFloat
+        var belowSkipPad:CGFloat
     }
 
 }
