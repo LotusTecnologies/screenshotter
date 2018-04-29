@@ -272,10 +272,13 @@ extension FormViewController: UITableViewDataSource {
         cell.textLabel?.text = formRow.placeholder
         
         if let cell = cell as? FormCheckboxTableViewCell {
-            cell.isChecked = NSString(string: formRow.value ?? "0").boolValue
+            cell.isChecked = FormRow.Checkbox.bool(for: formRow.value)
         }
         else if let cell = cell as? FormSelectionTableViewCell {
             cell.detailTextLabel?.text = formRow.value
+        }
+        else if let cell = cell as? FormCardTableViewCell {
+            cell.textField.placeholder = formRow.value
         }
         else if let cell = cell as? FormTextTableViewCell {
             cell.textField.text = formRow.value
