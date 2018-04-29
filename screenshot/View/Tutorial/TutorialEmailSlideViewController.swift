@@ -9,15 +9,16 @@
 import UIKit
 import Appsee
 
-protocol TutorialEmailSlideViewDelegate : class {
-    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView)
-    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView)
-    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView)
+protocol TutorialEmailSlideViewControllerDelegate : class {
+    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController)
+    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController)
+    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideViewController)
 }
 
-public class TutorialEmailSlideView : HelperView {
-    weak var delegate: TutorialEmailSlideViewDelegate?
-    
+public class TutorialEmailSlideViewController : UIViewController {
+    weak var delegate: TutorialEmailSlideViewControllerDelegate?
+    fileprivate let helperView = HelperView()
+
     fileprivate let nameTextField = TutorialEmailSlideTextField()
     fileprivate let emailTextField = TutorialEmailSlideTextField()
     fileprivate let textView = TappableTextView()
@@ -28,15 +29,50 @@ public class TutorialEmailSlideView : HelperView {
     
     // MARK: Life Cycle
     
-    public required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    init() {
+        super.init(nibName: nil, bundle: nil)
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.backgroundColor = .white
         
-        titleLabel.text = "tutorial.email.title".localized
-        subtitleLabel.text = "tutorial.email.detail".localized
+        helperView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(helperView)
+        helperView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        helperView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
+        helperView.rightAnchor.constraint(equalTo: self.view.rightAnchor).isActive = true
+
+        helperView.layoutMargins = {
+            var extraTop = CGFloat(0)
+            var extraBottom = CGFloat(0)
+            
+            if !UIApplication.shared.preferredContentSizeCategory.isAccessibilityCategory {
+                if UIDevice.is812h || UIDevice.is736h {
+                    extraTop = .extendedPadding
+                    extraBottom = .extendedPadding
+                    
+                } else if UIDevice.is667h {
+                    extraTop = .padding
+                    extraBottom = .padding
+                }
+            }
+            
+            let paddingX: CGFloat = .padding
+            
+            
+            return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
+        }()
+        
+        let contentView = helperView.contentView
+        
+        helperView.titleLabel.text = "tutorial.email.title".localized
+        helperView.subtitleLabel.text = "tutorial.email.detail".localized
         
         let paddingView1 = UIView()
         paddingView1.translatesAutoresizingMaskIntoConstraints = false
@@ -136,7 +172,7 @@ public class TutorialEmailSlideView : HelperView {
         textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
+        helperView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
     }
     
     deinit {
@@ -193,36 +229,50 @@ public class TutorialEmailSlideView : HelperView {
     }
     
     @objc private func resignTextField() {
-        endEditing(true)
+        self.view.endEditing(true)
     }
     
     // MARK: Keyboard
     
     @objc func keyboardWillShow(_ notification: NSNotification) {
-        guard window != nil, let value = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue else {
+        guard self.view.window != nil, let value = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue else {
             return
         }
         
-        scrollInset = UIEdgeInsets(top: 0, left: 0, bottom: value.cgRectValue.size.height, right: 0)
+        self.helperView.scrollInset = UIEdgeInsets(top: 0, left: 0, bottom: value.cgRectValue.size.height, right: 0)
     }
     
     @objc func keyboardWillHide(_ notification: NSNotification) {
-        guard window != nil else {
+        guard self.view.window != nil else {
             return
         }
         
         if let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber {
             UIView.animate(withDuration: duration.doubleValue) {
-                self.scrollInset = .zero
+                self.helperView.scrollInset = .zero
             }
             
         } else {
-            scrollInset = .zero
+            self.helperView.scrollInset = .zero
         }
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Appsee.startScreen("Tutorial Email")
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
+
+    }
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+      
     }
 }
 
-extension TutorialEmailSlideView : UITextViewDelegate {
+extension TutorialEmailSlideViewController : UITextViewDelegate {
     public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         
         switch URL.absoluteString {
@@ -240,7 +290,7 @@ extension TutorialEmailSlideView : UITextViewDelegate {
     }
 }
 
-extension TutorialEmailSlideView : UITextFieldDelegate {
+extension TutorialEmailSlideViewController : UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == nameTextField {
             emailTextField.becomeFirstResponder()
@@ -253,18 +303,6 @@ extension TutorialEmailSlideView : UITextFieldDelegate {
     }
 }
 
-extension TutorialEmailSlideView : TutorialSlideViewProtocol {
-    func didEnterSlide() {
-        Appsee.startScreen("Tutorial Email")
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
-    }
-    
-    func willLeaveSlide() {
-        NotificationCenter.default.removeObserver(self)
-    }
-}
 
 private class TutorialEmailSlideTextField : UITextField {
     override var intrinsicContentSize: CGSize {

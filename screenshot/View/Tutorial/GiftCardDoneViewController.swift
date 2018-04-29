@@ -8,12 +8,12 @@
 
 import UIKit
 
-protocol GiftCardDoneViewControllerProtocol : class {
+protocol GiftCardDoneViewControllerDelegate : class {
     func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController)
 }
 
 class GiftCardDoneViewController: UIViewController {
-    weak var delegate:GiftCardDoneViewControllerProtocol?
+    weak var delegate:GiftCardDoneViewControllerDelegate?
     let campaign = CampaignDescription(
         headline: "2018_05_01_campaign.done.headline".localized,
         message: "2018_05_01_campaign.done.message".localized,

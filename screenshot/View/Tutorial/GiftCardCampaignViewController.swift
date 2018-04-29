@@ -28,7 +28,6 @@ class GiftCardCampaignViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         let sizes:ElementSizes = {
             if UIDevice.is320w {
                 return ElementSizes(
@@ -194,6 +193,12 @@ class GiftCardCampaignViewController: UIViewController {
         var skipTextFontSize:CGFloat
         var aboveSkipPad:CGFloat
         var belowSkipPad:CGFloat
+    }
+    func didEnterSlide(){
+        
+    }
+    func willLeaveSlide(){
+        
     }
 
 }

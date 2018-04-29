@@ -9,159 +9,34 @@
 import UIKit
 
 @objc protocol TutorialViewControllerDelegate : class {
-    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController)
+    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController)
 }
 
-class TutorialViewController : BaseViewController {
-    weak var delegate: TutorialViewControllerDelegate?
+class TutorialViewController : UINavigationController {
+    weak var tutorialDelegate: TutorialViewControllerDelegate?
     
-    let scrollView = UIScrollView()
-    let contentView = UIView()
-    
-    private var didPresentDeterminePushAlertController = false
-    fileprivate var scrollViewIsScrollingAnimation = false
-    
-    // MARK: - Life Cycle
+   
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        
+        
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        let welcomeSlide = TutorialWelcomeSlideViewController()
+        self.viewControllers = [welcomeSlide]
+        welcomeSlide.delegate = self
+        AnalyticsTrackers.standard.track(.startedTutorial)
+        view.backgroundColor = .white
+        self.isNavigationBarHidden = true
+        self.delegate = self
+    }
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
-        
-        slides = buildSlides()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        AnalyticsTrackers.standard.track(.startedTutorial)
-        
-        view.backgroundColor = .white
-        
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.delegate = self
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.isPagingEnabled = true
-        scrollView.isScrollEnabled = false
-        view.addSubview(scrollView)
-        scrollView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CGFloat(slides.count)).isActive = true
-        contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
-        
-        prepareSlideViews()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        currentSlide.didEnterSlide()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        currentSlide.willLeaveSlide()
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        
-        let currentSlideIdx = currentSlideIndex
-        coordinator.animate(alongsideTransition: { context in
-            var offset = self.scrollView.contentOffset
-            offset.x = size.width * CGFloat(currentSlideIdx)
-            self.scrollView.contentOffset = offset
-        }, completion: nil)
-    }
-    
-    @objc func contentSizeCategoryDidChange(_ notification: Notification) {
-        slides.forEach { slide in
-            slide.layoutMargins = slideLayoutMargins(slide)
-        }
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
     
     // MARK: - Slides
     
-    var slides: [TutorialSlideView] = []
-    
-    private func buildSlides() -> [TutorialSlideView] {
-        let welcomeSlide = TutorialWelcomeSlideView()
-        welcomeSlide.button.addTarget(self, action: #selector(tutorialWelcomeSlideViewDidComplete), for: .touchUpInside)
-        
-        let emailSlide = TutorialEmailSlideView()
-        emailSlide.delegate = self
-        
-        let trySlide = TutorialTrySlideView()
-        trySlide.delegate = self
-        
-        return [welcomeSlide, emailSlide, trySlide]
-    }
-    
-    fileprivate var currentSlideIndex: Int {
-        guard scrollView.bounds != .zero else {
-            return 0
-        }
-        
-        return Int(ceil(scrollView.contentOffset.x / scrollView.bounds.size.width))
-    }
-    
-    fileprivate var currentSlide: TutorialSlideView {
-        return slides[currentSlideIndex]
-    }
-    
-    fileprivate func scrollToNextSlide(animated: Bool = true) {
-        guard scrollViewIsScrollingAnimation == false else {
-            return
-        }
-        
-        scrollViewIsScrollingAnimation = true
-        currentSlide.willLeaveSlide()
-        
-        var offset = CGPoint.zero
-        offset.x = scrollView.bounds.size.width + scrollView.contentOffset.x
-        scrollView.setContentOffset(offset, animated: animated)
-    }
-    
-    private func prepareSlideViews() {
-        slides.enumerated().forEach { i, slide in
-            slide.translatesAutoresizingMaskIntoConstraints = false
-            slide.layoutMargins = slideLayoutMargins(slide)
-            contentView.addSubview(slide)
-            slide.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-            slide.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
-            slide.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-            
-            if i == 0 {
-                slide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-                
-            } else if i == slides.count - 1 {
-                slide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-            }
-            
-            if i > 0 {
-                let previousSlide = slides[i - 1]
-                slide.leadingAnchor.constraint(equalTo: previousSlide.trailingAnchor).isActive = true
-            }
-        }
-    }
-    
-    private func slideLayoutMargins(_ slide: TutorialSlideView) -> UIEdgeInsets {
+    private func slideLayoutMargins(_ slide: UIViewController) -> UIEdgeInsets {
         var extraTop = CGFloat(0)
         var extraBottom = CGFloat(0)
         
@@ -178,7 +53,7 @@ class TutorialViewController : BaseViewController {
         
         var paddingX: CGFloat = .padding
         
-        if slide.isKind(of: TutorialTrySlideView.self) {
+        if slide.isKind(of: TutorialTrySlideViewController.self) {
             // TODO: when supporting localization, this should be if isEnglish
             // Only customize insets for default font size
             if UIApplication.shared.preferredContentSizeCategory == UIContentSizeCategory.large {
@@ -194,32 +69,42 @@ class TutorialViewController : BaseViewController {
         return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
     }
 }
-
-extension TutorialViewController : UIScrollViewDelegate {
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        scrollViewIsScrollingAnimation = false
-        currentSlide.didEnterSlide()
-    }
-}
-
-extension TutorialViewController: GiftCardCampaignViewControllerDelegate, CheckoutFormViewControllerDelegate {
-    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
-        dismiss(animated: true) {
-         
-            let viewController = CampaignPromotionViewController(modal: false)
-            viewController.modalTransitionStyle = .crossDissolve
-            viewController.delegate = self
-            self.present(viewController, animated: true, completion: nil)
+extension TutorialViewController : UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool){
+        if let _ = viewController as? CheckoutPaymentFormViewController {
+            self.isNavigationBarHidden = false
+        }else{
+            self.isNavigationBarHidden = true
         }
     }
-    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
-        let cardInfo = CheckoutPaymentFormViewController()
-        cardInfo.delegate = self
-        viewController.navigationController?.isNavigationBarHidden = false
-        viewController.title = "Payment"
-        viewController.navigationController?.pushViewController(cardInfo, animated: true)
-        
+
+}
+
+
+extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
+    func tutorialWelcomeSlideViewControllerDidComplete(_ viewController:TutorialWelcomeSlideViewController) {
+        let viewController = GiftCardCampaignViewController()
+        viewController.delegate = self
+        self.pushViewController(viewController, animated: true)
     }
+
+    
+    
+}
+extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
+    func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
+        let viewController = CampaignPromotionViewController(modal: false)
+        viewController.delegate = self
+        self.pushViewController(viewController, animated: true)
+
+    }
+    func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
+        let viewController = CheckoutPaymentFormViewController()
+        viewController.delegate = self
+        self.pushViewController(viewController, animated: true)
+    }
+}
+extension TutorialViewController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
         
     }
@@ -229,52 +114,70 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate, Checko
     func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController){
         
     }
+}
+
+extension TutorialViewController : GiftCardDoneViewControllerDelegate {
+    func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
+        let viewController = CampaignPromotionViewController(modal: false)
+        viewController.delegate = self
+        self.pushViewController(viewController, animated: true)
+    }
+}
+
+extension TutorialViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
+        let learnMore = CampaignPromotionExplanationViewController(modal:false)
+        learnMore.delegate = self
+        self.pushViewController(learnMore, animated: true)
+    }
+    
+    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
+        let signup = TutorialEmailSlideViewController()
+        signup.delegate = self
+        self.pushViewController(signup, animated: true)
+    }
+}
+
+extension TutorialViewController : CampaignPromotionExplanationViewControllerDelegate {
+    func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
+        let signup = TutorialEmailSlideViewController()
+        signup.delegate = self
+        self.pushViewController(signup, animated: true)
+    }
+    func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
+        self.popViewController(animated: true)
+    }
 
 }
 
-extension TutorialViewController : VideoDisplayingViewControllerDelegate, TutorialEmailSlideViewDelegate, TutorialTrySlideViewDelegate {
-    @objc fileprivate func tutorialWelcomeSlideViewDidComplete() {
-        let viewController = GiftCardCampaignViewController()
-        viewController.modalTransitionStyle = .crossDissolve
-        viewController.delegate = self
-        let navVC = UINavigationController.init(rootViewController: viewController)
-        navVC.isNavigationBarHidden = true
-        present(navVC, animated: true, completion: nil)
+extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
+    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController){
+        let tryItOut = TutorialTrySlideViewController()
+        tryItOut.delegate = self
+        self.pushViewController(tryItOut, animated: true)
     }
-    
-    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
-        if let viewController = viewController as? TutorialViewController {
-            viewController.delegate = nil
-        }
-        dismiss(animated: true, completion: nil)
-        scrollToNextSlide()
-    }
-    
-    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideView) {
-        slideView.delegate = nil
-        scrollToNextSlide()
-    }
-    
-    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideView) {
-        if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
-            present(viewController, animated: true, completion: nil)
-        }
-    }
-    
-    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideView) {
+    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
         if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
             present(viewController, animated: true, completion: nil)
         }
     }
     
-    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideView) {
+    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideViewController){
+        if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
+            present(viewController, animated: true, completion: nil)
+        }
+    }
+
+}
+
+extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
+    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
         tutorialTrySlideViewDidComplete(slideView)
-        
         AnalyticsTrackers.standard.track(.skippedTutorial)
         AppDelegate.shared.shouldLoadDiscoverNextLoad = true
+
     }
-    
-    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideView) {
+    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideViewController){
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
@@ -282,6 +185,7 @@ extension TutorialViewController : VideoDisplayingViewControllerDelegate, Tutori
         //TODO: why is this extra branch tracking here?
         AnalyticsTrackers.branch.track(.finishedTutorial)
         
-        delegate?.tutoriaViewControllerDidComplete(self)
+        self.tutorialDelegate?.tutorialViewControllerDidComplete(self)
     }
 }
+

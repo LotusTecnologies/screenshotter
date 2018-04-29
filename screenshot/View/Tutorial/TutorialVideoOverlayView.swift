@@ -13,6 +13,7 @@ class TutorialVideoOverlayView : UIView {
     private(set) var replayPauseButton = UIButton()
     private(set) var volumeToggleButton = UIButton()
     
+    
     // MARK: - Life Cycle
     
     required init?(coder aDecoder: NSCoder) {

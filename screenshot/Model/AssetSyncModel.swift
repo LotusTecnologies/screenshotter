@@ -981,7 +981,7 @@ extension AssetSyncModel {
                 let getData:Promise<Data?> = Promise.init(resolvers: { (fulfill, reject) in
                     let imageData: Data?
                     #if STORE_NEW_TUTORIAL_SCREENSHOT
-                    imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                    imageData = self.data(for: TutorialTrySlideViewController.rawGraphic ?? image)
                     #else
                     imageData = self.data(for: image)
                     #endif
