@@ -23,6 +23,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>io.crazeapp.screenshot</string>
 				<string>fb1960379067541863</string>
 			</array>
 		</dict>
