@@ -232,6 +232,10 @@ class FormSelectionPickerTableViewCell: TableViewCell, FormErrorTableViewCellPro
         pickerView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         pickerView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         pickerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureAction(_:)))
+        tapGesture.delegate = self
+        pickerView.addGestureRecognizer(tapGesture)
     }
     
     fileprivate func sizeChanged(_ size: CGSize) {
@@ -251,6 +255,39 @@ class FormSelectionPickerTableViewCell: TableViewCell, FormErrorTableViewCellPro
         
         pickerView.dataSource = nil
         pickerView.delegate = nil
+    }
+    
+    @objc fileprivate func tapGestureAction(_ tapGesture: UITapGestureRecognizer) {
+        let location = tapGesture.location(in: pickerView)
+        
+        if let pickerTableViewCell = tapGesture.view?.hitTest(location, with: nil) as? UITableViewCell {
+            var tableView: UITableView?
+            var superview = pickerTableViewCell.superview
+            
+            while superview != nil {
+                if let view = superview as? UITableView {
+                    tableView = view
+                    break
+                }
+                else {
+                    superview = superview?.superview
+                }
+            }
+            
+            if let tableView = tableView, let indexPath = tableView.indexPath(for: pickerTableViewCell) {
+                if indexPath.row == 0 {
+                    let component = Int(floor(location.x / (pickerView.bounds.size.width / CGFloat(pickerView.numberOfComponents))))
+                    
+                    pickerView.delegate?.pickerView!(pickerView, didSelectRow: indexPath.row, inComponent: component)
+                }
+            }
+        }
+    }
+    
+    // MARK: Gesture Recognizer
+    
+    override func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }
 
