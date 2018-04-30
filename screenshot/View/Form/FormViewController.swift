@@ -492,6 +492,39 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         }
     }
     
+    private func expirationDate(for pickerView: UIPickerView, row: Int, component: Int) -> FormRow.Expiration.Date? {
+        if let dateComponent = FormExpirationPickerTableViewCell.DateComponent(rawValue: component) {
+            let dateComponents: [FormExpirationPickerTableViewCell.DateComponent] = [.month, .year]
+            let otherDateComponent = dateComponents.first { dateComponent -> Bool in
+                return dateComponent.rawValue != component
+            }
+            
+            if let otherDateComponent = otherDateComponent {
+                let otherRow = pickerView.selectedRow(inComponent: otherDateComponent.rawValue)
+                
+                if let value = FormExpirationPickerTableViewCell.dateMap[dateComponent]?[row],
+                    let otherValue = FormExpirationPickerTableViewCell.dateMap[otherDateComponent]?[otherRow]
+                {
+                    let month: Int
+                    let year: Int
+                    
+                    if component == FormExpirationPickerTableViewCell.DateComponent.month.rawValue {
+                        month = value
+                        year = otherValue
+                    }
+                    else {
+                        month = otherValue
+                        year = value
+                    }
+                    
+                    return FormRow.Expiration.Date(month: month, year: year)
+                }
+            }
+        }
+        
+        return nil
+    }
+    
     private func expirationValue(forRow row: Int, inComponent component: Int) -> Int? {
         if let dateComponent = FormExpirationPickerTableViewCell.DateComponent(rawValue: component) {
             return FormExpirationPickerTableViewCell.dateMap[dateComponent]?[row]
@@ -575,45 +608,12 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
             
         case FormRow.ExpirationPicker.tag:
             guard let expirationPickerRow = expirationPickerRow(for: pickerView),
-                let value = expirationValue(forRow: row, inComponent: component)
+                let date = expirationDate(for: pickerView, row: row, component: component)
                 else {
                     return
             }
             
-            func setFormRowValue(with date: FormRow.Expiration.Date) {
-                var date = date
-                
-                if component == FormExpirationPickerTableViewCell.DateComponent.month.rawValue {
-                    date.month = value
-                }
-                else {
-                    date.year = value
-                }
-                
-                expirationPickerRow.attachedRow.value = FormRow.Expiration.value(for: date)
-            }
-            
-            if let date = FormRow.Expiration.date(for: expirationPickerRow.attachedRow.value) {
-                setFormRowValue(with: date)
-            }
-            else if let currentValueString = expirationPickerRow.attachedRow.value,
-                let currentValue = Int(currentValueString)
-            {
-                var date = FormRow.Expiration.Date(month: 0, year: 0)
-                
-                if FormRow.Expiration.isYear(currentValue) {
-                    date.year = currentValue
-                }
-                else {
-                    date.month = currentValue
-                }
-                
-                setFormRowValue(with: date)
-            }
-            else {
-                expirationPickerRow.attachedRow.value = expirationValue(forValue: value, inComponent: component)
-            }
-            
+            expirationPickerRow.attachedRow.value = FormRow.Expiration.value(for: date)
             syncPickerRow(expirationPickerRow)
             
         default:
