@@ -100,7 +100,8 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
 
     }
     func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
-        let viewController = CheckoutPaymentFormViewController()
+        let viewController = CheckoutPaymentFormViewController(card:nil, isEditLayout: true)
+        viewController.title = "2018_05_01_campaign.payment".localized
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
     }

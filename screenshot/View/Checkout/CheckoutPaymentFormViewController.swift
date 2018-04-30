@@ -33,7 +33,10 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     
     convenience init(withCard card: Card? = nil) {
         let isEditLayout = card != nil
-        
+        self.init(withCard: card, isEditLayout: isEditLayout)
+    }
+    
+    convenience init(withCard card: Card? = nil, isEditLayout:Bool) {
         var cardRows: [FormRow] = []
         var billingRows: [FormRow] = []
         

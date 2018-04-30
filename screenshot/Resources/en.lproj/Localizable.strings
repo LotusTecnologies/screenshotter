@@ -35,6 +35,7 @@
 "2018_05_01_campaign.done.headline" = "You Got It!";
 "2018_05_01_campaign.done.message" = "You will receive a $25 gift card when you make your first purchase.";
 "2018_05_01_campaign.done.button" = "Awesome!";
+"2018_05_01_campaign.payment" = "Payment";
 
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
