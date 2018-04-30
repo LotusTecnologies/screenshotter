@@ -186,7 +186,7 @@ final class NotificationManager: NSObject {
             }
         }
         
-        TapticHelper.peek()
+        ActionFeedbackGenerator().actionOccurred(.peek)
     }
     
     public func dismiss() {

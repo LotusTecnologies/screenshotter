@@ -150,7 +150,7 @@ class FormViewController: BaseViewController {
         
         form.sections?.enumerated().forEach({ (i: Int, section: FormSection) in
             section.rows?.enumerated().forEach({ (j: Int, row: FormRow) in
-                if row.isRequired && !row.isValid {
+                if row.isRequired && !row.isValid() {
                     errorIndexPaths.append(IndexPath(row: j, section: i))
                 }
             })
@@ -161,7 +161,7 @@ class FormViewController: BaseViewController {
             tableView.reloadData()
             tableView.scrollToRow(at: firstIndexPath, at: .top, animated: true)
             
-            TapticHelper.nope()
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
         }
     }
     
@@ -269,16 +269,17 @@ extension FormViewController: UITableViewDataSource {
             return
         }
         
-        cell.textLabel?.text = formRow.placeholder
+        cell.textLabel?.text = formRow.title
         
         if let cell = cell as? FormCheckboxTableViewCell {
-            cell.isChecked = NSString(string: formRow.value ?? "0").boolValue
+            cell.isChecked = FormRow.Checkbox.bool(for: formRow.value)
         }
         else if let cell = cell as? FormSelectionTableViewCell {
             cell.detailTextLabel?.text = formRow.value
         }
         else if let cell = cell as? FormTextTableViewCell {
             cell.textField.text = formRow.value
+            cell.textField.placeholder = formRow.placeholder
         }
     }
     
@@ -317,9 +318,10 @@ extension FormViewController: UITableViewDataSource {
 
 extension FormViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? FormTextTableViewCell, let formRow = formRowAt(indexPath) as? FormRow.Text {
-            formRow.value = cell.textField.text?.trimmingCharacters(in: .whitespaces)
+        if let cell = cell as? FormTextTableViewCell {
+            updateFormRow(with: cell.textField, at: indexPath)
         }
+        
         
     
         // TODO: when scrolling a picker cell off screen there are issues with the first responder
@@ -452,6 +454,10 @@ extension FormViewController: UITextFieldDelegate {
             return
         }
         
+        updateFormRow(with: textField, at: indexPath)
+    }
+    
+    fileprivate func updateFormRow(with textField: UITextField, at indexPath: IndexPath) {
         if let formRow = formRowAt(indexPath) as? FormRow.Text {
             formRow.value = textField.text?.trimmingCharacters(in: .whitespaces)
         }
@@ -484,6 +490,39 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         else {
             return nil
         }
+    }
+    
+    private func expirationDate(for pickerView: UIPickerView, row: Int, component: Int) -> FormRow.Expiration.Date? {
+        if let dateComponent = FormExpirationPickerTableViewCell.DateComponent(rawValue: component) {
+            let dateComponents: [FormExpirationPickerTableViewCell.DateComponent] = [.month, .year]
+            let otherDateComponent = dateComponents.first { dateComponent -> Bool in
+                return dateComponent.rawValue != component
+            }
+            
+            if let otherDateComponent = otherDateComponent {
+                let otherRow = pickerView.selectedRow(inComponent: otherDateComponent.rawValue)
+                
+                if let value = FormExpirationPickerTableViewCell.dateMap[dateComponent]?[row],
+                    let otherValue = FormExpirationPickerTableViewCell.dateMap[otherDateComponent]?[otherRow]
+                {
+                    let month: Int
+                    let year: Int
+                    
+                    if component == FormExpirationPickerTableViewCell.DateComponent.month.rawValue {
+                        month = value
+                        year = otherValue
+                    }
+                    else {
+                        month = otherValue
+                        year = value
+                    }
+                    
+                    return FormRow.Expiration.Date(month: month, year: year)
+                }
+            }
+        }
+        
+        return nil
     }
     
     private func expirationValue(forRow row: Int, inComponent component: Int) -> Int? {
@@ -569,45 +608,12 @@ extension FormViewController: UIPickerViewDataSource, UIPickerViewDelegate {
             
         case FormRow.ExpirationPicker.tag:
             guard let expirationPickerRow = expirationPickerRow(for: pickerView),
-                let value = expirationValue(forRow: row, inComponent: component)
+                let date = expirationDate(for: pickerView, row: row, component: component)
                 else {
                     return
             }
             
-            func setFormRowValue(with date: FormRow.Expiration.Date) {
-                var date = date
-                
-                if component == FormExpirationPickerTableViewCell.DateComponent.month.rawValue {
-                    date.month = value
-                }
-                else {
-                    date.year = value
-                }
-                
-                expirationPickerRow.attachedRow.value = FormRow.Expiration.value(for: date)
-            }
-            
-            if let date = FormRow.Expiration.date(for: expirationPickerRow.attachedRow.value) {
-                setFormRowValue(with: date)
-            }
-            else if let currentValueString = expirationPickerRow.attachedRow.value,
-                let currentValue = Int(currentValueString)
-            {
-                var date = FormRow.Expiration.Date(month: 0, year: 0)
-                
-                if FormRow.Expiration.isYear(currentValue) {
-                    date.year = currentValue
-                }
-                else {
-                    date.month = currentValue
-                }
-                
-                setFormRowValue(with: date)
-            }
-            else {
-                expirationPickerRow.attachedRow.value = expirationValue(forValue: value, inComponent: component)
-            }
-            
+            expirationPickerRow.attachedRow.value = FormRow.Expiration.value(for: date)
             syncPickerRow(expirationPickerRow)
             
         default:

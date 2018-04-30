@@ -105,7 +105,7 @@ class CheckoutOrderViewController: BaseViewController {
     
     deinit {
         tableView.dataSource = nil
-        // TODO: remove all temp cards
+        DataModel.sharedInstance.deleteAllTemporaryCards()
     }
     
     // MARK: Navigation
@@ -133,11 +133,14 @@ class CheckoutOrderViewController: BaseViewController {
             return
         }
         
-        let selectedCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL)
+        let selectedCardURL = DataModel.sharedInstance.selectedCardURL
         
         if let cvvMap = cvvMap, cvvMap.url == selectedCardURL {
             _view.orderButton.isLoading = true
             _view.orderButton.isEnabled = false
+            
+            let feedbackGenerator = UINotificationFeedbackGenerator()
+            feedbackGenerator.prepare()
             
             ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress)
                 .then { [weak self] someBool -> Void in
@@ -145,7 +148,7 @@ class CheckoutOrderViewController: BaseViewController {
                 }
                 .catch { [weak self] error in
                     // TODO: handle this
-                    TapticHelper.nope()
+                    feedbackGenerator.notificationOccurred(.error)
                 }
                 .always { [weak self] in
                     self?._view.orderButton.isLoading = false
@@ -193,6 +196,9 @@ class CheckoutOrderViewController: BaseViewController {
         confirmPaymentViewController?.orderButton.isLoading = true
         confirmPaymentViewController?.orderButton.isEnabled = false
         
+        let feedbackGenerator = UINotificationFeedbackGenerator()
+        feedbackGenerator.prepare()
+        
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { [weak self] someBool -> Void in
                 self?.dismiss(animated: true, completion: nil)
@@ -201,7 +207,7 @@ class CheckoutOrderViewController: BaseViewController {
             }
             .catch { [weak self] error in
                 // TODO: handle this
-                TapticHelper.nope()
+                feedbackGenerator.notificationOccurred(.error)
             }
             .always { [weak self] in
                 self?.confirmPaymentViewController?.orderButton.isLoading = false
@@ -226,12 +232,13 @@ class CheckoutOrderViewController: BaseViewController {
         // If the FRC has only one item, use that as the primary.
         var card: Card?
         
-        if let cardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+        if let cardURL = DataModel.sharedInstance.selectedCardURL,
             let objectID = DataModel.sharedInstance.mainMoc().objectId(for: cardURL)
         {
             card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID)
         }
-        else if cardFrc?.fetchedObjectsCount == 1 {
+        
+        if card == nil {
             card = cardFrc?.fetchedObjects.first
         }
         
@@ -262,12 +269,13 @@ class CheckoutOrderViewController: BaseViewController {
         
         var shippingAddress: ShippingAddress?
         
-        if let shippingURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryAddressURL),
+        if let shippingURL = DataModel.sharedInstance.selectedShippingAddressURL,
             let objectID = DataModel.sharedInstance.mainMoc().objectId(for: shippingURL)
         {
             shippingAddress = DataModel.sharedInstance.mainMoc().shippingAddressWith(objectId: objectID)
         }
-        else if shippingAddressFrc?.fetchedObjectsCount == 1 {
+        
+        if shippingAddress == nil {
             shippingAddress = shippingAddressFrc?.fetchedObjects.first
         }
         

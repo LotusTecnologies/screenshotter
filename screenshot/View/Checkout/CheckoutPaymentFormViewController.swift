@@ -42,17 +42,17 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         var billingRows: [FormRow] = []
         
         let cardName = FormRow.Text(CheckoutPaymentFormKeys.cardName.rawValue)
-        cardName.placeholder = "Name on Card"
+        cardName.title = "Name on Card"
         cardName.value = card?.fullName
         cardRows.append(cardName)
         
         let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
-        cardNumber.placeholder = "Card Number"
-        cardNumber.value = card?.displayNumber
+        cardNumber.title = "Card Number"
+        cardNumber.placeholder = card?.displayNumber
         cardRows.append(cardNumber)
         
         let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
-        exp.placeholder = "Exp"
+        exp.title = "Exp"
         exp.value = {
             guard let card = card else {
                 return nil
@@ -65,24 +65,24 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         if !isEditLayout {
             let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
-            cvv.placeholder = "CVV"
+            cvv.title = "CVV"
             cardRows.append(cvv)
         }
         
         let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
-        street.placeholder = "Street Address"
+        street.title = "Street Address"
         street.value = card?.street
         billingRows.append(street)
         
         let city = FormRow.Text(CheckoutPaymentFormKeys.addressCity.rawValue)
-        city.placeholder = "City"
+        city.title = "City"
         city.value = card?.city
         billingRows.append(city)
         
         let supportedCountriesMap = CheckoutSupportedCountriesMap()
         
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
-        country.placeholder = "Country"
+        country.title = "Country"
         country.value = {
             var value: String?
             
@@ -100,7 +100,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         let state = FormRow.Selection(CheckoutPaymentFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
-        state.placeholder = "State"
+        state.title = "State"
         state.value = { // TODO: value should auto select the correct picker index
             var value: String?
             
@@ -114,24 +114,24 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         billingRows.append(state)
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
-        zip.placeholder = "Zip Code"
+        zip.title = "Zip Code"
         zip.value = card?.zipCode
         billingRows.append(zip)
         
         let email = FormRow.Email(CheckoutPaymentFormKeys.email.rawValue)
-        email.placeholder = "Email"
+        email.title = "Email"
         email.value = card?.email
         email.isRequired = false
         billingRows.append(email)
         
         let phone = FormRow.Phone(CheckoutPaymentFormKeys.phoneNumber.rawValue)
-        phone.placeholder = "Phone Number"
+        phone.title = "Phone Number"
         phone.value = card?.phone
         billingRows.append(phone)
         
         if !isEditLayout {
             let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
-            ship.placeholder = "Ship to this address"
+            ship.title = "Ship to this address"
             billingRows.append(ship)
         }
         
@@ -197,11 +197,11 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         addressState = supportedStatesMap?.stateCodes[addressState] ?? addressState
         
         func performAction(withSavingCard saveCard: Bool) {
+            DataModel.sharedInstance.selectedCardURL = nil
+            
             DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
                 .then { card -> Void in
-                    let cardURL = card.objectID.uriRepresentation()
-                    UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
-                    UserDefaults.standard.synchronize()
+                    DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
                     
                     self.delegate?.checkoutFormViewControllerDidAdd(self)
             }
@@ -209,9 +209,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             if isShipToSameAddressChecked {
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
-                        let shippingAddressURL = shippingAddress.objectID.uriRepresentation()
-                        UserDefaults.standard.set(shippingAddressURL, forKey: Constants.checkoutPrimaryAddressURL)
-                        UserDefaults.standard.synchronize()
+                        DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()
                 }
             }
         }
@@ -235,7 +233,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     @objc fileprivate func updateCard() {
         guard form.hasValidFields,
             let card = card,
-            let cardName = formRow(.cardName)?.value,
+            let cardName = formRow(.cardName)?.value ?? formRow(.cardName)?.placeholder,
             let cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
@@ -274,10 +272,9 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             return
         }
         
-        if let primaryCardURL = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL) {
+        if let primaryCardURL = DataModel.sharedInstance.selectedCardURL {
             if primaryCardURL == card.objectID.uriRepresentation() {
-                UserDefaults.standard.set(nil, forKey: Constants.checkoutPrimaryCardURL)
-                UserDefaults.standard.synchronize()
+                DataModel.sharedInstance.selectedCardURL = nil
             }
         }
         

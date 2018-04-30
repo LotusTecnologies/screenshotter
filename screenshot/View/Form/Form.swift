@@ -66,8 +66,16 @@ class Form {
                 }
                 
                 for row in rows {
-                    if row.isRequired && (row.value == nil || row.value!.isEmpty || !row.isValid) {
-                        return false
+                    if row.isRequired {
+                        let value = (row.value?.isEmpty ?? true) ? nil : row.value
+                        let placeholder = (row.placeholder?.isEmpty ?? true) ? nil : row.placeholder
+                        
+                        if (value == nil && placeholder == nil) ||
+                            (value != nil && !row.isValid(value)) ||
+                            (value == nil && placeholder != nil && !row.isValid(placeholder))
+                        {
+                            return false
+                        }
                     }
                 }
             }
@@ -89,16 +97,17 @@ class FormSection {
 
 class FormRow: NSObject {
     var id: Int?
+    var title: String?
     var placeholder: String?
     var value: String?
     
     var isRequired = true
-    var isValid: Bool {
+    func isValid(_ text: String? = nil) -> Bool {
         guard isRequired else {
             return true
         }
         
-        guard let value = value, !value.isEmpty, let validRegex = validRegex else {
+        guard let value = text ?? value, !value.isEmpty, let validRegex = validRegex else {
             return false
         }
         

@@ -70,7 +70,7 @@ class CheckoutPaymentListViewController: CheckoutListViewController {
     
     override func indexPathForSelectedCell() -> IndexPath? {
         let card: Card? = {
-            if let url = UserDefaults.standard.url(forKey: Constants.checkoutPrimaryCardURL),
+            if let url = DataModel.sharedInstance.selectedCardURL,
                 let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
                 let card = DataModel.sharedInstance.mainMoc().cardWith(objectId: objectID)
             {
@@ -78,9 +78,7 @@ class CheckoutPaymentListViewController: CheckoutListViewController {
             }
             
             if let card = cardFrc?.fetchedObjects.first {
-                let url = card.objectID.uriRepresentation()
-                UserDefaults.standard.set(url, forKey: Constants.checkoutPrimaryCardURL)
-                UserDefaults.standard.synchronize()
+                DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
                 return card
             }
             
@@ -132,9 +130,7 @@ extension CheckoutPaymentListViewController: UITableViewDataSource {
 extension CheckoutPaymentListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let card = cardFrc?.object(at: indexPath) {
-            let cardURL = card.objectID.uriRepresentation()
-            UserDefaults.standard.set(cardURL, forKey: Constants.checkoutPrimaryCardURL)
-            UserDefaults.standard.synchronize()
+            DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
         }
     }
 }

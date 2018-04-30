@@ -814,6 +814,26 @@ extension DataModel {
         }
         return false
     }
+    
+    var selectedCardURL: URL? {
+        set {
+            UserDefaults.standard.set(newValue, forKey: "checkoutPrimaryCardURL")
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.url(forKey: "checkoutPrimaryCardURL")
+        }
+    }
+    
+    var selectedShippingAddressURL: URL? {
+        set {
+            UserDefaults.standard.set(newValue, forKey: "checkoutPrimaryAddressURL")
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.url(forKey: "checkoutPrimaryAddressURL")
+        }
+    }
 
     // Returns a Promise of the saved ShippingAddress that should be used only on the main thread.
     func saveShippingAddress(firstName: String?,
@@ -881,6 +901,10 @@ extension DataModel {
         do {
             let results = try managedObjectContext.fetch(fetchRequest)
             for card in results {
+                if card.objectID.uriRepresentation() == selectedCardURL {
+                    selectedCardURL = nil
+                }
+                
                 managedObjectContext.delete(card)
             }
             try managedObjectContext.save()
