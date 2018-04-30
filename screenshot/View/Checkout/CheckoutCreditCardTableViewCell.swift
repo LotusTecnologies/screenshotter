@@ -67,7 +67,7 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
         expirationLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor).isActive = true
         
         tempCardLabel.translatesAutoresizingMaskIntoConstraints = false
-        tempCardLabel.text = "This card will not be saved after purchase"
+        tempCardLabel.text = "checkout.card.temporary".localized
         tempCardLabel.textColor = .gray4
         tempCardLabel.textAlignment = .center
         tempCardLabel.font = UIFont.screenshopFont(.hindLight, textStyle: .callout)
@@ -96,11 +96,11 @@ class CheckoutCreditCardTableViewCell: CardTableViewCell {
     
     private func syncExpirationLabel() {
         if isExpired {
-            expirationLabel.text = "EXPIRED"
+            expirationLabel.text = "checkout.card.expired".localized
             expirationLabel.textColor = .crazeRed
         }
         else {
-            expirationLabel.text = "EXPIRES \(expirationString)"
+            expirationLabel.text = "checkout.card.expires".localized(withFormat: expirationString)
             expirationLabel.textColor = .gray7
         }
     }

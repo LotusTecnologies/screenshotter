@@ -42,7 +42,7 @@ class CheckoutOrderViewController: BaseViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        title = "Place Your Order"
+        title = "checkout.order.title".localized
         restorationIdentifier = String(describing: type(of: self))
         
         cardFrc = DataModel.sharedInstance.cardFrc(delegate: self)
@@ -253,11 +253,11 @@ class CheckoutOrderViewController: BaseViewController {
                         return brand
                     }
                     else {
-                        return "Card"
+                        return "checkout.card.default_brand".localized
                     }
                 }()
                 
-                _view.cardLabel.text = "\(brand) ending in …\(cardNumber)"
+                _view.cardLabel.text = "checkout.card.brand_last_digits".localized(withFormat: brand, cardNumber)
             }
         }
     }
@@ -289,13 +289,13 @@ class CheckoutOrderViewController: BaseViewController {
     // MARK: Alerts
     
     fileprivate func presentNeedsPrimaryCardAlert() {
-        let alertController = UIAlertController(title: "Add A Card", message: "Select a credit card to complete your purchase.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "checkout.order.error.card.title".localized, message: "checkout.order.error.card.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)
     }
     
     fileprivate func presentNeedsPrimaryShippingAddressAlert() {
-        let alertController = UIAlertController(title: "Add A Shipping Address", message: "Let us know where to send your items!", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "checkout.order.error.shipping.title".localized, message: "checkout.order.error.shipping.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)
     }
@@ -319,13 +319,13 @@ extension CheckoutOrderViewController: UITableViewDataSource {
     }
     
     private func productDescription(_ cartItem: CartItem) -> String {
-        var description = "Qty: \(Int(cartItem.quantity))"
+        var description = "checkout.order.description.quantity".localized(withFormat: Int(cartItem.quantity))
         
         if let color = cartItem.color {
-            description += ", Color: \(color)"
+            description += ", " + "checkout.order.description.color".localized(withFormat: color)
         }
         if let size = cartItem.size {
-            description += ", Size: \(size)"
+            description += ", " + "checkout.order.description.size".localized(withFormat: size)
         }
         
         return description

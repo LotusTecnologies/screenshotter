@@ -50,7 +50,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         label.adjustsFontForContentSizeCategory = true
         label.minimumScaleFactor = 0.7
         label.adjustsFontSizeToFitWidth = true
-        label.text = "Enter your CVV"
+        label.text = "checkout.confirm.payment.enter_cvv".localized
         view.addSubview(label)
         label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         label.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
@@ -59,7 +59,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         label.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
         
         cvvTextField.translatesAutoresizingMaskIntoConstraints = false
-        cvvTextField.placeholder = "CVV"
+        cvvTextField.placeholder = "checkout.confirm.payment.cvv".localized
         cvvTextField.keyboardType = .numberPad
         cvvTextField.textAlignment = .center
         cvvTextField.font = .monospacedDigitSystemFont(ofSize: 20, weight: UIFont.Weight.medium)
@@ -79,7 +79,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         
         let whatButton = UIButton()
         whatButton.translatesAutoresizingMaskIntoConstraints = false
-        whatButton.setTitle("what's this?", for: .normal)
+        whatButton.setTitle("checkout.confirm.payment.what".localized, for: .normal)
         whatButton.setTitleColor(.crazeGreen, for: .normal)
         whatButton.setTitleColor(UIColor.crazeGreen.darker(), for: .highlighted)
         whatButton.titleLabel?.font = .screenshopFont(.hindMedium, size: 14)
@@ -103,7 +103,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         
         orderButton.translatesAutoresizingMaskIntoConstraints = false
         orderButton.backgroundColor = .crazeGreen
-        orderButton.setTitle("Place Your Order", for: .normal)
+        orderButton.setTitle("checkout.order.title".localized, for: .normal)
         view.addSubview(orderButton)
         orderButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         orderButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)

@@ -50,7 +50,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         bottomImageView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         orderLabel.translatesAutoresizingMaskIntoConstraints = false
-        orderLabel.text = "Order Summary"
+        orderLabel.text = "checkout.order.headline".localized
         orderLabel.textColor = .gray3
         orderLabel.font = .screenshopFont(.hindLight, textStyle: .title2)
         orderLabel.adjustsFontForContentSizeCategory = true
@@ -99,7 +99,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         }
         
         let shippingLabel = setLabeledControl(shippingControl)
-        shippingLabel.text = "Shipping to:"
+        shippingLabel.text = "checkout.order.address_title".localized
         shippingControl.topAnchor.constraint(equalTo: summaryView.topAnchor).isActive = true
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -125,7 +125,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         addressLabel.trailingAnchor.constraint(equalTo: shippingControl.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let paymentLabel = setLabeledControl(paymentControl)
-        paymentLabel.text = "Payment Method:"
+        paymentLabel.text = "checkout.order.payment_title".localized
         paymentControl.topAnchor.constraint(equalTo: shippingControl.bottomAnchor).isActive = true
         
         cardLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -180,32 +180,32 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         }
         
         let itemsKeyLabel = createSummaryKeyLabel()
-        itemsKeyLabel.text = "Items:"
+        itemsKeyLabel.text = "checkout.order.items_title".localized
         itemsKeyLabel.topAnchor.constraint(equalTo: paymentControl.bottomAnchor, constant: summaryView.layoutMargins.top).isActive = true
         
         setSummaryValueLabel(itemsPriceLabel, with: itemsKeyLabel)
         
         let shippingKeyLabel = createSummaryKeyLabel()
-        shippingKeyLabel.text = "Shipping & handling:"
+        shippingKeyLabel.text = "checkout.order.shipping_handling".localized
         shippingKeyLabel.topAnchor.constraint(equalTo: itemsPriceLabel.bottomAnchor).isActive = true
         
         setSummaryValueLabel(shippingPriceLabel, with: shippingKeyLabel)
         
         let beforeTaxKeyLabel = createSummaryKeyLabel()
-        beforeTaxKeyLabel.text = "Total before tax:"
+        beforeTaxKeyLabel.text = "checkout.order.total_pre_tax".localized
         beforeTaxKeyLabel.topAnchor.constraint(equalTo: shippingPriceLabel.bottomAnchor).isActive = true
         
         setSummaryValueLabel(beforeTaxPriceLabel, with: beforeTaxKeyLabel)
         
         let estimateTaxKeyLabel = createSummaryKeyLabel()
-        estimateTaxKeyLabel.text = "Estimated tax to be collected:"
+        estimateTaxKeyLabel.text = "checkout.order.total_tax".localized
         estimateTaxKeyLabel.topAnchor.constraint(equalTo: beforeTaxPriceLabel.bottomAnchor).isActive = true
         
         setSummaryValueLabel(estimateTaxLabel, with: estimateTaxKeyLabel)
         
         let totalKeyLabel = createSummaryKeyLabel()
         totalKeyLabel.font = .screenshopFont(.hindSemibold, textStyle: .body)
-        totalKeyLabel.text = "Order Total:"
+        totalKeyLabel.text = "checkout.order.total".localized
         totalKeyLabel.topAnchor.constraint(equalTo: estimateTaxLabel.bottomAnchor, constant: .padding).isActive = true
         
         setSummaryValueLabel(totalPriceLabel, with: totalKeyLabel)
@@ -214,7 +214,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         totalPriceLabel.bottomAnchor.constraint(equalTo: summaryView.layoutMarginsGuide.bottomAnchor).isActive = true
         
         itemsLabel.translatesAutoresizingMaskIntoConstraints = false
-        itemsLabel.text = "Items"
+        itemsLabel.text = "checkout.order.items".localized
         itemsLabel.textColor = .gray3
         itemsLabel.font = .screenshopFont(.hindLight, textStyle: .title2)
         itemsLabel.adjustsFontForContentSizeCategory = true
@@ -250,7 +250,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         
         orderButton.translatesAutoresizingMaskIntoConstraints = false
         orderButton.backgroundColor = .crazeGreen
-        orderButton.setTitle("Place Your Order", for: .normal)
+        orderButton.setTitle("checkout.order.title".localized, for: .normal)
         addSubview(orderButton)
         orderButton.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor).isActive = true
         orderButton.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -276,7 +276,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         
         let dividerLabel = UILabel()
         dividerLabel.translatesAutoresizingMaskIntoConstraints = false
-        dividerLabel.text = "or"
+        dividerLabel.text = "checkout.order.or".localized
         dividerLabel.textColor = .gray3
         dividerLabel.font = .screenshopFont(.hindMedium, size: 16)
         dividerLabel.textAlignment = .center
@@ -304,7 +304,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         rightDividerFragment.trailingAnchor.constraint(equalTo: dividerView.trailingAnchor).isActive = true
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.setTitle("Cancel and Continue Shopping", for: .normal)
+        cancelButton.setTitle("checkout.order.cancel".localized, for: .normal)
         cancelButton.setTitleColor(.crazeGreen, for: .normal)
         addSubview(cancelButton)
         cancelButton.topAnchor.constraint(equalTo: dividerView.bottomAnchor, constant: .padding).isActive = true
@@ -320,7 +320,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         legalTextView.textColor = .gray3
         legalTextView.font = .screenshopFont(.hindLight, textStyle: .footnote)
         legalTextView.adjustsFontForContentSizeCategory = true
-        legalTextView.text = "Your payment details are securely processed. Your personal information is kept confidential. By placing an order you agree to the Terms and Services provided by the retail merchant’s associated with your purchase."
+        legalTextView.text = "checkout.order.legal".localized
         addSubview(legalTextView)
         legalTextView.topAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: .padding).isActive = true
         legalTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true

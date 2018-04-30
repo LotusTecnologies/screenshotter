@@ -46,8 +46,36 @@
 
 "changelog.title" = "What's New";
 
+"checkout.card.default_brand" = "Card";
+"checkout.card.brand_last_digits" = "%@ ending in …%@";
+"checkout.card.expired" = "EXPIRED";
+"checkout.card.expires" = "EXPIRES %@";
+"checkout.card.temporary" = "This card will not be saved after purchase";
 "checkout.confirmation.detail" = "Thanks for shopping\nwith Screenshop!";
 "checkout.confirmation.title" = "Order Placed";
+"checkout.confirm.payment.cvv" = "CVV";
+"checkout.confirm.payment.enter_cvv" = "Enter your CVV";
+"checkout.confirm.payment.what" = "what's this?";
+"checkout.order.address_title" = "Shipping to:";
+"checkout.order.cancel" = "Cancel and Continue Shopping";
+"checkout.order.description.color" = "Color: %@";
+"checkout.order.description.quantity" = "Qty: %d";
+"checkout.order.description.size" = "Size: %@";
+"checkout.order.error.card.message" = "Select a credit card to complete your purchase.";
+"checkout.order.error.card.title" = "Add A Card";
+"checkout.order.error.shipping.message" = "Let us know where to send your items!";
+"checkout.order.error.shipping.title" = "Add A Shipping Address";
+"checkout.order.headline" = "Order Summary";
+"checkout.order.items" = "Items:";
+"checkout.order.items_title" = "Items";
+"checkout.order.legal" = "Your payment details are securely processed. Your personal information is kept confidential. By placing an order you agree to the Terms and Services provided by the retail merchant’s associated with your purchase.";
+"checkout.order.or" = "or";
+"checkout.order.payment_title" = "Payment Method:";
+"checkout.order.shipping_handling" = "Shipping & handling:";
+"checkout.order.title" = "Place Your Order";
+"checkout.order.total" = "Order Total:";
+"checkout.order.total_pre_tax" = "Total before tax:";
+"checkout.order.total_tax" = "Estimated tax to be collected:";
 "checkout.title" = "Checkout";
 
 "currency.auto" = "Automatic";
