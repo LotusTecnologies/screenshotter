@@ -30,13 +30,14 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     fileprivate var card: Card?
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
-    
+    private var confirmBeforeSave = false
     convenience init(withCard card: Card? = nil) {
         let isEditLayout = card != nil
-        self.init(withCard: card, isEditLayout: isEditLayout)
+        self.init(withCard: card, isEditLayout: isEditLayout, confirmBeforeSave: true)
     }
     
-    convenience init(withCard card: Card? = nil, isEditLayout:Bool) {
+    convenience init(withCard card: Card? = nil, isEditLayout:Bool, confirmBeforeSave:Bool) {
+        
         var cardRows: [FormRow] = []
         var billingRows: [FormRow] = []
         
@@ -149,15 +150,18 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         title = isEditLayout ? "Edit Card" : "Add Card"
         restorationIdentifier = String(describing: type(of: self))
         
-        generateButtons(withEditLayout: isEditLayout)
+        let hasSaveAndDeleteButtons = (isEditLayout && card != nil)
         
-        if isEditLayout {
+        generateButtons(withEditLayout: hasSaveAndDeleteButtons)
+        
+        if hasSaveAndDeleteButtons {
             continueButton.addTarget(self, action: #selector(updateCard), for: .touchUpInside)
             deleteButton?.addTarget(self, action: #selector(removeCard), for: .touchUpInside)
         }
         else {
             continueButton.addTarget(self, action: #selector(addCard), for: .touchUpInside)
         }
+        self.confirmBeforeSave = confirmBeforeSave
     }
     
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
@@ -169,7 +173,6 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             let cardName = formRow(.cardName)?.value,
             var cardNumber = formRow(.cardNumber)?.value,
             let cardExp = formRow(.cardExp)?.value,
-            let cardCVV = formRow(.cardCVV)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressCity = formRow(.addressCity)?.value,
             var addressCountry = formRow(.addressCountry)?.value,
@@ -182,7 +185,9 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                 highlightErrorFields()
                 return
         }
-        
+        let cardCVV = formRow(.cardCVV)?.value
+
+
         cardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
         let email = formRow(.email)?.value
         let addressShip = formRow(.addressShip)?.value
@@ -210,17 +215,21 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                 }
             }
         }
-        
-        let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
-        let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
+        if self.confirmBeforeSave {
+            let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
+            let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
+                performAction(withSavingCard: true)
+            }
+            alertController.addAction(saveAlertAction)
+            alertController.addAction(UIAlertAction(title: "Don't Save", style: .cancel, handler: { alertAction in
+                performAction(withSavingCard: false)
+            }))
+            alertController.preferredAction = saveAlertAction
+            present(alertController, animated: true, completion: nil)
+        }else{
             performAction(withSavingCard: true)
+            
         }
-        alertController.addAction(saveAlertAction)
-        alertController.addAction(UIAlertAction(title: "Don't Save", style: .cancel, handler: { alertAction in
-            performAction(withSavingCard: false)
-        }))
-        alertController.preferredAction = saveAlertAction
-        present(alertController, animated: true, completion: nil)
     }
     
     @objc fileprivate func updateCard() {

@@ -100,7 +100,7 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
 
     }
     func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
-        let viewController = CheckoutPaymentFormViewController(card:nil, isEditLayout: true)
+        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false)
         viewController.title = "2018_05_01_campaign.payment".localized
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -108,13 +108,9 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
 }
 extension TutorialViewController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
-        
-    }
-    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController){
-        
-    }
-    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController){
-        
+        let viewController = GiftCardDoneViewController()
+        viewController.delegate = self
+        self.pushViewController(viewController, animated: true)
     }
 }
 
