@@ -11,6 +11,12 @@ import AVFoundation
 
 
 
+protocol CampaignPromotionViewControllerDelegate: class {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController)
+    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController)
+    
+}
+
 class CampaignPromotionViewController: UIViewController, CampaignPromotionExplanationViewControllerDelegate {
     /*
         To re-use this viewController change the CampaignDescription
@@ -32,7 +38,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
 
     var imageView:UIImageView?
     
-    weak var delegate: VideoDisplayingViewControllerDelegate?
+    weak var delegate: CampaignPromotionViewControllerDelegate?
     private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
     
     init(modal:Bool) {
@@ -42,7 +48,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         if modal {
             transitioningDelegate = transitioning
             modalPresentationStyle = .custom
-
         }
 
     }
@@ -213,26 +218,42 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         requiredSpacing.isActive = true
         
     }
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
+        } catch let error as NSError {
+            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+        }
+    }
     
     @objc func tappedLearnMoreButton() {
-        let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
-        explain.delegate = self
-        if let player = self.player {
-            if player.playbackState != .paused {
-                self.player?.pause()
-                self.flashPauseOverlay()
+        if self.willPresentInModal {
+            
+        
+            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
+            explain.delegate = self
+            if let player = self.player {
+                if player.playbackState != .paused {
+                    self.player?.pause()
+                    self.flashPauseOverlay()
+                }
             }
+            self.present(explain, animated: false, completion: nil)
+        }else{
+            self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
         }
-        self.present(explain, animated: false, completion: nil)
     }
     
     func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
         self.dismiss(animated: false, completion: nil)
         UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
+        self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
+        
     }
     
     func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+        
         self.dismiss(animated: false, completion: nil)
         
     }
@@ -240,7 +261,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     @objc func tappedSecondaryButton() {
         
         UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
+        self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
     }
     
     @objc func tappedVideo(){
@@ -248,7 +269,11 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mp4")!)
             let player = AVPlayer(playerItem: playerItem)
             player.allowsExternalPlayback = false
-            
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            } catch let error as NSError {
+                AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            }
             player.actionAtItemEnd = .pause
             self.player = player
             let layer = AVPlayerLayer(player: player)
@@ -326,7 +351,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             self.playPauseButton.alpha = 0
         }
     }
-    
 
     struct CampaignDescription {
         var headline:String

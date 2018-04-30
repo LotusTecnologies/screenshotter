@@ -159,6 +159,16 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
     }
 }
 
+extension ScreenshotsViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
+        
+    }
+    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
+        self.dismiss(animated: true, completion: nil)
+    }
+
+}
+
 //Setup view
 extension ScreenshotsViewController {
     func setupViews() {
