@@ -31,29 +31,29 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         var formRows: [FormRow] = []
         
         let firstName = FormRow.Text(CheckoutShippingFormKeys.nameFirst.rawValue)
-        firstName.placeholder = "First Name"
+        firstName.title = "First Name"
         firstName.value = shippingAddress?.firstName
         formRows.append(firstName)
         
         let lastName = FormRow.Text(CheckoutShippingFormKeys.nameLast.rawValue)
-        lastName.placeholder = "Last Name"
+        lastName.title = "Last Name"
         lastName.value = shippingAddress?.lastName
         formRows.append(lastName)
         
         let street = FormRow.Text(CheckoutShippingFormKeys.addressStreet.rawValue)
-        street.placeholder = "Street Address"
+        street.title = "Street Address"
         street.value = shippingAddress?.street
         formRows.append(street)
         
         let city = FormRow.Text(CheckoutShippingFormKeys.addressCity.rawValue)
-        city.placeholder = "City"
+        city.title = "City"
         city.value = shippingAddress?.city
         formRows.append(city)
         
         let supportedCountriesMap = CheckoutSupportedCountriesMap()
         
         let country = FormRow.Selection(CheckoutShippingFormKeys.addressCountry.rawValue)
-        country.placeholder = "Country"
+        country.title = "Country"
         country.value = {
             var value: String?
             
@@ -71,7 +71,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         let state = FormRow.Selection(CheckoutShippingFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
-        state.placeholder = "State"
+        state.title = "State"
         state.value = {
             var value: String?
             
@@ -85,12 +85,12 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         formRows.append(state)
         
         let zip = FormRow.Number(CheckoutShippingFormKeys.addressZip.rawValue)
-        zip.placeholder = "Zip Code"
+        zip.title = "Zip Code"
         zip.value = shippingAddress?.zipCode
         formRows.append(zip)
         
         let phone = FormRow.Phone(CheckoutShippingFormKeys.phoneNumber.rawValue)
-        phone.placeholder = "Phone Number"
+        phone.title = "Phone Number"
         phone.value = shippingAddress?.phone
         formRows.append(phone)
         

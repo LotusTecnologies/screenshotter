@@ -150,7 +150,7 @@ class FormViewController: BaseViewController {
         
         form.sections?.enumerated().forEach({ (i: Int, section: FormSection) in
             section.rows?.enumerated().forEach({ (j: Int, row: FormRow) in
-                if row.isRequired && !row.isValid {
+                if row.isRequired && !row.isValid() {
                     errorIndexPaths.append(IndexPath(row: j, section: i))
                 }
             })
@@ -269,7 +269,7 @@ extension FormViewController: UITableViewDataSource {
             return
         }
         
-        cell.textLabel?.text = formRow.placeholder
+        cell.textLabel?.text = formRow.title
         
         if let cell = cell as? FormCheckboxTableViewCell {
             cell.isChecked = FormRow.Checkbox.bool(for: formRow.value)
@@ -277,11 +277,9 @@ extension FormViewController: UITableViewDataSource {
         else if let cell = cell as? FormSelectionTableViewCell {
             cell.detailTextLabel?.text = formRow.value
         }
-        else if let cell = cell as? FormCardTableViewCell {
-            cell.textField.placeholder = formRow.value
-        }
         else if let cell = cell as? FormTextTableViewCell {
             cell.textField.text = formRow.value
+            cell.textField.placeholder = formRow.placeholder
         }
     }
     
@@ -320,9 +318,10 @@ extension FormViewController: UITableViewDataSource {
 
 extension FormViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? FormTextTableViewCell, let formRow = formRowAt(indexPath) as? FormRow.Text {
-            formRow.value = cell.textField.text?.trimmingCharacters(in: .whitespaces)
+        if let cell = cell as? FormTextTableViewCell {
+            updateFormRow(with: cell.textField, at: indexPath)
         }
+        
         
     
         // TODO: when scrolling a picker cell off screen there are issues with the first responder
@@ -455,6 +454,10 @@ extension FormViewController: UITextFieldDelegate {
             return
         }
         
+        updateFormRow(with: textField, at: indexPath)
+    }
+    
+    fileprivate func updateFormRow(with textField: UITextField, at indexPath: IndexPath) {
         if let formRow = formRowAt(indexPath) as? FormRow.Text {
             formRow.value = textField.text?.trimmingCharacters(in: .whitespaces)
         }
