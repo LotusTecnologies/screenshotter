@@ -445,34 +445,48 @@ class NetworkingPromise : NSObject {
                     reject(error)
                     return
                 }
-                guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode >= 200,
-                  httpResponse.statusCode <  300 else {
-                    let error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout invalid http statusCode for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout httpResponse.statusCode error")
-                    reject(error)
-                    return
-                }
                 guard let data = data else {
                     let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout empty data for url:\(String(describing: request.url))"])
                     print("sendAndParseNativeCheckout empty data")
                     reject(error)
                     return
                 }
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout no http response for url:\(String(describing: request.url))"])
+                    print("sendAndParseNativeCheckout no httpResponse")
+                    reject(error)
+                    return
+                }
+                let serializedObject: Any
                 do {
-                    guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [[String : Any]] else {
-                        let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize failed for url:\(String(describing: request.url))"])
-                        print("sendAndParseNativeCheckout failed to JSONSerialize")
-                        reject(error)
-                        return
-                    }
-                    fulfill(jsonObject)
+                    serializedObject = try JSONSerialization.jsonObject(with: data)
                 } catch {
                     let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize exception for url:\(String(describing: request.url))"])
                     print("sendAndParseNativeCheckout exception on JSONSerialize")
                     reject(error)
+                    return
                 }
-                
+                guard httpResponse.statusCode >= 200,
+                  httpResponse.statusCode < 300 else {
+                    let error: NSError
+                    if httpResponse.statusCode == 422,
+                      let jsonError = serializedObject as? [String : Any] {
+                        error = NSError(domain: "Shoppable", code: httpResponse.statusCode, userInfo: jsonError)
+                        print("sendAndParseNativeCheckout Shoppable code:\(httpResponse.statusCode)  jsonError:\(String(describing: jsonError))")
+                    } else {
+                        error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout invalid http statusCode for url:\(String(describing: request.url))"])
+                        print("sendAndParseNativeCheckout httpResponse.statusCode error")
+                    }
+                    reject(error)
+                    return
+                }
+                guard let jsonObject = serializedObject as? [[String : Any]] else {
+                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize failed for url:\(String(describing: request.url))"])
+                    print("sendAndParseNativeCheckout failed to JSONSerialize")
+                    reject(error)
+                    return
+                }
+                fulfill(jsonObject)
             })
             dataTask.resume()
         }
