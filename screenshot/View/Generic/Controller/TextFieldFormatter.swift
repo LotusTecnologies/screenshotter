@@ -64,8 +64,11 @@ class TextFieldFormatter {
                 NotificationCenter.default.addObserver(self, selector: #selector(phoneTextFieldTextDidChange(_:)), name: .UITextFieldTextDidChange, object: textField)
             }
             
-            maxLength = 14 // 10 digits + 4 extra characters
-            allowedCharacters = .decimalDigits
+            var characterSet = CharacterSet.decimalDigits
+            characterSet.insert(charactersIn: "()-+")
+            
+            maxLength = 15 // 10 digits + 5 extra characters, such as ' ',(,),-,+
+            allowedCharacters = characterSet
             
         case .zip:
             maxLength = 9

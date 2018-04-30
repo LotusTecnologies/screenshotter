@@ -46,7 +46,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .gray3
-        label.font = .screenshopFont(.hindMedium, textStyle: .title2, staticSize: true)
+        label.font = .screenshopFont(.hindMedium, size: UIDevice.is320w ? 24 : 28)
         label.adjustsFontForContentSizeCategory = true
         label.minimumScaleFactor = 0.7
         label.adjustsFontSizeToFitWidth = true

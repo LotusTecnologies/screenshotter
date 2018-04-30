@@ -162,6 +162,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func addCard() {
+        tableView.endEditing(true)
+        
         guard form.hasValidFields,
             let cardName = formRow(.cardName)?.value,
             var cardNumber = formRow(.cardNumber)?.value,
@@ -219,6 +221,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func updateCard() {
+        tableView.endEditing(true)
+        
         guard form.hasValidFields,
             let card = card,
             let cardName = formRow(.cardName)?.value ?? formRow(.cardName)?.placeholder,

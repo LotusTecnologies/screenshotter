@@ -48,6 +48,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         bottomImageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         bottomImageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         bottomImageView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        bottomImageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         
         orderLabel.translatesAutoresizingMaskIntoConstraints = false
         orderLabel.text = "checkout.order.headline".localized

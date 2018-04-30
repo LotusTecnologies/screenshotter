@@ -121,6 +121,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func addShippingAddress() {
+        tableView.endEditing(true)
+        
         guard form.hasValidFields,
             let addressCity = formRow(.addressCity)?.value,
             var addressCountry = formRow(.addressCountry)?.value,
@@ -149,6 +151,8 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
     }
     
     @objc fileprivate func updateShippingAddress() {
+        tableView.endEditing(true)
+        
         guard form.hasValidFields,
             let addressCity = formRow(.addressCity)?.value,
             var addressCountry = formRow(.addressCountry)?.value,

@@ -239,7 +239,7 @@ extension FormRow {
     
     class Phone: Text {
         fileprivate override var validRegex: String? {
-            return "\\+?[0-9-]{10,14}"
+            return "\\+?[0-9-() ]{10,15}"
         }
     }
     
