@@ -85,6 +85,7 @@ class CheckoutOrderViewController: BaseViewController {
         _view.beforeTaxPriceLabel.text = formattedPrice(shippingAndSubtotal)
         _view.estimateTaxLabel.text = formattedPrice(taxTotal)
         _view.totalPriceLabel.text = formattedPrice(shippingAndSubtotal + taxTotal)
+        _view.legalTextView.delegate = self
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
         _view.shippingControl.addTarget(self, action: #selector(navigateToShippingList), for: .touchUpInside)
@@ -342,5 +343,21 @@ extension CheckoutOrderViewController: FetchedResultsControllerManagerDelegate {
                 syncPrimaryShippingAddress()
             }
         }
+    }
+}
+
+extension CheckoutOrderViewController : UITextViewDelegate {
+    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        switch URL.absoluteString {
+        case _view.legalLinkTOS:
+            if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+                present(viewController, animated: true, completion: nil)
+            }
+            
+        default:
+            break
+        }
+        
+        return false
     }
 }

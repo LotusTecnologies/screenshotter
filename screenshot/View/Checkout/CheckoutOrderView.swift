@@ -24,7 +24,9 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
     let tableView: UITableView = AutoresizingTableView()
     let orderButton = MainButton()
     let cancelButton = BorderButton()
-    let legalTextView = UITextView()
+    let legalTextView: UITextView = TappableTextView()
+    
+    let legalLinkTOS = "TOS"
     
     var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
     var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
@@ -314,14 +316,43 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         cancelButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
         cancelButton.widthAnchor.constraint(equalTo: orderButton.widthAnchor).isActive = true
         
+        let linkTextColor: UIColor = .crazeGreen
+        
         legalTextView.translatesAutoresizingMaskIntoConstraints = false
         legalTextView.scrollsToTop = false
         legalTextView.isScrollEnabled = false
+        legalTextView.isEditable = false
         legalTextView.backgroundColor = .clear
         legalTextView.textColor = .gray3
-        legalTextView.font = .screenshopFont(.hindLight, textStyle: .footnote)
         legalTextView.adjustsFontForContentSizeCategory = true
-        legalTextView.text = "checkout.order.legal".localized
+        legalTextView.linkTextAttributes = [
+            NSAttributedStringKey.foregroundColor.rawValue: linkTextColor,
+            NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
+            NSAttributedStringKey.underlineColor.rawValue: linkTextColor
+        ]
+        legalTextView.attributedText = {
+            let textViewFont: UIFont = .screenshopFont(.hindLight, textStyle: .footnote)
+            let paragraph = NSMutableParagraphStyle()
+            
+            func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
+                var attributes: [NSAttributedStringKey : Any] = [
+                    NSAttributedStringKey.font: textViewFont,
+                    NSAttributedStringKey.paragraphStyle: paragraph
+                ]
+                
+                if let link = link {
+                    attributes[NSAttributedStringKey.link] = link
+                }
+                
+                return attributes
+            }
+            
+            return NSMutableAttributedString(segmentedString: "checkout.order.legal", attributes: [
+                attributes(),
+                attributes(legalLinkTOS),
+                attributes()
+                ])
+        }()
         addSubview(legalTextView)
         legalTextView.topAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: .padding).isActive = true
         legalTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true

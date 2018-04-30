@@ -68,7 +68,9 @@
 "checkout.order.headline" = "Order Summary";
 "checkout.order.items" = "Items:";
 "checkout.order.items_title" = "Items";
-"checkout.order.legal" = "Your payment details are securely processed. Your personal information is kept confidential. By placing an order you agree to the Terms and Services provided by the retail merchant’s associated with your purchase.";
+"checkout.order.legal.0" = "Your payment details are securely processed. Your personal information is kept confidential. By placing an order you agree to the ";
+"checkout.order.legal.1" = "Terms of Service";
+"checkout.order.legal.2" = " provided by the retail merchant’s associated with your purchase.";
 "checkout.order.or" = "or";
 "checkout.order.payment_title" = "Payment Method:";
 "checkout.order.shipping_handling" = "Shipping & handling:";
