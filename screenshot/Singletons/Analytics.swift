@@ -312,7 +312,7 @@ public class AnalyticsTrackers : NSObject {
     static let branch = BranchAnalyticsTracker()
     static let kochava = KochavaAnalyticsTracker()
 
-    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom, kochava])
+    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom])
 }
 
 fileprivate let marketingBrands = [
