@@ -70,6 +70,8 @@
 "checkout.confirm.payment.cvv" = "CVV";
 "checkout.confirm.payment.enter_cvv" = "Enter your CVV";
 "checkout.confirm.payment.what" = "what's this?";
+"checkout.error.message" = "We were unable to complete your transaction. Please check your connection and try again.";
+"checkout.error.title" = "Something Went Wrong";
 "checkout.order.address_title" = "Shipping to:";
 "checkout.order.cancel" = "Cancel and Continue Shopping";
 "checkout.order.description.color" = "Color: %@";

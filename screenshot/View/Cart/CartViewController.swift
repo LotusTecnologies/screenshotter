@@ -305,7 +305,10 @@ fileprivate extension CartViewControllerCheckout {
                 }
             }
             .catch { [weak self] error in
-                self?.presentErrorAlert()
+                let alertController = UIAlertController(title: "checkout.error.title".localized, message: "checkout.error.message".localized, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+                self?.present(alertController, animated: true, completion: nil)
+                
                 self?.dismissCheckoutLoader()
         }
     }
@@ -338,11 +341,5 @@ fileprivate extension CartViewControllerCheckout {
 //            let navigationController = ModalNavigationController(rootViewController: checkoutWebViewController)
 //            present(navigationController, animated: true, completion: nil)
 //        }
-    }
-    
-    func presentErrorAlert() {
-        let alertController = UIAlertController(title: "Something Went Wrong", message: "We were unable to complete your transaction. Please check your connection and try again.", preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
-        present(alertController, animated: true, completion: nil)
     }
 }
