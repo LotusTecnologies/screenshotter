@@ -65,6 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
+        frameworkSetupMainViewDidLoad()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
@@ -356,7 +357,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate : ViewControllerLifeCycle {
     func viewControllerDidLoad(_ viewController: UIViewController) {
-        frameworkSetupMainViewDidLoad()
     }
 }
 
@@ -464,9 +464,8 @@ extension AppDelegate {
             }
         }
         else {
-            let tutorialViewController = TutorialViewController()
-            tutorialViewController.delegate = self
-            tutorialViewController.lifeCycleDelegate = self
+            let tutorialViewController = TutorialViewController.init(nibName: nil, bundle: nil)
+            tutorialViewController.tutorialDelegate = self
             viewController = tutorialViewController
         }
         
@@ -485,7 +484,7 @@ extension AppDelegate {
 // MARK: - Tutorial
 
 extension AppDelegate : TutorialViewControllerDelegate {
-    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
+    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
         // Create a delay for a more natural feel after taking the screenshot
