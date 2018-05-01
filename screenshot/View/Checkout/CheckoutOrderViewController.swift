@@ -48,7 +48,9 @@ class CheckoutOrderViewController: BaseViewController {
         cardFrc = DataModel.sharedInstance.cardFrc(delegate: self)
         shippingAddressFrc = DataModel.sharedInstance.shippingAddressFrc(delegate: self)
         
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: nil, style: .plain, target: nil, action: nil)
+        let backBarButtonItem = UIBarButtonItem()
+        backBarButtonItem.title = ""
+        navigationItem.backBarButtonItem = backBarButtonItem
     }
     
     override func viewDidLoad() {
