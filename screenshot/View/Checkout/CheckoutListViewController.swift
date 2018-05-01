@@ -34,6 +34,17 @@ class CheckoutListViewController: BaseViewController {
         addButton.adjustInsetsForImage(withPadding: 6)
         addButton.sizeToFit()
         tableView.tableFooterView = addButton
+        
+        let topBorder = BorderView(edge: .top)
+        let bottomBorder = BorderView(edge: .bottom)
+        
+        if let separatorColor = tableView.separatorColor {
+            topBorder.backgroundColor = separatorColor
+            bottomBorder.backgroundColor = separatorColor
+        }
+        
+        addButton.addSubview(topBorder)
+        addButton.addSubview(bottomBorder)
     }
     
     override func viewWillAppear(_ animated: Bool) {
