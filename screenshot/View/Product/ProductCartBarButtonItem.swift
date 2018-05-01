@@ -10,14 +10,22 @@ import UIKit
 
 class ProductCartBarButtonItem: UIBarButtonItem {
     fileprivate let countLabel = Label()
+    private var timer: Timer?
     
     convenience init(target: Any?, action: Selector?) {
         let image = UIImage(named: "ProductCart")?.withRenderingMode(.alwaysTemplate)
         
         self.init(image: image, style: .plain, target: target, action: action)
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+            if let view = self?.targetView {
+                timer.invalidate()
+                self?.view = view
+            }
+        }
     }
     
-    var view: UIView? {
+    fileprivate var view: UIView? {
         didSet {
             guard let view = view else {
                 return
@@ -49,6 +57,8 @@ class ProductCartBarButtonItem: UIBarButtonItem {
     }
     
     deinit {
+        timer?.invalidate()
+        
         if #available(iOS 11.0, *) {} else {
             tintView?.removeObserver(self, forKeyPath: #keyPath(UIView.tintColor))
         }
