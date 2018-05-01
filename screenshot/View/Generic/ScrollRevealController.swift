@@ -207,7 +207,7 @@ extension ScrollRevealController {
         if offset > max && offset < min {
             let shouldReveal = min - offset < view.bounds.size.height / 2
             
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                 self.edgeConstraint?.constant = shouldReveal ? min : max
                 self.adjustScrollViewInsets()
                 self.view.superview?.layoutIfNeeded()

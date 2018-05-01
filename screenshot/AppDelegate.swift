@@ -14,6 +14,7 @@ import FBSDKLoginKit
 import Branch
 import PromiseKit
 import Segment_Amplitude
+import AdSupport
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -64,10 +65,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
+        frameworkSetupMainViewDidLoad()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
-        
+        UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
+
         return true
     }
     
@@ -103,22 +106,67 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let contentAvailable = aps["content-available"] as? NSNumber,
             contentAvailable.intValue == 1 {
             //TODO: why is this only segment
-            AnalyticsTrackers.segment.track(.wokeFromSilentPush)
+            Analytics.trackWokeFromSilentPush()
         } else {
-            AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
+            Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
+        
+        
+        if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
+            
+            if self.isSendToDebugURL(url) {
+                self.sendDebugDataToDebugApp(url:url)
+                return true
+            }
+        }
+
         
         return true
     }
-    var lastPresentedLowDiskSpaceWarning:Date?
-    func presentLowDiskSpaceWarning(){
+
+    func isSendToDebugURL(_ url:URL) -> Bool{
+        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other thrid parties
+        return url.absoluteString.contains("sendDebugInfo-b32963e7-ad86-4f80-8f2a-131d76ece793")
+
+    }
+    func sendDebugDataToDebugApp(url:URL){
+        let urlAbsoluteString = url.absoluteString
+
+        var paramsToSend:[String:String] = [:]
+        let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData
         
-        //don't change to guard - lead to large complie time
-        if let lastTime = self.lastPresentedLowDiskSpaceWarning {
-            let timeInterval = abs(lastTime.timeIntervalSinceNow)
-            if timeInterval  < 60*5 {
-                return
+        if urlAbsoluteString.contains("pushToken") {
+            if let pushToken = pushTokenData?.description.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
+                paramsToSend["pushToken"] = pushToken
             }
+        }
+        if urlAbsoluteString.contains("sharedScreenshots") {
+            var screenshots:[String] = []
+            let screenShotsFrc = DataModel.sharedInstance.screenshotFrc(delegate: nil)
+            screenShotsFrc.fetchedObjects.forEach { (s) in
+                if s.submittedDate != nil {
+                    if let screenshotId = s.screenshotId {
+                        screenshots.append("\(screenshotId)|\(s.submittedFeedbackCountGoal )")
+                    }
+                }
+            }
+            paramsToSend["sharedScreenshots"] = screenshots.joined(separator: ",")
+        }
+        if let url = URL.urlWith(string: "crazeDebugApp://sendDebugInfo", queryParameters: paramsToSend) {
+        
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    
+    var lastPresentedLowDiskSpaceWarning:Date?
+    
+    func presentLowDiskSpaceWarning() {
+        //don't change to guard - lead to large complie time
+        if let lastPresentation = self.lastPresentedLowDiskSpaceWarning,
+          -lastPresentation.timeIntervalSinceNow <= 60 * 5 { // Do nothing if presented warning within last 5 minutes.
+            return
         }
         
         
@@ -138,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
         ApplicationStateModel.sharedInstance.applicationState = .background
-        AnalyticsTrackers.standard.track(.sessionEnded)
+        Analytics.trackSessionEnded()
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
@@ -148,15 +196,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
-        AnalyticsTrackers.standard.track(.sessionStarted)
+        PermissionsManager.shared.fetchPushPermissionStatus()
+        Analytics.trackSessionStarted()
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         ApplicationStateModel.sharedInstance.applicationState = .active
+        PermissionsManager.shared.fetchPushPermissionStatus()
         FBSDKAppEvents.activateApp()
-        AnalyticsTrackers.standard.trackUserAge()
+        Analytics.trackUserAge()
     }
     
 //    func applicationWillTerminate(_ application: UIApplication) {
@@ -168,12 +218,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        
+        if self.isSendToDebugURL(url) {
+            self.sendDebugDataToDebugApp(url:url)
+            return true
+        }
+        
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
+        return handled
+    }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+        let handled = Branch.getInstance().continue(userActivity)
         return handled
     }
     
@@ -296,16 +357,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate : ViewControllerLifeCycle {
     func viewControllerDidLoad(_ viewController: UIViewController) {
-        frameworkSetupMainViewDidLoad()
     }
 }
 
 // MARK: - Framework Setup
 
-extension AppDelegate {
+extension AppDelegate : KochavaTrackerDelegate {
+    func tracker(_ tracker: KochavaTracker, didRetrieveAttributionDictionary attributionDictionary: [AnyHashable : Any]) {
+    }
+    
     fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
         frameworkSetupLaunchOptions = launchOptions
-        
+                
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
@@ -317,8 +380,19 @@ extension AppDelegate {
         configuration.use(SEGAmplitudeIntegrationFactory.instance())
         SEGAnalytics.setup(with: configuration)
         
+        var trackerParametersDictionary: [AnyHashable: Any] = [:]
+        trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
+        trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
+        
+        KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
+        
+        
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
+        }
+        
+        if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+            Branch.setTrackingDisabled(true)
         }
         
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
@@ -379,21 +453,19 @@ extension AppDelegate {
         let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            
             viewController = mainTabBarController
+            
             if self.shouldLoadDiscoverNextLoad {
                 self.shouldLoadDiscoverNextLoad = false
+                
                 if let mainTabBarController = viewController as? MainTabBarController {
-                    if let vc = mainTabBarController.viewControllers?.first(where: {($0 as? DiscoverNavigationController) != nil}) {
-                        mainTabBarController.selectedViewController = vc
-                    }
+                    mainTabBarController.selectedViewController = mainTabBarController.discoverNavigationController
                 }
             }
         }
         else {
-            let tutorialViewController = TutorialViewController()
-            tutorialViewController.delegate = self
-            tutorialViewController.lifeCycleDelegate = self
+            let tutorialViewController = TutorialViewController.init(nibName: nil, bundle: nil)
+            tutorialViewController.tutorialDelegate = self
             viewController = tutorialViewController
         }
         
@@ -412,7 +484,7 @@ extension AppDelegate {
 // MARK: - Tutorial
 
 extension AppDelegate : TutorialViewControllerDelegate {
-    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
+    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController) {
         viewController.delegate = nil
         
         // Create a delay for a more natural feel after taking the screenshot
@@ -437,27 +509,77 @@ extension AppDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
 
-        // Only spin up a background task if we are already in the background
-        if application.applicationState == .background {
-            if bgTask != UIBackgroundTaskInvalid {
-                application.endBackgroundTask(self.bgTask)
+        if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+            
+                likeUpdates.forEach({ (dict) in
+                    let period:TimeInterval? = {
+                        if let p = dict["periodS"] as? Double {
+                            return TimeInterval(p)
+                        }else if let p = dict["periodS"] as? Int {
+                            return TimeInterval(p)
+                        }else if let p = dict["periodS"] as? String {
+                            return TimeInterval(p)
+                        }
+                        return nil
+                    }()
+                    let likes:Int64? = {
+                        if let l = dict["likes"] as? Double {
+                            return Int64(l)
+                        }else if let l = dict["likes"] as? Int {
+                            return Int64(l)
+                        }else if let l = dict["likes"] as? String {
+                            return Int64(l)
+                        }
+                        return nil
+                    }()
+                    if let period = period,
+                        let screenshotId = dict["screenshotId"] as? String,
+                        let likes = likes {
+                        
+                        if let screenshot = context.screenshotWith(screenshotId: screenshotId){
+                            if screenshot.submittedDate != nil {
+                                screenshot.submittedFeedbackCountGoal = max(screenshot.submittedFeedbackCountGoal, likes)
+                                screenshot.submittedFeedbackCountGoalDate =  Date.init(timeIntervalSinceNow: period)
+                            }
+                        }
+                    }
+                })
+                
+                context.saveIfNeeded()
+                DispatchQueue.main.async {
+                    if UIApplication.shared.applicationState == .active {
+                        UserFeedback.shared.cancelNotifications()
+                        UserFeedback.shared.scheduleNotifications()
+                    }
+                   completionHandler(.newData)
+                }
+            }
+        }else{
+            
+            // Only spin up a background task if we are already in the background
+            if application.applicationState == .background {
+                if bgTask != UIBackgroundTaskInvalid {
+                    application.endBackgroundTask(self.bgTask)
+                }
+                
+                bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
+                    // TODO: Call the completion handler when the sync is done.
+                    // TODO: Provide the correct background fetch result to the completionHandler.
+                    application.endBackgroundTask(self.bgTask)
+                    self.bgTask = UIBackgroundTaskInvalid
+                    
+                    completionHandler(.newData)
+                })
+            } else {
+                completionHandler(.noData)
             }
             
-            bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
-                // TODO: Call the completion handler when the sync is done.
-                // TODO: Provide the correct background fetch result to the completionHandler.
-                application.endBackgroundTask(self.bgTask)
-                self.bgTask = UIBackgroundTaskInvalid
-                
-                completionHandler(.newData)
-            })
-        } else {
-            completionHandler(.noData)
+            IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
+            Branch.getInstance().handlePushNotification(userInfo)
         }
-        
-        IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
-        Branch.getInstance().handlePushNotification(userInfo)
     }
+    
 }
 
 // MARK: - Settings
@@ -472,17 +594,31 @@ extension AppDelegate {
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        if let userInfo = response.notification.request.content.userInfo as? [String : String],
-          let openingScreen = userInfo[Constants.openingScreenKey],
-          openingScreen == Constants.openingScreenValueScreenshot,
-          let openingAssetId = userInfo[Constants.openingAssetIdKey] {
-            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
-            showScreenshotListTop()
+        if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
+            if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
+                openingScreen == Constants.openingScreenValueScreenshot,
+                let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
+                showScreenshotListTop()
+            } else if let aps = userInfo["aps"] as? [String : Any],
+                let category = aps["category"] as? String,
+                category == "PRICE_ALERT",
+                let partNumber = userInfo["partNumber"] as? String,
+                !partNumber.isEmpty {
+                ProductViewController.present(with: partNumber)
+            }
         }
         
         completionHandler()
-        
-        AnalyticsTrackers.standard.track(.appOpenedFromLocalNotification)
+        Analytics.trackAppOpenedFromLocalNotification()
     }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let category = notification.request.content.categoryIdentifier
+        let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
+        completionHandler(options)
+    }
+    
 }

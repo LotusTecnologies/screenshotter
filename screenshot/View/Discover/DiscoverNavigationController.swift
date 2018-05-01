@@ -18,6 +18,10 @@ class DiscoverNavigationController : UINavigationController, ViewControllerLifeC
         super.init(coder: aDecoder)
     }
     
+    convenience init() {
+        self.init(nibName: nil, bundle: nil)
+    }
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
@@ -44,6 +48,7 @@ class DiscoverNavigationController : UINavigationController, ViewControllerLifeC
 extension DiscoverNavigationController : DiscoverScreenshotViewControllerDelegate {
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath) {
         discoverScreenshotViewController.decidedToAdd { screenshot in
+            Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .discover)
             let productsViewController = ProductsViewController.init(screenshot: screenshot)
             productsViewController.lifeCycleDelegate = self
             productsViewController.hidesBottomBarWhenPushed = true

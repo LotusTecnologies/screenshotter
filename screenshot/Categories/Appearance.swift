@@ -10,12 +10,14 @@ import Foundation
 import UIKit
 
 extension UIColor {
-    static let background = UIColor(white: 244.0/255.0, alpha: 1)
+    static let background = UIColor(white: 244/255, alpha: 1)
+    static let border = UIColor.black.withAlphaComponent(0.3)
+    static let cellBackground = UIColor(white: 250/255, alpha: 1)
+    static let cellBorder = UIColor(red: 216/255, green: 224/255, blue: 227/255, alpha: 1)
     
-    static let crazeRed = UIColor(red: 237.0/255.0, green: 20.0/255.0, blue: 90.0/255.0, alpha: 1)
-    static let crazeGreen = UIColor(red: 32.0/255.0, green: 200.0/255.0, blue: 163.0/255.0, alpha: 1)
-    static let shamrockGreen = UIColor(red:0.0, green:0.50, blue:0.0, alpha:1.0)
-
+    static let crazeRed = UIColor(red: 237/255, green: 20/255, blue: 90/255, alpha: 1)
+    static let crazeGreen = UIColor(red: 32/255, green: 200/255, blue: 163/255, alpha: 1)
+    static let shamrockGreen = UIColor(red: 0, green: 0.5, blue: 0, alpha: 1)
     
     static let gray1 = UIColor(white: 0.1, alpha: 1) // 25.5
     static let gray2 = UIColor(white: 0.2, alpha: 1) // 51
@@ -27,30 +29,52 @@ extension UIColor {
     static let gray8 = UIColor(white: 0.8, alpha: 1) // 204
     static let gray9 = UIColor(white: 0.9, alpha: 1) // 229.5
     
-    func lighter(by percentage: CGFloat = 8) -> UIColor? {
-        return adjust(by: abs(percentage))
+    func lighter(by percentage: CGFloat = 8) -> UIColor {
+        return adjust(rgbBy: abs(percentage))
     }
     
-    func darker(by percentage: CGFloat = 8) -> UIColor? {
-        return adjust(by: -1 * abs(percentage))
+    func darker(by percentage: CGFloat = 8) -> UIColor {
+        return adjust(rgbBy: -1 * abs(percentage))
     }
     
-    private func adjust(by percentage: CGFloat = 8) -> UIColor? {
+    private func adjust(rgbBy percentage: CGFloat = 8) -> UIColor {
         var r = CGFloat(), g = CGFloat(), b = CGFloat(), a = CGFloat()
         
         if getRed(&r, green: &g, blue: &b, alpha: &a) {
             let p = percentage / 100
             return UIColor(red: min(r + p, 1), green: min(g + p, 1), blue: min(b + p, 1), alpha: a)
-            
-        } else {
-            return nil
+        }
+        else {
+            return self
         }
     }
 }
 
+extension UIImage {
+    convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {
+        let rect = CGRect(origin: .zero, size: size)
+        
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)
+        color.setFill()
+        UIRectFill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        guard let cgImage = image?.cgImage else {
+            return nil
+        }
+        
+        self.init(cgImage: cgImage)
+    }
+}
+
+extension TimeInterval {
+    static let defaultAnimationDuration = 0.25
+}
+
 extension UIContentSizeCategory {
     var isAccessibilityCategory: Bool {
-        var isAccessibility: Bool
+        let isAccessibility: Bool
         
         switch self {
         case .accessibilityMedium,
@@ -114,8 +138,8 @@ extension UIApplication {
         navigationBar.barTintColor = .white
         navigationBar.tintColor = .gray3
         navigationBar.titleTextAttributes = [
-            NSFontAttributeName: UIFont.screenshopFont(.futuraMedium, size: 20),
-            NSForegroundColorAttributeName: UIColor.gray3
+            NSAttributedStringKey.font: UIFont.screenshopFont(.futuraMedium, size: 20),
+            NSAttributedStringKey.foregroundColor: UIColor.gray3
         ]
         
         // Tab Bar
@@ -130,18 +154,18 @@ extension UIApplication {
         let toolbar = UIToolbar.appearance()
         toolbar.tintColor = crazeRedColor
         
-        var barButtonItemTitleTextAttributes: [String:Any] = [
-            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 16)
+        var barButtonItemTitleTextAttributes: [NSAttributedStringKey:Any] = [
+            NSAttributedStringKey.font: UIFont.screenshopFont(.futura, size: 16)
         ]
         let navigationBarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .highlighted)
         
-        barButtonItemTitleTextAttributes[NSForegroundColorAttributeName] = UIColor.gray7
+        barButtonItemTitleTextAttributes[NSAttributedStringKey.foregroundColor] = UIColor.gray7
         navigationBarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .disabled)
         
         barButtonItemTitleTextAttributes = [
-            NSFontAttributeName: UIFont.screenshopFont(.futura, size: 12)
+            NSAttributedStringKey.font: UIFont.screenshopFont(.futura, size: 12)
         ]
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
         toolbarButtonItem.setTitleTextAttributes(barButtonItemTitleTextAttributes, for: .normal)
@@ -153,8 +177,8 @@ extension UIApplication {
         // Segmented Control
         
         let segmentedControlTitleTextAttributes: [String: Any] = [
-            NSFontAttributeName: UIFont.screenshopFont(.hind, size: 13),
-            NSBaselineOffsetAttributeName: -1
+            NSAttributedStringKey.font.rawValue: UIFont.screenshopFont(.hind, size: 13),
+            NSAttributedStringKey.baselineOffset.rawValue: -1
         ]
         
         let segmentedControl = UISegmentedControl.appearance()
@@ -162,7 +186,20 @@ extension UIApplication {
     }
 }
 
-
+// TODO: move to better location
+extension NSAttributedStringKey {
+    static func convertStringAnyToNSAttributedStringKeyAny(_ dict:[String:Any]?) -> [NSAttributedStringKey : Any]? {
+        if let dict = dict {
+            var toReturn:[NSAttributedStringKey:Any] = [:]
+            dict.forEach { (key, value) in
+                let newKey = NSAttributedStringKey.init(String.init(key))
+                toReturn[newKey] = value
+            }
+            return toReturn
+        }
+        return nil
+    }
+}
 
 extension UIImage {
     func shamrock() -> UIImage? {

@@ -47,7 +47,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.isHidden = true
         mainView.addSubview(iconImageView)
-        iconImageView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+        iconImageView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
         iconImageView.topAnchor.constraint(equalTo: mainView.layoutMarginsGuide.topAnchor, constant: -verPadding).isActive = true
         iconImageView.leadingAnchor.constraint(equalTo: mainView.layoutMarginsGuide.leadingAnchor).isActive = true
         iconImageView.bottomAnchor.constraint(equalTo: mainView.layoutMarginsGuide.bottomAnchor, constant: verPadding).isActive = true
@@ -60,7 +60,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         tempContentView.trailingAnchor.constraint(equalTo: mainView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let tempContentViewLeadingConstraint = tempContentView.leadingAnchor.constraint(equalTo: mainView.layoutMarginsGuide.leadingAnchor)
-        tempContentViewLeadingConstraint.priority = UILayoutPriorityDefaultHigh
+        tempContentViewLeadingConstraint.priority = UILayoutPriority.defaultHigh
         tempContentViewLeadingConstraint.isActive = true
         
         tempContentViewToIconConstraint = tempContentView.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: mainView.layoutMargins.left)
@@ -99,7 +99,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = .gray6
+        borderView.backgroundColor = .border
         tempContentView.addSubview(borderView)
         borderView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: type(of: self).mainViewLayoutMargins.top).isActive = true
         borderView.bottomAnchor.constraint(equalTo: tempContentView.bottomAnchor).isActive = true
@@ -238,7 +238,7 @@ extension ScreenshotNotificationCollectionViewCell {
         let contentWidth = width - shadowInsets.left - mainViewLayoutMargins.left - iconWidth - mainViewLayoutMargins.left - mainViewLayoutMargins.right - shadowInsets.right
         let constraintRect = CGSize(width: contentWidth, height: .greatestFiniteMagnitude)
         
-        let boundingBox = string.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSFontAttributeName: labelFont], context: nil)
+        let boundingBox = string.boundingRect(with: constraintRect, options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [NSAttributedStringKey.font: labelFont], context: nil)
         
         return shadowInsets.top + mainViewLayoutMargins.top + ceil(boundingBox.height) + mainViewLayoutMargins.top + buttonHeight + mainViewLayoutMargins.bottom + shadowInsets.bottom
     }

@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import AVFoundation
 import CoreLocation
 import Photos
@@ -36,25 +36,22 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     private var pushStatus: PermissionStatus = .undetermined {
         didSet {
             let enabled = pushStatus == .authorized
-            var properties: [String : String]?
             
-            if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data {
-                properties = ["token": token.description]
-            }
+            let tokenString = (UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data)?.description
+            
             if enabled {
-                AnalyticsTrackers.standard.track(.apnEnabled, properties: properties)
-            }else{
-                AnalyticsTrackers.standard.track(.apnDisabled, properties: properties)
-
+                Analytics.trackAPNEnabled(token: tokenString)
             }
-            
+            else {
+                Analytics.trackAPNDisabled(token: tokenString)
+            }
         }
     }
     
     func permissionStatus(for type: PermissionType) -> PermissionStatus {
         switch type {
         case .camera:
-            return permissionStatus(forCamera: AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo))
+            return permissionStatus(forCamera: AVCaptureDevice.authorizationStatus(for: AVMediaType.video))
         case .photo:
             return permissionStatus(forPhoto: PHPhotoLibrary.authorizationStatus())
         case .push:
@@ -166,17 +163,11 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
         }
     }
     
-   
-    
-    func _requestPushPermission(response: PermissionBlock?) {
-        requestPermission(for: .push, response: response)
-    }
-    
     fileprivate func requestCameraPermission(with response: PermissionBlock?) {
-        let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
+        let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
         
         if status == .notDetermined {
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: response)
+            AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: response!)
             
         } else {
             if let response = response {
@@ -280,8 +271,20 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     // MARK: Alert
     
     func deniedAlertController(for type: PermissionType, opened: PermissionBlock? = nil) -> UIAlertController? {
-        if type == .photo {
-            let alertController = UIAlertController(title: "permission.photo.denied.title".localized, message: "permission.photo.denied.message".localized, preferredStyle: .alert)
+        let message: String? = {
+            switch type {
+            case .photo:
+                return "permission.photo.denied.message".localized
+            case .push:
+                return "permission.push.denied.message".localized
+            default:
+                return nil
+            }
+        }()
+        
+        switch type {
+        case .photo, .push:
+            let alertController = UIAlertController(title: "permission.denied.title".localized, message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: { action in
                 if let url = URL(string: UIApplicationOpenSettingsURLString) {
                     UIApplication.shared.open(url, options: [:], completionHandler: opened)
@@ -289,7 +292,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             }))
             return alertController
             
-        } else {
+        default:
             return nil
         }
     }

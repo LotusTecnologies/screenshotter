@@ -47,7 +47,7 @@ class ThankYouForSharingViewController : UIViewController {
         titleLabel.numberOfLines = 0
         titleLabel.font = .systemFont(ofSize: 28)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        titleLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         view.addSubview(titleLabel)
         titleLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -60,7 +60,7 @@ class ThankYouForSharingViewController : UIViewController {
         messageLabel.textColor = .crazeGreen
         messageLabel.font = .systemFont(ofSize: 20)
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        messageLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         view.addSubview(messageLabel)
         messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive =  true
         messageLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -71,7 +71,7 @@ class ThankYouForSharingViewController : UIViewController {
         let thumbsUpImageView = UIImageView(image: UIImage(named: "ShareToMatchsticksThumbsUp"))
         thumbsUpImageView.translatesAutoresizingMaskIntoConstraints = false
         thumbsUpImageView.contentMode = .scaleAspectFit
-        thumbsUpImageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        thumbsUpImageView.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         view.addSubview(thumbsUpImageView)
         thumbsUpImageView.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: imageViewPadding).isActive = true
         thumbsUpImageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -79,7 +79,7 @@ class ThankYouForSharingViewController : UIViewController {
         
         closeButton.setTitle("generic.close".localized, for: .normal)
         closeButton.translatesAutoresizingMaskIntoConstraints = false
-        closeButton.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
+        closeButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         view.addSubview(closeButton)
         closeButton.topAnchor.constraint(equalTo: thumbsUpImageView.bottomAnchor, constant: imageViewPadding).isActive = true
         closeButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true

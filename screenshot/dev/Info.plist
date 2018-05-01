@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.10</string>
+	<string>3.13</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -54,7 +54,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>120</string>
+	<string>132</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
@@ -69,6 +69,7 @@
 		<string>googlegmail</string>
 		<string>googlechromes</string>
 		<string>googlechrome</string>
+		<string>crazeDebugApp</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

@@ -5,6 +5,7 @@ inhibit_all_warnings!
 def shared_pods
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     use_frameworks!
+    pod 'KochavaTrackeriOS'
     pod 'Clarifai-Apple-SDK', '3.0.0-beta14'
     pod 'PromiseKit/Foundation', '4.5.2'
     pod 'PromiseKit/StoreKit', '~> 4.0'
@@ -19,6 +20,10 @@ def shared_pods
     pod 'Intercom'
     pod 'lottie-ios'
     pod 'Segment-Amplitude'
+    pod 'SwiftKeychainWrapper'
+    pod 'CreditCardValidator'
+    pod 'Whisper'
+    pod 'PhoneNumberKit'
 end
 
 target 'screenshot' do

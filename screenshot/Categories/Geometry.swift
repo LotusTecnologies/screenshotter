@@ -6,16 +6,29 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 extension CGFloat {
-    static let padding = CGFloat(16)
-    static let extendedPadding:CGFloat = CGFloat(UIDevice.is480h ? 20 : 40)
+    static let padding: CGFloat = 16
+    static let extendedPadding: CGFloat = UIDevice.is480h ? 20 : 40
     
-    static let halfPoint = CGFloat(UIScreen.main.scale > 1 ? 0.5 : 1)
+    static let halfPoint: CGFloat = UIScreen.main.scale > 1 ? 0.5 : 1
     
-    static let defaultCornerRadius = CGFloat(6)
+    static let defaultCornerRadius: CGFloat = 6
+}
+
+extension CGSize {
+    func aspectFitRectInSize(_ size: CGSize) -> CGRect {
+        let scale = min(size.width / width, size.height / height)
+        let scaledSize = CGSize(width: width * scale, height: height * scale)
+        
+        var rect = CGRect.zero
+        rect.origin.x = round((size.width - scaledSize.width) * 0.5)
+        rect.origin.y = round((size.height - scaledSize.height) * 0.5)
+        rect.size.width = round(scaledSize.width)
+        rect.size.height = round(scaledSize.height)
+        return rect
+    }
 }
 
 extension CGRect {

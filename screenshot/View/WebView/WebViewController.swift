@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import WebKit
 import SpriteKit
 import Appsee
@@ -79,9 +79,7 @@ class WebViewController : BaseViewController {
         super.viewWillDisappear(animated)
         
         if isShowingGame {
-            AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
-                "From": "User Navigating"
-                ])
+            Analytics.trackGameInterrupted(from: .userNavigating)
         }
     }
     
@@ -99,26 +97,22 @@ class WebViewController : BaseViewController {
         updateLoadingCoverLayoutMargins()
     }
     
-    func applicationDidEnterBackground(_ notification: Notification) {
+    @objc func applicationDidEnterBackground(_ notification: Notification) {
         if view.window != nil {
             loader?.stopAnimation()
             
             if isShowingGame {
-                AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
-                    "From": "App Backgrounding"
-                    ])
+                Analytics.trackGameInterrupted(from: .appBackgrounding)
             }
         }
     }
     
-    func applicationWillEnterForeground(_ notification: Notification) {
+    @objc func applicationWillEnterForeground(_ notification: Notification) {
         if view.window != nil {
             loader?.startAnimation()
             
             if isShowingGame {
-                AnalyticsTrackers.standard.track(.gameResumed, properties: [
-                    "From": "App Backgrounding"
-                    ])
+                Analytics.trackGameResumed(from: .appBackgrounding)
             }
         }
     }
@@ -298,9 +292,7 @@ class WebViewController : BaseViewController {
             webView.reload()
         }
         
-        AnalyticsTrackers.standard.track(.refreshedWebpage, properties: [
-            "url": url?.absoluteString ?? ""
-            ])
+        Analytics.trackRefreshedWebpage(url: url?.absoluteString)
     }
     
     @objc fileprivate func shareAction() {
@@ -396,10 +388,7 @@ class WebViewController : BaseViewController {
         
         if isShowingGame {
             isShowingGame = false
-            
-            AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
-                "From": "Page Loading"
-                ])
+            Analytics.trackGameInterrupted(from: .pageLoading)
         }
     }
     
@@ -446,7 +435,7 @@ extension WebViewController : WKNavigationDelegate {
             }
             else {
                 decisionHandler(.cancel)
-                AnalyticsTrackers.standard.track(.webviewInvalidUrl, properties: ["url": url.absoluteString])
+                Analytics.trackWebViewInvalidUrl(url: url.absoluteString)
                 self.delegate?.webViewController(self, declinedInvalidURL: url)
             }
         }
@@ -465,30 +454,9 @@ extension WebViewController : WKNavigationDelegate {
         }
     }
     
-    func urlIsTracker(url:URL?) -> Bool{
-        let trackers = [
-            "api.shopstyle.com",
-            "doubleclick.net",
-            "adservice.google",
-            "www.googletagmanager.com"
-        ]
-        if let host = url?.host {
-            for t in trackers{
-                if host.contains(t) {
-                    
-                    return true
-                }
-            }
-        }
-        
-        return false
-        
-    }
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
         if didLoadInitialPage == false {
-            if !self.urlIsTracker(url: navigationResponse.response.url){
-                
+            if !isTrackerURL(url: navigationResponse.response.url) {
                 didLoadInitialPage = true
                 
                 if !isShowingGame {
@@ -514,6 +482,24 @@ extension WebViewController : WKNavigationDelegate {
         let alertController = UIAlertController(title: "webview.invalid.title".localized, message: "webview.invalid.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alertController
+    }
+    
+    fileprivate func isTrackerURL(url: URL?) -> Bool {
+        let trackers = [
+            "api.shopstyle.com",
+            "doubleclick.net",
+            "adservice.google",
+            "www.googletagmanager.com"
+        ]
+        if let host = url?.host {
+            for tracker in trackers {
+                if host.contains(tracker) {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 }
 

@@ -44,13 +44,14 @@ class SettingsViewController : BaseViewController {
         case restoreInAppPurchase
         case talkToStylist
         case openIn
+        case region
     }
     
     weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableHeaderContentView = UIView()
-    fileprivate let screenshotsCountLabel = Label()
+    fileprivate let screenshotsCountLabel = UILabel()
     fileprivate let tableFooterTextView = UITextView()
     
     fileprivate var nameTextField: UITextField?
@@ -118,7 +119,7 @@ class SettingsViewController : BaseViewController {
             imageView.contentMode = .scaleAspectFit
             imageView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -.padding)
             tableHeaderContentView.addSubview(imageView)
-            imageView.setContentHuggingPriority(UILayoutPriorityRequired, for: .horizontal)
+            imageView.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
             imageView.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
             imageView.leftAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.leftAnchor).isActive = true
             imageView.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
@@ -128,8 +129,9 @@ class SettingsViewController : BaseViewController {
             screenshotsCountLabel.font = .screenshopFont(.hindLight, size: 20)
             screenshotsCountLabel.adjustsFontSizeToFitWidth = true
             screenshotsCountLabel.minimumScaleFactor = 0.7
+            screenshotsCountLabel.baselineAdjustment = .alignCenters
             tableHeaderContentView.addSubview(screenshotsCountLabel)
-            screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
+            screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .horizontal)
             screenshotsCountLabel.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
             screenshotsCountLabel.leftAnchor.constraint(equalTo: imageView.layoutMarginsGuide.rightAnchor).isActive = true
             screenshotsCountLabel.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
@@ -152,8 +154,8 @@ class SettingsViewController : BaseViewController {
         tableFooterTextView.adjustsFontForContentSizeCategory = true
         tableFooterTextView.text = "settings.contact".localized
         tableFooterTextView.linkTextAttributes = [
-            NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue,
-            NSUnderlineColorAttributeName: UIColor.gray7
+            NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
+            NSAttributedStringKey.underlineColor.rawValue: UIColor.gray7
         ]
         tableFooterTextView.frame = rectForTableFooterTextView()
         
@@ -221,10 +223,6 @@ class SettingsViewController : BaseViewController {
         }
     }
     
-    @objc fileprivate func dismissViewController() {
-        presentedViewController?.dismiss(animated: true, completion: nil)
-    }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
         
@@ -252,6 +250,7 @@ class SettingsViewController : BaseViewController {
             .talkToStylist,
             .usageStreak,
             .coins,
+            .region,
             .version,
             .partners
         ],
@@ -308,8 +307,7 @@ class SettingsViewController : BaseViewController {
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
         let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
         let integer = gender.rawValue
-        
-        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Gender Filter to \(gender.stringValue)")
+        Analytics.trackSetGlobalGenderFiler(gender: gender.stringValue)
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
@@ -317,7 +315,7 @@ class SettingsViewController : BaseViewController {
         let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
         let integer = size.rawValue
         
-        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Size Filter to \(size.stringValue)")
+        Analytics.trackSetGlobalSizeFiler(size: size.stringValue)
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -487,10 +485,7 @@ extension SettingsViewController : UITableViewDelegate {
             IntercomHelper.sharedInstance.presentMessagingUI()
             
         case .coins:
-            let gameViewController = GameViewController()
-            gameViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissViewController))
-            
-            let navigationController = UINavigationController(rootViewController: gameViewController)
+            let navigationController = ModalNavigationController(rootViewController: GameViewController())
             present(navigationController, animated: true, completion: nil)
             
         case .pushPermission, .photoPermission:
@@ -506,7 +501,7 @@ extension SettingsViewController : UITableViewDelegate {
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
-            let options:[OpenProductPage] = [.embededSafari, .safari, .chrome]
+            let options:[OpenWebPage] = [.embededSafari, .safari, .chrome]
             options.forEach({ (setting) in
                 alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
                     setting.saveToUserDefaults()
@@ -615,6 +610,22 @@ extension SettingsViewController : UITableViewDelegate {
                 }
             }
  
+        case .region:
+            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction(title: "settings.region.us".localized, style: .default, handler: { (alertAction) in
+                UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isUSC)
+                tableView.reloadRows(at: [indexPath], with: .none)
+            }))
+            alert.addAction(UIAlertAction(title: "settings.region.other".localized, style: .default, handler: { (alertAction) in
+                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.isUSC)
+                tableView.reloadRows(at: [indexPath], with: .none)
+            }))
+
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            
+            present(alert, animated: true, completion: nil)
+            
         default:
             break
         }
@@ -690,6 +701,8 @@ fileprivate extension SettingsViewController {
             return "settings.row.restore_in_app_purchase.title".localized
         case .talkToStylist:
             return "settings.row.talk_to_stylist.title".localized
+        case .region:
+            return "settings.row.region.title".localized
         }
     }
     
@@ -698,7 +711,7 @@ fileprivate extension SettingsViewController {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
         case .openIn:
-            return OpenProductPage.fromSystemInfo().localizedDisplayString()
+            return OpenWebPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
@@ -723,6 +736,16 @@ fileprivate extension SettingsViewController {
             }
             else {
                 return "🔒"
+            }
+        case .region:
+            if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
+                return "settings.region.unknown".localized
+            } else {
+                if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+                    return "settings.region.us".localized
+                } else {
+                    return "settings.region.other".localized
+                }
             }
         default:
             return nil
@@ -922,8 +945,11 @@ extension SettingsViewController : UITextFieldDelegate {
         let email = emailTextField?.text?.trimmingCharacters(in: .whitespaces)
         let user = AnalyticsUser(name: name, email: email)
         
-        AnalyticsTrackers.standard.identify(user)
+        AnalyticsTrackers.segment.identify(user)
         AnalyticsTrackers.branch.identify(user)
+        AnalyticsTrackers.appsee.identify(user)
+        AnalyticsTrackers.intercom.identify(user)
+        
     }
     
     fileprivate func dismissKeyboard() {
@@ -933,15 +959,14 @@ extension SettingsViewController : UITextFieldDelegate {
 
 // MARK: - Tutorial
 
-extension SettingsViewController : TutorialVideoViewControllerDelegate {
-    func tutorialVideoViewControllerDidTapDone(_ viewController: TutorialVideoViewController) {
+extension SettingsViewController : VideoDisplayingViewControllerDelegate {
+    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
         dismiss(animated: true, completion: nil)
     }
     
-    func tutorialVideoViewControllerDidEnd(_ viewController: TutorialVideoViewController) {
+    func videoDisplayingViewControllerDidEnd(_ viewController: UIViewController) {
         dismiss(animated: true, completion: nil)
-        
-        AnalyticsTrackers.standard.track(.automaticallyExitedTutorialVideo)
+        Analytics.trackAutomaticallyExitedTutorialVideo()
     }
 }
 

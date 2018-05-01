@@ -16,6 +16,16 @@ class DimmedPresentationController: UIPresentationController {
         return view
     }()
     
+    override init(presentedViewController: UIViewController, presenting presentingViewController: UIViewController?) {
+        super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChangeFrame(_:)), name: .UIKeyboardWillChangeFrame, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
         
@@ -55,6 +65,26 @@ class DimmedPresentationController: UIPresentationController {
         
         if completed {
             dimmedView.removeFromSuperview()
+        }
+    }
+    
+    // MARK: Keyboard
+    
+    var keyboardRect: CGRect = .null
+    
+    @objc fileprivate func keyboardWillChangeFrame(_ notification: Notification) {
+        guard let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+            let presentedView = presentedView
+            else {
+                return
+        }
+        
+        self.keyboardRect = keyboardRect
+        
+        let newPresentedViewFrame = frameOfPresentedViewInContainerView
+        
+        if !presentedView.frame.equalTo(newPresentedViewFrame) {
+            presentedView.frame = newPresentedViewFrame
         }
     }
 }

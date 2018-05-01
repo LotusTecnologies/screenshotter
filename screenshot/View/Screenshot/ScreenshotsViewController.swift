@@ -40,11 +40,11 @@ class ScreenshotsViewController: BaseViewController {
     var hasProductBar = false
     
     init() {
-
-        
         super.init(nibName: nil, bundle: nil)
         
         self.restorationIdentifier = "ScreenshotsViewController"
+        title = "screenshots.title".localized
+            
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
@@ -86,16 +86,31 @@ extension ScreenshotsViewController{
     }
 }
 
-extension ScreenshotsViewController {
+extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
+    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
-
+ 
+        
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
 
         self.setupViews()
         self.syncEmptyListView()
         NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
+        
+        
+        let productsBarController = ProductsBarController()
+        productsBarController.setup()
+        productsBarController.delegate = self
+        self.productsBarController = productsBarController
+        UIView.performWithoutAnimation {
+            self.productBarContentChanged(productsBarController)
+        }
+        
 
     }
     
@@ -103,7 +118,13 @@ extension ScreenshotsViewController {
         super.viewWillAppear(animated)
         syncEmptyListView()
         self.updateHasNewScreenshot()
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
+            let campaign = CampaignPromotionViewController(modal:true)
+            campaign.delegate = self
+            self.present(campaign, animated: true, completion: nil)
+        }
     }
+    
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -115,13 +136,13 @@ extension ScreenshotsViewController {
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
     }
     
-    func applicationDidEnterBackground(_ notification:Notification){
+    @objc func applicationDidEnterBackground(_ notification:Notification){
         if self.isViewLoaded && self.view.window != nil {
             self.removeScreenshotHelperView()
         }
     }
     
-    func applicationWillEnterForeground(_ notification:Notification) {
+    @objc func applicationWillEnterForeground(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             syncEmptyListView()
             self.updateHasNewScreenshot()
@@ -129,13 +150,23 @@ extension ScreenshotsViewController {
         }
     }
     
-    func contentSizeCategoryDidChange(_ notification:Notification) {
+    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
                 self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ScreenshotsSection.notification.rawValue)])
             }
         }
     }
+}
+
+extension ScreenshotsViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
+        
+    }
+    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
+        self.dismiss(animated: true, completion: nil)
+    }
+
 }
 
 //Setup view
@@ -197,7 +228,7 @@ extension ScreenshotsViewController {
         
     }
     
-    func refreshControlAction(_ refreshControl:UIRefreshControl){
+    @objc func refreshControlAction(_ refreshControl:UIRefreshControl){
         
         if (refreshControl.isRefreshing) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
@@ -206,7 +237,7 @@ extension ScreenshotsViewController {
         }
     }
     
-    func emptyListViewAllowAccessAction() {
+    @objc func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
             self.syncEmptyListView()
         }
@@ -261,8 +292,9 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
     
     func productBar(_ controller: ProductsBarController, didTap product: Product) {
         if !self.isEditing {
-            OpenProductPage.present(product: product, fromViewController: self, analyticsKey: .tappedOnProductProductbar, fromPage: "ProductBar")
-        }else{
+            self.presentProduct(product, atLocation: .productBar)
+        }
+        else {
             if let index = self.toHideFromProductBarObjectIDs.index(of: product.objectID){
                 self.toHideFromProductBarObjectIDs.remove(at: index)
             }else{
@@ -301,7 +333,7 @@ extension ScreenshotsViewController {
                 let titleLabel = UILabel()
                 titleLabel.translatesAutoresizingMaskIntoConstraints = false
                 titleLabel.text = "screenshots.helper.title".localized
-                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightSemibold)
+                titleLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.semibold)
                 titleLabel.numberOfLines = 0
                 contentView.addSubview(titleLabel)
                 titleLabel.topAnchor.constraint(equalTo:contentView.topAnchor).isActive = true
@@ -312,7 +344,7 @@ extension ScreenshotsViewController {
                 let descriptionLabel = UILabel()
                 descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
                 descriptionLabel.text = "screenshots.helper.byline".localized
-                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFontWeightLight)
+                descriptionLabel.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.light)
                 
                 descriptionLabel.numberOfLines = 0
                 contentView.addSubview(descriptionLabel)
@@ -344,7 +376,7 @@ extension ScreenshotsViewController {
 
 //Edit actions
 extension ScreenshotsViewController {
-    func editButtonAction() {
+    @objc func editButtonAction() {
         let isEditing = !self.isEditing
         
         if !isEditing {
@@ -403,7 +435,7 @@ extension ScreenshotsViewController {
         }
         
         if (animated) {
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                 cellEditing()
                 // TODO:
                 ///     putting `removeDeleteButton` here instead of in the completion
@@ -447,7 +479,7 @@ extension ScreenshotsViewController {
         self.deleteButton?.deleteCount = self.toHideFromProductBarObjectIDs.count + self.deleteScreenshotObjectIDs.count
     }
     
-    func deleteButtonAction() {
+    @objc func deleteButtonAction() {
         setEditing(false, animated: true)
         
         if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
@@ -459,60 +491,87 @@ extension ScreenshotsViewController {
 
 //Screenshot cell
 extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
-    func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
-        if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            let introductoryText = "screenshots.share.title".localized
-            
-            if screenshot.shoppablesCount <= 0 {
-                //TODO: fix this when there is a better indciator of failure to load
-                let alertController = UIAlertController.init(title: "screenshots.share.error.title".localized, message: "screenshots.share.error.message".localized, preferredStyle: .alert)
-                alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
-                self.present(alertController, animated: true, completion: nil)
-                return
-            }
-            var items:[Any]? = nil
-            
-            // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
-            let space = " "
-            
-            if let shareLink = screenshot.shareLink, let shareURL = URL.init(string: shareLink) {
-                items = [introductoryText, space, shareURL]
-            }else{
-                if let url = URL.init(string: "https://getscreenshop.com/") {
-                    let screenshotActivityItemProvider = ScreenshotActivityItemProvider.init(screenshot: screenshot, placeholderURL:url)
-                    items = [introductoryText, space, screenshotActivityItemProvider]
-                }
-            }
-            if let items =  items {
-                var applicationActivities:[UIActivity] = []
-                if let share = AddToDiscoverActivity.addToDiscoverActivity(screenshot: screenshot) {
-                    applicationActivities.append(share)
-                }
-                let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: applicationActivities)
-                activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
-                activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
-                    if (completed) {
-                        AnalyticsTrackers.standard.track(.shareCompleted)
-                        //TODO: why is this branch tracking here?
-                        AnalyticsTrackers.branch.track(.shareCompleted)
-                        
-                        if activityType?.rawValue == AddToDiscoverActivity.activityTypeString {
-                            let thankYou = ThankYouForSharingViewController()
-                            thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
-                            self.present(thankYou, animated: true, completion: nil)
-                        }
-                    } else {
-                        AnalyticsTrackers.standard.track(.shareIncomplete)
-                    }
-                }
-                activityViewController.popoverPresentationController?.sourceView = self.view // so iPads don't crash
-                self.present(activityViewController, animated: true, completion: nil)
-                AnalyticsTrackers.standard.track(.sharedScreenshot)
+    func presentSocailShare(screenshot:Screenshot){
+        let introductoryText = "screenshots.share.title".localized
+
+        let screenshotObjectId = screenshot.objectID
+        var items:[Any]? = nil
+        
+        // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
+        let space = " "
+        
+        if let shareLink = screenshot.shareLink, let shareURL = URL.init(string: shareLink) {
+            items = [introductoryText, space, shareURL]
+        }else{
+            if let url = URL.init(string: "https://getscreenshop.com/") {
+                let screenshotActivityItemProvider = ScreenshotActivityItemProvider.init(screenshot: screenshot, placeholderURL:url)
+                items = [introductoryText, space, screenshotActivityItemProvider]
             }
         }
+        if let items =  items {
+            let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: [])
+            activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
+            activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
+                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
+                if (completed) {
+                    Analytics.trackShareSocial(screenshot: screenshot)
+                } else {
+                    Analytics.trackShareIncomplete(screenshot: screenshot)
+                }
+            }
+            activityViewController.popoverPresentationController?.sourceView = self.view // so iPads don't crash
+            self.present(activityViewController, animated: true, completion: nil)
+        }
     }
+        
+    func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
+        if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
+            let source = screenshot.source
+            let submittedDate = screenshot.submittedDate
+            let screenshotObjectId = screenshot.objectID
+            let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
+            
+            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
+                    if !(source == .gallery || source == .share || source == .unknown) || submittedDate != nil {
+                        let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
+                        
+                        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
+                            Analytics.trackShareIncomplete(screenshot: screenshot)
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                    }else {
+                        screenshot.submitToDiscover()
+                        let thankYou = ThankYouForSharingViewController()
+                        thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
+                        self.present(thankYou, animated: true, completion: nil)
+                        Analytics.trackShareDiscover(screenshot: screenshot)
+                    }
+                }
+                
+            }))
+            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.social".localized, style: .default, handler: { (a) in
+                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
+                    self.presentSocailShare(screenshot: screenshot)
+                }
+            }))
+            alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
+                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
+                Analytics.trackShareIncomplete(screenshot: screenshot)
+
+            }))
+            alert.popoverPresentationController?.sourceView = self.view
+            
+            self.present(alert, animated: true, completion: nil)
+            
+            
+            Analytics.trackSharedScreenshotStarted(screenshot: screenshot)
     
-    func thankYouForSharingViewDidClose(_ sender: Any) {
+        }
+        
+    }
+        
+    @objc func thankYouForSharingViewDidClose(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -523,13 +582,13 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
             alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
                 if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectId) {
+                    Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .single)
                     screenshot.setHide()
                     self.removeScreenshotHelperView()
                     self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                         cell.selectedState = .disabled
                     })
-                    AnalyticsTrackers.standard.track(.removedScreenshot)
                 }
             }))
             
@@ -583,7 +642,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-        AnalyticsTrackers.standard.track(.screenshotNotificationCancelled, properties: ["Screenshot count": screenshotsCount])
+    Analytics.trackScreenshotNotificationCancelled(screenshotCount: screenshotsCount)
     }
     func notificationCellAssetId() -> String?{
         return AccumulatorModel.sharedInstance.assetIds.first
@@ -610,7 +669,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-        AnalyticsTrackers.standard.track(.screenshotNotificationAccepted, properties: ["Screenshot count": screenshotsCount])
+        Analytics.trackScreenshotNotificationAccepted(screenshotCount: screenshotsCount)
     }
     
     func updateHasNewScreenshot(){
@@ -634,7 +693,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         
     }
     
-    func accumulatorModelNumberDidChange( _ notification: Notification) {
+    @objc func accumulatorModelNumberDidChange( _ notification: Notification) {
         
         if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
@@ -778,9 +837,8 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
                     collectionView.deselectItem(at: indexPath, animated: false)
                     self.delegate?.screenshotsViewController(self, didSelectItemAt: indexPath)
                     
-                    if let uploadedImageURL = screenshot.uploadedImageURL {
-                        AnalyticsTrackers.standard.track(.tappedOnScreenshot, properties: ["screenshot":uploadedImageURL])
-                    }
+                    Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .list)
+                    
                 }
             }
         }
@@ -827,6 +885,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         cell.delegate = self
         cell.contentView.backgroundColor = collectionView.backgroundColor
         cell.isShamrock = screenshot?.isShamrockVersion ?? false
+        cell.likes = Int(screenshot?.submittedFeedbackCount ?? 0)
         cell.screenshot = screenshot
         cell.isBadgeEnabled = screenshot?.isNew ?? false
         cell.isEditing = self.isEditing

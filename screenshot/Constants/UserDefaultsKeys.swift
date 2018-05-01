@@ -17,6 +17,9 @@ class UserDefaultsKeys  {
     static let referralChannel = "ReferralChannel"
     static let campaign = "Campaign"
 
+    // USC
+    static let isUSC = "IsUSC"
+    
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
@@ -30,13 +33,17 @@ class UserDefaultsKeys  {
     static let productCurrency = "ProductCurrency"
     static let productCategory = "ProductCategory"
     
-    static let openProductPageInSetting = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
+    static let openWebPage = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
+    static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
+    enum CampaignCompleted : String {
+        case campaign_2018_04_20 // Kim video to push users to do purchases
+    }
     
     // Device / Version
     static let dateInstalled = "DateInstalled"
