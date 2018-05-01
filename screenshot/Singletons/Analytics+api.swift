@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Tue May  1 13:58:13 IDT 2018
-// created from: changes -  - db06ec6  WARNING BRANCH WAS DIRTY 
+// created on: Tue May  1 14:21:56 IDT 2018
+// created from: master -  - 659d9b3 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -330,8 +330,8 @@ extension AnalyticsReceivedResponseFromClarifai {
   static func trackReceivedResponseFromClarifai(isFashion:Bool,  isFurniture:Bool ) {
       let key = "received response from Clarifai"
       var properties:[String:Any] = [:]
-        properties["isFashion"] = isFashion
-        properties["isFurniture"] = isFurniture
+        properties["isFashion"] = NSNumber.init(value: isFashion)
+        properties["isFurniture"] = NSNumber.init(value: isFurniture)
             
 
 
