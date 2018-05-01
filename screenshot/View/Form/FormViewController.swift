@@ -328,7 +328,12 @@ extension FormViewController: UITableViewDataSource {
 extension FormViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? FormTextTableViewCell {
-            updateFormRow(with: cell.textField, at: indexPath)
+            if indexPath.isEmpty {
+                // Not sure why this is sometimes empty
+            }
+            else {
+                updateFormRow(with: cell.textField, at: indexPath)
+            }
         }
         
         
