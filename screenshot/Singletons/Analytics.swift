@@ -11,6 +11,7 @@ import Analytics
 import Appsee
 import Branch
 import FBSDKCoreKit
+import Whisper
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -105,6 +106,24 @@ class Analytics {
             Analytics.trackTappedOnProductByBrand(product: product, brand: brandEnum)
         }
     }
+    static func debugShowLoggedAnalytics(eventName: String, properties: [AnyHashable:Any], destinations:[String]){
+        DispatchQueue.main.async {
+            if let viewController = AppDelegate.shared.window?.rootViewController {
+                let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{
+                    //notification was tapped
+                    let alert = UIAlertController.init(title: eventName, message: String(describing: properties), preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction.init(title: "OK", style: .cancel, handler: nil))
+                    viewController.present(alert, animated: true, completion: nil)
+                    
+                })
+                Whisper.show(shout: announcement, to: viewController, completion: {
+                    print("The shout was silent.")
+                })
+            }
+        }
+    }
+
 }
 
 public class AnalyticsUser : NSObject {
