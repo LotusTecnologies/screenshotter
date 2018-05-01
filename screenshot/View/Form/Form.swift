@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CreditCardValidator
 
 class Form {
     var sections: [FormSection]? {
@@ -71,8 +72,8 @@ class Form {
                         let placeholder = (row.placeholder?.isEmpty ?? true) ? nil : row.placeholder
                         
                         if (value == nil && placeholder == nil) ||
-                            (value != nil && !row.isValid(value)) ||
-                            (value == nil && placeholder != nil && !row.isValid(placeholder))
+                            (value != nil && !row.isValid()) ||
+                            (value == nil && placeholder != nil && !row.isValid())
                         {
                             return false
                         }
@@ -102,12 +103,12 @@ class FormRow: NSObject {
     var value: String?
     
     var isRequired = true
-    func isValid(_ text: String? = nil) -> Bool {
+    func isValid() -> Bool {
         guard isRequired else {
             return true
         }
         
-        guard let value = text ?? value, !value.isEmpty, let validRegex = validRegex else {
+        guard let value = value ?? placeholder, !value.isEmpty, let validRegex = validRegex else {
             return false
         }
         
@@ -155,6 +156,16 @@ extension FormRow {
     class Card: Text {
         fileprivate override var validRegex: String? {
             return "[0-9* ]{15,19}"
+        }
+        
+        override func isValid() -> Bool {
+            var isValid = super.isValid()
+            
+            if isValid, let number = value, !number.isEmpty {
+                isValid = CreditCardValidator().validate(string: number)
+            }
+            
+            return isValid
         }
     }
     

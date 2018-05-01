@@ -241,8 +241,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         guard form.hasValidFields,
             let card = card,
-            let cardName = formRow(.cardName)?.value ?? formRow(.cardName)?.placeholder,
-            let cardNumber = formRow(.cardNumber)?.value,
+            let cardName = formRow(.cardName)?.value,
+            let cardNumber = formRow(.cardNumber)?.value ?? formRow(.cardNumber)?.placeholder,
             let cardExp = formRow(.cardExp)?.value,
             let addressStreet = formRow(.addressStreet)?.value,
             let addressCity = formRow(.addressCity)?.value,
