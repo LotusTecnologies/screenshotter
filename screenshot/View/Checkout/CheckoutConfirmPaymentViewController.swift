@@ -132,7 +132,10 @@ class CheckoutConfirmPaymentViewController: UIViewController {
     }
     
     @objc fileprivate func presentCVVExplanation() {
-        // TODO:
+        let webViewController = CheckoutWhatIsCVVWebViewController()
+        let navigationController = ModalNavigationController(rootViewController: webViewController)
+        navigationController.modalPresentationStyle = .custom // Very important for the presenting vc frame
+        present(navigationController, animated: true, completion: nil)
     }
     
     func displayCVVError() {
