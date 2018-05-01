@@ -679,12 +679,14 @@ extension DataModel {
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
-                        syteJson: String) -> Matchstick {
+                        syteJson: String,
+                        trackingInfo: String?) -> Matchstick {
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
         matchstickToSave.syteJson = syteJson
         matchstickToSave.receivedAt = Date()
+        matchstickToSave.trackingInfo = trackingInfo
         return matchstickToSave
     }
     
@@ -1620,6 +1622,7 @@ extension Matchstick {
                                                                    classification: nil)
                     addedScreenshot.uploadedImageURL = uploadedImageURL
                     addedScreenshot.syteJson = syteJson
+                    addedScreenshot.trackingInfo = matchstick.trackingInfo
                     if callback == nil {
                         managedObjectContext.delete(matchstick)
                     }
