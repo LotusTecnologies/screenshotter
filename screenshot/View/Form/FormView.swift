@@ -29,5 +29,44 @@ class FormView: UIView {
 }
 
 class FormViewTableView: UITableView {
+    private var disableContentOffsetAdjustmentTimer: Timer?
+    private var contentOffsetCalledCount = 0
     
+    deinit {
+        disableContentOffsetAdjustmentTimer?.invalidate()
+    }
+    
+    override func beginUpdates() {
+        contentOffsetCalledCount = 0
+        var previousContentOffsetCalledCount = 0
+        
+        disableContentOffsetAdjustmentTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { timer in
+            if previousContentOffsetCalledCount == self.contentOffsetCalledCount {
+                timer.invalidate()
+                self.disableContentOffsetAdjustmentTimer = nil
+            }
+            
+            previousContentOffsetCalledCount = self.contentOffsetCalledCount
+        })
+        
+        super.beginUpdates()
+    }
+    
+    override var contentOffset: CGPoint {
+        set {
+            contentOffsetCalledCount += 1
+            
+            if isTracking, let timer = disableContentOffsetAdjustmentTimer {
+                timer.invalidate()
+                disableContentOffsetAdjustmentTimer = nil
+            }
+            
+            if disableContentOffsetAdjustmentTimer == nil {
+                super.contentOffset = newValue
+            }
+        }
+        get {
+            return super.contentOffset
+        }
+    }
 }
