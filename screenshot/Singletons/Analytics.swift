@@ -62,6 +62,36 @@ class Analytics {
         return user.analyticsProperties
     }
     
+    static func propertiesFor(_ cart:Cart) -> [String:Any] {
+        var properties:[String:Any] = [:]
+
+        properties["cart-uniqueItems"] = cart.items?.count ?? 0
+        
+        var totalItemCount = 0
+        if let items = cart.items {
+            items.forEach { (cartItem) in
+                if let c = cartItem as? CartItem {
+                    totalItemCount += Int(c.quantity)
+                }
+            }
+        }
+        
+        properties["cart-items"] = totalItemCount
+
+        properties["cart-shippingTotal"] = cart.shippingTotal
+        properties["cart-subtotal"] = cart.subtotal
+        properties["cart-remoteId"] = cart.remoteId
+        if let dateModified = cart.dateModified {
+            properties["cart-dateModified"] = dateModified
+        }
+        if let dateSubmitted = cart.dateSubmitted {
+            properties["cart-dateSubmitted"] = dateSubmitted
+        }
+        properties["cart-isPastOrder"] = cart.isPastOrder
+        
+        return properties
+    }
+    
     static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
         var properties:[String:Any] = [:]
         
