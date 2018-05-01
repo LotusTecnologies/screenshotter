@@ -26,6 +26,15 @@ class Analytics {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
         
+        do {
+            if let string = matchstick.trackingInfo, let data = string.data(using: .utf8) {
+                if let json = JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                    json.forEach { properties[$0] = $1 }
+                }
+            }
+        }catch {
+            
+        }
         return properties
     }
     
@@ -35,6 +44,15 @@ class Analytics {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
         
+        do {
+            if let string = matchstick.trackingInfo, let data = string.data(using: .utf8) {
+                if let json = JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                    json.forEach { properties[$0] = $1 }
+                }
+            }
+        }catch {
+            
+        }
         
         return properties
     }
