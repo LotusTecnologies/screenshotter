@@ -23,7 +23,7 @@ class TutorialViewController : UINavigationController {
         let welcomeSlide = TutorialWelcomeSlideViewController()
         self.viewControllers = [welcomeSlide]
         welcomeSlide.delegate = self
-        AnalyticsTrackers.standard.track(.startedTutorial)
+        Analytics.trackStartedTutorialVideo()
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
         self.delegate = self
@@ -171,7 +171,7 @@ extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
 extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
     func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
         tutorialTrySlideViewDidComplete(slideView)
-        AnalyticsTrackers.standard.track(.skippedTutorial)
+        Analytics.trackSkippedTutorial()
         AppDelegate.shared.shouldLoadDiscoverNextLoad = true
 
     }
@@ -179,9 +179,7 @@ extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        AnalyticsTrackers.standard.track(.finishedTutorial)
-        //TODO: why is this extra branch tracking here?
-        AnalyticsTrackers.branch.track(.finishedTutorial)
+        Analytics.trackFinishedTutorial()
         
         self.tutorialDelegate?.tutorialViewControllerDidComplete(self)
     }

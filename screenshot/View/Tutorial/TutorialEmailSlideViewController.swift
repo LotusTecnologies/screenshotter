@@ -211,14 +211,17 @@ public class TutorialEmailSlideViewController : UIViewController {
         UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
         
         let user = AnalyticsUser(name: name, email: email)
-        AnalyticsTrackers.standard.identify(user)
-        AnalyticsTrackers.branch.identify(user)
         
-        if email.count > 0 {
-            AnalyticsTrackers.standard.track(.submittedEmail, properties: user.analyticsProperties)
-        }else{
-            AnalyticsTrackers.standard.track(.submittedBlankEmail, properties: user.analyticsProperties)
+        AnalyticsTrackers.segment.identify(user)
+        AnalyticsTrackers.branch.identify(user)
+        AnalyticsTrackers.appsee.identify(user)
+        AnalyticsTrackers.intercom.identify(user)
+        
 
+        if email.count > 0 {
+            Analytics.trackSubmittedEmail(email: email)
+        }else{
+            Analytics.trackSubmittedBlankEmail()
         }
 
         UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)

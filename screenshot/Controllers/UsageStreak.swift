@@ -50,8 +50,7 @@ final class UsageStreakManager {
     
     func updateStreakTo(streak:Int) {
         let now = Date()
-        
-        AnalyticsTrackers.standard.track(.dailyStreak, properties: ["current": streak])
+        Analytics.trackDailyStreak(current: streak)
         UserDefaults.standard.set(streak, forKey: UserDefaultsKeys.dailyStreak)
         UserDefaults.standard.set(now, forKey: UserDefaultsKeys.dateLastAppSession)
 

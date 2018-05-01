@@ -178,7 +178,7 @@ class ProductsOptions : NSObject {
             
             for (name, value) in changeMap {
                 if value.new != value.old {
-                    AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set \(name) Filter to \(value.new)")
+                    Analytics.trackSetFiler(name: name, newValue: value.new)
                 }
             }
         }

@@ -11,7 +11,6 @@ import UIKit
 extension UIViewController {
     @discardableResult func presentProduct(_ product: Product, atLocation location: AnalyticsTrackers.Location) -> ProductViewController? {
         AnalyticsTrackers.standard.trackTappedOnProduct(product, atLocation: location)
-        
         if product.partNumber != nil {
             let productViewController = ProductViewController(product: product)
             navigationController?.pushViewController(productViewController, animated: true)
