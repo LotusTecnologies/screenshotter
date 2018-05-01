@@ -228,17 +228,15 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     }
     
     @objc func tappedLearnMoreButton() {
-        if self.willPresentInModal {
-            
-        
-            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
-            explain.delegate = self
-            if let player = self.player {
-                if player.playbackState != .paused {
-                    self.player?.pause()
-                    self.flashPauseOverlay()
-                }
+        if let player = self.player {
+            if player.playbackState != .paused {
+                self.player?.pause()
+                self.flashPauseOverlay()
             }
+        }
+        if self.willPresentInModal {
+            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
+            explain.delegate = self   
             self.present(explain, animated: false, completion: nil)
         }else{
             self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
