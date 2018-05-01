@@ -106,15 +106,44 @@ class Analytics {
         properties["product-filter-gender"] = options.gender.analyticsStringValue
         properties["product-filter-category"] = options.category.analyticsStringValue
         
-        /*
-         price normalized to USD
-         */
+        if let priceString = product.price {
+            properties["product-price-display"] = priceString
+        }
+        
+        if let partNumber = product.partNumber {
+            properties["product-partNumber"] = partNumber
+        }
+
         if let shoppable = product.shoppable{
             propertiesFor(shoppable).forEach { properties[$0] = $1 }
         }
         
         return properties
     }
+    static func propertiesFor(_ cartItem:CartItem) -> [String:Any] {
+        var properties:[String:Any] = [:]
+
+        if let product = cartItem.product{
+            propertiesFor(product).forEach { properties[$0] = $1 }
+        }
+        
+        properties["product-quantity"] = NSNumber(value:cartItem.quantity)
+        if let color = cartItem.color {
+            properties["product-color"] = color
+        }
+        if let size = cartItem.size {
+            properties["product-size"] = size
+        }
+        
+        properties["product-price"] = NSNumber(value:cartItem.price)
+        if let sku = cartItem.sku {
+            properties["product-sku"] = sku
+        }
+
+        return properties
+
+    }
+
     
     static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
         let willShowShoppingCartPage = (product.partNumber != nil )
@@ -131,24 +160,23 @@ class Analytics {
         }
     }
     static func debugShowLoggedAnalytics(eventName: String, properties: [AnyHashable:Any], destinations:[String]){
-        let showDebugUI = false
-        if showDebugUI {
-            DispatchQueue.main.async {
-                if let viewController = AppDelegate.shared.window?.rootViewController {
-                    let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{
-                        //notification was tapped
-                        let alert = UIAlertController.init(title: eventName, message: String(describing: properties), preferredStyle: .alert)
-                        
-                        alert.addAction(UIAlertAction.init(title: "OK", style: .cancel, handler: nil))
-                        viewController.present(alert, animated: true, completion: nil)
-                        
-                    })
-                    Whisper.show(shout: announcement, to: viewController, completion: {
-                        print("The shout was silent.")
-                    })
-                }
+        #if true
+        DispatchQueue.main.async {
+            if let viewController = AppDelegate.shared.window?.rootViewController {
+                let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{
+                    //notification was tapped
+                    let alert = UIAlertController.init(title: eventName, message: String(describing: properties), preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction.init(title: "OK", style: .cancel, handler: nil))
+                    viewController.present(alert, animated: true, completion: nil)
+                    
+                })
+                Whisper.show(shout: announcement, to: viewController, completion: {
+                    print("The shout was silent.")
+                })
             }
         }
+        #endif
     }
 
 }

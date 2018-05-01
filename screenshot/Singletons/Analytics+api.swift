@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Tue May  1 17:14:21 IDT 2018
-// created from: betterCode -  - 2a6cf1f  WARNING BRANCH WAS DIRTY 
+// created on: Tue May  1 20:06:44 IDT 2018
+// created from: betterCode -  - 6e0bd7f 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -11,6 +11,474 @@ import FBSDKCoreKit
 
 
 
+
+typealias AnalyticsCartCreditCardAdded = Analytics
+extension AnalyticsCartCreditCardAdded {
+    
+  static func trackCartCreditCardAdded(cart:Cart? ) {
+      let key = "cart-creditCard-added"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCreditCardEdited = Analytics
+extension AnalyticsCartCreditCardEdited {
+    
+  static func trackCartCreditCardEdited(cart:Cart? ) {
+      let key = "cart-creditCard-edited"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCreditCardRemoved = Analytics
+extension AnalyticsCartCreditCardRemoved {
+    
+  static func trackCartCreditCardRemoved(cart:Cart? ) {
+      let key = "cart-creditCard-removed"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCvvCanceledPerItem = Analytics
+extension AnalyticsCartCvvCanceledPerItem {
+    
+  static func trackCartCvvCanceledPerItem(cartItem:CartItem? ) {
+      let key = "cart-cvv-canceled-perItem"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCvvCanceled = Analytics
+extension AnalyticsCartCvvCanceled {
+    
+  static func trackCartCvvCanceled(cart:Cart? ) {
+      let key = "cart-cvv-canceled"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCvvEnteredPerItem = Analytics
+extension AnalyticsCartCvvEnteredPerItem {
+    
+  static func trackCartCvvEnteredPerItem(cartItem:CartItem? ) {
+      let key = "cart-cvv-entered-perItem"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCvvEntered = Analytics
+extension AnalyticsCartCvvEntered {
+    
+  static func trackCartCvvEntered(cart:Cart? ) {
+      let key = "cart-cvv-entered"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCvvShownPerItem = Analytics
+extension AnalyticsCartCvvShownPerItem {
+    
+  static func trackCartCvvShownPerItem(cartItem:CartItem? ) {
+      let key = "cart-cvv-shown-perItem"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartCvvShown = Analytics
+extension AnalyticsCartCvvShown {
+    
+  static func trackCartCvvShown(cart:Cart? ) {
+      let key = "cart-cvv-shown"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartErrorPerItem = Analytics
+extension AnalyticsCartErrorPerItem {
+    
+  static func trackCartErrorPerItem(cartItem:CartItem? ) {
+      let key = "cart-error-perItem"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartError = Analytics
+extension AnalyticsCartError {
+    
+  static func trackCartError(cart:Cart? ) {
+      let key = "cart-error"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartPressedCheckoutPerItem = Analytics
+extension AnalyticsCartPressedCheckoutPerItem {
+    
+  static func trackCartPressedCheckoutPerItem(cartItem:CartItem? ) {
+      let key = "cart-pressedCheckout-perItem"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartPressedCheckout = Analytics
+extension AnalyticsCartPressedCheckout {
+    
+  static func trackCartPressedCheckout(cart:Cart? ) {
+      let key = "cart-pressedCheckout"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartPressedPlaceOrderPerItem = Analytics
+extension AnalyticsCartPressedPlaceOrderPerItem {
+    
+  static func trackCartPressedPlaceOrderPerItem(cartItem:CartItem? ) {
+      let key = "cart-pressedPlaceOrder-perItem"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartPressedPlaceOrder = Analytics
+extension AnalyticsCartPressedPlaceOrder {
+    
+  static func trackCartPressedPlaceOrder(cart:Cart? ) {
+      let key = "cart-pressedPlaceOrder"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartShippingAdded = Analytics
+extension AnalyticsCartShippingAdded {
+    
+  static func trackCartShippingAdded(cart:Cart? ) {
+      let key = "cart-shipping-added"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartShippingEdited = Analytics
+extension AnalyticsCartShippingEdited {
+    
+  static func trackCartShippingEdited(cart:Cart? ) {
+      let key = "cart-shipping-edited"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCartShippingRemoved = Analytics
+extension AnalyticsCartShippingRemoved {
+    
+  static func trackCartShippingRemoved(cart:Cart? ) {
+      let key = "cart-shipping-removed"
+      var properties:[String:Any] = [:]
+      if let cart = cart {
+          propertiesFor(cart).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
 
 typealias AnalyticsAPNDisabled = Analytics
 extension AnalyticsAPNDisabled {
@@ -108,6 +576,27 @@ extension AnalyticsAppSentLocalPushNotification {
 
  
 
+typealias AnalyticsBypassedClarifaiOnRetry = Analytics
+extension AnalyticsBypassedClarifaiOnRetry {
+    
+  static func trackBypassedClarifaiOnRetry() {
+      let key = "bypassed Clarifai on retry"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
 typealias AnalyticsBypassedClarifai = Analytics
 extension AnalyticsBypassedClarifai {
     
@@ -129,11 +618,76 @@ extension AnalyticsBypassedClarifai {
 
  
 
-typealias AnalyticsBypassedClarifaiOnRetry = Analytics
-extension AnalyticsBypassedClarifaiOnRetry {
+typealias AnalyticsFinishedDownloadingClarifaiModel = Analytics
+extension AnalyticsFinishedDownloadingClarifaiModel {
     
-  static func trackBypassedClarifaiOnRetry() {
-      let key = "bypassed Clarifai on retry"
+  static func trackFinishedDownloadingClarifaiModel() {
+      let key = "finished downloading Clarifai model"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsStartedDownloadingClarifaiModel = Analytics
+extension AnalyticsStartedDownloadingClarifaiModel {
+    
+  static func trackStartedDownloadingClarifaiModel() {
+      let key = "started downloading Clarifai model"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsReceivedResponseFromClarifai = Analytics
+extension AnalyticsReceivedResponseFromClarifai {
+    
+  static func trackReceivedResponseFromClarifai(isFashion:Bool,  isFurniture:Bool ) {
+      let key = "received response from Clarifai"
+      var properties:[String:Any] = [:]
+        properties["isFashion"] = NSNumber.init(value: isFashion)
+        properties["isFurniture"] = NSNumber.init(value: isFurniture)
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSentImageToClarifai = Analytics
+extension AnalyticsSentImageToClarifai {
+    
+  static func trackSentImageToClarifai() {
+      let key = "sent image to Clarifai"
       var properties:[String:Any] = [:]
             
 
@@ -210,27 +764,6 @@ extension AnalyticsError {
 
  
 
-typealias AnalyticsFinishedDownloadingClarifaiModel = Analytics
-extension AnalyticsFinishedDownloadingClarifaiModel {
-    
-  static func trackFinishedDownloadingClarifaiModel() {
-      let key = "finished downloading Clarifai model"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
 typealias AnalyticsOpenedWithRemoteNotification = Analytics
 extension AnalyticsOpenedWithRemoteNotification {
     
@@ -257,33 +790,6 @@ extension AnalyticsOpenedWithRemoteNotification {
 
  
 
-typealias AnalyticsReceivedProductsFromSyte = Analytics
-extension AnalyticsReceivedProductsFromSyte {
-    
-  static func trackReceivedProductsFromSyte(productCount:Int?,  optionsMask:Int? ) {
-      let key = "received products from Syte"
-      var properties:[String:Any] = [:]
-      if let productCount = productCount {
-          properties["productCount"] = NSNumber.init(value: productCount)
-      }
-      if let optionsMask = optionsMask {
-          properties["optionsMask"] = NSNumber.init(value: optionsMask)
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
 typealias AnalyticsReceivedRemoteNotification = Analytics
 extension AnalyticsReceivedRemoteNotification {
     
@@ -292,59 +798,6 @@ extension AnalyticsReceivedRemoteNotification {
       var properties:[String:Any] = [:]
       if let fromIntercom = fromIntercom {
           properties["fromIntercom"] = fromIntercom.toStringLiteral()
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsReceivedResponseFromClarifai = Analytics
-extension AnalyticsReceivedResponseFromClarifai {
-    
-  static func trackReceivedResponseFromClarifai(isFashion:Bool,  isFurniture:Bool ) {
-      let key = "received response from Clarifai"
-      var properties:[String:Any] = [:]
-        properties["isFashion"] = NSNumber.init(value: isFashion)
-        properties["isFurniture"] = NSNumber.init(value: isFurniture)
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsReceivedResponseFromSyte = Analytics
-extension AnalyticsReceivedResponseFromSyte {
-    
-  static func trackReceivedResponseFromSyte(imageUrl:String?,  segmentCount:Int?,  categories:String? ) {
-      let key = "received response from Syte"
-      var properties:[String:Any] = [:]
-      if let imageUrl = imageUrl {
-          properties["imageUrl"] = imageUrl
-      }
-      if let segmentCount = segmentCount {
-          properties["segmentCount"] = NSNumber.init(value: segmentCount)
-      }
-      if let categories = categories {
-          properties["categories"] = categories
       }
             
 
@@ -379,27 +832,6 @@ extension AnalyticsRefreshedWebpage {
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
       Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSentImageToClarifai = Analytics
-extension AnalyticsSentImageToClarifai {
-    
-  static func trackSentImageToClarifai() {
-      let key = "sent image to Clarifai"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -475,12 +907,48 @@ extension AnalyticsSessionStarted {
 
  
 
-typealias AnalyticsStartedDownloadingClarifaiModel = Analytics
-extension AnalyticsStartedDownloadingClarifaiModel {
+typealias AnalyticsReceivedResponseFromSyte = Analytics
+extension AnalyticsReceivedResponseFromSyte {
     
-  static func trackStartedDownloadingClarifaiModel() {
-      let key = "started downloading Clarifai model"
+  static func trackReceivedResponseFromSyte(imageUrl:String?,  segmentCount:Int?,  categories:String? ) {
+      let key = "received response from Syte"
       var properties:[String:Any] = [:]
+      if let imageUrl = imageUrl {
+          properties["imageUrl"] = imageUrl
+      }
+      if let segmentCount = segmentCount {
+          properties["segmentCount"] = NSNumber.init(value: segmentCount)
+      }
+      if let categories = categories {
+          properties["categories"] = categories
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsReceivedProductsFromSyte = Analytics
+extension AnalyticsReceivedProductsFromSyte {
+    
+  static func trackReceivedProductsFromSyte(productCount:Int?,  optionsMask:Int? ) {
+      let key = "received products from Syte"
+      var properties:[String:Any] = [:]
+      if let productCount = productCount {
+          properties["productCount"] = NSNumber.init(value: productCount)
+      }
+      if let optionsMask = optionsMask {
+          properties["optionsMask"] = NSNumber.init(value: optionsMask)
+      }
             
 
 
@@ -507,9 +975,8 @@ extension AnalyticsTabBarTapped {
 
 
 
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:[])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -534,8 +1001,9 @@ extension AnalyticsUserProperties {
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.intercom.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava", "intercom" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1170,6 +1638,52 @@ extension AnalyticsRatedApp {
       if let rating = rating {
           properties["rating"] = rating
       }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsTookScreenshot = Analytics
+extension AnalyticsTookScreenshot {
+    
+  static func trackTookScreenshot() {
+      let key = "Took Screenshot"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsTookScreenshotWhileShowingIntercomWindow = Analytics
+extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
+    
+  static func trackTookScreenshotWhileShowingIntercomWindow() {
+      let key = "Took Screenshot While Showing Intercom Window"
+      var properties:[String:Any] = [:]
             
 
 
@@ -1836,19 +2350,151 @@ extension AnalyticsOnboardingWelcome {
 
 typealias AnalyticsProductAddedToCart = Analytics
 extension AnalyticsProductAddedToCart {
-  enum AnalyticsProductAddedToCartPage : String{
-    case `favorite` = "Favorite"
-    case `productDetail` = "ProductDetail"
-    }
     
-  static func trackProductAddedToCart(product:Product?,  page:AnalyticsProductAddedToCartPage? ) {
-      let key = "Product added to cart"
+  static func trackProductAddedToCart(cartItem:CartItem? ) {
+      let key = "product added to cart"
       var properties:[String:Any] = [:]
-      if let product = product {
-          propertiesFor(product).forEach { properties[$0] = $1 }
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
       }
-      if let page = page {
-          properties["page"] = page.rawValue
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsProductCartQuanityStepDown = Analytics
+extension AnalyticsProductCartQuanityStepDown {
+    
+  static func trackProductCartQuanityStepDown(cartItem:CartItem? ) {
+      let key = "product-cart-quanity-stepDown"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsProductCartQuanityStepUp = Analytics
+extension AnalyticsProductCartQuanityStepUp {
+    
+  static func trackProductCartQuanityStepUp(cartItem:CartItem? ) {
+      let key = "product-cart-quanity-stepUp"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsProductQuantityChanged = Analytics
+extension AnalyticsProductQuantityChanged {
+    
+  static func trackProductQuantityChanged(cartItem:CartItem?,  from:Int? ) {
+      let key = "Product quantity changed"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+      if let from = from {
+          properties["from"] = NSNumber.init(value: from)
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsProductRemovedFromCart = Analytics
+extension AnalyticsProductRemovedFromCart {
+    
+  static func trackProductRemovedFromCart(cartItem:CartItem? ) {
+      let key = "product removed from cart"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsProductVarientChanged = Analytics
+extension AnalyticsProductVarientChanged {
+    
+  static func trackProductVarientChanged(cartItem:CartItem?,  fromSize:String?,  fromColor:String? ) {
+      let key = "Product varient changed"
+      var properties:[String:Any] = [:]
+      if let cartItem = cartItem {
+          propertiesFor(cartItem).forEach { properties[$0] = $1 }
+      }
+      if let fromSize = fromSize {
+          properties["fromSize"] = fromSize
+      }
+      if let fromColor = fromColor {
+          properties["fromColor"] = fromColor
       }
             
 
@@ -2664,52 +3310,6 @@ extension AnalyticsTappedOnShoppable {
       if let shoppable = shoppable {
           propertiesFor(shoppable).forEach { properties[$0] = $1 }
       }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsTookScreenshot = Analytics
-extension AnalyticsTookScreenshot {
-    
-  static func trackTookScreenshot() {
-      let key = "Took Screenshot"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsTookScreenshotWhileShowingIntercomWindow = Analytics
-extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
-    
-  static func trackTookScreenshotWhileShowingIntercomWindow() {
-      let key = "Took Screenshot While Showing Intercom Window"
-      var properties:[String:Any] = [:]
             
 
 
