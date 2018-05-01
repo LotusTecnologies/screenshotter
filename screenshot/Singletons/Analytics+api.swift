@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Tue May  1 14:21:56 IDT 2018
-// created from: master -  - 659d9b3 
+// created on: Tue May  1 15:16:53 IDT 2018
+// created from: betterCode -  - 09fea22 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -26,6 +26,7 @@ extension AnalyticsAcceptedPushPermissions {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -51,6 +52,7 @@ extension AnalyticsAPNDisabled {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -76,6 +78,7 @@ extension AnalyticsAPNEnabled {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -98,6 +101,7 @@ extension AnalyticsAppOpenedFromLocalNotification {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -120,6 +124,7 @@ extension AnalyticsAppSentLocalPushNotification {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -142,6 +147,7 @@ extension AnalyticsAutomaticallyExitedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -162,6 +168,7 @@ extension AnalyticsBypassedClarifaiOnRetry {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -184,6 +191,7 @@ extension AnalyticsCanceledPhotoCreation {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -206,6 +214,7 @@ extension AnalyticsCreatedPhoto {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -231,6 +240,7 @@ extension AnalyticsDailyStreak {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -253,6 +263,7 @@ extension AnalyticsDeniedPushPermissions {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -273,6 +284,7 @@ extension AnalyticsBypassedClarifai {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -296,6 +308,7 @@ extension AnalyticsErrImgHang {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -316,6 +329,7 @@ extension AnalyticsFinishedDownloadingClarifaiModel {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -338,6 +352,7 @@ extension AnalyticsReceivedResponseFromClarifai {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -367,6 +382,7 @@ extension AnalyticsReceivedResponseFromSyte {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -387,6 +403,7 @@ extension AnalyticsSentImageToClarifai {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -408,6 +425,7 @@ extension AnalyticsTabBarTapped {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -428,6 +446,7 @@ extension AnalyticsUserRetriedScreenshots {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -463,6 +482,7 @@ extension AnalyticsError {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -483,6 +503,7 @@ extension AnalyticsGameScoreIncreased {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -505,6 +526,7 @@ extension AnalyticsGameCollision {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -533,6 +555,7 @@ extension AnalyticsGameInterrupted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -555,6 +578,7 @@ extension AnalyticsGameOpened {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -577,6 +601,7 @@ extension AnalyticsGameRestarted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -607,6 +632,7 @@ extension AnalyticsGameResumed {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -629,6 +655,7 @@ extension AnalyticsGameStarted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -660,6 +687,7 @@ extension AnalyticsInAppPurchase {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -691,6 +719,7 @@ extension AnalyticsRequestedCustomStylist {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -713,6 +742,7 @@ extension AnalyticsIgnoredRatingOnAppStore {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -735,6 +765,7 @@ extension AnalyticsRatedAppOnAppStore {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -757,6 +788,7 @@ extension AnalyticsIgnoredRatingInApp {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -782,6 +814,7 @@ extension AnalyticsRatedApp {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -805,6 +838,7 @@ extension AnalyticsFinishedTutorial {
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.branch.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava", "branch" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -833,6 +867,7 @@ extension AnalyticsImportedPhotos {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -855,6 +890,7 @@ extension AnalyticsStartedTutorial {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -877,6 +913,7 @@ extension AnalyticsSubmittedBlankEmail {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -902,6 +939,7 @@ extension AnalyticsSubmittedEmail {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -924,6 +962,7 @@ extension AnalyticsSkippedTutorial {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -946,6 +985,7 @@ extension AnalyticsCompletedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -968,6 +1008,7 @@ extension AnalyticsContinuedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -990,6 +1031,7 @@ extension AnalyticsPausedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1012,6 +1054,7 @@ extension AnalyticsReplayedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1034,6 +1077,7 @@ extension AnalyticsStartedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1056,6 +1100,7 @@ extension AnalyticsOpenedFiltersView {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1078,6 +1123,7 @@ extension AnalyticsOpenedPicker {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1103,6 +1149,7 @@ extension AnalyticsOpenedWithRemoteNotification {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1129,6 +1176,7 @@ extension AnalyticsReceivedProductsFromSyte {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1152,6 +1200,7 @@ extension AnalyticsReceivedRemoteNotification {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1177,6 +1226,7 @@ extension AnalyticsRefreshedWebpage {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1200,6 +1250,7 @@ extension AnalyticsScreenshotNotificationAccepted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1223,6 +1274,7 @@ extension AnalyticsScreenshotNotificationCancelled {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1243,6 +1295,7 @@ extension AnalyticsSentImageToSyte {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1265,6 +1318,7 @@ extension AnalyticsSessionEnded {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1287,6 +1341,7 @@ extension AnalyticsSessionStarted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1311,6 +1366,7 @@ extension AnalyticsSetFiler {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1334,6 +1390,7 @@ extension AnalyticsSetGlobalGenderFiler {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1357,6 +1414,7 @@ extension AnalyticsSetGlobalSizeFiler {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1377,6 +1435,7 @@ extension AnalyticsStartedDownloadingClarifaiModel {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1400,6 +1459,7 @@ extension AnalyticsTappedOnSegmentedControl {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1422,6 +1482,7 @@ extension AnalyticsTappedOnShoppable {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1444,6 +1505,7 @@ extension AnalyticsTookScreenshot {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1466,6 +1528,7 @@ extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1488,6 +1551,7 @@ extension AnalyticsUserAge {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1513,6 +1577,7 @@ extension AnalyticsUserExitedTutorialVideo {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1535,6 +1600,7 @@ extension AnalyticsUserProperties {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1557,6 +1623,7 @@ extension AnalyticsUserReceivedSharedScreenshots {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1589,6 +1656,7 @@ extension AnalyticsProductAddedToCart {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1648,6 +1716,7 @@ extension AnalyticsProductFavorited {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1689,6 +1758,7 @@ extension AnalyticsTappedOnProductByBrand {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1753,6 +1823,7 @@ extension AnalyticsProductForEmail {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1810,6 +1881,7 @@ extension AnalyticsProductOpened {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1869,6 +1941,7 @@ extension AnalyticsProductUnfavorited {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1899,6 +1972,7 @@ extension AnalyticsScreenshotDeleted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1929,6 +2003,7 @@ extension AnalyticsMatchsticksFlagged {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1959,6 +2034,7 @@ extension AnalyticsMatchsticksSkip {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -1990,6 +2066,7 @@ extension AnalyticsMatchsticksAdd {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2015,6 +2092,7 @@ extension AnalyticsScreenshotOpenedWithoutShoppables {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2041,6 +2119,7 @@ extension AnalyticsShareDiscover {
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.branch.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava", "branch" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2066,6 +2145,7 @@ extension AnalyticsShareIncomplete {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2092,6 +2172,7 @@ extension AnalyticsShareSocial {
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.branch.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava", "branch" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2117,6 +2198,7 @@ extension AnalyticsSharedScreenshotStarted {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2142,6 +2224,7 @@ extension AnalyticsShuffledAScreenshot {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2180,6 +2263,7 @@ extension AnalyticsOpenedScreenshot {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2217,6 +2301,7 @@ extension AnalyticsShoppableScrolledFirstTime {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2243,6 +2328,7 @@ extension AnalyticsShoppableFeedbackNegative {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2287,6 +2373,7 @@ extension AnalyticsShoppableRatingNegative {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2331,6 +2418,7 @@ extension AnalyticsShoppableRatingPositive {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2354,6 +2442,7 @@ extension AnalyticsWebViewInvalidUrl {
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2376,6 +2465,7 @@ extension AnalyticsWokeFromSilentPush {
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
