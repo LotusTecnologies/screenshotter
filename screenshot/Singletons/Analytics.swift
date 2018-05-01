@@ -38,6 +38,11 @@ class Analytics {
         
         return properties
     }
+    
+    static func propertiesFor(_ user:AnalyticsUser) -> [String:Any] {
+        return user.analyticsProperties
+    }
+    
     static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
         var properties:[String:Any] = [:]
         

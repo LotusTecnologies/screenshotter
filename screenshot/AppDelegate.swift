@@ -206,7 +206,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = .active
         PermissionsManager.shared.fetchPushPermissionStatus()
         FBSDKAppEvents.activateApp()
-        Analytics.trackUserAge()
+        Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
     }
     
 //    func applicationWillTerminate(_ application: UIApplication) {
