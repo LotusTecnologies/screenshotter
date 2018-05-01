@@ -125,50 +125,6 @@ class CheckoutOrderViewController: BaseViewController {
         navigationController?.pushViewController(shippingListViewController, animated: true)
     }
     
-    // MARK: Order
-    
-    @objc fileprivate func orderAction() {
-        guard let card = card else {
-            presentNeedsPrimaryCardAlert()
-            return
-        }
-        
-        guard let shippingAddress = shippingAddress else {
-            presentNeedsPrimaryShippingAddressAlert()
-            return
-        }
-        
-        let selectedCardURL = DataModel.sharedInstance.selectedCardURL
-        
-        if let cvvMap = cvvMap, cvvMap.url == selectedCardURL {
-            _view.orderButton.isLoading = true
-            _view.orderButton.isEnabled = false
-            
-            let feedbackGenerator = UINotificationFeedbackGenerator()
-            feedbackGenerator.prepare()
-            
-            ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress)
-                .then { [weak self] someBool -> Void in
-                    self?.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
-                }
-                .catch { [weak self] error in
-                    // TODO: handle this
-                    feedbackGenerator.notificationOccurred(.error)
-                }
-                .always { [weak self] in
-                    self?._view.orderButton.isLoading = false
-                    self?._view.orderButton.isEnabled = true
-            }
-        }
-        else {
-            let confirmPaymentViewController = CheckoutConfirmPaymentViewController()
-            confirmPaymentViewController.orderButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
-            confirmPaymentViewController.cancelButton.addTarget(self, action: #selector(confirmCancelAction), for: .touchUpInside)
-            present(confirmPaymentViewController, animated: true, completion: nil)
-            self.confirmPaymentViewController = confirmPaymentViewController
-        }
-    }
-    
     @objc fileprivate func cancelAction() {
         if tabBarController != nil {
             MainTabBarController.resetViewControllerHierarchy(self, select: .screenshots)
@@ -176,55 +132,6 @@ class CheckoutOrderViewController: BaseViewController {
         else {
             presentingViewController?.dismiss(animated: true, completion: nil)
         }
-    }
-    
-    @objc fileprivate func confirmOrderAction() {
-        guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
-            confirmPaymentViewController?.displayCVVError()
-            return
-        }
-        
-        guard let card = card else {
-            dismiss(animated: true, completion: nil)
-            confirmPaymentViewController = nil
-            presentNeedsPrimaryCardAlert()
-            return
-        }
-        
-        guard let shippingAddress = shippingAddress else {
-            dismiss(animated: true, completion: nil)
-            confirmPaymentViewController = nil
-            presentNeedsPrimaryShippingAddressAlert()
-            return
-        }
-        
-        confirmPaymentViewController?.orderButton.isLoading = true
-        confirmPaymentViewController?.orderButton.isEnabled = false
-        
-        let feedbackGenerator = UINotificationFeedbackGenerator()
-        feedbackGenerator.prepare()
-        
-        ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
-            .then { [weak self] someBool -> Void in
-                self?.dismiss(animated: true, completion: nil)
-                self?.confirmPaymentViewController = nil
-                self?.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
-            }
-            .catch { [weak self] error in
-                // TODO: handle this
-                feedbackGenerator.notificationOccurred(.error)
-            }
-            .always { [weak self] in
-                self?.confirmPaymentViewController?.orderButton.isLoading = false
-                self?.confirmPaymentViewController?.orderButton.isEnabled = true
-        }
-    }
-    
-    @objc fileprivate func confirmCancelAction() {
-        dismiss(animated: true, completion: nil)
-        confirmPaymentViewController = nil
-        
-        // TODO: analytics
     }
     
     // MARK: Primary Selection
@@ -350,7 +257,7 @@ extension CheckoutOrderViewController: FetchedResultsControllerManagerDelegate {
     }
 }
 
-extension CheckoutOrderViewController : UITextViewDelegate {
+extension CheckoutOrderViewController: UITextViewDelegate {
     public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         switch URL.absoluteString {
         case _view.legalLinkTOS:
@@ -363,5 +270,131 @@ extension CheckoutOrderViewController : UITextViewDelegate {
         }
         
         return false
+    }
+}
+
+typealias CheckoutOrderViewControllerOrder = CheckoutOrderViewController
+extension CheckoutOrderViewControllerOrder {
+    @objc fileprivate func orderAction() {
+        guard let card = card else {
+            presentNeedsPrimaryCardAlert()
+            return
+        }
+        
+        guard let shippingAddress = shippingAddress else {
+            presentNeedsPrimaryShippingAddressAlert()
+            return
+        }
+        
+        let selectedCardURL = DataModel.sharedInstance.selectedCardURL
+        
+        if let cvvMap = cvvMap, cvvMap.url == selectedCardURL {
+            performCheckout(with: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress, orderButton: _view.orderButton)
+        }
+        else {
+            let confirmPaymentViewController = CheckoutConfirmPaymentViewController()
+            confirmPaymentViewController.orderButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
+            confirmPaymentViewController.cancelButton.addTarget(self, action: #selector(confirmCancelAction), for: .touchUpInside)
+            present(confirmPaymentViewController, animated: true, completion: nil)
+            self.confirmPaymentViewController = confirmPaymentViewController
+        }
+    }
+    
+    @objc fileprivate func confirmOrderAction() {
+        guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
+            confirmPaymentViewController?.displayCVVError()
+            return
+        }
+        
+        guard let card = card else {
+            dismissConfirmPaymentViewController()
+            presentNeedsPrimaryCardAlert()
+            return
+        }
+        
+        guard let shippingAddress = shippingAddress else {
+            dismissConfirmPaymentViewController()
+            presentNeedsPrimaryShippingAddressAlert()
+            return
+        }
+        
+        performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
+    }
+    
+    @objc fileprivate func confirmCancelAction() {
+        guard confirmPaymentViewController?.orderButton.isLoading == false else {
+            return
+        }
+        
+        dismissConfirmPaymentViewController()
+        
+        // TODO: analytics
+    }
+    
+    private func performCheckout(with card: Card, cvv: String, shippingAddress: ShippingAddress, orderButton: MainButton?) {
+        orderButton?.isLoading = true
+        orderButton?.isEnabled = false
+        
+        ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
+            .then { someBool -> Void in
+                self.dismissConfirmPaymentViewController()
+                self.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
+            }
+            .catch { error in
+                if let error = error as NSError?,
+                    error.domain == "Shoppable",
+                    let errors = error.userInfo["errors"] as? [[String: String]],
+                    !errors.isEmpty
+                {
+                    let errorKeys = errors.flatMap({ error -> [String] in
+                        return error.compactMap({ (key, value) -> String? in
+                            return key == "field" ? value : nil
+                        })
+                    })
+                    
+                    if errorKeys.count == 1,
+                        errorKeys.contains("payment.card_cvv"), // TODO: get correct cvv key
+                        let confirmPaymentViewController = self.confirmPaymentViewController
+                    {
+                        confirmPaymentViewController.displayCVVError()
+                    }
+                    else {
+                        self.dismissConfirmPaymentViewController()
+                        
+                        let message = self.confirmPaymentErrorMessage(errorKeys)
+                        let alertController = UIAlertController(title: "checkout.error.title".localized, message: message, preferredStyle: .alert)
+                        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+                        self.present(alertController, animated: true, completion: nil)
+                    }
+                }
+                else {
+                    let alertController = UIAlertController(title: "checkout.error.title".localized, message: "checkout.error.message".localized, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+                    self.present(alertController, animated: true, completion: nil)
+                }
+                
+                ActionFeedbackGenerator().actionOccurred(.nope)
+            }
+            .always {
+                orderButton?.isLoading = false
+                orderButton?.isEnabled = true
+        }
+    }
+    
+    private func dismissConfirmPaymentViewController() {
+        if confirmPaymentViewController != nil {
+            dismiss(animated: true, completion: nil)
+            confirmPaymentViewController = nil
+        }
+    }
+    
+    private func confirmPaymentErrorMessage(_ errorKeys: [String]) -> String {
+        var message = "Please fix these issues.\n\n"
+        
+        for errorKey in errorKeys {
+            message += "\(errorKey)\n"
+        }
+        
+        return message
     }
 }

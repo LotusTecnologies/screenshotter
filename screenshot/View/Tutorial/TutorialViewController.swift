@@ -16,6 +16,10 @@ class TutorialViewController : UINavigationController {
     weak var tutorialDelegate: TutorialViewControllerDelegate?
     
    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Analytics.trackStartedTutorial()
+    }
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         
         
@@ -23,7 +27,7 @@ class TutorialViewController : UINavigationController {
         let welcomeSlide = TutorialWelcomeSlideViewController()
         self.viewControllers = [welcomeSlide]
         welcomeSlide.delegate = self
-        AnalyticsTrackers.standard.track(.startedTutorial)
+        Analytics.trackStartedTutorialVideo()
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
         self.delegate = self
@@ -87,6 +91,7 @@ extension TutorialViewController : UINavigationControllerDelegate {
 
 extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
     func tutorialWelcomeSlideViewControllerDidComplete(_ viewController:TutorialWelcomeSlideViewController) {
+        Analytics.trackOnboardingWelcome()
         let viewController = GiftCardCampaignViewController()
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -94,13 +99,15 @@ extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
 }
 extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
     func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
+        Analytics.trackOnboardingCampainCreditCardSkip()
         let viewController = CampaignPromotionViewController(modal: false)
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
 
     }
     func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
-        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false)
+        Analytics.trackOnboardingCampainCreditCardLetsGo()
+        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
         viewController.title = "2018_05_01_campaign.payment".localized
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -108,6 +115,7 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
 }
 extension TutorialViewController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
+        Analytics.trackOnboardingCampainCreditCardEnteredCard()
         let viewController = GiftCardDoneViewController()
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -116,6 +124,8 @@ extension TutorialViewController: CheckoutFormViewControllerDelegate {
 
 extension TutorialViewController : GiftCardDoneViewControllerDelegate {
     func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
+        Analytics.trackOnboardingCampainCreditCardDone()
+        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
         let viewController = CampaignPromotionViewController(modal: false)
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -124,12 +134,14 @@ extension TutorialViewController : GiftCardDoneViewControllerDelegate {
 
 extension TutorialViewController: CampaignPromotionViewControllerDelegate {
     func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
+        Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
         let learnMore = CampaignPromotionExplanationViewController(modal:false)
         learnMore.delegate = self
         self.pushViewController(learnMore, animated: true)
     }
     
     func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
+        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign2018204)
         let signup = TutorialEmailSlideViewController()
         signup.delegate = self
         self.pushViewController(signup, animated: true)
@@ -138,11 +150,14 @@ extension TutorialViewController: CampaignPromotionViewControllerDelegate {
 
 extension TutorialViewController : CampaignPromotionExplanationViewControllerDelegate {
     func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
+        Analytics.trackOnboardingCampaignTextDone(campaign: .campaign2018204)
         let signup = TutorialEmailSlideViewController()
         signup.delegate = self
         self.pushViewController(signup, animated: true)
     }
-    func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
+    func campaignPromotionExplanationViewControllerDidPressBackButton(_
+        campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
+        Analytics.trackOnboardingCampaignTextBack(campaign: .campaign2018204)
         self.popViewController(animated: true)
     }
 
@@ -155,12 +170,14 @@ extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
         self.pushViewController(tryItOut, animated: true)
     }
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
+        Analytics.trackOnboardingSubmittedEmailTOS()
         if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
             present(viewController, animated: true, completion: nil)
         }
     }
     
     func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideViewController){
+        Analytics.trackOnboardingSubmittedEmailPrivacy()
         if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
             present(viewController, animated: true, completion: nil)
         }
@@ -170,18 +187,18 @@ extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
 
 extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
     func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
+        Analytics.trackOnboardingTryItOutSkipped()
         tutorialTrySlideViewDidComplete(slideView)
-        AnalyticsTrackers.standard.track(.skippedTutorial)
         AppDelegate.shared.shouldLoadDiscoverNextLoad = true
 
     }
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideViewController){
+        Analytics.trackOnboardingTryItOutScreenshot()
+
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        AnalyticsTrackers.standard.track(.finishedTutorial)
-        //TODO: why is this extra branch tracking here?
-        AnalyticsTrackers.branch.track(.finishedTutorial)
+        Analytics.trackFinishedTutorial()
         
         self.tutorialDelegate?.tutorialViewControllerDidComplete(self)
     }

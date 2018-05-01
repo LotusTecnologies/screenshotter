@@ -307,8 +307,7 @@ class SettingsViewController : BaseViewController {
     @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
         let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
         let integer = gender.rawValue
-        
-        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Gender Filter to \(gender.stringValue)")
+        Analytics.trackSetGlobalGenderFiler(gender: gender.stringValue)
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
     }
     
@@ -316,7 +315,7 @@ class SettingsViewController : BaseViewController {
         let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
         let integer = size.rawValue
         
-        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set Global Size Filter to \(size.stringValue)")
+        Analytics.trackSetGlobalSizeFiler(size: size.stringValue)
         UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
@@ -946,8 +945,8 @@ extension SettingsViewController : UITextFieldDelegate {
         let email = emailTextField?.text?.trimmingCharacters(in: .whitespaces)
         let user = AnalyticsUser(name: name, email: email)
         
-        AnalyticsTrackers.standard.identify(user)
-        AnalyticsTrackers.branch.identify(user)
+        user.sendToServers()
+        
     }
     
     fileprivate func dismissKeyboard() {
@@ -964,8 +963,7 @@ extension SettingsViewController : VideoDisplayingViewControllerDelegate {
     
     func videoDisplayingViewControllerDidEnd(_ viewController: UIViewController) {
         dismiss(animated: true, completion: nil)
-        
-        AnalyticsTrackers.standard.track(.automaticallyExitedTutorialVideo)
+        Analytics.trackAutomaticallyExitedTutorialVideo()
     }
 }
 

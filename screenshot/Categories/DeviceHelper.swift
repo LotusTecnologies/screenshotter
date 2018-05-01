@@ -6,8 +6,8 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
+
 // MARK: Type
 
 extension UIDevice {
@@ -19,6 +19,27 @@ extension UIDevice {
         }
         
         return window.safeAreaInsets.bottom > 0
+    }
+    
+    fileprivate var modelIdentifier: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        
+        return machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else {
+                return identifier
+            }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+    }
+    
+    fileprivate var modelIdentifierNumber: Double {
+        return Double(modelIdentifier.replacingOccurrences(of: ",", with: ".").trimmingCharacters(in: CharacterSet.decimalDigits.inverted)) ?? 0
+    }
+    
+    var hasTapticEngine: Bool {
+        return modelIdentifierNumber >= 8 // greater then iPhone 6s
     }
 }
 

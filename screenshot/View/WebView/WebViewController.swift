@@ -79,9 +79,7 @@ class WebViewController : BaseViewController {
         super.viewWillDisappear(animated)
         
         if isShowingGame {
-            AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
-                "From": "User Navigating"
-                ])
+            Analytics.trackGameInterrupted(from: .userNavigating)
         }
     }
     
@@ -104,9 +102,7 @@ class WebViewController : BaseViewController {
             loader?.stopAnimation()
             
             if isShowingGame {
-                AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
-                    "From": "App Backgrounding"
-                    ])
+                Analytics.trackGameInterrupted(from: .appBackgrounding)
             }
         }
     }
@@ -116,9 +112,7 @@ class WebViewController : BaseViewController {
             loader?.startAnimation()
             
             if isShowingGame {
-                AnalyticsTrackers.standard.track(.gameResumed, properties: [
-                    "From": "App Backgrounding"
-                    ])
+                Analytics.trackGameResumed(from: .appBackgrounding)
             }
         }
     }
@@ -298,9 +292,7 @@ class WebViewController : BaseViewController {
             webView.reload()
         }
         
-        AnalyticsTrackers.standard.track(.refreshedWebpage, properties: [
-            "url": url?.absoluteString ?? ""
-            ])
+        Analytics.trackRefreshedWebpage(url: url?.absoluteString)
     }
     
     @objc fileprivate func shareAction() {
@@ -396,10 +388,7 @@ class WebViewController : BaseViewController {
         
         if isShowingGame {
             isShowingGame = false
-            
-            AnalyticsTrackers.standard.track(.gameInterrupted, properties: [
-                "From": "Page Loading"
-                ])
+            Analytics.trackGameInterrupted(from: .pageLoading)
         }
     }
     
@@ -446,7 +435,7 @@ extension WebViewController : WKNavigationDelegate {
             }
             else {
                 decisionHandler(.cancel)
-                AnalyticsTrackers.standard.track(.webviewInvalidUrl, properties: ["url": url.absoluteString])
+                Analytics.trackWebViewInvalidUrl(url: url.absoluteString)
                 self.delegate?.webViewController(self, declinedInvalidURL: url)
             }
         }

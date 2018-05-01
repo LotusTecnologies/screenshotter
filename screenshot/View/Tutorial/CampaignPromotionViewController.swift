@@ -223,22 +223,20 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
         } catch let error as NSError {
-            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         }
     }
     
     @objc func tappedLearnMoreButton() {
-        if self.willPresentInModal {
-            
-        
-            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
-            explain.delegate = self
-            if let player = self.player {
-                if player.playbackState != .paused {
-                    self.player?.pause()
-                    self.flashPauseOverlay()
-                }
+        if let player = self.player {
+            if player.playbackState != .paused {
+                self.player?.pause()
+                self.flashPauseOverlay()
             }
+        }
+        if self.willPresentInModal {
+            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
+            explain.delegate = self   
             self.present(explain, animated: false, completion: nil)
         }else{
             self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
@@ -272,7 +270,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             do {
                 try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
             } catch let error as NSError {
-                AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+                Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
             }
             player.actionAtItemEnd = .pause
             self.player = player

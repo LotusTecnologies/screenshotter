@@ -167,7 +167,7 @@ fileprivate extension ProductViewControllerProductView {
                     item.setBorderErrorColor()
                 }
                 
-                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                ActionFeedbackGenerator().actionOccurred(.nope)
             }
             
             let adjustedContentInsetTop: CGFloat
@@ -221,7 +221,12 @@ fileprivate extension ProductViewControllerProductView {
         let isFavorited = productView.favoriteButton.isSelected
         product.setFavorited(toFavorited: isFavorited)
 
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product")
+        if isFavorited {
+            Analytics.trackProductFavorited(product: product, page: .product)
+        }else{
+            Analytics.trackProductUnfavorited(product: product, page: .product)
+        }
+
     }
     
     // MARK: Web

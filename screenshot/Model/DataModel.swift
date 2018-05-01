@@ -132,12 +132,12 @@ extension DataModel {
     func receivedCoreDataError(error:Error) {
         let error = error as NSError
         if error.domain == NSSQLiteErrorDomain && error.code == 13{ // disk full  see https://sqlite.org/c3ref/c_abort.html
-            AnalyticsTrackers.standard.track(.error, properties: ["type":"noHardDriveSpace"])
+            Analytics.trackError(type: .noHardDriveSpace, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
             DispatchQueue.main.async {
                 AppDelegate.shared.presentLowDiskSpaceWarning()
             }
         }else{
-            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         }
     }
 }
@@ -372,6 +372,7 @@ extension DataModel {
             do {
                 screenshotOIDArray.forEach { screenshotOID in
                     if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
+                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .multi)
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
@@ -1426,10 +1427,9 @@ extension Shoppable {
     }
     
     public func setRating(positive: Bool) {
-        let shoppableID = self.objectID
+        let shoppableObjectID = self.objectID
         let imageUrl = self.screenshot?.uploadedImageURL
         let offersUrl = self.offersURL
-        let category = self.label
         let b0x = self.b0x
         let b0y = self.b0y
         let b1x = self.b1x
@@ -1437,23 +1437,16 @@ extension Shoppable {
         
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "shoppable == %@", shoppableID)
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateSet", ascending: false)]
-            
-            do {
-                let results = try managedObjectContext.fetch(fetchRequest)
+            if let shoppable = managedObjectContext.shoppableWith(objectId: shoppableObjectID) {
+                let productFilters = shoppable.productFilters?.sortedArray(using: [NSSortDescriptor(key: "dateSet", ascending: false)])
                 let positiveRating: Int16 = 5
                 let negativeRating: Int16 = 1
                 let ratingValue: Int16 = positive ? positiveRating : negativeRating
                 let optionsMask: ProductsOptionsMask
-                if let productFilter = results.first {
+                if let productFilter = productFilters?.first as? ProductFilter{
                     productFilter.rating = ratingValue
                     optionsMask = ProductsOptionsMask(rawValue: Int(productFilter.optionsMask))
                 } else {
-                    guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableID) else {
-                        return
-                    }
                     optionsMask = ProductsOptionsMask(.auto, .auto, .adult) // Historical value that was never set.
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask, rating: ratingValue)
                 }
@@ -1463,18 +1456,12 @@ extension Shoppable {
                 }
                 NetworkingPromise.sharedInstance.feedbackToSyte(isPositive: positive, imageUrl: imageUrl, offersUrl: augmentedOffersUrl, b0x: b0x, b0y: b0y, b1x: b1x, b1y: b1y)
                 
-                let imageOrDash = imageUrl ?? "-"
-                let categoryOrDash = category ?? "-"
-                let augmentedOffersUrlOrDash = augmentedOffersUrl ?? "-"
                 if positive {
-                    AnalyticsTrackers.standard.track(.shoppableRatingPositive, properties: ["Rating" : positiveRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
+                    Analytics.trackShoppableRatingPositive(shoppable: shoppable)
                 } else {
-                    AnalyticsTrackers.standard.track(.shoppableRatingNegative, properties: ["Rating" : negativeRating, "Screenshot" : imageOrDash, "Category" : categoryOrDash, "AugmentedOffersUrl" : augmentedOffersUrlOrDash])
+                    Analytics.trackShoppableRatingNegative(shoppable: shoppable)
                 }
-                try managedObjectContext.save()
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("setRating shoppableID:\(shoppableID) results with error:\(error)")
+                managedObjectContext.saveIfNeeded()
             }
         }
     }
@@ -1889,6 +1876,18 @@ extension NSManagedObjectContext {
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
                 
+            }
+        }
+        return nil
+    }
+    
+    func shoppableWith(objectId:NSManagedObjectID) -> Shoppable? {
+        if let screenshot = self.object(with: objectId) as? Shoppable {
+            do{
+                try screenshot.validateForUpdate()
+                return screenshot
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
             }
         }
         return nil

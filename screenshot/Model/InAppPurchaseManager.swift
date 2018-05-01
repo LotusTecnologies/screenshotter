@@ -159,8 +159,7 @@ class InAppPurchaseManager: NSObject, SKPaymentTransactionObserver {
             success()
             NotificationCenter.default.post(name: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil)
             
-            
-            AnalyticsTrackers.standard.track(.inAppPurchase, properties: ["purchase":"stylists", "type":"onetime", "price": product.localizedPriceString()])
+            Analytics.trackInAppPurchase(purchase: .stylists, type: .onetime, price: product.localizedPriceString())
             
             return Promise(value:true)
         }.catch(on: .main) { (error) in

@@ -106,9 +106,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let contentAvailable = aps["content-available"] as? NSNumber,
             contentAvailable.intValue == 1 {
             //TODO: why is this only segment
-            AnalyticsTrackers.segment.track(.wokeFromSilentPush)
+            Analytics.trackWokeFromSilentPush()
         } else {
-            AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
+            Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
         
@@ -186,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
         ApplicationStateModel.sharedInstance.applicationState = .background
-        AnalyticsTrackers.standard.track(.sessionEnded)
+        Analytics.trackSessionEnded()
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
@@ -197,7 +197,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
         PermissionsManager.shared.fetchPushPermissionStatus()
-        AnalyticsTrackers.standard.track(.sessionStarted)
+        Analytics.trackSessionStarted()
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
     }
     
@@ -206,7 +206,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ApplicationStateModel.sharedInstance.applicationState = .active
         PermissionsManager.shared.fetchPushPermissionStatus()
         FBSDKAppEvents.activateApp()
-        AnalyticsTrackers.standard.trackUserAge()
+        Analytics.trackUserAge()
     }
     
 //    func applicationWillTerminate(_ application: UIApplication) {
@@ -612,8 +612,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         }
         
         completionHandler()
-        
-        AnalyticsTrackers.standard.track(.appOpenedFromLocalNotification)
+        Analytics.trackAppOpenedFromLocalNotification()
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
