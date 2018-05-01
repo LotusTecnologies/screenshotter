@@ -18,13 +18,32 @@ extension Bool {
         return self ? "true" : "false"
     }
 }
+
 class Analytics {
+    static private func addScreenshotProperitesFrom(trackingData:String?, toProperties:inout [String:Any]) {
+        do {
+            if let string = trackingData, let data = string.data(using: .utf8) {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                    json.forEach { (arg) in
+                        let (key, value) = arg
+                        if let key = key as? String {
+                            toProperties["screenshot-\(key)"] = value
+                        }
+                    }
+                }
+            }
+        }catch {
+            
+        }
+    }
     static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
         var properties:[String:Any] = [:]
         
         if let uploadedImageURL = matchstick.imageUrl {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
+        
+        self.addScreenshotProperitesFrom(trackingData: matchstick.trackingInfo, toProperties: &properties)
         
         return properties
     }
@@ -34,10 +53,15 @@ class Analytics {
         if let uploadedImageURL = screenshot.uploadedImageURL {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
-        
+        self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
         
         return properties
     }
+    
+    static func propertiesFor(_ user:AnalyticsUser) -> [String:Any] {
+        return user.analyticsProperties
+    }
+    
     static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
         var properties:[String:Any] = [:]
         

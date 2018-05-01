@@ -254,6 +254,7 @@ extension AssetSyncModel {
                         let urlError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from shareId:\(shareId)"])
                         return Promise(error: urlError)
                 }
+                // TODO: GMK remove print after fixing tapping on share URL does not import screenshot.
                 print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
                 return NetworkingPromise.sharedInstance.downloadInfo(url: screenshotInfoUrl)
             }()
@@ -333,7 +334,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     @objc func scanPhotoGalleryForFashion() {
         guard PermissionsManager.shared.hasPermission(for: .photo) else {
-            print("scanPhotoGalleryForFashion refused by guard")
             return
         }
         
@@ -391,7 +391,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     func registerForPhotoChanges() {
         guard PermissionsManager.shared.hasPermission(for: .photo) else {
-            print("registerForPhotoChanges refused by guard")
             return
         }
         if isRegistered == false {
@@ -401,7 +400,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     }
     
      @objc func applicationUserDidTakeScreenshot() {
-        print("AssetSyncModel applicationUserDidTakeScreenshot")
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
     
@@ -531,10 +529,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
-            print("sendScreenshotAddedLocalNotification refused by guard")
             return
         }
-        print("should display notification")
         let content = UNMutableNotificationContent()
         content.title = "notification.title".localized
         content.body = "notification.message".localized
@@ -630,7 +626,6 @@ extension AssetSyncModel {
         firstly {
             self.resaveScreenshot(assetId: assetId, imageData: imageData)
             }.then (on: processingQ) { (imageData, imageClassification) -> Void in
-                print("rescanClassification imageClassification:\(imageClassification)")
                 self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: assetId, optionsMask: optionsMask)
             }.catch { error in
                 print("rescanClassification catch error:\(error)")
@@ -652,11 +647,9 @@ extension AssetSyncModel {
             firstly { // _ -> Promise<Bool> in
                 let userDefaults = UserDefaults.standard
                 if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-                    print("UserDefaultsKeys.isUSC not set. geoLocating.")
                     return NetworkingPromise.sharedInstance.geoLocateIsUSC()
                 } else {
                     let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-                    print("UserDefaultsKeys.isUSC:\(isUSC)")
                     return Promise(value: isUSC)
                 }
             }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
@@ -967,7 +960,6 @@ extension AssetSyncModel {
         }
 #endif
         let data = UIImageJPEGRepresentation(imageForData, compressionQuality)
-        print("image.size:\(image.size)  desiredSize:\(desiredSize)  imageForData.size\(imageForData.size)  actualToTargetRatio:\(actualToTargetRatio)  data.count:\(data?.count ?? 0)")
         return data
     }
         

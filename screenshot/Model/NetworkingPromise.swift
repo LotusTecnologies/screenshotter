@@ -92,7 +92,6 @@ class NetworkingPromise : NSObject {
                         print("Syte no segments. responseObject:\(dict)")
                         return Promise(error: emptyError)
                 }
-                print("uploadToSyte segments:\(segments)")
                 return Promise(value: (uploadedURLString, segments))
         }
     }
@@ -229,7 +228,6 @@ class NetworkingPromise : NSObject {
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { nsDict in
             if let productsDict = nsDict as? [String : Any] {
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
-                    print("downloadProducts productsArray:\(productsArray)")
                     return Promise(value: productsDict)
                 } else {
                     let error = NSError(domain: "Craze", code: 20, userInfo: [NSLocalizedDescriptionKey: "no products"])
@@ -318,7 +316,6 @@ class NetworkingPromise : NSObject {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<Bool> in
-            print("clearCart received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
             guard let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode >= 200,
                 httpResponse.statusCode <  300 else {
@@ -342,11 +339,9 @@ class NetworkingPromise : NSObject {
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = jsonDatafy(object: jsonObject)
-        print("validateCart requesting url:\(url)  headers:\(String(describing: request.allHTTPHeaderFields))  data:\(String(data: request.httpBody!, encoding: .utf8) ?? "-")")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<[String : Any]> in
-            print("validateCart received response:\(response)  data:\(String(data: data, encoding: .utf8) ?? "-")")
             guard let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode >= 200,
                 httpResponse.statusCode <  300 else {
@@ -423,7 +418,6 @@ class NetworkingPromise : NSObject {
             "shipping_street2" : ""
         ]
         request.httpBody = jsonDatafy(object: jsonObject)
-        print("nativeCheckout requesting url:\(url)  headers:\(String(describing: request.allHTTPHeaderFields))  data:\(String(data: request.httpBody!, encoding: .utf8) ?? "-")")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         return sendAndParseNativeCheckout(request: request)
@@ -434,13 +428,6 @@ class NetworkingPromise : NSObject {
         sessionConfiguration.timeoutIntervalForResource = 60
         return Promise<[[String : Any]]> { fulfill, reject in
             let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request, completionHandler: { (data, response, error) in
-                var dataContentString = ""
-                var dataContentCount = 0
-                if let dataContent = data, let contentString = String(data: dataContent, encoding: .utf8) {
-                    dataContentString = contentString
-                    dataContentCount = dataContent.count
-                }
-                print("sendAndParseNativeCheckout dataCount:\(dataContentCount)  dataString:\(dataContentString)  response:\(String(describing: response))  error:\(String(describing: error))")
                 if let error = error {
                     print("sendAndParseNativeCheckout received error:\(error)")
                     reject(error)
@@ -506,7 +493,6 @@ class NetworkingPromise : NSObject {
               countryCode == "US" || countryCode == "IL" {
                 isUsc = true
             }
-            print("geoLocateIsUSC isUsc:\(isUsc)  dict:\(dict)")
             UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
             return Promise(value: isUsc)
         }
@@ -591,7 +577,6 @@ class NetworkingPromise : NSObject {
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = parameterData
-        print("\(actionName) url:\(url)  parameters:\(parameterDict)  httpHeaders:\(String(describing: request.allHTTPHeaderFields))")
         
         return URLSession.shared.dataTask(with: request).asDataAndResponse().then { data, response -> Promise<Bool> in
             guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
@@ -599,8 +584,6 @@ class NetworkingPromise : NSObject {
                 print(error)
                 return Promise(error: error)
             }
-            let dataString = String(data: data, encoding: .utf8)
-            print("\(actionName) success data:\(dataString ?? "-")")
             return Promise(value: true)
         }
     }
