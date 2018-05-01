@@ -83,7 +83,13 @@ public class TutorialEmailSlideViewController : UIViewController {
         paddingView1HeightConstraint.isActive = true
         
         setupTextField(nameTextField)
-        nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
+        
+        let frc = DataModel.sharedInstance.cardFrc(delegate: nil)
+        let card = frc.fetchedObjects.first
+        
+        let name = card?.fullName
+        let email = card?.email
+        nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? name ?? ""
         nameTextField.placeholder = "tutorial.email.name".localized
         nameTextField.returnKeyType = .next
         nameTextField.autocapitalizationType = .words
@@ -95,7 +101,7 @@ public class TutorialEmailSlideViewController : UIViewController {
         nameTextField.widthAnchor.constraint(greaterThanOrEqualToConstant: 236).isActive = true
         
         setupTextField(emailTextField)
-        emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
+        emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? email ?? ""
         emailTextField.placeholder = "tutorial.email.email".localized
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
