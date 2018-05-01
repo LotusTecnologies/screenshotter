@@ -21,7 +21,6 @@ class ShoppingCartModel {
             }.then { partNumber -> Promise<NSDictionary> in
                 return partNumber.isEmpty ? Promise(value: NSDictionary()) : NetworkingPromise.sharedInstance.getAvailableVariants(partNumber: partNumber)
             }.then { dict -> Promise<Bool> in
-                print("populateVariants dict:\(dict)")
                 guard dict.count > 0 else {
                     return Promise(value: false)
                 }
@@ -31,7 +30,6 @@ class ShoppingCartModel {
                 }
                 return self.saveVariantsFromDictionary(productOID: productOID, dict: dict)
             }.then { didSaveVariants -> Promise<(Product, Bool)> in // Must be on main queue.
-                print("populateVariants final then clause didSaveVariants:\(didSaveVariants)")
                 if let product = dataModel.mainMoc().object(with: productOID) as? Product {
                     return Promise(value: (product, didSaveVariants))
                 } else {
@@ -126,10 +124,7 @@ class ShoppingCartModel {
             .then { purchaseJsonObject, cartOID -> Promise<[String : Any]> in
                 if let remoteId = purchaseJsonObject["id"] as? String,
                   !remoteId.isEmpty {
-                    let items = purchaseJsonObject["items"] as? [[String : Any]]
-                    print("ShoppingCartModel checkout successfully got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
                     return NetworkingPromise.sharedInstance.clearCart(remoteId: remoteId).then { isCleared -> Promise<[String : Any]> in
-                        print("clearCart returned isCleared:\(isCleared)")
                         return Promise(value: purchaseJsonObject)
                     }
                 } else {
@@ -140,8 +135,6 @@ class ShoppingCartModel {
                             DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
                             var completeJsonObject = purchaseJsonObject
                             completeJsonObject["id"] = remoteId
-                            let items = completeJsonObject["items"] as? [[String : Any]]
-                            print("ShoppingCartModel checkout finally got \(items?.count ?? 0) items from cart with remoteId:\(remoteId)")
                             return Promise(value: completeJsonObject)
                         } else {
                             print("ShoppingCartModel checkout failed to extract remoteId from dict:\(dict)")
@@ -197,11 +190,7 @@ class ShoppingCartModel {
                                         errorMask.insert(.quantity)
                                         didChange = true
                                     }
-                                    let price = self.parseFloat(item["price"])
-                                    let salePrice = self.parseFloat(item["sale_price"])
-                                    let retailPrice = self.parseFloat(item["retail_price"])
-                                    print("price:\(String(describing: price))  salePrice:\(String(describing: salePrice))  retailPrice:\(String(describing: retailPrice))")
-                                    if let toPayPrice = price ?? salePrice ?? retailPrice,
+                                    if let toPayPrice = self.parseFloat(item["price"]) ?? self.parseFloat(item["sale_price"]) ?? self.parseFloat(item["retail_price"]),
                                       cartItem.price != toPayPrice {
                                         cartItem.price = toPayPrice
                                         errorMask.insert(.price)
@@ -213,7 +202,6 @@ class ShoppingCartModel {
                                         didChange = true
                                     }
                                     errorDict[sku] = nil  // Clear unavailable.
-                                    print("errorMask:\(errorMask.rawValue) price:\(cartItem.price)")
                                 }
                             }
                         }
@@ -231,7 +219,6 @@ class ShoppingCartModel {
                             cartObject.subtotal =  self.parseFloat(cart["subtotal"])
                                                 ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
                             cartObject.shippingTotal = self.parseFloat(cart["shipping_total"]) ?? 0
-                            print("Subtotal:\(cartObject.subtotal)  shippingTotal:\(cartObject.shippingTotal)")
                             didChange = true
                         } else {
                             print("Failed to update subtotal and shippingTotal for cart remoteId:\(remoteId)")
@@ -273,7 +260,6 @@ class ShoppingCartModel {
                   let orderComplete = "\(Constants.shoppableThankYou)?remoteId=\(remoteId)&from=complete".addingPercentEncoding(withAllowedCharacters: .alphanumerics),
                   let publisherCheckout = Constants.shoppablePublisherCheckout.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
                   let url = URL(string: "\(Constants.shoppableHosted)/checkout?cart=\(remoteId)&apiToken=\(Constants.shoppableToken)&campaign=screenshop&noiframe=0&publisherCheckout=\(publisherCheckout)&returnToSite=\(returnSite)&orderComplete=\(orderComplete)") {
-                    print("hostedUrl succeeded to form url:\(url)")
                     return Promise(value: url)
                 } else {
                     print("hostedUrl failed to form url for remoteId:\(remoteId)")
@@ -284,7 +270,6 @@ class ShoppingCartModel {
     }
     
     func hostedCompleted(remoteId: String, from: String, cardOID: NSManagedObjectID? = nil) {
-        print("hostedCompleted remoteId:\(remoteId)  from:\(from)")
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { managedObjectContext in
             if let cart = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
@@ -302,7 +287,6 @@ class ShoppingCartModel {
                     }
                 }
                 managedObjectContext.saveIfNeeded()
-                print("hostedCompleted cart:\(cart)")
             } else {
                 print("hostedCompleted failed to retrieve cart")
             }
@@ -324,7 +308,6 @@ class ShoppingCartModel {
             }
             //
             .then { nativeCheckoutResponseDict -> Promise<Bool> in
-                print("nativeCheckoutResponseDict:\(nativeCheckoutResponseDict)")
                 self.hostedCompleted(remoteId: rememberRemoteId, from: "nativeCheckout", cardOID: cardOID)
                 return Promise(value: true) // TODO: GMK Change to Void? True if saved?
         }
@@ -352,17 +335,13 @@ class ShoppingCartModel {
                   let firstVariant = variants.first {
                     if let dateModified = firstVariant.dateModified as Date?,
                         -dateModified.timeIntervalSinceNow <= 60 * 60 {
-                        print("populateVariants variant <= an hour old. variant:\(firstVariant)")
                         fulfill("")
                     } else {
                         // Delete the old variants.
-                        print("populateVariants variant > an hour old. Deleting:\(variants.count)")
                         variants.forEach {managedObjectContext.delete($0)}
                         rootProduct.hasVariants = false
                         managedObjectContext.saveIfNeeded()
                     }
-                } else {
-                    print("populateVariants no previous variants")
                 }
                 fulfill(partNumber)
             }
