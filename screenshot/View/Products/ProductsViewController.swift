@@ -163,7 +163,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
         if self.screenshotController?.first?.shoppablesCount == -1  {
             self.state = .retry
-            Analytics.trackScreenshotOpenedWithoutShoppables()
+            Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
             self.shoppablesToolbar?.selectFirstShoppable()

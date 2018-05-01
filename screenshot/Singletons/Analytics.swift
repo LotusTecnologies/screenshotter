@@ -21,6 +21,9 @@ class Analytics {
     static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
         var properties:[String:Any] = [:]
         
+        if let uploadedImageURL = matchstick.imageUrl {
+            properties["screenshot-imageURL"] = uploadedImageURL
+        }
         
         return properties
     }
@@ -59,6 +62,10 @@ class Analytics {
         if let merchant = product.merchant {
             properties["product-merchant"] = merchant
         }
+        if let brandOrMerchant = product.calculatedDisplayTitle {
+            properties["product-brandOrMerchant"] = brandOrMerchant
+        }
+        
         properties["product-isSale"] = product.isSale()
         properties["product-isFavorite"] = product.isFavorite
         if let imageURL = product.imageURL {
@@ -82,6 +89,21 @@ class Analytics {
         }
         
         return properties
+    }
+    
+    static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
+        let willShowShoppingCartPage = (product.partNumber != nil )
+        let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = .error
+        
+        
+        Analytics.trackProductOpened(product: product, order: nil, sort: nil, displayAs: displayAs, fromPage: location)
+        
+        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email), email.lengthOfBytes(using: .utf8) > 0 {
+            Analytics.trackProductForEmail(product: product, email: email)
+        }
+        if let brand = product.brand, let brandEnum = Analytics.AnalyticsTappedOnProductByBrandBrand.init(rawValue: brand) {
+            Analytics.trackTappedOnProductByBrand(product: product, brand: brandEnum)
+        }
     }
 }
 
@@ -143,47 +165,18 @@ public class AnalyticsUser : NSObject {
 
         return props
     }
+    
+    func  sendToServers(){
+        AnalyticsTrackers.segment.identify(self)
+        AnalyticsTrackers.branch.identify(self)
+        AnalyticsTrackers.appsee.identify(self)
+        AnalyticsTrackers.intercom.identify(self)
+    }
 }
 
 @objc public protocol AnalyticsTracker {
     func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
-}
-
-public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
-   
-    
-    private var trackers: [String : AnalyticsTracker] = [:]
-    
-    init(trackers ts: [AnalyticsTracker] = []) {
-        super.init()
-        
-        ts.forEach(add)
-    }
-    
-    func add(tracker: AnalyticsTracker) {
-        let id = String(describing: type(of:tracker))
-        
-        guard trackers[id] == nil else {
-            return
-        }
-        
-        trackers[id] = tracker
-    }
-    
-    func remove(tracker: AnalyticsTracker) {
-        trackers.removeValue(forKey: String(describing: type(of:tracker)))
-    }
-    
-    // MARK: - AnalyticsTracker
-    
-    public func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        trackers.values.forEach { $0.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(event, properties: properties) }
-    }
-    
-    public func identify(_ user: AnalyticsUser) {
-        trackers.values.forEach { $0.identify(user) }
-    }
 }
 
 class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -226,8 +219,7 @@ class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
     
     func identify(_ user: AnalyticsUser) {
         Appsee.setUserID(user.email ?? user.identifier)
-        
-        track(.userProperties, properties: user.analyticsProperties)
+        Appsee.addEvent("User Properties", withProperties: user.analyticsProperties)
     }
 }
 
@@ -293,121 +285,6 @@ public class AnalyticsTrackers : NSObject {
     static let kochava = KochavaAnalyticsTracker()
     static let intercom = IntercomAnalyticsTracker()
     static let branch = BranchAnalyticsTracker()    
-}
-
-fileprivate let marketingBrands = [
-    "boohoo",
-    "missguided",
-    "forever 21",
-    "asos",
-    "free people",
-    "urban outfitters",
-    "river island",
-    "bdg",
-    "tommy hilfiger",
-    "nbd",
-    "yoox.com",
-    "revolve",
-    "nordstrom"
-]
-
-extension AnalyticsTrackers {
-    enum Location: String {
-        case favorite = "Favorite"
-        case products = "Products"
-        case productBar = "ProductBar"
-        case productSimilar = "ProductSimilar"
-    }
-}
-
-extension AnalyticsTracker {
-    
-    func trackUserAge() {
-        let current = AnalyticsUser.current
-        
-        identify(current)
-    }
-    
-    
-    func trackTappedOnProduct(_ product: Product, atLocation location: AnalyticsTrackers.Location) {
-        let willShowShoppingCartPage = (product.partNumber != nil )
-        let displayAs:String = {
-            if willShowShoppingCartPage {
-                return "In app Product"
-            }else{
-                if let urlString = product.offer, let url = URL(string:urlString) {
-                    let willOpenWith = OpenWebPage.using(url:url)
-                    return willOpenWith.analyticsString()
-                }else{
-                    return "error"
-                }
-            }
-        }()
-        
-        switch location {
-        case .favorite:
-            track(.tappedOnProductFavorites, properties: ["display":displayAs])
-        case .products:
-            track(.tappedOnProductProducts, properties: ["display":displayAs])
-        case .productBar:
-            track(.tappedOnProductProductBar, properties: ["display":displayAs])
-        case .productSimilar:
-            track(.tappedOnProductProductSimilar, properties: ["display":displayAs])
-        }
-        
-        let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-        
-        if email.lengthOfBytes(using: .utf8) > 0 {
-            let uploadedImageURL = product.screenshot?.uploadedImageURL ?? ""
-            let merchant = product.merchant ?? ""
-            let brand = product.brand ?? ""
-            let displayTitle = product.calculatedDisplayTitle ?? ""
-            let offer = product.offer ?? ""
-            let imageURL = product.imageURL ?? ""
-            let price = product.price ?? ""
-            let name =  UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
-            
-            let properties = ["screenshot": uploadedImageURL,
-                              "merchant": merchant,
-                              "brand": brand,
-                              "title": displayTitle,
-                              "url": offer,
-                              "imageUrl": imageURL,
-                              "price": price,
-                              "email": email,
-                              "name": name,
-                              "display":displayAs]
-            AnalyticsTrackers.standard.track(.productForEmail, properties:properties)
-        }
-        
-        let merchant = product.merchant ?? ""
-        let brand = product.brand?.lowercased() ?? ""
-        let offer = product.offer ?? ""
-        let imageURL = product.imageURL ?? ""
-        let screenshot = product.shoppable?.screenshot ?? product.screenshot
-        let screenshotURL = screenshot?.uploadedImageURL ?? ""
-        let screenshotID = screenshot?.screenshotId ?? ""
-        
-        let sale = product.isSale()
-
-        track(.tappedOnProduct, properties: [
-            "merchant" : merchant,
-            "brand" : brand,
-            "url" : offer,
-            "imageUrl" : imageURL,
-            "screenshotURL" : screenshotURL,
-            "screenshotID" : screenshotID,
-            "sale" : sale,
-            "page" : location,
-            "display":displayAs
-        ])
-        
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID : imageURL])
-
-        if marketingBrands.contains(brand) {
-            trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped on \(brand) product", properties: [:])
-        }
-    }
 }
 
 // Returns the user's age in days.

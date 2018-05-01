@@ -55,8 +55,7 @@ final class UsageStreakManager {
         UserDefaults.standard.set(now, forKey: UserDefaultsKeys.dateLastAppSession)
 
         let current = AnalyticsUser.current
-        AnalyticsTrackers.standard.identify(current)
-        
+        current.sendToServers()
     }
     
     private func updateStreak() {

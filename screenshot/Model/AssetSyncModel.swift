@@ -680,7 +680,8 @@ extension AssetSyncModel {
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
                             let imageUrl: String = uploadedURLString ?? ""
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            Analytics.trackReceivedResponseFromSyte(imageUrl: "error:\(nsError.localizedDescription)", segmentCount: 0, categories: nil)
+                            Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
+                            Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
                         default:
                             break
                         }

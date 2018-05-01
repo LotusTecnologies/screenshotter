@@ -1,7 +1,7 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Tue May  1 12:53:54 IDT 2018
+// created on: Tue May  1 13:58:13 IDT 2018
 // created from: changes -  - db06ec6  WARNING BRANCH WAS DIRTY 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
@@ -1597,107 +1597,6 @@ extension AnalyticsProductAddedToCart {
 
  
 
-typealias AnalyticsTappedOnProduct = Analytics
-extension AnalyticsTappedOnProduct {
-  enum AnalyticsTappedOnProductSort : String{
-    case `priceHighToLow` = "price high to low"
-    case `priceLowToHigh` = "price low to high"
-    case `similar` = "similar"
-    case `brands` = "brands"
-    }
-  enum AnalyticsTappedOnProductDisplayAs : String{
-    case `error` = "error"
-    case `embededSafari` = "embededSafari"
-    case `safari` = "safari"
-    case `chrome` = "chrome"
-    }
-  enum AnalyticsTappedOnProductPage : String{
-    case `favorite` = "Favorite"
-    case `products` = "Products"
-    case `productBar` = "ProductBar"
-    case `productSimilar` = "ProductSimilar"
-    }
-    
-  static func trackTappedOnProduct(product:Product?,  order:Int?,  sort:AnalyticsTappedOnProductSort?,  displayAs:AnalyticsTappedOnProductDisplayAs?,  page:AnalyticsTappedOnProductPage? ) {
-      let key = "Tapped on product"
-      var properties:[String:Any] = [:]
-      if let product = product {
-          propertiesFor(product).forEach { properties[$0] = $1 }
-      }
-      if let order = order {
-          properties["order"] = NSNumber.init(value: order)
-      }
-      if let sort = sort {
-          properties["sort"] = sort.rawValue
-      }
-      if let displayAs = displayAs {
-          properties["displayAs"] = displayAs.rawValue
-      }
-      if let page = page {
-          properties["page"] = page.rawValue
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsProductDetailPage = Analytics
-extension AnalyticsProductDetailPage {
-  enum AnalyticsProductDetailPageSort : String{
-    case `priceHighToLow` = "price high to low"
-    case `priceLowToHigh` = "price low to high"
-    case `similar` = "similar"
-    case `brands` = "brands"
-    }
-  enum AnalyticsProductDetailPagePage : String{
-    case `favorite` = "Favorite"
-    case `products` = "Products"
-    case `productBar` = "ProductBar"
-    case `productSimilar` = "ProductSimilar"
-    }
-    
-  static func trackProductDetailPage(product:Product?,  order:Int?,  sort:AnalyticsProductDetailPageSort?,  page:AnalyticsProductDetailPagePage? ) {
-      let key = "Product detail page"
-      var properties:[String:Any] = [:]
-      if let product = product {
-          propertiesFor(product).forEach { properties[$0] = $1 }
-      }
-      if let order = order {
-          properties["order"] = NSNumber.init(value: order)
-      }
-      if let sort = sort {
-          properties["sort"] = sort.rawValue
-      }
-      if let page = page {
-          properties["page"] = page.rawValue
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
 typealias AnalyticsProductFavorited = Analytics
 extension AnalyticsProductFavorited {
   enum AnalyticsProductFavoritedPage : String{
@@ -1759,14 +1658,29 @@ extension AnalyticsProductFavorited {
 
 typealias AnalyticsTappedOnProductByBrand = Analytics
 extension AnalyticsTappedOnProductByBrand {
+  enum AnalyticsTappedOnProductByBrandBrand : String{
+    case `boohoo` = "boohoo"
+    case `missguided` = "missguided"
+    case `forever21` = "forever 21"
+    case `asos` = "asos"
+    case `freePeople` = "free people"
+    case `urbanOutfitters` = "urban outfitters"
+    case `riverIsland` = "river island"
+    case `bdg` = "bdg"
+    case `tommyHilfiger` = "tommy hilfiger"
+    case `nbd` = "nbd"
+    case `yooxcom` = "yoox.com"
+    case `revolve` = "revolve"
+    case `nordstrom` = "nordstrom"
+    }
     
-  static func trackTappedOnProductByBrand(product:Product?,  brand:String ) {
+  static func trackTappedOnProductByBrand(product:Product?,  brand:AnalyticsTappedOnProductByBrandBrand ) {
       let key = "Tapped on \(brand) product"
       var properties:[String:Any] = [:]
       if let product = product {
           propertiesFor(product).forEach { properties[$0] = $1 }
       }
-        properties["brand"] = brand
+        properties["brand"] = brand.rawValue
             
 
 
@@ -1785,21 +1699,8 @@ extension AnalyticsTappedOnProductByBrand {
 
 typealias AnalyticsProductForEmail = Analytics
 extension AnalyticsProductForEmail {
-  enum AnalyticsProductForEmailDisplayAs : String{
-    case `inAppProduct` = "In app Product"
-    case `error` = "error"
-    case `embededSafari` = "embededSafari"
-    case `safari` = "safari"
-    case `chrome` = "chrome"
-    }
-  enum AnalyticsProductForEmailPage : String{
-    case `favorite` = "Favorite"
-    case `products` = "Products"
-    case `productBar` = "ProductBar"
-    case `productSimilar` = "ProductSimilar"
-    }
     
-  static func trackProductForEmail(product:Product?,  email:String?,  title:String?,  displayAs:AnalyticsProductForEmailDisplayAs?,  page:AnalyticsProductForEmailPage? ) {
+  static func trackProductForEmail(product:Product?,  email:String? ) {
       let key = "Product for email"
       var properties:[String:Any] = [:]
       if let product = product {
@@ -1807,15 +1708,6 @@ extension AnalyticsProductForEmail {
       }
       if let email = email {
           properties["email"] = email
-      }
-      if let title = title {
-          properties["title"] = title
-      }
-      if let displayAs = displayAs {
-          properties["displayAs"] = displayAs.rawValue
-      }
-      if let page = page {
-          properties["page"] = page.rawValue
       }
             
 
@@ -1851,6 +1743,68 @@ extension AnalyticsProductForEmail {
             properties["merchant"] = a
         }
       }
+      if let a = properties["product-brandOrMerchant"] {
+        if properties["title"] == nil {
+            properties["title"] = a
+        }
+      }
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsProductOpened = Analytics
+extension AnalyticsProductOpened {
+  enum AnalyticsProductOpenedSort : String{
+    case `priceHighToLow` = "price high to low"
+    case `priceLowToHigh` = "price low to high"
+    case `similar` = "similar"
+    case `brands` = "brands"
+    }
+  enum AnalyticsProductOpenedDisplayAs : String{
+    case `productPage` = "productPage"
+    case `error` = "error"
+    case `embededSafari` = "embededSafari"
+    case `safari` = "safari"
+    case `chrome` = "chrome"
+    }
+  enum AnalyticsProductOpenedFromPage : String{
+    case `favorite` = "Favorite"
+    case `products` = "Products"
+    case `productBar` = "ProductBar"
+    case `productSimilar` = "ProductSimilar"
+    }
+    
+  static func trackProductOpened(product:Product?,  order:Int?,  sort:AnalyticsProductOpenedSort?,  displayAs:AnalyticsProductOpenedDisplayAs?,  fromPage:AnalyticsProductOpenedFromPage? ) {
+      let key = "Tapped on product"
+      var properties:[String:Any] = [:]
+      if let product = product {
+          propertiesFor(product).forEach { properties[$0] = $1 }
+      }
+      if let order = order {
+          properties["order"] = NSNumber.init(value: order)
+      }
+      if let sort = sort {
+          properties["sort"] = sort.rawValue
+      }
+      if let displayAs = displayAs {
+          properties["displayAs"] = displayAs.rawValue
+      }
+      if let fromPage = fromPage {
+          properties["page"] = fromPage.rawValue
+      }
+            
+      FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID:properties[product?.imageURL ?? String()] as Any ])
+
+
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)

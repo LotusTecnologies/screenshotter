@@ -945,10 +945,7 @@ extension SettingsViewController : UITextFieldDelegate {
         let email = emailTextField?.text?.trimmingCharacters(in: .whitespaces)
         let user = AnalyticsUser(name: name, email: email)
         
-        AnalyticsTrackers.segment.identify(user)
-        AnalyticsTrackers.branch.identify(user)
-        AnalyticsTrackers.appsee.identify(user)
-        AnalyticsTrackers.intercom.identify(user)
+        user.sendToServers()
         
     }
     

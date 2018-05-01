@@ -1430,7 +1430,6 @@ extension Shoppable {
         let shoppableObjectID = self.objectID
         let imageUrl = self.screenshot?.uploadedImageURL
         let offersUrl = self.offersURL
-        let category = self.label
         let b0x = self.b0x
         let b0y = self.b0y
         let b1x = self.b1x
