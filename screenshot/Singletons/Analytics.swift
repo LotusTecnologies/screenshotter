@@ -107,7 +107,7 @@ class Analytics {
         }
     }
     static func debugShowLoggedAnalytics(eventName: String, properties: [AnyHashable:Any], destinations:[String]){
-        let showDebugUI = true
+        let showDebugUI = false
         if showDebugUI {
             DispatchQueue.main.async {
                 if let viewController = AppDelegate.shared.window?.rootViewController {
