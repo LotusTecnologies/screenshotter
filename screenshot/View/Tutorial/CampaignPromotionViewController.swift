@@ -223,7 +223,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
         } catch let error as NSError {
-            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         }
     }
     
@@ -272,7 +272,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             do {
                 try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
             } catch let error as NSError {
-                AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+                Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
             }
             player.actionAtItemEnd = .pause
             self.player = player

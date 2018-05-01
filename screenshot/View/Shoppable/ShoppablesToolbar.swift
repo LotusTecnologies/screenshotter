@@ -81,8 +81,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
-        AnalyticsTrackers.standard.track(.tappedOnShoppable)
-        
+        Analytics.trackTappedOnShoppable()
         let shopable = self.shoppablesController.object(at: indexPath)
         self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shopable)
 

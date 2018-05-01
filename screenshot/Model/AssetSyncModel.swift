@@ -169,7 +169,7 @@ extension AssetSyncModel {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0, completion: { (completeOperation) in
             AccumulatorModel.sharedInstance.removeAssetId(asset.localIdentifier)
             asset.image(allowFromICloud: true).then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                AnalyticsTrackers.standard.track(.bypassedClarifai)
+                Analytics.trackBypassedClarifai()
                 let imageData: Data? = self.data(for: image)
                 return Promise { fulfill, reject in
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
@@ -411,7 +411,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
             asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                Analytics.trackSentImageToClarifai()
                 return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
                     return Promise.init(value: (c, image))
                 })
@@ -419,7 +419,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     let isRecognized = (imageClassification != .unrecognized)
                     let classification = imageClassification.shortString()
                     
-                    AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+                    Analytics.trackReceivedResponseFromClarifai(isFashion:  imageClassification == .human, isFurniture: imageClassification == .furniture)
                     return Promise { fulfill, reject in
                         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
                             if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
@@ -491,7 +491,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             }.then(on: self.processingQ) { success -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
             }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                Analytics.trackSentImageToClarifai()
                 return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
                     return Promise.init(value: (c, image))
                 })
@@ -576,7 +576,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             if let error = error {
                 print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
             } else {
-                AnalyticsTrackers.standard.track(.appSentLocalPushNotification)
+                Analytics.trackAppSentLocalPushNotification()
             }
         })
     }
@@ -626,7 +626,7 @@ extension AssetSyncModel {
     }
     
     func rescanClassification(assetId: String, imageData: Data?, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
-        AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
+        Analytics.trackBypassedClarifaiOnRetry()
         firstly {
             self.resaveScreenshot(assetId: assetId, imageData: imageData)
             }.then (on: processingQ) { (imageData, imageClassification) -> Void in
@@ -663,7 +663,8 @@ extension AssetSyncModel {
                 return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
-                    AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
+                    Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
+
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
@@ -679,7 +680,8 @@ extension AssetSyncModel {
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
                             let imageUrl: String = uploadedURLString ?? ""
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: nsError.code == 22 ? ["imageUrl" : imageUrl, "segmentCount" : 0, "timeout" : 1] : ["imageUrl" : imageUrl, "segmentCount" : 0])
+                            Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
+                            Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
                         default:
                             break
                         }
@@ -830,7 +832,7 @@ extension AssetSyncModel {
                 }
                 managedObjectContext.saveIfNeeded()
             }
-            AnalyticsTrackers.standard.track(.receivedProductsFromSyte, properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
+            Analytics.trackReceivedProductsFromSyte(productCount: productsArray.count, optionsMask: optionsMask.rawValue)
         }
             
         NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url)

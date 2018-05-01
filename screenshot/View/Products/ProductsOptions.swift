@@ -178,7 +178,7 @@ class ProductsOptions : NSObject {
             
             for (name, value) in changeMap {
                 if value.new != value.old {
-                    AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Set \(name) Filter to \(value.new)")
+                    Analytics.trackSetFiler(name: name, newValue: value.new)
                 }
             }
         }
@@ -563,6 +563,13 @@ enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtoco
         
         return string
     }
+    var analyticsStringValue:String {
+        switch self {
+        case .fashion: return "fashion";
+        case .furniture: return "furniture";
+        case .auto: return "auto";
+        }
+    }
 }
 
 enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
@@ -598,6 +605,13 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         }
         
         return string
+    }
+    var analyticsStringValue:String {
+        switch self {
+        case .female: return "female";
+        case .male: return "male";
+        case .auto: return "auto";
+        }
     }
 }
 
@@ -645,6 +659,13 @@ enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         
         return string
     }
+    var analyticsStringValue:String {
+        switch self {
+        case .child: return "child"
+        case .adult: return "adult"
+        case .plus: return "plus"
+        }
+    }
 }
 
 class _ProductsOptionsSize : NSObject {
@@ -655,6 +676,8 @@ class _ProductsOptionsSize : NSObject {
     static func fromOffsetValue(_ value: Int) -> Int {
         return ProductsOptionsSize(intValue: value).offsetValue
     }
+    
+   
 }
 
 enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {

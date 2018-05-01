@@ -39,7 +39,7 @@ class TutorialVideoViewController : BaseViewController {
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
         } catch let error as NSError {
-            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         }
         
         playerLayer = AVPlayerLayer(player: player)
@@ -89,8 +89,7 @@ class TutorialVideoViewController : BaseViewController {
         if player.playbackState == .paused {
             player.play()
             delegate?.videoDisplayingViewControllerDidPlay(self)
-            
-            AnalyticsTrackers.standard.track(.startedTutorialVideo)
+            Analytics.trackStartedTutorialVideo()
         }
     }
     
@@ -116,7 +115,7 @@ class TutorialVideoViewController : BaseViewController {
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
         } catch let error as NSError {
-            AnalyticsTrackers.standard.track(.error, properties: ["domain":error.domain, "code":error.code, "localizedDescription":error.localizedDescription])
+            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         }
     }
     
@@ -157,13 +156,13 @@ class TutorialVideoViewController : BaseViewController {
             }
         }
         
-        AnalyticsTrackers.standard.track(.replayedTutorialVideo)
+        Analytics.trackReplayedTutorialVideo()
+
         delegate?.videoDisplayingViewControllerDidPlay(self)
     }
     
     @objc private func doneButtonTapped() {
-        AnalyticsTrackers.standard.track(.userExitedTutorialVideo, properties: ["progressInSeconds": NSNumber(value: Int(self.player.currentTime().seconds))])
-        
+        Analytics.trackUserExitedTutorialVideo(progressInSeconds: self.player.currentTime().seconds)
         delegate?.videoDisplayingViewControllerDidTapDone(self)
     }
     
@@ -192,12 +191,12 @@ class TutorialVideoViewController : BaseViewController {
         
         if player.togglePlayback() == .paused {
             overlayView.flashPauseOverlay()
-            
-            AnalyticsTrackers.standard.track(.pausedTutorialVideo)
+            Analytics.trackPausedTutorialVideo()
+
             delegate?.videoDisplayingViewControllerDidPause(self)
             
         } else {
-            AnalyticsTrackers.standard.track(.continuedTutorialVideo)
+            Analytics.trackContinuedTutorialVideo()
             delegate?.videoDisplayingViewControllerDidPlay(self)
         }
     }
@@ -210,8 +209,7 @@ class TutorialVideoViewController : BaseViewController {
         }
         
         overlayView.hideVolumeToggleButton()
-        
-        AnalyticsTrackers.standard.track(.completedTutorialVideo)
+        Analytics.trackCompletedTutorialVideo()
         delegate?.videoDisplayingViewControllerDidEnd(self)
     }
 }

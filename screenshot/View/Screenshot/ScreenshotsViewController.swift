@@ -494,6 +494,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
     func presentSocailShare(screenshot:Screenshot){
         let introductoryText = "screenshots.share.title".localized
 
+        let screenshotObjectId = screenshot.objectID
         var items:[Any]? = nil
         
         // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
@@ -511,12 +512,11 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: [])
             activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
             activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
+                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
                 if (completed) {
-                    AnalyticsTrackers.standard.track(.shareCompleted)
-                    //TODO: why is this branch tracking here?
-                    AnalyticsTrackers.branch.track(.shareCompleted)
+                    Analytics.trackShareSocial(screenshot: screenshot)
                 } else {
-                    AnalyticsTrackers.standard.track(.shareIncomplete)
+                    Analytics.trackShareIncomplete(screenshot: screenshot)
                 }
             }
             activityViewController.popoverPresentationController?.sourceView = self.view // so iPads don't crash
@@ -537,7 +537,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                         let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
                         
                         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
-                            AnalyticsTrackers.standard.track(.shareIncomplete)
+                            Analytics.trackShareIncomplete(screenshot: screenshot)
                         }))
                         self.present(alert, animated: true, completion: nil)
                     }else {
@@ -545,7 +545,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                         let thankYou = ThankYouForSharingViewController()
                         thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
                         self.present(thankYou, animated: true, completion: nil)
-                        AnalyticsTrackers.branch.track(.shareCompleted)
+                        Analytics.trackShareDiscover(screenshot: screenshot)
                     }
                 }
                 
@@ -554,18 +554,18 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                 if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
                     self.presentSocailShare(screenshot: screenshot)
                 }
-                
             }))
             alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
-                AnalyticsTrackers.standard.track(.shareIncomplete)
+                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
+                Analytics.trackShareIncomplete(screenshot: screenshot)
+
             }))
             alert.popoverPresentationController?.sourceView = self.view
             
             self.present(alert, animated: true, completion: nil)
             
             
-            AnalyticsTrackers.standard.track(.sharedScreenshot)
-            
+            Analytics.trackSharedScreenshotStarted(screenshot: screenshot)
     
         }
         
@@ -582,13 +582,13 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
             alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
                 if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectId) {
+                    Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .single)
                     screenshot.setHide()
                     self.removeScreenshotHelperView()
                     self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
                     UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                         cell.selectedState = .disabled
                     })
-                    AnalyticsTrackers.standard.track(.removedScreenshot)
                 }
             }))
             
@@ -642,7 +642,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-        AnalyticsTrackers.standard.track(.screenshotNotificationCancelled, properties: ["Screenshot count": screenshotsCount])
+    Analytics.trackScreenshotNotificationCancelled(screenshotCount: screenshotsCount)
     }
     func notificationCellAssetId() -> String?{
         return AccumulatorModel.sharedInstance.assetIds.first
@@ -669,7 +669,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-        AnalyticsTrackers.standard.track(.screenshotNotificationAccepted, properties: ["Screenshot count": screenshotsCount])
+        Analytics.trackScreenshotNotificationAccepted(screenshotCount: screenshotsCount)
     }
     
     func updateHasNewScreenshot(){
@@ -837,9 +837,8 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
                     collectionView.deselectItem(at: indexPath, animated: false)
                     self.delegate?.screenshotsViewController(self, didSelectItemAt: indexPath)
                     
-                    if let uploadedImageURL = screenshot.uploadedImageURL {
-                        AnalyticsTrackers.standard.track(.tappedOnScreenshot, properties: ["screenshot":uploadedImageURL])
-                    }
+                    Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .list)
+                    
                 }
             }
         }
