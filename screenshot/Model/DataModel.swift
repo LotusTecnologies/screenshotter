@@ -680,7 +680,7 @@ extension DataModel {
                         remoteId: String,
                         imageUrl: String,
                         syteJson: String,
-                        trackingInfo: String) -> Matchstick {
+                        trackingInfo: String?) -> Matchstick {
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
