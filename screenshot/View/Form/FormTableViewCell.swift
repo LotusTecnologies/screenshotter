@@ -46,6 +46,7 @@ class FormCheckboxTableViewCell: TableViewCell, FormErrorTableViewCellProtocol {
         
         imageView?.image = checkboxImage
         
+        textLabel?.textColor = .gray6
         textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
     }
     
@@ -147,7 +148,11 @@ class FormSelectionTableViewCell: TableViewCell, FormErrorTableViewCellProtocol 
         
         clipsToBounds = true
         
+        textLabel?.textColor = .gray6
         textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+        
+        detailTextLabel?.textColor = .gray3
+        detailTextLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
         
         let dropDownImageView = UIImageView(image: UIImage(named: "FormDownArrow"))
         dropDownImageView.contentMode = .scaleAspectFit
@@ -308,10 +313,13 @@ class FormTextTableViewCell: TextFieldTableViewCell, UITextFieldDelegate, FormEr
         
         clipsToBounds = true
         
+        textLabel?.textColor = .gray6
+        
         textField.delegate = self
         textField.autocapitalizationType = .words
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
+        textField.textColor = .gray3
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -353,7 +361,7 @@ extension FormErrorTableViewCellProtocol where Self: UITableViewCell {
             textLabel?.textColor = .crazeRed
         }
         else {
-            textLabel?.textColor = .gray3
+            textLabel?.textColor = .gray6
         }
     }
 }
