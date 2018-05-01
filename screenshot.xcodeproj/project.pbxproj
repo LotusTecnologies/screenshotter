@@ -147,6 +147,7 @@
 		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
+		C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
 		C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */; };
@@ -381,6 +382,7 @@
 		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
+		C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWhatIsCVVWebViewController.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
 		C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshot.swift; sourceTree = "<group>"; };
@@ -613,6 +615,7 @@
 				C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */,
 				C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */,
 				C528005F20516293004DD7A3 /* CheckoutWebViewController.swift */,
+				C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */,
 			);
 			path = Checkout;
 			sourceTree = "<group>";
@@ -1464,6 +1467,7 @@
 				C501412C2061101100ABFB5C /* UITableView.swift in Sources */,
 				C501411A205FE50B00ABFB5C /* FavoriteProductsTableViewCell.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
+				C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */,
 				C5E9241C206914C100D44FF9 /* FormTableViewCell.swift in Sources */,
 				C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */,
 				C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */,

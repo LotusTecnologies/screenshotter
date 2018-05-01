@@ -167,7 +167,7 @@ fileprivate extension ProductViewControllerProductView {
                     item.setBorderErrorColor()
                 }
                 
-                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                ActionFeedbackGenerator().actionOccurred(.nope)
             }
             
             let adjustedContentInsetTop: CGFloat

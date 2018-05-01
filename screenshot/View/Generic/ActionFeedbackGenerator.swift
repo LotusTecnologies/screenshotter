@@ -26,7 +26,12 @@ class ActionFeedbackGenerator: UIFeedbackGenerator {
         case .pop:
             AudioServicesPlaySystemSound(1520)
         case .nope:
-            AudioServicesPlaySystemSound(1521)
+            if UIDevice.current.hasTapticEngine {
+                AudioServicesPlaySystemSound(1521)
+            }
+            else {
+                AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+            }
         }
     }
 }
