@@ -73,7 +73,11 @@ class ProductsCollectionView: UICollectionView {
         let onPage = analyticsOnPage ?? "Product"
         
         product.setFavorited(toFavorited: isFavorited)
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: onPage)
+        if isFavorited {
+            Analytics.trackProductFavorited(product: product, page: .product)
+        }else{
+            Analytics.trackProductUnfavorited(product: product, page: .product)
+        }
     }
 }
 

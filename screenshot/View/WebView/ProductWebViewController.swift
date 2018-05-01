@@ -52,6 +52,10 @@ class ProductWebViewController : WebViewController {
         let isFavorited = favoriteControl.isSelected
         
         product.setFavorited(toFavorited: isFavorited)
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Product Web View")
+        if isFavorited {
+            Analytics.trackProductFavorited(product: product, page: .productWebView)
+        }else{
+            Analytics.trackProductUnfavorited(product: product, page: .productWebView)
+        }
     }
 }

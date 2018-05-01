@@ -31,13 +31,14 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
     private var confirmBeforeSave = false
-    
+    private var autoSaveBillAddressAsShippingAddress = false
+
     convenience init(withCard card: Card? = nil) {
         let isEditLayout = card != nil
-        self.init(withCard: card, isEditLayout: isEditLayout, confirmBeforeSave: true)
+        self.init(withCard: card, isEditLayout: isEditLayout, confirmBeforeSave: true, autoSaveBillAddressAsShippingAddress:false)
     }
     
-    convenience init(withCard card: Card? = nil, isEditLayout: Bool, confirmBeforeSave: Bool) {
+    convenience init(withCard card: Card? = nil, isEditLayout:Bool, confirmBeforeSave:Bool, autoSaveBillAddressAsShippingAddress:Bool) {
         var cardRows: [FormRow] = []
         var billingRows: [FormRow] = []
         
@@ -163,6 +164,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         }
         
         self.confirmBeforeSave = confirmBeforeSave
+        self.autoSaveBillAddressAsShippingAddress = autoSaveBillAddressAsShippingAddress
     }
     
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
@@ -209,7 +211,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                     self.delegate?.checkoutFormViewControllerDidAdd(self)
             }
             
-            if isShipToSameAddressChecked {
+            if isShipToSameAddressChecked || self.autoSaveBillAddressAsShippingAddress {
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
                         DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()

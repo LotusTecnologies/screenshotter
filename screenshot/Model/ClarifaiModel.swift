@@ -64,12 +64,12 @@ class ClarifaiModel: NSObject {
     }
     
     @objc func modelDownloadStarted() {
-        AnalyticsTrackers.standard.track(.startedDownloadingClarifaiModel)
+        Analytics.trackStartedDownloadingClarifaiModel()
     }
     
     @objc func modelDownloadFinished() {
         modelDownloaded()
-        AnalyticsTrackers.standard.track(.finishedDownloadingClarifaiModel)
+        Analytics.trackFinishedDownloadingClarifaiModel()
     }
     
     @objc func modelAvailable() {

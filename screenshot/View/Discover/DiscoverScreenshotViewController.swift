@@ -330,18 +330,12 @@ class DiscoverScreenshotViewController : BaseViewController {
             
             if velocityAndPositionIsInSameDirection && velocityOrPositionPassedThreshhold {
                 if direction == 1 {
-                    AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
-                        "by": "swipe",
-                        "url": currentMatchstick?.imageUrl ?? ""
-                        ])
+                    Analytics.trackMatchsticksAdd(matchstick: currentMatchstick, by: .swipe)
                     
                     decidedToAdd()
                 }
                 else {
-                    AnalyticsTrackers.standard.track(.matchsticksSkip, properties: [
-                        "by": "swipe",
-                        "url": currentMatchstick?.imageUrl ?? ""
-                        ])
+                    Analytics.trackMatchsticksSkip(matchstick: currentMatchstick, by: .swipe)
                     
                     decidedToPass()
                 }
@@ -373,21 +367,14 @@ class DiscoverScreenshotViewController : BaseViewController {
     @objc fileprivate func passButtonAction() {
         setInteractiveElementsOnOff()
         
-        AnalyticsTrackers.standard.track(.matchsticksSkip, properties: [
-            "by": "tap",
-            "url": currentMatchstick?.imageUrl ?? ""
-            ])
+        Analytics.trackMatchsticksSkip(matchstick: currentMatchstick, by: .tap)
         
         decidedToPass()
     }
     
     @objc fileprivate func addButtonAction() {
         setInteractiveElementsOnOff()
-        
-        AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
-            "by": "tap",
-            "url": currentMatchstick?.imageUrl ?? ""
-            ])
+        Analytics.trackMatchsticksAdd(matchstick: currentMatchstick, by: .tap)
         
         decidedToAdd()
     }
@@ -469,10 +456,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track(.matchsticksFlagged, properties: [
-            "url": currentMatchstick?.imageUrl ?? "",
-            "why": "Inappropriate"
-            ])
+        Analytics.trackMatchsticksFlagged(matchstick: currentMatchstick, why: .inappropriate)
     }
     
     fileprivate func presentCopyrightAlertController() {
@@ -483,10 +467,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
         
-        AnalyticsTrackers.standard.track(.matchsticksFlagged, properties: [
-            "url": currentMatchstick?.imageUrl ?? "",
-            "why": "Copyright"
-            ])
+        Analytics.trackMatchsticksFlagged(matchstick: currentMatchstick, why: .copyright)
     }
     
     fileprivate func presentTermsOfServiceViewController() {
@@ -551,12 +532,7 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        AnalyticsTrackers.standard.track(.matchsticksAdd, properties: [
-            "by": "open",
-            "url": currentMatchstick?.imageUrl ?? ""
-            ])
-        AnalyticsTrackers.standard.track(.matchsticksOpenedScreenshot)
-        
+        Analytics.trackMatchsticksAdd(matchstick: currentMatchstick, by: .open)
         delegate?.discoverScreenshotViewController(self, didSelectItemAtIndexPath: indexPath)
     }
 }

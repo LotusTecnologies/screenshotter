@@ -69,7 +69,8 @@ class NetworkingPromise : NSObject {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
             return Promise(error: malformedError)
         }
-        AnalyticsTrackers.standard.track(.sentImageToSyte)
+        Analytics.trackSentImageToSyte()
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = imageData

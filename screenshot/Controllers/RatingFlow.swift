@@ -85,23 +85,23 @@ class RatingFlow : NSObject, RatingFlowControllerDelegate {
     
     fileprivate func controller(_ controller: RatingFlowController, didRate rating: RatingFlow.Rating) {
         if case .InApp(let ratingValue) = rating {
-            AnalyticsTrackers.standard.track(.ratedApp, properties: ["rating": "\(ratingValue)"])
+            Analytics.trackRatedApp(rating: "\(ratingValue)")
             
             if ratingValue < EggRating.minRatingToAppStore {
                 IntercomHelper.sharedInstance.recordUnsatisfactoryRating()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dismiss)
             }
         } else {
-            AnalyticsTrackers.standard.track(.ratedAppOnAppStore)
+            Analytics.trackRatedAppOnAppStore()
             dismiss()
         }
     }
     
     fileprivate func controllerDidCancel(_ controller: RatingFlowController, inPhase phase: RatingFlow.Phase) {
         if case .Initial = phase {
-            AnalyticsTrackers.standard.track(.ignoredRatingInApp)
+            Analytics.trackIgnoredRatingInApp()
         } else {
-            AnalyticsTrackers.standard.track(.ignoredRatingOnAppstore)
+            Analytics.trackIgnoredRatingOnAppStore()
         }
         
         dismiss()

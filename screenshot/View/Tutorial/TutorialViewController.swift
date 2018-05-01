@@ -23,7 +23,7 @@ class TutorialViewController : UINavigationController {
         let welcomeSlide = TutorialWelcomeSlideViewController()
         self.viewControllers = [welcomeSlide]
         welcomeSlide.delegate = self
-        AnalyticsTrackers.standard.track(.startedTutorial)
+        Analytics.trackStartedTutorialVideo()
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
         self.delegate = self
@@ -100,7 +100,7 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
 
     }
     func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
-        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false)
+        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
         viewController.title = "2018_05_01_campaign.payment".localized
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -116,6 +116,7 @@ extension TutorialViewController: CheckoutFormViewControllerDelegate {
 
 extension TutorialViewController : GiftCardDoneViewControllerDelegate {
     func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
+        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
         let viewController = CampaignPromotionViewController(modal: false)
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
@@ -171,7 +172,7 @@ extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
 extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
     func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
         tutorialTrySlideViewDidComplete(slideView)
-        AnalyticsTrackers.standard.track(.skippedTutorial)
+        Analytics.trackSkippedTutorial()
         AppDelegate.shared.shouldLoadDiscoverNextLoad = true
 
     }
@@ -179,9 +180,7 @@ extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        AnalyticsTrackers.standard.track(.finishedTutorial)
-        //TODO: why is this extra branch tracking here?
-        AnalyticsTrackers.branch.track(.finishedTutorial)
+        Analytics.trackFinishedTutorial()
         
         self.tutorialDelegate?.tutorialViewControllerDidComplete(self)
     }

@@ -83,7 +83,13 @@ public class TutorialEmailSlideViewController : UIViewController {
         paddingView1HeightConstraint.isActive = true
         
         setupTextField(nameTextField)
-        nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
+        
+        let frc = DataModel.sharedInstance.cardFrc(delegate: nil)
+        let card = frc.fetchedObjects.first
+        
+        let name = card?.fullName
+        let email = card?.email
+        nameTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? name ?? ""
         nameTextField.placeholder = "tutorial.email.name".localized
         nameTextField.returnKeyType = .next
         nameTextField.autocapitalizationType = .words
@@ -95,7 +101,7 @@ public class TutorialEmailSlideViewController : UIViewController {
         nameTextField.widthAnchor.constraint(greaterThanOrEqualToConstant: 236).isActive = true
         
         setupTextField(emailTextField)
-        emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
+        emailTextField.text = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? email ?? ""
         emailTextField.placeholder = "tutorial.email.email".localized
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
@@ -211,14 +217,14 @@ public class TutorialEmailSlideViewController : UIViewController {
         UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
         
         let user = AnalyticsUser(name: name, email: email)
-        AnalyticsTrackers.standard.identify(user)
-        AnalyticsTrackers.branch.identify(user)
         
-        if email.count > 0 {
-            AnalyticsTrackers.standard.track(.submittedEmail, properties: user.analyticsProperties)
-        }else{
-            AnalyticsTrackers.standard.track(.submittedBlankEmail, properties: user.analyticsProperties)
+        user.sendToServers()
+        
 
+        if email.count > 0 {
+            Analytics.trackSubmittedEmail(email: email)
+        }else{
+            Analytics.trackSubmittedBlankEmail()
         }
 
         UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)

@@ -76,7 +76,7 @@ extension ScreenshotsNavigationController {
         
         UserDefaults.standard.setValue(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
         
-        AnalyticsTrackers.standard.track(.openedPicker)
+        Analytics.trackOpenedPicker()
     }
     
     @objc func pickerViewControllerDidCancel() {
@@ -173,9 +173,9 @@ extension ScreenshotsNavigationController { //push permission
             PermissionsManager.shared.requestPermission(for: .push, response: { (granted) in
                 if (granted) {
                     self.screenshotsNavigationControllerDelegate?.screenshotsNavigationControllerDidGrantPushPermissions(self)
-                    AnalyticsTrackers.standard.track(.acceptedPushPermissions)
+                    Analytics.trackAcceptedPushPermissions()
                 } else {
-                    AnalyticsTrackers.standard.track(.deniedPushPermissions)
+                    Analytics.trackDeniedPushPermissions()
                 }
             })
         }))

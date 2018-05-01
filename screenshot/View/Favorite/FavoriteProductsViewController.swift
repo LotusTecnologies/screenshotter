@@ -83,8 +83,11 @@ class FavoriteProductsViewController : BaseViewController {
         else {
             unfavoriteProducts.append(product)
         }
-        
-        AnalyticsTrackers.standard.trackFavorited(isFavorited, product: product, onPage: "Favorites")
+        if isFavorited {
+            Analytics.trackProductFavorited(product: product, page: .favorites)
+        }else{
+            Analytics.trackProductUnfavorited(product: product, page: .favorites)
+        }
     }
     
     // MARK: Tracking
