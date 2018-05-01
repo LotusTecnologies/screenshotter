@@ -31,13 +31,13 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
     private var confirmBeforeSave = false
+    
     convenience init(withCard card: Card? = nil) {
         let isEditLayout = card != nil
         self.init(withCard: card, isEditLayout: isEditLayout, confirmBeforeSave: true)
     }
     
-    convenience init(withCard card: Card? = nil, isEditLayout:Bool, confirmBeforeSave:Bool) {
-        
+    convenience init(withCard card: Card? = nil, isEditLayout: Bool, confirmBeforeSave: Bool) {
         var cardRows: [FormRow] = []
         var billingRows: [FormRow] = []
         
@@ -161,6 +161,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         else {
             continueButton.addTarget(self, action: #selector(addCard), for: .touchUpInside)
         }
+        
         self.confirmBeforeSave = confirmBeforeSave
     }
     
@@ -215,6 +216,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                 }
             }
         }
+        
         if self.confirmBeforeSave {
             let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
             let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
@@ -226,9 +228,9 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
             }))
             alertController.preferredAction = saveAlertAction
             present(alertController, animated: true, completion: nil)
-        }else{
+        }
+        else {
             performAction(withSavingCard: true)
-            
         }
     }
     

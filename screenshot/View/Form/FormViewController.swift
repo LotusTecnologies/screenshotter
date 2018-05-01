@@ -158,10 +158,11 @@ class FormViewController: BaseViewController {
         
         if let firstIndexPath = errorIndexPaths.first {
             self.errorIndexPaths = errorIndexPaths
+            
             tableView.reloadData()
             tableView.scrollToRow(at: firstIndexPath, at: .top, animated: true)
             
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            ActionFeedbackGenerator().actionOccurred(.nope)
         }
     }
     
@@ -175,11 +176,19 @@ class FormViewController: BaseViewController {
 
 extension FormViewController: UITableViewDataSource {
     fileprivate func formSectionAt(_ index: Int) -> FormSection? {
-        return form.sections?[index]
+        if let sections = form.sections, sections.count > index {
+            return sections[index]
+        }
+        
+        return nil
     }
     
     fileprivate func formRowAt(_ indexPath: IndexPath) -> FormRow? {
-        return formSectionAt(indexPath.section)?.rows?[indexPath.row]
+        if let section = formSectionAt(indexPath.section), let rows = section.rows, rows.count > indexPath.row {
+            return rows[indexPath.row]
+        }
+        
+        return nil
     }
     
     fileprivate func tableViewCellOwning(_ view: UIView) -> UITableViewCell? {
