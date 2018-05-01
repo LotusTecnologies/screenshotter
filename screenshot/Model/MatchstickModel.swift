@@ -57,10 +57,12 @@ class MatchstickModel: NSObject {
                             if let remoteId = matchstick["id"] as? String,
                                 let imageUrl = matchstick["image"] as? String,
                                 let syteJson = matchstick["syteJson"] as? String {
+                                let trackingInfo = matchstick["trackingInfo"] as? String
                                 let _ = dataModel.saveMatchstick(managedObjectContext: managedObjectContext,
                                                                  remoteId: remoteId,
                                                                  imageUrl: imageUrl,
-                                                                 syteJson: syteJson)
+                                                                 syteJson: syteJson,
+                                                                 trackingInfo:trackingInfo)
                                 self.processingQ.async {
                                     self.fetchImageData(imageUrl: imageUrl)
                                 }

@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Tue May  1 16:12:04 IDT 2018
-// created from: betterCode -  - 09fea22  WARNING BRANCH WAS DIRTY 
+// created on: Tue May  1 17:14:21 IDT 2018
+// created from: betterCode -  - 2a6cf1f  WARNING BRANCH WAS DIRTY 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -11,29 +11,6 @@ import FBSDKCoreKit
 
 
 
-
-typealias AnalyticsAcceptedPushPermissions = Analytics
-extension AnalyticsAcceptedPushPermissions {
-    
-  static func trackAcceptedPushPermissions() {
-      let key = "Accepted Push Permissions"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
 
 typealias AnalyticsAPNDisabled = Analytics
 extension AnalyticsAPNDisabled {
@@ -121,10 +98,8 @@ extension AnalyticsAppSentLocalPushNotification {
 
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -133,34 +108,11 @@ extension AnalyticsAppSentLocalPushNotification {
 
  
 
-typealias AnalyticsAutomaticallyExitedTutorialVideo = Analytics
-extension AnalyticsAutomaticallyExitedTutorialVideo {
+typealias AnalyticsBypassedClarifai = Analytics
+extension AnalyticsBypassedClarifai {
     
-  static func trackAutomaticallyExitedTutorialVideo() {
-      let key = "Automatically Exited Tutorial Video"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsBypassedClarifaiOnRetry = Analytics
-extension AnalyticsBypassedClarifaiOnRetry {
-    
-  static func trackBypassedClarifaiOnRetry() {
-      let key = "bypassed Clarifai on retry"
+  static func trackBypassedClarifai() {
+      let key = "bypassed Clarifai"
       var properties:[String:Any] = [:]
             
 
@@ -177,106 +129,11 @@ extension AnalyticsBypassedClarifaiOnRetry {
 
  
 
-typealias AnalyticsCanceledPhotoCreation = Analytics
-extension AnalyticsCanceledPhotoCreation {
+typealias AnalyticsBypassedClarifaiOnRetry = Analytics
+extension AnalyticsBypassedClarifaiOnRetry {
     
-  static func trackCanceledPhotoCreation() {
-      let key = "Canceled Photo Creation"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsCreatedPhoto = Analytics
-extension AnalyticsCreatedPhoto {
-    
-  static func trackCreatedPhoto() {
-      let key = "Created Photo"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsDailyStreak = Analytics
-extension AnalyticsDailyStreak {
-    
-  static func trackDailyStreak(current:Int? ) {
-      let key = "Daily Streak"
-      var properties:[String:Any] = [:]
-      if let current = current {
-          properties["current"] = NSNumber.init(value: current)
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsDeniedPushPermissions = Analytics
-extension AnalyticsDeniedPushPermissions {
-    
-  static func trackDeniedPushPermissions() {
-      let key = "Denied Push Permissions"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsBypassedClarifai = Analytics
-extension AnalyticsBypassedClarifai {
-    
-  static func trackBypassedClarifai() {
-      let key = "bypassed Clarifai"
+  static func trackBypassedClarifaiOnRetry() {
+      let key = "bypassed Clarifai on retry"
       var properties:[String:Any] = [:]
             
 
@@ -317,12 +174,125 @@ extension AnalyticsErrImgHang {
 
  
 
+typealias AnalyticsError = Analytics
+extension AnalyticsError {
+  enum AnalyticsErrorType : String{
+    case `noHardDriveSpace` = "noHardDriveSpace"
+    }
+    
+  static func trackError(type:AnalyticsErrorType?,  domain:String?,  code:Int?,  localizedDescription:String? ) {
+      let key = "Error"
+      var properties:[String:Any] = [:]
+      if let type = type {
+          properties["type"] = type.rawValue
+      }
+      if let domain = domain {
+          properties["domain"] = domain
+      }
+      if let code = code {
+          properties["code"] = NSNumber.init(value: code)
+      }
+      if let localizedDescription = localizedDescription {
+          properties["localizedDescription"] = localizedDescription
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
 typealias AnalyticsFinishedDownloadingClarifaiModel = Analytics
 extension AnalyticsFinishedDownloadingClarifaiModel {
     
   static func trackFinishedDownloadingClarifaiModel() {
       let key = "finished downloading Clarifai model"
       var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsOpenedWithRemoteNotification = Analytics
+extension AnalyticsOpenedWithRemoteNotification {
+    
+  static func trackOpenedWithRemoteNotification(fromIntercom:Bool? ) {
+      let key = "Opened with remote notification"
+      var properties:[String:Any] = [:]
+      if let fromIntercom = fromIntercom {
+          properties["fromIntercom"] = fromIntercom.toStringLiteral()
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsReceivedProductsFromSyte = Analytics
+extension AnalyticsReceivedProductsFromSyte {
+    
+  static func trackReceivedProductsFromSyte(productCount:Int?,  optionsMask:Int? ) {
+      let key = "received products from Syte"
+      var properties:[String:Any] = [:]
+      if let productCount = productCount {
+          properties["productCount"] = NSNumber.init(value: productCount)
+      }
+      if let optionsMask = optionsMask {
+          properties["optionsMask"] = NSNumber.init(value: optionsMask)
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsReceivedRemoteNotification = Analytics
+extension AnalyticsReceivedRemoteNotification {
+    
+  static func trackReceivedRemoteNotification(fromIntercom:Bool? ) {
+      let key = "Received remote notification"
+      var properties:[String:Any] = [:]
+      if let fromIntercom = fromIntercom {
+          properties["fromIntercom"] = fromIntercom.toStringLiteral()
+      }
             
 
 
@@ -391,11 +361,125 @@ extension AnalyticsReceivedResponseFromSyte {
 
  
 
+typealias AnalyticsRefreshedWebpage = Analytics
+extension AnalyticsRefreshedWebpage {
+    
+  static func trackRefreshedWebpage(url:String? ) {
+      let key = "Refreshed webpage"
+      var properties:[String:Any] = [:]
+      if let url = url {
+          properties["url"] = url
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
 typealias AnalyticsSentImageToClarifai = Analytics
 extension AnalyticsSentImageToClarifai {
     
   static func trackSentImageToClarifai() {
       let key = "sent image to Clarifai"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSentImageToSyte = Analytics
+extension AnalyticsSentImageToSyte {
+    
+  static func trackSentImageToSyte() {
+      let key = "sent image to Syte"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSessionEnded = Analytics
+extension AnalyticsSessionEnded {
+    
+  static func trackSessionEnded() {
+      let key = "sessionEnded"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSessionStarted = Analytics
+extension AnalyticsSessionStarted {
+    
+  static func trackSessionStarted() {
+      let key = "sessionStarted"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsStartedDownloadingClarifaiModel = Analytics
+extension AnalyticsStartedDownloadingClarifaiModel {
+    
+  static func trackStartedDownloadingClarifaiModel() {
+      let key = "started downloading Clarifai model"
       var properties:[String:Any] = [:]
             
 
@@ -434,6 +518,32 @@ extension AnalyticsTabBarTapped {
 
  
 
+typealias AnalyticsUserProperties = Analytics
+extension AnalyticsUserProperties {
+    
+  static func trackUserProperties(analyticsUser:AnalyticsUser? ) {
+      let key = "User Properties"
+      var properties:[String:Any] = [:]
+      if let analyticsUser = analyticsUser {
+          propertiesFor(analyticsUser).forEach { properties[$0] = $1 }
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
 typealias AnalyticsUserRetriedScreenshots = Analytics
 extension AnalyticsUserRetriedScreenshots {
     
@@ -455,26 +565,14 @@ extension AnalyticsUserRetriedScreenshots {
 
  
 
-typealias AnalyticsError = Analytics
-extension AnalyticsError {
-  enum AnalyticsErrorType : String{
-    case `noHardDriveSpace` = "noHardDriveSpace"
-    }
+typealias AnalyticsWebViewInvalidUrl = Analytics
+extension AnalyticsWebViewInvalidUrl {
     
-  static func trackError(type:AnalyticsErrorType?,  domain:String?,  code:Int?,  localizedDescription:String? ) {
-      let key = "Error"
+  static func trackWebViewInvalidUrl(url:String? ) {
+      let key = "WebView invalid url"
       var properties:[String:Any] = [:]
-      if let type = type {
-          properties["type"] = type.rawValue
-      }
-      if let domain = domain {
-          properties["domain"] = domain
-      }
-      if let code = code {
-          properties["code"] = NSNumber.init(value: code)
-      }
-      if let localizedDescription = localizedDescription {
-          properties["localizedDescription"] = localizedDescription
+      if let url = url {
+          properties["url"] = url
       }
             
 
@@ -483,6 +581,149 @@ extension AnalyticsError {
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
       Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsWokeFromSilentPush = Analytics
+extension AnalyticsWokeFromSilentPush {
+    
+  static func trackWokeFromSilentPush() {
+      let key = "Woke From Silent Push"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSetFiler = Analytics
+extension AnalyticsSetFiler {
+    
+  static func trackSetFiler(name:String,  newValue:String ) {
+      let key = "Set \(name) Filter to \(newValue)"
+      var properties:[String:Any] = [:]
+        properties["name"] = name
+        properties["newValue"] = newValue
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSetGlobalGenderFiler = Analytics
+extension AnalyticsSetGlobalGenderFiler {
+    
+  static func trackSetGlobalGenderFiler(gender:String ) {
+      let key = "Set Global Gender Filter to \(gender)"
+      var properties:[String:Any] = [:]
+        properties["gender"] = gender
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsSetGlobalSizeFiler = Analytics
+extension AnalyticsSetGlobalSizeFiler {
+    
+  static func trackSetGlobalSizeFiler(size:String ) {
+      let key = "Set Global Size Filter to \(size)"
+      var properties:[String:Any] = [:]
+        properties["size"] = size
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsTappedOnSegmentedControl = Analytics
+extension AnalyticsTappedOnSegmentedControl {
+    
+  static func trackTappedOnSegmentedControl(selectedSegmentTitle:String ) {
+      let key = "Tapped \(selectedSegmentTitle) Picker List"
+      var properties:[String:Any] = [:]
+        properties["selectedSegmentTitle"] = selectedSegmentTitle
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsOpenedFiltersView = Analytics
+extension AnalyticsOpenedFiltersView {
+    
+  static func trackOpenedFiltersView() {
+      let key = "Opened Filters View"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -664,6 +905,54 @@ extension AnalyticsGameStarted {
 
  
 
+typealias AnalyticsScreenshotNotificationAccepted = Analytics
+extension AnalyticsScreenshotNotificationAccepted {
+    
+  static func trackScreenshotNotificationAccepted(screenshotCount:Int ) {
+      let key = "Screenshot notification accepted"
+      var properties:[String:Any] = [:]
+        properties["Screenshot count"] = NSNumber.init(value: screenshotCount)
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsScreenshotNotificationCancelled = Analytics
+extension AnalyticsScreenshotNotificationCancelled {
+    
+  static func trackScreenshotNotificationCancelled(screenshotCount:Int ) {
+      let key = "Screenshot notification cancelled"
+      var properties:[String:Any] = [:]
+        properties["Screenshot count"] = NSNumber.init(value: screenshotCount)
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
 typealias AnalyticsInAppPurchase = Analytics
 extension AnalyticsInAppPurchase {
   enum AnalyticsInAppPurchasePurchase : String{
@@ -714,6 +1003,81 @@ extension AnalyticsRequestedCustomStylist {
             properties["screenshotImageURL"] = a
         }
       }
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCanceledPhotoCreation = Analytics
+extension AnalyticsCanceledPhotoCreation {
+    
+  static func trackCanceledPhotoCreation() {
+      let key = "Canceled Photo Creation"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsCreatedPhoto = Analytics
+extension AnalyticsCreatedPhoto {
+    
+  static func trackCreatedPhoto() {
+      let key = "Created Photo"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsImportedPhotos = Analytics
+extension AnalyticsImportedPhotos {
+  enum AnalyticsImportedPhotosSection : String{
+    case `screenshots` = "Screenshots"
+    case `gallery` = "Gallery"
+    }
+    
+  static func trackImportedPhotos(section:AnalyticsImportedPhotosSection,  count:Int ) {
+      let key = "Imported Photos"
+      var properties:[String:Any] = [:]
+        properties["Section"] = section.rawValue
+        properties["Count"] = NSNumber.init(value: count)
+            
+
+
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
@@ -823,42 +1187,12 @@ extension AnalyticsRatedApp {
 
  
 
-typealias AnalyticsFinishedTutorial = Analytics
-extension AnalyticsFinishedTutorial {
+typealias AnalyticsAcceptedPushPermissions = Analytics
+extension AnalyticsAcceptedPushPermissions {
     
-  static func trackFinishedTutorial() {
-      let key = "Finished Tutorial"
+  static func trackAcceptedPushPermissions() {
+      let key = "Accepted Push Permissions"
       var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.branch.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava", "branch" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsImportedPhotos = Analytics
-extension AnalyticsImportedPhotos {
-  enum AnalyticsImportedPhotosSection : String{
-    case `screenshots` = "Screenshots"
-    case `gallery` = "Gallery"
-    }
-    
-  static func trackImportedPhotos(section:AnalyticsImportedPhotosSection,  count:Int ) {
-      let key = "Imported Photos"
-      var properties:[String:Any] = [:]
-        properties["Section"] = section.rawValue
-        properties["Count"] = NSNumber.init(value: count)
             
 
 
@@ -1103,6 +1437,52 @@ extension AnalyticsOnboardingCampainCreditCardLetsGo {
 
  
 
+typealias AnalyticsDeniedPushPermissions = Analytics
+extension AnalyticsDeniedPushPermissions {
+    
+  static func trackDeniedPushPermissions() {
+      let key = "Denied Push Permissions"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsOpenedPicker = Analytics
+extension AnalyticsOpenedPicker {
+    
+  static func trackOpenedPicker() {
+      let key = "Opened Picker"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
 typealias AnalyticsStartedTutorial = Analytics
 extension AnalyticsStartedTutorial {
     
@@ -1225,7 +1605,7 @@ typealias AnalyticsOnboardingTryItOutScreenshot = Analytics
 extension AnalyticsOnboardingTryItOutScreenshot {
     
   static func trackOnboardingTryItOutScreenshot() {
-      let key = "onboarding took screenshot"
+      let key = "Finished Tutorial"
       var properties:[String:Any] = [:]
             
 
@@ -1249,6 +1629,55 @@ extension AnalyticsOnboardingTryItOutSkipped {
     
   static func trackOnboardingTryItOutSkipped() {
       let key = "Skipped Tutorial"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsUserExitedTutorialVideo = Analytics
+extension AnalyticsUserExitedTutorialVideo {
+    
+  static func trackUserExitedTutorialVideo(progressInSeconds:Double? ) {
+      let key = "User Exited Tutorial Video"
+      var properties:[String:Any] = [:]
+      if let progressInSeconds = progressInSeconds {
+          properties["progressInSeconds"] = NSNumber.init(value: progressInSeconds)
+      }
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsAutomaticallyExitedTutorialVideo = Analytics
+extension AnalyticsAutomaticallyExitedTutorialVideo {
+    
+  static func trackAutomaticallyExitedTutorialVideo() {
+      let key = "Automatically Exited Tutorial Video"
       var properties:[String:Any] = [:]
             
 
@@ -1387,552 +1816,6 @@ extension AnalyticsOnboardingWelcome {
     
   static func trackOnboardingWelcome() {
       let key = "onboarding welcome"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsOpenedFiltersView = Analytics
-extension AnalyticsOpenedFiltersView {
-    
-  static func trackOpenedFiltersView() {
-      let key = "Opened Filters View"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsOpenedPicker = Analytics
-extension AnalyticsOpenedPicker {
-    
-  static func trackOpenedPicker() {
-      let key = "Opened Picker"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsOpenedWithRemoteNotification = Analytics
-extension AnalyticsOpenedWithRemoteNotification {
-    
-  static func trackOpenedWithRemoteNotification(fromIntercom:Bool? ) {
-      let key = "Opened with remote notification"
-      var properties:[String:Any] = [:]
-      if let fromIntercom = fromIntercom {
-          properties["fromIntercom"] = fromIntercom.toStringLiteral()
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsReceivedProductsFromSyte = Analytics
-extension AnalyticsReceivedProductsFromSyte {
-    
-  static func trackReceivedProductsFromSyte(productCount:Int?,  optionsMask:Int? ) {
-      let key = "received products from Syte"
-      var properties:[String:Any] = [:]
-      if let productCount = productCount {
-          properties["productCount"] = NSNumber.init(value: productCount)
-      }
-      if let optionsMask = optionsMask {
-          properties["optionsMask"] = NSNumber.init(value: optionsMask)
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsReceivedRemoteNotification = Analytics
-extension AnalyticsReceivedRemoteNotification {
-    
-  static func trackReceivedRemoteNotification(fromIntercom:Bool? ) {
-      let key = "Received remote notification"
-      var properties:[String:Any] = [:]
-      if let fromIntercom = fromIntercom {
-          properties["fromIntercom"] = fromIntercom.toStringLiteral()
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsRefreshedWebpage = Analytics
-extension AnalyticsRefreshedWebpage {
-    
-  static func trackRefreshedWebpage(url:String? ) {
-      let key = "Refreshed webpage"
-      var properties:[String:Any] = [:]
-      if let url = url {
-          properties["url"] = url
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsScreenshotNotificationAccepted = Analytics
-extension AnalyticsScreenshotNotificationAccepted {
-    
-  static func trackScreenshotNotificationAccepted(screenshotCount:Int ) {
-      let key = "Screenshot notification accepted"
-      var properties:[String:Any] = [:]
-        properties["Screenshot count"] = NSNumber.init(value: screenshotCount)
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsScreenshotNotificationCancelled = Analytics
-extension AnalyticsScreenshotNotificationCancelled {
-    
-  static func trackScreenshotNotificationCancelled(screenshotCount:Int ) {
-      let key = "Screenshot notification cancelled"
-      var properties:[String:Any] = [:]
-        properties["Screenshot count"] = NSNumber.init(value: screenshotCount)
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSentImageToSyte = Analytics
-extension AnalyticsSentImageToSyte {
-    
-  static func trackSentImageToSyte() {
-      let key = "sent image to Syte"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSessionEnded = Analytics
-extension AnalyticsSessionEnded {
-    
-  static func trackSessionEnded() {
-      let key = "sessionEnded"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSessionStarted = Analytics
-extension AnalyticsSessionStarted {
-    
-  static func trackSessionStarted() {
-      let key = "sessionStarted"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSetFiler = Analytics
-extension AnalyticsSetFiler {
-    
-  static func trackSetFiler(name:String,  newValue:String ) {
-      let key = "Set \(name) Filter to \(newValue)"
-      var properties:[String:Any] = [:]
-        properties["name"] = name
-        properties["newValue"] = newValue
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSetGlobalGenderFiler = Analytics
-extension AnalyticsSetGlobalGenderFiler {
-    
-  static func trackSetGlobalGenderFiler(gender:String ) {
-      let key = "Set Global Gender Filter to \(gender)"
-      var properties:[String:Any] = [:]
-        properties["gender"] = gender
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsSetGlobalSizeFiler = Analytics
-extension AnalyticsSetGlobalSizeFiler {
-    
-  static func trackSetGlobalSizeFiler(size:String ) {
-      let key = "Set Global Size Filter to \(size)"
-      var properties:[String:Any] = [:]
-        properties["size"] = size
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsStartedDownloadingClarifaiModel = Analytics
-extension AnalyticsStartedDownloadingClarifaiModel {
-    
-  static func trackStartedDownloadingClarifaiModel() {
-      let key = "started downloading Clarifai model"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsTappedOnSegmentedControl = Analytics
-extension AnalyticsTappedOnSegmentedControl {
-    
-  static func trackTappedOnSegmentedControl(selectedSegmentTitle:String ) {
-      let key = "Tapped \(selectedSegmentTitle) Picker List"
-      var properties:[String:Any] = [:]
-        properties["selectedSegmentTitle"] = selectedSegmentTitle
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsTappedOnShoppable = Analytics
-extension AnalyticsTappedOnShoppable {
-    
-  static func trackTappedOnShoppable() {
-      let key = "Tapped on shoppable"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsTookScreenshot = Analytics
-extension AnalyticsTookScreenshot {
-    
-  static func trackTookScreenshot() {
-      let key = "Took Screenshot"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsTookScreenshotWhileShowingIntercomWindow = Analytics
-extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
-    
-  static func trackTookScreenshotWhileShowingIntercomWindow() {
-      let key = "Took Screenshot While Showing Intercom Window"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsUserAge = Analytics
-extension AnalyticsUserAge {
-    
-  static func trackUserAge() {
-      let key = "User Age"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsUserExitedTutorialVideo = Analytics
-extension AnalyticsUserExitedTutorialVideo {
-    
-  static func trackUserExitedTutorialVideo(progressInSeconds:Double? ) {
-      let key = "User Exited Tutorial Video"
-      var properties:[String:Any] = [:]
-      if let progressInSeconds = progressInSeconds {
-          properties["progressInSeconds"] = NSNumber.init(value: progressInSeconds)
-      }
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsUserProperties = Analytics
-extension AnalyticsUserProperties {
-    
-  static func trackUserProperties() {
-      let key = "User Properties"
-      var properties:[String:Any] = [:]
-            
-
-
-
-      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
-
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
-      //edit properties after sent them to supress complier warning if unused
-      properties["_______"] = ""
-  
-  }
-}
-
- 
-
-typealias AnalyticsUserReceivedSharedScreenshots = Analytics
-extension AnalyticsUserReceivedSharedScreenshots {
-    
-  static func trackUserReceivedSharedScreenshots() {
-      let key = "user received shared screenshots"
       var properties:[String:Any] = [:]
             
 
@@ -2255,6 +2138,32 @@ extension AnalyticsProductUnfavorited {
             properties["merchant"] = a
         }
       }
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsUserReceivedSharedScreenshots = Analytics
+extension AnalyticsUserReceivedSharedScreenshots {
+    
+  static func trackUserReceivedSharedScreenshots(screenshot:Screenshot? ) {
+      let key = "user received shared screenshots"
+      var properties:[String:Any] = [:]
+      if let screenshot = screenshot {
+          propertiesFor(screenshot).forEach { properties[$0] = $1 }
+      }
+            
+
+
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
       AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
@@ -2746,22 +2655,24 @@ extension AnalyticsShoppableRatingPositive {
 
  
 
-typealias AnalyticsWebViewInvalidUrl = Analytics
-extension AnalyticsWebViewInvalidUrl {
+typealias AnalyticsTappedOnShoppable = Analytics
+extension AnalyticsTappedOnShoppable {
     
-  static func trackWebViewInvalidUrl(url:String? ) {
-      let key = "WebView invalid url"
+  static func trackTappedOnShoppable(shoppable:Shoppable? ) {
+      let key = "Tapped on shoppable"
       var properties:[String:Any] = [:]
-      if let url = url {
-          properties["url"] = url
+      if let shoppable = shoppable {
+          propertiesFor(shoppable).forEach { properties[$0] = $1 }
       }
             
 
 
 
       AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
 
-      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee" ])
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
       //edit properties after sent them to supress complier warning if unused
       properties["_______"] = ""
   
@@ -2770,11 +2681,34 @@ extension AnalyticsWebViewInvalidUrl {
 
  
 
-typealias AnalyticsWokeFromSilentPush = Analytics
-extension AnalyticsWokeFromSilentPush {
+typealias AnalyticsTookScreenshot = Analytics
+extension AnalyticsTookScreenshot {
     
-  static func trackWokeFromSilentPush() {
-      let key = "Woke From Silent Push"
+  static func trackTookScreenshot() {
+      let key = "Took Screenshot"
+      var properties:[String:Any] = [:]
+            
+
+
+
+      AnalyticsTrackers.appsee.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.segment.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+      AnalyticsTrackers.kochava.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(key, properties: properties)
+
+      Analytics.debugShowLoggedAnalytics(eventName: key, properties: properties, destinations:["appsee", "segment", "kochava" ])
+      //edit properties after sent them to supress complier warning if unused
+      properties["_______"] = ""
+  
+  }
+}
+
+ 
+
+typealias AnalyticsTookScreenshotWhileShowingIntercomWindow = Analytics
+extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
+    
+  static func trackTookScreenshotWhileShowingIntercomWindow() {
+      let key = "Took Screenshot While Showing Intercom Window"
       var properties:[String:Any] = [:]
             
 

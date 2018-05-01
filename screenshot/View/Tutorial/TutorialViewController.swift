@@ -198,7 +198,6 @@ extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
         slideView.delegate = nil
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        Analytics.trackFinishedTutorial()
         
         self.tutorialDelegate?.tutorialViewControllerDidComplete(self)
     }
