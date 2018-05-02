@@ -144,9 +144,11 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         
         DataModel.sharedInstance.saveShippingAddress(firstName: nameFirst, lastName: nameLast, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
             .then { shippingAddress -> Void in
-                DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()
-                
-                self.delegate?.checkoutFormViewControllerDidAdd(self)
+                DispatchQueue.main.async {
+                    DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()
+                    
+                    self.delegate?.checkoutFormViewControllerDidAdd(self)
+                }
         }
     }
     

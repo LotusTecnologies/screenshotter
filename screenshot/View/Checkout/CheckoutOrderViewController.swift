@@ -312,26 +312,26 @@ extension CheckoutOrderViewControllerOrder {
         let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
         
         guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
-            Analytics.trackCartPressedConfirmOrder(cart: cart, result: .needsCvv)
+            Analytics.trackCartCvvEntered(cart: cart, result: .cvvInvalidOrEmpty)
             confirmPaymentViewController?.displayCVVError()
             
             return
         }
         
         guard let card = card else {
-            Analytics.trackCartPressedConfirmOrder(cart: cart, result: .needsCreditCard)
+            Analytics.trackCartCvvEntered(cart: cart, result: .needsCreditCard)
             dismissConfirmPaymentViewController()
             presentNeedsPrimaryCardAlert()
             return
         }
         
         guard let shippingAddress = shippingAddress else {
-            Analytics.trackCartPressedConfirmOrder(cart: cart, result: .needsShippingAddress)
+            Analytics.trackCartCvvEntered(cart: cart, result: .needsShippingAddress)
             dismissConfirmPaymentViewController()
             presentNeedsPrimaryShippingAddressAlert()
             return
         }
-        Analytics.trackCartPressedConfirmOrder(cart: cart, result: .continue)
+        Analytics.trackCartCvvEntered(cart: cart, result: .continue)
         performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
     }
     

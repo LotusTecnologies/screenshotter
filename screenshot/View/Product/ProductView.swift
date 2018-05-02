@@ -426,7 +426,6 @@ class ProductView: UIView {
         let collectionView = ProductsCollectionView()
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = containerView.backgroundColor
-        collectionView.analyticsOnPage = "Product"
         containerView.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: similarProductsLabel.bottomAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true

@@ -96,7 +96,7 @@ extension CartNavigationController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
         if let checkout = viewController as? CheckoutPaymentFormViewController {
             let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
-            Analytics.trackCartCreditCardAdded(cart: cart)
+            Analytics.trackCartCreditCardAdded(cart: cart, source: .manual)
             
             let addressShip = checkout.formRow(.addressShip)?.value
             let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
@@ -116,7 +116,7 @@ extension CartNavigationController: CheckoutFormViewControllerDelegate {
         }
         else if let _ = viewController as? CheckoutShippingFormViewController {
             let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
-            Analytics.trackCartShippingAdded(cart: cart)
+            Analytics.trackCartShippingAdded(cart: cart, source: .manual)
 
             navigateToCheckoutOrder()
         }
@@ -182,13 +182,18 @@ extension CartNavigationController: CartViewControllerDelegate {
         let hasCard = DataModel.sharedInstance.hasSavedCards()
         let hasAddress = DataModel.sharedInstance.hasShippingAddresses()
         
+        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
         if hasCard && hasAddress {
+            Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .continue)
             navigateToCheckoutOrder()
         }
         else if hasCard {
+            Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .needsShippingAddress)
+
             navigateToCheckoutShippingForm()
         }
         else {
+            Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .needsCreditCard)
             navigateToCheckoutPaymentForm()
         }
     }
