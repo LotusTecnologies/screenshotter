@@ -262,24 +262,6 @@ class ShoppingCartModel {
         }
     }
     
-    func hostedUrl() -> Promise<URL> {
-        return firstly {
-            return retrieveCartRemoteId()
-            }.then { remoteId -> Promise<URL> in
-                if !remoteId.isEmpty,
-                  let returnSite = "\(Constants.shoppableThankYou)?remoteId=\(remoteId)&from=return".addingPercentEncoding(withAllowedCharacters: .alphanumerics),
-                  let orderComplete = "\(Constants.shoppableThankYou)?remoteId=\(remoteId)&from=complete".addingPercentEncoding(withAllowedCharacters: .alphanumerics),
-                  let publisherCheckout = Constants.shoppablePublisherCheckout.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
-                  let url = URL(string: "\(Constants.shoppableHosted)/checkout?cart=\(remoteId)&apiToken=\(Constants.shoppableToken)&campaign=screenshop&noiframe=0&publisherCheckout=\(publisherCheckout)&returnToSite=\(returnSite)&orderComplete=\(orderComplete)") {
-                    return Promise(value: url)
-                } else {
-                    print("hostedUrl failed to form url for remoteId:\(remoteId)")
-                    let error = NSError(domain: "Craze", code: 48, userInfo: [NSLocalizedDescriptionKey : "hostedUrl failed to form url"])
-                    return Promise(error: error)
-                }
-        }
-    }
-    
     func hostedCompleted(remoteId: String, from: String, cardOID: NSManagedObjectID? = nil) {
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { managedObjectContext in
@@ -424,23 +406,6 @@ class ShoppingCartModel {
                 return
             }
             DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
-        }
-    }
-    
-    func retrieveCartRemoteId() -> Promise<String> {
-        let dataModel = DataModel.sharedInstance
-        return Promise { fulfill, reject in
-            dataModel.performBackgroundTask { managedObjectContext in
-                if let cart = dataModel.retrieveAddableCart(managedObjectContext: managedObjectContext),
-                  let remoteId = cart.remoteId,
-                  !remoteId.isEmpty {
-                    fulfill(remoteId)
-                } else {
-                    print("retrieveCartRemoteId failed")
-                    let error = NSError(domain: "Craze", code: 47, userInfo: [NSLocalizedDescriptionKey : "retrieveCartRemoteId failed"])
-                    reject(error)
-                }
-            }
         }
     }
     

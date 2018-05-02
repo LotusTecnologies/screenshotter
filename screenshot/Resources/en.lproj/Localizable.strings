@@ -95,7 +95,6 @@
 "checkout.order.total" = "Order Total:";
 "checkout.order.total_pre_tax" = "Total before tax:";
 "checkout.order.total_tax" = "Estimated tax to be collected:";
-"checkout.title" = "Checkout";
 
 "currency.auto" = "Automatic";
 

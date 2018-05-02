@@ -294,20 +294,6 @@ fileprivate extension CartViewControllerCheckout {
                     
                     strongSelf.dismissCheckoutLoader()
                     strongSelf.delegate?.cartViewControllerDidValidateCart(strongSelf)
-                    
-                    // TODO: coordinate the removal from model
-//                    ShoppingCartModel.shared.hostedUrl()
-//                        .then { url -> Void in
-//                            guard let strongSelf = self else {
-//                                return
-//                            }
-//
-//                            strongSelf.dismissCheckoutLoader()
-//                            strongSelf.pushCheckoutViewController(with: url)
-//                        }
-//                        .catch(execute: { error in
-//                            self?.dismissCheckoutLoader()
-//                        })
                 }
                 else {
                     self?.dismissCheckoutLoader()
@@ -340,23 +326,5 @@ fileprivate extension CartViewControllerCheckout {
         checkoutView.checkoutButton.isEnabled = true
         loadingContainerView.isHidden = true
         loaderView.stopAnimation()
-    }
-    
-    func pushCheckoutViewController() {
-        
-        // TODO: remove relevant code
-//        let checkoutWebViewController = CheckoutWebViewController()
-//        checkoutWebViewController.hidesBottomBarWhenPushed = true
-//        checkoutWebViewController.title = "checkout.title".localized
-//        checkoutWebViewController.loadURL(url)
-//        checkoutWebViewController.isToolbarEnabled = false
-//
-//        if let navigationController = navigationController {
-//            navigationController.pushViewController(checkoutWebViewController, animated: true)
-//        }
-//        else {
-//            let navigationController = ModalNavigationController(rootViewController: checkoutWebViewController)
-//            present(navigationController, animated: true, completion: nil)
-//        }
     }
 }
