@@ -180,7 +180,6 @@ class ShoppingCartModel {
                             reject(error)
                             return
                         }
-                        var didChange = false
                         // Start with all cartItems errorMask as unavailable.
                         var errorDict: [String : CartItem.ErrorMaskOptions] = [:]
                         cartItems.forEach { cartItem in
@@ -199,18 +198,15 @@ class ShoppingCartModel {
                                       cartItem.quantity != qty {
                                         cartItem.quantity = qty
                                         errorMask.insert(.quantity)
-                                        didChange = true
                                     }
                                     if let toPayPrice = self.parseFloat(item["price"]) ?? self.parseFloat(item["sale_price"]) ?? self.parseFloat(item["retail_price"]),
                                       cartItem.price != toPayPrice {
                                         cartItem.price = toPayPrice
                                         errorMask.insert(.price)
                                         (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = toPayPrice
-                                        didChange = true
                                     }
                                     if cartItem.errorMask != errorMask.rawValue {
                                         cartItem.errorMask = errorMask.rawValue
-                                        didChange = true
                                     }
                                     errorDict[sku] = nil  // Clear unavailable.
                                 }
@@ -222,7 +218,6 @@ class ShoppingCartModel {
                                 let errorMask = errorDict[sku],
                                 cartItem.errorMask != errorMask.rawValue {
                                 cartItem.errorMask = errorMask.rawValue
-                                didChange = true
                             }
                         }
                         // Save subtotal and shippingTotal to Cart object.
@@ -230,15 +225,12 @@ class ShoppingCartModel {
                             cartObject.subtotal =  self.parseFloat(cart["subtotal"])
                                                 ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
                             cartObject.shippingTotal = self.parseFloat(cart["shipping_total"]) ?? 0
-                            didChange = true
                         } else {
                             print("Failed to update subtotal and shippingTotal for cart remoteId:\(remoteId)")
                         }
                         
                         let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
-                        if didChange {
-                            managedObjectContext.saveIfNeeded()
-                        }
+                        managedObjectContext.saveIfNeeded()
                         fulfill(isErrorFree)
                     }
                 }
