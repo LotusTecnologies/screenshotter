@@ -40,7 +40,6 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        // TODO: test with ios10
         layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         
         let bottomImageView = UIImageView(image: UIImage(named: "CheckoutOrderConfetti"))

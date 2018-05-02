@@ -9,8 +9,6 @@
 import UIKit
 
 extension NSMutableAttributedString {
-    // TODO: after swift 4 upgrade switch attributes: String with NSAttributedStringKey
-    
     /// SegmentedString is a localized string combination, all appending
     /// with an incremental index starting from 0. The attributes count
     /// represents the segmented string count.
