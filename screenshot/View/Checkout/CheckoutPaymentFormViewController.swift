@@ -43,17 +43,17 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         var billingRows: [FormRow] = []
         
         let cardName = FormRow.Text(CheckoutPaymentFormKeys.cardName.rawValue)
-        cardName.title = "Name on Card"
+        cardName.title = "form.card.full_name".localized
         cardName.value = card?.fullName
         cardRows.append(cardName)
         
         let cardNumber = FormRow.Card(CheckoutPaymentFormKeys.cardNumber.rawValue)
-        cardNumber.title = "Card Number"
+        cardNumber.title = "form.card.number".localized
         cardNumber.placeholder = card?.displayNumber
         cardRows.append(cardNumber)
         
         let exp = FormRow.Expiration(CheckoutPaymentFormKeys.cardExp.rawValue)
-        exp.title = "Exp"
+        exp.title = "form.card.expiration".localized
         exp.value = {
             guard let card = card else {
                 return nil
@@ -66,24 +66,24 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         if !isEditLayout {
             let cvv = FormRow.CVV(CheckoutPaymentFormKeys.cardCVV.rawValue)
-            cvv.title = "CVV"
+            cvv.title = "form.card.cvv".localized
             cardRows.append(cvv)
         }
         
         let street = FormRow.Text(CheckoutPaymentFormKeys.addressStreet.rawValue)
-        street.title = "Street Address"
+        street.title = "form.address.street".localized
         street.value = card?.street
         billingRows.append(street)
         
         let city = FormRow.Text(CheckoutPaymentFormKeys.addressCity.rawValue)
-        city.title = "City"
+        city.title = "form.address.city".localized
         city.value = card?.city
         billingRows.append(city)
         
         let supportedCountriesMap = CheckoutSupportedCountriesMap()
         
         let country = FormRow.Selection(CheckoutPaymentFormKeys.addressCountry.rawValue)
-        country.title = "Country"
+        country.title = "form.address.country".localized
         country.value = {
             var value: String?
             
@@ -101,7 +101,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         let state = FormRow.Selection(CheckoutPaymentFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
-        state.title = "State"
+        state.title = "form.address.state".localized
         state.value = { // TODO: value should auto select the correct picker index
             var value: String?
             
@@ -115,24 +115,24 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         billingRows.append(state)
         
         let zip = FormRow.Zip(CheckoutPaymentFormKeys.addressZip.rawValue)
-        zip.title = "Zip Code"
+        zip.title = "form.address.zip".localized
         zip.value = card?.zipCode
         billingRows.append(zip)
         
         let email = FormRow.Email(CheckoutPaymentFormKeys.email.rawValue)
-        email.title = "Email"
+        email.title = "form.personal.email".localized
         email.value = card?.email
         email.isRequired = false
         billingRows.append(email)
         
         let phone = FormRow.Phone(CheckoutPaymentFormKeys.phoneNumber.rawValue)
-        phone.title = "Phone Number"
+        phone.title = "form.personal.phone".localized
         phone.value = card?.phone
         billingRows.append(phone)
         
         if !isEditLayout {
             let ship = FormRow.Checkbox(CheckoutPaymentFormKeys.addressShip.rawValue)
-            ship.title = "Ship to this address"
+            ship.title = "form.address.ship_to".localized
             billingRows.append(ship)
         }
         
@@ -140,7 +140,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         cardSection.rows = cardRows
         
         let billingSection = FormSection()
-        billingSection.title = "BILLING ADDRESS"
+        billingSection.title = "checkout.form.card.billing".localized
         billingSection.rows = billingRows
         
         self.init(with: Form(with: [cardSection, billingSection]))
@@ -148,7 +148,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         self.supportedCountriesMap = supportedCountriesMap
         self.supportedStatesMap = supportedStatesMap
         
-        title = isEditLayout ? "Edit Card" : "Add Card"
+        title = isEditLayout ? "checkout.form.card.edit".localized : "checkout.form.card.add".localized
         restorationIdentifier = String(describing: type(of: self))
         
         let hasSaveAndDeleteButtons = (isEditLayout && card != nil)
@@ -228,12 +228,12 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         }
         
         if self.confirmBeforeSave {
-            let alertController = UIAlertController(title: "Save Card?", message: "You can use this for future purchases. Your information is saved securely on your device.", preferredStyle: .alert)
-            let saveAlertAction = UIAlertAction(title: "Save", style: .default) { alertAction in
+            let alertController = UIAlertController(title: "checkout.form.card.save.title".localized, message: "checkout.form.card.save.message".localized, preferredStyle: .alert)
+            let saveAlertAction = UIAlertAction(title: "generic.save".localized, style: .default) { alertAction in
                 performAction(withSavingCard: true)
             }
             alertController.addAction(saveAlertAction)
-            alertController.addAction(UIAlertAction(title: "Don't Save", style: .cancel, handler: { alertAction in
+            alertController.addAction(UIAlertAction(title: "generic.dont_save".localized, style: .cancel, handler: { alertAction in
                 performAction(withSavingCard: false)
             }))
             alertController.preferredAction = saveAlertAction

@@ -31,29 +31,29 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         var formRows: [FormRow] = []
         
         let firstName = FormRow.Text(CheckoutShippingFormKeys.nameFirst.rawValue)
-        firstName.title = "First Name"
+        firstName.title = "form.address.first_name".localized
         firstName.value = shippingAddress?.firstName
         formRows.append(firstName)
         
         let lastName = FormRow.Text(CheckoutShippingFormKeys.nameLast.rawValue)
-        lastName.title = "Last Name"
+        lastName.title = "form.address.last_name".localized
         lastName.value = shippingAddress?.lastName
         formRows.append(lastName)
         
         let street = FormRow.Text(CheckoutShippingFormKeys.addressStreet.rawValue)
-        street.title = "Street Address"
+        street.title = "form.address.street".localized
         street.value = shippingAddress?.street
         formRows.append(street)
         
         let city = FormRow.Text(CheckoutShippingFormKeys.addressCity.rawValue)
-        city.title = "City"
+        city.title = "form.address.city".localized
         city.value = shippingAddress?.city
         formRows.append(city)
         
         let supportedCountriesMap = CheckoutSupportedCountriesMap()
         
         let country = FormRow.Selection(CheckoutShippingFormKeys.addressCountry.rawValue)
-        country.title = "Country"
+        country.title = "form.address.country".localized
         country.value = {
             var value: String?
             
@@ -71,7 +71,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         let state = FormRow.Selection(CheckoutShippingFormKeys.addressState.rawValue)
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
-        state.title = "State"
+        state.title = "form.address.state".localized
         state.value = {
             var value: String?
             
@@ -85,12 +85,12 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         formRows.append(state)
         
         let zip = FormRow.Number(CheckoutShippingFormKeys.addressZip.rawValue)
-        zip.title = "Zip Code"
+        zip.title = "form.address.zip".localized
         zip.value = shippingAddress?.zipCode
         formRows.append(zip)
         
         let phone = FormRow.Phone(CheckoutShippingFormKeys.phoneNumber.rawValue)
-        phone.title = "Phone Number"
+        phone.title = "form.personal.phone".localized
         phone.value = shippingAddress?.phone
         formRows.append(phone)
         
@@ -102,7 +102,7 @@ class CheckoutShippingFormViewController: CheckoutFormViewController {
         self.supportedCountriesMap = supportedCountriesMap
         self.supportedStatesMap = supportedStatesMap
         
-        title = isEditLayout ? "Edit Address" : "Add Address"
+        title = isEditLayout ? "checkout.form.address.edit".localized : "checkout.form.address.add".localized
         restorationIdentifier = String(describing: type(of: self))
         
         generateButtons(withEditLayout: isEditLayout)

@@ -73,6 +73,17 @@
 "checkout.confirm.payment.what" = "what's this?";
 "checkout.error.message" = "We were unable to complete your transaction. Please check your connection and try again.";
 "checkout.error.title" = "Something Went Wrong";
+"checkout.form.address.add" = "Add Address";
+"checkout.form.address.edit" = "Edit Address";
+"checkout.form.card.add" = "Add Card";
+"checkout.form.card.billing" = "BILLING ADDRESS";
+"checkout.form.card.edit" = "Edit Card";
+"checkout.form.card.save.message" = "You can use this for future purchases. Your information is saved securely on your device.";
+"checkout.form.card.save.title" = "Save Card?";
+"checkout.list.payment.add_card" = "Add a new card";
+"checkout.list.payment.title" = "Payment Methods";
+"checkout.list.shipping.add_address" = "Add a new shipping address";
+"checkout.list.shipping.title" = "Shipping Addresses";
 "checkout.order.address_title" = "Shipping to:";
 "checkout.order.cancel" = "Cancel and Continue Shopping";
 "checkout.order.description.color" = "Color: %@";
@@ -141,6 +152,21 @@
 "favorites.screenshot.title.single" = "%d Favorited Item";
 "favorites.title" = "Favorites";
 
+"form.address.city" = "City";
+"form.address.country" = "Country";
+"form.address.first_name" = "First Name";
+"form.address.last_name" = "Last Name";
+"form.address.ship_to" = "Ship to this address";
+"form.address.state" = "State";
+"form.address.street" = "Street Address";
+"form.address.zip" = "Zip Code";
+"form.card.cvv" = "CVV";
+"form.card.expiration" = "Exp";
+"form.card.full_name" = "Name on Card";
+"form.card.number" = "Card Number";
+"form.personal.email" = "Email";
+"form.personal.phone" = "Phone Number";
+
 "game.enter" = "Get More Coins";
 "game.restart" = "Tap to play again";
 "game.score" = "My coins: %d";
@@ -153,6 +179,7 @@
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";
 "generic.done" = "Done";
+"generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";

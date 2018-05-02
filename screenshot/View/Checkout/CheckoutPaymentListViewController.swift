@@ -22,7 +22,7 @@ class CheckoutPaymentListViewController: CheckoutListViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        title = "Payment Methods"
+        title = "checkout.list.payment.title".localized
         restorationIdentifier = String(describing: type(of: self))
         
         cardFrc = DataModel.sharedInstance.cardFrc(delegate: self)
@@ -36,7 +36,7 @@ class CheckoutPaymentListViewController: CheckoutListViewController {
         tableView.estimatedRowHeight = 150
         tableView.register(CheckoutCreditCardTableViewCell.self, forCellReuseIdentifier: "cell")
         
-        addButton.setTitle("Add a new card", for: .normal)
+        addButton.setTitle("checkout.list.payment.add_card".localized, for: .normal)
         addButton.setImage(UIImage(named: "CheckoutCreditCard"), for: .normal)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
         addButton.sizeToFit()

@@ -21,7 +21,7 @@ class CheckoutShippingListViewController: CheckoutListViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        title = "Shipping Addresses"
+        title = "checkout.list.shipping.title".localized
         restorationIdentifier = String(describing: type(of: self))
         
         shippingFrc = DataModel.sharedInstance.shippingAddressFrc(delegate: self)
@@ -35,7 +35,7 @@ class CheckoutShippingListViewController: CheckoutListViewController {
         tableView.estimatedRowHeight = 120
         tableView.register(CheckoutShippingTableViewCell.self, forCellReuseIdentifier: "cell")
         
-        addButton.setTitle("Add a new shipping address", for: .normal)
+        addButton.setTitle("checkout.list.shipping.add_address".localized, for: .normal)
         addButton.setImage(UIImage(named: "CheckoutLocation"), for: .normal)
         addButton.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
         addButton.sizeToFit()
