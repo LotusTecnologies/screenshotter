@@ -185,7 +185,6 @@ class ShoppingCartModel {
                             reject(error)
                             return
                         }
-                        var didChange = false
                         // Start with all cartItems errorMask as unavailable.
                         var errorDict: [String : CartItem.ErrorMaskOptions] = [:]
                         cartItems.forEach { cartItem in
@@ -204,30 +203,35 @@ class ShoppingCartModel {
                                       cartItem.quantity != qty {
                                         cartItem.quantity = qty
                                         errorMask.insert(.quantity)
-                                        didChange = true
                                     }
                                     if let toPayPrice = self.parseFloat(item["price"]) ?? self.parseFloat(item["sale_price"]) ?? self.parseFloat(item["retail_price"]),
                                       cartItem.price != toPayPrice {
                                         cartItem.price = toPayPrice
                                         errorMask.insert(.price)
                                         (cartItem.product?.availableVariants as? Set<Variant>)?.first { $0.sku == sku }?.price = toPayPrice
-                                        didChange = true
                                     }
                                     if cartItem.errorMask != errorMask.rawValue {
                                         cartItem.errorMask = errorMask.rawValue
-                                        didChange = true
                                     }
                                     errorDict[sku] = nil  // Clear unavailable.
                                 }
                             }
                         }
-                        // Save the unavailables.
+                        // For the unavailables.
                         errorDict.keys.forEach { sku in
-                            if let cartItem = cartItems.first(where:{ $0.sku == sku }),
-                                let errorMask = errorDict[sku],
-                                cartItem.errorMask != errorMask.rawValue {
-                                cartItem.errorMask = errorMask.rawValue
-                                didChange = true
+                            if let cartItem = cartItems.first(where:{ $0.sku == sku }) {
+                                // Mark the CartItem as unavailable.
+                                if let errorMask = errorDict[sku],
+                                  cartItem.errorMask != errorMask.rawValue {
+                                    cartItem.errorMask = errorMask.rawValue
+                                }
+                                // Force next populateVariants to refresh.
+                                if let rootProduct = cartItem.product,
+                                  rootProduct.hasVariants,
+                                  let variants = rootProduct.availableVariants as? Set<Variant> {
+                                    variants.forEach {managedObjectContext.delete($0)}
+                                    rootProduct.hasVariants = false
+                                }
                             }
                         }
                         // Save subtotal and shippingTotal to Cart object.
@@ -235,15 +239,12 @@ class ShoppingCartModel {
                             cartObject.subtotal =  self.parseFloat(cart["subtotal"])
                                                 ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
                             cartObject.shippingTotal = self.parseFloat(cart["shipping_total"]) ?? 0
-                            didChange = true
                         } else {
                             print("Failed to update subtotal and shippingTotal for cart remoteId:\(remoteId)")
                         }
                         
                         let isErrorFree = cartItems.first(where: {$0.errorMask != 0}) == nil
-                        if didChange {
-                            managedObjectContext.saveIfNeeded()
-                        }
+                        managedObjectContext.saveIfNeeded()
                         fulfill(isErrorFree)
                     }
                 }
