@@ -107,7 +107,6 @@ class GiftCardCampaignViewController: UIViewController {
         skip.titleLabel?.font = UIFont.screenshopFont(.hind, size: sizes.skipTextFontSize)
         skip.setAttributedTitle(underlineString, for: .normal)
         skip.addTarget(self, action: #selector(skipAction(_:)), for: .touchUpInside)
-        button.backgroundColor = .crazeGreen
         
         
         

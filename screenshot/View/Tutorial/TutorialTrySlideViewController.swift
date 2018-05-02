@@ -25,11 +25,13 @@ public class TutorialTrySlideViewController : UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        automaticallyAdjustsScrollViewInsets = false
         self.view.backgroundColor = .white
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(helperView)
-        helperView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
         helperView.rightAnchor.constraint(equalTo: self.view.rightAnchor).isActive = true
@@ -43,7 +45,7 @@ public class TutorialTrySlideViewController : UIViewController {
                     extraTop = .extendedPadding
                     extraBottom = .extendedPadding
                     
-                } else if UIDevice.is667h {
+                } else {
                     extraTop = .padding
                     extraBottom = .padding
                 }

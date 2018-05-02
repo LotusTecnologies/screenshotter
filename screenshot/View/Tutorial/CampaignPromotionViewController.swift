@@ -100,15 +100,15 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         let skipButton = UIButton.init()
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.titleLabel?.textAlignment = .center
-        
         skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
         skipButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 5, left: .padding, bottom: 5, right: .padding)
         container.addSubview(skipButton)
         skipButton.setTitle("generic.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
         skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
-        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor, constant: -skipButton.contentEdgeInsets.bottom).isActive = true
         skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         
@@ -120,7 +120,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         mainButton.setTitle(self.campaign.buttonText, for: .normal)
         mainButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         mainButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
-        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-3).isActive = true
+        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         

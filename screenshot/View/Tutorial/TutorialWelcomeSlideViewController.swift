@@ -28,11 +28,12 @@ class TutorialWelcomeSlideViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        automaticallyAdjustsScrollViewInsets = false
+        view.backgroundColor = .white
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(helperView)
-        helperView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
         helperView.rightAnchor.constraint(equalTo: self.view.rightAnchor).isActive = true
@@ -46,18 +47,14 @@ class TutorialWelcomeSlideViewController : UIViewController {
                     extraTop = .extendedPadding
                     extraBottom = .extendedPadding
                     
-                } else if UIDevice.is667h {
+                } else {
                     extraTop = .padding
                     extraBottom = .padding
                 }
             }
             
-            let paddingX: CGFloat = .padding
-            
-            
-            return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
+            return UIEdgeInsets(top: .padding + extraTop, left: .padding, bottom: .padding + extraBottom, right: .padding)
         }()
-        
         
         helperView.titleLabel.attributedText = titleLabelAttributedText
         helperView.subtitleLabel.text = "tutorial.welcome.detail".localized
