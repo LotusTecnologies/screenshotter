@@ -205,7 +205,7 @@ class Analytics {
         }
     }
     static func debugShowLoggedAnalytics(eventName: String, properties: [AnyHashable:Any], destinations:[String]){
-        #if false
+        #if true
         DispatchQueue.main.async {
             if let viewController = AppDelegate.shared.window?.rootViewController {
                 let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{

@@ -218,14 +218,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         requiredSpacing.isActive = true
         
     }
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
-        } catch let error as NSError {
-            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
-        }
-    }
     
     @objc func tappedLearnMoreButton() {
         if let player = self.player {
