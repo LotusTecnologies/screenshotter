@@ -205,15 +205,16 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-        var tabTitle = self.selectedViewController?.title
-        
-        if item.tag == TabIndex.discover.rawValue {
-            tabTitle = "Matchsticks"
+        if let index = tabBar.items?.index(of: item) {
+            if  let vcs = self.viewControllers, vcs.count > index {
+                let viewcontroller = vcs[index]
+                if let tabTitle = viewcontroller.title {
+                    Analytics.trackTabBarTapped(tab: tabTitle)
+                }
+                
+            }
         }
         
-        if let tabTitle = tabTitle {
-            Analytics.trackTabBarTapped(tab: tabTitle)
-        }
     }
     
     func presentTabBarSettingsBadge() {

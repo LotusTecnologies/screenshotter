@@ -398,8 +398,11 @@ extension AppDelegate : KochavaTrackerDelegate {
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
+
             guard error == nil, let params = params as? [String : AnyObject] else {
-                AnalyticsTrackers.segment.error(withDescription: error!.localizedDescription)
+                if let e = error as NSError? {
+                    Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                }
                 return
             }
             
@@ -503,7 +506,8 @@ extension AppDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        AnalyticsTrackers.segment.error(withDescription: "Failed to register for remote notifications! (\(error))")
+         let e = error as NSError
+        Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {

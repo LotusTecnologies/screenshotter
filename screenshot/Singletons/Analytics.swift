@@ -20,6 +20,7 @@ extension Bool {
 }
 
 class Analytics {
+    
     static private func addScreenshotProperitesFrom(trackingData:String?, toProperties:inout [String:Any]) {
         do {
             if let string = trackingData, let data = string.data(using: .utf8) {
@@ -60,6 +61,36 @@ class Analytics {
     
     static func propertiesFor(_ user:AnalyticsUser) -> [String:Any] {
         return user.analyticsProperties
+    }
+    
+    static func propertiesFor(_ cart:Cart) -> [String:Any] {
+        var properties:[String:Any] = [:]
+
+        properties["cart-uniqueItems"] = cart.items?.count ?? 0
+        
+        var totalItemCount = 0
+        if let items = cart.items {
+            items.forEach { (cartItem) in
+                if let c = cartItem as? CartItem {
+                    totalItemCount += Int(c.quantity)
+                }
+            }
+        }
+        
+        properties["cart-items"] = totalItemCount
+
+        properties["cart-shippingTotal"] = cart.shippingTotal
+        properties["cart-subtotal"] = cart.subtotal
+        properties["cart-remoteId"] = cart.remoteId
+        if let dateModified = cart.dateModified {
+            properties["cart-dateModified"] = dateModified
+        }
+        if let dateSubmitted = cart.dateSubmitted {
+            properties["cart-dateSubmitted"] = dateSubmitted
+        }
+        properties["cart-isPastOrder"] = cart.isPastOrder
+        
+        return properties
     }
     
     static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
@@ -106,20 +137,63 @@ class Analytics {
         properties["product-filter-gender"] = options.gender.analyticsStringValue
         properties["product-filter-category"] = options.category.analyticsStringValue
         
-        /*
-         price normalized to USD
-         */
+        if let priceString = product.price {
+            properties["product-price-display"] = priceString
+        }
+        
+        if let partNumber = product.partNumber {
+            properties["product-partNumber"] = partNumber
+        }
+
         if let shoppable = product.shoppable{
             propertiesFor(shoppable).forEach { properties[$0] = $1 }
         }
         
         return properties
     }
+    static func propertiesFor(_ cartItem:CartItem) -> [String:Any] {
+        var properties:[String:Any] = [:]
+
+        if let product = cartItem.product{
+            propertiesFor(product).forEach { properties[$0] = $1 }
+        }
+        
+        properties["product-quantity"] = NSNumber(value:cartItem.quantity)
+        if let color = cartItem.color {
+            properties["product-color"] = color
+        }
+        if let size = cartItem.size {
+            properties["product-size"] = size
+        }
+        
+        properties["product-price"] = NSNumber(value:cartItem.price)
+        if let sku = cartItem.sku {
+            properties["product-sku"] = sku
+        }
+
+        return properties
+
+    }
+
     
     static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
         let willShowShoppingCartPage = (product.partNumber != nil )
-        let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = .error
-        
+        let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = {
+            if willShowShoppingCartPage {
+                return .productPage
+            }else{
+                if let urlString = product.offer, let url = URL(string:urlString) {
+                    let willOpenWith = OpenWebPage.using(url:url)
+                    if let a = Analytics.AnalyticsProductOpenedDisplayAs.init(rawValue: willOpenWith.analyticsString()){
+                        return a
+                    }else{
+                        return .error
+                    }
+                }else{
+                    return .error
+                }
+            }
+        }()
         
         Analytics.trackProductOpened(product: product, order: nil, sort: nil, displayAs: displayAs, fromPage: location)
         
@@ -131,24 +205,23 @@ class Analytics {
         }
     }
     static func debugShowLoggedAnalytics(eventName: String, properties: [AnyHashable:Any], destinations:[String]){
-        let showDebugUI = false
-        if showDebugUI {
-            DispatchQueue.main.async {
-                if let viewController = AppDelegate.shared.window?.rootViewController {
-                    let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{
-                        //notification was tapped
-                        let alert = UIAlertController.init(title: eventName, message: String(describing: properties), preferredStyle: .alert)
-                        
-                        alert.addAction(UIAlertAction.init(title: "OK", style: .cancel, handler: nil))
-                        viewController.present(alert, animated: true, completion: nil)
-                        
-                    })
-                    Whisper.show(shout: announcement, to: viewController, completion: {
-                        print("The shout was silent.")
-                    })
-                }
+        #if false
+        DispatchQueue.main.async {
+            if let viewController = AppDelegate.shared.window?.rootViewController {
+                let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{
+                    //notification was tapped
+                    let alert = UIAlertController.init(title: eventName, message: String(describing: properties), preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction.init(title: "OK", style: .cancel, handler: nil))
+                    viewController.present(alert, animated: true, completion: nil)
+                    
+                })
+                Whisper.show(shout: announcement, to: viewController, completion: {
+                    print("The shout was silent.")
+                })
             }
         }
+        #endif
     }
 
 }
@@ -202,7 +275,17 @@ public class AnalyticsUser : NSObject {
             props["pushToken"] = token.description
         }
         
-        props["userAge"] = "\(userAge())"
+        let userAge:Int = {
+            guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {
+                return 0
+            }
+            let components = Set<Calendar.Component>([.day])
+            guard let ageInDays = Calendar.current.dateComponents(components, from: dateInstalled, to: Date()).day else {
+                return 0
+            }
+            return ageInDays
+        }()
+        props["userAge"] = "\(userAge)"
         if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
             props["personalStylistPurchased"] = "true"
         }
@@ -213,136 +296,109 @@ public class AnalyticsUser : NSObject {
     }
     
     func  sendToServers(){
-        AnalyticsTrackers.segment.identify(self)
-        AnalyticsTrackers.branch.identify(self)
-        AnalyticsTrackers.appsee.identify(self)
-        AnalyticsTrackers.intercom.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.segment.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.branch.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.appsee.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.intercom.identify(self)
     }
 }
 
-@objc public protocol AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]?)
+protocol AnalyticsTracker {
+    func track(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
 }
 
-class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
-    }
-    
-    func identify(_ user: AnalyticsUser) {
-        SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
-    }
-    
-    func error(withDescription description: String) {
-        SEGAnalytics.shared().track("Error", properties: ["Description" : description])
-    }
-}
+class AnalyticsTrackers : NSObject {
+    static let autoGeneratedCodeApi = AnalyticsTrackers()
 
-class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        // Appsee properties can't exceed 300 bytes.
-        // https://www.appsee.com/docs/ios/api?section=events
-        
-        let finalKeys = (properties ?? [:]).keys.filter {
-            let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
-            return propertyLength < 300
+    let appsee = AppseeAnalyticsTracker()
+    let segment = SegmentAnalyticsTracker()
+    let kochava = KochavaAnalyticsTracker()
+    let intercom = IntercomAnalyticsTracker()
+    let branch = BranchAnalyticsTracker()
+    
+    class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
         
-        if finalKeys.count > 0 {
-            let props = finalKeys.reduce([:]) { (final, key) -> [AnyHashable : Any] in
-                var copy = final
-                copy[key] = properties?[key]
-                return copy
+        func identify(_ user: AnalyticsUser) {
+            SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
+        }
+    }
+    
+    class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            // Appsee properties can't exceed 300 bytes.
+            // https://www.appsee.com/docs/ios/api?section=events
+            
+            let finalKeys = (properties ?? [:]).keys.filter {
+                let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
+                return propertyLength < 300
             }
             
-            Appsee.addEvent(event, withProperties: props)
-            
-        } else {
-            Appsee.addEvent(event)
+            if finalKeys.count > 0 {
+                let props = finalKeys.reduce([:]) { (final, key) -> [AnyHashable : Any] in
+                    var copy = final
+                    copy[key] = properties?[key]
+                    return copy
+                }
+                
+                Appsee.addEvent(event, withProperties: props)
+                
+            } else {
+                Appsee.addEvent(event)
+            }
         }
-    }
-    
-    func identify(_ user: AnalyticsUser) {
-        Appsee.setUserID(user.email ?? user.identifier)
-        Appsee.addEvent("User Properties", withProperties: user.analyticsProperties)
-    }
-}
-
-class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
-    }
-    
-    func identify(_ user: AnalyticsUser) {
-        Branch.getInstance().setIdentity(user.email ?? user.identifier)
         
-        if let isEmpty = user.email?.isEmpty, isEmpty == false {
-            Branch.getInstance().userCompletedAction("Submitted email")
+        func identify(_ user: AnalyticsUser) {
+            Appsee.setUserID(user.email ?? user.identifier)
+            Appsee.addEvent("User Properties", withProperties: user.analyticsProperties)
         }
     }
-}
-
-
-class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        IntercomHelper.sharedInstance.record(event: event, properties: properties)
-    }
     
-    func identify(_ user: AnalyticsUser) {
-        IntercomHelper.sharedInstance.register(user: user)
-    }
-}
-
-class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
+    class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
+        }
         
-        if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
-            kEvent.nameString = event
-            kEvent.customEventNameString = event
-            //Do not track properties - there is an bug in ios 10 that will cause freezing.
-            kEvent.userIdString = AnalyticsUser.current.identifier
-            kEvent.userNameString = AnalyticsUser.current.name
-            KochavaTracker.shared.send(kEvent)
+        func identify(_ user: AnalyticsUser) {
+            Branch.getInstance().setIdentity(user.email ?? user.identifier)
             
+            if let isEmpty = user.email?.isEmpty, isEmpty == false {
+                Branch.getInstance().userCompletedAction("Submitted email")
+            }
         }
-        SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
     }
     
-    func identify(_ user: AnalyticsUser) {
-    }
     
-    func error(withDescription description: String) {
+    class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            IntercomHelper.sharedInstance.record(event: event, properties: properties)
+        }
         
-        if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
-            kEvent.nameString = "Error"
-            kEvent.payloadDictionary = ["description":description]
-            kEvent.userIdString = AnalyticsUser.current.identifier
-            kEvent.userNameString = AnalyticsUser.current.name
-            KochavaTracker.shared.send(kEvent)
+        func identify(_ user: AnalyticsUser) {
+            IntercomHelper.sharedInstance.register(user: user)
+        }
+    }
+    
+    class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
             
+            if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
+                kEvent.nameString = event
+                kEvent.customEventNameString = event
+                //Do not track properties - there is an bug in ios 10 that will cause freezing.
+                kEvent.userIdString = AnalyticsUser.current.identifier
+                kEvent.userNameString = AnalyticsUser.current.name
+                KochavaTracker.shared.send(kEvent)
+                
+            }
+            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
+        }
+        
+        func identify(_ user: AnalyticsUser) {
         }
     }
 }
 
-public class AnalyticsTrackers : NSObject {
-    static let appsee = AppseeAnalyticsTracker()
-    static let segment = SegmentAnalyticsTracker()
-    static let kochava = KochavaAnalyticsTracker()
-    static let intercom = IntercomAnalyticsTracker()
-    static let branch = BranchAnalyticsTracker()    
-}
-
-// Returns the user's age in days.
-fileprivate func userAge() -> Int {
-    guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {
-        return 0
-    }
-    
-    let components = Set<Calendar.Component>([.day])
-    guard let ageInDays = Calendar.current.dateComponents(components, from: dateInstalled, to: Date()).day else {
-        return 0
-    }
-    
-    return ageInDays
-}

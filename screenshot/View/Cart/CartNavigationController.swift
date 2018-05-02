@@ -95,6 +95,9 @@ class CartNavigationController: UINavigationController {
 extension CartNavigationController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
         if let checkout = viewController as? CheckoutPaymentFormViewController {
+            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+            Analytics.trackCartCreditCardAdded(cart: cart)
+            
             let addressShip = checkout.formRow(.addressShip)?.value
             let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
             
@@ -112,7 +115,33 @@ extension CartNavigationController: CheckoutFormViewControllerDelegate {
             }
         }
         else if let _ = viewController as? CheckoutShippingFormViewController {
+            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+            Analytics.trackCartShippingAdded(cart: cart)
+
             navigateToCheckoutOrder()
+        }
+    }
+    func checkoutFormViewControllerDidEdit(_ viewController: CheckoutFormViewController) {
+        if let _ = viewController as? CheckoutPaymentFormViewController {
+            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+            Analytics.trackCartCreditCardEdited(cart: cart)
+            
+        }
+        else if let _ = viewController as? CheckoutShippingFormViewController {
+            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+            Analytics.trackCartShippingEdited(cart: cart)
+        }
+    }
+    
+    func checkoutFormViewControllerDidRemove(_ viewController: CheckoutFormViewController) {
+        if let _ = viewController as? CheckoutPaymentFormViewController {
+            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+            Analytics.trackCartCreditCardRemoved(cart: cart)
+            
+        }
+        else if let _ = viewController as? CheckoutShippingFormViewController {
+            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+            Analytics.trackCartShippingRemoved(cart: cart)
         }
     }
 }

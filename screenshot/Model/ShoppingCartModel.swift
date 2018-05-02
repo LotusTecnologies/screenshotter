@@ -61,6 +61,10 @@ class ShoppingCartModel {
             } else {
                 cartItem = CartItem(context: managedObjectContext)
             }
+            let oldColor = cartItem.color
+            let oldSize = cartItem.size
+            let oldQuantity = cartItem.quantity
+            
             cartItem.color = variantToCopy.color
             cartItem.imageURL = variantToCopy.imageURLs?.components(separatedBy: ",").first
             cartItem.price = variantToCopy.price
@@ -72,6 +76,13 @@ class ShoppingCartModel {
             cartItem.dateModified = Date()
             cartItem.product = variantToCopy.product
             cartItem.cart = cart
+            
+            if (oldColor == nil && cartItem.color != nil) || (oldSize == nil && cartItem.size != nil) || (oldColor != nil && cartItem.color != nil && oldColor! != cartItem.color!) || (oldSize != nil && cartItem.size != nil && oldSize! != cartItem.size!){
+                Analytics.trackProductVarientChanged(cartItem: cartItem, fromSize: oldSize, fromColor: oldColor)
+            }
+            if oldQuantity != quantity {
+                Analytics.trackProductQuantityChanged(cartItem: cartItem, from: Int(oldQuantity))
+            }
             managedObjectContext.saveIfNeeded()
         }
     }

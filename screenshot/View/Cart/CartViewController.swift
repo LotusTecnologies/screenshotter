@@ -257,6 +257,12 @@ fileprivate extension CartViewControllerCartItem {
         }
         
         let quantity = Int16(stepper.value)
+        if quantity > cartItem.quantity {
+            Analytics.trackProductCartQuanityStepUp(cartItem: cartItem)
+        }else{
+            Analytics.trackProductCartQuanityStepDown(cartItem: cartItem)
+        }
+        
         ShoppingCartModel.shared.update(cartItem: cartItem, quantity: quantity)
     }
     
@@ -274,6 +280,9 @@ fileprivate extension CartViewControllerCartItem {
 typealias CartViewControllerCheckout = CartViewController
 fileprivate extension CartViewControllerCheckout {
     @objc func checkoutAction(_ button: UIButton) {
+        let cart = self.cartItemFrc?.fetchedObjects.first?.cart
+        Analytics.trackCartPressedCheckout(cart:cart)
+
         presentCheckoutLoader()
         
         ShoppingCartModel.shared.checkout()
@@ -305,6 +314,14 @@ fileprivate extension CartViewControllerCheckout {
                 }
             }
             .catch { [weak self] error in
+                let cart = self?.cartItemFrc?.fetchedObjects.first?.cart
+                
+                let nsError = error as NSError
+                let domain = nsError.domain
+                let code = nsError.code
+                
+                Analytics.trackCartError(cart: cart, domain: domain, code: code, localizedDescription: error.localizedDescription)
+                
                 let alertController = UIAlertController(title: "checkout.error.title".localized, message: "checkout.error.message".localized, preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
                 self?.present(alertController, animated: true, completion: nil)

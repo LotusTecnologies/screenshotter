@@ -276,12 +276,16 @@ extension CheckoutOrderViewController: UITextViewDelegate {
 typealias CheckoutOrderViewControllerOrder = CheckoutOrderViewController
 extension CheckoutOrderViewControllerOrder {
     @objc fileprivate func orderAction() {
+        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+
         guard let card = card else {
+            Analytics.trackCartPressedPlaceOrder(cart: cart, result: .needsCreditCard)
             presentNeedsPrimaryCardAlert()
             return
         }
         
         guard let shippingAddress = shippingAddress else {
+            Analytics.trackCartPressedPlaceOrder(cart: cart, result: .needsShippingAddress)
             presentNeedsPrimaryShippingAddressAlert()
             return
         }
@@ -289,9 +293,13 @@ extension CheckoutOrderViewControllerOrder {
         let selectedCardURL = DataModel.sharedInstance.selectedCardURL
         
         if let cvvMap = cvvMap, cvvMap.url == selectedCardURL {
+            Analytics.trackCartPressedPlaceOrder(cart: cart, result: .continue)
+            
             performCheckout(with: card, cvv: cvvMap.cvv, shippingAddress: shippingAddress, orderButton: _view.orderButton)
         }
         else {
+            Analytics.trackCartPressedPlaceOrder(cart: cart, result: .needsCvv)
+
             let confirmPaymentViewController = CheckoutConfirmPaymentViewController()
             confirmPaymentViewController.orderButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
             confirmPaymentViewController.cancelButton.addTarget(self, action: #selector(confirmCancelAction), for: .touchUpInside)
@@ -301,23 +309,29 @@ extension CheckoutOrderViewControllerOrder {
     }
     
     @objc fileprivate func confirmOrderAction() {
+        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+        
         guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
+            Analytics.trackCartPressedConfirmOrder(cart: cart, result: .needsCvv)
             confirmPaymentViewController?.displayCVVError()
+            
             return
         }
         
         guard let card = card else {
+            Analytics.trackCartPressedConfirmOrder(cart: cart, result: .needsCreditCard)
             dismissConfirmPaymentViewController()
             presentNeedsPrimaryCardAlert()
             return
         }
         
         guard let shippingAddress = shippingAddress else {
+            Analytics.trackCartPressedConfirmOrder(cart: cart, result: .needsShippingAddress)
             dismissConfirmPaymentViewController()
             presentNeedsPrimaryShippingAddressAlert()
             return
         }
-        
+        Analytics.trackCartPressedConfirmOrder(cart: cart, result: .continue)
         performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
     }
     
@@ -327,8 +341,8 @@ extension CheckoutOrderViewControllerOrder {
         }
         
         dismissConfirmPaymentViewController()
-        
-        // TODO: analytics
+        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+        Analytics.trackCartCvvCanceled(cart: cart)
     }
     
     private func performCheckout(with card: Card, cvv: String, shippingAddress: ShippingAddress, orderButton: MainButton?) {
