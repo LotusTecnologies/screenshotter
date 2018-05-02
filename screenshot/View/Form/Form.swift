@@ -108,7 +108,16 @@ class FormRow: NSObject {
             return true
         }
         
-        guard let value = value ?? placeholder, !value.isEmpty, let validRegex = validRegex else {
+        var _value: String?
+        
+        if let value = value, !value.isEmpty {
+            _value = value
+        }
+        else if let placeholder = placeholder, !placeholder.isEmpty {
+            _value = placeholder
+        }
+        
+        guard let value = _value, !value.isEmpty, let validRegex = validRegex else {
             return false
         }
         
