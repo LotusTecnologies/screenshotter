@@ -143,7 +143,7 @@ fileprivate extension ProductViewControllerProductView {
     
     @objc func cartButtonAction() {
         var errorItems: [SegmentedDropDownItem] = []
-        
+
         productView.selectionControl.items.forEach { item in
             if item.selectedPickerItem == nil {
                 errorItems.append(item)
@@ -154,6 +154,7 @@ fileprivate extension ProductViewControllerProductView {
             guard let variant = selectedVariant() else {
                 return
             }
+            
             
             let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
             

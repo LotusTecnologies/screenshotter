@@ -102,6 +102,12 @@ class FavoriteProductsViewController : BaseViewController {
             }
             
             button.isLoading = true
+            let hasPriceAlerts =  product.hasPriceAlerts
+            if hasPriceAlerts {
+                Analytics.trackProductPriceAlertUnsubscribed(product: product)
+            }else{
+                Analytics.trackProductPriceAlertSubscribed(product: product)
+            }
             
             (product.hasPriceAlerts ? product.untrack() : product.track())
                 .then { [weak button] isTracking -> Void in
@@ -110,6 +116,14 @@ class FavoriteProductsViewController : BaseViewController {
                     
                 }.catch { [weak button] error in
                     button?.isLoading = false
+                    let e = error as NSError
+                    if hasPriceAlerts {
+                        Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                    }else{
+                        Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                        
+                    }
+                    
             }
         }
         else {

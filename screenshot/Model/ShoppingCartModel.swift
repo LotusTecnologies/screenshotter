@@ -53,12 +53,14 @@ class ShoppingCartModel {
                 return
             }
             let cartItem: CartItem
+            var wasCreated = false
             if let sku = variantToCopy.sku,
                 !sku.isEmpty,
                 let items = cart.items as? Set<CartItem>,
                 let item = items.first(where: { $0.sku == sku }) {
                 cartItem = item
             } else {
+                wasCreated = true
                 cartItem = CartItem(context: managedObjectContext)
             }
             let oldColor = cartItem.color
@@ -82,6 +84,9 @@ class ShoppingCartModel {
             }
             if oldQuantity != quantity {
                 Analytics.trackProductQuantityChanged(cartItem: cartItem, from: Int(oldQuantity))
+            }
+            if wasCreated {
+                Analytics.trackProductAddedToCart(cartItem: cartItem)
             }
             managedObjectContext.saveIfNeeded()
         }
