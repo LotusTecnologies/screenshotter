@@ -104,6 +104,21 @@ class FormExpirationPickerTableViewCell: FormSelectionPickerTableViewCell {
         DateComponent.month: [Int](1...12),
         DateComponent.year: [Int](currentYear...(currentYear + 20))
     ]
+    
+    fileprivate override func defaultValue(forComponent component: Int) -> String? {
+        if let date = FormRow.Expiration.date(for: defaultValue) {
+            if component == DateComponent.month.rawValue {
+                // Get the formatted month string
+                let monthOnlyDate = FormRow.Expiration.Date(month: date.month, year: 0)
+                return FormRow.Expiration.value(for: monthOnlyDate)
+            }
+            else {
+                return "\(date.year)"
+            }
+        }
+        
+        return nil
+    }
 }
 
 class FormNumberTableViewCell: FormTextTableViewCell {
@@ -212,6 +227,9 @@ class FormSelectionPickerTableViewCell: TableViewCell, FormErrorTableViewCellPro
         }
     }
     
+    var defaultValue: String?
+    private var didSelectDefaultRow = false
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -262,6 +280,11 @@ class FormSelectionPickerTableViewCell: TableViewCell, FormErrorTableViewCellPro
         pickerView.delegate = nil
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        selectDefaultRow()
+    }
+    
     @objc fileprivate func tapGestureAction(_ tapGesture: UITapGestureRecognizer) {
         let location = tapGesture.location(in: pickerView)
         
@@ -283,10 +306,39 @@ class FormSelectionPickerTableViewCell: TableViewCell, FormErrorTableViewCellPro
                 if indexPath.row == 0 {
                     let component = Int(floor(location.x / (pickerView.bounds.size.width / CGFloat(pickerView.numberOfComponents))))
                     
-                    pickerView.delegate?.pickerView!(pickerView, didSelectRow: indexPath.row, inComponent: component)
+                    pickerView.delegate?.pickerView?(pickerView, didSelectRow: indexPath.row, inComponent: component)
                 }
             }
         }
+    }
+    
+    // MARK: Selection
+    
+    fileprivate func selectDefaultRow() {
+        guard !didSelectDefaultRow, let pickerViewDelegate = pickerView.delegate else {
+            return
+        }
+        
+        for component in 0..<pickerView.numberOfComponents {
+            guard let componentValue = defaultValue(forComponent: component) else {
+                continue
+            }
+            
+            for row in 0..<pickerView.numberOfRows(inComponent: component) {
+                didSelectDefaultRow = true
+                
+                let title = pickerViewDelegate.pickerView?(pickerView, titleForRow: row, forComponent: component)
+                
+                if title == componentValue {
+                    pickerView.selectRow(row, inComponent: component, animated: false)
+                    break
+                }
+            }
+        }
+    }
+    
+    fileprivate func defaultValue(forComponent component: Int) -> String? {
+        return defaultValue
     }
     
     // MARK: Gesture Recognizer

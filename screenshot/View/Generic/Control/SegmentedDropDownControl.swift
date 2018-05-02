@@ -442,7 +442,7 @@ fileprivate class DropDownControl : UIControl {
         var row = 0
         
         for i in 0 ..< dataSource.pickerView(pickerView, numberOfRowsInComponent: 0) {
-            let title = delegate.pickerView!(pickerView, titleForRow: i, forComponent: 0) ?? ""
+            let title = delegate.pickerView?(pickerView, titleForRow: i, forComponent: 0) ?? ""
             
             if !title.isEmpty && title == titleLabel.text {
                 row = i

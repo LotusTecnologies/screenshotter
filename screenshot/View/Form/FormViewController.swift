@@ -292,6 +292,14 @@ extension FormViewController: UITableViewDataSource {
         else if let cell = cell as? FormSelectionTableViewCell {
             cell.detailTextLabel?.text = formRow.value
         }
+        else if let cell = cell as? FormSelectionPickerTableViewCell {
+            if let formRow = formRow as? FormRow.SelectionPicker {
+                cell.defaultValue = formRow.attachedRow.value
+            }
+            else if let formRow = formRow as? FormRow.ExpirationPicker {
+                cell.defaultValue = formRow.attachedRow.value
+            }
+        }
         else if let cell = cell as? FormTextTableViewCell {
             cell.textField.text = formRow.value
             cell.textField.placeholder = formRow.placeholder

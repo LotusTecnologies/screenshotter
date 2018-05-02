@@ -102,7 +102,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         state.condition = FormCondition(displayWhen: country, hasValue: "United States")
         state.isVisible = false
         state.title = "form.address.state".localized
-        state.value = { // TODO: value should auto select the correct picker index
+        state.value = {
             var value: String?
             
             if let stateCode = card?.state {
