@@ -20,7 +20,6 @@ class GiftCardCampaignViewController: UIViewController {
     let campaign = CampaignDescription(
         headline: "2018_05_01_campaign.headline".localized,
         message: "2018_05_01_campaign.message".localized,
-        messageDetail: "2018_05_01_campaign.message.detail".localized,
         buttonText: "2018_05_01_campaign.button".localized,
         skipText: "2018_05_01_campaign.skip".localized)
     
@@ -33,16 +32,14 @@ class GiftCardCampaignViewController: UIViewController {
                 return ElementSizes(
                     headlineFontSize: 20,
                     messageFontSize: 15,
-                    messageDetailFontSize: 15,
-                    skipTextFontSize: 14,
+                    skipTextFontSize: 12,
                     aboveSkipPad: 10,
                     belowSkipPad: 20)
             }else{
                 return ElementSizes(
                     headlineFontSize: 30,
                     messageFontSize: 23,
-                    messageDetailFontSize: 23,
-                    skipTextFontSize: 20,
+                    skipTextFontSize: 15,
                     aboveSkipPad: 30,
                     belowSkipPad: 60)
             }
@@ -64,12 +61,13 @@ class GiftCardCampaignViewController: UIViewController {
         backgroundLine.backgroundColor = .gray9
         
         let giftCardImage = UIImageView.init(image: UIImage.init(named: "giftCard25USD"))
+        giftCardImage.contentMode = .scaleAspectFit
         
         let headline = UILabel.init()
         headline.text = self.campaign.headline
         headline.textAlignment = .center
         headline.textColor = .gray4
-        headline.font = UIFont.screenshopFont(.hindBold, size: sizes.headlineFontSize)
+        headline.font = UIFont.screenshopFont(.hindMedium, size: sizes.headlineFontSize)
         headline.numberOfLines = 0
         
         
@@ -77,20 +75,12 @@ class GiftCardCampaignViewController: UIViewController {
         message.text = self.campaign.message
         message.textAlignment = .center
         message.textColor = .gray4
-        message.font = UIFont.screenshopFont(.hindBold, size: sizes.messageFontSize)
+        message.font = UIFont.screenshopFont(.hindMedium, size: sizes.messageFontSize)
         message.minimumScaleFactor = 0.1
         message.numberOfLines = 0
         
         let separatorLine = UIView()
         separatorLine.backgroundColor = .gray9
-        
-        let messageDetail = UILabel.init()
-        messageDetail.text = self.campaign.messageDetail
-        messageDetail.textAlignment = .center
-        messageDetail.textColor = .gray6
-        messageDetail.font = UIFont.screenshopFont(.hindBold, size: sizes.messageDetailFontSize)
-        messageDetail.minimumScaleFactor = 0.1
-        messageDetail.numberOfLines = 0
         
         
         
@@ -123,11 +113,10 @@ class GiftCardCampaignViewController: UIViewController {
                      "skip":skip,
                      "button":button,
                      "message":message,
-                     "messageDetail":messageDetail,
                      "separatorLine":separatorLine]
         
         //everything is centeredX (don't use dictionary - order is important)
-        [topLine, topBackground, backgroundLine, bottomBackground, headline, giftCardImage, skip, button, message, messageDetail, separatorLine].forEach {
+        [topLine, topBackground, backgroundLine, bottomBackground, headline, giftCardImage, skip, button, message, separatorLine].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             container.addSubview($0)
             $0.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
@@ -139,7 +128,7 @@ class GiftCardCampaignViewController: UIViewController {
         }
         
         // objects that respect margin:
-        [ headline, skip, message, messageDetail].forEach {
+        [ headline, skip, message].forEach {
             let padding:CGFloat = 30
             $0.widthAnchor.constraint(equalTo: container.widthAnchor, constant: -2*padding).isActive = true
         }
@@ -154,7 +143,13 @@ class GiftCardCampaignViewController: UIViewController {
         
         
         //forground V layout:
-        container.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[giftCardImage][message][separatorLine(2)][messageDetail(==message)][button]-aboveSkipPad-[skip]-belowSkipPad-|", options: [], metrics: ["aboveSkipPad":sizes.aboveSkipPad, "belowSkipPad":sizes.belowSkipPad], views: views))
+//        container.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[giftCardImage][message][separatorLine(2)][button]-aboveSkipPad-[skip]-belowSkipPad-|", options: [], metrics: ["aboveSkipPad":sizes.aboveSkipPad, "belowSkipPad":sizes.belowSkipPad], views: views))
+        
+        message.topAnchor.constraint(equalTo: giftCardImage.bottomAnchor, constant: .padding).isActive = true
+        
+        button.topAnchor.constraint(equalTo: message.bottomAnchor, constant: .extendedPadding).isActive = true
+        
+        skip.topAnchor.constraint(equalTo: button.bottomAnchor, constant: .padding).isActive = true
 
         let guide = UIView()
         guide.translatesAutoresizingMaskIntoConstraints = false
@@ -168,6 +163,16 @@ class GiftCardCampaignViewController: UIViewController {
         
         giftCardImage.topAnchor.constraint(equalTo: backgroundLine.topAnchor, constant: -40).isActive = true
         
+        let gotchaLabel = UILabel()
+        gotchaLabel.translatesAutoresizingMaskIntoConstraints = false
+        gotchaLabel.text = "2018_05_01_campaign.star".localized
+        gotchaLabel.textAlignment = .center
+        gotchaLabel.font = .screenshopFont(.hindLight, size: 14)
+        container.addSubview(gotchaLabel)
+        gotchaLabel.topAnchor.constraint(greaterThanOrEqualTo: skip.bottomAnchor, constant: .padding).isActive = true
+        gotchaLabel.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
+        gotchaLabel.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -.padding).isActive = true
+        gotchaLabel.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
     }
     
 
@@ -181,7 +186,6 @@ class GiftCardCampaignViewController: UIViewController {
     struct CampaignDescription {
         var headline:String
         var message:String
-        var messageDetail:String
         var buttonText:String
         var skipText:String
     }
@@ -189,7 +193,6 @@ class GiftCardCampaignViewController: UIViewController {
     struct ElementSizes {
         var headlineFontSize:CGFloat
         var messageFontSize:CGFloat
-        var messageDetailFontSize:CGFloat
         var skipTextFontSize:CGFloat
         var aboveSkipPad:CGFloat
         var belowSkipPad:CGFloat

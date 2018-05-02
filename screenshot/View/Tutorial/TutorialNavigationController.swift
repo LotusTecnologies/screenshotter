@@ -76,6 +76,10 @@ extension TutorialNavigationController: GiftCardCampaignViewControllerDelegate {
         viewController.title = "2018_05_01_campaign.payment".localized
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
+        
+        let alertConroller = UIAlertController(title: "2018_05_01_campaign.alert.title".localized, message: "2018_05_01_campaign.alert.message".localized, preferredStyle: .alert)
+        alertConroller.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        viewController.present(alertConroller, animated: true, completion: nil)
     }
 }
 extension TutorialNavigationController: CheckoutFormViewControllerDelegate {

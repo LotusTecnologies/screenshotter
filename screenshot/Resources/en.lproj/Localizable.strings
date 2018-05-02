@@ -28,15 +28,16 @@
 
 // May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
 "2018_05_01_campaign.headline" = "Thanks for joining Screenshop!";
-"2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase";
-"2018_05_01_campaign.message.detail" = "Confirm your payment method to redeem";
+"2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase*";
 "2018_05_01_campaign.button" = "Let’s Go!";
 "2018_05_01_campaign.skip" = "No thanks, I don’t like free things";
 "2018_05_01_campaign.done.headline" = "You Got It!";
 "2018_05_01_campaign.done.message" = "You will receive a $25 gift card when you make your first purchase.";
 "2018_05_01_campaign.done.button" = "Awesome!";
 "2018_05_01_campaign.payment" = "Payment";
-
+"2018_05_01_campaign.star" = "*Applicable for purchases of $50 or more";
+"2018_05_01_campaign.alert.message" = "Enter your credit card information and you’ll receive your gift card after you make your first purchase. ";
+"2018_05_01_campaign.alert.title" = "Almost There!";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
