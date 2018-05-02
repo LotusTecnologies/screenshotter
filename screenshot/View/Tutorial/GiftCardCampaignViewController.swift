@@ -104,6 +104,7 @@ class GiftCardCampaignViewController: UIViewController {
             [NSAttributedStringKey.underlineStyle : NSUnderlineStyle.styleSingle.rawValue,
              NSAttributedStringKey.underlineColor : UIColor.gray4,
              NSAttributedStringKey.foregroundColor: UIColor.gray4])
+        skip.contentEdgeInsets = UIEdgeInsets(top: 5, left: .padding, bottom: 5, right: .padding)
         skip.titleLabel?.font = UIFont.screenshopFont(.hind, size: sizes.skipTextFontSize)
         skip.setAttributedTitle(underlineString, for: .normal)
         skip.addTarget(self, action: #selector(skipAction(_:)), for: .touchUpInside)
