@@ -218,6 +218,15 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         requiredSpacing.isActive = true
         
     }
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if let player = self.player {
+            if player.playbackState != .paused {
+                self.player?.pause()
+                self.flashPauseOverlay()
+            }
+        }
+    }
     
     @objc func tappedLearnMoreButton() {
         if let player = self.player {
