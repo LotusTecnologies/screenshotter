@@ -26,25 +26,25 @@ class CheckoutListViewController: BaseViewController {
         super.viewDidLoad()
         
         tableView.separatorInset = .zero
-//        
-//        addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-//        addButton.imageView?.contentMode = .scaleAspectFit
-//        addButton.setTitleColor(.gray3, for: .normal)
-//        addButton.setTitleColor(.black, for: .highlighted)
-//        addButton.adjustInsetsForImage(withPadding: 6)
-//        addButton.sizeToFit()
-//        tableView.tableFooterView = addButton
-//        
-//        let topBorder = BorderView(edge: .top)
-//        let bottomBorder = BorderView(edge: .bottom)
-//        
-//        if let separatorColor = tableView.separatorColor {
-//            topBorder.backgroundColor = separatorColor
-//            bottomBorder.backgroundColor = separatorColor
-//        }
-//        
-//        addButton.addSubview(topBorder)
-//        addButton.addSubview(bottomBorder)
+        
+        addButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        addButton.imageView?.contentMode = .scaleAspectFit
+        addButton.setTitleColor(.gray3, for: .normal)
+        addButton.setTitleColor(.black, for: .highlighted)
+        addButton.adjustInsetsForImage(withPadding: 6)
+        addButton.sizeToFit()
+        tableView.tableFooterView = addButton
+        
+        let topBorder = BorderView(edge: .top)
+        let bottomBorder = BorderView(edge: .bottom)
+        
+        if let separatorColor = tableView.separatorColor {
+            topBorder.backgroundColor = separatorColor
+            bottomBorder.backgroundColor = separatorColor
+        }
+        
+        addButton.addSubview(topBorder)
+        addButton.addSubview(bottomBorder)
     }
     
     override func viewWillAppear(_ animated: Bool) {

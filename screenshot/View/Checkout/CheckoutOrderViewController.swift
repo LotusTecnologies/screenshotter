@@ -406,6 +406,7 @@ extension CheckoutOrderViewControllerOrder {
     }
     
     private func confirmPaymentErrorMessage(_ errorKeys: [String]) -> String {
+        // TODO: need correct copy and keys to map out
         var message = "Please fix these issues.\n\n"
         
         for errorKey in errorKeys {
