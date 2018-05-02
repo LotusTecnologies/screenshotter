@@ -38,18 +38,20 @@ public class HelperView : UIView {
         scrollView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
+        let isScrollEnabled = isScrollable()
+        
         let scrollContentView = UIView()
         scrollContentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(scrollContentView)
         scrollContentViewTopConstraint = scrollContentView.topAnchor.constraint(equalTo: scrollView.topAnchor)
-        scrollContentViewTopConstraint.isActive = true
+        scrollContentViewTopConstraint.isActive = isScrollEnabled
         scrollContentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         scrollContentViewBottomConstraint = scrollContentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
-        scrollContentViewBottomConstraint.isActive = true
+        scrollContentViewBottomConstraint.isActive = isScrollEnabled
         scrollContentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         scrollContentView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor).isActive = true
         scrollContentViewMaxHeightConstraint = scrollContentView.heightAnchor.constraint(equalTo: layoutMarginsGuide.heightAnchor)
-        scrollContentViewMaxHeightConstraint.isActive = !isScrollable()
+        scrollContentViewMaxHeightConstraint.isActive = !isScrollEnabled
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
@@ -132,9 +134,15 @@ public class HelperView : UIView {
     }
     
     @objc func contentSizeCategoryDidChange(_ notification: Notification) {
-        if let userInfo = notification.userInfo, let contentSizeCategoryString = userInfo[UIContentSizeCategoryNewValueKey] as? String {
+        if let userInfo = notification.userInfo,
+            let contentSizeCategoryString = userInfo[UIContentSizeCategoryNewValueKey] as? String
+        {
             let contentSizeCategory = UIContentSizeCategory(rawValue: contentSizeCategoryString)
-            scrollContentViewMaxHeightConstraint.isActive = !isScrollable(contentSizeCategory: contentSizeCategory)
+            let isScrollEnabled = isScrollable(contentSizeCategory: contentSizeCategory)
+            
+            scrollContentViewMaxHeightConstraint.isActive = !isScrollEnabled
+            scrollContentViewTopConstraint.isActive = isScrollEnabled
+            scrollContentViewBottomConstraint.isActive = isScrollEnabled
         }
     }
     

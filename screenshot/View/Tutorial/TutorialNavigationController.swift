@@ -36,43 +36,8 @@ class TutorialNavigationController : UINavigationController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
-    // MARK: - Slides
-    
-    private func slideLayoutMargins(_ slide: UIViewController) -> UIEdgeInsets {
-        var extraTop = CGFloat(0)
-        var extraBottom = CGFloat(0)
-        
-        if !UIApplication.shared.preferredContentSizeCategory.isAccessibilityCategory {
-            if UIDevice.is812h || UIDevice.is736h {
-                extraTop = .extendedPadding
-                extraBottom = .extendedPadding
-                
-            } else if UIDevice.is667h {
-                extraTop = .padding
-                extraBottom = .padding
-            }
-        }
-        
-        var paddingX: CGFloat = .padding
-        
-        if slide.isKind(of: TutorialTrySlideViewController.self) {
-            // TODO: when supporting localization, this should be if isEnglish
-            // Only customize insets for default font size
-            if UIApplication.shared.preferredContentSizeCategory == UIContentSizeCategory.large {
-                if UIDevice.is375w {
-                    paddingX = 30
-                    
-                } else if UIDevice.is414w {
-                    paddingX = 45
-                }
-            }
-        }
-        
-        return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
-    }
 }
+
 extension TutorialNavigationController : UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool){
         if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
