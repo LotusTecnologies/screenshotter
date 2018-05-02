@@ -116,6 +116,7 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
 extension TutorialViewController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
         Analytics.trackOnboardingCampainCreditCardEnteredCard()
+        Analytics.trackCartCreditCardAdded(cart: nil, source: .onboarding)
         let viewController = GiftCardDoneViewController()
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)

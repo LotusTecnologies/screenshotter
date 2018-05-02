@@ -270,10 +270,13 @@ fileprivate extension CartViewControllerCartItem {
         let position: CGPoint = button.convert(.zero, to: tableView)
         
         if let indexPath = tableView.indexPathForRow(at: position) {
+            let cartItem = cartItemFrc?.object(at: indexPath)
+            Analytics.trackProductRemovedFromCart(cartItem: cartItem)
+
             tableView(removeCellForRowAt: indexPath)
         }
         
-        // TODO: analytic event for did tap remove
+        
     }
 }
 

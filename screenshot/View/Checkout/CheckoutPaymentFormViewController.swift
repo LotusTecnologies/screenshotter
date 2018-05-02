@@ -203,15 +203,23 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         func performAction(withSavingCard saveCard: Bool) {
             DataModel.sharedInstance.selectedCardURL = nil
-            
             DataModel.sharedInstance.saveCard(fullName: cardName, number: cardNumber, displayNumber: secureNumber, brand: brand.rawValue, expirationMonth: Int16(cardExpDate.month), expirationYear: Int16(cardExpDate.year), street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, email: email, phone: phone, isSaved: saveCard)
                 .then { card -> Void in
-                    DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
-                    
-                    self.delegate?.checkoutFormViewControllerDidAdd(self)
+                    DispatchQueue.main.async {
+                        
+                        DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
+                        
+                        self.delegate?.checkoutFormViewControllerDidAdd(self)
+                    }
             }
             
             if isShipToSameAddressChecked || self.autoSaveBillAddressAsShippingAddress {
+                let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                if self.autoSaveBillAddressAsShippingAddress {
+                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding)
+                }else{
+                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling)
+                }
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
                         DataModel.sharedInstance.selectedShippingAddressURL = shippingAddress.objectID.uriRepresentation()
