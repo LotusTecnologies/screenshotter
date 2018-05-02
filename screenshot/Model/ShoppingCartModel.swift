@@ -212,12 +212,21 @@ class ShoppingCartModel {
                                 }
                             }
                         }
-                        // Save the unavailables.
+                        // For the unavailables.
                         errorDict.keys.forEach { sku in
-                            if let cartItem = cartItems.first(where:{ $0.sku == sku }),
-                                let errorMask = errorDict[sku],
-                                cartItem.errorMask != errorMask.rawValue {
-                                cartItem.errorMask = errorMask.rawValue
+                            if let cartItem = cartItems.first(where:{ $0.sku == sku }) {
+                                // Mark the CartItem as unavailable.
+                                if let errorMask = errorDict[sku],
+                                  cartItem.errorMask != errorMask.rawValue {
+                                    cartItem.errorMask = errorMask.rawValue
+                                }
+                                // Force next populateVariants to refresh.
+                                if let rootProduct = cartItem.product,
+                                  rootProduct.hasVariants,
+                                  let variants = rootProduct.availableVariants as? Set<Variant> {
+                                    variants.forEach {managedObjectContext.delete($0)}
+                                    rootProduct.hasVariants = false
+                                }
                             }
                         }
                         // Save subtotal and shippingTotal to Cart object.
