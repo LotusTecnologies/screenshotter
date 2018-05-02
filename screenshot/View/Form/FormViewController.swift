@@ -47,11 +47,17 @@ class FormViewController: BaseViewController {
             let endIndex = section.rows?.endIndex ?? 0
             
             for index in startIndex..<endIndex {
-                if let selectionRow = section.rows?[index] as? FormRow.Selection {
+                guard let formRow = section.rows?[index] else {
+                    continue
+                }
+                
+                FormViewController.syncConditionedFormRow(formRow)
+                
+                if let selectionRow = formRow as? FormRow.Selection {
                     let selectionPickerRow = FormRow.SelectionPicker(with: selectionRow)
                     section.rows?.insert(selectionPickerRow, at: index + 1)
                 }
-                else if let expirationRow = section.rows?[index] as? FormRow.Expiration {
+                else if let expirationRow = formRow as? FormRow.Expiration {
                     let expirationPickerRow = FormRow.ExpirationPicker(with: expirationRow)
                     section.rows?.insert(expirationPickerRow, at: index + 1)
                 }
@@ -95,6 +101,23 @@ class FormViewController: BaseViewController {
         NotificationCenter.default.removeObserver(self)
         tableView.dataSource = nil
         tableView.delegate = nil
+    }
+    
+    // MARK: Form Row
+    
+    static fileprivate func syncConditionedFormRow(_ formRow: FormRow, callback: ((_ linkCondition: FormLinkedCondition, _ willBeVisible: Bool) -> ())? = nil) {
+        if !formRow.linkedConditions.isEmpty {
+            formRow.linkedConditions.forEach({ linkCondition in
+                let isVisible = linkCondition.formRow.isVisible
+                let willBeVisible = linkCondition.value == formRow.value
+                
+                if isVisible != willBeVisible {
+                    linkCondition.formRow.isVisible = willBeVisible
+                    
+                    callback?(linkCondition, willBeVisible)
+                }
+            })
+        }
     }
     
     // MARK: Keyboard
@@ -219,22 +242,6 @@ extension FormViewController: UITableViewDataSource {
         return formSectionAt(section)?.title
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let formRow = formRowAt(indexPath)
-        
-        if formRow?.isVisible ?? true {
-            if formRow is FormRow.Picker {
-                return 200
-            }
-            else {
-                return tableView.rowHeight
-            }
-        }
-        else {
-            return 0
-        }
-    }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let formRow = formRowAt(indexPath) else {
             return UITableViewCell()
@@ -262,7 +269,6 @@ extension FormViewController: UITableViewDataSource {
         
         syncError(for: cell, at: indexPath)
         syncValues(for: cell, at: indexPath)
-        syncConditionedCell(at: indexPath)
         
         return cell
     }
@@ -297,19 +303,10 @@ extension FormViewController: UITableViewDataSource {
             return
         }
         
-        if !formRow.linkedConditions.isEmpty {
-            formRow.linkedConditions.forEach({ linkCondition in
-                let isVisible = linkCondition.formRow.isVisible
-                let willBeVisible = linkCondition.value == formRow.value
-                
-                if isVisible != willBeVisible {
-                    linkCondition.formRow.isVisible = willBeVisible
-                    
-                    if let aIndexPath = form.indexPath(for: linkCondition.formRow) {
-                        tableView.reloadRows(at: [aIndexPath], with: willBeVisible ? .bottom : .top)
-                    }
-                }
-            })
+        FormViewController.syncConditionedFormRow(formRow) { (linkCondition, willBeVisible) in
+            if let aIndexPath = self.form.indexPath(for: linkCondition.formRow) {
+                self.tableView.reloadRows(at: [aIndexPath], with: willBeVisible ? .bottom : .top)
+            }
         }
     }
     
@@ -326,6 +323,22 @@ extension FormViewController: UITableViewDataSource {
 }
 
 extension FormViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let formRow = formRowAt(indexPath)
+
+        if formRow?.isVisible ?? true {
+            if formRow is FormRow.Picker {
+                return 200
+            }
+            else {
+                return tableView.rowHeight
+            }
+        }
+        else {
+            return 0
+        }
+    }
+    
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? FormTextTableViewCell {
             if indexPath.isEmpty {
