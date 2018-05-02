@@ -10,6 +10,7 @@ import UIKit
 
 class CheckoutConfirmationViewController: BaseViewController {
     fileprivate let helperView = HelperView()
+    var email: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,7 +20,22 @@ class CheckoutConfirmationViewController: BaseViewController {
         
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.titleLabel.text = "checkout.confirmation.title".localized
-        helperView.subtitleLabel.text = "checkout.confirmation.detail".localized
+        helperView.subtitleLabel.attributedText = {
+            var message = "checkout.confirmation.detail".localized
+            
+            if let email = email, !email.isEmpty {
+                message += "\n" + "checkout.confirmation.email".localized(withFormat: email)
+            }
+            
+            let attributedString = NSMutableAttributedString(string: message)
+            
+            if let email = email {
+                let emailRange = NSString(string: message).range(of: email)
+                attributedString.addAttribute(.foregroundColor, value: UIColor.crazeGreen, range: emailRange)
+            }
+            
+            return attributedString
+        }()
         helperView.contentImage = UIImage(named: "CheckoutDeliveryBox")
         view.addSubview(helperView)
         helperView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: .extendedPadding).isActive = true

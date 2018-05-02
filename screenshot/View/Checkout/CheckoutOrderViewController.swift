@@ -352,7 +352,10 @@ extension CheckoutOrderViewControllerOrder {
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { someBool -> Void in
                 self.dismissConfirmPaymentViewController()
-                self.navigationController?.pushViewController(CheckoutConfirmationViewController(), animated: true)
+                
+                let confirmationViewController = CheckoutConfirmationViewController()
+                confirmationViewController.email = card.email
+                self.navigationController?.pushViewController(confirmationViewController, animated: true)
             }
             .catch { error in
                 if let error = error as NSError?,

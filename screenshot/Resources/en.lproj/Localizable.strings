@@ -65,7 +65,8 @@
 "checkout.card.expired" = "EXPIRED";
 "checkout.card.expires" = "EXPIRES %@";
 "checkout.card.temporary" = "This card will not be saved after purchase";
-"checkout.confirmation.detail" = "Thanks for shopping\nwith Screenshop!";
+"checkout.confirmation.detail" = "Thanks for shopping with us!";
+"checkout.confirmation.email" = "A confirmation email will be sent to %@";
 "checkout.confirmation.title" = "Order Placed";
 "checkout.confirm.payment.cvv" = "CVV";
 "checkout.confirm.payment.enter_cvv" = "Enter your CVV";
