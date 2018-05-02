@@ -184,6 +184,7 @@ class CartViewController: BaseViewController {
     // MARK: Empty List
     
     @objc fileprivate func emptyListAction() {
+        Analytics.trackCartEmptyPressedButton()
         MainTabBarController.resetViewControllerHierarchy(self, select: .discover)
     }
 }

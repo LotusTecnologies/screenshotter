@@ -30,6 +30,7 @@ extension ProductViewController {
         let dataModel = DataModel.sharedInstance
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
+            Analytics.trackProductPriceAlertOpened(product: product)
             let productViewController = ProductViewController(product: product)
             let navigationController = ModalNavigationController(rootViewController: productViewController)
             AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)

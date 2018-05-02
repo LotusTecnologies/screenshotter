@@ -102,7 +102,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         skipButton.titleLabel?.textAlignment = .center
         skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
         skipButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
-        skipButton.contentEdgeInsets = UIEdgeInsets(top: 5, left: .padding, bottom: 5, right: .padding)
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
         container.addSubview(skipButton)
         skipButton.setTitle("generic.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
@@ -220,10 +220,11 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     }
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
-        } catch let error as NSError {
-            Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
+        if let player = self.player {
+            if player.playbackState != .paused {
+                self.player?.pause()
+                self.flashPauseOverlay()
+            }
         }
     }
     

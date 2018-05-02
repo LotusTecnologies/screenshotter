@@ -560,7 +560,10 @@ extension AppDelegate {
                 }
             }
         }else{
-            
+            if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
+                let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
+                Analytics.trackProductPriceAlertRecieved(product: product)
+            }
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
@@ -611,6 +614,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 category == "PRICE_ALERT",
                 let partNumber = userInfo["partNumber"] as? String,
                 !partNumber.isEmpty {
+                
                 ProductViewController.present(with: partNumber)
             }
         }
