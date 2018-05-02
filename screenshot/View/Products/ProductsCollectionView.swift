@@ -16,7 +16,6 @@ class ProductsCollectionView: UICollectionView {
     }()
     
     var products: [Product]?
-    var analyticsOnPage: String?
     
     // MARK: Life Cycle
     
@@ -70,7 +69,6 @@ class ProductsCollectionView: UICollectionView {
         }
         
         let isFavorited = favoriteControl.isSelected
-        let onPage = analyticsOnPage ?? "Product"
         
         product.setFavorited(toFavorited: isFavorited)
         if isFavorited {

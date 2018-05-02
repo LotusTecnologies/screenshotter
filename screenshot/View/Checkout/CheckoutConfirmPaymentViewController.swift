@@ -132,6 +132,7 @@ class CheckoutConfirmPaymentViewController: UIViewController {
     }
     
     @objc fileprivate func presentCVVExplanation() {
+        Analytics.trackCartCvvWhatsThis()
         let webViewController = CheckoutWhatIsCVVWebViewController()
         let navigationController = ModalNavigationController(rootViewController: webViewController)
         navigationController.modalPresentationStyle = .custom // Very important for the presenting vc frame
