@@ -78,7 +78,7 @@ class ShoppingCartModel {
             cartItem.cart = cart
             
             if (oldColor == nil && cartItem.color != nil) || (oldSize == nil && cartItem.size != nil) || (oldColor != nil && cartItem.color != nil && oldColor! != cartItem.color!) || (oldSize != nil && cartItem.size != nil && oldSize! != cartItem.size!){
-                Analytics.trackProductVarientChanged(cartItem: cartItem, fromSize: oldSize, fromColor: oldColor)
+                Analytics.trackProductVariantChanged(cartItem: cartItem, fromSize: oldSize, fromColor: oldColor)
             }
             if oldQuantity != quantity {
                 Analytics.trackProductQuantityChanged(cartItem: cartItem, from: Int(oldQuantity))
