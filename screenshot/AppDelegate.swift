@@ -464,9 +464,9 @@ extension AppDelegate {
             }
         }
         else {
-            let tutorialViewController = TutorialViewController.init(nibName: nil, bundle: nil)
-            tutorialViewController.tutorialDelegate = self
-            viewController = tutorialViewController
+            let tutorialNavigationController = TutorialNavigationController.init(nibName: nil, bundle: nil)
+            tutorialNavigationController.tutorialDelegate = self
+            viewController = tutorialNavigationController
         }
         
         return viewController
@@ -483,8 +483,8 @@ extension AppDelegate {
 
 // MARK: - Tutorial
 
-extension AppDelegate : TutorialViewControllerDelegate {
-    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController) {
+extension AppDelegate : TutorialNavigationControllerDelegate {
+    func tutorialNavigationControllerDidComplete(_ viewController: TutorialNavigationController) {
         viewController.delegate = nil
         
         // Create a delay for a more natural feel after taking the screenshot

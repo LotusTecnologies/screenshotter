@@ -18,7 +18,7 @@
 		3125448620972013009410D5 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447B20972012009410D5 /* CampaignPromotionViewController.swift */; };
 		3125448720972013009410D5 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447C20972012009410D5 /* GiftCardDoneViewController.swift */; };
 		3125448820972013009410D5 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447D20972012009410D5 /* CampaignPromotionExplanationViewController.swift */; };
-		3125448920972013009410D5 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447E20972012009410D5 /* TutorialViewController.swift */; };
+		3125448920972013009410D5 /* TutorialNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447E20972012009410D5 /* TutorialNavigationController.swift */; };
 		3125448A20972013009410D5 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447F20972012009410D5 /* TutorialEmailSlideViewController.swift */; };
 		3125448B20972013009410D5 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448020972013009410D5 /* TutorialVideoViewController.swift */; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
@@ -249,7 +249,7 @@
 		3125447B20972012009410D5 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		3125447C20972012009410D5 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
 		3125447D20972012009410D5 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
-		3125447E20972012009410D5 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
+		3125447E20972012009410D5 /* TutorialNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialNavigationController.swift; sourceTree = "<group>"; };
 		3125447F20972012009410D5 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
 		3125448020972013009410D5 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
@@ -715,7 +715,7 @@
 				3125447820972011009410D5 /* TutorialTrySlideViewController.swift */,
 				3125447620972011009410D5 /* TutorialVideoOverlayView.swift */,
 				3125448020972013009410D5 /* TutorialVideoViewController.swift */,
-				3125447E20972012009410D5 /* TutorialViewController.swift */,
+				3125447E20972012009410D5 /* TutorialNavigationController.swift */,
 				3125447720972011009410D5 /* TutorialWelcomeSlideViewController.swift */,
 				3125447920972011009410D5 /* VideoDisplayingViewControllerDelegate.swift */,
 			);
@@ -1513,7 +1513,7 @@
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
 				C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */,
 				C54088591FE90E2200198955 /* MainButton.swift in Sources */,
-				3125448920972013009410D5 /* TutorialViewController.swift in Sources */,
+				3125448920972013009410D5 /* TutorialNavigationController.swift in Sources */,
 				C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */,

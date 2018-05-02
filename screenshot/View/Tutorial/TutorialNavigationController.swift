@@ -1,5 +1,5 @@
 //
-//  TutorialViewController.swift
+//  TutorialNavigationController.swift
 //  screenshot
 //
 //  Created by Corey Werner on 10/14/17.
@@ -8,12 +8,12 @@
 
 import UIKit
 
-@objc protocol TutorialViewControllerDelegate : class {
-    func tutorialViewControllerDidComplete(_ viewController: TutorialViewController)
+@objc protocol TutorialNavigationControllerDelegate : class {
+    func tutorialNavigationControllerDidComplete(_ viewController: TutorialNavigationController)
 }
 
-class TutorialViewController : UINavigationController {
-    weak var tutorialDelegate: TutorialViewControllerDelegate?
+class TutorialNavigationController : UINavigationController {
+    weak var tutorialDelegate: TutorialNavigationControllerDelegate?
     
    
     override func viewDidAppear(_ animated: Bool) {
@@ -73,7 +73,7 @@ class TutorialViewController : UINavigationController {
         return UIEdgeInsets(top: .padding + extraTop, left: paddingX, bottom: .padding + extraBottom, right: paddingX)
     }
 }
-extension TutorialViewController : UINavigationControllerDelegate {
+extension TutorialNavigationController : UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool){
         if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
             self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
@@ -89,7 +89,7 @@ extension TutorialViewController : UINavigationControllerDelegate {
 
 
 
-extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
+extension TutorialNavigationController: TutorialWelcomeSlideViewControllerDelegate {
     func tutorialWelcomeSlideViewControllerDidComplete(_ viewController:TutorialWelcomeSlideViewController) {
         Analytics.trackOnboardingWelcome()
         let viewController = GiftCardCampaignViewController()
@@ -97,7 +97,7 @@ extension TutorialViewController: TutorialWelcomeSlideViewControllerDelegate {
         self.pushViewController(viewController, animated: true)
     }
 }
-extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
+extension TutorialNavigationController: GiftCardCampaignViewControllerDelegate {
     func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
         Analytics.trackOnboardingCampainCreditCardSkip()
         let viewController = CampaignPromotionViewController(modal: false)
@@ -113,7 +113,7 @@ extension TutorialViewController: GiftCardCampaignViewControllerDelegate {
         self.pushViewController(viewController, animated: true)
     }
 }
-extension TutorialViewController: CheckoutFormViewControllerDelegate {
+extension TutorialNavigationController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
         Analytics.trackOnboardingCampainCreditCardEnteredCard()
         let viewController = GiftCardDoneViewController()
@@ -122,7 +122,7 @@ extension TutorialViewController: CheckoutFormViewControllerDelegate {
     }
 }
 
-extension TutorialViewController : GiftCardDoneViewControllerDelegate {
+extension TutorialNavigationController : GiftCardDoneViewControllerDelegate {
     func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
         Analytics.trackOnboardingCampainCreditCardDone()
         UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
@@ -132,7 +132,7 @@ extension TutorialViewController : GiftCardDoneViewControllerDelegate {
     }
 }
 
-extension TutorialViewController: CampaignPromotionViewControllerDelegate {
+extension TutorialNavigationController: CampaignPromotionViewControllerDelegate {
     func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
         Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
         let learnMore = CampaignPromotionExplanationViewController(modal:false)
@@ -148,7 +148,7 @@ extension TutorialViewController: CampaignPromotionViewControllerDelegate {
     }
 }
 
-extension TutorialViewController : CampaignPromotionExplanationViewControllerDelegate {
+extension TutorialNavigationController : CampaignPromotionExplanationViewControllerDelegate {
     func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
         Analytics.trackOnboardingCampaignTextDone(campaign: .campaign2018204)
         let signup = TutorialEmailSlideViewController()
@@ -163,7 +163,7 @@ extension TutorialViewController : CampaignPromotionExplanationViewControllerDel
 
 }
 
-extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
+extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate {
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController){
         let tryItOut = TutorialTrySlideViewController()
         tryItOut.delegate = self
@@ -185,7 +185,7 @@ extension TutorialViewController: TutorialEmailSlideViewControllerDelegate {
 
 }
 
-extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
+extension TutorialNavigationController : TutorialTrySlideViewControllerDelegate {
     func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
         Analytics.trackOnboardingTryItOutSkipped()
         tutorialTrySlideViewDidComplete(slideView)
@@ -199,7 +199,7 @@ extension TutorialViewController : TutorialTrySlideViewControllerDelegate {
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
         
-        self.tutorialDelegate?.tutorialViewControllerDidComplete(self)
+        self.tutorialDelegate?.tutorialNavigationControllerDidComplete(self)
     }
 }
 

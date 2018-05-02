@@ -37,6 +37,7 @@ class FormViewTableView: UITableView {
     }
     
     override func beginUpdates() {
+        // Prevent unwanted scrolling from picker views opening and closing.
         contentOffsetCalledCount = 0
         var previousContentOffsetCalledCount = 0
         
