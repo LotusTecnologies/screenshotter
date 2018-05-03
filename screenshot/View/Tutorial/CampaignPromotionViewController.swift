@@ -27,8 +27,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             buttonText: "2018_04_20_campaign.button".localized,
             videoName: "campaign_video_2018_04_20",
             thumbName: "campaign_thumb_2018_04_20.jpg",
-            videoRatio: 1280.0 / 720.0,
-            userDefaultsKey: UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue)
+            videoRatio: 1280.0 / 720.0)
     
     var showsReplayButtonUponFinishing: Bool = true
     var willPresentInModal:Bool = false
@@ -246,7 +245,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     
     func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
         self.dismiss(animated: false, completion: nil)
-        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
         
     }
@@ -259,7 +257,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     
     @objc func tappedSecondaryButton() {
         
-        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
         self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
     }
     
@@ -358,6 +355,5 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         var videoName:String
         var thumbName:String
         var videoRatio:CGFloat
-        var userDefaultsKey:String
     }
 }

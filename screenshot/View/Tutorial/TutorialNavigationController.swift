@@ -65,6 +65,7 @@ extension TutorialNavigationController: TutorialWelcomeSlideViewControllerDelega
 extension TutorialNavigationController: GiftCardCampaignViewControllerDelegate {
     func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
         Analytics.trackOnboardingCampainCreditCardSkip()
+        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
         let viewController = CampaignPromotionViewController(modal: false)
         viewController.delegate = self
         self.pushViewController(viewController, animated: true)
