@@ -268,17 +268,17 @@ class ShoppingCartModel {
         }
     }
     
-    func hostedCompleted(remoteId: String, from: String, cardOID: NSManagedObjectID? = nil) {
+    func checkoutCompleted(remoteId: String, cardOID: NSManagedObjectID, orderNumber: String) {
         let dataModel = DataModel.sharedInstance
         dataModel.performBackgroundTask { managedObjectContext in
             if let cart = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
+                cart.orderNumber = orderNumber
                 cart.isPastOrder = true
                 let now = Date()
                 cart.dateSubmitted = now
                 // Write to items without changing anything, so the cartItemFrc is updated.
                 (cart.items?.sortedArray(using: []) as? [CartItem])?.forEach { $0.errorMask = $0.errorMask }
-                if let cardOID = cardOID,
-                  let card = managedObjectContext.object(with: cardOID) as? Card {
+                if let card = managedObjectContext.object(with: cardOID) as? Card {
                     if card.isSaved {
                         card.dateLastSuccessfulUse = now
                     } else {
@@ -287,7 +287,7 @@ class ShoppingCartModel {
                 }
                 managedObjectContext.saveIfNeeded()
             } else {
-                print("hostedCompleted failed to retrieve cart")
+                print("checkoutCompleted failed to retrieve cart")
             }
         }
     }
@@ -305,18 +305,12 @@ class ShoppingCartModel {
                 rememberRemoteId = remoteId
                 return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, cvv: cvv, shippingAddress: shippingAddress)
             }
-            //
+            // Extract values from response and save to DB.
             .then { nativeCheckoutResponseDict -> Promise<String> in
-                self.hostedCompleted(remoteId: rememberRemoteId, from: "nativeCheckout", cardOID: cardOID)
-                var orderNumbersSet:Set<String> = []
-                nativeCheckoutResponseDict.forEach({ (dict) in
-                    if let n = dict["number"] as? String{
-                        orderNumbersSet.insert(n)
-                    }
-                })
-                let orderNumber = orderNumbersSet.joined(separator: "|")
-                
-                return Promise.init(value: orderNumber)
+                let orderNumbersSet = Set<String>(nativeCheckoutResponseDict.compactMap { $0["number"] as? String })
+                let orderNumber = orderNumbersSet.joined(separator: ",")
+                self.checkoutCompleted(remoteId: rememberRemoteId, cardOID: cardOID, orderNumber: orderNumber)
+                return Promise(value: orderNumber)
         }
     }
     

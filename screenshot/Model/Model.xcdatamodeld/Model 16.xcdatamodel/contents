@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17E199" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17E202" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Address" representedClassName="Address" isAbstract="YES" syncable="YES" codeGenerationType="class">
         <attribute name="city" attributeType="String" syncable="YES"/>
         <attribute name="country" attributeType="String" syncable="YES"/>
@@ -24,6 +24,7 @@
         <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dateSubmitted" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isPastOrder" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="orderNumber" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="remoteId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shippingTotal" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="subtotal" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -150,7 +151,7 @@
     <elements>
         <element name="Address" positionX="522" positionY="225" width="128" height="165"/>
         <element name="Card" positionX="718" positionY="173" width="128" height="165"/>
-        <element name="Cart" positionX="297" positionY="423" width="128" height="150"/>
+        <element name="Cart" positionX="297" positionY="423" width="128" height="165"/>
         <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="135"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="525"/>
