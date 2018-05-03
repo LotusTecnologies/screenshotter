@@ -68,6 +68,9 @@
 "checkout.card.temporary" = "This card will not be saved after purchase";
 "checkout.confirmation.detail" = "Thanks for shopping with us!";
 "checkout.confirmation.email" = "A confirmation email will be sent to %@";
+"checkout.confirmation.orderNumber" = "Save your order number:";
+"checkout.confirmation.orderNumber2" = "Order Number: %@";
+"checkout.confirmation.orderNumber.savedToClipBoard" = "Your order number has been copied to the clipboard";
 "checkout.confirmation.title" = "Order Placed";
 "checkout.confirm.payment.cvv" = "CVV";
 "checkout.confirm.payment.enter_cvv" = "Enter your CVV";
