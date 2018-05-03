@@ -54,6 +54,11 @@ class Analytics {
         if let uploadedImageURL = screenshot.uploadedImageURL {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
+        
+        properties["screenshot-source"] = screenshot.source.rawValue
+
+        
+
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
         
         return properties
@@ -147,6 +152,8 @@ class Analytics {
 
         if let shoppable = product.shoppable{
             propertiesFor(shoppable).forEach { properties[$0] = $1 }
+        }else if let screenshot = product.screenshot {
+            propertiesFor(screenshot).forEach { properties[$0] = $1 }
         }
         
         return properties
