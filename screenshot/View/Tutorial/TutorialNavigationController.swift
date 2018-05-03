@@ -96,7 +96,6 @@ extension TutorialNavigationController : GiftCardDoneViewControllerDelegate {
     func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
         let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
         Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
-        git 
         UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
         let viewController = CampaignPromotionViewController(modal: false)
         viewController.delegate = self
