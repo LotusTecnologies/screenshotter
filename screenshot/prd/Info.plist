@@ -23,6 +23,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>io.crazeapp.screenshot</string>
 				<string>fb1960379067541863</string>
 			</array>
 		</dict>
@@ -54,7 +55,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>123</string>
+	<string>136</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>

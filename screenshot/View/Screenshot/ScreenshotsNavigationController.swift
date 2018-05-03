@@ -76,7 +76,7 @@ extension ScreenshotsNavigationController {
         
         UserDefaults.standard.setValue(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
         
-        AnalyticsTrackers.standard.track(.openedPicker)
+        Analytics.trackOpenedPicker()
     }
     
     @objc func pickerViewControllerDidCancel() {
@@ -173,9 +173,9 @@ extension ScreenshotsNavigationController { //push permission
             PermissionsManager.shared.requestPermission(for: .push, response: { (granted) in
                 if (granted) {
                     self.screenshotsNavigationControllerDelegate?.screenshotsNavigationControllerDidGrantPushPermissions(self)
-                    AnalyticsTrackers.standard.track(.acceptedPushPermissions)
+                    Analytics.trackAcceptedPushPermissions()
                 } else {
-                    AnalyticsTrackers.standard.track(.deniedPushPermissions)
+                    Analytics.trackDeniedPushPermissions()
                 }
             })
         }))
@@ -236,7 +236,7 @@ extension ScreenshotsNavigationControllerClipView {
                     clipView.bottomAnchor.constraint(equalTo: tabBarView.bottomAnchor).isActive = true
                     clipView.trailingAnchor.constraint(equalTo: tabBarView.trailingAnchor).isActive = true
                     self.clipView = clipView
-                    UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                         self.clipView?.alpha = 1.0
                     })
                 }
@@ -246,7 +246,7 @@ extension ScreenshotsNavigationControllerClipView {
     
     func dismissPickerClipView() {
         if let _ = self.clipView {
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
                 self.clipView?.alpha = 0.0
                 
             }, completion: { (finished) in
@@ -285,8 +285,8 @@ extension ScreenshotsNavigationControllerStateRestoration {
         
         if coder.containsValue(forKey: screenshotKey),
             let url = coder.decodeObject(forKey: screenshotKey) as? URL,
-            let objectID = persistentStoreCoordinator.managedObjectID(forURIRepresentation: url),
-            let screenshot = DataModel.sharedInstance.retrieveScreenshot(objectId: objectID)
+            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
+            let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectID)
         {
             restoredProductsViewController?.screenshot = screenshot
         }

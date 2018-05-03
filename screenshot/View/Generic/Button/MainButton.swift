@@ -8,10 +8,7 @@
 
 import UIKit
 
-class MainButton: UIButton {
-    private var edgePadding = CGFloat(16)
-    private var imagePadding = CGFloat(6)
-    
+class MainButton: LoadingButton {
     private var backgroundColorStates: [UInt : UIColor] = [:]
     private var isSettingBackgroundColor = false
     
@@ -25,7 +22,7 @@ class MainButton: UIButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: edgePadding, left: edgePadding, bottom: edgePadding, right: edgePadding)
+        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.4, left: .padding, bottom: .padding / 1.4, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
@@ -47,17 +44,17 @@ class MainButton: UIButton {
         return size
     }
     
-    // MARK: Interaction
+    // MARK: States
     
     override var isHighlighted: Bool {
         didSet {
-            isSettingBackgroundColor = true
-            backgroundColor = backgroundColorStates[isHighlighted ? UIControlState.highlighted.rawValue : UIControlState.normal.rawValue]
-            isSettingBackgroundColor = false
-            
-            if isLoading {
-                activityIndicator?.backgroundColor = self.backgroundColor
-            }
+            setBackgroundColor(to: isHighlighted ? .highlighted : state)
+        }
+    }
+    
+    override var isEnabled: Bool {
+        didSet {
+            setBackgroundColor(to: isEnabled ? state : .disabled)
         }
     }
     
@@ -68,53 +65,21 @@ class MainButton: UIButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
+                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter()
             }
         }
+    }
+    
+    fileprivate func setBackgroundColor(to state: UIControlState) {
+        isSettingBackgroundColor = true
+        backgroundColor = backgroundColorStates[state.rawValue]
+        isSettingBackgroundColor = false
     }
     
     // MARK: Image
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
-        
-        imageEdgeInsets = UIEdgeInsets(top: 0, left: -imagePadding, bottom: 0, right: imagePadding / 2.0)
-        titleEdgeInsets = UIEdgeInsets(top: 0, left: imagePadding / 2.0, bottom: 0, right: -imagePadding)
-        
-        var contentInsets = contentEdgeInsets
-        contentInsets.left += imageEdgeInsets.right
-        contentInsets.right += titleEdgeInsets.left
-        contentEdgeInsets = contentInsets
+        adjustInsetsForImage(withPadding: 6)
     }
-    
-    // MARK: Loader
-    
-    var isLoading = Bool() {
-        didSet {
-            if isLoading {
-                activityIndicator?.isHidden = false
-                activityIndicator?.startAnimating()
-                
-            } else {
-                activityIndicator?.stopAnimating()
-                activityIndicator?.isHidden = true
-            }
-        }
-    }
-    
-    lazy var activityIndicator: UIActivityIndicatorView? = {
-        guard let imageView = self.imageView else {
-            return nil
-        }
-        
-        let activity = UIActivityIndicatorView(activityIndicatorStyle: .white)
-        activity.translatesAutoresizingMaskIntoConstraints = false
-        activity.backgroundColor = self.backgroundColor
-        activity.isHidden = true
-        self.addSubview(activity)
-        activity.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
-        activity.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
-        activity.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
-        activity.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
-        return activity
-    }()
 }

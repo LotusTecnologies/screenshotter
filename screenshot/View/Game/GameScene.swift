@@ -37,8 +37,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let scoreCategory: UInt32 = 1 << 3
     
     override func didMove(to view: SKView) {
-        AnalyticsTrackers.standard.track(.gameOpened)
-        
+        Analytics.trackGameOpened()
         canRestart = false
         
         // setup physics
@@ -192,8 +191,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func startScene() {
-        AnalyticsTrackers.standard.track(.gameStarted)
-        
+
+        Analytics.trackGameStarted()
         didInitialStart = true
         
         // Apply bird physics
@@ -221,8 +220,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func resetScene() {
-        AnalyticsTrackers.standard.track(.gameRestarted)
-        
+        Analytics.trackGameRestarted()
         // Move bird to original position and reset velocity
         bird.position = CGPoint(x: self.frame.size.width / 2.5, y: self.frame.midY)
         bird.physicsBody?.velocity = CGVector( dx: 0, dy: 0 )
@@ -280,11 +278,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 
                 // Save the score
                 UserDefaults.standard.set(score, forKey: UserDefaultsKeys.gameScore)
-                
-                AnalyticsTrackers.standard.track(.gameScoreIncreased)
+                Analytics.trackGameScoreIncreased()
+
                 
             } else {
-                AnalyticsTrackers.standard.track(.gameCollision)
+                Analytics.trackGameCollision()
                 
                 moving.speed = 0
                 

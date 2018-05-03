@@ -9,6 +9,9 @@
 		<string>applinks:getscreenshop.com</string>
 		<string>applinks:bo38.app.link</string>
 		<string>applinks:bo38-alternate.app.link</string>
+        <string>applinks:crazeshop.net</string>
+        <string>applinks:bo38.test-app.link</string>
+        <string>applinks:bo38-alternate.test-app.link</string>
 	</array>
 </dict>
 </plist>

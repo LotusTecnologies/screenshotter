@@ -55,7 +55,10 @@ class ScreenshotPickerNavigationController : UINavigationController {
         }
         
         let title = screenshotPickerViewController.selectedSegmentTitle()
-        AnalyticsTrackers.standard.track(.importedPhotos, properties: ["Section":title, "Count":assets.count])
+        
+        let section =  (title ==  "picker.list.screenshot".localized) ? Analytics.AnalyticsImportedPhotosSection.screenshots : Analytics.AnalyticsImportedPhotosSection.gallery
+        Analytics.trackImportedPhotos(section: section, count: assets.count)
+        
     }
 }
 
@@ -220,7 +223,7 @@ class ScreenshotPickerViewController : BaseViewController {
     
     @objc private func segmentsChanged() {
         prepareSegmentReload()
-        AnalyticsTrackers.standard.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped \(selectedSegmentTitle()) Picker List")
+       Analytics.trackTappedOnSegmentedControl(selectedSegmentTitle: selectedSegmentTitle())
     }
     
     fileprivate func setSegmentsIndex(_ index: Int) {
@@ -302,8 +305,7 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
-            
-            AnalyticsTrackers.standard.track(.createdPhoto)
+            Analytics.trackCreatedPhoto()
         }else{
             self.image(nil, didFinishSavingWithError: nil, contextInfo: nil)
         }
@@ -311,8 +313,8 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.presentingViewController?.dismiss(animated: true, completion: nil)
-        
-        AnalyticsTrackers.standard.track(.canceledPhotoCreation)
+        Analytics.trackCanceledPhotoCreation()
+
     }
     
     @objc func image(_ image: UIImage?, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer?) {

@@ -20,7 +20,10 @@ def shared_pods
     pod 'Intercom'
     pod 'lottie-ios'
     pod 'Segment-Amplitude'
+    pod 'SwiftKeychainWrapper'
+    pod 'CreditCardValidator'
     pod 'Whisper'
+    pod 'PhoneNumberKit'
 end
 
 target 'screenshot' do

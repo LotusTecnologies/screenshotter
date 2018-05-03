@@ -12,6 +12,7 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
+// April 20, 2018 campain was a kim video to encourage users to submit to discover
 "2018_04_20_campaign.headline" = "Win up to $1,000";
 "2018_04_20_campaign.body" = "New winners every week! Send your favorite looks to Discover to enter, submit as many times as you’d like!";
 "2018_04_20_campaign.button" = "Learn More";
@@ -21,13 +22,94 @@
 "2018_04_20_campaign.instructions.step_3" = "Tap Share, then Share to Discover";
 "2018_04_20_campaign.instructions.step_4" = "Submit as many images as you want, they each count as an entry";
 "2018_04_20_campaign.instructions.step_5" = "Follow us on Instagram to see when we announce the winners";
+"2018_04_20_campaign.instructions.button" = "Video Explanation";
 "2018_04_20_campaign.instructions.button" = "Got it!";
 "2018_04_20_campaign.instructions.secondButton" = "back to video";
+
+// May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
+"2018_05_01_campaign.headline" = "Thanks for joining Screenshop!";
+"2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase*";
+"2018_05_01_campaign.button" = "Let’s Go!";
+"2018_05_01_campaign.skip" = "No thanks, I don’t like free things";
+"2018_05_01_campaign.done.headline" = "You Got It!";
+"2018_05_01_campaign.done.message" = "You will receive a $25 gift card when you make your first purchase.";
+"2018_05_01_campaign.done.button" = "Awesome!";
+"2018_05_01_campaign.payment" = "Payment";
+"2018_05_01_campaign.star" = "*Applicable for purchases of $50 or more";
+"2018_05_01_campaign.alert.message" = "Enter your credit card information and you’ll receive your gift card after you make your first purchase. ";
+"2018_05_01_campaign.alert.title" = "Almost There!";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
+"cart.checkout.button" = "Checkout";
+"cart.checkout.total" = "Total: %@";
+"cart.empty.button" = "Find your next outfit!";
+"cart.empty.title" = "No Items in Cart";
+"cart.favorite.add" = "Add to Favorites";
+"cart.favorite.remove" = "Added to Favorites";
+"cart.header.title" = "Your Cart";
+"cart.header.item_count" = "Items: %d";
+"cart.item.error.price" = "Price has changed";
+"cart.item.error.quantity" = "Quantity has changed";
+"cart.item.error.unavailable" = "Out of stock";
+"cart.remove" = "Remove";
+"cart.title" = "Cart";
+"cart.variant.color" = "Color:";
+"cart.variant.quantity" = "Quantity:";
+"cart.variant.size" = "Size:";
+
 "changelog.title" = "What's New";
+
+"checkout.card.default_brand" = "Card";
+"checkout.card.brand_last_digits" = "%@ ending in …%@";
+"checkout.card.expired" = "EXPIRED";
+"checkout.card.expires" = "EXPIRES %@";
+"checkout.card.temporary" = "This card will not be saved after purchase";
+"checkout.confirmation.detail" = "Thanks for shopping with us!";
+"checkout.confirmation.email" = "A confirmation email will be sent to %@";
+"checkout.confirmation.orderNumber" = "Save your order number:";
+"checkout.confirmation.orderNumber2" = "Order Number: %@";
+"checkout.confirmation.orderNumber.savedToClipBoard" = "Your order number has been copied to the clipboard";
+"checkout.confirmation.title" = "Order Placed";
+"checkout.confirm.payment.cvv" = "CVV";
+"checkout.confirm.payment.enter_cvv" = "Enter your CVV";
+"checkout.confirm.payment.what" = "what's this?";
+"checkout.error.message" = "We were unable to complete your transaction. Please check your connection and try again.";
+"checkout.error.title" = "Something Went Wrong";
+"checkout.form.address.add" = "Add Address";
+"checkout.form.address.edit" = "Edit Address";
+"checkout.form.card.add" = "Add Card";
+"checkout.form.card.billing" = "BILLING ADDRESS";
+"checkout.form.card.edit" = "Edit Card";
+"checkout.form.card.save.message" = "You can use this for future purchases. Your information is saved securely on your device.";
+"checkout.form.card.save.title" = "Save Card?";
+"checkout.list.payment.add_card" = "Add a new card";
+"checkout.list.payment.title" = "Payment Methods";
+"checkout.list.shipping.add_address" = "Add a new shipping address";
+"checkout.list.shipping.title" = "Shipping Addresses";
+"checkout.order.address_title" = "Shipping to:";
+"checkout.order.cancel" = "Cancel and Continue Shopping";
+"checkout.order.description.color" = "Color: %@";
+"checkout.order.description.quantity" = "Qty: %d";
+"checkout.order.description.size" = "Size: %@";
+"checkout.order.error.card.message" = "Select a credit card to complete your purchase.";
+"checkout.order.error.card.title" = "Add A Card";
+"checkout.order.error.shipping.message" = "Let us know where to send your items!";
+"checkout.order.error.shipping.title" = "Add A Shipping Address";
+"checkout.order.headline" = "Order Summary";
+"checkout.order.items" = "Items:";
+"checkout.order.items_title" = "Items";
+"checkout.order.legal.0" = "Your payment details are securely processed. Your personal information is kept confidential. By placing an order you agree to the ";
+"checkout.order.legal.1" = "Terms of Service";
+"checkout.order.legal.2" = " provided by the retail merchants associated with your purchase.";
+"checkout.order.or" = "or";
+"checkout.order.payment_title" = "Payment Method:";
+"checkout.order.shipping_handling" = "Shipping & handling:";
+"checkout.order.title" = "Place Your Order";
+"checkout.order.total" = "Order Total:";
+"checkout.order.total_pre_tax" = "Total before tax:";
+"checkout.order.total_tax" = "Estimated tax to be collected:";
 
 "currency.auto" = "Automatic";
 
@@ -55,7 +137,6 @@
 "email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.title" = "Setup Email";
 
-
 "error.database_cant_load.title" = "Something Went Wrong";
 "error.database_cant_load.message" = "Try clearing some space on your device and reopening the app. If the problem persists, you should reset your app";
 "error.database_cant_load.button.try_again" = "Try Again";
@@ -68,9 +149,27 @@
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
+"favorites.product.cart" = "Add to Cart";
+"favorites.product.price_alert_off" = "GET PRICE ALERTS";
+"favorites.product.price_alert_on" = "PRICE ALERTS ON";
 "favorites.screenshot.title.plural" = "%d Favorited Items";
 "favorites.screenshot.title.single" = "%d Favorited Item";
 "favorites.title" = "Favorites";
+
+"form.address.city" = "City";
+"form.address.country" = "Country";
+"form.address.first_name" = "First Name";
+"form.address.last_name" = "Last Name";
+"form.address.ship_to" = "Ship to this address";
+"form.address.state" = "State";
+"form.address.street" = "Street Address";
+"form.address.zip" = "Zip Code";
+"form.card.cvv" = "CVV";
+"form.card.expiration" = "Exp";
+"form.card.full_name" = "Name on Card";
+"form.card.number" = "Card Number";
+"form.personal.email" = "Email";
+"form.personal.phone" = "Phone Number";
 
 "game.enter" = "Get More Coins";
 "game.restart" = "Tap to play again";
@@ -84,12 +183,15 @@
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";
 "generic.done" = "Done";
+"generic.dont_save" = "Don't Save";
+"generic.edit" = "Edit";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";
 "generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
 "generic.sale" = "SALE";
+"generic.save" = "Save";
 "generic.setup" = "Setup";
 "generic.skip" = "skip";
 "generic.submit" = "Submit";
@@ -104,19 +206,18 @@
 "negative_feedback.options.send" = "Send Feedback";
 "negative_feedback.title" = "Sorry To Hear That!";
 
+"notification.message" = "Check out the products in your screenshot";
 "notification.screenshot.latest" = "Tap to import your latest screenshot";
 "notification.screenshot.recent" = "Tap to import your new screenshots";
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
-
 "notification.title" = "Ready to shop?";
-"notification.message" = "Check out the products in your screenshot";
-
 
 "partners.content" = "Screenshop makes it easy to turn any app into shopping inspiration. When you take a screenshot on Instagram, Facebook, Snapchat or any other app with photos, we analyze the image for fashion or furniture and then show you products from 400+ brands we’re partnered with.\n\nScreenshop automatically imports screenshots you take that are detected as fashion or furniture related, so you can start shopping immediately. Screenshots you take that aren’t relevant won’t clutter up your collection thanks to our image recognition technology.\n\nWe also programatically determine what categories your photo fits - women’s clothing, men’s clothing, Kids, plus size, furniture, etc, and let you sort manually to fine tune your fashion hunt based on size, price, brands or gender.\n\nOur visual search is powered by our partners, %@";
 "partners.title" = "Our Technology";
 
+"permission.denied.title" = "Allow Permissions To Continue";
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
-"permission.photo.denied.title" = "Allow Permissions To Continue";
+"permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
 
 "personal_stylist.error" = "Unlocking a personal stylist requires a one time in-app purchase.\nUnable to connect to the appstore at this time:\n%@";
 "personal_stylist.error.invalid_device" = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases.";
@@ -134,6 +235,19 @@
 "picker.permission.title" = "Shop Your Photos";
 "picker.save.error" = "Save Error";
 "picker.title" = "Add Photos";
+
+"product.add" = "Add to Cart";
+"product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
+"product.buy" = "Buy Now";
+"product.color.default" = "Color";
+"product.next_step.cart" = "Go to Cart";
+"product.next_step.continue" = "Continue Shopping";
+"product.next_step.added" = "Product was added to your cart!";
+"product.similar_items" = "Related Items";
+"product.size.default" = "Size";
+"product.website" = "Go To %@";
 
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
@@ -180,6 +294,7 @@
 "screenshot.permission.photo.title" = "Shop With Screenshop";
 "screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 "screenshot.permission.push.title" = "Start Screenshotting";
+
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.plural" = "Delete %d Items";
 "screenshots.delete.single" = "Delete %d Item";
@@ -188,6 +303,7 @@
 "screenshots.share.error.message" = "We could not find similar items to share.";
 "screenshots.share.error.title" = "Sorry";
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
+"screenshots.title" = "Screenshots";
 
 "share_to_discover.add_button" = "Add";
 "share_to_discover.share_icon" = "Post on Discover";
@@ -207,6 +323,9 @@
 "settings.open_in.option.chrome" = "Chrome";
 "settings.open_in.option.embeded" = "ScreenShop";
 "settings.open_in.option.safari" = "Safari";
+"settings.region.other" = "Other";
+"settings.region.unknown" = "Unknown";
+"settings.region.us" = "United States";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
@@ -220,6 +339,7 @@
 "settings.row.partners.title" = "Our Technology";
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
+"settings.row.region.title" = "Region";
 "settings.row.restore_in_app_purchase.title" = "Restore Purchases";
 "settings.row.size.title" = "Size";
 "settings.row.talk_to_stylist.title" = "Talk to Your Stylist";

@@ -44,6 +44,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     override func layoutSubviews() {
         super.layoutSubviews()
         if let collectionView = self.collectionView {
+            // Needed for iOS 10
             self.bringSubview(toFront: collectionView)
         }
     }
@@ -80,9 +81,8 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.productCompletedTooltip)
-        AnalyticsTrackers.standard.track(.tappedOnShoppable)
-        
         let shopable = self.shoppablesController.object(at: indexPath)
+        Analytics.trackTappedOnShoppable(shoppable: shopable)
         self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shopable)
 
     }

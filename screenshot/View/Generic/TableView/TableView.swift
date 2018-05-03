@@ -22,7 +22,7 @@ class TableView: UITableView, EmptyListProtocol {
     
     override var contentSize: CGSize {
         didSet {
-            emptyListController.didSetContentSize(scrollView: self, emptyView: emptyView)
+            emptyListController.didSetContentSize(tableView: self, emptyView: emptyView)
         }
     }
     

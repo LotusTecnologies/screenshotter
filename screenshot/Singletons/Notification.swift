@@ -169,7 +169,7 @@ final class NotificationManager: NSObject {
         
         constraint.isActive = true
         
-        UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: .curveEaseOut, animations: {
             self.window.layoutIfNeeded()
             
         }) { (completed) in
@@ -186,7 +186,7 @@ final class NotificationManager: NSObject {
             }
         }
         
-        TapticHelper.peek()
+        ActionFeedbackGenerator().actionOccurred(.peek)
     }
     
     public func dismiss() {
@@ -204,7 +204,7 @@ final class NotificationManager: NSObject {
         case .slide:
             notificationWrapper.constraint.isActive = false
             
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
                 self.window.layoutIfNeeded()
                 
             }) { (completed) in
@@ -213,7 +213,7 @@ final class NotificationManager: NSObject {
             break
             
         case .fade:
-            UIView.animate(withDuration: Constants.defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
+            UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: .curveEaseIn, animations: {
                 notificationWrapper.view.alpha = 0
                 
             }) { (completed) in

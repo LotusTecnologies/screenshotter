@@ -65,6 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
+        frameworkSetupMainViewDidLoad()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
@@ -105,9 +106,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let contentAvailable = aps["content-available"] as? NSNumber,
             contentAvailable.intValue == 1 {
             //TODO: why is this only segment
-            AnalyticsTrackers.segment.track(.wokeFromSilentPush)
+            Analytics.trackWokeFromSilentPush()
         } else {
-            AnalyticsTrackers.standard.track(.sessionStarted) // Roi Tal from AppSee suggested
+            Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
         
@@ -122,6 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+
     func isSendToDebugURL(_ url:URL) -> Bool{
         //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other thrid parties
         return url.absoluteString.contains("sendDebugInfo-b32963e7-ad86-4f80-8f2a-131d76ece793")
@@ -159,14 +161,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     var lastPresentedLowDiskSpaceWarning:Date?
-    func presentLowDiskSpaceWarning(){
-        
+    
+    func presentLowDiskSpaceWarning() {
         //don't change to guard - lead to large complie time
-        if let lastTime = self.lastPresentedLowDiskSpaceWarning {
-            let timeInterval = abs(lastTime.timeIntervalSinceNow)
-            if timeInterval  < 60*5 {
-                return
-            }
+        if let lastPresentation = self.lastPresentedLowDiskSpaceWarning,
+          -lastPresentation.timeIntervalSinceNow <= 60 * 5 { // Do nothing if presented warning within last 5 minutes.
+            return
         }
         
         
@@ -186,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
         ApplicationStateModel.sharedInstance.applicationState = .background
-        AnalyticsTrackers.standard.track(.sessionEnded)
+        Analytics.trackSessionEnded()
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
@@ -196,15 +196,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         ApplicationStateModel.sharedInstance.applicationState = .active
-        AnalyticsTrackers.standard.track(.sessionStarted)
+        PermissionsManager.shared.fetchPushPermissionStatus()
+        Analytics.trackSessionStarted()
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         ApplicationStateModel.sharedInstance.applicationState = .active
+        PermissionsManager.shared.fetchPushPermissionStatus()
         FBSDKAppEvents.activateApp()
-        AnalyticsTrackers.standard.trackUserAge()
+        Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
     }
     
 //    func applicationWillTerminate(_ application: UIApplication) {
@@ -355,7 +357,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate : ViewControllerLifeCycle {
     func viewControllerDidLoad(_ viewController: UIViewController) {
-        frameworkSetupMainViewDidLoad()
     }
 }
 
@@ -397,8 +398,11 @@ extension AppDelegate : KochavaTrackerDelegate {
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
+
             guard error == nil, let params = params as? [String : AnyObject] else {
-                AnalyticsTrackers.segment.error(withDescription: error!.localizedDescription)
+                if let e = error as NSError? {
+                    Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                }
                 return
             }
             
@@ -452,22 +456,20 @@ extension AppDelegate {
         let viewController: UIViewController
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
-            
             viewController = mainTabBarController
+            
             if self.shouldLoadDiscoverNextLoad {
                 self.shouldLoadDiscoverNextLoad = false
+                
                 if let mainTabBarController = viewController as? MainTabBarController {
-                    if let vc = mainTabBarController.viewControllers?.first(where: {($0 as? DiscoverNavigationController) != nil}) {
-                        mainTabBarController.selectedViewController = vc
-                    }
+                    mainTabBarController.selectedViewController = mainTabBarController.discoverNavigationController
                 }
             }
         }
         else {
-            let tutorialViewController = TutorialViewController()
-            tutorialViewController.delegate = self
-            tutorialViewController.lifeCycleDelegate = self
-            viewController = tutorialViewController
+            let tutorialNavigationController = TutorialNavigationController.init(nibName: nil, bundle: nil)
+            tutorialNavigationController.tutorialDelegate = self
+            viewController = tutorialNavigationController
         }
         
         return viewController
@@ -484,8 +486,8 @@ extension AppDelegate {
 
 // MARK: - Tutorial
 
-extension AppDelegate : TutorialViewControllerDelegate {
-    func tutoriaViewControllerDidComplete(_ viewController: TutorialViewController) {
+extension AppDelegate : TutorialNavigationControllerDelegate {
+    func tutorialNavigationControllerDidComplete(_ viewController: TutorialNavigationController) {
         viewController.delegate = nil
         
         // Create a delay for a more natural feel after taking the screenshot
@@ -504,7 +506,8 @@ extension AppDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        AnalyticsTrackers.segment.error(withDescription: "Failed to register for remote notifications! (\(error))")
+         let e = error as NSError
+        Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -557,7 +560,10 @@ extension AppDelegate {
                 }
             }
         }else{
-            
+            if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
+                let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
+                Analytics.trackProductPriceAlertRecieved(product: product)
+            }
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
@@ -580,6 +586,7 @@ extension AppDelegate {
             Branch.getInstance().handlePushNotification(userInfo)
         }
     }
+    
 }
 
 // MARK: - Settings
@@ -594,17 +601,32 @@ extension AppDelegate {
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        if let userInfo = response.notification.request.content.userInfo as? [String : String],
-          let openingScreen = userInfo[Constants.openingScreenKey],
-          openingScreen == Constants.openingScreenValueScreenshot,
-          let openingAssetId = userInfo[Constants.openingAssetIdKey] {
-            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
-            showScreenshotListTop()
+        if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
+            if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
+                openingScreen == Constants.openingScreenValueScreenshot,
+                let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
+                showScreenshotListTop()
+            } else if let aps = userInfo["aps"] as? [String : Any],
+                let category = aps["category"] as? String,
+                category == "PRICE_ALERT",
+                let partNumber = userInfo["partNumber"] as? String,
+                !partNumber.isEmpty {
+                
+                ProductViewController.present(with: partNumber)
+            }
         }
         
         completionHandler()
-        
-        AnalyticsTrackers.standard.track(.appOpenedFromLocalNotification)
+        Analytics.trackAppOpenedFromLocalNotification()
     }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let category = notification.request.content.categoryIdentifier
+        let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
+        completionHandler(options)
+    }
+    
 }

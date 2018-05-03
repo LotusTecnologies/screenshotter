@@ -11,97 +11,227 @@ import Analytics
 import Appsee
 import Branch
 import FBSDKCoreKit
+import Whisper
 
-public enum AnalyticsEvent : String {
-    case acceptedPushPermissions = "Accepted Push Permissions"
-    case apnDisabled = "APN Disabled"
-    case apnEnabled = "APN Enabled"
-    case appOpenedFromLocalNotification = "app opened from local notification"
-    case appSentLocalPushNotification = "app sent local push notification"
-    case automaticallyExitedTutorialVideo = "Automatically Exited Tutorial Video"
-    case bypassedClarifai = "bypassed Clarifai"
-    case bypassedClarifaiOnRetry = "bypassed Clarifai on retry"
-    case canceledPhotoCreation = "Canceled Photo Creation"
-    case completedTutorialVideo = "Completed Tutorial Video"
-    case continuedTutorialVideo = "Continued Tutorial Video"
-    case createdPhoto = "Created Photo"
-    case dailyStreak = "Daily Streak"
-    case deniedPushPermissions = "Denied Push Permissions"
-    case errImgHang = "err img hang"
-    case error = "Error"
-    case finishedDownloadingClarifaiModel = "finished downloading Clarifai model"
-    case finishedTutorial = "Finished Tutorial"
-    case gameCollision = "Game Collision"
-    case gameInterrupted = "Game Interrupted"
-    case gameOpened = "Game Opened"
-    case gameRestarted = "Game Restarted"
-    case gameResumed = "Game Resumed"
-    case gameScoreIncreased = "Game Score Increased"
-    case gameStarted = "Game Started"
-    case ignoredRatingInApp = "Ignored rating in app"
-    case ignoredRatingOnAppstore = "Ignored rating on AppStore"
-    case inAppPurchase = "InAppPurchase"
-    case importedPhotos = "Imported Photos"
-    case matchsticksAdd = "Matchsticks Add"
-    case matchsticksFlagged = "Matchsticks Flagged"
-    case matchsticksOpenedScreenshot = "Matchsticks Opened Screenshot"
-    case matchsticksSkip = "Matchsticks Skip"
-    case openedFiltersView = "Opened Filters View"
-    case openedPicker = "Opened Picker"
-    case openedWithRemoteNotification = "Opened with remote notification"
-    case pausedTutorialVideo = "Paused Tutorial Video"
-    case productFavorited = "Product favorited"
-    case productForEmail = "Product for email"
-    case productUnfavorited = "Product unfavorited"
-    case ratedApp = "Rated app"
-    case ratedAppOnAppStore = "Rated app on app store"
-    case receivedProductsFromSyte = "received products from Syte"
-    case receivedRemoteNotification = "Received remote notification"
-    case receivedResponseFromClarifai = "received response from Clarifai"
-    case receivedResponseFromSyte = "received response from Syte"
-    case refreshedWebpage = "Refreshed webpage"
-    case removedScreenshot = "Removed screenshot"
-    case replayedTutorialVideo = "Replayed Tutorial Video"
-    case requestedCustomStylist = "Requested Custom Stylist"
-    case screenshotNotificationAccepted = "Screenshot notification accepted"
-    case screenshotNotificationCancelled = "Screenshot notification cancelled"
-    case screenshotOpenedWithoutShoppables = "Screenshot Opened Without Shoppables"
-    case sentImageToClarifai = "sent image to Clarifai"
-    case sentImageToSyte = "sent image to Syte"
-    case sessionEnded = "sessionEnded"
-    case sessionStarted = "sessionStarted"
-    case shareCompleted = "Share completed"
-    case shareIncomplete = "Share incomplete"
-    case sharedScreenshot = "Shared screenshot"
-    case shoppableFeedbackNegative = "Shoppable Feedback Negative"
-    case shoppableRatingNegative = "Shoppable rating negative"
-    case shoppableRatingPositive = "Shoppable rating positive"
-    case skippedTutorial = "Skipped Tutorial"
-    case startedDownloadingClarifaiModel = "started downloading Clarifai model"
-    case startedTutorial = "Started Tutorial"
-    case startedTutorialVideo = "Started Tutorial Video"
-    case submittedBlankEmail = "Submitted blank email"
-    case submittedEmail = "Submitted email"
-    case tabBarTapped = "Tab Bar tapped"
-    case tappedOnProduct = "Tapped on product"
-    case tappedOnProductFavorites = "Tapped on product - Favorites"
-    case tappedOnProductProductbar = "Tapped on product - ProductBar"
-    case tappedOnProductProducts = "Tapped on product - Products"
-    case tappedOnScreenshot = "Tapped on screenshot"
-    case tappedOnShoppable = "Tapped on shoppable"
-    case tookScreenshot = "Took Screenshot"
-    case tookScreenshotWhileShowingIntercomWindow = "Took Screenshot While Showing Intercom Window"
-    case userAge = "User Age"
-    case userExitedTutorialVideo = "User Exited Tutorial Video"
-    case userImportedOldScreenshots = "user imported old screenshots"
-    case userImportedScreenshots = "user imported screenshots"
-    case userProperties = "User Properties"
-    case userReceivedSharedScreenshots = "user received shared screenshots"
-    case userRetriedScreenshots = "user retried screenshots"
-    case webviewInvalidUrl = "WebView invalid url"
-    case wokeFromSilentPush = "Woke From Silent Push"
+extension Bool {
+    func toStringLiteral() -> String {
+        return self ? "true" : "false"
+    }
 }
 
+class Analytics {
+    
+    static private func addScreenshotProperitesFrom(trackingData:String?, toProperties:inout [String:Any]) {
+        do {
+            if let string = trackingData, let data = string.data(using: .utf8) {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                    json.forEach { (arg) in
+                        let (key, value) = arg
+                        if let key = key as? String {
+                            toProperties["screenshot-\(key)"] = value
+                        }
+                    }
+                }
+            }
+        }catch {
+            
+        }
+    }
+    static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        
+        if let uploadedImageURL = matchstick.imageUrl {
+            properties["screenshot-imageURL"] = uploadedImageURL
+        }
+        
+        self.addScreenshotProperitesFrom(trackingData: matchstick.trackingInfo, toProperties: &properties)
+        
+        return properties
+    }
+    
+    static func propertiesFor(_ screenshot:Screenshot) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        if let uploadedImageURL = screenshot.uploadedImageURL {
+            properties["screenshot-imageURL"] = uploadedImageURL
+        }
+        
+        properties["screenshot-source"] = screenshot.source.rawValue
+
+        
+
+        self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
+        
+        return properties
+    }
+    
+    static func propertiesFor(_ user:AnalyticsUser) -> [String:Any] {
+        return user.analyticsProperties
+    }
+    
+    static func propertiesFor(_ cart:Cart) -> [String:Any] {
+        var properties:[String:Any] = [:]
+
+        properties["cart-uniqueItems"] = cart.items?.count ?? 0
+        
+        var totalItemCount = 0
+        if let items = cart.items {
+            items.forEach { (cartItem) in
+                if let c = cartItem as? CartItem {
+                    totalItemCount += Int(c.quantity)
+                }
+            }
+        }
+        
+        properties["cart-items"] = totalItemCount
+
+        properties["cart-shippingTotal"] = cart.shippingTotal
+        properties["cart-subtotal"] = cart.subtotal
+        properties["cart-remoteId"] = cart.remoteId
+        if let dateModified = cart.dateModified {
+            properties["cart-dateModified"] = dateModified
+        }
+        if let dateSubmitted = cart.dateSubmitted {
+            properties["cart-dateSubmitted"] = dateSubmitted
+        }
+        properties["cart-isPastOrder"] = cart.isPastOrder
+        
+        return properties
+    }
+    
+    static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        
+        if let offersURL = shoppable.offersURL {
+            properties["shoppable-offerURL"] = offersURL
+        }
+        if let category = shoppable.label {
+            properties["shoppable-category"] = category
+        }
+        
+        
+        if let screenshot = shoppable.screenshot {
+            propertiesFor(screenshot).forEach { properties[$0] = $1 }
+        }
+        
+        return properties
+    }
+    static func propertiesFor(_ product:Product) -> [String:Any] {
+        var properties:[String:Any] = [:]
+        if let brand = product.brand {
+            properties["product-brand"] = brand
+        }
+        if let merchant = product.merchant {
+            properties["product-merchant"] = merchant
+        }
+        if let brandOrMerchant = product.calculatedDisplayTitle {
+            properties["product-brandOrMerchant"] = brandOrMerchant
+        }
+        
+        properties["product-isSale"] = product.isSale()
+        properties["product-isFavorite"] = product.isFavorite
+        if let imageURL = product.imageURL {
+            properties["product-imageURL"] = imageURL
+        }
+        if let offerURL = product.offer {
+            properties["product-offerURL"] = offerURL
+            
+        }
+        
+        let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
+        properties["product-filter-size"] = options.size.analyticsStringValue
+        properties["product-filter-gender"] = options.gender.analyticsStringValue
+        properties["product-filter-category"] = options.category.analyticsStringValue
+        
+        if let priceString = product.price {
+            properties["product-price-display"] = priceString
+        }
+        
+        if let partNumber = product.partNumber {
+            properties["product-partNumber"] = partNumber
+        }
+
+        if let shoppable = product.shoppable{
+            propertiesFor(shoppable).forEach { properties[$0] = $1 }
+        }else if let screenshot = product.screenshot {
+            propertiesFor(screenshot).forEach { properties[$0] = $1 }
+        }
+        
+        return properties
+    }
+    static func propertiesFor(_ cartItem:CartItem) -> [String:Any] {
+        var properties:[String:Any] = [:]
+
+        if let product = cartItem.product{
+            propertiesFor(product).forEach { properties[$0] = $1 }
+        }
+        
+        properties["product-quantity"] = NSNumber(value:cartItem.quantity)
+        if let color = cartItem.color {
+            properties["product-color"] = color
+        }
+        if let size = cartItem.size {
+            properties["product-size"] = size
+        }
+        
+        properties["product-price"] = NSNumber(value:cartItem.price)
+        if let sku = cartItem.sku {
+            properties["product-sku"] = sku
+        }
+
+        return properties
+
+    }
+
+    
+    static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
+        let willShowShoppingCartPage = (product.partNumber != nil )
+        let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = {
+            if willShowShoppingCartPage {
+                return .productPage
+            }else{
+                if let urlString = product.offer, let url = URL(string:urlString) {
+                    let willOpenWith = OpenWebPage.using(url:url)
+                    if let a = Analytics.AnalyticsProductOpenedDisplayAs.init(rawValue: willOpenWith.analyticsString()){
+                        return a
+                    }else{
+                        return .error
+                    }
+                }else{
+                    return .error
+                }
+            }
+        }()
+        
+        Analytics.trackProductOpened(product: product, order: nil, sort: nil, displayAs: displayAs, fromPage: location)
+        
+        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email), email.lengthOfBytes(using: .utf8) > 0 {
+            Analytics.trackProductForEmail(product: product, email: email)
+        }
+        if let brand = product.brand, let brandEnum = Analytics.AnalyticsTappedOnProductByBrandBrand.init(rawValue: brand) {
+            Analytics.trackTappedOnProductByBrand(product: product, brand: brandEnum)
+        }
+    }
+    static func debugShowLoggedAnalytics(eventName: String, properties: [AnyHashable:Any], destinations:[String]){
+        #if false
+        DispatchQueue.main.async {
+            if let viewController = AppDelegate.shared.window?.rootViewController {
+                let announcement = Announcement(title: eventName, subtitle: destinations.joined(separator: ", "), image: nil, duration:10.0, action:{
+                    //notification was tapped
+                    let alert = UIAlertController.init(title: eventName, message: String(describing: properties), preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction.init(title: "OK", style: .cancel, handler: nil))
+                    viewController.present(alert, animated: true, completion: nil)
+                    
+                })
+                Whisper.show(shout: announcement, to: viewController, completion: {
+                    print("The shout was silent.")
+                })
+            }
+        }
+        #endif
+    }
+
+}
 
 public class AnalyticsUser : NSObject {
     static var current: AnalyticsUser {
@@ -152,7 +282,17 @@ public class AnalyticsUser : NSObject {
             props["pushToken"] = token.description
         }
         
-        props["userAge"] = "\(userAge())"
+        let userAge:Int = {
+            guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {
+                return 0
+            }
+            let components = Set<Calendar.Component>([.day])
+            guard let ageInDays = Calendar.current.dateComponents(components, from: dateInstalled, to: Date()).day else {
+                return 0
+            }
+            return ageInDays
+        }()
+        props["userAge"] = "\(userAge)"
         if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
             props["personalStylistPurchased"] = "true"
         }
@@ -161,256 +301,111 @@ public class AnalyticsUser : NSObject {
 
         return props
     }
+    
+    func  sendToServers(){
+        AnalyticsTrackers.autoGeneratedCodeApi.segment.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.branch.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.appsee.identify(self)
+        AnalyticsTrackers.autoGeneratedCodeApi.intercom.identify(self)
+    }
 }
 
-@objc public protocol AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]?)
+protocol AnalyticsTracker {
+    func track(_ event: String, properties: [AnyHashable : Any]?)
     func identify(_ user: AnalyticsUser)
 }
 
-public class CompositeAnalyticsTracker : NSObject, AnalyticsTracker {
-   
+class AnalyticsTrackers : NSObject {
+    static let autoGeneratedCodeApi = AnalyticsTrackers()
+
+    let appsee = AppseeAnalyticsTracker()
+    let segment = SegmentAnalyticsTracker()
+    let kochava = KochavaAnalyticsTracker()
+    let intercom = IntercomAnalyticsTracker()
+    let branch = BranchAnalyticsTracker()
     
-    private var trackers: [String : AnalyticsTracker] = [:]
-    
-    init(trackers ts: [AnalyticsTracker] = []) {
-        super.init()
-        
-        ts.forEach(add)
-    }
-    
-    func add(tracker: AnalyticsTracker) {
-        let id = String(describing: type(of:tracker))
-        
-        guard trackers[id] == nil else {
-            return
+    class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
         
-        trackers[id] = tracker
-    }
-    
-    func remove(tracker: AnalyticsTracker) {
-        trackers.removeValue(forKey: String(describing: type(of:tracker)))
-    }
-    
-    // MARK: - AnalyticsTracker
-    
-    public func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        trackers.values.forEach { $0.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(event, properties: properties) }
-    }
-    
-    public func identify(_ user: AnalyticsUser) {
-        trackers.values.forEach { $0.identify(user) }
-    }
-}
-
-class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
-    }
-    
-    func identify(_ user: AnalyticsUser) {
-        SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
-    }
-    
-    func error(withDescription description: String) {
-        SEGAnalytics.shared().track("Error", properties: ["Description" : description])
-    }
-}
-
-class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        // Appsee properties can't exceed 300 bytes.
-        // https://www.appsee.com/docs/ios/api?section=events
-        
-        let finalKeys = (properties ?? [:]).keys.filter {
-            let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
-            return propertyLength < 300
+        func identify(_ user: AnalyticsUser) {
+            SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
         }
-        
-        if finalKeys.count > 0 {
-            let props = finalKeys.reduce([:]) { (final, key) -> [AnyHashable : Any] in
-                var copy = final
-                copy[key] = properties?[key]
-                return copy
+    }
+    
+    class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            // Appsee properties can't exceed 300 bytes.
+            // https://www.appsee.com/docs/ios/api?section=events
+            
+            let finalKeys = (properties ?? [:]).keys.filter {
+                let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
+                return propertyLength < 300
             }
             
-            Appsee.addEvent(event, withProperties: props)
+            if finalKeys.count > 0 {
+                let props = finalKeys.reduce([:]) { (final, key) -> [AnyHashable : Any] in
+                    var copy = final
+                    copy[key] = properties?[key]
+                    return copy
+                }
+                
+                Appsee.addEvent(event, withProperties: props)
+                
+            } else {
+                Appsee.addEvent(event)
+            }
+        }
+        
+        func identify(_ user: AnalyticsUser) {
+            Appsee.setUserID(user.email ?? user.identifier)
+            Appsee.addEvent("User Properties", withProperties: user.analyticsProperties)
+        }
+    }
+    
+    class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
+        }
+        
+        func identify(_ user: AnalyticsUser) {
+            Branch.getInstance().setIdentity(user.email ?? user.identifier)
             
-        } else {
-            Appsee.addEvent(event)
+            if let isEmpty = user.email?.isEmpty, isEmpty == false {
+                Branch.getInstance().userCompletedAction("Submitted email")
+            }
         }
     }
     
-    func identify(_ user: AnalyticsUser) {
-        Appsee.setUserID(user.email ?? user.identifier)
-        
-        track(.userProperties, properties: user.analyticsProperties)
-    }
-}
-
-class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-//        IntercomHelper.sharedInstance.record(event: event, properties: properties)
-    }
     
-    func identify(_ user: AnalyticsUser) {
-//        IntercomHelper.sharedInstance.register(user: user)
-    }
-}
-
-class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
-    }
-    
-    func identify(_ user: AnalyticsUser) {
-        Branch.getInstance().setIdentity(user.email ?? user.identifier)
+    class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            IntercomHelper.sharedInstance.record(event: event, properties: properties)
+        }
         
-        if let isEmpty = user.email?.isEmpty, isEmpty == false {
-            Branch.getInstance().userCompletedAction("Submitted email")
+        func identify(_ user: AnalyticsUser) {
+            IntercomHelper.sharedInstance.register(user: user)
         }
     }
-}
-
-class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
-    func trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(_ event: String, properties: [AnyHashable : Any]? = nil) {
-        
-        if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
-            kEvent.nameString = event
-            kEvent.customEventNameString = event
-            kEvent.payloadDictionary = properties
-            kEvent.userIdString = AnalyticsUser.current.identifier
-            kEvent.userNameString = AnalyticsUser.current.name
-            KochavaTracker.shared.send(kEvent)
+    
+    class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
             
+            if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
+                kEvent.nameString = event
+                kEvent.customEventNameString = event
+                //Do not track properties - there is an bug in ios 10 that will cause freezing.
+                kEvent.userIdString = AnalyticsUser.current.identifier
+                kEvent.userNameString = AnalyticsUser.current.name
+                KochavaTracker.shared.send(kEvent)
+                
+            }
+            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
-        SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
-    }
-    
-    func identify(_ user: AnalyticsUser) {
-    }
-    
-    func error(withDescription description: String) {
         
-        if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
-            kEvent.nameString = "Error"
-            kEvent.payloadDictionary = ["description":description]
-            kEvent.userIdString = AnalyticsUser.current.identifier
-            kEvent.userNameString = AnalyticsUser.current.name
-            KochavaTracker.shared.send(kEvent)
-            
+        func identify(_ user: AnalyticsUser) {
         }
     }
 }
 
-public class AnalyticsTrackers : NSObject {
-    static let appsee = AppseeAnalyticsTracker()
-    static let segment = SegmentAnalyticsTracker()
-    static let intercom = IntercomAnalyticsTracker()
-    static let branch = BranchAnalyticsTracker()
-    static let kochava = KochavaAnalyticsTracker()
-
-    static let standard = CompositeAnalyticsTracker(trackers: [segment, appsee, intercom, kochava])
-}
-
-fileprivate let marketingBrands = [
-    "boohoo",
-    "missguided",
-    "forever 21",
-    "asos",
-    "free people",
-    "urban outfitters",
-    "river island",
-    "bdg",
-    "tommy hilfiger",
-    "nbd",
-    "yoox.com",
-    "revolve",
-    "nordstrom"
-]
-
-extension AnalyticsTracker {
-    public func track(_ event: AnalyticsEvent, properties: [AnyHashable : Any]? = nil) {
-        self.trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent(event.rawValue, properties: properties)
-    }
-    
-    func trackUserAge() {
-        let current = AnalyticsUser.current
-        
-        track( .userAge, properties: ["age": userAge()])
-        identify(current)
-    }
-    
-    func trackFavorited(_ favorited: Bool, product: Product, onPage page: String) {
-        let uploadedImageURL = product.shoppable?.screenshot?.uploadedImageURL ?? ""
-        let merchant = product.merchant ?? ""
-        let brand = product.brand ?? ""
-        let offer = product.offer ?? ""
-        let imageURL = product.imageURL ?? ""
-        let price = product.price ?? "0"
-        let properties = [
-            "screenshot" : uploadedImageURL,
-            "merchant": merchant,
-            "brand": brand,
-            "url": offer,
-            "imageUrl": imageURL,
-            "price": price,
-            "page": page
-        ]
-        if favorited {
-            track(.productFavorited, properties: properties)
-        } else {
-            track(.productUnfavorited, properties: properties)
-        }
-        if favorited {
-            FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: FBSDKAppEventParameterValueYes])
-        } else {
-            FBSDKAppEvents.logEvent(FBSDKAppEventNameAddedToWishlist, parameters: [FBSDKAppEventParameterNameSuccess: FBSDKAppEventParameterValueNo])
-        }
-    }
-    
-    func trackTappedOnProduct(_ product: Product, onPage page: String) {
-        let screenshot = product.shoppable?.screenshot ?? product.screenshot
-        let merchant = product.merchant ?? ""
-        let brand = product.brand?.lowercased() ?? ""
-        let offer = product.offer ?? ""
-        let imageURL = product.imageURL ?? ""
-        let screenshotURL = screenshot?.uploadedImageURL ?? ""
-        let screenshotID = screenshot?.screenshotId ?? ""
-        
-        let sale = product.isSale()
-
-        track(.tappedOnProduct, properties: [
-            "merchant" : merchant,
-            "brand" : brand,
-            "url" : offer,
-            "imageUrl" : imageURL,
-            "screenshotURL" : screenshotURL,
-            "screenshotID" : screenshotID,
-            "sale" : sale,
-            "page" : page
-        ])
-        
-        FBSDKAppEvents.logEvent(FBSDKAppEventNameViewedContent, parameters: [FBSDKAppEventParameterNameContentID : imageURL])
-        
-        // Need to use properties: [:] to clarify which track function we want to call
-        if marketingBrands.contains(brand) {
-            trackUsingStringEventhoughtYouReallyKnowYouShouldBeUsingAnAnalyticEvent("Tapped on \(brand) product", properties: [:])
-        }
-    }
-}
-
-// Returns the user's age in days.
-fileprivate func userAge() -> Int {
-    guard let dateInstalled = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date else {
-        return 0
-    }
-    
-    let components = Set<Calendar.Component>([.day])
-    guard let ageInDays = Calendar.current.dateComponents(components, from: dateInstalled, to: Date()).day else {
-        return 0
-    }
-    
-    return ageInDays
-}
