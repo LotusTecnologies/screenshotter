@@ -254,8 +254,6 @@ extension AssetSyncModel {
                         let urlError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from shareId:\(shareId)"])
                         return Promise(error: urlError)
                 }
-                // TODO: GMK remove print after fixing tapping on share URL does not import screenshot.
-                print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
                 return NetworkingPromise.sharedInstance.downloadInfo(url: screenshotInfoUrl)
             }()
             networkRequest.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
