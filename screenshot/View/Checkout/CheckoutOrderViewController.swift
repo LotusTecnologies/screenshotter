@@ -350,14 +350,22 @@ extension CheckoutOrderViewControllerOrder {
         orderButton?.isEnabled = false
         
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
-            .then { someBool -> Void in
+            .then { orderNumber -> Void in
+                
+                Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber)
                 self.dismissConfirmPaymentViewController()
                 
                 let confirmationViewController = CheckoutConfirmationViewController()
                 confirmationViewController.email = card.email
+                confirmationViewController.orderNumber = orderNumber
+
                 self.navigationController?.pushViewController(confirmationViewController, animated: true)
             }
             .catch { error in
+                let error = error as NSError
+                Analytics.trackCartError(cart: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
+                
+
                 if let error = error as NSError?,
                     error.domain == "Shoppable",
                     let errors = error.userInfo["errors"] as? [[String: String]],
