@@ -348,8 +348,6 @@
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";
 "settings.row.version.title" = "App Version";
-"settings.screenshot.plural" = "%d screenshots";
-"settings.screenshot.single" = "%d screenshot";
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
 "settings.section.info" = "Your Info";
