@@ -9,6 +9,7 @@
 import Foundation
 import MessageUI
 import PromiseKit
+import Whisper
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -173,6 +174,34 @@ class SettingsViewController : BaseViewController {
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let tapper = UITapGestureRecognizer.init(target: self, action: #selector(didTripleTapTableView(_:)))
+        tapper.numberOfTapsRequired = 3
+        tapper.numberOfTouchesRequired = 2
+        tableView.addGestureRecognizer(tapper)
+    }
+    
+    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
+        if tapper.state == .recognized {
+            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
+                let point = tapper.location(in: cell)
+                if cell.bounds.contains(point) {
+                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    if enabled {
+                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }else{
+                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }
+                    if let viewController = AppDelegate.shared.window?.rootViewController {
+                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
+                        })
+                        Whisper.show(shout: announcement, to: viewController, completion: {
+                        })
+                    }
+                }
+                
+            }
+        }
     }
     
     override func viewDidLayoutSubviews() {
