@@ -1,14 +1,13 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Sun May  6 08:23:50 IDT 2018
-// created from: betterCode -  - 667f9d0 
+// created on: Sun May  6 10:29:30 IDT 2018
+// created from: betterCode -  - d1ada99 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
 import Foundation
 import FBSDKCoreKit
-
 
 
 
@@ -40,7 +39,6 @@ extension AnalyticsCartCreditCardAdded {
 }
 
  
-
 typealias AnalyticsCartCreditCardEdited = Analytics
 extension AnalyticsCartCreditCardEdited {
     
@@ -64,7 +62,6 @@ extension AnalyticsCartCreditCardEdited {
 }
 
  
-
 typealias AnalyticsCartCreditCardRemoved = Analytics
 extension AnalyticsCartCreditCardRemoved {
     
@@ -88,7 +85,6 @@ extension AnalyticsCartCreditCardRemoved {
 }
 
  
-
 typealias AnalyticsCartCvvCanceled = Analytics
 extension AnalyticsCartCvvCanceled {
     
@@ -125,7 +121,6 @@ extension AnalyticsCartCvvCanceled {
 }
 
  
-
 typealias AnalyticsCartCvvEntered = Analytics
 extension AnalyticsCartCvvEntered {
   enum AnalyticsCartCvvEnteredResult : String{
@@ -170,7 +165,6 @@ extension AnalyticsCartCvvEntered {
 }
 
  
-
 typealias AnalyticsCartCvvWhatsThis = Analytics
 extension AnalyticsCartCvvWhatsThis {
     
@@ -191,7 +185,6 @@ extension AnalyticsCartCvvWhatsThis {
 }
 
  
-
 typealias AnalyticsCartEmptyPressedButton = Analytics
 extension AnalyticsCartEmptyPressedButton {
     
@@ -212,7 +205,6 @@ extension AnalyticsCartEmptyPressedButton {
 }
 
  
-
 typealias AnalyticsCartError = Analytics
 extension AnalyticsCartError {
     
@@ -267,7 +259,6 @@ extension AnalyticsCartError {
 }
 
  
-
 typealias AnalyticsCartPressedCheckoutValidated = Analytics
 extension AnalyticsCartPressedCheckoutValidated {
   enum AnalyticsCartPressedCheckoutValidatedResult : String{
@@ -312,7 +303,6 @@ extension AnalyticsCartPressedCheckoutValidated {
 }
 
  
-
 typealias AnalyticsCartPressedCheckout = Analytics
 extension AnalyticsCartPressedCheckout {
     
@@ -349,7 +339,6 @@ extension AnalyticsCartPressedCheckout {
 }
 
  
-
 typealias AnalyticsCartPressedConfirmOrder = Analytics
 extension AnalyticsCartPressedConfirmOrder {
   enum AnalyticsCartPressedConfirmOrderResult : String{
@@ -394,7 +383,6 @@ extension AnalyticsCartPressedConfirmOrder {
 }
 
  
-
 typealias AnalyticsCartPressedPlaceOrder = Analytics
 extension AnalyticsCartPressedPlaceOrder {
   enum AnalyticsCartPressedPlaceOrderResult : String{
@@ -439,7 +427,6 @@ extension AnalyticsCartPressedPlaceOrder {
 }
 
  
-
 typealias AnalyticsCartPurchaseCompleted = Analytics
 extension AnalyticsCartPurchaseCompleted {
     
@@ -461,7 +448,6 @@ extension AnalyticsCartPurchaseCompleted {
 }
 
  
-
 typealias AnalyticsCartShippingAdded = Analytics
 extension AnalyticsCartShippingAdded {
   enum AnalyticsCartShippingAddedSource : String{
@@ -491,7 +477,6 @@ extension AnalyticsCartShippingAdded {
 }
 
  
-
 typealias AnalyticsCartShippingEdited = Analytics
 extension AnalyticsCartShippingEdited {
     
@@ -515,7 +500,6 @@ extension AnalyticsCartShippingEdited {
 }
 
  
-
 typealias AnalyticsCartShippingRemoved = Analytics
 extension AnalyticsCartShippingRemoved {
     
@@ -539,7 +523,6 @@ extension AnalyticsCartShippingRemoved {
 }
 
  
-
 typealias AnalyticsAPNDisabled = Analytics
 extension AnalyticsAPNDisabled {
     
@@ -563,7 +546,6 @@ extension AnalyticsAPNDisabled {
 }
 
  
-
 typealias AnalyticsAPNEnabled = Analytics
 extension AnalyticsAPNEnabled {
     
@@ -587,7 +569,6 @@ extension AnalyticsAPNEnabled {
 }
 
  
-
 typealias AnalyticsAppOpenedFromLocalNotification = Analytics
 extension AnalyticsAppOpenedFromLocalNotification {
     
@@ -608,7 +589,6 @@ extension AnalyticsAppOpenedFromLocalNotification {
 }
 
  
-
 typealias AnalyticsAppSentLocalPushNotification = Analytics
 extension AnalyticsAppSentLocalPushNotification {
     
@@ -627,7 +607,6 @@ extension AnalyticsAppSentLocalPushNotification {
 }
 
  
-
 typealias AnalyticsBypassedClarifaiOnRetry = Analytics
 extension AnalyticsBypassedClarifaiOnRetry {
     
@@ -646,7 +625,6 @@ extension AnalyticsBypassedClarifaiOnRetry {
 }
 
  
-
 typealias AnalyticsBypassedClarifai = Analytics
 extension AnalyticsBypassedClarifai {
     
@@ -665,7 +643,6 @@ extension AnalyticsBypassedClarifai {
 }
 
  
-
 typealias AnalyticsFinishedDownloadingClarifaiModel = Analytics
 extension AnalyticsFinishedDownloadingClarifaiModel {
     
@@ -684,7 +661,6 @@ extension AnalyticsFinishedDownloadingClarifaiModel {
 }
 
  
-
 typealias AnalyticsStartedDownloadingClarifaiModel = Analytics
 extension AnalyticsStartedDownloadingClarifaiModel {
     
@@ -703,7 +679,6 @@ extension AnalyticsStartedDownloadingClarifaiModel {
 }
 
  
-
 typealias AnalyticsReceivedResponseFromClarifai = Analytics
 extension AnalyticsReceivedResponseFromClarifai {
     
@@ -724,7 +699,6 @@ extension AnalyticsReceivedResponseFromClarifai {
 }
 
  
-
 typealias AnalyticsSentImageToClarifai = Analytics
 extension AnalyticsSentImageToClarifai {
     
@@ -743,7 +717,6 @@ extension AnalyticsSentImageToClarifai {
 }
 
  
-
 typealias AnalyticsErrImgHang = Analytics
 extension AnalyticsErrImgHang {
     
@@ -765,7 +738,6 @@ extension AnalyticsErrImgHang {
 }
 
  
-
 typealias AnalyticsError = Analytics
 extension AnalyticsError {
   enum AnalyticsErrorType : String{
@@ -799,7 +771,6 @@ extension AnalyticsError {
 }
 
  
-
 typealias AnalyticsOpenedWithRemoteNotification = Analytics
 extension AnalyticsOpenedWithRemoteNotification {
     
@@ -823,7 +794,6 @@ extension AnalyticsOpenedWithRemoteNotification {
 }
 
  
-
 typealias AnalyticsReceivedRemoteNotification = Analytics
 extension AnalyticsReceivedRemoteNotification {
     
@@ -845,7 +815,6 @@ extension AnalyticsReceivedRemoteNotification {
 }
 
  
-
 typealias AnalyticsRefreshedWebpage = Analytics
 extension AnalyticsRefreshedWebpage {
     
@@ -869,7 +838,6 @@ extension AnalyticsRefreshedWebpage {
 }
 
  
-
 typealias AnalyticsSentImageToSyte = Analytics
 extension AnalyticsSentImageToSyte {
     
@@ -888,7 +856,6 @@ extension AnalyticsSentImageToSyte {
 }
 
  
-
 typealias AnalyticsSessionEnded = Analytics
 extension AnalyticsSessionEnded {
     
@@ -909,7 +876,6 @@ extension AnalyticsSessionEnded {
 }
 
  
-
 typealias AnalyticsSessionStarted = Analytics
 extension AnalyticsSessionStarted {
     
@@ -930,7 +896,6 @@ extension AnalyticsSessionStarted {
 }
 
  
-
 typealias AnalyticsReceivedResponseFromSyte = Analytics
 extension AnalyticsReceivedResponseFromSyte {
     
@@ -958,7 +923,6 @@ extension AnalyticsReceivedResponseFromSyte {
 }
 
  
-
 typealias AnalyticsReceivedProductsFromSyte = Analytics
 extension AnalyticsReceivedProductsFromSyte {
     
@@ -983,7 +947,6 @@ extension AnalyticsReceivedProductsFromSyte {
 }
 
  
-
 typealias AnalyticsTabBarTapped = Analytics
 extension AnalyticsTabBarTapped {
     
@@ -1002,7 +965,6 @@ extension AnalyticsTabBarTapped {
 }
 
  
-
 typealias AnalyticsUserProperties = Analytics
 extension AnalyticsUserProperties {
     
@@ -1027,7 +989,6 @@ extension AnalyticsUserProperties {
 }
 
  
-
 typealias AnalyticsUserRetriedScreenshots = Analytics
 extension AnalyticsUserRetriedScreenshots {
     
@@ -1046,7 +1007,6 @@ extension AnalyticsUserRetriedScreenshots {
 }
 
  
-
 typealias AnalyticsWebViewInvalidUrl = Analytics
 extension AnalyticsWebViewInvalidUrl {
     
@@ -1068,7 +1028,6 @@ extension AnalyticsWebViewInvalidUrl {
 }
 
  
-
 typealias AnalyticsWokeFromSilentPush = Analytics
 extension AnalyticsWokeFromSilentPush {
     
@@ -1089,7 +1048,6 @@ extension AnalyticsWokeFromSilentPush {
 }
 
  
-
 typealias AnalyticsSetFiler = Analytics
 extension AnalyticsSetFiler {
     
@@ -1112,7 +1070,6 @@ extension AnalyticsSetFiler {
 }
 
  
-
 typealias AnalyticsSetGlobalGenderFiler = Analytics
 extension AnalyticsSetGlobalGenderFiler {
     
@@ -1134,7 +1091,6 @@ extension AnalyticsSetGlobalGenderFiler {
 }
 
  
-
 typealias AnalyticsSetGlobalSizeFiler = Analytics
 extension AnalyticsSetGlobalSizeFiler {
     
@@ -1156,7 +1112,6 @@ extension AnalyticsSetGlobalSizeFiler {
 }
 
  
-
 typealias AnalyticsTappedOnSegmentedControl = Analytics
 extension AnalyticsTappedOnSegmentedControl {
     
@@ -1178,7 +1133,6 @@ extension AnalyticsTappedOnSegmentedControl {
 }
 
  
-
 typealias AnalyticsOpenedFiltersView = Analytics
 extension AnalyticsOpenedFiltersView {
     
@@ -1199,7 +1153,6 @@ extension AnalyticsOpenedFiltersView {
 }
 
  
-
 typealias AnalyticsGameScoreIncreased = Analytics
 extension AnalyticsGameScoreIncreased {
     
@@ -1218,7 +1171,6 @@ extension AnalyticsGameScoreIncreased {
 }
 
  
-
 typealias AnalyticsGameCollision = Analytics
 extension AnalyticsGameCollision {
     
@@ -1239,7 +1191,6 @@ extension AnalyticsGameCollision {
 }
 
  
-
 typealias AnalyticsGameInterrupted = Analytics
 extension AnalyticsGameInterrupted {
   enum AnalyticsGameInterruptedFrom : String{
@@ -1266,7 +1217,6 @@ extension AnalyticsGameInterrupted {
 }
 
  
-
 typealias AnalyticsGameOpened = Analytics
 extension AnalyticsGameOpened {
     
@@ -1287,7 +1237,6 @@ extension AnalyticsGameOpened {
 }
 
  
-
 typealias AnalyticsGameRestarted = Analytics
 extension AnalyticsGameRestarted {
     
@@ -1308,7 +1257,6 @@ extension AnalyticsGameRestarted {
 }
 
  
-
 typealias AnalyticsGameResumed = Analytics
 extension AnalyticsGameResumed {
   enum AnalyticsGameResumedFrom : String{
@@ -1337,7 +1285,6 @@ extension AnalyticsGameResumed {
 }
 
  
-
 typealias AnalyticsGameStarted = Analytics
 extension AnalyticsGameStarted {
     
@@ -1358,7 +1305,6 @@ extension AnalyticsGameStarted {
 }
 
  
-
 typealias AnalyticsScreenshotNotificationAccepted = Analytics
 extension AnalyticsScreenshotNotificationAccepted {
     
@@ -1380,7 +1326,6 @@ extension AnalyticsScreenshotNotificationAccepted {
 }
 
  
-
 typealias AnalyticsScreenshotNotificationCancelled = Analytics
 extension AnalyticsScreenshotNotificationCancelled {
     
@@ -1402,7 +1347,6 @@ extension AnalyticsScreenshotNotificationCancelled {
 }
 
  
-
 typealias AnalyticsInAppPurchase = Analytics
 extension AnalyticsInAppPurchase {
   enum AnalyticsInAppPurchasePurchase : String{
@@ -1432,7 +1376,6 @@ extension AnalyticsInAppPurchase {
 }
 
  
-
 typealias AnalyticsRequestedCustomStylist = Analytics
 extension AnalyticsRequestedCustomStylist {
     
@@ -1462,7 +1405,6 @@ extension AnalyticsRequestedCustomStylist {
 }
 
  
-
 typealias AnalyticsCanceledPhotoCreation = Analytics
 extension AnalyticsCanceledPhotoCreation {
     
@@ -1483,7 +1425,6 @@ extension AnalyticsCanceledPhotoCreation {
 }
 
  
-
 typealias AnalyticsCreatedPhoto = Analytics
 extension AnalyticsCreatedPhoto {
     
@@ -1504,7 +1445,6 @@ extension AnalyticsCreatedPhoto {
 }
 
  
-
 typealias AnalyticsImportedPhotos = Analytics
 extension AnalyticsImportedPhotos {
   enum AnalyticsImportedPhotosSection : String{
@@ -1531,7 +1471,6 @@ extension AnalyticsImportedPhotos {
 }
 
  
-
 typealias AnalyticsIgnoredRatingOnAppStore = Analytics
 extension AnalyticsIgnoredRatingOnAppStore {
     
@@ -1552,7 +1491,6 @@ extension AnalyticsIgnoredRatingOnAppStore {
 }
 
  
-
 typealias AnalyticsRatedAppOnAppStore = Analytics
 extension AnalyticsRatedAppOnAppStore {
     
@@ -1573,7 +1511,6 @@ extension AnalyticsRatedAppOnAppStore {
 }
 
  
-
 typealias AnalyticsIgnoredRatingInApp = Analytics
 extension AnalyticsIgnoredRatingInApp {
     
@@ -1594,7 +1531,6 @@ extension AnalyticsIgnoredRatingInApp {
 }
 
  
-
 typealias AnalyticsRatedApp = Analytics
 extension AnalyticsRatedApp {
     
@@ -1618,7 +1554,6 @@ extension AnalyticsRatedApp {
 }
 
  
-
 typealias AnalyticsTookScreenshot = Analytics
 extension AnalyticsTookScreenshot {
     
@@ -1639,7 +1574,6 @@ extension AnalyticsTookScreenshot {
 }
 
  
-
 typealias AnalyticsTookScreenshotWhileShowingIntercomWindow = Analytics
 extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
     
@@ -1660,7 +1594,6 @@ extension AnalyticsTookScreenshotWhileShowingIntercomWindow {
 }
 
  
-
 typealias AnalyticsFeatureScreenshotPreviewViewed = Analytics
 extension AnalyticsFeatureScreenshotPreviewViewed {
     
@@ -1684,7 +1617,6 @@ extension AnalyticsFeatureScreenshotPreviewViewed {
 }
 
  
-
 typealias AnalyticsAcceptedPushPermissions = Analytics
 extension AnalyticsAcceptedPushPermissions {
     
@@ -1705,7 +1637,6 @@ extension AnalyticsAcceptedPushPermissions {
 }
 
  
-
 typealias AnalyticsOnboardingCampaignTextBack = Analytics
 extension AnalyticsOnboardingCampaignTextBack {
   enum AnalyticsOnboardingCampaignTextBackCampaign : String{
@@ -1730,7 +1661,6 @@ extension AnalyticsOnboardingCampaignTextBack {
 }
 
  
-
 typealias AnalyticsOnboardingCampaignTextDone = Analytics
 extension AnalyticsOnboardingCampaignTextDone {
   enum AnalyticsOnboardingCampaignTextDoneCampaign : String{
@@ -1755,7 +1685,6 @@ extension AnalyticsOnboardingCampaignTextDone {
 }
 
  
-
 typealias AnalyticsOnboardingCampaignVideoLearnMore = Analytics
 extension AnalyticsOnboardingCampaignVideoLearnMore {
   enum AnalyticsOnboardingCampaignVideoLearnMoreCampaign : String{
@@ -1780,7 +1709,6 @@ extension AnalyticsOnboardingCampaignVideoLearnMore {
 }
 
  
-
 typealias AnalyticsOnboardingCampaignVideoPlay = Analytics
 extension AnalyticsOnboardingCampaignVideoPlay {
   enum AnalyticsOnboardingCampaignVideoPlayCampaign : String{
@@ -1805,7 +1733,6 @@ extension AnalyticsOnboardingCampaignVideoPlay {
 }
 
  
-
 typealias AnalyticsOnboardingCampaignVideoSkip = Analytics
 extension AnalyticsOnboardingCampaignVideoSkip {
   enum AnalyticsOnboardingCampaignVideoSkipCampaign : String{
@@ -1830,7 +1757,6 @@ extension AnalyticsOnboardingCampaignVideoSkip {
 }
 
  
-
 typealias AnalyticsOnboardingCampainCreditCardDone = Analytics
 extension AnalyticsOnboardingCampainCreditCardDone {
     
@@ -1857,7 +1783,6 @@ extension AnalyticsOnboardingCampainCreditCardDone {
 }
 
  
-
 typealias AnalyticsOnboardingCampainCreditCardEnteredCard = Analytics
 extension AnalyticsOnboardingCampainCreditCardEnteredCard {
     
@@ -1878,7 +1803,6 @@ extension AnalyticsOnboardingCampainCreditCardEnteredCard {
 }
 
  
-
 typealias AnalyticsOnboardingCampainCreditCardSkip = Analytics
 extension AnalyticsOnboardingCampainCreditCardSkip {
     
@@ -1899,7 +1823,6 @@ extension AnalyticsOnboardingCampainCreditCardSkip {
 }
 
  
-
 typealias AnalyticsOnboardingCampainCreditCardLetsGo = Analytics
 extension AnalyticsOnboardingCampainCreditCardLetsGo {
     
@@ -1920,7 +1843,6 @@ extension AnalyticsOnboardingCampainCreditCardLetsGo {
 }
 
  
-
 typealias AnalyticsDeniedPushPermissions = Analytics
 extension AnalyticsDeniedPushPermissions {
     
@@ -1941,7 +1863,6 @@ extension AnalyticsDeniedPushPermissions {
 }
 
  
-
 typealias AnalyticsOpenedPicker = Analytics
 extension AnalyticsOpenedPicker {
     
@@ -1962,7 +1883,6 @@ extension AnalyticsOpenedPicker {
 }
 
  
-
 typealias AnalyticsStartedTutorial = Analytics
 extension AnalyticsStartedTutorial {
     
@@ -1983,7 +1903,6 @@ extension AnalyticsStartedTutorial {
 }
 
  
-
 typealias AnalyticsSubmittedBlankEmail = Analytics
 extension AnalyticsSubmittedBlankEmail {
     
@@ -2004,7 +1923,6 @@ extension AnalyticsSubmittedBlankEmail {
 }
 
  
-
 typealias AnalyticsSubmittedEmail = Analytics
 extension AnalyticsSubmittedEmail {
     
@@ -2028,7 +1946,6 @@ extension AnalyticsSubmittedEmail {
 }
 
  
-
 typealias AnalyticsOnboardingSubmittedEmailPrivacy = Analytics
 extension AnalyticsOnboardingSubmittedEmailPrivacy {
     
@@ -2049,7 +1966,6 @@ extension AnalyticsOnboardingSubmittedEmailPrivacy {
 }
 
  
-
 typealias AnalyticsOnboardingSubmittedEmailTOS = Analytics
 extension AnalyticsOnboardingSubmittedEmailTOS {
     
@@ -2070,7 +1986,6 @@ extension AnalyticsOnboardingSubmittedEmailTOS {
 }
 
  
-
 typealias AnalyticsOnboardingTryItOutScreenshot = Analytics
 extension AnalyticsOnboardingTryItOutScreenshot {
     
@@ -2091,7 +2006,6 @@ extension AnalyticsOnboardingTryItOutScreenshot {
 }
 
  
-
 typealias AnalyticsOnboardingTryItOutSkipped = Analytics
 extension AnalyticsOnboardingTryItOutSkipped {
     
@@ -2112,7 +2026,6 @@ extension AnalyticsOnboardingTryItOutSkipped {
 }
 
  
-
 typealias AnalyticsUserExitedTutorialVideo = Analytics
 extension AnalyticsUserExitedTutorialVideo {
     
@@ -2136,7 +2049,6 @@ extension AnalyticsUserExitedTutorialVideo {
 }
 
  
-
 typealias AnalyticsAutomaticallyExitedTutorialVideo = Analytics
 extension AnalyticsAutomaticallyExitedTutorialVideo {
     
@@ -2157,7 +2069,6 @@ extension AnalyticsAutomaticallyExitedTutorialVideo {
 }
 
  
-
 typealias AnalyticsCompletedTutorialVideo = Analytics
 extension AnalyticsCompletedTutorialVideo {
     
@@ -2178,7 +2089,6 @@ extension AnalyticsCompletedTutorialVideo {
 }
 
  
-
 typealias AnalyticsContinuedTutorialVideo = Analytics
 extension AnalyticsContinuedTutorialVideo {
     
@@ -2199,7 +2109,6 @@ extension AnalyticsContinuedTutorialVideo {
 }
 
  
-
 typealias AnalyticsPausedTutorialVideo = Analytics
 extension AnalyticsPausedTutorialVideo {
     
@@ -2220,7 +2129,6 @@ extension AnalyticsPausedTutorialVideo {
 }
 
  
-
 typealias AnalyticsReplayedTutorialVideo = Analytics
 extension AnalyticsReplayedTutorialVideo {
     
@@ -2241,7 +2149,6 @@ extension AnalyticsReplayedTutorialVideo {
 }
 
  
-
 typealias AnalyticsStartedTutorialVideo = Analytics
 extension AnalyticsStartedTutorialVideo {
     
@@ -2262,7 +2169,6 @@ extension AnalyticsStartedTutorialVideo {
 }
 
  
-
 typealias AnalyticsOnboardingWelcome = Analytics
 extension AnalyticsOnboardingWelcome {
     
@@ -2283,7 +2189,6 @@ extension AnalyticsOnboardingWelcome {
 }
 
  
-
 typealias AnalyticsProductAddedToCart = Analytics
 extension AnalyticsProductAddedToCart {
     
@@ -2307,7 +2212,6 @@ extension AnalyticsProductAddedToCart {
 }
 
  
-
 typealias AnalyticsProductCartQuanityStepDown = Analytics
 extension AnalyticsProductCartQuanityStepDown {
     
@@ -2331,7 +2235,6 @@ extension AnalyticsProductCartQuanityStepDown {
 }
 
  
-
 typealias AnalyticsProductCartQuanityStepUp = Analytics
 extension AnalyticsProductCartQuanityStepUp {
     
@@ -2355,7 +2258,6 @@ extension AnalyticsProductCartQuanityStepUp {
 }
 
  
-
 typealias AnalyticsProductQuantityChanged = Analytics
 extension AnalyticsProductQuantityChanged {
     
@@ -2382,7 +2284,6 @@ extension AnalyticsProductQuantityChanged {
 }
 
  
-
 typealias AnalyticsProductRemovedFromCart = Analytics
 extension AnalyticsProductRemovedFromCart {
     
@@ -2406,7 +2307,6 @@ extension AnalyticsProductRemovedFromCart {
 }
 
  
-
 typealias AnalyticsProductVariantChanged = Analytics
 extension AnalyticsProductVariantChanged {
     
@@ -2436,7 +2336,6 @@ extension AnalyticsProductVariantChanged {
 }
 
  
-
 typealias AnalyticsProductFavorited = Analytics
 extension AnalyticsProductFavorited {
   enum AnalyticsProductFavoritedPage : String{
@@ -2444,6 +2343,7 @@ extension AnalyticsProductFavorited {
     case `favorites` = "favorites"
     case `productWebView` = "Product Web View"
     case `product` = "product"
+    case `cart` = "cart"
     }
     
   static func trackProductFavorited(product:Product?,  page:AnalyticsProductFavoritedPage ) {
@@ -2494,7 +2394,6 @@ extension AnalyticsProductFavorited {
 }
 
  
-
 typealias AnalyticsProductPriceAlertOpened = Analytics
 extension AnalyticsProductPriceAlertOpened {
     
@@ -2518,7 +2417,6 @@ extension AnalyticsProductPriceAlertOpened {
 }
 
  
-
 typealias AnalyticsProductPriceAlertRecieved = Analytics
 extension AnalyticsProductPriceAlertRecieved {
     
@@ -2542,7 +2440,6 @@ extension AnalyticsProductPriceAlertRecieved {
 }
 
  
-
 typealias AnalyticsProductPriceAlertSubscribedError = Analytics
 extension AnalyticsProductPriceAlertSubscribedError {
     
@@ -2575,7 +2472,6 @@ extension AnalyticsProductPriceAlertSubscribedError {
 }
 
  
-
 typealias AnalyticsProductPriceAlertSubscribed = Analytics
 extension AnalyticsProductPriceAlertSubscribed {
     
@@ -2599,7 +2495,6 @@ extension AnalyticsProductPriceAlertSubscribed {
 }
 
  
-
 typealias AnalyticsProductPriceAlertUnsubscribedError = Analytics
 extension AnalyticsProductPriceAlertUnsubscribedError {
     
@@ -2632,7 +2527,6 @@ extension AnalyticsProductPriceAlertUnsubscribedError {
 }
 
  
-
 typealias AnalyticsProductPriceAlertUnsubscribed = Analytics
 extension AnalyticsProductPriceAlertUnsubscribed {
     
@@ -2656,7 +2550,6 @@ extension AnalyticsProductPriceAlertUnsubscribed {
 }
 
  
-
 typealias AnalyticsTappedOnProductByBrand = Analytics
 extension AnalyticsTappedOnProductByBrand {
   enum AnalyticsTappedOnProductByBrandBrand : String{
@@ -2676,7 +2569,7 @@ extension AnalyticsTappedOnProductByBrand {
     }
     
   static func trackTappedOnProductByBrand(product:Product?,  brand:AnalyticsTappedOnProductByBrandBrand ) {
-      let key = "Tapped on \(brand) product"
+      let key = String.init(format: "Tapped on %s product" , brand.rawValue)
       var properties:[String:Any] = [:]
       if let product = product {
           propertiesFor(product).forEach { properties[$0] = $1 }
@@ -2696,7 +2589,6 @@ extension AnalyticsTappedOnProductByBrand {
 }
 
  
-
 typealias AnalyticsProductForEmail = Analytics
 extension AnalyticsProductForEmail {
     
@@ -2759,7 +2651,6 @@ extension AnalyticsProductForEmail {
 }
 
  
-
 typealias AnalyticsProductOpened = Analytics
 extension AnalyticsProductOpened {
   enum AnalyticsProductOpenedSort : String{
@@ -2815,7 +2706,6 @@ extension AnalyticsProductOpened {
 }
 
  
-
 typealias AnalyticsProductUnfavorited = Analytics
 extension AnalyticsProductUnfavorited {
   enum AnalyticsProductUnfavoritedPage : String{
@@ -2823,6 +2713,7 @@ extension AnalyticsProductUnfavorited {
     case `favorites` = "favorites"
     case `productWebView` = "Product Web View"
     case `product` = "product"
+    case `cart` = "cart"
     }
     
   static func trackProductUnfavorited(product:Product?,  page:AnalyticsProductUnfavoritedPage ) {
@@ -2873,7 +2764,6 @@ extension AnalyticsProductUnfavorited {
 }
 
  
-
 typealias AnalyticsUserReceivedSharedScreenshots = Analytics
 extension AnalyticsUserReceivedSharedScreenshots {
     
@@ -2897,7 +2787,6 @@ extension AnalyticsUserReceivedSharedScreenshots {
 }
 
  
-
 typealias AnalyticsScreenshotDeleted = Analytics
 extension AnalyticsScreenshotDeleted {
   enum AnalyticsScreenshotDeletedKind : String{
@@ -2926,7 +2815,6 @@ extension AnalyticsScreenshotDeleted {
 }
 
  
-
 typealias AnalyticsMatchsticksFlagged = Analytics
 extension AnalyticsMatchsticksFlagged {
   enum AnalyticsMatchsticksFlaggedWhy : String{
@@ -2955,7 +2843,6 @@ extension AnalyticsMatchsticksFlagged {
 }
 
  
-
 typealias AnalyticsMatchsticksSkip = Analytics
 extension AnalyticsMatchsticksSkip {
   enum AnalyticsMatchsticksSkipBy : String{
@@ -2984,7 +2871,6 @@ extension AnalyticsMatchsticksSkip {
 }
 
  
-
 typealias AnalyticsMatchsticksAdd = Analytics
 extension AnalyticsMatchsticksAdd {
   enum AnalyticsMatchsticksAddBy : String{
@@ -3020,7 +2906,6 @@ extension AnalyticsMatchsticksAdd {
 }
 
  
-
 typealias AnalyticsScreenshotOpenedWithoutShoppables = Analytics
 extension AnalyticsScreenshotOpenedWithoutShoppables {
     
@@ -3044,7 +2929,6 @@ extension AnalyticsScreenshotOpenedWithoutShoppables {
 }
 
  
-
 typealias AnalyticsShareDiscover = Analytics
 extension AnalyticsShareDiscover {
     
@@ -3069,7 +2953,6 @@ extension AnalyticsShareDiscover {
 }
 
  
-
 typealias AnalyticsShareIncomplete = Analytics
 extension AnalyticsShareIncomplete {
     
@@ -3093,7 +2976,6 @@ extension AnalyticsShareIncomplete {
 }
 
  
-
 typealias AnalyticsShareSocial = Analytics
 extension AnalyticsShareSocial {
     
@@ -3118,7 +3000,6 @@ extension AnalyticsShareSocial {
 }
 
  
-
 typealias AnalyticsSharedScreenshotStarted = Analytics
 extension AnalyticsSharedScreenshotStarted {
     
@@ -3142,7 +3023,6 @@ extension AnalyticsSharedScreenshotStarted {
 }
 
  
-
 typealias AnalyticsShuffledAScreenshot = Analytics
 extension AnalyticsShuffledAScreenshot {
     
@@ -3166,7 +3046,6 @@ extension AnalyticsShuffledAScreenshot {
 }
 
  
-
 typealias AnalyticsOpenedScreenshot = Analytics
 extension AnalyticsOpenedScreenshot {
   enum AnalyticsOpenedScreenshotSource : String{
@@ -3203,7 +3082,6 @@ extension AnalyticsOpenedScreenshot {
 }
 
  
-
 typealias AnalyticsShoppableScrolledFirstTime = Analytics
 extension AnalyticsShoppableScrolledFirstTime {
     
@@ -3239,7 +3117,6 @@ extension AnalyticsShoppableScrolledFirstTime {
 }
 
  
-
 typealias AnalyticsShoppableFeedbackNegative = Analytics
 extension AnalyticsShoppableFeedbackNegative {
     
@@ -3264,7 +3141,6 @@ extension AnalyticsShoppableFeedbackNegative {
 }
 
  
-
 typealias AnalyticsShoppableRatingNegative = Analytics
 extension AnalyticsShoppableRatingNegative {
     
@@ -3307,7 +3183,6 @@ extension AnalyticsShoppableRatingNegative {
 }
 
  
-
 typealias AnalyticsShoppableRatingPositive = Analytics
 extension AnalyticsShoppableRatingPositive {
     
@@ -3350,7 +3225,6 @@ extension AnalyticsShoppableRatingPositive {
 }
 
  
-
 typealias AnalyticsTappedOnShoppable = Analytics
 extension AnalyticsTappedOnShoppable {
     
