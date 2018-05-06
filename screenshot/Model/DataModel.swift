@@ -1298,26 +1298,26 @@ extension Screenshot {
 }
 
 extension Shoppable {
+    public func relatedImagesUrlString() -> URL? {
+        if let urlString = self.offersURL {
+            return URL.urlWith(string: urlString, queryParameters:["feed":"ctl"])
+        }
+        return nil
+    }
+    
+    public func relativeRect() -> CGRect{
+        let topLeft = CGPoint.init(x: self.b0x, y: self.b0y)
+        let bottomRight = CGPoint.init(x: self.b1x, y: self.b1y)
+        return CGRect.rectWith(topLeft: topLeft, bottomRight: bottomRight)
+    }
     
     public func frame(size: CGSize) -> CGRect {
-        let viewWidth = Double(size.width)
-        let viewHeight = Double(size.height)
-        let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
-        return frame
+        let relativeRect = self.relativeRect()
+        return size.rectFrom(relativeSizeRect: relativeRect)
     }
     
     public func cropped(image: UIImage, thumbSize:CGSize) -> UIImage? {
-        let cropFrame = self.frame(size: image.size)
-        let imageFrame = CGRect.init(origin: .zero, size: image.size)
-        let thumbFrame = CGRect.init(origin: .zero, size: thumbSize)
-        let cropFrameWithoutWhiteBars = thumbFrame.aspectFit(around:cropFrame).intersection(imageFrame)
-        
-        if let imageRef = image.cgImage?.cropping(to: cropFrameWithoutWhiteBars) {
-            let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
-            return croppedImage
-        }else{
-            return nil
-        }
+        return UIImage.cropped(image: image, thumbSize: thumbSize, relativeSizeCropRect: self.relativeRect())
     }
     
     private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {

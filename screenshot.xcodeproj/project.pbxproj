@@ -124,7 +124,6 @@
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
 		C543695020453CDF00599134 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694F20453CDF00599134 /* ProductView.swift */; };
 		C543695920453FE300599134 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695220453FE300599134 /* ProductsOptions.swift */; };
-		C543695B20453FE300599134 /* ProductsTooltipCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695420453FE300599134 /* ProductsTooltipCollectionViewCell.swift */; };
 		C543695D20453FE300599134 /* ProductsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695620453FE300599134 /* ProductsCollectionViewCell.swift */; };
 		C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695820453FE300599134 /* ProductsViewControllerControl.swift */; };
 		C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696120468C4100599134 /* SegmentedDropDownControl.swift */; };
@@ -360,7 +359,6 @@
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		C543694F20453CDF00599134 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		C543695220453FE300599134 /* ProductsOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsOptions.swift; sourceTree = "<group>"; };
-		C543695420453FE300599134 /* ProductsTooltipCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsTooltipCollectionViewCell.swift; sourceTree = "<group>"; };
 		C543695620453FE300599134 /* ProductsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsCollectionViewCell.swift; sourceTree = "<group>"; };
 		C543695820453FE300599134 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		C543696120468C4100599134 /* SegmentedDropDownControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownControl.swift; sourceTree = "<group>"; };
@@ -900,7 +898,6 @@
 				C543695620453FE300599134 /* ProductsCollectionViewCell.swift */,
 				C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */,
 				C543695220453FE300599134 /* ProductsOptions.swift */,
-				C543695420453FE300599134 /* ProductsTooltipCollectionViewCell.swift */,
 				C5F37C94205505690072FE1D /* ProductsViewController.swift */,
 				C543695820453FE300599134 /* ProductsViewControllerControl.swift */,
 			);
@@ -1537,7 +1534,6 @@
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,
 				3125448120972013009410D5 /* TutorialVideoOverlayView.swift in Sources */,
 				C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */,
-				C543695B20453FE300599134 /* ProductsTooltipCollectionViewCell.swift in Sources */,
 				C5D2E304204D1C6500B5BD92 /* CartItemCountView.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
