@@ -204,6 +204,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     }
     
     @objc func displayScreenshotAction() {
+        Analytics.trackFeatureScreenshotPreviewViewed(screenshot: self.screenshot)
         let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
         navigationController.screenshotDisplayViewController.image = self.image
         navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
