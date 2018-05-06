@@ -107,7 +107,6 @@ typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationControl
 extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
         let productsViewController = ProductsViewController(screenshot: screenshot)
-        productsViewController.hidesBottomBarWhenPushed = true
         return productsViewController
     }
     
