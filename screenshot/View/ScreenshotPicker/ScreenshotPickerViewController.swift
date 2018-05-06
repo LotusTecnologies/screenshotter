@@ -46,10 +46,13 @@ class ScreenshotPickerNavigationController : UINavigationController {
         navigationBar.shadowImage = UIImage()
     }
     
-    @objc func doneAction() {
+    @objc func doneAction(_ sender:Any) {
         let assets = screenshotPickerViewController.selectedAssets()
-        AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets)
-        
+        if let _ = sender as? ScreenshotPickerViewController {
+            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets, source: .camera)
+        }else{
+            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets, source: .gallery)
+        }
         if let action = doneButton.action {
             UIApplication.shared.sendAction(action, to: doneButton.target, from: self, for: nil)
         }
