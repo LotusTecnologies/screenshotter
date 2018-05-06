@@ -100,9 +100,10 @@ class ScreenshotPickerViewController : BaseViewController {
             ])
         segments.translatesAutoresizingMaskIntoConstraints = false
         segments.tintColor = .crazeGreen
-        segments.selectedSegmentIndex = 0
+        segments.selectedSegmentIndex = 1
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem(customView: segments)]
+        syncIsScreenshotsOnly()
         
         if #available(iOS 11.0, *) {} else {
             segments.topAnchor.constraint(equalTo: toolbar.layoutMarginsGuide.topAnchor).isActive = true
@@ -223,7 +224,7 @@ class ScreenshotPickerViewController : BaseViewController {
     
     @objc private func segmentsChanged() {
         prepareSegmentReload()
-       Analytics.trackTappedOnSegmentedControl(selectedSegmentTitle: selectedSegmentTitle())
+        Analytics.trackTappedOnSegmentedControl(selectedSegmentTitle: selectedSegmentTitle())
     }
     
     fileprivate func setSegmentsIndex(_ index: Int) {
@@ -232,8 +233,12 @@ class ScreenshotPickerViewController : BaseViewController {
     }
     
     private func prepareSegmentReload() {
-        isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
+        syncIsScreenshotsOnly()
         reloadAssets()
+    }
+    
+    private func syncIsScreenshotsOnly() {
+        isScreenshotsOnly = segments.selectedSegmentIndex == 0 ? true : false
     }
     
     fileprivate func selectedSegmentTitle() -> String {
