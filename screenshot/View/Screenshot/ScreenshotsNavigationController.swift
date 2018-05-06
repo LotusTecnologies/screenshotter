@@ -148,7 +148,6 @@ extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
         let productsViewController = ProductsViewController(screenshot: screenshot)
         productsViewController.lifeCycleDelegate = self
-        productsViewController.hidesBottomBarWhenPushed = true
         return productsViewController
     }
     
