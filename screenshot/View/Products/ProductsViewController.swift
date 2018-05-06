@@ -59,8 +59,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
         
-        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
-        
         self.productsOptions.delegate = self
     }
     
@@ -189,14 +187,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
     }
     
-    @objc func contentSizeCategoryDidChange(_ notification: Notification) {
-      
-    }
     
     deinit {
         self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
-        NotificationCenter.default.removeObserver(self)
     }
     
     @objc func displayScreenshotAction() {
