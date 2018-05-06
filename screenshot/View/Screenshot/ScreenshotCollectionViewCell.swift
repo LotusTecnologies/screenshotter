@@ -29,6 +29,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
     private var shamrockView:UIView?
     private var likesCountView:UIView?
+    fileprivate let shareButton = UIButton()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -47,20 +48,15 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         imageView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
         imageView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
         
-        let shareButtonItem = UIBarButtonItem(title: "screenshot.option.share".localized, style: .plain, target: self, action: #selector(shareAction))
         let deleteButtonItem = UIBarButtonItem(title: "screenshot.option.delete".localized, style: .plain, target: self, action: #selector(deleteAction))
         let flexilbeItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Even though this is set globally, it is possible to hit a race condition
         // where the first cell has the wrong font. This will force the font.
         let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
-        let titleTextAttributesNormal = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny( toolbarButtonItem.titleTextAttributes(for: .normal) )
-        let titleTextAttributesHighlighted = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .highlighted) )
-        let titleTextAttributesDisabled = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny( toolbarButtonItem.titleTextAttributes(for: .disabled) )
-        
-        shareButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
-        shareButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
-        shareButtonItem.setTitleTextAttributes(titleTextAttributesDisabled, for: .disabled)
+        let titleTextAttributesNormal = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .normal))
+        let titleTextAttributesHighlighted = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .highlighted))
+        let titleTextAttributesDisabled = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .disabled))
         
         deleteButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
         deleteButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
@@ -70,7 +66,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         toolbar.backgroundColor = UIColor(white: 1, alpha: 0.9)
         toolbar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
         toolbar.tintColor = .gray3
-        toolbar.items = [shareButtonItem, flexilbeItem, deleteButtonItem]
+        toolbar.items = [flexilbeItem, deleteButtonItem]
         mainView.addSubview(toolbar)
         toolbar.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
         toolbar.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
@@ -93,16 +89,19 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         badge.widthAnchor.constraint(equalToConstant: badge.bounds.size.width).isActive = true
         badge.heightAnchor.constraint(equalToConstant: badge.bounds.size.height).isActive = true
         
+        shareButton.translatesAutoresizingMaskIntoConstraints = false
+        shareButton.setImage(UIImage(named: "ScreenshotShare"), for: .normal)
+        shareButton.addTarget(self, action: #selector(shareAction), for: .touchUpInside)
+        mainView.addSubview(shareButton)
+        shareButton.topAnchor.constraint(equalTo: mainView.layoutMarginsGuide.topAnchor).isActive = true
+        shareButton.trailingAnchor.constraint(equalTo: mainView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
         checkImageView.translatesAutoresizingMaskIntoConstraints = false
         checkImageView.alpha = 0
         checkImageView.contentMode = .scaleAspectFit
         mainView.addSubview(checkImageView)
         checkImageView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 6).isActive = true
         checkImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -6).isActive = true
-        
-        
-        
-
     }
     
     override func prepareForReuse() {
@@ -194,9 +193,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
             
             self.likesCountView = view
-            
         }
-        
     }
     
     var selectedState: ScreenshotCollectionViewCellSelectedState = .none {
