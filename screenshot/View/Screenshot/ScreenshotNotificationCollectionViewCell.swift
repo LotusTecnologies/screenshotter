@@ -99,7 +99,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
         
         let borderView = UIView()
         borderView.translatesAutoresizingMaskIntoConstraints = false
-        borderView.backgroundColor = .gray6
+        borderView.backgroundColor = .border
         tempContentView.addSubview(borderView)
         borderView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: type(of: self).mainViewLayoutMargins.top).isActive = true
         borderView.bottomAnchor.constraint(equalTo: tempContentView.bottomAnchor).isActive = true

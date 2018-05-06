@@ -169,7 +169,7 @@ extension AssetSyncModel {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0, completion: { (completeOperation) in
             AccumulatorModel.sharedInstance.removeAssetId(asset.localIdentifier)
             asset.image(allowFromICloud: true).then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
-                AnalyticsTrackers.standard.track(.bypassedClarifai)
+                Analytics.trackBypassedClarifai()
                 let imageData: Data? = self.data(for: image)
                 return Promise { fulfill, reject in
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
@@ -193,7 +193,7 @@ extension AssetSyncModel {
                             }
                             
                             if screenshot.shoppablesCount > 0 {
-                                screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                                screenshot.hideWorkhorse()
                             }
                             screenshot.shoppablesCount = 0
                             screenshot.imageData = imageData
@@ -254,7 +254,6 @@ extension AssetSyncModel {
                         let urlError = NSError(domain: "Craze", code: 8, userInfo: [NSLocalizedDescriptionKey : "Could not form URL from shareId:\(shareId)"])
                         return Promise(error: urlError)
                 }
-                print("downloadScreenshot shareId:\(shareId)  encode:\(encoded)  screenshotInfoUrl:\(screenshotInfoUrl)")
                 return NetworkingPromise.sharedInstance.downloadInfo(url: screenshotInfoUrl)
             }()
             networkRequest.then(on: self.processingQ) { jsonDict -> Promise<(Data, [String : Any])> in
@@ -267,19 +266,21 @@ extension AssetSyncModel {
                         return Promise(error: imageURLError)
                 }
                 return when(fulfilled:  NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURLString), Promise.init(value: screenshotDict))
-            }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise<(NSManagedObject, [String : Any])> in
-                // Save screenshot to db.
-                return DataModel.sharedInstance.backgroundPromise(dict: screenshotDict) { (managedObjectContext) -> NSManagedObject in
-                    return DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                    assetId: shareId,
-                                                    createdAt: Date(),
-                                                    isRecognized: true,
-                                                    source: .share,
-                                                    isHidden: false,
-                                                    imageData: imageData,
-                                                    classification: nil)
-                }
-            }.then(on: self.processingQ) { screenshotManagedObject, screenshotDict -> Void in
+            }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise< [String : Any]> in
+                return Promise(resolvers: { (fulfil, reject) in
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
+                                                                assetId: shareId,
+                                                                createdAt: Date(),
+                                                                isRecognized: true,
+                                                                source: .share,
+                                                                isHidden: false,
+                                                                imageData: imageData,
+                                                                classification: nil)
+                        fulfil(screenshotDict)
+                    })
+                })
+            }.then(on: self.processingQ) { screenshotDict -> Void in
                 // Save shoppables to db.
                 guard let syteJsonString = screenshotDict["syteJson"] as? String,
                     let segments = NetworkingPromise.sharedInstance.jsonDestringify(string: syteJsonString),
@@ -331,7 +332,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     @objc func scanPhotoGalleryForFashion() {
         guard PermissionsManager.shared.hasPermission(for: .photo) else {
-            print("scanPhotoGalleryForFashion refused by guard")
             return
         }
         
@@ -389,7 +389,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     func registerForPhotoChanges() {
         guard PermissionsManager.shared.hasPermission(for: .photo) else {
-            print("registerForPhotoChanges refused by guard")
             return
         }
         if isRegistered == false {
@@ -399,7 +398,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     }
     
      @objc func applicationUserDidTakeScreenshot() {
-        print("AssetSyncModel applicationUserDidTakeScreenshot")
         isNextScreenshotForeground = ApplicationStateModel.sharedInstance.isActive()
     }
     
@@ -409,7 +407,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0, completion: { (completeOperation) in
             asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                Analytics.trackSentImageToClarifai()
                 return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
                     return Promise.init(value: (c, image))
                 })
@@ -417,7 +415,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     let isRecognized = (imageClassification != .unrecognized)
                     let classification = imageClassification.shortString()
                     
-                    AnalyticsTrackers.standard.track(.receivedResponseFromClarifai, properties: ["isFashion" : imageClassification == .human, "isFurniture" : imageClassification == .furniture])
+                    Analytics.trackReceivedResponseFromClarifai(isFashion:  imageClassification == .human, isFurniture: imageClassification == .furniture)
                     return Promise { fulfill, reject in
                         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
                             if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
@@ -489,7 +487,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             }.then(on: self.processingQ) { success -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
             }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                AnalyticsTrackers.standard.track(.sentImageToClarifai)
+                Analytics.trackSentImageToClarifai()
                 return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
                     return Promise.init(value: (c, image))
                 })
@@ -529,10 +527,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
-            print("sendScreenshotAddedLocalNotification refused by guard")
             return
         }
-        print("should display notification")
         let content = UNMutableNotificationContent()
         content.title = "notification.title".localized
         content.body = "notification.message".localized
@@ -574,7 +570,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             if let error = error {
                 print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
             } else {
-                AnalyticsTrackers.standard.track(.appSentLocalPushNotification)
+                Analytics.trackAppSentLocalPushNotification()
             }
         })
     }
@@ -606,7 +602,7 @@ extension AssetSyncModel {
                         imageClassification = .human
                     }
                     if screenshot.shoppablesCount > 0 {
-                        screenshot.hideWorkhorse(managedObjectContext: managedObjectContext)
+                        screenshot.hideWorkhorse()
                     }
                     screenshot.shoppablesCount = 0
                     screenshot.imageData = imageData
@@ -624,11 +620,10 @@ extension AssetSyncModel {
     }
     
     func rescanClassification(assetId: String, imageData: Data?, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
-        AnalyticsTrackers.standard.track(.bypassedClarifaiOnRetry)
+        Analytics.trackBypassedClarifaiOnRetry()
         firstly {
             self.resaveScreenshot(assetId: assetId, imageData: imageData)
             }.then (on: processingQ) { (imageData, imageClassification) -> Void in
-                print("rescanClassification imageClassification:\(imageClassification)")
                 self.syteProcessing(imageClassification: imageClassification, imageData: imageData, assetId: assetId, optionsMask: optionsMask)
             }.catch { error in
                 print("rescanClassification catch error:\(error)")
@@ -647,11 +642,20 @@ extension AssetSyncModel {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
-            firstly { 
-                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification)
+            firstly { // _ -> Promise<Bool> in
+                let userDefaults = UserDefaults.standard
+                if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+                    return NetworkingPromise.sharedInstance.geoLocateIsUSC()
+                } else {
+                    let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
+                    return Promise(value: isUSC)
+                }
+            }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, imageClassification: imageClassification, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
-                    AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: ["imageUrl" : uploadedURLString, "segmentCount" : segments.count, "categories" : categories])
+                    Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
+
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
@@ -667,7 +671,8 @@ extension AssetSyncModel {
                             let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
                             let imageUrl: String = uploadedURLString ?? ""
                             DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            AnalyticsTrackers.standard.track(.receivedResponseFromSyte, properties: nsError.code == 22 ? ["imageUrl" : imageUrl, "segmentCount" : 0, "timeout" : 1] : ["imageUrl" : imageUrl, "segmentCount" : 0])
+                            Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
+                            Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
                         default:
                             break
                         }
@@ -736,19 +741,30 @@ extension AssetSyncModel {
                      prod: [String : Any],
                      optionsMask: Int32) {
         let extractedCategories = prod["categories"] as? [String]
+        let originalData = prod["original_data"] as? [String : Any]
+        let shoppingModel = ShoppingCartModel.shared
+        let fallbackPrice: Float = shoppingModel.parseFloat(originalData?["price"])
+            ?? shoppingModel.parseFloat(originalData?["sale_price"])
+            ?? shoppingModel.parseFloat(originalData?["discount_price"])
+            ?? shoppingModel.parseFloat(originalData?["retail_price"])
+            ?? 0
         let _ = DataModel.sharedInstance.saveProduct(managedObjectContext: managedObjectContext,
                                                      shoppable: shoppable,
                                                      order: productOrder,
                                                      productDescription: prod["description"] as? String,
                                                      price: prod["price"] as? String,
                                                      originalPrice: prod["originalPrice"] as? String,
-                                                     floatPrice: prod["floatPrice"] as? Float ?? 0,
-                                                     floatOriginalPrice: prod["floatOriginalPrice"] as? Float ?? 0,
+                                                     floatPrice: shoppingModel.parseFloat(prod["floatPrice"]) ?? 0,
+                                                     floatOriginalPrice: shoppingModel.parseFloat(prod["floatOriginalPrice"]) ?? 0,
                                                      categories: extractedCategories?.first,
                                                      brand: prod["brand"] as? String,
                                                      offer: prod["offer"] as? String,
                                                      imageURL: prod["imageUrl"] as? String,
                                                      merchant: prod["merchant"] as? String,
+                                                     partNumber: originalData?["part_number"] as? String,
+                                                     color: originalData?["color"] as? String,
+                                                     sku: originalData?["id"] as? String,
+                                                     fallbackPrice: fallbackPrice,
                                                      optionsMask: optionsMask)
     }
     
@@ -807,7 +823,7 @@ extension AssetSyncModel {
                 }
                 managedObjectContext.saveIfNeeded()
             }
-            AnalyticsTrackers.standard.track(.receivedProductsFromSyte, properties: ["productCount" : productsArray.count, "optionsMask" : optionsMask.rawValue])
+            Analytics.trackReceivedProductsFromSyte(productCount: productsArray.count, optionsMask: optionsMask.rawValue)
         }
             
         NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url)
@@ -942,7 +958,6 @@ extension AssetSyncModel {
         }
 #endif
         let data = UIImageJPEGRepresentation(imageForData, compressionQuality)
-        print("image.size:\(image.size)  desiredSize:\(desiredSize)  imageForData.size\(imageForData.size)  actualToTargetRatio:\(actualToTargetRatio)  data.count:\(data?.count ?? 0)")
         return data
     }
         
@@ -958,7 +973,7 @@ extension AssetSyncModel {
                 let getData:Promise<Data?> = Promise.init(resolvers: { (fulfill, reject) in
                     let imageData: Data?
                     #if STORE_NEW_TUTORIAL_SCREENSHOT
-                    imageData = self.data(for: TutorialTrySlideView.rawGraphic ?? image)
+                    imageData = self.data(for: TutorialTrySlideViewController.rawGraphic ?? image)
                     #else
                     imageData = self.data(for: image)
                     #endif
@@ -995,18 +1010,18 @@ extension AssetSyncModel {
     
     
     func tupleForRawGraphic() -> (String, [[String : Any]]) {
-        let imageURL = "https://s3.amazonaws.com/s3-file-store/generated/-hJEtepr-0ctvjWrtAs28"
+        let imageURL = "https://s3-us-west-2.amazonaws.com/syte-image-uploads-west/-hJEtepr-0ctvjWrtAs28"
         let segments = [
-            ["label":"Shoes","gender":"female","b0":[0.385934054851532, 0.6467227935791016],"b1":[0.4655290246009827, 0.7181835174560547],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC43Mzc3MTAxMTgyOTM3NjIyLCJ5IjowLjYyNzE5NjE5Mjc0MTM5NCwieDIiOjAuNDg3Mjc4MzEyNDQ0Njg2OSwieCI6MC4zNjQxODQ3NjcwMDc4Mjc3Nn0%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6160&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.514782726764679, 0.6339549422264099],"b1":[0.6010540127754211, 0.7061108946800232],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC43MjUyNTQ1OTUyNzk2OTM2LCJ5IjowLjYxNDgxMTI0MTYyNjczOTUsIngyIjowLjYyMzk0MjY3MzIwNjMyOTMsIngiOjAuNDkxODk0MDY2MzMzNzcwNzV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6405&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Bags","gender":"female","b0":[0.3161032795906067, 0.4687742590904236],"b1":[0.4117679595947266, 0.5696807503700256],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC41OTI2NjM5NDM3Njc1NDc2LCJ5IjowLjQ0NTc5MTA2NTY5MjkwMTYsIngyIjowLjQzMzU1NzIxMjM1Mjc1MjcsIngiOjAuMjk0MzE0MDI2ODMyNTgwNTd9&cats=WyJIYW5kYmFncyJd&prob=0.7384&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Jackets","gender":"female","b0":[0.319490909576416, 0.2713195383548737],"b1":[0.6690635085105896, 0.4435304701328278],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC40NTQyMTExNzU0NDE3NDE5NCwieSI6MC4yNjA2Mzg4MzMwNDU5NTk1LCJ4MiI6MC42OTA3NDQ0MDAwMjQ0MTQxLCJ4IjowLjI5NzgxMDA3NzY2NzIzNjMzfQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.7578&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
             ["label":"Skirts","gender":"female","b0":[0.3360975980758667, 0.3655535876750946],"b1":[0.7115286588668823, 0.6397957801818848],
-             "offers":"//d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3MzLWZpbGUtc3RvcmUvZ2VuZXJhdGVkLy1oSkV0ZXByLTBjdHZqV3J0QXMyOA%3D%3D&crop=eyJ5MiI6MC42NDk5OTM1OTg0NjExNTExLCJ5IjowLjM1NTM1NTc5OTE5ODE1MDYzLCJ4MiI6MC43MjU0ODkxOTkxNjE1Mjk1LCJ4IjowLjMyMjEzNzA1Nzc4MTIxOTV9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.8272&gender=female&feed=default&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
+             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC42NDk5OTM1OTg0NjExNTExLCJ5IjowLjM1NTM1NTc5OTE5ODE1MDYzLCJ4MiI6MC43MjU0ODkxOTkxNjE1Mjk1LCJ4IjowLjMyMjEzNzA1Nzc4MTIxOTV9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.8272&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Jackets","gender":"female","b0":[0.3194908499717712, 0.2713195383548737],"b1":[0.6690635085105896, 0.4435304701328278],
+             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC40NTQyMTExNzU0NDE3NDE5NCwieSI6MC4yNjA2Mzg4MzMwNDU5NTk1LCJ4MiI6MC42OTA3NDQzNDA0MTk3NjkzLCJ4IjowLjI5NzgxMDAxODA2MjU5MTU1fQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.7578&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Bags","gender":"female","b0":[0.3161032795906067, 0.4687742590904236],"b1":[0.4117679595947266, 0.5696807503700256],
+             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC41OTI2NjM5NDM3Njc1NDc2LCJ5IjowLjQ0NTc5MTA2NTY5MjkwMTYsIngyIjowLjQzMzU1NzIxMjM1Mjc1MjcsIngiOjAuMjk0MzE0MDI2ODMyNTgwNTd9&cats=WyJIYW5kYmFncyJd&prob=0.7384&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Shoes","gender":"female","b0":[0.514782726764679, 0.6339548826217651],"b1":[0.6010540127754211, 0.7061108350753784],
+             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC43MjUyNTQ1MzU2NzUwNDg4LCJ5IjowLjYxNDgxMTE4MjAyMjA5NDcsIngyIjowLjYyMzk0MjY3MzIwNjMyOTMsIngiOjAuNDkxODk0MDY2MzMzNzcwNzV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6405&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
+            ["label":"Shoes","gender":"female","b0":[0.3859340250492096, 0.6467227935791016],"b1":[0.4655289947986603, 0.7181835174560547],
+             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC43Mzc3MTAxMTgyOTM3NjIyLCJ5IjowLjYyNzE5NjE5Mjc0MTM5NCwieDIiOjAuNDg3Mjc4MjgyNjQyMzY0NSwieCI6MC4zNjQxODQ3MzcyMDU1MDUzN30%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6160&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
         ]
         return (imageURL, segments)
     }

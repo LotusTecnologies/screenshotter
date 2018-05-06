@@ -21,17 +21,17 @@ extension UIApplication {
     }
     
     func chomeURLFor(url:URL) -> URL? {
-        guard let scheme = url.scheme?.lowercased() else {
-            return nil
-        }
-        
-        let chromeScheme:String?
-        switch scheme {
-        case "http":
-            chromeScheme = UIApplication.kGoogleChromeHTTPScheme
-        case "https":
-            chromeScheme = UIApplication.kGoogleChromeHTTPSScheme
-        default:
+        let chromeScheme: String?
+        if let scheme = url.scheme?.lowercased() {
+            switch scheme {
+            case "http":
+                chromeScheme = UIApplication.kGoogleChromeHTTPScheme
+            case "https":
+                chromeScheme = UIApplication.kGoogleChromeHTTPSScheme
+            default:
+                chromeScheme = nil
+            }
+        } else {
             chromeScheme = nil
         }
         

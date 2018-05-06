@@ -67,7 +67,7 @@ class UserFeedback  {
                        
                         if let submittedFeedbackCountDate = s.submittedFeedbackCountDate, let d2 = s.submittedFeedbackCountGoalDate {
                             //if submittedFeedbackCountDate is very old. change it to be equidistant to submittedFeedbackCountGoalDate
-                            let d1 = submittedFeedbackCountDate.laterDate(Date.init(timeIntervalSinceNow: -1 * d2.timeIntervalSinceNow))
+                            let d1 = max(submittedFeedbackCountDate, Date(timeIntervalSinceNow: -1 * d2.timeIntervalSinceNow))
                             let c2 = max(s.submittedFeedbackCountGoal, s.submittedFeedbackCount)
                             let c1 = s.submittedFeedbackCount
                             

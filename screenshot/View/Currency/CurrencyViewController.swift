@@ -73,6 +73,7 @@ extension CurrencyViewController : UITableViewDataSource {
         
         cell.detailTextLabel?.highlightedTextColor = .white
         cell.detailTextLabel?.minimumScaleFactor = 0.7
+        cell.detailTextLabel?.baselineAdjustment = .alignCenters
         cell.detailTextLabel?.adjustsFontSizeToFitWidth = true
         
         let selectedBackgroundView = UIView()

@@ -113,15 +113,16 @@ class FavoritesTableViewCell : UITableViewCell {
         if let imageSize = screenshotView.image?.size, !screenshotContainerView.bounds.isEmpty {
             let rect = imageSize.aspectFitRectInSize(screenshotContainerView.bounds.size)
             let width = rect.size.width
+            let height = rect.size.height
+            
             if screenshotImageViewWidthConstraint.constant != width {
                 screenshotImageViewWidthConstraint.constant = width
             }
-            let height = rect.size.height
             if screenshotImageViewHeightConstraint.constant != height {
                 screenshotImageViewHeightConstraint.constant = height
             }
-            
-        } else {
+        }
+        else {
             screenshotImageViewWidthConstraint.constant = 0
             screenshotImageViewHeightConstraint.constant = 0
         }

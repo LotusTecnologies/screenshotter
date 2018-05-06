@@ -11,6 +11,12 @@ import AVFoundation
 
 
 
+protocol CampaignPromotionViewControllerDelegate: class {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController)
+    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController)
+    
+}
+
 class CampaignPromotionViewController: UIViewController, CampaignPromotionExplanationViewControllerDelegate {
     /*
         To re-use this viewController change the CampaignDescription
@@ -21,8 +27,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             buttonText: "2018_04_20_campaign.button".localized,
             videoName: "campaign_video_2018_04_20",
             thumbName: "campaign_thumb_2018_04_20.jpg",
-            videoRatio: 1280.0 / 720.0,
-            userDefaultsKey: UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue)
+            videoRatio: 1280.0 / 720.0)
     
     var showsReplayButtonUponFinishing: Bool = true
     var willPresentInModal:Bool = false
@@ -32,7 +37,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
 
     var imageView:UIImageView?
     
-    weak var delegate: VideoDisplayingViewControllerDelegate?
+    weak var delegate: CampaignPromotionViewControllerDelegate?
     private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
     
     init(modal:Bool) {
@@ -42,7 +47,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         if modal {
             transitioningDelegate = transitioning
             modalPresentationStyle = .custom
-
         }
 
     }
@@ -95,15 +99,15 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         let skipButton = UIButton.init()
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.titleLabel?.textAlignment = .center
-        
         skipButton.titleLabel?.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-        skipButton.addTarget(self, action: #selector(tappedSkipButton), for: .touchUpInside)
+        skipButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
         container.addSubview(skipButton)
         skipButton.setTitle("generic.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
         skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
-        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor, constant: -skipButton.contentEdgeInsets.bottom).isActive = true
         skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         
@@ -115,7 +119,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         mainButton.setTitle(self.campaign.buttonText, for: .normal)
         mainButton.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         mainButton.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
-        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant:-3).isActive = true
+        mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         
@@ -213,34 +217,47 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         requiredSpacing.isActive = true
         
     }
-    
-    @objc func tappedLearnMoreButton() {
-        let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
-        explain.delegate = self
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         if let player = self.player {
             if player.playbackState != .paused {
                 self.player?.pause()
                 self.flashPauseOverlay()
             }
         }
-        self.present(explain, animated: false, completion: nil)
     }
     
-    func campaignPromotionExplanationViewControllerDidPressSkip(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+    @objc func tappedLearnMoreButton() {
+        if let player = self.player {
+            if player.playbackState != .paused {
+                self.player?.pause()
+                self.flashPauseOverlay()
+            }
+        }
+        if self.willPresentInModal {
+            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
+            explain.delegate = self   
+            self.present(explain, animated: false, completion: nil)
+        }else{
+            self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
+        }
+    }
+    
+    func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
         self.dismiss(animated: false, completion: nil)
-        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
+        self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
+        
     }
     
-    func campaignPromotionExplanationViewControllerDidPressMainButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+    func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+        
         self.dismiss(animated: false, completion: nil)
         
     }
     
-    @objc func tappedSkipButton() {
+    @objc func tappedSecondaryButton() {
         
-        UserDefaults.standard.set(self.campaign.userDefaultsKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        self.delegate?.videoDisplayingViewControllerDidTapDone(self)
+        self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
     }
     
     @objc func tappedVideo(){
@@ -248,7 +265,11 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mp4")!)
             let player = AVPlayer(playerItem: playerItem)
             player.allowsExternalPlayback = false
-            
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            } catch let error as NSError {
+                Analytics.trackError(type: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
+            }
             player.actionAtItemEnd = .pause
             self.player = player
             let layer = AVPlayerLayer(player: player)
@@ -295,7 +316,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         playPauseButton.isSelected = true
         playPauseButton.alpha = 0
         
-        UIView.animateKeyframes(withDuration: Constants.defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
+        UIView.animateKeyframes(withDuration: .defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.33, animations: {
                 self.playPauseButton.alpha = 1
             })
@@ -312,7 +333,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             return
         }
         
-        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
             self.playPauseButton.alpha = 1
         }
     }
@@ -322,11 +343,10 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             return
         }
         
-        UIView.animate(withDuration: Constants.defaultAnimationDuration) {
+        UIView.animate(withDuration: .defaultAnimationDuration) {
             self.playPauseButton.alpha = 0
         }
     }
-    
 
     struct CampaignDescription {
         var headline:String
@@ -335,6 +355,5 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         var videoName:String
         var thumbName:String
         var videoRatio:CGFloat
-        var userDefaultsKey:String
     }
 }
