@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Sun May  6 10:29:30 IDT 2018
-// created from: betterCode -  - d1ada99 
+// created on: Sun May  6 13:26:20 IDT 2018
+// created from: betterCode -  - 6590b33 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -1052,7 +1052,7 @@ typealias AnalyticsSetFiler = Analytics
 extension AnalyticsSetFiler {
     
   static func trackSetFiler(name:String,  newValue:String ) {
-      let key = String.init(format: "Set %s Filter to %s" , name,newValue)
+      let key = String.init(format: "Set %@ Filter to %@" , name,newValue)
       var properties:[String:Any] = [:]
       properties["name"] = name
       properties["newValue"] = newValue
@@ -1074,7 +1074,7 @@ typealias AnalyticsSetGlobalGenderFiler = Analytics
 extension AnalyticsSetGlobalGenderFiler {
     
   static func trackSetGlobalGenderFiler(gender:String ) {
-      let key = String.init(format: "Set Global Gender Filter to %s" , gender)
+      let key = String.init(format: "Set Global Gender Filter to %@" , gender)
       var properties:[String:Any] = [:]
       properties["gender"] = gender
             
@@ -1095,7 +1095,7 @@ typealias AnalyticsSetGlobalSizeFiler = Analytics
 extension AnalyticsSetGlobalSizeFiler {
     
   static func trackSetGlobalSizeFiler(size:String ) {
-      let key = String.init(format: "Set Global Size Filter to %s" , size)
+      let key = String.init(format: "Set Global Size Filter to %@" , size)
       var properties:[String:Any] = [:]
       properties["size"] = size
             
@@ -1116,7 +1116,7 @@ typealias AnalyticsTappedOnSegmentedControl = Analytics
 extension AnalyticsTappedOnSegmentedControl {
     
   static func trackTappedOnSegmentedControl(selectedSegmentTitle:String ) {
-      let key = String.init(format: "Tapped %s Picker List" , selectedSegmentTitle)
+      let key = String.init(format: "Tapped %@ Picker List" , selectedSegmentTitle)
       var properties:[String:Any] = [:]
       properties["selectedSegmentTitle"] = selectedSegmentTitle
             
@@ -2569,7 +2569,7 @@ extension AnalyticsTappedOnProductByBrand {
     }
     
   static func trackTappedOnProductByBrand(product:Product?,  brand:AnalyticsTappedOnProductByBrandBrand ) {
-      let key = String.init(format: "Tapped on %s product" , brand.rawValue)
+      let key = String.init(format: "Tapped on %@ product" , brand.rawValue)
       var properties:[String:Any] = [:]
       if let product = product {
           propertiesFor(product).forEach { properties[$0] = $1 }
