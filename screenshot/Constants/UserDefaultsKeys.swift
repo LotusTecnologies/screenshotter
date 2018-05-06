@@ -78,6 +78,10 @@ class UserDefaultsKeys  {
     
     //In app Purchase
     static let purchasedProductIdentifier = "PurchasedProductIdentifier"
+    
+    //Debug
+    static let showsDebugAnalyticsUI = "ShowsDebugAnalyticsUI"
+
 }
 
 extension UIApplication {
