@@ -116,7 +116,6 @@
 		C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */; };
 		C54088511FE90E2200198955 /* NotifyChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540883E1FE90E2100198955 /* NotifyChangeView.swift */; };
 		C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */; };
-		C54088551FE90E2200198955 /* ClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088461FE90E2200198955 /* ClipView.swift */; };
 		C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088481FE90E2200198955 /* ImageCollectionViewCell.swift */; };
 		C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088491FE90E2200198955 /* ShadowCollectionViewCell.swift */; };
 		C54088591FE90E2200198955 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884E1FE90E2200198955 /* MainButton.swift */; };
@@ -352,7 +351,6 @@
 		C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
 		C540883E1FE90E2100198955 /* NotifyChangeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotifyChangeView.swift; sourceTree = "<group>"; };
 		C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
-		C54088461FE90E2200198955 /* ClipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipView.swift; sourceTree = "<group>"; };
 		C54088481FE90E2200198955 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		C54088491FE90E2200198955 /* ShadowCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShadowCollectionViewCell.swift; sourceTree = "<group>"; };
 		C540884E1FE90E2200198955 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
@@ -817,7 +815,6 @@
 				C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */,
 				C5D2E309204DC97800B5BD92 /* BorderView.swift */,
 				C540884D1FE90E2200198955 /* Button */,
-				C54088461FE90E2200198955 /* ClipView.swift */,
 				C5D57931203EDD6200A076FE /* CollectionView */,
 				C54088471FE90E2200198955 /* CollectionViewCell */,
 				C543696020468C2F00599134 /* Control */,
@@ -1419,7 +1416,6 @@
 				C53B46511FBC396900A8C886 /* Appearance.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C5D2E306204D29D100B5BD92 /* CartTableViewCell.swift in Sources */,
-				C54088551FE90E2200198955 /* ClipView.swift in Sources */,
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
