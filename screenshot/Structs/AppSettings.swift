@@ -35,11 +35,7 @@ class AppSettings  {
     init() {
         previousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
         UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.persistentVersion)
-        if let previousVersion = previousVersion {
-            if previousVersion != currentVersion {
-                UserDefaults.standard.synchronize()
-            }
-        }else{
+        if previousVersion != currentVersion {
             UserDefaults.standard.synchronize()
         }
     }
