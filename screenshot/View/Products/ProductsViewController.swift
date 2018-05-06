@@ -11,8 +11,7 @@ import UIKit
 import CoreData
 
 enum ProductsSection : Int {
-    case tooltip = 0
-    case product = 1
+    case product = 0
     
     var section: Int {
         return self.rawValue
@@ -59,8 +58,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: .UIContentSizeCategoryDidChange, object: nil)
         
         self.productsOptions.delegate = self
     }
@@ -115,7 +112,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
-            collectionView.register(ProductsTooltipCollectionViewCell.self, forCellWithReuseIdentifier: "tooltip")
             collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
             
             
@@ -191,16 +187,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
     }
     
-    @objc func contentSizeCategoryDidChange(_ notification: Notification) {
-        if self.view.window != nil && self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
-            self.collectionView?.reloadItems(at: [IndexPath(item: 0, section: ProductsSection.tooltip.section)])
-        }
-    }
     
     deinit {
         self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
-        NotificationCenter.default.removeObserver(self)
     }
     
     @objc func displayScreenshotAction() {
@@ -291,7 +281,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     func productSectionType(forSection:Int) -> ProductsSection {
-        return ProductsSection(rawValue: forSection) ?? .tooltip
+        return ProductsSection(rawValue: forSection) ?? .product
     }
     
     func collectionViewToShoppablesFrcIndexPath(_ index:Int) ->IndexPath {
@@ -308,12 +298,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionType = productSectionType(forSection: section)
-        if sectionType == .tooltip {
-            let shouldPresentTooldtip = !UserDefaults.standard.bool(forKey: UserDefaultsKeys.productCompletedTooltip)
-            let hasProducts = (self.products.count > 0)
-            return (shouldPresentTooldtip && hasProducts) ? 1 : 0
-            
-        } else if sectionType == .product {
+        if sectionType == .product {
             return self.products.count
             
         } else {
@@ -328,11 +313,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let padding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
         let sectionType = productSectionType(forSection: indexPath.section)
 
-        if sectionType == .tooltip {
-            size.width = collectionView.bounds.size.width
-            size.height = ProductsTooltipCollectionViewCell.height(withCellWidth: size.width)
-            
-        } else if sectionType == .product {
+        if sectionType == .product {
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
             size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
@@ -344,11 +325,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let sectionType = productSectionType(forSection: indexPath.section)
 
-        if sectionType == .tooltip {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tooltip", for: indexPath)
-            return cell
-        }
-        else if sectionType == .product {
+        if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
             
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductsCollectionViewCell {
@@ -376,8 +353,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        let sectionType = productSectionType(forSection: indexPath.section)
-        return sectionType != .tooltip
+        return true
     }
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let sectionType = productSectionType(forSection: section)
@@ -538,10 +514,7 @@ extension ProductsViewControllerProducts{
         
         productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
         
-        if self.collectionView?.numberOfItems(inSection: ProductsSection.tooltip.section) ?? 0 > 0 {
-            self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.tooltip.section), at: .top, animated: false)
-            
-        } else if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
+        if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
     }

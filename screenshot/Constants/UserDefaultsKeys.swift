@@ -25,7 +25,6 @@ class UserDefaultsKeys  {
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
 
     // Product
-    static let productCompletedTooltip = "ProductCompletedTooltip"
     static let productGender = "ProductGender"
     static let productSize = "ProductSize"
     static let productSale = "ProductSale"
