@@ -124,7 +124,6 @@
 		C543695020453CDF00599134 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694F20453CDF00599134 /* ProductView.swift */; };
 		C543695920453FE300599134 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695220453FE300599134 /* ProductsOptions.swift */; };
 		C543695D20453FE300599134 /* ProductsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695620453FE300599134 /* ProductsCollectionViewCell.swift */; };
-		C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695820453FE300599134 /* ProductsViewControllerControl.swift */; };
 		C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696120468C4100599134 /* SegmentedDropDownControl.swift */; };
 		C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */; };
 		C54369672046D6FD00599134 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54369662046D6FD00599134 /* BaseViewController.swift */; };
@@ -152,6 +151,7 @@
 		C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */; };
 		C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB87EC208382EF00E2CB98 /* UIResponder.swift */; };
 		C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AC7E661FFA363500F491C0 /* EmbossedView.swift */; };
+		C5B19BF4209F21C60063CB69 /* CustomInputtableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B19BF3209F21C60063CB69 /* CustomInputtableView.swift */; };
 		C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5BE7C1E20186309000DB8A0 /* DiscoverNavigationController.swift */; };
 		C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C43A53209599D7000AF22A /* ActionFeedbackGenerator.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
@@ -358,7 +358,6 @@
 		C543694F20453CDF00599134 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		C543695220453FE300599134 /* ProductsOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsOptions.swift; sourceTree = "<group>"; };
 		C543695620453FE300599134 /* ProductsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsCollectionViewCell.swift; sourceTree = "<group>"; };
-		C543695820453FE300599134 /* ProductsViewControllerControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsViewControllerControl.swift; sourceTree = "<group>"; };
 		C543696120468C4100599134 /* SegmentedDropDownControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownControl.swift; sourceTree = "<group>"; };
 		C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCartBarButtonItem.swift; sourceTree = "<group>"; };
 		C54369662046D6FD00599134 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
@@ -386,6 +385,7 @@
 		C5AAE78A1FEA38AA00BCFF78 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		C5AB87EC208382EF00E2CB98 /* UIResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIResponder.swift; sourceTree = "<group>"; };
 		C5AC7E661FFA363500F491C0 /* EmbossedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbossedView.swift; sourceTree = "<group>"; };
+		C5B19BF3209F21C60063CB69 /* CustomInputtableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomInputtableView.swift; sourceTree = "<group>"; };
 		C5BE7C1E20186309000DB8A0 /* DiscoverNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverNavigationController.swift; sourceTree = "<group>"; };
 		C5C43A53209599D7000AF22A /* ActionFeedbackGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionFeedbackGenerator.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
@@ -817,6 +817,7 @@
 				C54088471FE90E2200198955 /* CollectionViewCell */,
 				C543696020468C2F00599134 /* Control */,
 				C5D57934203F043200A076FE /* Controller */,
+				C5B19BF3209F21C60063CB69 /* CustomInputtableView.swift */,
 				C5406A86206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift */,
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
@@ -896,7 +897,6 @@
 				C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */,
 				C543695220453FE300599134 /* ProductsOptions.swift */,
 				C5F37C94205505690072FE1D /* ProductsViewController.swift */,
-				C543695820453FE300599134 /* ProductsViewControllerControl.swift */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -1416,6 +1416,7 @@
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
+				C5B19BF4209F21C60063CB69 /* CustomInputtableView.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				3125448A20972013009410D5 /* TutorialEmailSlideViewController.swift in Sources */,
@@ -1564,7 +1565,6 @@
 				3125448420972013009410D5 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
 				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
-				C543695F20453FE300599134 /* ProductsViewControllerControl.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
