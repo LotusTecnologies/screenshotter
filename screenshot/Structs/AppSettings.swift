@@ -35,6 +35,9 @@ class AppSettings  {
     init() {
         previousVersion = UserDefaults.standard.string(forKey: UserDefaultsKeys.persistentVersion)
         UserDefaults.standard.set(currentVersion, forKey: UserDefaultsKeys.persistentVersion)
+        if previousVersion != currentVersion {
+            UserDefaults.standard.synchronize()
+        }
     }
     
     func isCurrentVersion(lessThan version: String?) -> Bool {

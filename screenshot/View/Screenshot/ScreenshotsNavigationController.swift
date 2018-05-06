@@ -17,9 +17,7 @@ class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
     var pickerNavigationController:ScreenshotPickerNavigationController?
-    var clipView:ClipView?
     var activityBarButtonItem:UIBarButtonItem?
-    var previousDidAppearViewControllerWasProductViewController = false
     
     fileprivate var restoredProductsViewController: ProductsViewController?
     
@@ -29,7 +27,6 @@ class ScreenshotsNavigationController: UINavigationController {
         screenshotsViewController.navigationItem.rightBarButtonItem?.tintColor = .crazeRed
         screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(presentPickerViewController))
         screenshotsViewController.delegate = self
-        screenshotsViewController.lifeCycleDelegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
         
@@ -63,18 +60,10 @@ extension ScreenshotsNavigationController {
         return navigationController
     }
     
-    func needsToPresentPickerViewController() -> Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
-    }
-    
     @objc func presentPickerViewController() {
-        self.dismissPickerClipView()
-        
         let picker = self.createScreenshotPickerNavigationController()
         self.pickerNavigationController = picker // ???: is this needed?
         self.present(picker, animated: true, completion: nil)
-        
-        UserDefaults.standard.setValue(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
         
         Analytics.trackOpenedPicker()
     }
@@ -89,33 +78,6 @@ extension ScreenshotsNavigationController {
     @objc func pickerViewControllerDidFinish(){
         self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
-    }
-}
-
-extension ScreenshotsNavigationController : ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, didAppear animated: Bool){
-        if (viewController == self.screenshotsViewController &&
-            self.previousDidAppearViewControllerWasProductViewController)
-        {
-            if self.needsToPresentPickerViewController() {
-                // Allow the view controller transition view to cleanup
-                DispatchQueue.main.async {
-                    self.presentPickerClipView()
-                }
-                
-                // Go back into Products before presenting the next view
-                self.previousDidAppearViewControllerWasProductViewController = false
-                
-            } else if (self.needsToPresentPushAlert()) {
-                self.presentPushAlert()
-            }
-        }
-        
-        if let _ = viewController as? ProductsViewController {
-            self.previousDidAppearViewControllerWasProductViewController = true
-        }else{
-            self.previousDidAppearViewControllerWasProductViewController = false
-        }
     }
 }
 
@@ -134,9 +96,7 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     }
     
     func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController){
-        if (self.needsToPresentPickerViewController()) {
-            self.presentPickerClipView()
-        }
+        
     }
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController){
         self.presentPickerViewController()
@@ -147,7 +107,6 @@ typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationControl
 extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
         let productsViewController = ProductsViewController(screenshot: screenshot)
-        productsViewController.lifeCycleDelegate = self
         return productsViewController
     }
     
@@ -209,49 +168,6 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
             }
             
             self.activityBarButtonItem = nil
-        }
-    }
-}
-
-typealias ScreenshotsNavigationControllerClipView = ScreenshotsNavigationController
-extension ScreenshotsNavigationControllerClipView {
-    func presentPickerClipView() {
-        if (self.clipView == nil && !self.screenshotsViewController.isEditing) {
-            if let tabBarView = self.tabBarController?.view {
-                if let rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem?.targetView, let rightBarButtonViewSuperview = rightBarButtonView.superview {
-                    
-                    let rightBarButtonItemFrame = rightBarButtonView.frame
-                    let rect = rightBarButtonViewSuperview.convert(rightBarButtonItemFrame, to:self.view)
-                    let radius = min(rect.size.height / 2.0, rect.size.width / 2.0)
-                    let croppedPath = UIBezierPath.init(roundedRect: rect, cornerRadius: radius)
-                    
-                    let clipView = ClipView()
-                    clipView.translatesAutoresizingMaskIntoConstraints = false
-                    clipView.clippings = [croppedPath]
-                    clipView.alpha = 0.0
-                    tabBarView.addSubview(clipView)
-                    clipView.topAnchor.constraint(equalTo: tabBarView.topAnchor).isActive = true
-                    clipView.leadingAnchor.constraint(equalTo: tabBarView.leadingAnchor).isActive = true
-                    clipView.bottomAnchor.constraint(equalTo: tabBarView.bottomAnchor).isActive = true
-                    clipView.trailingAnchor.constraint(equalTo: tabBarView.trailingAnchor).isActive = true
-                    self.clipView = clipView
-                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                        self.clipView?.alpha = 1.0
-                    })
-                }
-            }
-        }
-    }
-    
-    func dismissPickerClipView() {
-        if let _ = self.clipView {
-            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                self.clipView?.alpha = 0.0
-                
-            }, completion: { (finished) in
-                self.clipView?.removeFromSuperview()
-                self.clipView = nil
-            })
         }
     }
 }
