@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Sun May  6 13:24:03 IDT 2018
-// created from: betterCode -  - f0cb887 
+// created on: Sun May  6 13:26:20 IDT 2018
+// created from: betterCode -  - 6590b33 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -1052,7 +1052,7 @@ typealias AnalyticsSetFiler = Analytics
 extension AnalyticsSetFiler {
     
   static func trackSetFiler(name:String,  newValue:String ) {
-      let key = String.init(format: "Set %@ Filter to %s" , name,newValue)
+      let key = String.init(format: "Set %@ Filter to %@" , name,newValue)
       var properties:[String:Any] = [:]
       properties["name"] = name
       properties["newValue"] = newValue
