@@ -17,14 +17,13 @@ enum ScreenshotCollectionViewCellSelectedState {
 
 protocol ScreenshotCollectionViewCellDelegate: NSObjectProtocol {
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell)
-    func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell)
 }
 
 class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     weak var delegate: ScreenshotCollectionViewCellDelegate?
     
     private let imageView = UIImageView()
-    private let toolbar = UIToolbar()
+    fileprivate let shopLabel = UILabel()
     private let badge = UIView()
     private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))
     private var shamrockView:UIView?
@@ -48,29 +47,17 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         imageView.layoutMarginsGuide.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
         imageView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
         
-        let deleteButtonItem = UIBarButtonItem(title: "screenshot.option.delete".localized, style: .plain, target: self, action: #selector(deleteAction))
-        let flexilbeItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        
-        // Even though this is set globally, it is possible to hit a race condition
-        // where the first cell has the wrong font. This will force the font.
-        let toolbarButtonItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UIToolbar.self])
-        let titleTextAttributesNormal = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .normal))
-        let titleTextAttributesHighlighted = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .highlighted))
-        let titleTextAttributesDisabled = NSAttributedStringKey.convertStringAnyToNSAttributedStringKeyAny(toolbarButtonItem.titleTextAttributes(for: .disabled))
-        
-        deleteButtonItem.setTitleTextAttributes(titleTextAttributesNormal, for: .normal)
-        deleteButtonItem.setTitleTextAttributes(titleTextAttributesHighlighted, for: .highlighted)
-        deleteButtonItem.setTitleTextAttributes(titleTextAttributesDisabled, for: .disabled)
-        
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
-        toolbar.backgroundColor = UIColor(white: 1, alpha: 0.9)
-        toolbar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
-        toolbar.tintColor = .gray3
-        toolbar.items = [flexilbeItem, deleteButtonItem]
-        mainView.addSubview(toolbar)
-        toolbar.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
-        toolbar.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
-        toolbar.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
+        shopLabel.translatesAutoresizingMaskIntoConstraints = false
+        shopLabel.text = "screenshot.shop".localized
+        shopLabel.textAlignment = .center
+        shopLabel.backgroundColor = .white
+        shopLabel.font = .screenshopFont(.hindSemibold, size: 16)
+        shopLabel.textColor = .gray5
+        mainView.addSubview(shopLabel)
+        shopLabel.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
+        shopLabel.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        shopLabel.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
+        shopLabel.heightAnchor.constraint(equalToConstant: 38).isActive = true
         
         badge.frame = CGRect(x: 0, y: 0, width: 28, height: 28)
         badge.translatesAutoresizingMaskIntoConstraints = false
@@ -153,7 +140,6 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             shamrackImageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor).isActive = true
             shamrackImageView.widthAnchor.constraint(equalToConstant: 58).isActive = true
             shamrackImageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
-
             
             self.shamrockView = shamrackImageView
         }
@@ -205,8 +191,9 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     fileprivate func resetSelectedState() {
         imageView.alpha = 1
         badge.alpha = 1
-        toolbar.alpha = isEditing ? 0 : 1
+        shopLabel.alpha = isEditing ? 0 : 1
         likesCountView?.alpha = isEditing ? 0 : 1
+        shareButton.alpha = isEditing ? 0 : 1
         checkImageView.alpha = 0
         isUserInteractionEnabled = true
     }
@@ -216,7 +203,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
             return
         }
         
-        let toolbarAlpha: CGFloat = isEditing ? 0 : 0.5
+        let alpha: CGFloat = isEditing ? 0 : 0.5
         
         switch selectedState {
         case .none:
@@ -225,16 +212,18 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
         case .checked:
             imageView.alpha = 0.5
             badge.alpha = 0.5
-            toolbar.alpha = toolbarAlpha
-            likesCountView?.alpha = toolbarAlpha
+            shopLabel.alpha = alpha
+            likesCountView?.alpha = alpha
+            shareButton.alpha = alpha
             checkImageView.alpha = 1
             isUserInteractionEnabled = true
             
         case .disabled:
             imageView.alpha = 0.5
             badge.alpha = 0.5
-            toolbar.alpha = toolbarAlpha
-            likesCountView?.alpha = toolbarAlpha
+            shopLabel.alpha = alpha
+            likesCountView?.alpha = alpha
+            shareButton.alpha = alpha
             checkImageView.alpha = 0
             isUserInteractionEnabled = false
         }
@@ -256,8 +245,9 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     var isEditing = false {
         didSet {
-            toolbar.alpha = isEditing ? 0 : 1
+            shopLabel.alpha = isEditing ? 0 : 1
             likesCountView?.alpha = isEditing ? 0 : 1
+            shareButton.alpha = isEditing ? 0 : 1
         }
     }
     
@@ -291,9 +281,5 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     @objc func shareAction() {
         delegate?.screenshotCollectionViewCellDidTapShare(self)
-    }
-    
-    @objc func deleteAction() {
-        delegate?.screenshotCollectionViewCellDidTapDelete(self)
     }
 }
