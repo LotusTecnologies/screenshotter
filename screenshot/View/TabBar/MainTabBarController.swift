@@ -47,23 +47,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         super.init(nibName: nil, bundle: nil)
         
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
-        favoritesNavigationController.tabBarItem = tabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: TabIndex.favorites.rawValue)
+        favoritesNavigationController.tabBarItem = UITabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: TabIndex.favorites.rawValue)
         
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
-        discoverNavigationController.tabBarItem = tabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: TabIndex.discover.rawValue)
+        discoverNavigationController.tabBarItem = UITabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: TabIndex.discover.rawValue)
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
         screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = tabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: TabIndex.screenshots.rawValue)
+        screenshotsNavigationController.tabBarItem = UITabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: TabIndex.screenshots.rawValue)
         
         settingsNavigationController.settingsViewController.delegate = self
         settingsNavigationController.title = settingsNavigationController.settingsViewController.title
-        settingsNavigationController.tabBarItem = tabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: TabIndex.settings.rawValue)
+        settingsNavigationController.tabBarItem = UITabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: TabIndex.settings.rawValue)
         settingsNavigationController.tabBarItem.badgeColor = .crazeRed
         settingsTabBarItem = settingsNavigationController.tabBarItem
         
         cartNavigationController.title = cartNavigationController.cartViewController.title
-        cartNavigationController.tabBarItem = tabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: TabIndex.cart.rawValue)
+        cartNavigationController.tabBarItem = UITabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: TabIndex.cart.rawValue)
         cartNavigationController.tabBarItem.badgeColor = .crazeRed
         
         self.delegate = self
@@ -123,19 +123,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         self.lifeCycleDelegate?.viewController(self, didDisappear: animated)
     }
-
-    @available(iOS, introduced: 11.0)
-    override func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        
-        let offset: CGFloat = 16
-        if let safeAreaInsetsBottom = self.view.window?.safeAreaInsets.bottom,
-          safeAreaInsetsBottom > 0 {
-            viewControllers?.forEach { viewController in
-                viewController.tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0, -offset, 0)
-            }
-        }
-    }
     
     @objc private func applicationDidBecomeActive(_ notification: Notification) {
         if self.view.window != nil {
@@ -188,13 +175,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 
     // MARK: - Tab Bar
     
-    func tabBarItem(title: String?, image: UIImage?, tag: Int) -> UITabBarItem {
-        let offset: CGFloat = 6
-        let tabBarItem = UITabBarItem(title: title, image: image, tag: tag)
-        tabBarItem.imageInsets = UIEdgeInsetsMake(offset, 0, -offset, 0)
-        tabBarItem.titlePositionAdjustment = UIOffsetMake(0, self.tabBar.intrinsicContentSize.height * 2)
-        return tabBarItem
-    }
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if self.selectedViewController == self.settingsNavigationController {
@@ -211,10 +191,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 if let tabTitle = viewcontroller.title {
                     Analytics.trackTabBarTapped(tab: tabTitle)
                 }
-                
             }
         }
-        
     }
     
     func presentTabBarSettingsBadge() {
