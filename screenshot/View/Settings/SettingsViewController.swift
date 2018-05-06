@@ -51,8 +51,6 @@ class SettingsViewController : BaseViewController {
     weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
-    fileprivate let tableHeaderContentView = UIView()
-    fileprivate let screenshotsCountLabel = UILabel()
     fileprivate let tableFooterTextView = UITextView()
     
     fileprivate var nameTextField: UITextField?
@@ -96,55 +94,6 @@ class SettingsViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tableHeaderView: UIView = {
-            let view = UIView()
-            view.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: 0, right: .padding)
-
-            tableHeaderContentView.translatesAutoresizingMaskIntoConstraints = false
-            tableHeaderContentView.backgroundColor = .white
-            tableHeaderContentView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-            tableHeaderContentView.layer.cornerRadius = .defaultCornerRadius
-            tableHeaderContentView.layer.shadowColor = Shadow.basic.color.cgColor
-            tableHeaderContentView.layer.shadowOffset = Shadow.basic.offset
-            tableHeaderContentView.layer.shadowRadius = Shadow.basic.radius
-            tableHeaderContentView.layer.shadowOpacity = 1
-            view.addSubview(tableHeaderContentView)
-            tableHeaderContentView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
-            tableHeaderContentView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
-            tableHeaderContentView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            tableHeaderContentView.leftAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leftAnchor).isActive = true
-            tableHeaderContentView.rightAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.rightAnchor).isActive = true
-
-            let imageView = UIImageView(image: UIImage(named: "SettingsAddPhotos"))
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            imageView.contentMode = .scaleAspectFit
-            imageView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -.padding)
-            tableHeaderContentView.addSubview(imageView)
-            imageView.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
-            imageView.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
-            imageView.leftAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.leftAnchor).isActive = true
-            imageView.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
-            
-            screenshotsCountLabel.translatesAutoresizingMaskIntoConstraints = false
-            screenshotsCountLabel.textAlignment = .center
-            screenshotsCountLabel.font = .screenshopFont(.hindLight, size: 20)
-            screenshotsCountLabel.adjustsFontSizeToFitWidth = true
-            screenshotsCountLabel.minimumScaleFactor = 0.7
-            screenshotsCountLabel.baselineAdjustment = .alignCenters
-            tableHeaderContentView.addSubview(screenshotsCountLabel)
-            screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .horizontal)
-            screenshotsCountLabel.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
-            screenshotsCountLabel.leftAnchor.constraint(equalTo: imageView.layoutMarginsGuide.rightAnchor).isActive = true
-            screenshotsCountLabel.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
-            screenshotsCountLabel.rightAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.rightAnchor).isActive = true
-            
-            var rect = view.frame
-            rect.size.height = view.layoutMargins.top + view.layoutMargins.bottom + tableHeaderContentView.layoutMargins.top + tableHeaderContentView.layoutMargins.bottom + (imageView.image?.size.height ?? 0)
-            view.frame = rect
-            
-            return view
-        }()
-        
         tableFooterTextView.backgroundColor = .clear
         tableFooterTextView.isEditable = false
         tableFooterTextView.scrollsToTop = false
@@ -166,7 +115,6 @@ class SettingsViewController : BaseViewController {
         tableView.dataSource = self
         tableView.backgroundView = nil
         tableView.backgroundColor = .clear
-        tableView.tableHeaderView = tableHeaderView
         tableView.tableFooterView = tableFooterTextView
         tableView.keyboardDismissMode = .onDrag
         view.addSubview(tableView)
@@ -218,7 +166,6 @@ class SettingsViewController : BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        updateScreenshotsCount()
         reloadChangeableIndexPaths()
     }
     
@@ -247,7 +194,6 @@ class SettingsViewController : BaseViewController {
     
     @objc private func applicationWillEnterForeground(_ notification: Notification) {
         if view?.window != nil {
-            updateScreenshotsCount()
             reloadChangeableIndexPaths()
         }
     }
@@ -306,29 +252,6 @@ class SettingsViewController : BaseViewController {
             return nil
         }
         return IndexPath(row: rowValue, section: section.rawValue)
-    }
-    
-    // MARK: Screenshots
-    
-    var screenshotsCountText: String {
-        let screenshotCount = DataModel.sharedInstance.countTotalScreenshots()
-        
-        if screenshotCount == 1 {
-            return "settings.screenshot.single".localized(withFormat: screenshotCount)
-            
-        } else {
-            return "settings.screenshot.plural".localized(withFormat: screenshotCount)
-        }
-    }
-    
-    private func layoutScreenshotsCountShadow() {
-        tableHeaderContentView.layoutIfNeeded()
-        tableHeaderContentView.layer.shadowPath = UIBezierPath(roundedRect: tableHeaderContentView.bounds, cornerRadius: tableHeaderContentView.layer.cornerRadius).cgPath
-    }
-    
-    private func updateScreenshotsCount() {
-        screenshotsCountLabel.text = screenshotsCountText
-        layoutScreenshotsCountShadow()
     }
     
     // MARK: Product Options
