@@ -8,7 +8,6 @@
 
 import UIKit
 import Intercom
-//import UserNotifications
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {
@@ -47,25 +46,29 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         // Important to note that super.init will call viewDidLoad before completing the init
         super.init(nibName: nil, bundle: nil)
         
+        func createTabBarItem(title: String?, imageNamed: String, tag: TabIndex) -> UITabBarItem {
+            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.rawValue)
+            tabBarItem.badgeColor = .crazeRed
+            return tabBarItem
+        }
+        
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
-        favoritesNavigationController.tabBarItem = UITabBarItem(title: favoritesNavigationController.title, image: UIImage(named: "TabBarHeart"), tag: TabIndex.favorites.rawValue)
+        favoritesNavigationController.tabBarItem = createTabBarItem(title: favoritesNavigationController.title, imageNamed: "TabBarHeart", tag: .favorites)
         
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
-        discoverNavigationController.tabBarItem = UITabBarItem(title: discoverNavigationController.title, image: UIImage(named: "TabBarGlobe"), tag: TabIndex.discover.rawValue)
+        discoverNavigationController.tabBarItem = createTabBarItem(title: discoverNavigationController.title, imageNamed: "TabBarGlobe", tag: .discover)
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
         screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = UITabBarItem(title: screenshotsNavigationController.title, image: UIImage(named: "TabBarScreenshot"), tag: TabIndex.screenshots.rawValue)
+        screenshotsNavigationController.tabBarItem = createTabBarItem(title: screenshotsNavigationController.title, imageNamed: "TabBarScreenshot", tag: .screenshots)
         
         settingsNavigationController.settingsViewController.delegate = self
         settingsNavigationController.title = settingsNavigationController.settingsViewController.title
-        settingsNavigationController.tabBarItem = UITabBarItem(title: settingsNavigationController.title, image: UIImage(named: "TabBarUser"), tag: TabIndex.settings.rawValue)
-        settingsNavigationController.tabBarItem.badgeColor = .crazeRed
+        settingsNavigationController.tabBarItem = createTabBarItem(title: settingsNavigationController.title, imageNamed: "TabBarUser", tag: .settings)
         settingsTabBarItem = settingsNavigationController.tabBarItem
         
         cartNavigationController.title = cartNavigationController.cartViewController.title
-        cartNavigationController.tabBarItem = UITabBarItem(title: cartNavigationController.title, image: UIImage(named: "TabBarCart"), tag: TabIndex.cart.rawValue)
-        cartNavigationController.tabBarItem.badgeColor = .crazeRed
+        cartNavigationController.tabBarItem = createTabBarItem(title: cartNavigationController.title, imageNamed: "TabBarCart", tag: .cart)
         
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
@@ -83,7 +86,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: .fetchedAppSettings, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
         
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
         
@@ -255,18 +257,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
     }
     
-    fileprivate func syncScreenshotTabBadgeCount() {
-        let count = AccumulatorModel.sharedInstance.getNewScreenshotsCount()
+    func syncScreenshotTabBadgeCount() {
+        let count = DataModel.sharedInstance.countNewScreenshots()
         screenshotsNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
-        
-        // TODO: neither of the below approaches seem to work...
-        UIApplication.shared.applicationIconBadgeNumber = count
-        
-//        let content = UNMutableNotificationContent()
-//        content.badge = NSNumber(value: count)
-//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-//        let request = UNNotificationRequest(identifier: "UpdateBadge", content: content, trigger: trigger)
-//        UNUserNotificationCenter.current().add(request)
     }
     
     // MARK: View Controllers
@@ -337,12 +330,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     @objc func presentChangelogAlertIfNeeded() {
         ChangelogAlertController.presentIfNeeded(inViewController: self)
-    }
-    
-    // MARK: - Accumulator
-    
-    @objc fileprivate func accumulatorModelNumberDidChange(_ notification: Notification) {
-        syncScreenshotTabBadgeCount()
     }
 }
 
