@@ -740,7 +740,13 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         }
         return .zero
     }
+    
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let cell = cell as? ScreenshotCollectionViewCell {
+            // The editing state can be out of sync. because the state is set for all visible cells and new cells that are created - BUT there are cells that are created but not yet put into the view that are not in a correct editing state.
+            self.setupScreenshot(cell: cell, collectionView: collectionView, indexPath: indexPath)
+        }
+        
         if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
             switch sectionType {
             case .product:
@@ -872,6 +878,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         self.syncScreenshotCollectionViewCellSelectedState(cell)
         
     }
+    
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
             switch sectionType {
