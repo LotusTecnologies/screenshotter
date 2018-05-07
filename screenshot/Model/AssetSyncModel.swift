@@ -153,19 +153,19 @@ class AssetSyncModel: NSObject {
 //User initiated Import
 extension AssetSyncModel {
     
-    public func importPhotosToScreenshot(assetIds:[String]) {
+    public func importPhotosToScreenshot(assetIds:[String], source:ScreenshotSource) {
         assetIds.forEach {
             if let asset = PHAsset.assetWith(assetId: $0) {
-                self.uploadPhoto(asset: asset)
+                self.uploadPhoto(asset: asset, source: source)
             }
         }
     }
     
-    public func importPhotosToScreenshot(assets:[PHAsset]) {
-        assets.forEach{ self.uploadPhoto(asset: $0) }
+    public func importPhotosToScreenshot(assets:[PHAsset], source:ScreenshotSource) {
+        assets.forEach{ self.uploadPhoto(asset: $0, source: source) }
     }
     
-    func uploadPhoto(asset: PHAsset) {
+    func uploadPhoto(asset: PHAsset, source:ScreenshotSource) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0, completion: { (completeOperation) in
             AccumulatorModel.sharedInstance.removeAssetId(asset.localIdentifier)
             asset.image(allowFromICloud: true).then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
@@ -200,7 +200,7 @@ extension AssetSyncModel {
                             screenshot.isHidden = false
                             screenshot.isRecognized = true
                             screenshot.lastModified = Date()
-                            screenshot.source = .gallery
+                            screenshot.source = source
                             screenshot.submittedDate = nil
                             screenshot.submittedFeedbackCount = 0
                             screenshot.submittedFeedbackCountDate = nil
@@ -225,7 +225,7 @@ extension AssetSyncModel {
                             screenshot.isRecognized = true
                             screenshot.isHidden = false
                             screenshot.imageData = imageData
-                            screenshot.source = .gallery
+                            screenshot.source = source
                             
                             managedObjectContext.saveIfNeeded()
                             fulfill((ClarifaiModel.ImageClassification.human, imageData))
@@ -430,7 +430,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 assetId: asset.localIdentifier,
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
-                                                                                source: .gallery,
+                                                                                source: .screenshot,
                                                                                 isHidden: isHidden,
                                                                                 imageData: imageData,
                                                                                 classification: classification)
@@ -924,7 +924,8 @@ extension AssetSyncModel {
             }
             backgroundScreenshot?.shoppablesCount = 0
             managedObjectContext.saveIfNeeded()
-            self.uploadPhoto(asset: asset)
+            let source = backgroundScreenshot?.source
+            self.uploadPhoto(asset: asset, source: source ?? .unknown)
         }
     }
 }

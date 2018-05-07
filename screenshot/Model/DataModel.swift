@@ -15,6 +15,8 @@ enum ScreenshotSource : String {
     case unknown
     case discover
     case gallery
+    case camera
+    case screenshot
     case shuffle
     case share
     case tutorial

@@ -183,7 +183,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         super.viewWillDisappear(animated)
         self.dismissOptions()
         hideShareToDiscoverPrompt()
-        
     }
     
     deinit {

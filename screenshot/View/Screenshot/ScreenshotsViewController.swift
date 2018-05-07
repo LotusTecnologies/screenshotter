@@ -533,7 +533,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             
             alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
                 if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
-                    if !(source == .gallery || source == .share || source == .unknown) || submittedDate != nil {
+                    if !(source == .gallery || source == .share || source == .unknown || source == .camera || source == .screenshot) || submittedDate != nil {
                         let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
                         
                         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
@@ -635,7 +635,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         switch cell.contentText {
             case .importSingleScreenshot:
                 if let assetId = self.notificationCellAssetId() {
-                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId])
+                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId], source: .screenshot)
                 }else{
                     self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
                 }
