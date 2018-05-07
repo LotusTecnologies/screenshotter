@@ -280,14 +280,12 @@
 "products.rate.unrated" = "Are these results relevant?";
 "products.title" = "Products";
 
-"screenshot.delete.title" = "Delete Screenshot";
 "screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
 "screenshot.empty.title" = "No Screenshots Yet";
 "screenshot.import.latest" = "Import your latest screenshot?";
 "screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
 "screenshot.import.very_many" = "You have many new screenshots, do you want to import them?";
-"screenshot.option.delete" = "DELETE";
-"screenshot.option.share" = "SHARE";
+"screenshot.shop" = "Shop Photo";
 "screenshot.permission.photo.allow" = "Allow Access";
 "screenshot.permission.photo.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.photo.title" = "Shop With Screenshop";

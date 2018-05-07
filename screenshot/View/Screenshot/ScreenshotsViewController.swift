@@ -575,26 +575,6 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         self.dismiss(animated: true, completion: nil)
     }
     
-    func screenshotCollectionViewCellDidTapDelete(_ cell: ScreenshotCollectionViewCell) {
-        if let indexPath = self.collectionView?.indexPath(for: cell), let screenshot = self.screenshot(at: indexPath.item) {
-            let objectId = screenshot.objectID
-            let alertController = UIAlertController.init(title: "screenshot.delete.title".localized, message: nil, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
-            alertController.addAction(UIAlertAction.init(title: "generic.delete".localized, style: .destructive, handler: { (a) in
-                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectId) {
-                    Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .single)
-                    screenshot.setHide()
-                    self.removeScreenshotHelperView()
-                    self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                        cell.selectedState = .disabled
-                    })
-                }
-            }))
-            
-            self.present(alertController, animated: true, completion: nil)
-        }
-    }
     func syncScreenshotCollectionViewCellSelectedState(_ cell:ScreenshotCollectionViewCell) {
         if self.isEditing {
             cell.selectedState = .checked
