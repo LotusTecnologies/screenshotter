@@ -8,7 +8,7 @@
 
 import UIKit
 import Intercom
-import UserNotifications
+//import UserNotifications
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {
