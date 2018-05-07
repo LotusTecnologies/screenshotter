@@ -100,7 +100,11 @@ class FormRow: NSObject {
     var id: Int?
     var title: String?
     var placeholder: String?
-    var value: String?
+    var value: String?{
+        didSet {
+            print("change value  \(oldValue) -> \(value) " );
+        }
+    }
     
     var isRequired = true
     func isValid() -> Bool {

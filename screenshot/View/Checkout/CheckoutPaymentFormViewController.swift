@@ -26,7 +26,7 @@ enum CheckoutPaymentFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutPaymentFormViewController: CheckoutFormViewController {
+class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPaymentViewControllerDelegate {
     fileprivate var card: Card?
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
@@ -165,8 +165,32 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         
         self.confirmBeforeSave = confirmBeforeSave
         self.autoSaveBillAddressAsShippingAddress = autoSaveBillAddressAsShippingAddress
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "OCR", style: .plain, target: self, action: #selector(enterCreditCard(_:)))
     }
     
+    @objc func enterCreditCard(_ sender:Any){
+        if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
+            scanner.modalTransitionStyle = .crossDissolve
+            self.present(scanner, animated: true, completion: nil)
+        }
+    }
+    func userDidProvide(_ cardInfo: CardIOCreditCardInfo!, in paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        formRow(.cardName)?.value = cardInfo.cardholderName
+        formRow(.cardNumber)?.value = "4242424242424242";//cardInfo.cardNumber
+        let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
+        formRow(.cardCVV)?.value = cardInfo.cvv
+        formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
+        
+        self.tableView.reloadData()
+    }
+    func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        formRow(.cardNumber)?.value = "4242424242424242";//cardInfo.cardNumber
+        
+        self.tableView.reloadData()
+
+    }
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
     }

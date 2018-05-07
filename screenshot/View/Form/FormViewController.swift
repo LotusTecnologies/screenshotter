@@ -262,7 +262,7 @@ extension FormViewController: UITableViewDataSource {
         }
         else if let cell = cell as? FormTextTableViewCell {
             let isLastCell = (indexPath.row > tableView.numberOfRows(inSection: indexPath.section) - 1)
-            
+
             cell.textField.delegate = self
             cell.textField.returnKeyType = isLastCell ? .done : .next
         }
