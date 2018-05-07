@@ -137,7 +137,11 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.rateView = rateView
         
         let scrollRevealController = ScrollRevealController(edge: .bottom)
-        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+        scrollRevealController.adjustedContentInset = {
+            let top = navigationController?.navigationBar.frame.maxY ?? 0
+            let bottom = tabBarController?.tabBar.bounds.height ?? 0
+            return UIEdgeInsets(top: top, left: 0, bottom: bottom, right: 0)
+        }()
         scrollRevealController.insertAbove(collectionView)
 
         scrollRevealController.view.addSubview(rateView)
