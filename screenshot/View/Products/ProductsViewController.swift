@@ -43,13 +43,13 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
-    var image:UIImage!
     var state:ProductsViewControllerState = .loading {
         didSet {
             self.syncViewsAfterStateChange()
         }
     }
     var shareToDiscoverPrompt:UIView?
+    fileprivate let filterView = CustomInputtableView()
     
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
@@ -60,6 +60,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.restorationIdentifier = "ProductsViewController"
         
         self.productsOptions.delegate = self
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(presentOptions))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -146,25 +148,22 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
         rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
         
+        view.addSubview(filterView)
         
         var height = self.rateView.intrinsicContentSize.height
-        
 
         if #available(iOS 11.0, *) {
             height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
         }
         self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
         
-        self.syncScreenshotRelatedObjects()
-        
-        if self.screenshotController?.first?.shoppablesCount == -1  {
+        if self.screenshotController?.first?.shoppablesCount == -1 {
             self.state = .retry
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -187,7 +186,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
     }
     
-    
     deinit {
         self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
@@ -195,8 +193,13 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     
     @objc func displayScreenshotAction() {
         Analytics.trackFeatureScreenshotPreviewViewed(screenshot: self.screenshot)
+        
         let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
-        navigationController.screenshotDisplayViewController.image = self.image
+        
+        if let data = self.screenshot.imageData, let image = UIImage(data: data as Data) {
+            navigationController.screenshotDisplayViewController.image = image
+        }
+        
         navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
         self.present(navigationController, animated: true, completion: nil)
     }
@@ -398,61 +401,23 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
 private typealias ProductsViewControllerOptionsView = ProductsViewController
 extension ProductsViewControllerOptionsView {
-    
-    func updateOptionsView() {
-        if self.hasShoppables() {
-            if self.navigationItem.titleView == nil {
-                let label = UILabel()
-                label.adjustsFontSizeToFitWidth = true
-                label.minimumScaleFactor = 0.7
-                
-                var attributes = UINavigationBar.appearance().titleTextAttributes
-                attributes?[NSAttributedStringKey.foregroundColor] = UIColor.crazeGreen
-                
-                let attributedString = NSMutableAttributedString(string: "products.options.title".localized, attributes: attributes)
-                
-                let offset:CGFloat = 3
-                attributes?[NSAttributedStringKey.baselineOffset] = offset
-                
-                let arrowString = NSAttributedString(string: "⌄", attributes: attributes)
-                attributedString.append(arrowString)
-                
-                label.attributedText = attributedString
-                label.sizeToFit()
-                
-                var rect = label.frame
-                rect.origin.y -= offset
-                label.frame = rect
-                
-                let container = ProductsViewControllerControl(frame:label.bounds)
-                container.addTarget(self, action: #selector(presentOptions(_:)), for: .touchUpInside)
-                container.addSubview(label)
-                self.navigationItem.titleView = container
-            }
+    @objc func presentOptions() {
+        if filterView.isFirstResponder {
+            filterView.resignFirstResponder()
         }
         else {
-            self.navigationItem.titleView = nil
-        }
-    }
-    
-    @objc func presentOptions(_ control:ProductsViewControllerControl) {
-        
-        if control.isFirstResponder {
-            control.resignFirstResponder()
-        }
-        else {
-
             Analytics.trackOpenedFiltersView()
-            if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
+            
+            if let shoppable = self.shoppablesToolbar?.selectedShoppable() {
                 self.productsOptions.syncOptions(withMask: shoppable.getLast())
             }
-            control.customInputView = self.productsOptions.view
-            control.becomeFirstResponder()
+            filterView.customInputView = self.productsOptions.view
+            filterView.becomeFirstResponder()
         }
     }
     
     func dismissOptions() {
-        self.navigationItem.titleView?.endEditing(true)
+        filterView.endEditing(true)
     }
 }
 
@@ -756,9 +721,7 @@ extension ProductsViewControllerShareToDiscoverPrompt {
 }
 
 extension ProductsViewController {
-    
     func syncViewsAfterStateChange() {
-        self.updateOptionsView()
         self.shoppablesToolbar?.isHidden = self.shouldHideToolbar()
         
         switch (state) {
@@ -798,36 +761,6 @@ extension ProductsViewController {
             self.showNoItemsHelperView()
         }
     }
-    
-    func syncScreenshotRelatedObjects() {
-        if let data = self.screenshot.imageData, let i = UIImage(data: data as Data) {
-            self.image = i
-        } else {
-            self.image = UIImage()
-        }
-        
-        self.navigationItem.rightBarButtonItem = {
-            let buttonSize:CGFloat = 32
-            
-            let button = UIButton(type: UIButtonType.custom)
-            button.frame = CGRect(x: 0, y: 0, width: buttonSize, height: buttonSize)
-            button.imageView?.contentMode = .scaleAspectFill
-            button.setImage(self.image, for: .normal)
-            
-            button.addTarget(self, action: #selector(displayScreenshotAction), for: .touchUpInside)
-            
-            button.layer.borderColor = UIColor.crazeGreen.cgColor
-            button.layer.borderWidth = 1
-            
-            let barButtonItem = UIBarButtonItem(customView: button)
-            button.widthAnchor.constraint(equalToConstant: button.bounds.size.width).isActive = true
-            button.heightAnchor.constraint(equalToConstant: button.bounds.size.height).isActive = true
-            
-            
-            return barButtonItem
-        }()
-    }
-    
 }
 
 private typealias ProductsViewControllerNoItemsHelperView = ProductsViewController
