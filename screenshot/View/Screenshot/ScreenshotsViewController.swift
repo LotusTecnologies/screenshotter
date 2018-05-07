@@ -220,7 +220,9 @@ extension ScreenshotsViewController {
         
         let emptyListView:ScreenshotsHelperView = {
             let emptyListView = ScreenshotsHelperView()
-            emptyListView.button.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            emptyListView.permissionButton.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            emptyListView.uploadButton.addTarget(self, action: #selector(emptyListViewUploadAction), for:.touchUpInside)
+            emptyListView.discoverButton.addTarget(self, action: #selector(emptyListViewDiscoverAction), for:.touchUpInside)
             collectionView.emptyView = emptyListView
             return emptyListView
         }()
@@ -237,9 +239,21 @@ extension ScreenshotsViewController {
         }
     }
     
-    @objc func emptyListViewAllowAccessAction() {
+    @objc fileprivate func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
             self.syncEmptyListView()
+        }
+    }
+    
+    @objc fileprivate func emptyListViewUploadAction() {
+        if let navigationController = navigationController as? ScreenshotsNavigationController {
+            navigationController.presentPickerViewController()
+        }
+    }
+    
+    @objc fileprivate func emptyListViewDiscoverAction() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
         }
     }
 }
