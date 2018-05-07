@@ -75,7 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
-        Analytics.trackDevMemoryWarning(freeDiskSpace: UIDevice.current.freeDiskSpace(), totalDiskSpace: UIDevice.current.totalDiskSpace(), freeRam: UIDevice.current.ramFree(), usedRam: UIDevice.current.ramUsed())
+        Analytics.trackDevMemoryWarning()
     }
     
     func asyncLoadStore(){
