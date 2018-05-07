@@ -8,6 +8,7 @@
 
 import UIKit
 import Intercom
+import UserNotifications
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {
@@ -81,12 +82,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name:.fetchedAppSettings, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: .fetchedAppSettings, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
         
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
-        syncCartTabItemCount()
+        syncCartTabBadgeCount()
     }
     
     override func viewDidLoad() {
@@ -101,6 +103,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.lifeCycleDelegate?.viewController(self, willAppear: animated)
         
         self.refreshTabBarSettingsBadge()
+        syncScreenshotTabBadgeCount()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -175,7 +178,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 
     // MARK: - Tab Bar
     
-    
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
@@ -248,6 +250,25 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         })
     }
     
+    fileprivate func syncCartTabBadgeCount() {
+        let count = cartItemFrc?.fetchedObjectsCount ?? 0
+        cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+    }
+    
+    fileprivate func syncScreenshotTabBadgeCount() {
+        let count = AccumulatorModel.sharedInstance.getNewScreenshotsCount()
+        screenshotsNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+        
+        // TODO: neither of the below approaches seem to work...
+        UIApplication.shared.applicationIconBadgeNumber = count
+        
+//        let content = UNMutableNotificationContent()
+//        content.badge = NSNumber(value: count)
+//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+//        let request = UNNotificationRequest(identifier: "UpdateBadge", content: content, trigger: trigger)
+//        UNUserNotificationCenter.current().add(request)
+    }
+    
     // MARK: View Controllers
     
     static func resetViewControllerHierarchy(_ viewController: UIViewController, select tabIndex: MainTabBarController.TabIndex) {
@@ -303,7 +324,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
     }
     
-    
     // MARK: - Update Prompt
     
     @objc func presentUpdatePromptIfNeeded() {
@@ -319,16 +339,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         ChangelogAlertController.presentIfNeeded(inViewController: self)
     }
     
-    // MARK: - Cart
+    // MARK: - Accumulator
     
-    fileprivate func syncCartTabItemCount() {
-        let count = cartItemFrc?.fetchedObjectsCount ?? 0
-        cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+    @objc fileprivate func accumulatorModelNumberDidChange(_ notification: Notification) {
+        syncScreenshotTabBadgeCount()
     }
 }
 
 extension MainTabBarController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        syncCartTabItemCount()
+        syncCartTabBadgeCount()
     }
 }

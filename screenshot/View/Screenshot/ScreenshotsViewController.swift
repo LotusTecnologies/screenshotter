@@ -622,8 +622,9 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-    Analytics.trackScreenshotNotificationCancelled(screenshotCount: screenshotsCount)
+        Analytics.trackScreenshotNotificationCancelled(screenshotCount: screenshotsCount)
     }
+    
     func notificationCellAssetId() -> String?{
         return AccumulatorModel.sharedInstance.assetIds.first
     }
