@@ -402,7 +402,6 @@ class AnalyticsTrackers : NSObject {
                 KochavaTracker.shared.send(kEvent)
                 
             }
-            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
         
         func identify(_ user: AnalyticsUser) {
