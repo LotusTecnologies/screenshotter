@@ -348,11 +348,13 @@ extension CheckoutOrderViewControllerOrder {
     private func performCheckout(with card: Card, cvv: String, shippingAddress: ShippingAddress, orderButton: MainButton?) {
         orderButton?.isLoading = true
         orderButton?.isEnabled = false
+        let cardEmail = card.email
+        let cardName = card.fullName
         
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { orderNumber -> Void in
                 
-                Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber)
+                Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber, cardEmail: cardEmail, cardFullName: cardName)
                 self.dismissConfirmPaymentViewController()
                 
                 let confirmationViewController = CheckoutConfirmationViewController()
