@@ -74,6 +74,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        Analytics.trackDevMemoryWarning()
+    }
+    
     func asyncLoadStore(){
         DataModel.sharedInstance.loadStore(multipleAttempts: 5).then(execute: { (success) -> Void in
             DispatchQueue.main.async {
