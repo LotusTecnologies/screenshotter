@@ -39,6 +39,8 @@ class ScreenshotsViewController: BaseViewController {
     var hasNewScreenshotSection = false
     var hasProductBar = false
     
+    fileprivate var screenshotPreviewingContext: UIViewControllerPreviewing?
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         
@@ -78,9 +80,7 @@ class ScreenshotsViewController: BaseViewController {
             self.productBarContentChanged(productsBarController)
         }
         
-        if traitCollection.forceTouchCapability == .available {
-            registerForPreviewing(with: self, sourceView: collectionView)
-        }
+        enableScreenshotPreviewing()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -388,6 +388,13 @@ extension ScreenshotsViewController {
     
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
+        
+        if editing {
+            disableScreenshotPreviewing()
+        }
+        else {
+            enableScreenshotPreviewing()
+        }
         
         if (self.tabBarController != nil && editing) {
             var bottom:CGFloat = 0.0
@@ -928,6 +935,18 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
 }
 
 extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
+    fileprivate func enableScreenshotPreviewing() {
+        if traitCollection.forceTouchCapability == .available {
+            screenshotPreviewingContext = registerForPreviewing(with: self, sourceView: collectionView)
+        }
+    }
+    
+    fileprivate func disableScreenshotPreviewing() {
+        if traitCollection.forceTouchCapability == .available, let context = screenshotPreviewingContext {
+            unregisterForPreviewing(withContext: context)
+        }
+    }
+    
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         if let indexPath = collectionView.indexPathForItem(at: location),
             let screenshot = screenshot(at: indexPath.item),
