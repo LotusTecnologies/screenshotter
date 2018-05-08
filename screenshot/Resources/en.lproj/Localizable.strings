@@ -322,6 +322,7 @@
 "settings.region.other" = "Other";
 "settings.region.unknown" = "Unknown";
 "settings.region.us" = "United States";
+"settings.row.address.title" = "Shipping Addresses";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
@@ -333,6 +334,7 @@
 "settings.row.name.detail" = "Enter Your Name";
 "settings.row.open_in.title" = "Open Products In";
 "settings.row.partners.title" = "Our Technology";
+"settings.row.payment.title" = "Payment Methods";
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
