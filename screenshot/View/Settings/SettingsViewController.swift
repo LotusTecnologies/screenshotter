@@ -46,6 +46,8 @@ class SettingsViewController : BaseViewController {
         case talkToStylist
         case openIn
         case region
+        case payment
+        case address
     }
     
     weak var delegate: SettingsViewControllerDelegate?
@@ -215,6 +217,8 @@ class SettingsViewController : BaseViewController {
         .info: [
             .name,
             .email,
+            .payment,
+            .address,
             .currency
         ],
         .about: [
@@ -388,8 +392,17 @@ extension SettingsViewController : UITableViewDataSource {
             cell.textLabel?.textColor = .black
         }
         
-        cell.detailTextLabel?.text = cellDetailedText(for: row)
         cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
+        cell.detailTextLabel?.text = nil
+        cell.detailTextLabel?.attributedText = nil
+        
+        if let text = cellDetailedText(for: row) {
+            cell.detailTextLabel?.text = text
+        }
+        else if let attributedText = cellDetailedAttributedText(for: row) {
+            cell.detailTextLabel?.attributedText = attributedText
+        }
+        
         return cell
     }
 }
@@ -578,6 +591,16 @@ extension SettingsViewController : UITableViewDelegate {
             
             present(alert, animated: true, completion: nil)
             
+        case .address:
+            let viewController = CheckoutShippingListViewController()
+            viewController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(viewController, animated: true)
+            
+        case .payment:
+            let viewController = CheckoutPaymentListViewController()
+            viewController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(viewController, animated: true)
+            
         default:
             break
         }
@@ -655,6 +678,10 @@ fileprivate extension SettingsViewController {
             return "settings.row.talk_to_stylist.title".localized
         case .region:
             return "settings.row.region.title".localized
+        case .payment:
+            return "settings.row.payment.title".localized
+        case .address:
+            return "settings.row.address.title".localized
         }
     }
     
@@ -699,6 +726,24 @@ fileprivate extension SettingsViewController {
                     return "settings.region.other".localized
                 }
             }
+            
+        default:
+            return nil
+        }
+    }
+    
+    func cellDetailedAttributedText(for row: Row) -> NSAttributedString? {
+        switch (row) {
+        case .address:
+            let textAttachment = NSTextAttachment()
+            textAttachment.image = UIImage(named: "SettingsTruck")
+            return NSAttributedString(attachment: textAttachment)
+            
+        case .payment:
+            let textAttachment = NSTextAttachment()
+            textAttachment.image = UIImage(named: "SettingsCreditCard")
+            return NSAttributedString(attachment: textAttachment)
+            
         default:
             return nil
         }
@@ -719,7 +764,7 @@ fileprivate extension SettingsViewController {
     
     func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .currency, .partners:
+        case .currency, .partners, .address, .payment:
             return .disclosureIndicator
         default:
             return .none

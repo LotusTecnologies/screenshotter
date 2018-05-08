@@ -118,13 +118,7 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
         super.viewWillAppear(animated)
         syncEmptyListView()
         self.updateHasNewScreenshot()
-        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
-            let campaign = CampaignPromotionViewController(modal:true)
-            campaign.delegate = self
-            self.present(campaign, animated: true, completion: nil)
-        }
     }
-    
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -157,16 +151,6 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
             }
         }
     }
-}
-
-extension ScreenshotsViewController: CampaignPromotionViewControllerDelegate {
-    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
-        
-    }
-    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
-        self.dismiss(animated: true, completion: nil)
-    }
-
 }
 
 //Setup view
@@ -220,7 +204,9 @@ extension ScreenshotsViewController {
         
         let emptyListView:ScreenshotsHelperView = {
             let emptyListView = ScreenshotsHelperView()
-            emptyListView.button.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            emptyListView.permissionButton.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            emptyListView.uploadButton.addTarget(self, action: #selector(emptyListViewUploadAction), for:.touchUpInside)
+            emptyListView.discoverButton.addTarget(self, action: #selector(emptyListViewDiscoverAction), for:.touchUpInside)
             collectionView.emptyView = emptyListView
             return emptyListView
         }()
@@ -237,9 +223,21 @@ extension ScreenshotsViewController {
         }
     }
     
-    @objc func emptyListViewAllowAccessAction() {
+    @objc fileprivate func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
             self.syncEmptyListView()
+        }
+    }
+    
+    @objc fileprivate func emptyListViewUploadAction() {
+        if let navigationController = navigationController as? ScreenshotsNavigationController {
+            navigationController.presentPickerViewController()
+        }
+    }
+    
+    @objc fileprivate func emptyListViewDiscoverAction() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
         }
     }
 }
