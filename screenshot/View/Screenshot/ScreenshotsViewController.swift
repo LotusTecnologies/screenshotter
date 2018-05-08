@@ -164,16 +164,6 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
     }
 }
 
-extension ScreenshotsViewController: CampaignPromotionViewControllerDelegate {
-    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
-        
-    }
-    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
-        self.dismiss(animated: true, completion: nil)
-    }
-
-}
-
 //Setup view
 extension ScreenshotsViewController {
     func setupViews() {
@@ -225,7 +215,9 @@ extension ScreenshotsViewController {
         
         let emptyListView:ScreenshotsHelperView = {
             let emptyListView = ScreenshotsHelperView()
-            emptyListView.button.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            emptyListView.permissionButton.addTarget(self, action: #selector(emptyListViewAllowAccessAction), for:.touchUpInside)
+            emptyListView.uploadButton.addTarget(self, action: #selector(emptyListViewUploadAction), for:.touchUpInside)
+            emptyListView.discoverButton.addTarget(self, action: #selector(emptyListViewDiscoverAction), for:.touchUpInside)
             collectionView.emptyView = emptyListView
             return emptyListView
         }()
@@ -242,9 +234,21 @@ extension ScreenshotsViewController {
         }
     }
     
-    @objc func emptyListViewAllowAccessAction() {
+    @objc fileprivate func emptyListViewAllowAccessAction() {
         PermissionsManager.shared.requestPermission(for: .photo, openSettingsIfNeeded: true) { (granted) in
             self.syncEmptyListView()
+        }
+    }
+    
+    @objc fileprivate func emptyListViewUploadAction() {
+        if let navigationController = navigationController as? ScreenshotsNavigationController {
+            navigationController.presentPickerViewController()
+        }
+    }
+    
+    @objc fileprivate func emptyListViewDiscoverAction() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
         }
     }
 }
@@ -542,7 +546,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
             
             alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
                 if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
-                    if !(source == .gallery || source == .share || source == .unknown) || submittedDate != nil {
+                    if !(source == .gallery || source == .share || source == .unknown || source == .camera || source == .screenshot) || submittedDate != nil {
                         let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
                         
                         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
@@ -645,7 +649,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         switch cell.contentText {
             case .importSingleScreenshot:
                 if let assetId = self.notificationCellAssetId() {
-                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId])
+                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId], source: .screenshot)
                 }else{
                     self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
                 }
@@ -747,7 +751,13 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
         }
         return .zero
     }
+    
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let cell = cell as? ScreenshotCollectionViewCell {
+            // The editing state can be out of sync. because the state is set for all visible cells and new cells that are created - BUT there are cells that are created but not yet put into the view that are not in a correct editing state.
+            self.setupScreenshot(cell: cell, collectionView: collectionView, indexPath: indexPath)
+        }
+        
         if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
             switch sectionType {
             case .product:
@@ -879,6 +889,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         self.syncScreenshotCollectionViewCellSelectedState(cell)
         
     }
+    
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
             switch sectionType {

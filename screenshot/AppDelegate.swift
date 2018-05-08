@@ -74,6 +74,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        Analytics.trackDevMemoryWarning()
+    }
+    
     func asyncLoadStore(){
         DataModel.sharedInstance.loadStore(multipleAttempts: 5).then(execute: { (success) -> Void in
             DispatchQueue.main.async {
@@ -623,7 +627,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
                 openingScreen == Constants.openingScreenValueScreenshot,
                 let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
+                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
                 showScreenshotListTop()
             } else if let aps = userInfo["aps"] as? [String : Any],
                 let category = aps["category"] as? String,

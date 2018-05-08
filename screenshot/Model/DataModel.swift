@@ -15,6 +15,8 @@ enum ScreenshotSource : String {
     case unknown
     case discover
     case gallery
+    case camera
+    case screenshot
     case shuffle
     case share
     case tutorial
@@ -928,12 +930,14 @@ extension DataModel {
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
     // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
-        self.dbQ.addOperation {
+        self.dbQ.addOperation(AsyncOperation.init(timeout: nil, completion: { (completion) in
             let managedObjectContext = self.persistentContainer.newBackgroundContext()
-            managedObjectContext.performAndWait {
+            managedObjectContext.perform {
                 block(managedObjectContext)
+                completion()
             }
-        }
+            
+        }))
     }
     
     public func unfavorite(favoriteArray: [Product]) {
