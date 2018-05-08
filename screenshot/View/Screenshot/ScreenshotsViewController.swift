@@ -486,6 +486,8 @@ extension ScreenshotsViewController {
             DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs)
             DataModel.sharedInstance.hideFromProductBar(toHideFromProductBarObjectIDs)
         }
+        self.deleteScreenshotObjectIDs.removeAll()
+        self.toHideFromProductBarObjectIDs.removeAll()
     }
 }
 
