@@ -118,13 +118,7 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
         super.viewWillAppear(animated)
         syncEmptyListView()
         self.updateHasNewScreenshot()
-        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
-            let campaign = CampaignPromotionViewController(modal:true)
-            campaign.delegate = self
-            self.present(campaign, animated: true, completion: nil)
-        }
     }
-    
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -157,16 +151,6 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
             }
         }
     }
-}
-
-extension ScreenshotsViewController: CampaignPromotionViewControllerDelegate {
-    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
-        
-    }
-    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
-        self.dismiss(animated: true, completion: nil)
-    }
-
 }
 
 //Setup view
