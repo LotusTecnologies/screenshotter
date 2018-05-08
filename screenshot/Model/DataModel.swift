@@ -932,8 +932,11 @@ extension DataModel {
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
         self.dbQ.addOperation(AsyncOperation.init(timeout: nil, completion: { (completion) in
             let managedObjectContext = self.persistentContainer.newBackgroundContext()
-            block(managedObjectContext)
-            completion()
+            managedObjectContext.perform {
+                block(managedObjectContext)
+                completion()
+            }
+            
         }))
     }
     
