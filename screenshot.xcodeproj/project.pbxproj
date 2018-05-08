@@ -32,6 +32,9 @@
 		31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A0781A207E182100D70DC3 /* URL+craze.swift */; };
 		31A0781E20830D9A00D70DC3 /* UserFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A0781D20830D9900D70DC3 /* UserFeedback.swift */; };
 		31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */; };
+		31C0C80820A1AED2002EE95B /* RelatedLooksCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C80720A1AED2002EE95B /* RelatedLooksCollectionViewCell.swift */; };
+		31C0C80A20A1B3B7002EE95B /* ProductsViewHeaderReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C80920A1B3B7002EE95B /* ProductsViewHeaderReusableView.swift */; };
+		31C0C80C20A1BD3C002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C80B20A1BD3C002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
 		31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110320396194000156EE /* ScreenshotsViewController.swift */; };
@@ -262,6 +265,9 @@
 		31A0781C207F239400D70DC3 /* Model 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 14.xcdatamodel"; sourceTree = "<group>"; };
 		31A0781D20830D9900D70DC3 /* UserFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserFeedback.swift; sourceTree = "<group>"; };
 		31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsNavigationController.swift; sourceTree = "<group>"; };
+		31C0C80720A1AED2002EE95B /* RelatedLooksCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedLooksCollectionViewCell.swift; sourceTree = "<group>"; };
+		31C0C80920A1B3B7002EE95B /* ProductsViewHeaderReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsViewHeaderReusableView.swift; sourceTree = "<group>"; };
+		31C0C80B20A1BD3C002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionBackgroundCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110320396194000156EE /* ScreenshotsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsViewController.swift; sourceTree = "<group>"; };
@@ -897,6 +903,9 @@
 				C572FEE5205A53600046BFEB /* ProductsCollectionView.swift */,
 				C543695220453FE300599134 /* ProductsOptions.swift */,
 				C5F37C94205505690072FE1D /* ProductsViewController.swift */,
+				31C0C80720A1AED2002EE95B /* RelatedLooksCollectionViewCell.swift */,
+				31C0C80920A1B3B7002EE95B /* ProductsViewHeaderReusableView.swift */,
+				31C0C80B20A1BD3C002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -1395,6 +1404,7 @@
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
+				31C0C80C20A1BD3C002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
 				C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				319B031320592A7700446054 /* ShowProduct.swift in Sources */,
@@ -1440,10 +1450,12 @@
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
+				31C0C80820A1AED2002EE95B /* RelatedLooksCollectionViewCell.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
 				C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
+				31C0C80A20A1B3B7002EE95B /* ProductsViewHeaderReusableView.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
 				C5D57933203EDD7A00A076FE /* TableView.swift in Sources */,
 				319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */,

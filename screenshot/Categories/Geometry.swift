@@ -17,6 +17,14 @@ extension CGFloat {
     static let defaultCornerRadius: CGFloat = 6
 }
 
+extension Double {
+    public static var goldenRatio:Double {
+        get {
+            return 1.6180339887498948482
+        }
+    }
+}
+
 extension CGSize {
     var area:CGFloat {
         return self.width * self.height

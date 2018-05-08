@@ -9,10 +9,12 @@
 import Foundation
 import UIKit
 import CoreData
+import PromiseKit
 
 enum ProductsSection : Int {
     case product = 0
-    
+    case relatedLooks = 1
+
     var section: Int {
         return self.rawValue
     }
@@ -31,7 +33,58 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
     
     var products:[Product] = []
-    
+    var relatedLooks = Promise.init(value: [
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17882982_1916411428577436_8154856183031660544_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294572_778446935649976_284911831015751680_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17882465_386110208440068_813241092446093312_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13741426_1717054188543060_1040489109_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21227656_944219765717780_3372714225569890304_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18380193_142648489609504_4906023335562838016_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13534361_912881562168430_213000940_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21296543_105334746873270_9172771996348448768_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18011458_1865589167049389_6438160207246786560_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294619_121516448503164_3529480441679577088_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/22157823_839614326211580_1912553442329493504_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21371947_1127149297429133_5267684522761125888_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/10903226_1520319674897261_992439649_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/26186718_144393056231252_8548036700696215552_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11909371_1700908866806204_1796268346_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/22427367_1809768332369924_1520569231970664448_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13651708_269435350091628_406024557_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17493843_753716978118816_8518453180709732352_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11111475_799661776779935_1433968858_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/20346864_429856740747363_3701678745866731520_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21296799_120232581970248_5229337959525777408_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17267546_583890535142492_6253413344355549184_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/14624468_1854003298166551_9014731407607463936_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/27893605_505602579841108_1814352481145061376_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/14726299_1043776192406099_991395073163788288_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17596372_267353487055815_3494021926123208704_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/1517078_561645047257601_1263719982_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/10632156_878466062177528_1707889987_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294901_114385985916978_7185887681035894784_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13724483_1743966922510450_993567476_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18723391_443831265973491_5106348096376274944_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11199632_841020505965855_442868542_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17881726_1170291863093828_1911868012793692160_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21227358_115024339217604_1892186247850360832_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/27576629_392018501240099_7840576533876965376_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/26187209_179344236147799_1212080706264498176_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/22351998_532980693701111_4334103239864614912_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17333996_398106220551395_977448627158908928_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/10453912_312933792199064_1394767148_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/23823570_1930365280313467_6505824492122537984_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11272040_869422876440949_1768764987_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18381041_813645912125179_6199767871388647424_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/12930976_1756601797908049_44598166_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/14718213_194532787671443_7846066545758306304_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/16464921_189832344831278_6346774706326077440_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13628326_168442330247432_430333845_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/12093561_554158741433403_1065597627_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19624835_654273358103465_3947611790166196224_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/928645_1499963033574808_1101628008_n.jpg",
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19052283_2015319452072475_6773187782551535616_n.jpg"])
+
     var loader:Loader?
     var noItemsHelperView:HelperView?
     var collectionView:UICollectionView?
@@ -98,10 +151,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         let collectionView:UICollectionView = {
             let minimumSpacing = self.collectionViewMinimumSpacing()
             
-            let layout = UICollectionViewFlowLayout()
+            let layout = SectionBackgroundCollectionViewFlowLayout()
             layout.minimumInteritemSpacing = minimumSpacing.x
             layout.minimumLineSpacing = minimumSpacing.y
-            
+
             let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
             
             collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -115,7 +168,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-            
+            collectionView.register(RelatedLooksCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks")
+            collectionView.register(ProductsViewHeaderReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
+            collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground, withReuseIdentifier: "background")
+
             
             self.view.insertSubview(collectionView, at: 0)
             collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
@@ -304,8 +360,23 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return self.products.count
             
         } else {
-            return 0
+            if let relatedLooks = self.relatedLooks.value {
+                return relatedLooks.count
+            }else{
+                return 1 // loading or error message
+            }
+            
         }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let sectionType = productSectionType(forSection: section)
+
+        if sectionType == .relatedLooks {
+            return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+        }
+        
+        return .zero;
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -319,9 +390,44 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
             size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
+        }else if sectionType == .relatedLooks {
+            if let _ = self.relatedLooks.value {
+                let columns = CGFloat(numberOfCollectionViewProductColumns)
+                size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
+                size.height = size.width * CGFloat(Double.goldenRatio)
+            }else if let _ = relatedLooks.error {
+                size.width = collectionView.bounds.size.width
+                size.height = 300
+            }else if relatedLooks.isPending{
+                size.width = collectionView.bounds.size.width
+                size.height = 300
+            }
         }
         
         return size
+    }
+    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let sectionType = productSectionType(forSection: indexPath.section)
+        if kind == UICollectionElementKindSectionHeader {
+            if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
+                if sectionType == .relatedLooks {
+                    cell.label.text = "Simliar Looks"
+                }
+                
+                return cell
+            }
+        }else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
+            let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "background", for: indexPath)
+            if sectionType == .product {
+                cell.backgroundColor = self.view.backgroundColor
+            }else if sectionType == .relatedLooks{
+                cell.backgroundColor = UIColor(red:0.93, green:0.93, blue:0.93, alpha:1.0)
+            }
+            return cell
+            
+        }
+        return UICollectionReusableView()
+        
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -343,6 +449,27 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.hasExternalPreview = (product.partNumber == nil)
                 return cell
             }
+        }else if sectionType == .relatedLooks {
+            if let relatedLooks = self.relatedLooks.value, relatedLooks.count > indexPath.row {
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks", for: indexPath) as? RelatedLooksCollectionViewCell {
+                    let imageString = relatedLooks[indexPath.row]
+                    let url = URL.init(string: imageString)
+                    
+                    cell.imageView.sd_setImage(with: url, completed: nil)
+                    
+                    return cell
+                }
+            }else if let error = relatedLooks.error {
+                //show error message
+            }else if relatedLooks.isPending {
+                //show spinner cell
+
+            }else{
+                //something went wrong.  show something...
+                
+            }
+           
+            
         }
         
         return UICollectionViewCell()
@@ -363,9 +490,19 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .product {
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
             return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
-        } else {
-            return .zero
+        }else if sectionType == .relatedLooks {
+            if let _  = self.relatedLooks.value {
+                let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
+                return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
+            }else if let _ = self.relatedLooks.error {
+                return .zero
+            }else if self.relatedLooks.isPending {
+                return .zero
+            }
         }
+        
+        return .zero
+        
     }
    
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
