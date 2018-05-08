@@ -12,46 +12,30 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
     
     // MARK: Properties
     
-    var shoppables: [Shoppable]?
-    var scrollView: UIScrollView!
+    let scrollView = UIScrollView()
     var screenshotImageFrameView: UIView?
     var b0: CGPoint = .zero
-
+    
     // MARK: - Life Cycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let p: CGFloat = .padding
-        let statusBarHeight:CGFloat = UIApplication.shared.statusBarFrame.size.height
+        view.backgroundColor = .gray4
         
-        let backgroundView = UIView.init()
-        backgroundView.translatesAutoresizingMaskIntoConstraints = false
-        backgroundView.backgroundColor = .gray4
-        self.view.addSubview(backgroundView)
-        backgroundView.topAnchor.constraint(equalTo:self.view.topAnchor, constant:statusBarHeight).isActive = true
-        backgroundView.leadingAnchor.constraint(equalTo:self.view.leadingAnchor).isActive = true
-        backgroundView.bottomAnchor.constraint(equalTo:self.view.bottomAnchor).isActive = true
-        backgroundView.trailingAnchor.constraint(equalTo:self.view.trailingAnchor).isActive = true
-        
-        self.scrollView = {
-            let scrollView = UIScrollView.init()
-            scrollView.translatesAutoresizingMaskIntoConstraints = false
-            scrollView.delegate = self
-            scrollView.maximumZoomScale = 3
-            scrollView.contentInset = UIEdgeInsetsMake(p, p, p, p)
-            self.view.addSubview(scrollView)
-            scrollView.topAnchor.constraint(equalTo:self.topLayoutGuide.bottomAnchor).isActive = true
-            scrollView.leadingAnchor.constraint(equalTo:self.view.leadingAnchor).isActive = true
-            scrollView.bottomAnchor.constraint(equalTo:self.bottomLayoutGuide.topAnchor).isActive = true
-            scrollView.trailingAnchor.constraint(equalTo:self.view.trailingAnchor).isActive = true
-            return scrollView
-        }()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.delegate = self
+        scrollView.maximumZoomScale = 3
+        scrollView.contentInset = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        self.view.addSubview(scrollView)
+        scrollView.topAnchor.constraint(equalTo:self.topLayoutGuide.bottomAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo:self.view.leadingAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo:self.bottomLayoutGuide.topAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo:self.view.trailingAnchor).isActive = true
         
         let horizontal: CGFloat = self.scrollView.contentInset.left + self.scrollView.contentInset.right
         let vertical: CGFloat  = self.scrollView.contentInset.top + self.scrollView.contentInset.bottom
         
-        let screenshotImageView = self.screenshotImageView
         screenshotImageView.contentMode = .scaleAspectFit
         self.scrollView.addSubview(screenshotImageView)
         screenshotImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -62,28 +46,45 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         screenshotImageView.widthAnchor.constraint(equalTo:self.scrollView.widthAnchor, constant:-horizontal).isActive = true
         screenshotImageView.heightAnchor.constraint(equalTo:self.scrollView.heightAnchor, constant:-vertical).isActive = true
         
-#if STORE_NEW_TUTORIAL_SCREENSHOT
+        #if STORE_NEW_TUTORIAL_SCREENSHOT
+        
         screenshotImageView.isUserInteractionEnabled = true
         let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture(gestureRecognizer:)))
         screenshotImageView.addGestureRecognizer(longPressGestureRecognizer)
-#endif
+        
+        #else
+        
+        screenshotImageView.didLayoutSubviews = { [weak self] in
+            self?.insertShoppableFrames()
+        }
+        
+        #endif
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-#if STORE_NEW_TUTORIAL_SCREENSHOT
-#else
-        if !self.screenshotImageView.bounds.isEmpty {
-            self.insertShoppableFrames()
+    // MARK: Screenshot
+    
+    fileprivate var shoppablesFrc: FetchedResultsControllerManager<Shoppable>?
+    
+    var screenshot: Screenshot? {
+        didSet {
+            if let screenshot = screenshot {
+                let shoppablesFrc = DataModel.sharedInstance.shoppableFrc(delegate: self, screenshot: screenshot)
+                self.shoppablesFrc = shoppablesFrc
+                
+                if let data = screenshot.imageData, let image = UIImage(data: data as Data) {
+                    self.image = image
+                }
+                
+                shoppables = shoppablesFrc.fetchedObjects
+            }
         }
-#endif
     }
     
     // MARK: - Image
     
-    let screenshotImageView = UIImageView()
-    var image: UIImage? {
+    fileprivate let screenshotImageView = ImageView()
+    
+    fileprivate var image: UIImage? {
         get {
             return self.screenshotImageView.image
         }
@@ -93,9 +94,11 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
     }
     
     // MARK: - Shoppable
-
+    
+    fileprivate var shoppables: [Shoppable]?
+    
     @objc func insertShoppableFrames() {
-        guard let image = image else {
+        guard let image = image, !screenshotImageView.bounds.isEmpty else {
             print("insertShoppableFrames empty image")
             return
         }
@@ -154,5 +157,23 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
             self.b0 = .zero
         }
     }
-    
+}
+
+extension ScreenshotDisplayViewController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        if isViewLoaded {
+            insertShoppableFrames()
+        }
+    }
+}
+
+fileprivate extension ScreenshotDisplayViewController {
+    class ImageView: UIImageView {
+        var didLayoutSubviews: (()->())?
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            didLayoutSubviews?()
+        }
+    }
 }

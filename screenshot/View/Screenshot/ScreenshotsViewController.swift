@@ -59,6 +59,65 @@ class ScreenshotsViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
+        
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
+        
+        self.setupViews()
+        self.syncEmptyListView()
+        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
+        
+        
+        let productsBarController = ProductsBarController()
+        productsBarController.setup()
+        productsBarController.delegate = self
+        self.productsBarController = productsBarController
+        UIView.performWithoutAnimation {
+            self.productBarContentChanged(productsBarController)
+        }
+        
+        if traitCollection.forceTouchCapability == .available {
+            registerForPreviewing(with: self, sourceView: collectionView)
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        syncEmptyListView()
+        self.updateHasNewScreenshot()
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
+            let campaign = CampaignPromotionViewController(modal:true)
+            campaign.delegate = self
+            self.present(campaign, animated: true, completion: nil)
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.removeScreenshotHelperView()
+        if self.isEditing {
+            self.setEditing(false, animated: animated)
+        }
+        
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
+    }
+    
+    @objc func applicationDidEnterBackground(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            self.removeScreenshotHelperView()
+        }
+    }
+    
+    @objc func applicationWillEnterForeground(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            syncEmptyListView()
+            self.updateHasNewScreenshot()
+            
+        }
+    }
+    
     deinit {
         self.collectionView?.delegate = nil
         self.collectionView?.dataSource = nil
@@ -89,65 +148,6 @@ extension ScreenshotsViewController{
 extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
     func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
- 
-        
-        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
-
-        self.setupViews()
-        self.syncEmptyListView()
-        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
-        
-        
-        let productsBarController = ProductsBarController()
-        productsBarController.setup()
-        productsBarController.delegate = self
-        self.productsBarController = productsBarController
-        UIView.performWithoutAnimation {
-            self.productBarContentChanged(productsBarController)
-        }
-        
-
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        syncEmptyListView()
-        self.updateHasNewScreenshot()
-        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
-            let campaign = CampaignPromotionViewController(modal:true)
-            campaign.delegate = self
-            self.present(campaign, animated: true, completion: nil)
-        }
-    }
-    
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        self.removeScreenshotHelperView()
-        if self.isEditing {
-            self.setEditing(false, animated: animated)
-        }
-        
-        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
-    }
-    
-    @objc func applicationDidEnterBackground(_ notification:Notification){
-        if self.isViewLoaded && self.view.window != nil {
-            self.removeScreenshotHelperView()
-        }
-    }
-    
-    @objc func applicationWillEnterForeground(_ notification:Notification) {
-        if self.isViewLoaded && self.view.window != nil {
-            syncEmptyListView()
-            self.updateHasNewScreenshot()
-
-        }
     }
     
     @objc func contentSizeCategoryDidChange(_ notification:Notification) {
@@ -924,5 +924,32 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
             }
         }
         return 0
+    }
+}
+
+extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        if let indexPath = collectionView.indexPathForItem(at: location),
+            let screenshot = screenshot(at: indexPath.item),
+            let cell = collectionView.cellForItem(at: indexPath)
+        {
+            previewingContext.sourceRect = cell.frame
+            
+            let viewController = ScreenshotDisplayViewController()
+            viewController.screenshot = screenshot
+            return viewController
+        }
+        
+        return nil
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        guard let viewController = viewControllerToCommit as? ScreenshotDisplayViewController else {
+            return
+        }
+        
+        let navigationController = ScreenshotDisplayNavigationController()
+        navigationController.screenshotDisplayViewController.screenshot = viewController.screenshot
+        showDetailViewController(navigationController, sender: self)
     }
 }
