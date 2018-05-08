@@ -38,6 +38,8 @@ class ScrollRevealController : NSObject {
     fileprivate var offsetY: CGFloat = 0
     fileprivate var previousOffsetY: CGFloat = 0
     
+    var hasBottomBar = false
+    
     convenience init(edge: UInt) {
         self.init(edge: ScrollRevealEdge(rawValue: edge)!)
     }
@@ -221,16 +223,27 @@ extension ScrollRevealController {
         }
         
         let inset = abs(edgeConstraint.constant - concealedOffset)
+        var scrollInset = inset
+        
+        if #available(iOS 11.0, *), !hasBottomBar {
+            let viewHeight = view.bounds.size.height
+            
+            if viewHeight > 0 {
+                let safeAreaBottom = (abs(edgeConstraint.constant) / viewHeight) * scrollView.safeAreaInsets.bottom
+                scrollInset = inset - safeAreaBottom
+            }
+        }
+        
         var contentInset = scrollView.contentInset
         var scrollIndicatorInsets = scrollView.scrollIndicatorInsets
         
         if edge == .top {
             contentInset.top = inset
-            scrollIndicatorInsets.top = inset
+            scrollIndicatorInsets.top = scrollInset
             
         } else {
             contentInset.bottom = inset
-            scrollIndicatorInsets.bottom = inset
+            scrollIndicatorInsets.bottom = scrollInset
         }
         
         // Setting the contentInset will call the scrollViewDidScroll delegate.
