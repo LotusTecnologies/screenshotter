@@ -1035,7 +1035,7 @@ extension ProductsViewController {
             self.presentCopyrightAlertController(url:url)
         }))
         
-        alertController.addAction(UIAlertAction(title: "Duplicate".localized, style: .default, handler: { action in
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.duplicate".localized, style: .default, handler: { action in
             self.presentDuplicateAlertController(url:url)
         }))
         alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
@@ -1060,11 +1060,8 @@ extension ProductsViewController {
         Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .copyright)
     }
     fileprivate func presentDuplicateAlertController(url:String) {
-        let alertController = UIAlertController(title: "discover.screenshot.flag.copyright.title".localized, message: "discover.screenshot.flag.copyright.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "legal.terms_of_service".localized, style: .default, handler: { action in
-            self.presentTermsOfServiceViewController()
-        }))
-        alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
+        let alertController = UIAlertController(title: "discover.screenshot.flag.inappropriate.title".localized, message: "discover.screenshot.flag.inappropriate.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
         
         Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .duplicate)

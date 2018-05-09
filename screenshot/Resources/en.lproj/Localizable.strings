@@ -122,6 +122,7 @@
 "discover.screenshot.flag.inappropriate" = "Inappropriate Image";
 "discover.screenshot.flag.inappropriate.message" = "We’ll review this as soon as possible.";
 "discover.screenshot.flag.inappropriate.title" = "Thanks For Letting Us Know!";
+"discover.screenshot.flag.duplicate" = "Duplicate"
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
 "discover.screenshot.helper.swipe_left.0" = "Swipe Left";
