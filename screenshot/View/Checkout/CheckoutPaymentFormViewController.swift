@@ -210,15 +210,25 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                         DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
                         
                         self.delegate?.checkoutFormViewControllerDidAdd(self)
+                        
+                        let numberOfCards = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjectsCount
+                        
+                        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                        if self.autoSaveBillAddressAsShippingAddress {
+                            Analytics.trackCartCreditCardAdded(cart: cart, source: .manual, numberOfCards: numberOfCards, isSave: saveCard)
+                        }else{
+                            Analytics.trackCartCreditCardAdded(cart: cart, source: .onboarding, numberOfCards: numberOfCards, isSave: saveCard)
+                        }
                     }
             }
             
             if isShipToSameAddressChecked || self.autoSaveBillAddressAsShippingAddress {
                 let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                let addressesCount = DataModel.sharedInstance.shippingAddressFrc(delegate: nil).fetchedObjectsCount
                 if self.autoSaveBillAddressAsShippingAddress {
-                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding)
+                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding, numberOfAddresses: addressesCount)
                 }else{
-                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling)
+                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling, numberOfAddresses: addressesCount)
                 }
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
