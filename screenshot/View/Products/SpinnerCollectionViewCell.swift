@@ -9,7 +9,7 @@
 import UIKit
 
 class SpinnerCollectionViewCell: UICollectionViewCell {
-    let spinner = UIActivityIndicatorView.init(activityIndicatorStyle: .gray)
+    let spinner = UIActivityIndicatorView.init(activityIndicatorStyle: UIActivityIndicatorViewStyle.whiteLarge)
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -21,5 +21,6 @@ class SpinnerCollectionViewCell: UICollectionViewCell {
         self.addSubview(spinner)
         spinner.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         spinner.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        spinner.startAnimating()
     }
 }

@@ -498,7 +498,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             }else {
                 //show spinner cell
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
-                    cell.spinner.color = .crazeGreen
+                    cell.spinner.color = .gray2
                     return cell
                 }
                 
