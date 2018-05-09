@@ -89,12 +89,6 @@ class ScreenshotsViewController: BaseViewController {
         syncEmptyListView()
         self.updateHasNewScreenshot()
         
-        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue {
-            let campaign = CampaignPromotionViewController(modal:true)
-            campaign.delegate = self
-            self.present(campaign, animated: true, completion: nil)
-        }
-        
         if let tabBarController = tabBarController as? MainTabBarController {
             tabBarController.syncScreenshotTabBadgeCount()
         }
