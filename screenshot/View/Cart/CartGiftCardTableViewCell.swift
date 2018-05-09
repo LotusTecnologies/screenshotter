@@ -32,7 +32,7 @@ class CartGiftCardTableViewCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "cart.gift_card".localized
         label.textColor = .white
-        label.font = UIFont.screenshopFont(.hind, textStyle: .body)
+        label.font = .screenshopFont(.hind, textStyle: .body)
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 0
         contentView.addSubview(label)

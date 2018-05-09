@@ -30,6 +30,7 @@ class CartViewController: BaseViewController {
     fileprivate let loaderView = Loader()
     
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
+    fileprivate var notificationSectionCount = 0
     
     fileprivate lazy var formatter: NumberFormatter = {
         let localeIdentifier = Locale.identifier(fromComponents: [
@@ -129,9 +130,16 @@ class CartViewController: BaseViewController {
         syncItemCount()
         syncTotalPrice()
         syncCheckoutViewVisibility()
+        notificationSectionCount = expectedNotificationSectionCount
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        syncNotificationSection()
     }
     
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
@@ -201,6 +209,13 @@ class CartViewController: BaseViewController {
         }
     }
     
+    fileprivate func syncNotificationSection() {
+        if notificationSectionCount != expectedNotificationSectionCount {
+            notificationSectionCount = expectedNotificationSectionCount
+            tableView.reloadSections(IndexSet(integer: Section.notification.rawValue), with: .none)
+        }
+    }
+    
     // MARK: Empty List
     
     @objc fileprivate func emptyListAction() {
@@ -219,13 +234,17 @@ extension CartViewController: UITableViewDataSource {
         return cartItemFrc?.object(at: indexPath)
     }
     
+    fileprivate var expectedNotificationSectionCount: Int {
+        return (!UserDefaults.standard.bool(forKey: UserDefaultsKeys.completedCheckout) && numberOfItems > 0) ? 1 : 0
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == Section.notification.rawValue {
-            return 1
+            return notificationSectionCount
         }
         else {
             return numberOfItems
@@ -284,26 +303,19 @@ extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return itemCountView
     }
-    
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        if indexPath.section == Section.notification.rawValue {
-//            return 0
-//        }
-//        else {
-//            return UITableViewAutomaticDimension
-//        }
-//    }
 }
 
 extension CartViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
             let animation: UITableViewRowAnimation = change.deletedRows.isEmpty ? .none : .fade
+            change.shiftIndexSections(by: Section.product.rawValue)
             change.applyChanges(tableView: tableView, with: animation)
             
             syncItemCount()
             syncTotalPrice()
             syncCheckoutViewVisibility()
+            syncNotificationSection()
         }
     }
 }
