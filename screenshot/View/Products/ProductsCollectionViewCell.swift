@@ -277,7 +277,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             }
         }
     }
-    func imageView() -> UIImageView? {
+    var productImageView: UIImageView? {
         return self.productView?.imageView
     }
 }

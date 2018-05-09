@@ -177,7 +177,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             return
         }
         let point = gesture.location(in: self.collectionView)
-        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell, let imageView = cell.imageView(){
+        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell, let imageView = cell.productImageView {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
         }
     }

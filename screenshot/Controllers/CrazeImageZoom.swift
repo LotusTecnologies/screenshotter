@@ -115,7 +115,7 @@ class CrazeImageZoom: NSObject {
             self.firstCenterPoint = nil
             self.isHandlingGesture = false
             self.isAnimatingReset = false
-            NotificationCenter.default.post(name: .CrazeImageZoom_started_notification, object: nil)
+            NotificationCenter.default.post(name: .CrazeImageZoom_ended_notification, object: nil)
         })
     }
 }
