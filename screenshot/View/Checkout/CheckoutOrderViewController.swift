@@ -18,6 +18,7 @@ class CheckoutOrderViewController: BaseViewController {
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
     fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
     var cvvMap: (url: URL, cvv: String)?
+    var isPriceAtLeast50 = false
     
     // MARK: View
     
@@ -316,7 +317,6 @@ extension CheckoutOrderViewControllerOrder {
         guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
             Analytics.trackCartCvvEntered(cart: cart, result: .cvvInvalidOrEmpty)
             confirmPaymentViewController?.displayCVVError()
-            
             return
         }
         
@@ -333,6 +333,7 @@ extension CheckoutOrderViewControllerOrder {
             presentNeedsPrimaryShippingAddressAlert()
             return
         }
+        
         Analytics.trackCartCvvEntered(cart: cart, result: .continue)
         performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
     }
@@ -355,8 +356,12 @@ extension CheckoutOrderViewControllerOrder {
         
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { orderNumber -> Void in
-                
                 Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber, cardEmail: cardEmail, cardFullName: cardName)
+                
+                if self.isPriceAtLeast50 {
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
+                }
+                
                 self.dismissConfirmPaymentViewController()
                 
                 let confirmationViewController = CheckoutConfirmationViewController()
@@ -369,7 +374,6 @@ extension CheckoutOrderViewControllerOrder {
                 let error = error as NSError
                 Analytics.trackCartError(cart: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
                 
-
                 if let error = error as NSError?,
                     error.domain == "Shoppable",
                     let errors = error.userInfo["errors"] as? [[String: String]],

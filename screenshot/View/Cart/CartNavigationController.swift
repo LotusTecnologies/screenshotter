@@ -11,6 +11,7 @@ import UIKit
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
     fileprivate var cvvMap: (url: URL, cvv: String)?
+    fileprivate var isPriceAtLeast50 = false
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -85,6 +86,7 @@ class CartNavigationController: UINavigationController {
     fileprivate func navigateToCheckoutOrder() {
         let checkoutOrderViewController = CheckoutOrderViewController()
         checkoutOrderViewController.cvvMap = cvvMap
+        checkoutOrderViewController.isPriceAtLeast50 = isPriceAtLeast50
         checkoutOrderViewController.hidesBottomBarWhenPushed = true
         pushViewController(checkoutOrderViewController, animated: true)
         
@@ -180,15 +182,15 @@ extension CartNavigationController: CartViewControllerDelegate {
     func cartViewControllerDidValidateCart(_ viewController: CartViewController) {
         let hasCard = DataModel.sharedInstance.hasSavedCards()
         let hasAddress = DataModel.sharedInstance.hasShippingAddresses()
-        
         let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+        isPriceAtLeast50 = viewController.isPriceAtLeast50
+        
         if hasCard && hasAddress {
             Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .continue)
             navigateToCheckoutOrder()
         }
         else if hasCard {
             Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .needsShippingAddress)
-
             navigateToCheckoutShippingForm()
         }
         else {
