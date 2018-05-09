@@ -350,8 +350,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 //                if product is not load then related looks does not appear at all
                 if let relatedLooks = self.relatedLooks?.value {
                     return relatedLooks.count
-                }else{
-                    return 1 // loading or error message
+                }else {
+                    if let _ = self.products.first?.shoppable?.relatedImagesUrl() {
+                        return 1
+                    }else{
+                        return 0
+                    }
                 }
             }
             
@@ -363,8 +367,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let sectionType = productSectionType(forSection: section)
 
         if sectionType == .relatedLooks {
-            if self.products.count > 0  {
-                return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+            if self.products.count > 0 {
+                if let _ = self.products.first?.shoppable?.relatedImagesUrl() {
+                    return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+                }
             }
         }
         
@@ -387,9 +393,13 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 let columns = CGFloat(numberOfCollectionViewProductColumns)
                 size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
                 size.height = size.width * CGFloat(Double.goldenRatio)
-            }else if let _ = relatedLooks?.error {
+            }else if let error = relatedLooks?.error {
                 size.width = collectionView.bounds.size.width
-                size.height = 300
+                if self.isErrorRetryable(error: error){
+                    size.height = 300
+                }else{
+                    size.height = 300
+                }
             }else { // is pending or nil
                 size.width = collectionView.bounds.size.width
                 size.height = 150
@@ -1067,24 +1077,29 @@ extension ProductsViewController {
             let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
                 if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
                     let objectId = shopable.objectID
-                    if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String] {
+                    if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
                         fulfil(a)
                     }else{
                         URLSession.shared.dataTask(with: URLRequest.init(url: relatedlooksURL)).asDictionary().then(execute: { (dict) -> Void in
                             
                             if let array = dict["related_looks"] as? [ String] {
-                                DataModel.sharedInstance.performBackgroundTask({ (context) in
-                                    if let shopable = context.shoppableWith(objectId: objectId){
-                                        if let data = try? JSONSerialization.data(withJSONObject: array, options: []),  let string =  String.init(data: data, encoding:.utf8) {
-                                            shopable.relatedImagesArray = string
+                                if array.count > 0 {
+                                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                        if let shopable = context.shoppableWith(objectId: objectId){
+                                            if let data = try? JSONSerialization.data(withJSONObject: array, options: []),  let string =  String.init(data: data, encoding:.utf8) {
+                                                shopable.relatedImagesArray = string
+                                            }
                                         }
-                                    }
-                                    context.saveIfNeeded()
-                                    fulfil(array)
-                                })
+                                        context.saveIfNeeded()
+                                        fulfil(array)
+                                    })
+                                }else{
+                                    let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])
+                                    reject(error)
+                                }
                                 
                             }else{
-                                let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
+                                let error = NSError.init(domain: "related_looks", code: 2, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
                                 reject(error)
 
                             }
@@ -1131,6 +1146,11 @@ extension ProductsViewController {
     }
     
     func isErrorRetryable(error:Error) -> Bool {
-        return true
+        let nsError = error as NSError
+        if let retryable = nsError.userInfo["retryable"] as? Bool {
+            return retryable
+        }else{
+            return true
+        }
     }
 }
