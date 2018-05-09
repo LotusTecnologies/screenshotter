@@ -75,7 +75,6 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
                     self.image = image
                 }
                 
-                shoppables = shoppablesFrc.fetchedObjects
             }
         }
     }
@@ -95,8 +94,6 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
     
     // MARK: - Shoppable
     
-    fileprivate var shoppables: [Shoppable]?
-    
     @objc func insertShoppableFrames() {
         guard let image = image, !screenshotImageView.bounds.isEmpty else {
             print("insertShoppableFrames empty image")
@@ -111,7 +108,8 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         self.screenshotImageView.addSubview(screenshotImageFrameView)
         self.screenshotImageFrameView = screenshotImageFrameView
 
-        if let shoppables = self.shoppables {
+        
+        if let shoppables = self.shoppablesFrc?.fetchedObjects {
             for shoppable in shoppables {
                 let frame = shoppable.frame(size: screenshotImageFrameView.bounds.size)
                 
