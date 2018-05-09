@@ -171,23 +171,21 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             layout.minimumLineSpacing = minimumSpacing.y
 
             let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
-            
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
             collectionView.dataSource = self
             collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbar?.bounds.size.height ?? 0, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
             collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbar?.bounds.size.height ?? 0, left: 0.0, bottom: 0.0, right: 0.0)
-            
             collectionView.backgroundColor = self.view.backgroundColor
             // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+
             collectionView.register(RelatedLooksCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks")
             collectionView.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
             collectionView.register(ProductsViewHeaderReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
             collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground, withReuseIdentifier: "background")
-
             
             self.view.insertSubview(collectionView, at: 0)
             collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
@@ -210,7 +208,17 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.rateView = rateView
         
         let scrollRevealController = ScrollRevealController(edge: .bottom)
-        scrollRevealController.adjustedContentInset = UIEdgeInsets(top: self.navigationController?.navigationBar.frame.maxY ?? 0, left: 0, bottom: 0, right: 0)
+        scrollRevealController.hasBottomBar = !hidesBottomBarWhenPushed
+        scrollRevealController.adjustedContentInset = {
+            let top = navigationController?.navigationBar.frame.maxY ?? 0
+            var bottom = tabBarController?.tabBar.bounds.height ?? 0
+            
+            if !scrollRevealController.hasBottomBar {
+                bottom = 0
+            }
+            
+            return UIEdgeInsets(top: top, left: 0, bottom: bottom, right: 0)
+        }()
         scrollRevealController.insertAbove(collectionView)
 
         scrollRevealController.view.addSubview(rateView)
@@ -223,12 +231,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
         view.addSubview(filterView)
         
-        var height = self.rateView.intrinsicContentSize.height
-
-        if #available(iOS 11.0, *) {
-            height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+        if !scrollRevealController.hasBottomBar {
+            var height = self.rateView.intrinsicContentSize.height
+            
+            if #available(iOS 11.0, *) {
+                height += UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+            }
+            self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
         }
-        self.rateView.heightAnchor.constraint(equalToConstant: height).isActive = true
         
         if self.screenshotController?.first?.shoppablesCount == -1 {
             self.state = .retry
