@@ -1011,6 +1011,7 @@ extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         if let indexPath = collectionView.indexPathForItem(at: location),
+            indexPath.section == ScreenshotsSection.image.rawValue,
             let screenshot = screenshot(at: indexPath.item),
             let cell = collectionView.cellForItem(at: indexPath)
         {
