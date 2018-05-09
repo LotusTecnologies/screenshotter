@@ -16,7 +16,6 @@ protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
 class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
-    var pickerNavigationController:ScreenshotPickerNavigationController?
     var activityBarButtonItem:UIBarButtonItem?
     
     fileprivate var restoredProductsViewController: ProductsViewController?
@@ -62,7 +61,6 @@ extension ScreenshotsNavigationController {
     
     @objc func presentPickerViewController() {
         let picker = self.createScreenshotPickerNavigationController()
-        self.pickerNavigationController = picker // ???: is this needed?
         self.present(picker, animated: true, completion: nil)
         
         Analytics.trackOpenedPicker()
@@ -75,8 +73,8 @@ extension ScreenshotsNavigationController {
             }
         }
     }
+    
     @objc func pickerViewControllerDidFinish(){
-        self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
     }
 }
