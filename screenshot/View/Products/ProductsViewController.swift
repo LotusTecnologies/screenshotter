@@ -34,7 +34,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     
     var products:[Product] = []
     var relatedLooks:Promise<[String]>?
-    func loadRelatedLooks() {
+    func loadRelatedLooksIfNeeded() {
         if self.relatedLooks == nil {
             let promise = Promise.init(resolvers: { (fulfil, reject) in
                 DispatchQueue.main.asyncAfter(deadline: .now()+10, execute: {
@@ -98,7 +98,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/12093561_554158741433403_1065597627_n.jpg",
         "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19624835_654273358103465_3947611790166196224_n.jpg",
         "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/928645_1499963033574808_1101628008_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19052283_2015319452072475_6773187782551535616_n.jpg"])
+        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19052283_2015319452072475_6773187782551535616_n.jpg"]
 
     var loader:Loader?
     var noItemsHelperView:HelperView?
@@ -184,6 +184,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
             collectionView.register(RelatedLooksCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks")
+            collectionView.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
             collectionView.register(ProductsViewHeaderReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
             collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground, withReuseIdentifier: "background")
 
@@ -284,6 +285,16 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let scrollViewHeight = scrollView.frame.size.height;
+        let scrollContentSizeHeight = scrollView.contentSize.height;
+        let scrollOffset = scrollView.contentOffset.y;
+        let startLoadingDistance:CGFloat = 500
+        
+        
+        if (scrollOffset + scrollViewHeight + startLoadingDistance >= scrollContentSizeHeight){
+            self.loadRelatedLooksIfNeeded()
+        }
+        
         self.scrollRevealController?.scrollViewDidScroll(scrollView)
     }
     
@@ -378,7 +389,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return self.products.count
             
         } else {
-            if let relatedLooks = self.relatedLooks.value {
+            if let relatedLooks = self.relatedLooks?.value {
                 return relatedLooks.count
             }else{
                 return 1 // loading or error message
@@ -409,14 +420,14 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
             size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
         }else if sectionType == .relatedLooks {
-            if let _ = self.relatedLooks.value {
+            if let _ = self.relatedLooks?.value {
                 let columns = CGFloat(numberOfCollectionViewProductColumns)
                 size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
                 size.height = size.width * CGFloat(Double.goldenRatio)
-            }else if let _ = relatedLooks.error {
+            }else if let _ = relatedLooks?.error {
                 size.width = collectionView.bounds.size.width
                 size.height = 300
-            }else if relatedLooks.isPending{
+            }else { // is pending or nil
                 size.width = collectionView.bounds.size.width
                 size.height = 300
             }
@@ -471,7 +482,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 return cell
             }
         }else if sectionType == .relatedLooks {
-            if let relatedLooks = self.relatedLooks.value, relatedLooks.count > indexPath.row {
+            if let relatedLooks = self.relatedLooks?.value, relatedLooks.count > indexPath.row {
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks", for: indexPath) as? RelatedLooksCollectionViewCell {
                     let imageString = relatedLooks[indexPath.row]
                     let url = URL.init(string: imageString)
@@ -480,13 +491,14 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     
                     return cell
                 }
-            }else if let error = relatedLooks.error {
+            }else if let error = self.relatedLooks?.error {
                 //show error message
-            }else if relatedLooks.isPending {
+            }else {
                 //show spinner cell
-
-            }else{
-                //something went wrong.  show something...
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
+                    cell.spinner.color = .crazeGreen
+                    return cell
+                }
                 
             }
            
@@ -512,12 +524,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
             return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 30, right: minimumSpacing.x)
         }else if sectionType == .relatedLooks {
-            if let _  = self.relatedLooks.value {
+            if let _  = self.relatedLooks?.value {
                 let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
                 return UIEdgeInsets(top: 0, left: minimumSpacing.x, bottom: 30.0, right: minimumSpacing.x)
-            }else if let _ = self.relatedLooks.error {
+            }else if let _ = self.relatedLooks?.error {
                 return .zero
-            }else if self.relatedLooks.isPending {
+            }else { // spinner
                 return .zero
             }
         }

@@ -13,8 +13,8 @@ class SectionBackgroundCollectionViewFlowLayout: UICollectionViewFlowLayout {
 
     private var decorationItems:[UICollectionViewLayoutAttributes] = []
     
-    override func prepare() {
-        super.prepare()
+    func loadDecorationItems () {
+        decorationItems.removeAll()
         
         
         if let collectionView = self.collectionView {
@@ -60,6 +60,28 @@ class SectionBackgroundCollectionViewFlowLayout: UICollectionViewFlowLayout {
                     }
                 }
             }
+        }
+    }
+    override func prepare() {
+        super.prepare()
+        self.loadDecorationItems()
+    }
+    override func invalidateLayout() {
+        super.invalidateLayout()
+        self.loadDecorationItems()
+    }
+    override func invalidateLayout(with context: UICollectionViewLayoutInvalidationContext) {
+        super.invalidateLayout(with: context)
+        self.loadDecorationItems()
+    }
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        return false
+    }
+    override func layoutAttributesForDecorationView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        if elementKind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
+            return self.decorationItems[indexPath.section]
+        }else{
+            return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
         }
     }
     
