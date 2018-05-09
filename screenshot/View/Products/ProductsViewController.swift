@@ -194,6 +194,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
             collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
             return collectionView
         }()
         self.collectionView = collectionView
@@ -236,8 +237,22 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
+
     }
     
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+        }
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -260,19 +275,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     deinit {
         self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
-    }
-    
-    @objc func displayScreenshotAction() {
-        Analytics.trackFeatureScreenshotPreviewViewed(screenshot: self.screenshot)
-        
-        let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
-        
-        if let data = self.screenshot.imageData, let image = UIImage(data: data as Data) {
-            navigationController.screenshotDisplayViewController.image = image
-        }
-        
-        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
-        self.present(navigationController, animated: true, completion: nil)
     }
 }
 

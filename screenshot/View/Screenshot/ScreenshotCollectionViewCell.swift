@@ -22,7 +22,7 @@ protocol ScreenshotCollectionViewCellDelegate: NSObjectProtocol {
 class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     weak var delegate: ScreenshotCollectionViewCellDelegate?
     
-    private let imageView = UIImageView()
+    let imageView = UIImageView()
     fileprivate let shopLabel = UILabel()
     private let badge = UIView()
     private let checkImageView = UIImageView(image: UIImage(named: "PickerCheckRed"))

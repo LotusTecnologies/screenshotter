@@ -10,7 +10,7 @@ import Foundation
 import SDWebImage
 
 class EmbossedView : UIView {
-    fileprivate let imageView = UIImageView()
+    let imageView = UIImageView()
     let contentView = UIView()
     var placeholderImage: UIImage?
     

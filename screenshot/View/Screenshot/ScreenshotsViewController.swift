@@ -39,6 +39,8 @@ class ScreenshotsViewController: BaseViewController {
     var hasNewScreenshotSection = false
     var hasProductBar = false
     
+    fileprivate var screenshotPreviewingContext: UIViewControllerPreviewing?
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         
@@ -57,6 +59,58 @@ class ScreenshotsViewController: BaseViewController {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
+        
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
+        
+        self.setupViews()
+        self.syncEmptyListView()
+        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
+        
+        
+        let productsBarController = ProductsBarController()
+        productsBarController.setup()
+        productsBarController.delegate = self
+        self.productsBarController = productsBarController
+        UIView.performWithoutAnimation {
+            self.productBarContentChanged(productsBarController)
+        }
+        
+        enableScreenshotPreviewing()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        syncEmptyListView()
+        self.updateHasNewScreenshot()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.removeScreenshotHelperView()
+        if self.isEditing {
+            self.setEditing(false, animated: animated)
+        }
+        
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
+    }
+    
+    @objc func applicationDidEnterBackground(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            self.removeScreenshotHelperView()
+        }
+    }
+    
+    @objc func applicationWillEnterForeground(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            syncEmptyListView()
+            self.updateHasNewScreenshot()
+            
+        }
     }
     
     deinit {
@@ -91,59 +145,6 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.screenshotFrcManager = DataModel.sharedInstance.screenshotFrc(delegate: self)
- 
-        
-        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
-
-        self.setupViews()
-        self.syncEmptyListView()
-        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
-        
-        
-        let productsBarController = ProductsBarController()
-        productsBarController.setup()
-        productsBarController.delegate = self
-        self.productsBarController = productsBarController
-        UIView.performWithoutAnimation {
-            self.productBarContentChanged(productsBarController)
-        }
-        
-
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        syncEmptyListView()
-        self.updateHasNewScreenshot()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        self.removeScreenshotHelperView()
-        if self.isEditing {
-            self.setEditing(false, animated: animated)
-        }
-        
-        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
-    }
-    
-    @objc func applicationDidEnterBackground(_ notification:Notification){
-        if self.isViewLoaded && self.view.window != nil {
-            self.removeScreenshotHelperView()
-        }
-    }
-    
-    @objc func applicationWillEnterForeground(_ notification:Notification) {
-        if self.isViewLoaded && self.view.window != nil {
-            syncEmptyListView()
-            self.updateHasNewScreenshot()
-
-        }
-    }
-    
     @objc func contentSizeCategoryDidChange(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
@@ -155,6 +156,56 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
 
 //Setup view
 extension ScreenshotsViewController {
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath){
+            if let cell = cell as? ScreenshotCollectionViewCell {
+                
+                var transform:((UIImageView)->UIView)?
+                let imageView = cell.imageView
+                
+                if  let superView = imageView.superview {
+                    let frame = superView.bounds.aspectFit(in: UIScreen.main.bounds.applying(CGAffineTransform(scaleX: 2, y: 2)))
+                    
+                    let container = UIView.init(frame: frame)
+                    
+                    let newImageView = UIImageView.init(image: imageView.image)
+                    newImageView.contentMode = imageView.contentMode
+                    let scaledBy = frame.width / superView.frame.width
+                    newImageView.frame =  imageView.frame.applying(CGAffineTransform(scaleX: scaledBy, y: scaledBy))
+                    container.addSubview(newImageView)
+                    
+                    
+                    if let snapshot = container.snapshotView(afterScreenUpdates: true) {
+                        snapshot.center = superView.convert(superView.center, to: nil)
+                        snapshot.bounds = superView.bounds
+                        
+                        transform = { imageView in
+                            return snapshot
+                        }
+                    }
+                   
+                    
+                }
+
+                
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView,  popViewTransform:transform)
+                
+            } else if let cell = cell as? ScreenshotProductBarCollectionViewCell {
+                let collectionView = cell.collectionView
+                let point = gesture.location(in: collectionView)
+                if let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsBarCollectionViewCell{
+                    CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView)
+                }
+            }
+        }
+    }
+    
     func setupViews() {
         let collectionView: CollectionView = {
             let minimumSpacing = self.collectionViewInteritemOffset()
@@ -184,6 +235,7 @@ extension ScreenshotsViewController {
             collectionView.leadingAnchor.constraint( equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint( equalTo: self.view.trailingAnchor).isActive = true
 
+            
             return collectionView
         }()
         self.collectionView = collectionView
@@ -212,6 +264,9 @@ extension ScreenshotsViewController {
         }()
         self.emptyListView = emptyListView
         
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
+
     }
     
     @objc func refreshControlAction(_ refreshControl:UIRefreshControl){
@@ -387,6 +442,13 @@ extension ScreenshotsViewController {
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         
+        if editing {
+            disableScreenshotPreviewing()
+        }
+        else {
+            enableScreenshotPreviewing()
+        }
+        
         if (self.tabBarController != nil && editing) {
             var bottom:CGFloat = 0.0
             
@@ -484,6 +546,8 @@ extension ScreenshotsViewController {
             DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs)
             DataModel.sharedInstance.hideFromProductBar(toHideFromProductBarObjectIDs)
         }
+        self.deleteScreenshotObjectIDs.removeAll()
+        self.toHideFromProductBarObjectIDs.removeAll()
     }
 }
 
@@ -922,5 +986,48 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
             }
         }
         return 0
+    }
+}
+
+extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
+    fileprivate func enableScreenshotPreviewing() {
+        if traitCollection.forceTouchCapability == .available {
+            screenshotPreviewingContext = registerForPreviewing(with: self, sourceView: collectionView)
+        }
+    }
+    
+    fileprivate func disableScreenshotPreviewing() {
+        if traitCollection.forceTouchCapability == .available, let context = screenshotPreviewingContext {
+            unregisterForPreviewing(withContext: context)
+        }
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        if let indexPath = collectionView.indexPathForItem(at: location),
+            let screenshot = screenshot(at: indexPath.item),
+            let cell = collectionView.cellForItem(at: indexPath)
+        {
+            Analytics.trackFeatureScreenshotPreviewPeek(screenshot: screenshot)
+            
+            previewingContext.sourceRect = cell.frame
+            
+            let viewController = ScreenshotDisplayViewController()
+            viewController.screenshot = screenshot
+            return viewController
+        }
+        
+        return nil
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        guard let viewController = viewControllerToCommit as? ScreenshotDisplayViewController else {
+            return
+        }
+        
+        Analytics.trackFeatureScreenshotPreviewPop(screenshot: viewController.screenshot)
+        
+        let navigationController = ScreenshotDisplayNavigationController()
+        navigationController.screenshotDisplayViewController.screenshot = viewController.screenshot
+        showDetailViewController(navigationController, sender: self)
     }
 }
