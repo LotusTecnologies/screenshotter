@@ -184,6 +184,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
 
             collectionView.register(RelatedLooksCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks")
             collectionView.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
+            collectionView.register(ErrorRetryableCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error-retry")
+            collectionView.register(ErrorNotRetryableCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error-no-retry")
             collectionView.register(ProductsViewHeaderReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
             collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground, withReuseIdentifier: "background")
             
@@ -518,7 +520,19 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     return cell
                 }
             }else if let error = self.relatedLooks?.error {
-                //show error message
+                if self.isErrorRetryable(error:error) {
+                    if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-retry", for: indexPath) as? ErrorRetryableCollectionViewCell {
+                        
+                        
+                        return cell
+                    }
+                }else{
+                    if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-no-retry", for: indexPath) as? ErrorNotRetryableCollectionViewCell {
+                        
+                        
+                        return cell
+                    }
+                }
             }else {
                 //show spinner cell
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
@@ -1102,5 +1116,18 @@ extension ProductsViewController {
         if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
             present(viewController, animated: true, completion: nil)
         }
+    }
+}
+
+extension ProductsViewController {
+    @objc func didPresetRetryRelatedLooks(_ sender:Any) {
+        self.relatedLooks = nil
+        self.loadRelatedLooksIfNeeded()
+        let section = self.sectionIndex(forProductType: .relatedLooks)
+        self.collectionView?.reloadSections(IndexSet.init(integer: section))
+    }
+    
+    func isErrorRetryable(error:Error) -> Bool {
+        return true
     }
 }
