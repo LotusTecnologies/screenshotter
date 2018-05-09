@@ -421,7 +421,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             if sectionType == .product {
                 cell.backgroundColor = self.view.backgroundColor
             }else if sectionType == .relatedLooks{
-                cell.backgroundColor = UIColor(red:0.93, green:0.93, blue:0.93, alpha:1.0)
+                if let image = UIImage.init(named: "confetti") {
+                    cell.backgroundColor = UIColor.init(patternImage: image )
+                    
+                }
             }
             return cell
             
@@ -489,11 +492,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
-            return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
+            return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 30, right: minimumSpacing.x)
         }else if sectionType == .relatedLooks {
             if let _  = self.relatedLooks.value {
                 let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
-                return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
+                return UIEdgeInsets(top: 0, left: minimumSpacing.x, bottom: 30.0, right: minimumSpacing.x)
             }else if let _ = self.relatedLooks.error {
                 return .zero
             }else if self.relatedLooks.isPending {
