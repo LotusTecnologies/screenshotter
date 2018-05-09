@@ -83,6 +83,7 @@
 		C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005A205133BA004DD7A3 /* FavoriteButton.swift */; };
 		C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005C2051342B004DD7A3 /* BorderButton.swift */; };
 		C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */; };
+		C52CE22220A2C844004B5257 /* CartGiftCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52CE22120A2C844004B5257 /* CartGiftCardView.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -317,6 +318,7 @@
 		C528005A205133BA004DD7A3 /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
 		C528005C2051342B004DD7A3 /* BorderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderButton.swift; sourceTree = "<group>"; };
 		C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmationViewController.swift; sourceTree = "<group>"; };
+		C52CE22120A2C844004B5257 /* CartGiftCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartGiftCardView.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -633,6 +635,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D2E307204D682B00B5BD92 /* CartCheckoutView.swift */,
+				C52CE22120A2C844004B5257 /* CartGiftCardView.swift */,
 				C5D2E303204D1C6500B5BD92 /* CartItemCountView.swift */,
 				C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */,
 				C5D2E305204D29D100B5BD92 /* CartTableViewCell.swift */,
@@ -1408,6 +1411,7 @@
 				31CE1111203BF055000156EE /* ProductsBarCollectionViewCell.swift in Sources */,
 				C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */,
 				C5D2E30A204DC97800B5BD92 /* BorderView.swift in Sources */,
+				C52CE22220A2C844004B5257 /* CartGiftCardView.swift in Sources */,
 				31A0781E20830D9A00D70DC3 /* UserFeedback.swift in Sources */,
 				C53B462A1FB1A50F00A8C886 /* Intercom.swift in Sources */,
 				C53B46511FBC396900A8C886 /* Appearance.swift in Sources */,
