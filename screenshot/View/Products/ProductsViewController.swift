@@ -33,7 +33,22 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
     
     var products:[Product] = []
-    var relatedLooks = Promise.init(value: [
+    var relatedLooks:Promise<[String]>?
+    func loadRelatedLooks() {
+        if self.relatedLooks == nil {
+            let promise = Promise.init(resolvers: { (fulfil, reject) in
+                DispatchQueue.main.asyncAfter(deadline: .now()+10, execute: {
+                    fulfil(self.relatedLooksArrayReuslt);
+                })
+            })
+            promise.always(on: .main) {
+                let section = self.sectionIndex(forProductType: .relatedLooks)
+                self.collectionView?.reloadSections(IndexSet.init(integer: section))
+            }
+            self.relatedLooks = promise
+        }
+    }
+    var relatedLooksArrayReuslt =   [
         "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17882982_1916411428577436_8154856183031660544_n.jpg",
         "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294572_778446935649976_284911831015751680_n.jpg",
         "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17882465_386110208440068_813241092446093312_n.jpg",
@@ -340,6 +355,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     func productSectionType(forSection:Int) -> ProductsSection {
         return ProductsSection(rawValue: forSection) ?? .product
+    }
+    func sectionIndex(forProductType:ProductsSection) -> Int {
+        return forProductType.rawValue
     }
     
     func collectionViewToShoppablesFrcIndexPath(_ index:Int) ->IndexPath {
