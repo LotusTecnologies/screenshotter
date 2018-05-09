@@ -10,6 +10,8 @@ import UIKit
 
 class RelatedLooksCollectionViewCell: ShadowCollectionViewCell {
     let imageView = UIImageView()
+    let flagButton = UIButton()
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -23,6 +25,15 @@ class RelatedLooksCollectionViewCell: ShadowCollectionViewCell {
         imageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
         imageView.topAnchor.constraint(equalTo: mainView.topAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+                
+        flagButton.translatesAutoresizingMaskIntoConstraints = false
+        flagButton.setImage(UIImage(named: "DiscoverScreenshotFlag"), for: .normal)
+        flagButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        mainView.addSubview(flagButton)
+        flagButton.bottomAnchor.constraint(equalTo: mainView.bottomAnchor).isActive = true
+        flagButton.trailingAnchor.constraint(equalTo: mainView.trailingAnchor).isActive = true
+        
+        
         
     }
 }

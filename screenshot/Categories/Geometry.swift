@@ -48,6 +48,9 @@ extension CGSize {
 }
 
 extension CGRect {
+    var center:CGPoint {
+        return CGPoint.init(x: self.minX, y: self.midY)
+    }
     func scaleToAspectFit(in rtarget: CGRect) -> CGFloat {
         // first try to match width
         let s = rtarget.width / self.width;

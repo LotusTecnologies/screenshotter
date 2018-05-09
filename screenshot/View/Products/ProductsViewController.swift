@@ -490,6 +490,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     let url = URL.init(string: imageString)
                     
                     cell.imageView.sd_setImage(with: url, completed: nil)
+                    cell.flagButton.addTarget(self, action: #selector(pressedFlagButton(_:)), for: .touchUpInside)
                     
                     return cell
                 }
@@ -992,5 +993,76 @@ extension ProductsViewControllerNoItemsHelperView{
         }))
         alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
+    }
+}
+
+extension ProductsViewController {
+    
+    @objc fileprivate func pressedFlagButton(_ sender:Any) {
+        if let button = sender as? UIView, let collectionView = self.collectionView {
+            let rect = collectionView.convert(button.bounds, from: button)
+            let point = rect.center
+            if let indexpath = collectionView.indexPathForItem(at: point) {
+                let sectionType = self.productSectionType(forSection: indexpath.section)
+                if sectionType == .relatedLooks {
+                    if let relatedLooksArray = self.relatedLooks?.value {
+                        if relatedLooksArray.count > indexpath.row {
+                            let url = relatedLooksArray[indexpath.row]
+                            self.presentReportAlertController(url:url)
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fileprivate func presentReportAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.title".localized, message: "discover.screenshot.flag.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.inappropriate".localized, style: .default, handler: { action in
+            self.presentInappropriateAlertController(url:url)
+        }))
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.copyright".localized, style: .default, handler: { action in
+            self.presentCopyrightAlertController(url:url)
+        }))
+        
+        alertController.addAction(UIAlertAction(title: "Duplicate".localized, style: .default, handler: { action in
+            self.presentDuplicateAlertController(url:url)
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    fileprivate func presentInappropriateAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.inappropriate.title".localized, message: "discover.screenshot.flag.inappropriate.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .inappropriate)
+    }
+    
+    fileprivate func presentCopyrightAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.copyright.title".localized, message: "discover.screenshot.flag.copyright.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "legal.terms_of_service".localized, style: .default, handler: { action in
+            self.presentTermsOfServiceViewController()
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        
+        Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .copyright)
+    }
+    fileprivate func presentDuplicateAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.copyright.title".localized, message: "discover.screenshot.flag.copyright.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "legal.terms_of_service".localized, style: .default, handler: { action in
+            self.presentTermsOfServiceViewController()
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        
+        Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .duplicate)
+    }
+    
+    fileprivate func presentTermsOfServiceViewController() {
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+            present(viewController, animated: true, completion: nil)
+        }
     }
 }
