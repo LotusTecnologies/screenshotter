@@ -46,9 +46,41 @@ class ProductViewController : BaseViewController {
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
         productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
         productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        productView.addGestureRecognizer(pinchZoom)
+        
+        
         view = productView
     }
     
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        var imageViewToZoom:UIImageView?
+        for v in productView.galleryScrollContentView.subviews {
+            if let imageView = v as? UIImageView {
+                let point = gesture.location(in: imageView)
+                if imageView.bounds.contains(point) {
+                    imageViewToZoom = imageView
+                }
+            }
+        }
+        
+        if imageViewToZoom == nil, let collectionView = productView.similarProductsCollectionView {
+            let point = gesture.location(in: collectionView)
+            if let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
+                imageViewToZoom = cell.productView?.imageView
+                
+            }
+        }
+        
+        if let i = imageViewToZoom {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: i)
+        }
+    }
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
