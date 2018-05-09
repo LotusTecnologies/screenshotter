@@ -85,8 +85,13 @@ class ScreenshotsViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         syncEmptyListView()
         self.updateHasNewScreenshot()
+        
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.syncScreenshotTabBadgeCount()
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -302,6 +307,10 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
         change.shiftIndexSections(by: 2)
         change.applyChanges(collectionView: collectionView)
         syncEmptyListView()
+        
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.syncScreenshotTabBadgeCount()
+        }
     }
 }
 
@@ -684,8 +693,9 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         self.dismissNotificationCell()
         syncEmptyListView()
         
-    Analytics.trackScreenshotNotificationCancelled(screenshotCount: screenshotsCount)
+        Analytics.trackScreenshotNotificationCancelled(screenshotCount: screenshotsCount)
     }
+    
     func notificationCellAssetId() -> String?{
         return AccumulatorModel.sharedInstance.assetIds.first
     }
@@ -736,7 +746,6 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     }
     
     @objc func accumulatorModelNumberDidChange( _ notification: Notification) {
-        
         if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
@@ -746,9 +755,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
             updateHasNewScreenshot()
         }
         
-        
         syncEmptyListView()
-        
     }
     
     func dismissNotificationCell(){
