@@ -133,7 +133,30 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncEmptyListViews()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let campaign = UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue
+        
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != campaign {
+            UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.lastCampaignCompleted)
+            
+            let campaign = CampaignPromotionViewController(modal: true)
+            campaign.delegate = self
+            present(campaign, animated: true, completion: nil)
+        }
+    }
     
+    deinit {
+        if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
+            layout.delegate = nil
+        }
+        
+        collectionView.dataSource = nil
+        collectionView.delegate = nil
+    }
+    
+    // MARK:
     
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
@@ -145,17 +168,6 @@ class DiscoverScreenshotViewController : BaseViewController {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView)
         }
     }
-
-    
-    deinit {        
-        if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
-            layout.delegate = nil
-        }
-        
-        collectionView.dataSource = nil
-        collectionView.delegate = nil
-    }
-    
     
     fileprivate var currentIndexPath: IndexPath {
         return IndexPath(item: 0, section: 0)
@@ -568,6 +580,16 @@ extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDele
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
+    }
+}
+
+extension DiscoverScreenshotViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController: CampaignPromotionViewController) {
+        
+    }
+    
+    func campaignPromotionViewControllerDidPressSkip(_ viewController: CampaignPromotionViewController) {
+        dismiss(animated: true, completion: nil)
     }
 }
 

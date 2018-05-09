@@ -65,12 +65,12 @@ extension TutorialNavigationController: TutorialWelcomeSlideViewControllerDelega
 extension TutorialNavigationController: GiftCardCampaignViewControllerDelegate {
     func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
         Analytics.trackOnboardingCampainCreditCardSkip()
-        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        let viewController = CampaignPromotionViewController(modal: false)
-        viewController.delegate = self
-        self.pushViewController(viewController, animated: true)
-
+        
+        let signup = TutorialEmailSlideViewController()
+        signup.delegate = self
+        self.pushViewController(signup, animated: true)
     }
+    
     func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
         Analytics.trackOnboardingCampainCreditCardLetsGo()
         let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
@@ -97,42 +97,11 @@ extension TutorialNavigationController : GiftCardDoneViewControllerDelegate {
     func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
         let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
         Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
-        UserDefaults.standard.set(UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue, forKey: UserDefaultsKeys.lastCampaignCompleted)
-        let viewController = CampaignPromotionViewController(modal: false)
-        viewController.delegate = self
-        self.pushViewController(viewController, animated: true)
-    }
-}
-
-extension TutorialNavigationController: CampaignPromotionViewControllerDelegate {
-    func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController){
-        Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
-        let learnMore = CampaignPromotionExplanationViewController(modal:false)
-        learnMore.delegate = self
-        self.pushViewController(learnMore, animated: true)
-    }
-    
-    func campaignPromotionViewControllerDidPressSkip(_ viewController:CampaignPromotionViewController){
-        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign2018204)
+        
         let signup = TutorialEmailSlideViewController()
         signup.delegate = self
         self.pushViewController(signup, animated: true)
     }
-}
-
-extension TutorialNavigationController : CampaignPromotionExplanationViewControllerDelegate {
-    func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
-        Analytics.trackOnboardingCampaignTextDone(campaign: .campaign2018204)
-        let signup = TutorialEmailSlideViewController()
-        signup.delegate = self
-        self.pushViewController(signup, animated: true)
-    }
-    func campaignPromotionExplanationViewControllerDidPressBackButton(_
-        campaignPromotionExplanationViewController:CampaignPromotionExplanationViewController){
-        Analytics.trackOnboardingCampaignTextBack(campaign: .campaign2018204)
-        self.popViewController(animated: true)
-    }
-
 }
 
 extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate {
