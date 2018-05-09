@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Wed May  9 11:36:44 IDT 2018
-// created from: relatedLooks -  - 9d176af 
+// created on: Wed May  9 12:18:49 IDT 2018
+// created from: relatedLooks -  - 625f4b3 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -3178,6 +3178,7 @@ extension AnalyticsOpenedScreenshot {
   enum AnalyticsOpenedScreenshotSource : String{
     case `list` = "list"
     case `discover` = "discover"
+    case `relatedLooks` = "relatedLooks"
     }
     
   static func trackOpenedScreenshot(screenshot:Screenshot?,  source:AnalyticsOpenedScreenshotSource? ) {

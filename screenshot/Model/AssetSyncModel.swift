@@ -12,7 +12,7 @@ import MobileCoreServices // kUTTypeImage
 import CoreData // NSManagedObjectContext
 import PromiseKit
 import UserNotifications
-
+import SDWebImage
 
 class AccumulatorModel: NSObject {
     
@@ -161,6 +161,45 @@ extension AssetSyncModel {
         }
     }
     
+    
+    public func addFromRelatedLook(urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+            SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
+                
+                var imageData =  data
+                if imageData == nil {
+                    if let i = image {
+                        imageData = self.data(for: i)
+                    }
+                }
+                if let imageData = imageData {
+                    let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                                  assetId: urlString,
+                                                                                  createdAt: Date(),
+                                                                                  isRecognized: true,
+                                                                                  source: .shuffle,
+                                                                                  isHidden: false,
+                                                                                  imageData: imageData,
+                                                                                  classification: nil)
+                    addedScreenshot.uploadedImageURL = urlString
+                    
+                    // download stye stuff for URL
+                    
+                    if let callback = callback {
+                        let addedScreenshotOID = addedScreenshot.objectID
+                        DispatchQueue.main.async {
+                            if let mainScreenshot = DataModel.sharedInstance.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
+                                callback(mainScreenshot)
+                            }
+                        }
+                    }
+                }
+            })
+            
+        }
+
+    }
+
     public func importPhotosToScreenshot(assets:[PHAsset], source:ScreenshotSource) {
         assets.forEach{ self.uploadPhoto(asset: $0, source: source) }
     }

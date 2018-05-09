@@ -441,7 +441,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 size.height = 300
             }else { // is pending or nil
                 size.width = collectionView.bounds.size.width
-                size.height = 300
+                size.height = 150
             }
         }
         
@@ -560,6 +560,24 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
+            }
+        }else if sectionType == .relatedLooks {
+            if let relatedLooks = self.relatedLooks?.value {
+                if relatedLooks.count > indexPath.row {
+                    let url = relatedLooks[indexPath.row]
+                    Analytics.trackScreenshotRelatedLookAdd(url: url)
+                    AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: url, callback: { (screenshot) in
+                        Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
+                        let productsViewController = ProductsViewController.init(screenshot: screenshot)
+                        self.present(productsViewController, animated: true, completion: {
+                            
+                        })
+                        if screenshot.isNew {
+                            screenshot.setViewed()
+                        }
+
+                    })
+                }
             }
         }
     }
