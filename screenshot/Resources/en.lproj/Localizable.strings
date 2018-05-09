@@ -48,7 +48,8 @@
 "cart.empty.title" = "No Items in Cart";
 "cart.favorite.add" = "Add to Favorites";
 "cart.favorite.remove" = "Added to Favorites";
-"cart.gift_card" = "You'll recieve your gift card after you make this purchase!";
+"cart.gift_card.available" = "You’ll receive your gift card after you make this purchase!";
+"cart.gift_card.unavailable" = "You need to make a purchase over $50 to redeem your gift card";
 "cart.header.title" = "Your Cart";
 "cart.header.item_count" = "Items: %d";
 "cart.item.error.price" = "Price has changed";

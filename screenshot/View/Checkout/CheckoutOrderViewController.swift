@@ -18,6 +18,7 @@ class CheckoutOrderViewController: BaseViewController {
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
     fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
     var cvvMap: (url: URL, cvv: String)?
+    var isPriceAtLeast50 = false
     
     // MARK: View
     
@@ -314,7 +315,6 @@ extension CheckoutOrderViewControllerOrder {
         guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
             Analytics.trackCartCvvEntered(cart: cart, result: .cvvInvalidOrEmpty)
             confirmPaymentViewController?.displayCVVError()
-            
             return
         }
         
@@ -331,6 +331,7 @@ extension CheckoutOrderViewControllerOrder {
             presentNeedsPrimaryShippingAddressAlert()
             return
         }
+        
         Analytics.trackCartCvvEntered(cart: cart, result: .continue)
         performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
     }
@@ -354,7 +355,10 @@ extension CheckoutOrderViewControllerOrder {
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
             .then { orderNumber -> Void in
                 Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber, cardEmail: cardEmail, cardFullName: cardName)
-                UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
+                
+                if self.isPriceAtLeast50 {
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
+                }
                 
                 self.dismissConfirmPaymentViewController()
                 

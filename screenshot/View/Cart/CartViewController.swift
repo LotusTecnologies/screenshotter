@@ -176,6 +176,8 @@ class CartViewController: BaseViewController {
     
     // MARK: Sync Views
     
+    private(set) var isPriceAtLeast50 = false
+    
     fileprivate func syncTotalPrice() {
         var price: Double = 0
         
@@ -184,6 +186,15 @@ class CartViewController: BaseViewController {
         })
         
         checkoutView.price = formatter.string(from: NSNumber(value: price))
+        isPriceAtLeast50 = price >= 50
+        
+        if notificationSectionCount > 0, let visibleIndexPaths = tableView.indexPathsForVisibleRows {
+            let giftIndexPath = IndexPath(row: 0, section: Section.notification.rawValue)
+
+            if visibleIndexPaths.contains(giftIndexPath) {
+                tableView.reloadSections(IndexSet(integer: Section.notification.rawValue), with: .none)
+            }
+        }
     }
     
     fileprivate func syncCheckoutViewVisibility() {
@@ -261,7 +272,13 @@ extension CartViewController: UITableViewDataSource {
     }
     
     fileprivate func tableView(_ tableView: UITableView, notificationCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return tableView.dequeueReusableCell(withIdentifier: "gift", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "gift", for: indexPath)
+        
+        if let cell = cell as? CartGiftCardTableViewCell {
+            cell.isAvailable = isPriceAtLeast50
+        }
+        
+        return cell
     }
     
     fileprivate func tableView(_ tableView: UITableView, productCellForRowAt indexPath: IndexPath) -> UITableViewCell {
