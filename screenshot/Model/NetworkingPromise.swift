@@ -64,7 +64,7 @@ class NetworkingPromise : NSObject {
         }
         let urlString = imageClassification == .human
             ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)&payload_type=image_bin"
-            : "https://homedecor.syteapi.com/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&feed=craze_home&payload_type=image_bin"
+            : "https://homedecor.syteapi.com/v1.1/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&features=related_looks&feed=craze_home&payload_type=image_bin"
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
             return Promise(error: malformedError)
