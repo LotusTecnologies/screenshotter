@@ -23,4 +23,9 @@ class SpinnerCollectionViewCell: UICollectionViewCell {
         spinner.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         spinner.startAnimating()
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        spinner.startAnimating()
+    }
 }

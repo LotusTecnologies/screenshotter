@@ -34,72 +34,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     
     var products:[Product] = []
     var relatedLooks:Promise<[String]>?
-    func loadRelatedLooksIfNeeded() {
-        if self.relatedLooks == nil {
-            let promise = Promise.init(resolvers: { (fulfil, reject) in
-                DispatchQueue.main.asyncAfter(deadline: .now()+10, execute: {
-                    fulfil(self.relatedLooksArrayReuslt);
-                })
-            })
-            promise.always(on: .main) {
-                let section = self.sectionIndex(forProductType: .relatedLooks)
-                self.collectionView?.reloadSections(IndexSet.init(integer: section))
-            }
-            self.relatedLooks = promise
-        }
-    }
-    var relatedLooksArrayReuslt =   [
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17882982_1916411428577436_8154856183031660544_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294572_778446935649976_284911831015751680_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17882465_386110208440068_813241092446093312_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13741426_1717054188543060_1040489109_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21227656_944219765717780_3372714225569890304_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18380193_142648489609504_4906023335562838016_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13534361_912881562168430_213000940_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21296543_105334746873270_9172771996348448768_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18011458_1865589167049389_6438160207246786560_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294619_121516448503164_3529480441679577088_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/22157823_839614326211580_1912553442329493504_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21371947_1127149297429133_5267684522761125888_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/10903226_1520319674897261_992439649_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/26186718_144393056231252_8548036700696215552_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11909371_1700908866806204_1796268346_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/22427367_1809768332369924_1520569231970664448_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13651708_269435350091628_406024557_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17493843_753716978118816_8518453180709732352_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11111475_799661776779935_1433968858_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/20346864_429856740747363_3701678745866731520_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21296799_120232581970248_5229337959525777408_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17267546_583890535142492_6253413344355549184_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/14624468_1854003298166551_9014731407607463936_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/27893605_505602579841108_1814352481145061376_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/14726299_1043776192406099_991395073163788288_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17596372_267353487055815_3494021926123208704_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/1517078_561645047257601_1263719982_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/10632156_878466062177528_1707889987_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21294901_114385985916978_7185887681035894784_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13724483_1743966922510450_993567476_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18723391_443831265973491_5106348096376274944_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11199632_841020505965855_442868542_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17881726_1170291863093828_1911868012793692160_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/21227358_115024339217604_1892186247850360832_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/27576629_392018501240099_7840576533876965376_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/26187209_179344236147799_1212080706264498176_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/22351998_532980693701111_4334103239864614912_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/17333996_398106220551395_977448627158908928_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/10453912_312933792199064_1394767148_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/23823570_1930365280313467_6505824492122537984_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/11272040_869422876440949_1768764987_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/18381041_813645912125179_6199767871388647424_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/12930976_1756601797908049_44598166_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/14718213_194532787671443_7846066545758306304_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/16464921_189832344831278_6346774706326077440_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/13628326_168442330247432_430333845_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/12093561_554158741433403_1065597627_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19624835_654273358103465_3947611790166196224_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/928645_1499963033574808_1101628008_n.jpg",
-        "https://s3.amazonaws.com/syte-dev-storage/mns-ctl-instagram/19052283_2015319452072475_6773187782551535616_n.jpg"]
-
+    
     var loader:Loader?
     var noItemsHelperView:HelperView?
     var collectionView:UICollectionView?
@@ -305,7 +240,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.loader == nil {
+        if self.products.count > 0 && scrollView.contentSize.height > 0  {
             let scrollViewHeight = scrollView.frame.size.height;
             let scrollContentSizeHeight = scrollView.contentSize.height;
             let scrollOffset = scrollView.contentOffset.y;
@@ -331,6 +266,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 extension ProductsViewController {
     func clearProductListAndStateLoading(){
         self.products = []
+        self.relatedLooks = nil
         self.productsUnfilteredCount = 0
         self.state = .loading
         self.collectionView?.reloadData()
@@ -686,6 +622,7 @@ extension ProductsViewControllerProducts{
     
     func reloadProductsFor(shoppable:Shoppable) {
         self.products = []
+        self.relatedLooks = nil
         self.productsUnfilteredCount = 0
         self.scrollRevealController?.resetViewOffset()
         
@@ -1120,9 +1057,75 @@ extension ProductsViewController {
 }
 
 extension ProductsViewController {
+    func loadRelatedLooksIfNeeded() {
+        if self.relatedLooks == nil {
+            let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
+                DispatchQueue.main.asyncAfter(deadline: .now()+2, execute: {
+                    fulfil(true);
+                })
+            })
+            let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
+                if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
+                    let objectId = shopable.objectID
+                    if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String] {
+                        fulfil(a)
+                    }else{
+                        URLSession.shared.dataTask(with: URLRequest.init(url: relatedlooksURL)).asDictionary().then(execute: { (dict) -> Void in
+                            
+                            if let array = dict["related_looks"] as? [ String] {
+                                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                    if let shopable = context.shoppableWith(objectId: objectId){
+                                        if let data = try? JSONSerialization.data(withJSONObject: array, options: []),  let string =  String.init(data: data, encoding:.utf8) {
+                                            shopable.relatedImagesArray = string
+                                        }
+                                    }
+                                    context.saveIfNeeded()
+                                    fulfil(array)
+                                })
+                                
+                            }else{
+                                let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
+                                reject(error)
+
+                            }
+                            
+                        }).catch(execute: { (error) in
+                            reject(error)
+                        })
+                        
+                    }
+                    
+                }else{
+                    let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
+                    reject(error)
+                }
+            });
+            
+            let promise = Promise.init(resolvers: { (fulfil, reject) in
+                
+                atLeastXSeconds.always {
+                    loadRequest.then(execute: { (value) -> Void in
+                        fulfil(value)
+                    }).catch(execute: { (error) in
+                        reject(error)
+                    })
+                }
+            })
+            promise.always(on: .main) {
+                let section = self.sectionIndex(forProductType: .relatedLooks)
+                self.collectionView?.reloadSections(IndexSet.init(integer: section))
+            }
+            self.relatedLooks = promise
+            
+        }
+    }
+    
+    
     @objc func didPresetRetryRelatedLooks(_ sender:Any) {
         self.relatedLooks = nil
-        self.loadRelatedLooksIfNeeded()
+        if self.products.count > 0 {
+            self.loadRelatedLooksIfNeeded()
+        }
         let section = self.sectionIndex(forProductType: .relatedLooks)
         self.collectionView?.reloadSections(IndexSet.init(integer: section))
     }

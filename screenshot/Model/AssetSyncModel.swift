@@ -759,11 +759,13 @@ extension AssetSyncModel {
                     print("AssetSyncModel error parsing offers, b0, b1")
                     continue
             }
+            let relatedImagesURL = segment["related_looks"] as? String
             let label = segment["label"] as? String
             self.extractProducts(assetId: assetId,
                                  uploadedURLString: uploadedURLString,
                                  segments: segments,
                                  offersURL: offersURL,
+                                 relatedImagesURL: relatedImagesURL,
                                  optionsMask: optionsMask,
                                  url: url,
                                  label: label,
@@ -811,6 +813,7 @@ extension AssetSyncModel {
                          uploadedURLString: String,
                          segments: [[String : Any]],
                          offersURL: String,
+                         relatedImagesURL: String?,
                          optionsMask: ProductsOptionsMask,
                          url: URL,
                          label: String?,
@@ -831,6 +834,7 @@ extension AssetSyncModel {
                                                         screenshot: screenshot,
                                                         label: label,
                                                         offersURL: offersURL,
+                                                        relatedImagesURL: relatedImagesURL,
                                                         b0x: b0x,
                                                         b0y: b0y,
                                                         b1x: b1x,

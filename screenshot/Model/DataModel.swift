@@ -400,6 +400,7 @@ extension DataModel {
                        screenshot: Screenshot,
                        label: String?,
                        offersURL: String?,
+                       relatedImagesURL: String?,
                        b0x: Double,
                        b0y: Double,
                        b1x: Double,
@@ -441,6 +442,7 @@ extension DataModel {
         } else {
             shoppableToSave.order = shoppableToSave.label
         }
+        shoppableToSave.relatedImagesURLString = relatedImagesURL
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
         shoppableToSave.b0y = b0y
@@ -1302,9 +1304,9 @@ extension Screenshot {
 }
 
 extension Shoppable {
-    public func relatedImagesUrlString() -> URL? {
-        if let urlString = self.offersURL {
-            return URL.urlWith(string: urlString, queryParameters:["feed":"ctl"])
+    public func relatedImagesUrl() -> URL? {
+        if let urlString = self.relatedImagesURLString {
+            return URL.init(string: urlString)
         }
         return nil
     }
