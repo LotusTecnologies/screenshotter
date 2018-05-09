@@ -234,6 +234,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
                 self.flashPauseOverlay()
             }
         }
+        Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
         if self.willPresentInModal {
             let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
             explain.delegate = self   
@@ -244,19 +245,20 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     }
     
     func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
+        Analytics.trackOnboardingCampaignTextDone(campaign: .campaign2018204)
         self.dismiss(animated: false, completion: nil)
         self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
         
     }
     
     func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
-        
+        Analytics.trackOnboardingCampaignTextBack(campaign: .campaign2018204)
         self.dismiss(animated: false, completion: nil)
         
     }
     
     @objc func tappedSecondaryButton() {
-        
+        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign2018204)
         self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
     }
     

@@ -122,13 +122,26 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         syncEmptyListViews()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let campaign = UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue
+        
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != campaign {
+            UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.lastCampaignCompleted)
+            
+            let campaign = CampaignPromotionViewController(modal: true)
+            campaign.delegate = self
+            present(campaign, animated: true, completion: nil)
+        }
     }
     
     deinit {        
@@ -140,6 +153,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.delegate = nil
     }
     
+    // MARK:
     
     fileprivate var currentIndexPath: IndexPath {
         return IndexPath(item: 0, section: 0)
@@ -552,6 +566,16 @@ extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDele
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
+    }
+}
+
+extension DiscoverScreenshotViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController: CampaignPromotionViewController) {
+        
+    }
+    
+    func campaignPromotionViewControllerDidPressSkip(_ viewController: CampaignPromotionViewController) {
+        dismiss(animated: true, completion: nil)
     }
 }
 
