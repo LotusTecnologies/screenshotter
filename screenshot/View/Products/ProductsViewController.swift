@@ -259,8 +259,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             return
         }
         let point = gesture.location(in: self.collectionView)
-        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell, let imageView = cell.productImageView {
-            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point),  let cell = collectionView.cellForItem(at: indexPath){
+            
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }else if let cell = cell as? RelatedLooksCollectionViewCell {
+                let imageView = cell.imageView
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }
         }
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -297,16 +303,17 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let scrollViewHeight = scrollView.frame.size.height;
-        let scrollContentSizeHeight = scrollView.contentSize.height;
-        let scrollOffset = scrollView.contentOffset.y;
-        let startLoadingDistance:CGFloat = 500
-        
-        
-        if (scrollOffset + scrollViewHeight + startLoadingDistance >= scrollContentSizeHeight){
-            self.loadRelatedLooksIfNeeded()
+        if self.loader == nil {
+            let scrollViewHeight = scrollView.frame.size.height;
+            let scrollContentSizeHeight = scrollView.contentSize.height;
+            let scrollOffset = scrollView.contentOffset.y;
+            let startLoadingDistance:CGFloat = 500
+            
+            
+            if (scrollOffset + scrollViewHeight + startLoadingDistance >= scrollContentSizeHeight){
+                self.loadRelatedLooksIfNeeded()
+            }
         }
-        
         self.scrollRevealController?.scrollViewDidScroll(scrollView)
     }
     
@@ -401,20 +408,26 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return self.products.count
             
         } else {
-            if let relatedLooks = self.relatedLooks?.value {
-                return relatedLooks.count
-            }else{
-                return 1 // loading or error message
+            if self.products.count > 0  {
+//                if product is not load then related looks does not appear at all
+                if let relatedLooks = self.relatedLooks?.value {
+                    return relatedLooks.count
+                }else{
+                    return 1 // loading or error message
+                }
             }
             
         }
+        return 0
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let sectionType = productSectionType(forSection: section)
 
         if sectionType == .relatedLooks {
-            return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+            if self.products.count > 0  {
+                return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+            }
         }
         
         return .zero;
