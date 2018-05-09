@@ -155,6 +155,56 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
 
 //Setup view
 extension ScreenshotsViewController {
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath){
+            if let cell = cell as? ScreenshotCollectionViewCell {
+                
+                var transform:((UIImageView)->UIView)?
+                let imageView = cell.imageView
+                
+                if  let superView = imageView.superview {
+                    let frame = superView.bounds.aspectFit(in: UIScreen.main.bounds.applying(CGAffineTransform(scaleX: 2, y: 2)))
+                    
+                    let container = UIView.init(frame: frame)
+                    
+                    let newImageView = UIImageView.init(image: imageView.image)
+                    newImageView.contentMode = imageView.contentMode
+                    let scaledBy = frame.width / superView.frame.width
+                    newImageView.frame =  imageView.frame.applying(CGAffineTransform(scaleX: scaledBy, y: scaledBy))
+                    container.addSubview(newImageView)
+                    
+                    
+                    if let snapshot = container.snapshotView(afterScreenUpdates: true) {
+                        snapshot.center = superView.convert(superView.center, to: nil)
+                        snapshot.bounds = superView.bounds
+                        
+                        transform = { imageView in
+                            return snapshot
+                        }
+                    }
+                   
+                    
+                }
+
+                
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView,  popViewTransform:transform)
+                
+            } else if let cell = cell as? ScreenshotProductBarCollectionViewCell {
+                let collectionView = cell.collectionView
+                let point = gesture.location(in: collectionView)
+                if let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsBarCollectionViewCell{
+                    CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView)
+                }
+            }
+        }
+    }
+    
     func setupViews() {
         let collectionView: CollectionView = {
             let minimumSpacing = self.collectionViewInteritemOffset()
@@ -184,6 +234,7 @@ extension ScreenshotsViewController {
             collectionView.leadingAnchor.constraint( equalTo: self.view.leadingAnchor).isActive = true
             collectionView.trailingAnchor.constraint( equalTo: self.view.trailingAnchor).isActive = true
 
+            
             return collectionView
         }()
         self.collectionView = collectionView
@@ -212,6 +263,9 @@ extension ScreenshotsViewController {
         }()
         self.emptyListView = emptyListView
         
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
+
     }
     
     @objc func refreshControlAction(_ refreshControl:UIRefreshControl){

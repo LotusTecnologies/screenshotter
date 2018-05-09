@@ -122,6 +122,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -144,7 +147,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         }
     }
     
-    deinit {        
+    deinit {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = nil
         }
@@ -154,6 +157,17 @@ class DiscoverScreenshotViewController : BaseViewController {
     }
     
     // MARK:
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath) as? DiscoverScreenshotCollectionViewCell{
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView)
+        }
+    }
     
     fileprivate var currentIndexPath: IndexPath {
         return IndexPath(item: 0, section: 0)

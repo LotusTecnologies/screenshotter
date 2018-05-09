@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class DiscoverScreenshotCollectionViewCell : ShadowCollectionViewCell {
-    fileprivate let imageView = UIImageView()
+    let imageView = UIImageView()
     let flagButton = UIButton()
     
     // MARK: Life Cycle

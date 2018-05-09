@@ -277,4 +277,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             }
         }
     }
+    var productImageView: UIImageView? {
+        return self.productView?.imageView
+    }
 }
