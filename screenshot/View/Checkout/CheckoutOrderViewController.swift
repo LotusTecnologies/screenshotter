@@ -126,6 +126,8 @@ class CheckoutOrderViewController: BaseViewController {
     }
     
     @objc fileprivate func cancelAction() {
+        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+        Analytics.trackCartPressedCancelCheckout(cart: cart)
         if tabBarController != nil {
             MainTabBarController.resetViewControllerHierarchy(self, select: .screenshots)
         }
