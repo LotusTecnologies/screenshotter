@@ -204,19 +204,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
     }
-    
-    @objc func displayScreenshotAction() {
-        Analytics.trackFeatureScreenshotPreviewViewed(screenshot: self.screenshot)
-        
-        let navigationController = ScreenshotDisplayNavigationController(nibName: nil, bundle: nil)
-        
-        if let data = self.screenshot.imageData, let image = UIImage(data: data as Data) {
-            navigationController.screenshotDisplayViewController.image = image
-        }
-        
-        navigationController.screenshotDisplayViewController.shoppables = self.shoppablesToolbar?.shoppablesController.fetchedObjects
-        self.present(navigationController, animated: true, completion: nil)
-    }
 }
 
 private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
