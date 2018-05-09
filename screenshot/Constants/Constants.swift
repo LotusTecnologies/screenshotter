@@ -27,8 +27,8 @@ class Constants {
     static let cartItemMaxQuantity = 10
     
     // Syte
-    static let syteAccountId = 6809
-    static let syteAccountSignature = "4O0RFhXeyIJWXgrkAS1nhDnw2vTv3RIYpfOiF5cxtio="
+    static let syteAccountId = 6677
+    static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="
     static let syteHardcodedAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTM3NjEzNzI1OTksInV1aWQiOiJjMTliZmVkNy05M2FmLTVkZjAtYTQ1ZS1kNWQ5ZGVmMjMzMjYifQ.6KtjqtvusixdqoaZjfp3au9b6SU5x-mdyq8WEJJx2U0"
     
     static let furnitureAccountId = 6722
