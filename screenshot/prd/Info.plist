@@ -122,5 +122,7 @@
 		<key>test</key>
 		<string>key_test_nhuLfd9jmgzQdyMXBQwnzfinzyh6aPfx</string>
 	</dict>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
 </dict>
 </plist>
