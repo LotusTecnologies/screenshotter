@@ -15,6 +15,11 @@ protocol CartViewControllerDelegate: NSObjectProtocol {
 }
 
 class CartViewController: BaseViewController {
+    enum Section: Int {
+        case notification
+        case product
+    }
+    
     weak var delegate: CartViewControllerDelegate?
     
     fileprivate let tableView = TableView(frame: .zero, style: .grouped)
@@ -67,8 +72,8 @@ class CartViewController: BaseViewController {
         tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 200
+        tableView.register(CartGiftCardTableViewCell.self, forCellReuseIdentifier: "gift")
         tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.tableHeaderView = CartGiftCardView()
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -129,8 +134,6 @@ class CartViewController: BaseViewController {
         self.view.addGestureRecognizer(pinchZoom)
     }
     
-    
-    
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
@@ -141,8 +144,6 @@ class CartViewController: BaseViewController {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.productImageView.imageView)
         }
     }
-
-    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -213,14 +214,41 @@ extension CartViewController: UITableViewDataSource {
         return cartItemFrc?.fetchedObjectsCount ?? 0
     }
     
+    fileprivate func cartItem(at index: Int) -> CartItem? {
+        let indexPath = IndexPath(row: index, section: 0)
+        return cartItemFrc?.object(at: indexPath)
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return numberOfItems
+        if section == Section.notification.rawValue {
+            return 1
+        }
+        else {
+            return numberOfItems
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.section == Section.notification.rawValue {
+            return self.tableView(tableView, notificationCellForRowAt: indexPath)
+        }
+        else {
+            return self.tableView(tableView, productCellForRowAt: indexPath)
+        }
+    }
+    
+    fileprivate func tableView(_ tableView: UITableView, notificationCellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        return tableView.dequeueReusableCell(withIdentifier: "gift", for: indexPath)
+    }
+    
+    fileprivate func tableView(_ tableView: UITableView, productCellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? CartTableViewCell, let cartItem = cartItemFrc?.object(at: indexPath) {
+        if let cell = cell as? CartTableViewCell, let cartItem = cartItem(at: indexPath.row) {
             cell.contentView.backgroundColor = .cellBackground
             cell.productImageView.setImage(withURLString: cartItem.imageURL)
             cell.titleLabel.text = cartItem.productTitle()
@@ -237,7 +265,7 @@ extension CartViewController: UITableViewDataSource {
     }
     
     func tableView(removeCellForRowAt indexPath: IndexPath) {
-        if let cartItem = cartItemFrc?.object(at: indexPath) {
+        if let cartItem = cartItem(at: indexPath.row) {
             ShoppingCartModel.shared.remove(item: cartItem)
         }
     }
@@ -245,12 +273,26 @@ extension CartViewController: UITableViewDataSource {
 
 extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return numberOfItems == 0 ? 0 : 74
+        if section == Section.notification.rawValue {
+            return 0
+        }
+        else {
+            return numberOfItems == 0 ? 0 : 74
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return itemCountView
     }
+    
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        if indexPath.section == Section.notification.rawValue {
+//            return 0
+//        }
+//        else {
+//            return UITableViewAutomaticDimension
+//        }
+//    }
 }
 
 extension CartViewController: FetchedResultsControllerManagerDelegate {
@@ -272,7 +314,7 @@ fileprivate extension CartViewControllerCartItem {
         let position: CGPoint = stepper.convert(.zero, to: tableView)
         
         guard let indexPath = tableView.indexPathForRow(at: position),
-            let cartItem = cartItemFrc?.object(at: indexPath) else {
+            let cartItem = cartItem(at: indexPath.row) else {
             return
         }
         
@@ -290,13 +332,12 @@ fileprivate extension CartViewControllerCartItem {
         let position: CGPoint = button.convert(.zero, to: tableView)
         
         if let indexPath = tableView.indexPathForRow(at: position) {
-            let cartItem = cartItemFrc?.object(at: indexPath)
-            Analytics.trackProductRemovedFromCart(cartItem: cartItem)
-
+            if let cartItem = cartItem(at: indexPath.row) {
+                Analytics.trackProductRemovedFromCart(cartItem: cartItem)
+            }
+            
             tableView(removeCellForRowAt: indexPath)
         }
-        
-        
     }
 }
 
