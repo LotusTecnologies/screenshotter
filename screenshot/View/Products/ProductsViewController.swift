@@ -189,14 +189,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
     }
-    
-    @objc func displayScreenshotAction() {
-        Analytics.trackFeatureScreenshotPreviewViewed(screenshot: self.screenshot)
-        
-        let navigationController = ScreenshotDisplayNavigationController()
-        navigationController.screenshotDisplayViewController.screenshot = screenshot
-        self.present(navigationController, animated: true, completion: nil)
-    }
 }
 
 private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController

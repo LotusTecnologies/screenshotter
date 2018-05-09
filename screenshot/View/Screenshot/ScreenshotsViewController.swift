@@ -953,6 +953,8 @@ extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
             let screenshot = screenshot(at: indexPath.item),
             let cell = collectionView.cellForItem(at: indexPath)
         {
+            Analytics.trackFeatureScreenshotPreviewPeek(screenshot: screenshot)
+            
             previewingContext.sourceRect = cell.frame
             
             let viewController = ScreenshotDisplayViewController()
@@ -967,6 +969,8 @@ extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
         guard let viewController = viewControllerToCommit as? ScreenshotDisplayViewController else {
             return
         }
+        
+        Analytics.trackFeatureScreenshotPreviewPop(screenshot: viewController.screenshot)
         
         let navigationController = ScreenshotDisplayNavigationController()
         navigationController.screenshotDisplayViewController.screenshot = viewController.screenshot
