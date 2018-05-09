@@ -13,6 +13,7 @@ class CheckoutConfirmationViewController: BaseViewController {
     fileprivate let helperView = HelperView()
     var email: String?
     var orderNumber:String?
+    var shouldPresentGiftCardModal = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +30,7 @@ class CheckoutConfirmationViewController: BaseViewController {
                 message += "\n" + "checkout.confirmation.email".localized(withFormat: email)
             }
             if let orderNumber = orderNumber, !orderNumber.isEmpty {
-                message += "\n" + "checkout.confirmation.orderNumber".localized
+                message += "\n\n" + "checkout.confirmation.orderNumber".localized
                 message += "\n" + "checkout.confirmation.orderNumber2".localized(withFormat: orderNumber)
             }
             
@@ -40,17 +41,14 @@ class CheckoutConfirmationViewController: BaseViewController {
                 attributedString.addAttribute(.foregroundColor, value: UIColor.crazeGreen, range: emailRange)
             }
             
-
             if let orderNumber = orderNumber {
                 let orderRange = NSString(string: message).range(of: orderNumber)
                 
                 var attributes:[NSAttributedStringKey:Any] = [:]
-                attributes[NSAttributedStringKey.foregroundColor] = UIColor.black
-                attributes[NSAttributedStringKey.underlineColor] = UIColor.black
-                attributes[NSAttributedStringKey.underlineStyle] =  NSUnderlineStyle.styleSingle.rawValue
-
+                attributes[.foregroundColor] = UIColor.black
+                attributes[.underlineColor] = UIColor.black
+                attributes[.underlineStyle] = NSUnderlineStyle.styleSingle.rawValue
                 attributedString.addAttributes(attributes, range: orderRange)
-
             }
             
             return attributedString
@@ -78,9 +76,26 @@ class CheckoutConfirmationViewController: BaseViewController {
         button.centerXAnchor.constraint(equalTo: helperView.controlView.centerXAnchor).isActive = true
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if shouldPresentGiftCardModal {
+           shouldPresentGiftCardModal = false
+            
+            let viewController = CartGiftCardConfirmationViewController()
+            viewController.continueButton.addTarget(self, action: #selector(dismissGiftCardConfirmation), for: .touchUpInside)
+            present(viewController, animated: true, completion: nil)
+        }
+    }
+    
+    @objc private func dismissGiftCardConfirmation() {
+        dismiss(animated: true, completion: nil)
+    }
+    
     @objc fileprivate func navigateToScreenshotTab() {
         MainTabBarController.resetViewControllerHierarchy(self, select: .screenshots)
     }
+    
     @objc func didTap( gesture:UITapGestureRecognizer){
         if gesture.state == .recognized {
             if let orderNumber = orderNumber {
@@ -92,10 +107,7 @@ class CheckoutConfirmationViewController: BaseViewController {
                     
                     Whisper.show(whisper: message, to: navigationController, action: .show)
                 }
-                
             }
         }
-        
-        
     }
 }

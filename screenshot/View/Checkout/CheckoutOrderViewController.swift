@@ -18,7 +18,7 @@ class CheckoutOrderViewController: BaseViewController {
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
     fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
     var cvvMap: (url: URL, cvv: String)?
-    var isPriceAtLeast50 = false
+    var isGiftCardRedeemable = false
     
     // MARK: View
     
@@ -358,16 +358,17 @@ extension CheckoutOrderViewControllerOrder {
             .then { orderNumber -> Void in
                 Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber, cardEmail: cardEmail, cardFullName: cardName)
                 
-                if self.isPriceAtLeast50 {
-                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
-                }
-                
                 self.dismissConfirmPaymentViewController()
                 
                 let confirmationViewController = CheckoutConfirmationViewController()
                 confirmationViewController.email = card.email
                 confirmationViewController.orderNumber = orderNumber
-
+                
+                if self.isGiftCardRedeemable {
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
+                    confirmationViewController.shouldPresentGiftCardModal = true
+                }
+                
                 self.navigationController?.pushViewController(confirmationViewController, animated: true)
             }
             .catch { error in
