@@ -185,7 +185,7 @@ extension ScreenshotsViewController {
                 let imageView = cell.imageView
                 
                 if  let superView = imageView.superview {
-                    let frame = superView.bounds.aspectFit(in: UIScreen.main.bounds)
+                    let frame = superView.bounds.aspectFit(in: UIScreen.main.bounds.applying(CGAffineTransform(scaleX: 2, y: 2)))
                     
                     let container = UIView.init(frame: frame)
                     
@@ -196,28 +196,9 @@ extension ScreenshotsViewController {
                     container.addSubview(newImageView)
                     
                     
-                    let framesContainer = UIView.init(frame: newImageView.frame)
-                    container.addSubview(framesContainer)
-
-                    let screenshot = self.screenshot(at: indexPath.item)
-                    if let shoppables = screenshot?.shoppables {
-                        for shoppable in shoppables {
-                            if let shoppable = shoppable as? Shoppable {
-                                let frame = shoppable.frame(size: newImageView.frame.size)
-                                let frameView = UIView(frame: frame)
-                                frameView.layer.borderColor = UIColor.white.withAlphaComponent(0.7).cgColor
-                                frameView.layer.borderWidth = 2
-                                framesContainer.addSubview(frameView)
-
-
-                            }
-                        }
-                    }
-                    
                     if let snapshot = container.snapshotView(afterScreenUpdates: true) {
                         snapshot.center = superView.convert(superView.center, to: nil)
                         snapshot.bounds = superView.bounds
-                        
                         
                         transform = { imageView in
                             return snapshot
