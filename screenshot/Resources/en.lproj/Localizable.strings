@@ -48,6 +48,7 @@
 "cart.empty.title" = "No Items in Cart";
 "cart.favorite.add" = "Add to Favorites";
 "cart.favorite.remove" = "Added to Favorites";
+"cart.gift_card" = "You'll recieve your gift card after you make this purchase!";
 "cart.header.title" = "Your Cart";
 "cart.header.item_count" = "Items: %d";
 "cart.item.error.price" = "Price has changed";

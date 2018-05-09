@@ -68,6 +68,7 @@ class CartViewController: BaseViewController {
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 200
         tableView.register(CartTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.tableHeaderView = CartGiftCardView()
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
