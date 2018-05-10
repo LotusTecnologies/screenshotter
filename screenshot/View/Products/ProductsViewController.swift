@@ -413,7 +413,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if kind == UICollectionElementKindSectionHeader {
             if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
                 if sectionType == .relatedLooks {
-                    cell.label.text = "Simliar Looks"
+                    cell.label.text = "products.related_looks.headline".localized
                 }
                 
                 return cell
@@ -470,7 +470,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-retry", for: indexPath) as? ErrorRetryableCollectionViewCell {
                         
                         cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
-                        cell.label.text = "Unable to load. Please check your connection and try again."
+                        cell.label.text = "products.related_looks.error.connection".localized
                         
                         
                         return cell
@@ -479,10 +479,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-no-retry", for: indexPath) as? ErrorNotRetryableCollectionViewCell {
                         let e = error as NSError
                         if e.code == 3 { // no results
-                            cell.label.text = "We couldn't find anything simmilar to this image. It seems like your image is very unique."
+                            cell.label.text = "products.related_looks.error.no_looks".localized
                         }else {
                             //Shouldn't happen -  section shouldn't be here at all
-                            cell.label.text = "Not available for this image"
+                            cell.label.text = ""
                             
                         }
                         
