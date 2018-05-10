@@ -67,7 +67,7 @@ DEPENDENCIES:
   - Whisper
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - Amplitude-iOS
     - Analytics
     - Appsee
@@ -115,4 +115,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: a54d3fdc5ad50ce98c478e10a00e86f77a400d6a
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.5.2
