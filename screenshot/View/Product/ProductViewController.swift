@@ -207,12 +207,18 @@ fileprivate extension ProductViewControllerProductView {
                 return
             }
             
-            
             let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
             
             ShoppingCartModel.shared.update(variant: variant, quantity: Int16(quantity))
             
-            presentNextStep()
+            if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard),
+                let navigationController = navigationController as? ScreenshotsNavigationController
+            {
+                navigationController.presentGiftCardCampaign()
+            }
+            else {
+                presentNextStep()
+            }
         }
         else {
             func displayErrorItems() {
@@ -279,7 +285,6 @@ fileprivate extension ProductViewControllerProductView {
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
         }
-
     }
     
     // MARK: Web

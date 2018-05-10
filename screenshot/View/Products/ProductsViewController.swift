@@ -401,6 +401,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let product = self.productAtIndex(indexPath.item)
         
         product.setFavorited(toFavorited: isFavorited)
+        
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .productList)
         }else{
