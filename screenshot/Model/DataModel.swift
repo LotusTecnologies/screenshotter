@@ -1695,11 +1695,7 @@ extension CartItem {
 extension Cart {
     var estimatedTax:Float {
         get{
-            let shippingAndSubtotal = self.subtotal + self.shippingTotal
-            let tax: Float = 6
-            let taxTotal = (tax / 100) * shippingAndSubtotal
-            return taxTotal
-
+            return 0.06 * ( self.subtotal + self.shippingTotal )
         }
     }
     var estimatedTotalOrder:Float {
