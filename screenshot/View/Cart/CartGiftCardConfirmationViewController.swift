@@ -38,17 +38,24 @@ class CartGiftCardConfirmationViewController: UIViewController {
         layoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -.extendedPadding).isActive = true
         layoutGuide.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
         
-        let topBorderImageView = UIImageView()
+        let topBorderImageView = UIImageView(image: UIImage(named: "BrandGradientBorder"))
         topBorderImageView.translatesAutoresizingMaskIntoConstraints = false
-        topBorderImageView.backgroundColor = .crazeRed // TODO: replace with image
         topBorderImageView.contentMode = .scaleToFill
         view.addSubview(topBorderImageView)
         topBorderImageView.setContentCompressionResistancePriority(.required, for: .vertical)
         topBorderImageView.setContentHuggingPriority(.required, for: .vertical)
-        topBorderImageView.heightAnchor.constraint(equalToConstant: 6).isActive = true
         topBorderImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         topBorderImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         topBorderImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let graffitiImageView = UIImageView(image: UIImage(named: "BrandGraffitiColorTop"))
+        graffitiImageView.translatesAutoresizingMaskIntoConstraints = false
+        graffitiImageView.contentMode = .scaleAspectFill
+        view.addSubview(graffitiImageView)
+        graffitiImageView.setContentHuggingPriority(.required, for: .vertical)
+        graffitiImageView.topAnchor.constraint(equalTo: topBorderImageView.bottomAnchor).isActive = true
+        graffitiImageView.leadingAnchor.constraint(equalTo: topBorderImageView.leadingAnchor).isActive = true
+        graffitiImageView.trailingAnchor.constraint(equalTo: topBorderImageView.trailingAnchor).isActive = true
         
         let giftCardImageView = UIImageView(image: UIImage(named: "giftCard25USD"))
         giftCardImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -63,7 +70,7 @@ class CartGiftCardConfirmationViewController: UIViewController {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textColor = .gray3
         titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title2, staticSize: true)
-        titleLabel.text = "$25 gift card, coming your way!" // TODO: localize
+        titleLabel.text = "2018_05_01_campaign.confirmation.title".localized
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 0
         view.addSubview(titleLabel)
@@ -76,7 +83,7 @@ class CartGiftCardConfirmationViewController: UIViewController {
         detailLabel.translatesAutoresizingMaskIntoConstraints = false
         detailLabel.textColor = .gray4
         detailLabel.font = .screenshopFont(.hindSemibold, textStyle: .body, staticSize: true)
-        detailLabel.text = "You’ll receive an email with redemption instructions shortly." // TODO: localize
+        detailLabel.text = "2018_05_01_campaign.confirmation.detail".localized
         detailLabel.textAlignment = .center
         detailLabel.numberOfLines = 0
         view.addSubview(detailLabel)
@@ -86,7 +93,7 @@ class CartGiftCardConfirmationViewController: UIViewController {
         detailLabel.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
-        continueButton.setTitle("Awesome!", for: .normal) // TODO: localize
+        continueButton.setTitle("2018_05_01_campaign.confirmation.button".localized, for: .normal)
         continueButton.backgroundColor = .crazeGreen
         view.addSubview(continueButton)
         continueButton.setContentHuggingPriority(.required, for: .vertical)
