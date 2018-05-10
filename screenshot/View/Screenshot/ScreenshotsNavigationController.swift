@@ -105,6 +105,28 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     }
 }
 
+extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegate {
+    func presentGiftCardCampaign() {
+        let viewController = GiftCardCampaignViewController()
+        viewController.delegate = self
+        present(viewController, animated: true, completion: nil)
+        
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
+    }
+    
+    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
+        Analytics.trackOnboardingCampainCreditCardSkip()
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
+        Analytics.trackOnboardingCampainCreditCardLetsGo()
+        
+        MainTabBarController.resetViewControllerHierarchy(viewController, select: .cart)
+    }
+}
+
 typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {

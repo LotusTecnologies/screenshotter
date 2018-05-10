@@ -38,6 +38,7 @@ class UserDefaultsKeys  {
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
+    static let onboardingPresentedGiftCard = "OnboardingPresentedGiftCard"
     static let completedCheckout = "CompletedCheckout"
     static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
     enum CampaignCompleted : String {

@@ -23,8 +23,8 @@ class TutorialNavigationController : UINavigationController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         let welcomeSlide = TutorialWelcomeSlideViewController()
-        self.viewControllers = [welcomeSlide]
         welcomeSlide.delegate = self
+        self.viewControllers = [welcomeSlide]
         
         Analytics.trackStartedTutorialVideo()
         
@@ -50,53 +50,11 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
             self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
         }
     }
-
 }
-
-
 
 extension TutorialNavigationController: TutorialWelcomeSlideViewControllerDelegate {
     func tutorialWelcomeSlideViewControllerDidComplete(_ viewController:TutorialWelcomeSlideViewController) {
         Analytics.trackOnboardingWelcome()
-        let viewController = GiftCardCampaignViewController()
-        viewController.delegate = self
-        self.pushViewController(viewController, animated: true)
-    }
-}
-extension TutorialNavigationController: GiftCardCampaignViewControllerDelegate {
-    func giftCardCampaignViewControllerDidSkip(_ viewController:GiftCardCampaignViewController){
-        Analytics.trackOnboardingCampainCreditCardSkip()
-        
-        let signup = TutorialEmailSlideViewController()
-        signup.delegate = self
-        self.pushViewController(signup, animated: true)
-    }
-    
-    func giftCardCampaignViewControllerDidContinue(_ viewController:GiftCardCampaignViewController){
-        Analytics.trackOnboardingCampainCreditCardLetsGo()
-        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
-        viewController.title = "2018_05_01_campaign.payment".localized
-        viewController.delegate = self
-        self.pushViewController(viewController, animated: true)
-        
-        let alertConroller = UIAlertController(title: "2018_05_01_campaign.alert.title".localized, message: "2018_05_01_campaign.alert.message".localized, preferredStyle: .alert)
-        alertConroller.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
-        viewController.present(alertConroller, animated: true, completion: nil)
-    }
-}
-extension TutorialNavigationController: CheckoutFormViewControllerDelegate {
-    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController){
-        Analytics.trackOnboardingCampainCreditCardEnteredCard()
-        let viewController = GiftCardDoneViewController()
-        viewController.delegate = self
-        self.pushViewController(viewController, animated: true)
-    }
-}
-
-extension TutorialNavigationController : GiftCardDoneViewControllerDelegate {
-    func giftCardDoneViewControllerDidPressDone(_ viewController:GiftCardDoneViewController){
-        let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
-        Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
         
         let signup = TutorialEmailSlideViewController()
         signup.delegate = self
