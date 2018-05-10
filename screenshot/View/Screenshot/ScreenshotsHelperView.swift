@@ -57,7 +57,7 @@ class ScreenshotsHelperView: HelperView {
         case .screenshot:
             titleLabel.text = "screenshot.empty.title".localized
             subtitleLabel.text = "screenshot.empty.detail".localized
-            contentImage = nil
+            contentImage = UIImage(named: "ScreenshotsEmptyListGraphic")
             removePermissionControl()
             insertScreenshotContent()
         }
@@ -83,14 +83,14 @@ class ScreenshotsHelperView: HelperView {
             return
         }
         
-        contentView.addSubview(uploadButton)
-        uploadButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .extendedPadding).isActive = true
-        uploadButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        controlView.addSubview(uploadButton)
+        uploadButton.topAnchor.constraint(equalTo: controlView.topAnchor).isActive = true
+        uploadButton.centerXAnchor.constraint(equalTo: controlView.centerXAnchor).isActive = true
         
-        contentView.addSubview(discoverButton)
-        discoverButton.topAnchor.constraint(equalTo: uploadButton.bottomAnchor, constant: .extendedPadding).isActive = true
-        discoverButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        discoverButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor).isActive = true
+        controlView.addSubview(discoverButton)
+        discoverButton.topAnchor.constraint(equalTo: uploadButton.bottomAnchor, constant: .padding).isActive = true
+        discoverButton.centerXAnchor.constraint(equalTo: controlView.centerXAnchor).isActive = true
+        discoverButton.bottomAnchor.constraint(equalTo: controlView.bottomAnchor).isActive = true
         discoverButton.widthAnchor.constraint(equalTo: uploadButton.widthAnchor).isActive = true
     }
     
