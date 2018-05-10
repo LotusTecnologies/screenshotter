@@ -97,9 +97,16 @@ class ProductViewController : BaseViewController {
         super.viewWillAppear(animated)
         
         if #available(iOS 11.0, *) {} else {
-            // TODO: also handle the scroll insets bottom
             if !hidesBottomBarWhenPushed, let height = tabBarController?.tabBar.bounds.height {
                 productView.controlContainerBottomConstraint?.constant = -height
+                
+                var contentInsets = productView.scrollView.contentInset
+                contentInsets.bottom = -height
+                productView.scrollView.contentInset = contentInsets
+                
+                var scrollIndicatorInsets = productView.scrollView.scrollIndicatorInsets
+                scrollIndicatorInsets.bottom = -height
+                productView.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
             }
         }
     }
