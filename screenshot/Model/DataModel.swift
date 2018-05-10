@@ -1692,6 +1692,19 @@ extension CartItem {
     
 }
 
+extension Cart {
+    var estimatedTax:Float {
+        get{
+            return 0.06 * ( self.subtotal + self.shippingTotal )
+        }
+    }
+    var estimatedTotalOrder:Float {
+        get{
+            return self.subtotal + self.shippingTotal + self.estimatedTax
+        }
+    }
+}
+
 extension Card {
     
     func cardNumberKeychainKey() -> String {
