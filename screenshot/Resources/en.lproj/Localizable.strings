@@ -280,9 +280,9 @@
 "products.rate.talk_to_stylist" = "Talk to your stylist";
 "products.rate.unrated" = "Are these results relevant?";
 "products.title" = "Shop Photo";
-"products.related_looks.headline" = "Simliar Looks";
+"products.related_looks.headline" = "Similar Looks";
 "products.related_looks.error.connection" = "Please check your connection and try again.";
-"products.related_looks.error.no_looks" = "We couldn't find anything simmilar to this image. It seems like your image is very unique.";
+"products.related_looks.error.no_looks" = "We couldn't find anything similar to this image.";
 
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
