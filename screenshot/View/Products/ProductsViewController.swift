@@ -1096,7 +1096,10 @@ extension ProductsViewController {
                                             }
                                         }
                                         context.saveIfNeeded()
-                                        fulfil(array)
+                                        DispatchQueue.main.async {
+                                            fulfil(array)
+                                        }
+                                        
                                     })
                                 }else{
                                     let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])

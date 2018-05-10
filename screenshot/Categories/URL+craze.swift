@@ -20,7 +20,9 @@ extension URL {
             
             //add the query parameters
             queryParameters.forEach({ (key, value) in
-                items.append(URLQueryItem.init(name: key, value: value))
+                if !value.isEmpty {
+                    items.append(URLQueryItem.init(name: key, value: value))
+                }
             })
             urlComponents.queryItems = items
             
