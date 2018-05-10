@@ -95,7 +95,6 @@
     </entity>
     <entity name="Screenshot" representedClassName="Screenshot" syncable="YES" codeGenerationType="class">
         <attribute name="assetId" attributeType="String" syncable="YES"/>
-        <attribute name="catalog" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="favoritesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
@@ -159,7 +158,7 @@
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="135"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="525"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
-        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="435"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="420"/>
         <element name="ShippingAddress" positionX="718" positionY="393" width="128" height="75"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="255"/>
         <element name="Variant" positionX="124" positionY="636" width="128" height="165"/>
