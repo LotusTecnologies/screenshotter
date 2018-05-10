@@ -292,7 +292,7 @@ class ShoppingCartModel {
         }
     }
     
-    func nativeCheckout(card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<String> {
+    func nativeCheckout(card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<(String, String)> {
         // Get cart remoteId, or error.
         var rememberRemoteId = ""
         let cardOID = card.objectID
@@ -306,11 +306,11 @@ class ShoppingCartModel {
                 return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, cvv: cvv, shippingAddress: shippingAddress)
             }
             // Extract values from response and save to DB.
-            .then { nativeCheckoutResponseDict -> Promise<String> in
+            .then { nativeCheckoutResponseDict -> Promise<(String,String)> in
                 let orderNumbersSet = Set<String>(nativeCheckoutResponseDict.compactMap { $0["number"] as? String })
                 let orderNumber = orderNumbersSet.joined(separator: ",")
                 self.checkoutCompleted(remoteId: rememberRemoteId, cardOID: cardOID, orderNumber: orderNumber)
-                return Promise(value: orderNumber)
+                return Promise(value: (orderNumber, rememberRemoteId))
         }
     }
     
