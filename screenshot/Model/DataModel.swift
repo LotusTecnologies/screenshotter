@@ -147,7 +147,7 @@ extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
+        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
