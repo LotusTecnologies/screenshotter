@@ -174,7 +174,7 @@ extension AssetSyncModel {
                     }
                 }
             }else{
-                SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
+                SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
                     
                     var imageData =  data
                     if imageData == nil {
