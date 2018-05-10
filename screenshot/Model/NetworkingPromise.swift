@@ -373,6 +373,73 @@ class NetworkingPromise : NSObject {
         return (firstName, lastName)
     }
     
+    func checkStock(partNumbers: [String]) -> Promise<([[String : Any]], [String])> {
+        guard let url = URL(string: Constants.shoppableDomain + "/product?part_numbers=" + partNumbers.joined(separator: "%2C")) else {
+            let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
+            print("networking checkStock url error:\(error)")
+            return Promise(error: error)
+        }
+        print("GMK networking checkStock url:\(url)")
+        var request = URLRequest(url: url)
+        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { data, response -> Promise<([[String : Any]], [String])> in
+            if let dataString = String(data: data, encoding: .utf8) {
+                print("GMK dataString:\(dataString)")
+            }
+            guard let httpResponse = response as? HTTPURLResponse else {
+                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock no http response for url:\(String(describing: request.url))"])
+                print("checkStock no httpResponse")
+                return Promise(error: error)
+            }
+            let serializedObject: Any
+            do {
+                serializedObject = try JSONSerialization.jsonObject(with: data)
+            } catch {
+                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock JSONSerialize exception for url:\(String(describing: request.url))"])
+                print("checkStock exception on JSONSerialize")
+                return Promise(error: error)
+            }
+            guard httpResponse.statusCode >= 200,
+                httpResponse.statusCode < 300 else {
+                    let error: NSError
+                    if httpResponse.statusCode == 422,
+                        let jsonError = serializedObject as? [String : Any] {
+                        error = NSError(domain: "Shoppable", code: httpResponse.statusCode, userInfo: jsonError)
+                        print("checkStock Shoppable code:\(httpResponse.statusCode)  jsonError:\(String(describing: jsonError))")
+                    } else {
+                        error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "checkStock invalid http statusCode for url:\(String(describing: request.url))"])
+                        print("checkStock httpResponse.statusCode error")
+                    }
+                    return Promise(error: error)
+            }
+            if let jsonObject = serializedObject as? [[[String : Any]]] { // First array is array of variant info, second array is array of out of stock. Either may be empty.
+                let variantInfo: [[String : Any]] = jsonObject.first ?? []
+                let outOfStocks: [String] = jsonObject.count >= 2 ? jsonObject[1].compactMap { $0["part_number"] as? String } : []
+                return Promise(value: (variantInfo, outOfStocks))
+            } else if let jsonObject = serializedObject as? [String : Any] { // Unlikely. If passed in single partNumber, receive dictionary, like redirect to /product/partNumber.
+                let variantInfo: [[String : Any]]
+                let outOfStocks: [String]
+                if jsonObject["error"] as? String == "Product Not Found" {
+                    variantInfo = []
+                    if let partNumber = jsonObject["part_number"] as? String {
+                        outOfStocks = [partNumber]
+                    } else {
+                        outOfStocks = []
+                    }
+                } else {
+                    variantInfo = [jsonObject]
+                    outOfStocks = []
+                }
+                return Promise(value: (variantInfo, outOfStocks))
+            }
+            let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock JSONSerialize failed for url:\(String(describing: request.url))"])
+            print("checkStock failed to JSONSerialize")
+            return Promise(error: error)
+        }
+    }
+    
     func nativeCheckout(remoteId: String, card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
         guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
             let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableDomain:\(Constants.shoppableDomain)"])

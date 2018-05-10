@@ -86,6 +86,10 @@ extension ScreenshotsNavigationController {
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
         if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
+            let screenshotOID = screenshot.objectID
+            print("GMK tapped screenshot:\(screenshotOID)")
+            let _ = ShoppingCartModel.shared.checkStock(screenshotOID: screenshotOID)
+            
             let productsViewController = createProductsViewController(screenshot: screenshot)
             self.pushViewController(productsViewController, animated: true)
             
