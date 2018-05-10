@@ -748,32 +748,32 @@ extension AssetSyncModel {
                      productOrder: Int16,
                      prod: [String : Any],
                      optionsMask: Int32) {
+        let dataModel = DataModel.sharedInstance
         let extractedCategories = prod["categories"] as? [String]
         let originalData = prod["original_data"] as? [String : Any]
-        let shoppingModel = ShoppingCartModel.shared
-        let fallbackPrice: Float = shoppingModel.parseFloat(originalData?["price"])
-            ?? shoppingModel.parseFloat(originalData?["sale_price"])
-            ?? shoppingModel.parseFloat(originalData?["discount_price"])
-            ?? shoppingModel.parseFloat(originalData?["retail_price"])
+        let fallbackPrice: Float = dataModel.parseFloat(originalData?["price"])
+            ?? dataModel.parseFloat(originalData?["sale_price"])
+            ?? dataModel.parseFloat(originalData?["discount_price"])
+            ?? dataModel.parseFloat(originalData?["retail_price"])
             ?? 0
-        let _ = DataModel.sharedInstance.saveProduct(managedObjectContext: managedObjectContext,
-                                                     shoppable: shoppable,
-                                                     order: productOrder,
-                                                     productDescription: prod["description"] as? String,
-                                                     price: prod["price"] as? String,
-                                                     originalPrice: prod["originalPrice"] as? String,
-                                                     floatPrice: shoppingModel.parseFloat(prod["floatPrice"]) ?? 0,
-                                                     floatOriginalPrice: shoppingModel.parseFloat(prod["floatOriginalPrice"]) ?? 0,
-                                                     categories: extractedCategories?.first,
-                                                     brand: prod["brand"] as? String,
-                                                     offer: prod["offer"] as? String,
-                                                     imageURL: prod["imageUrl"] as? String,
-                                                     merchant: prod["merchant"] as? String,
-                                                     partNumber: originalData?["part_number"] as? String,
-                                                     color: originalData?["color"] as? String,
-                                                     sku: originalData?["id"] as? String,
-                                                     fallbackPrice: fallbackPrice,
-                                                     optionsMask: optionsMask)
+        let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
+                                      shoppable: shoppable,
+                                      order: productOrder,
+                                      productDescription: prod["description"] as? String,
+                                      price: prod["price"] as? String,
+                                      originalPrice: prod["originalPrice"] as? String,
+                                      floatPrice: dataModel.parseFloat(prod["floatPrice"]) ?? 0,
+                                      floatOriginalPrice: dataModel.parseFloat(prod["floatOriginalPrice"]) ?? 0,
+                                      categories: extractedCategories?.first,
+                                      brand: prod["brand"] as? String,
+                                      offer: prod["offer"] as? String,
+                                      imageURL: prod["imageUrl"] as? String,
+                                      merchant: prod["merchant"] as? String,
+                                      partNumber: originalData?["part_number"] as? String,
+                                      color: originalData?["color"] as? String,
+                                      sku: originalData?["id"] as? String,
+                                      fallbackPrice: fallbackPrice,
+                                      optionsMask: optionsMask)
     }
     
     func extractProducts(assetId: String,
