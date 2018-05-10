@@ -176,7 +176,11 @@ class CartViewController: BaseViewController {
     
     // MARK: Sync Views
     
-    private(set) var isPriceAtLeast50 = false
+    private var isPriceAtLeast50 = false
+    
+    var isGiftCardRedeemable: Bool {
+        return isPriceAtLeast50 && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.completedCheckout)
+    }
     
     fileprivate func syncTotalPrice() {
         var price: Double = 0

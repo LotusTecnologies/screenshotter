@@ -38,6 +38,9 @@
 "2018_05_01_campaign.star" = "*Applicable for purchases of $50 or more";
 "2018_05_01_campaign.alert.message" = "Enter your credit card information and you’ll receive your gift card after you make your first purchase. ";
 "2018_05_01_campaign.alert.title" = "Almost There!";
+"2018_05_01_campaign.confirmation.title" = "$25 gift card, coming your way!";
+"2018_05_01_campaign.confirmation.detail" = "You’ll receive an email with redemption instructions shortly.";
+"2018_05_01_campaign.confirmation.button" = "Awesome!";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";

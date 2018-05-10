@@ -122,6 +122,7 @@
 		C54088591FE90E2200198955 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884E1FE90E2200198955 /* MainButton.swift */; };
 		C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884F1FE90E2200198955 /* FloatingActionButton.swift */; };
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
+		C54124C020A3204700CA03DB /* CartGiftCardConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */; };
 		C543695020453CDF00599134 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694F20453CDF00599134 /* ProductView.swift */; };
 		C543695920453FE300599134 /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695220453FE300599134 /* ProductsOptions.swift */; };
 		C543695D20453FE300599134 /* ProductsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543695620453FE300599134 /* ProductsCollectionViewCell.swift */; };
@@ -358,6 +359,7 @@
 		C540884E1FE90E2200198955 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
 		C540884F1FE90E2200198955 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
+		C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartGiftCardConfirmationViewController.swift; sourceTree = "<group>"; };
 		C543694F20453CDF00599134 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		C543695220453FE300599134 /* ProductsOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsOptions.swift; sourceTree = "<group>"; };
 		C543695620453FE300599134 /* ProductsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -638,6 +640,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D2E307204D682B00B5BD92 /* CartCheckoutView.swift */,
+				C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */,
 				C5D6B41820A2D872008B27EF /* CartGiftCardTableViewCell.swift */,
 				C5D2E303204D1C6500B5BD92 /* CartItemCountView.swift */,
 				C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */,
@@ -1442,6 +1445,7 @@
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */,
+				C54124C020A3204700CA03DB /* CartGiftCardConfirmationViewController.swift in Sources */,
 				C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
