@@ -27,7 +27,7 @@
 "2018_04_20_campaign.instructions.secondButton" = "back to video";
 
 // May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
-"2018_05_01_campaign.headline" = "Thanks for joining Screenshop!";
+"2018_05_01_campaign.headline" = "Start Shopping!";
 "2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase*";
 "2018_05_01_campaign.button" = "Let’s Go!";
 "2018_05_01_campaign.skip" = "No thanks, I don’t like free things";
@@ -38,6 +38,9 @@
 "2018_05_01_campaign.star" = "*Applicable for purchases of $50 or more";
 "2018_05_01_campaign.alert.message" = "Enter your credit card information and you’ll receive your gift card after you make your first purchase. ";
 "2018_05_01_campaign.alert.title" = "Almost There!";
+"2018_05_01_campaign.confirmation.title" = "$25 gift card, coming your way!";
+"2018_05_01_campaign.confirmation.detail" = "You’ll receive an email with redemption instructions shortly.";
+"2018_05_01_campaign.confirmation.button" = "Awesome!";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
@@ -48,6 +51,8 @@
 "cart.empty.title" = "No Items in Cart";
 "cart.favorite.add" = "Add to Favorites";
 "cart.favorite.remove" = "Added to Favorites";
+"cart.gift_card.available" = "You’ll receive your gift card after you make this purchase!";
+"cart.gift_card.unavailable" = "You need to make a purchase over $50 to redeem your gift card";
 "cart.header.title" = "Your Cart";
 "cart.header.item_count" = "Items: %d";
 "cart.item.error.price" = "Price has changed";

@@ -132,6 +132,7 @@
 		C54088591FE90E2200198955 /* MainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884E1FE90E2200198955 /* MainButton.swift */; };
 		C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884F1FE90E2200198955 /* FloatingActionButton.swift */; };
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
+		C54124C020A3204700CA03DB /* CartGiftCardConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */; };
 		C543695020453CDF00599134 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694F20453CDF00599134 /* ProductView.swift */; };
 		C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696120468C4100599134 /* SegmentedDropDownControl.swift */; };
 		C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */; };
@@ -173,6 +174,7 @@
 		C5D57933203EDD7A00A076FE /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D57932203EDD7A00A076FE /* TableView.swift */; };
 		C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D57935203F044B00A076FE /* EmptyListController.swift */; };
 		C5D579382042897300A076FE /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D579372042897300A076FE /* CollectionView.swift */; };
+		C5D6B41920A2D872008B27EF /* CartGiftCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D6B41820A2D872008B27EF /* CartGiftCardTableViewCell.swift */; };
 		C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C5D98CCA1FFA642300CC1A97 /* GameScene.sks */; };
 		C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CCB1FFA642300CC1A97 /* GameScene.swift */; };
 		C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */; };
@@ -373,6 +375,7 @@
 		C540884E1FE90E2200198955 /* MainButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainButton.swift; sourceTree = "<group>"; };
 		C540884F1FE90E2200198955 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
+		C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartGiftCardConfirmationViewController.swift; sourceTree = "<group>"; };
 		C543694F20453CDF00599134 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		C543696120468C4100599134 /* SegmentedDropDownControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownControl.swift; sourceTree = "<group>"; };
 		C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCartBarButtonItem.swift; sourceTree = "<group>"; };
@@ -414,6 +417,7 @@
 		C5D57932203EDD7A00A076FE /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		C5D57935203F044B00A076FE /* EmptyListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyListController.swift; sourceTree = "<group>"; };
 		C5D579372042897300A076FE /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
+		C5D6B41820A2D872008B27EF /* CartGiftCardTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartGiftCardTableViewCell.swift; sourceTree = "<group>"; };
 		C5D98CCA1FFA642300CC1A97 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C5D98CCB1FFA642300CC1A97 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		C5D98CD61FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDisplayNavigationController.swift; sourceTree = "<group>"; };
@@ -647,6 +651,8 @@
 			isa = PBXGroup;
 			children = (
 				C5D2E307204D682B00B5BD92 /* CartCheckoutView.swift */,
+				C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */,
+				C5D6B41820A2D872008B27EF /* CartGiftCardTableViewCell.swift */,
 				C5D2E303204D1C6500B5BD92 /* CartItemCountView.swift */,
 				C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */,
 				C5D2E305204D29D100B5BD92 /* CartTableViewCell.swift */,
@@ -1456,6 +1462,7 @@
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */,
+				C54124C020A3204700CA03DB /* CartGiftCardConfirmationViewController.swift in Sources */,
 				C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
@@ -1577,6 +1584,7 @@
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
 				C5014130206283A200ABFB5C /* LoadingButton.swift in Sources */,
 				C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */,
+				C5D6B41920A2D872008B27EF /* CartGiftCardTableViewCell.swift in Sources */,
 				C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */,
 				C50DBB8C207CC37100BB206E /* CheckoutOrderItemTableViewCell.swift in Sources */,
 				C5406A83206B6858002977CE /* UIApplication.swift in Sources */,

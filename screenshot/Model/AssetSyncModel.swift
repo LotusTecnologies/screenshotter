@@ -46,6 +46,7 @@ class AccumulatorModel: NSObject {
             }
         }
     }
+    
     public func resetNewScreenshotsCount() {
         modifyCount {
             self.assetIds.removeAll()
@@ -504,7 +505,11 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         } else { // Screenshot taken while app in background (or killed)
                             AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
                             if  ApplicationStateModel.sharedInstance.isBackground() {
-                                self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
+                                DispatchQueue.main.async {
+                                    // The accumulator updates the count in an async block.
+                                    // Without a delay the count is wrong when setting the content.badge.
+                                    self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
+                                }
                             }
                         }
                     }
@@ -583,6 +588,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             return
         }
+        
         let content = UNMutableNotificationContent()
         content.title = "notification.title".localized
         content.body = "notification.message".localized
@@ -601,7 +607,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             
             content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                 Constants.openingAssetIdKey : representativeScreenshotData.assetId]
-
+            
             identifier += representativeScreenshotData.assetId.replacingOccurrences(of: "/", with: "-")
             // Add image url
             let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
@@ -615,6 +621,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 print("Local notification attachment error:\(error)")
             }
         }
+        
+        content.badge = NSNumber(value: AccumulatorModel.sharedInstance.getNewScreenshotsCount())
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let request = UNNotificationRequest(identifier: identifier,

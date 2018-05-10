@@ -278,7 +278,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         var newSecureNumber: String?
         var newBrand: String?
         
-        if cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
+        if !cardNumber.isEmpty && cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
             newCardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
             newSecureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             newBrand = CreditCardValidator.shared.brand(forNumber: cardNumber).rawValue
