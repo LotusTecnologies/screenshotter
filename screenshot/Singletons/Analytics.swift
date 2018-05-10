@@ -95,6 +95,10 @@ class Analytics {
         }
         properties["cart-isPastOrder"] = cart.isPastOrder
 
+        if let orderNumber = cart.orderNumber {
+            properties["cart-orderNumber"] = cart.orderNumber
+        }
+
         return properties
     }
     
