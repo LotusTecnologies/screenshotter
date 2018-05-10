@@ -42,6 +42,31 @@ class ShoppingCartModel {
             })
     }
     
+    func checkStock(screenshotOID: NSManagedObjectID) {
+        let dataModel = DataModel.sharedInstance
+        dataModel.partNumbers(screenshotOID: screenshotOID)
+        //
+            .then { partNumbers -> Promise<([[String : Any]], [String])> in
+                return NetworkingPromise.sharedInstance.checkStock(partNumbers: partNumbers)
+        }
+        //
+            .then { variantInfo, outOfStocks -> Void in
+                //print("GMK variantInfo:\(variantInfo)  outOfStocks:\(outOfStocks)")
+                print("GMK variantInfo.count:\(variantInfo.count)  outOfStocks.count:\(outOfStocks.count)")
+                dataModel.performBackgroundTask { managedObjectContext in
+                    dataModel.markOutOfStock(managedObjectContext: managedObjectContext, partNumbers: outOfStocks)
+                    variantInfo.forEach { dict in
+                        if let partNumber = dict["part_number"] as? String,
+                          let rootProduct = dataModel.retrieveProduct(managedObjectContext: managedObjectContext, partNumber: partNumber) {
+                            dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct)
+                            let _ = dataModel.saveVariantsFromDictionary(managedObjectContext: managedObjectContext, rootProduct: rootProduct, dict: dict as NSDictionary, shouldSave: false)
+                        }
+                    }
+                    managedObjectContext.saveIfNeeded()
+                }
+        }
+    }
+    
     public func update(variant: Variant, quantity: Int16) {
         let variantOID = variant.objectID
         let dataModel = DataModel.sharedInstance
@@ -206,7 +231,7 @@ class ShoppingCartModel {
                                         cartItem.quantity = qty
                                         errorMask.insert(.quantity)
                                     }
-                                    if let toPayPrice = self.parseFloat(item["price"]) ?? self.parseFloat(item["sale_price"]) ?? self.parseFloat(item["retail_price"]),
+                                    if let toPayPrice = dataModel.parseFloat(item["price"]) ?? dataModel.parseFloat(item["sale_price"]) ?? dataModel.parseFloat(item["retail_price"]),
                                       cartItem.price != toPayPrice {
                                         cartItem.price = toPayPrice
                                         errorMask.insert(.price)
@@ -228,19 +253,16 @@ class ShoppingCartModel {
                                     cartItem.errorMask = errorMask.rawValue
                                 }
                                 // Force next populateVariants to refresh.
-                                if let rootProduct = cartItem.product,
-                                  rootProduct.hasVariants,
-                                  let variants = rootProduct.availableVariants as? Set<Variant> {
-                                    variants.forEach {managedObjectContext.delete($0)}
-                                    rootProduct.hasVariants = false
+                                if let rootProduct = cartItem.product {
+                                    dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct)
                                 }
                             }
                         }
                         // Save subtotal and shippingTotal to Cart object.
                         if let cartObject = dataModel.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId) {
-                            cartObject.subtotal =  self.parseFloat(cart["subtotal"])
+                            cartObject.subtotal =  dataModel.parseFloat(cart["subtotal"])
                                                 ?? cartItems.filter({ $0.errorMask & CartItem.ErrorMaskOptions.unavailable.rawValue == 0 }).reduce(0, { $0 + $1.price })
-                            cartObject.shippingTotal = self.parseFloat(cart["shipping_total"]) ?? 0
+                            cartObject.shippingTotal = dataModel.parseFloat(cart["shipping_total"]) ?? 0
                         } else {
                             print("Failed to update subtotal and shippingTotal for cart remoteId:\(remoteId)")
                         }
@@ -294,7 +316,7 @@ class ShoppingCartModel {
         }
     }
     
-    func nativeCheckout(card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<String> {
+    func nativeCheckout(card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<(String, String)> {
         // Get cart remoteId, or error.
         var rememberRemoteId = ""
         let cardOID = card.objectID
@@ -308,11 +330,11 @@ class ShoppingCartModel {
                 return NetworkingPromise.sharedInstance.nativeCheckout(remoteId: remoteId, card: card, cvv: cvv, shippingAddress: shippingAddress)
             }
             // Extract values from response and save to DB.
-            .then { nativeCheckoutResponseDict -> Promise<String> in
+            .then { nativeCheckoutResponseDict -> Promise<(String,String)> in
                 let orderNumbersSet = Set<String>(nativeCheckoutResponseDict.compactMap { $0["number"] as? String })
                 let orderNumber = orderNumbersSet.joined(separator: ",")
                 self.checkoutCompleted(remoteId: rememberRemoteId, cardOID: cardOID, orderNumber: orderNumber)
-                return Promise(value: orderNumber)
+                return Promise(value: (orderNumber, rememberRemoteId))
         }
     }
     
@@ -341,8 +363,7 @@ class ShoppingCartModel {
                         fulfill("")
                     } else {
                         // Delete the old variants.
-                        variants.forEach {managedObjectContext.delete($0)}
-                        rootProduct.hasVariants = false
+                        dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct)
                         managedObjectContext.saveIfNeeded()
                     }
                 }
@@ -361,48 +382,7 @@ class ShoppingCartModel {
                     reject(error)
                     return
                 }
-                
-                rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
-                rootProduct.detailedDescription = dict["description"] as? String
-                rootProduct.name = dict["name"] as? String
-                rootProduct.url = dict["url"] as? String
-                if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["discount_price"]) ?? self.parseFloat(dict["retail_price"]) {
-                    rootProduct.fallbackPrice = dictPrice
-                }
-                
-                var hasVariants = false
-                let colors = dict["colors"] as? [[String : Any]]
-                colors?.forEach { color in
-                    let colorString = color["color"] as? String
-                    let colorPrice = self.parseFloat(color["sale_price"]) ?? self.parseFloat(color["retail_price"]) ?? rootProduct.fallbackPrice
-                    let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-                    let sizes = color["sizes"] as? [[String : Any]]
-                    sizes?.forEach { size in
-                        if let sku = size["id"] as? String,
-                          !sku.isEmpty {
-                            let _ = dataModel.saveVariant(managedObjectContext: managedObjectContext,
-                                                          product: rootProduct,
-                                                          color: colorString,
-                                                          size: size["size"] as? String,
-                                                          price: self.parseFloat(size["price"])
-                                                                ?? self.parseFloat(size["discount_price"])
-                                                                ?? self.parseFloat(size["retail_price"])
-                                                                ?? colorPrice,
-                                                          sku: sku,
-                                                          url: size["url"] as? String,
-                                                          imageURLs: colorImageURLs)
-                            hasVariants = true
-                            if rootProduct.sku == sku,
-                              let updatedColor = colorString,
-                              !updatedColor.isEmpty,
-                              rootProduct.color != updatedColor {
-                                rootProduct.color = updatedColor
-                            }
-                        }
-                    }
-                }
-                rootProduct.hasVariants = hasVariants
-                managedObjectContext.saveIfNeeded()
+                let hasVariants = dataModel.saveVariantsFromDictionary(managedObjectContext: managedObjectContext, rootProduct: rootProduct, dict: dict)
                 return fulfill(hasVariants)
             }
         }
@@ -417,23 +397,6 @@ class ShoppingCartModel {
             }
             DataModel.sharedInstance.add(remoteId: remoteId, toCartOID: cartOID)
         }
-    }
-    
-    func parseFloat(_ anyValueOptional: Any?) -> Float? {
-        if anyValueOptional == nil {
-            return nil
-        } else if let floatVal = anyValueOptional as? Float {
-            return floatVal
-        } else if let intVal = anyValueOptional as? Int {
-            return Float(intVal)
-        } else if let stringVal = anyValueOptional as? String {
-            return Float(stringVal)
-        } else if let nsNumber = anyValueOptional as? NSNumber {
-            return nsNumber.floatValue
-        } else if let anyValue = anyValueOptional {
-            print("parseFloat received anyValueOptional:\(String(describing: anyValueOptional))  anyValue:\(anyValue) type:\(type(of: anyValueOptional))")
-        }
-        return nil
     }
     
 }

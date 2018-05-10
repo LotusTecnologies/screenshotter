@@ -81,15 +81,12 @@ class CheckoutOrderViewController: BaseViewController {
             return formatter.string(from: NSNumber(value: price))
         }
         
-        let shippingAndSubtotal = cart.subtotal + cart.shippingTotal
-        let tax: Float = 6
-        let taxTotal = (tax / 100) * shippingAndSubtotal
-        
+
         _view.itemsPriceLabel.text = formattedPrice(cart.subtotal)
         _view.shippingPriceLabel.text = formattedPrice(cart.shippingTotal)
-        _view.beforeTaxPriceLabel.text = formattedPrice(shippingAndSubtotal)
-        _view.estimateTaxLabel.text = formattedPrice(taxTotal)
-        _view.totalPriceLabel.text = formattedPrice(shippingAndSubtotal + taxTotal)
+        _view.beforeTaxPriceLabel.text = formattedPrice(cart.subtotal + cart.shippingTotal)
+        _view.estimateTaxLabel.text = formattedPrice(cart.estimatedTax)
+        _view.totalPriceLabel.text = formattedPrice(cart.estimatedTotalOrder)
         _view.legalTextView.delegate = self
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
@@ -370,8 +367,15 @@ extension CheckoutOrderViewControllerOrder {
         let cardName = card.fullName
         
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
-            .then { orderNumber -> Void in
-                Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber, cardEmail: cardEmail, cardFullName: cardName)
+            .then { orderNumber, remoteId -> Void in
+                
+                DataModel.sharedInstance.performBackgroundTask({ (managedObjectContext) in
+                    let cart = DataModel.sharedInstance.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId)
+                    cart?.orderNumber = orderNumber //do not need ot save -- this assignement is just to ensure being passed ot anaytlics
+                    Analytics.trackCartPurchaseCompleted(cart: cart, cardEmail: cardEmail, cardFullName: cardName)
+                    
+                })
+                
                 
                 self.dismissConfirmPaymentViewController()
                 

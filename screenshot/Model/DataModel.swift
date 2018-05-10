@@ -525,6 +525,78 @@ extension DataModel {
         return nil
     }
     
+    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product) {
+        if product.hasVariants {
+            let variants = product.availableVariants as? Set<Variant>
+            variants?.forEach { managedObjectContext.delete($0) }
+            product.hasVariants = false
+        }
+    }
+    
+    func partNumbers(screenshotOID: NSManagedObjectID) -> Promise<[String]> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<NSDictionary> = NSFetchRequest(entityName: "Product")
+                fetchRequest.resultType = .dictionaryResultType
+                fetchRequest.returnsObjectsAsFaults = false
+                fetchRequest.includesSubentities = false
+                fetchRequest.returnsDistinctResults = true
+                fetchRequest.propertiesToFetch = ["partNumber"]
+                fetchRequest.fetchLimit = 600
+                let optionsMaskInt = ProductsOptionsMask.global.rawValue
+                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d", screenshotOID, optionsMaskInt, optionsMaskInt)
+                fetchRequest.sortDescriptors = nil
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if let partNumbers = results.compactMap({ $0["partNumber"] }) as? [String] {
+                        print("GMK count:\(partNumbers.count)  partNumbers:\(partNumbers)")
+                        fulfill(partNumbers)
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("partNumbers results with error:\(error)")
+                }
+                fulfill([])
+            }
+        }
+    }
+    
+    func markOutOfStock(managedObjectContext: NSManagedObjectContext, partNumbers: [String]) {
+        guard partNumbers.count > 0 else {
+            return
+        }
+        
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "partNumber IN %@", partNumbers)
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            results.forEach { deleteVariants(managedObjectContext: managedObjectContext, product: $0) }
+            managedObjectContext.saveIfNeeded()
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("markOutOfStock results with error:\(error)")
+        }
+    }
+    
+    func parseFloat(_ anyValueOptional: Any?) -> Float? {
+        if anyValueOptional == nil {
+            return nil
+        } else if let floatVal = anyValueOptional as? Float {
+            return floatVal
+        } else if let intVal = anyValueOptional as? Int {
+            return Float(intVal)
+        } else if let stringVal = anyValueOptional as? String {
+            return Float(stringVal)
+        } else if let nsNumber = anyValueOptional as? NSNumber {
+            return nsNumber.floatValue
+        } else if let anyValue = anyValueOptional {
+            print("parseFloat received anyValueOptional:\(String(describing: anyValueOptional))  anyValue:\(anyValue) type:\(type(of: anyValueOptional))")
+        }
+        return nil
+    }
+
     // Save a new Variant to Core Data.
     func saveVariant(managedObjectContext: NSManagedObjectContext,
                      product: Product,
@@ -544,6 +616,53 @@ extension DataModel {
         variantToSave.imageURLs = imageURLs
         variantToSave.dateModified = Date()
         return variantToSave
+    }
+    
+    func saveVariantsFromDictionary(managedObjectContext: NSManagedObjectContext, rootProduct: Product, dict: NSDictionary, shouldSave: Bool = true) -> Bool {
+        rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
+        rootProduct.detailedDescription = dict["description"] as? String
+        rootProduct.name = dict["name"] as? String
+        rootProduct.url = dict["url"] as? String
+        if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["discount_price"]) ?? self.parseFloat(dict["retail_price"]) {
+            rootProduct.fallbackPrice = dictPrice
+        }
+        
+        var hasVariants = false
+        let colors = dict["colors"] as? [[String : Any]]
+        colors?.forEach { color in
+            let colorString = color["color"] as? String
+            let colorPrice = self.parseFloat(color["sale_price"]) ?? self.parseFloat(color["retail_price"]) ?? rootProduct.fallbackPrice
+            let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
+            let sizes = color["sizes"] as? [[String : Any]]
+            sizes?.forEach { size in
+                if let sku = size["id"] as? String,
+                    !sku.isEmpty {
+                    let _ = self.saveVariant(managedObjectContext: managedObjectContext,
+                                             product: rootProduct,
+                                             color: colorString,
+                                             size: size["size"] as? String,
+                                             price: self.parseFloat(size["price"])
+                                                ?? self.parseFloat(size["discount_price"])
+                                                ?? self.parseFloat(size["retail_price"])
+                                                ?? colorPrice,
+                                             sku: sku,
+                                             url: size["url"] as? String,
+                                             imageURLs: colorImageURLs)
+                    hasVariants = true
+                    if rootProduct.sku == sku,
+                        let updatedColor = colorString,
+                        !updatedColor.isEmpty,
+                        rootProduct.color != updatedColor {
+                        rootProduct.color = updatedColor
+                    }
+                }
+            }
+        }
+        rootProduct.hasVariants = hasVariants
+        if shouldSave {
+            managedObjectContext.saveIfNeeded()
+        }
+        return hasVariants
     }
     
     func retrieveAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
@@ -1692,6 +1811,19 @@ extension CartItem {
         return productDescription?.productTitle()
     }
     
+}
+
+extension Cart {
+    var estimatedTax:Float {
+        get{
+            return 0.06 * ( self.subtotal + self.shippingTotal )
+        }
+    }
+    var estimatedTotalOrder:Float {
+        get{
+            return self.subtotal + self.shippingTotal + self.estimatedTax
+        }
+    }
 }
 
 extension Card {
