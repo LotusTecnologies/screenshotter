@@ -127,6 +127,7 @@
 "discover.screenshot.flag.inappropriate" = "Inappropriate Image";
 "discover.screenshot.flag.inappropriate.message" = "We’ll review this as soon as possible.";
 "discover.screenshot.flag.inappropriate.title" = "Thanks For Letting Us Know!";
+"discover.screenshot.flag.duplicate" = "Duplicate";
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
 "discover.screenshot.helper.swipe_left.0" = "Swipe Left";
@@ -187,6 +188,7 @@
 "generic.continue" = "Continue";
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";
+"generic.dismiss" = "Dismiss";
 "generic.done" = "Done";
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
@@ -195,6 +197,7 @@
 "generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
+"generic.retry" = "Try Again";
 "generic.sale" = "SALE";
 "generic.save" = "Save";
 "generic.setup" = "Setup";
@@ -283,6 +286,9 @@
 "products.rate.talk_to_stylist" = "Talk to your stylist";
 "products.rate.unrated" = "Are these results relevant?";
 "products.title" = "Shop Photo";
+"products.related_looks.headline" = "Similar Looks";
+"products.related_looks.error.connection" = "Please check your connection and try again.";
+"products.related_looks.error.no_looks" = "No similar looks found";
 
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";

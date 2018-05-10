@@ -147,7 +147,7 @@ extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
+        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
@@ -400,6 +400,7 @@ extension DataModel {
                        screenshot: Screenshot,
                        label: String?,
                        offersURL: String?,
+                       relatedImagesURL: String?,
                        b0x: Double,
                        b0y: Double,
                        b1x: Double,
@@ -441,6 +442,7 @@ extension DataModel {
         } else {
             shoppableToSave.order = shoppableToSave.label
         }
+        shoppableToSave.relatedImagesURLString = relatedImagesURL
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
         shoppableToSave.b0y = b0y
@@ -1426,9 +1428,9 @@ extension Screenshot {
 }
 
 extension Shoppable {
-    public func relatedImagesUrlString() -> URL? {
-        if let urlString = self.offersURL {
-            return URL.urlWith(string: urlString, queryParameters:["feed":"ctl"])
+    public func relatedImagesUrl() -> URL? {
+        if let urlString = self.relatedImagesURLString {
+            return URL.urlWith(string: urlString, queryParameters: ["feed":"mns_ctl"])
         }
         return nil
     }

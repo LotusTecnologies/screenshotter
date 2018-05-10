@@ -17,6 +17,14 @@ extension CGFloat {
     static let defaultCornerRadius: CGFloat = 6
 }
 
+extension Double {
+    public static var goldenRatio:Double {
+        get {
+            return 1.6180339887498948482
+        }
+    }
+}
+
 extension CGSize {
     var area:CGFloat {
         return self.width * self.height
@@ -40,6 +48,9 @@ extension CGSize {
 }
 
 extension CGRect {
+    var center:CGPoint {
+        return CGPoint.init(x: self.midX, y: self.midY)
+    }
     func scaleToAspectFit(in rtarget: CGRect) -> CGFloat {
         // first try to match width
         let s = rtarget.width / self.width;

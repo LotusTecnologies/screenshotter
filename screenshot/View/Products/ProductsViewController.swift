@@ -9,10 +9,12 @@
 import Foundation
 import UIKit
 import CoreData
+import PromiseKit
 
 enum ProductsSection : Int {
     case product = 0
-    
+    case relatedLooks = 1
+
     var section: Int {
         return self.rawValue
     }
@@ -31,6 +33,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
     
     var products:[Product] = []
+    var relatedLooks:Promise<[String]>?
     
     var loader:Loader?
     var noItemsHelperView:HelperView?
@@ -98,10 +101,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         let collectionView:UICollectionView = {
             let minimumSpacing = self.collectionViewMinimumSpacing()
             
-            let layout = UICollectionViewFlowLayout()
+            let layout = SectionBackgroundCollectionViewFlowLayout()
             layout.minimumInteritemSpacing = minimumSpacing.x
             layout.minimumLineSpacing = minimumSpacing.y
-            
+
             let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
@@ -113,6 +116,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+
+            collectionView.register(RelatedLooksCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks")
+            collectionView.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
+            collectionView.register(ErrorCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error")
+            collectionView.register(ProductsViewHeaderReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
+            collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground, withReuseIdentifier: "background")
             
             self.view.insertSubview(collectionView, at: 0)
             collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
@@ -186,8 +195,14 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             return
         }
         let point = gesture.location(in: self.collectionView)
-        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell, let imageView = cell.productImageView {
-            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point),  let cell = collectionView.cellForItem(at: indexPath){
+            
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }else if let cell = cell as? RelatedLooksCollectionViewCell {
+                let imageView = cell.imageView
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }
         }
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -224,6 +239,17 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if self.hasRelatedLooksSection() && scrollView.contentSize.height > 0  {
+            let scrollViewHeight = scrollView.frame.size.height;
+            let scrollContentSizeHeight = scrollView.contentSize.height;
+            let scrollOffset = scrollView.contentOffset.y;
+            let startLoadingDistance:CGFloat = 500
+            
+            
+            if (scrollOffset + scrollViewHeight + startLoadingDistance >= scrollContentSizeHeight){
+                self.loadRelatedLooksIfNeeded()
+            }
+        }
         self.scrollRevealController?.scrollViewDidScroll(scrollView)
     }
     
@@ -239,6 +265,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 extension ProductsViewController {
     func clearProductListAndStateLoading(){
         self.products = []
+        self.relatedLooks = nil
         self.productsUnfilteredCount = 0
         self.state = .loading
         self.collectionView?.reloadData()
@@ -296,6 +323,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     func productSectionType(forSection:Int) -> ProductsSection {
         return ProductsSection(rawValue: forSection) ?? .product
     }
+    func sectionIndex(forProductType:ProductsSection) -> Int {
+        return forProductType.rawValue
+    }
     
     func collectionViewToShoppablesFrcIndexPath(_ index:Int) ->IndexPath {
         return IndexPath(item: index, section: 0)
@@ -315,8 +345,35 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return self.products.count
             
         } else {
-            return 0
+            if self.hasRelatedLooksSection()  {
+//                if product is not load then related looks does not appear at all
+                if let relatedLooks = self.relatedLooks?.value {
+                    return relatedLooks.count
+                }else {
+                    if let _ = self.products.first?.shoppable?.relatedImagesUrl() {
+                        return 1
+                    }else{
+                        return 0
+                    }
+                }
+            }
+            
         }
+        return 0
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let sectionType = productSectionType(forSection: section)
+
+        if sectionType == .relatedLooks {
+            if self.hasRelatedLooksSection() {
+                if let _ = self.products.first?.shoppable?.relatedImagesUrl() {
+                    return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+                }
+            }
+        }
+        
+        return .zero;
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -330,9 +387,45 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
             size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
+        }else if sectionType == .relatedLooks {
+            if let _ = self.relatedLooks?.value {
+                let columns = CGFloat(numberOfCollectionViewProductColumns)
+                size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
+                size.height = size.width * CGFloat(Double.goldenRatio)
+            }else{
+                // error or pending is the same size
+                size.width = collectionView.bounds.size.width
+                size.height = 200
+            }
         }
         
         return size
+    }
+    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let sectionType = productSectionType(forSection: indexPath.section)
+        if kind == UICollectionElementKindSectionHeader {
+            if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
+                if sectionType == .relatedLooks {
+                    cell.label.text = "products.related_looks.headline".localized
+                }
+                
+                return cell
+            }
+        }else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
+            let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "background", for: indexPath)
+            if sectionType == .product {
+                cell.backgroundColor = self.view.backgroundColor
+            }else if sectionType == .relatedLooks{
+                if let image = UIImage.init(named: "confetti") {
+                    cell.backgroundColor = UIColor.init(patternImage: image )
+                    
+                }
+            }
+            return cell
+            
+        }
+        return UICollectionReusableView()
+        
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -355,6 +448,41 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.buyLabel?.text = product.hasVariants ? "BUY" : "OUT OF STOCK"
                 return cell
             }
+        }else if sectionType == .relatedLooks {
+            if let relatedLooks = self.relatedLooks?.value, relatedLooks.count > indexPath.row {
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks", for: indexPath) as? RelatedLooksCollectionViewCell {
+                    let imageString = relatedLooks[indexPath.row]
+                    let url = URL.init(string: imageString)
+                    
+                    cell.imageView.sd_setImage(with: url, completed: nil)
+                    cell.flagButton.addTarget(self, action: #selector(pressedFlagButton(_:)), for: .touchUpInside)
+                    
+                    return cell
+                }
+            }else if let error = self.relatedLooks?.error {
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error", for: indexPath) as? ErrorCollectionViewCell {
+                    if self.isErrorRetryable(error:error) {
+                        cell.button.setTitle("generic.retry".localized, for: .normal)
+                        cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
+                        cell.label.text = "products.related_looks.error.connection".localized
+                    }else{
+                        cell.button.setTitle("generic.dismiss".localized, for: .normal)
+                        cell.button.addTarget(self, action: #selector(didPressDismissRelatedLooks(_:)), for: .touchUpInside)
+                        cell.label.text = "products.related_looks.error.no_looks".localized
+                    }
+                    return cell
+                }
+               
+            }else {
+                //show spinner cell
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
+                    cell.spinner.color = .gray3
+                    return cell
+                }
+                
+            }
+           
+            
         }
         
         return UICollectionViewCell()
@@ -374,10 +502,20 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
-            return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0.0, right: minimumSpacing.x)
-        } else {
-            return .zero
+            return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 30, right: minimumSpacing.x)
+        }else if sectionType == .relatedLooks {
+            if let _  = self.relatedLooks?.value {
+                let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
+                return UIEdgeInsets(top: 0, left: minimumSpacing.x, bottom: 30.0, right: minimumSpacing.x)
+            }else if let _ = self.relatedLooks?.error {
+                return .zero
+            }else { // spinner
+                return .zero
+            }
         }
+        
+        return .zero
+        
     }
    
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -389,6 +527,21 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
+            }
+        }else if sectionType == .relatedLooks {
+            if let relatedLooks = self.relatedLooks?.value {
+                if relatedLooks.count > indexPath.row {
+                    let url = relatedLooks[indexPath.row]
+                    Analytics.trackScreenshotRelatedLookAdd(url: url)
+                    AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: url, callback: { (screenshot) in
+                        Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
+                        let productsViewController = ProductsViewController.init(screenshot: screenshot)
+                        //This is so 'back' doens't say 'shop photo' which looks weird when the tile is shop photo
+                        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
+                        self.navigationController?.pushViewController(productsViewController, animated: true)
+
+                    })
+                }
             }
         }
     }
@@ -471,6 +624,7 @@ extension ProductsViewControllerProducts{
     
     func reloadProductsFor(shoppable:Shoppable) {
         self.products = []
+        self.relatedLooks = nil
         self.productsUnfilteredCount = 0
         self.scrollRevealController?.resetViewOffset()
         
@@ -833,5 +987,180 @@ extension ProductsViewControllerNoItemsHelperView{
         }))
         alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
+    }
+}
+
+extension ProductsViewController {
+    
+    @objc fileprivate func pressedFlagButton(_ sender:Any) {
+        if let button = sender as? UIView, let collectionView = self.collectionView {
+            let rect = collectionView.convert(button.bounds, from: button)
+            let point = rect.center
+            if let indexpath = collectionView.indexPathForItem(at: point) {
+                let sectionType = self.productSectionType(forSection: indexpath.section)
+                if sectionType == .relatedLooks {
+                    if let relatedLooksArray = self.relatedLooks?.value {
+                        if relatedLooksArray.count > indexpath.row {
+                            let url = relatedLooksArray[indexpath.row]
+                            self.presentReportAlertController(url:url)
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fileprivate func presentReportAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.title".localized, message: "discover.screenshot.flag.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.inappropriate".localized, style: .default, handler: { action in
+            self.presentInappropriateAlertController(url:url)
+        }))
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.copyright".localized, style: .default, handler: { action in
+            self.presentCopyrightAlertController(url:url)
+        }))
+        
+        alertController.addAction(UIAlertAction(title: "discover.screenshot.flag.duplicate".localized, style: .default, handler: { action in
+            self.presentDuplicateAlertController(url:url)
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    fileprivate func presentInappropriateAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.inappropriate.title".localized, message: "discover.screenshot.flag.inappropriate.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .inappropriate)
+    }
+    
+    fileprivate func presentCopyrightAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.copyright.title".localized, message: "discover.screenshot.flag.copyright.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "legal.terms_of_service".localized, style: .default, handler: { action in
+            self.presentTermsOfServiceViewController()
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.done".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        
+        Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .copyright)
+    }
+    fileprivate func presentDuplicateAlertController(url:String) {
+        let alertController = UIAlertController(title: "discover.screenshot.flag.inappropriate.title".localized, message: "discover.screenshot.flag.inappropriate.message".localized, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+        
+        Analytics.trackScreenshotRelatedLookFlagged(url: url, why: .duplicate)
+    }
+    
+    fileprivate func presentTermsOfServiceViewController() {
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+            present(viewController, animated: true, completion: nil)
+        }
+    }
+}
+
+extension ProductsViewController {
+    func loadRelatedLooksIfNeeded() {
+        if self.relatedLooks == nil {
+            let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: {
+                    fulfil(true);
+                })
+            })
+            let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
+
+                if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
+                    let objectId = shopable.objectID
+                    if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
+                        fulfil(a)
+                    }else{
+                        URLSession.shared.dataTask(with: URLRequest.init(url: relatedlooksURL)).asDictionary().then(execute: { (dict) -> Void in
+
+                            if let array = dict["related_looks"] as? [ String] {
+                                if array.count > 0 {
+                                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                        if let shopable = context.shoppableWith(objectId: objectId){
+                                            if let data = try? JSONSerialization.data(withJSONObject: array, options: []),  let string =  String.init(data: data, encoding:.utf8) {
+                                                shopable.relatedImagesArray = string
+                                            }
+                                        }
+                                        context.saveIfNeeded()
+                                        DispatchQueue.main.async {
+                                            fulfil(array)
+                                        }
+
+                                    })
+                                }else{
+                                    let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])
+                                    reject(error)
+                                }
+
+                            }else{
+                                let error = NSError.init(domain: "related_looks", code: 2, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
+                                reject(error)
+
+                            }
+
+                        }).catch(execute: { (error) in
+                            reject(error)
+                        })
+
+                    }
+
+                }else{
+                    let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
+                    reject(error)
+                }
+            });
+            
+            let promise = Promise.init(resolvers: { (fulfil, reject) in
+                
+                atLeastXSeconds.always {
+                    loadRequest.then(execute: { (value) -> Void in
+                        fulfil(value)
+                    }).catch(execute: { (error) in
+                        reject(error)
+                    })
+                }
+            })
+            promise.always(on: .main) {
+                let section = self.sectionIndex(forProductType: .relatedLooks)
+                self.collectionView?.reloadSections(IndexSet.init(integer: section))
+            }
+            self.relatedLooks = promise
+            
+        }
+    }
+    @objc func didPressDismissRelatedLooks(_ sender:Any) {
+        let error = NSError.init(domain: "related_looks", code: 0, userInfo: [NSLocalizedDescriptionKey:"don't show section", "retryable":false])
+        self.relatedLooks = Promise.init(error: error)
+        let section = self.sectionIndex(forProductType: .relatedLooks)
+        self.collectionView?.reloadSections(IndexSet.init(integer: section))
+    }
+    
+    @objc func didPressRetryRelatedLooks(_ sender:Any) {
+        self.relatedLooks = nil
+        if self.hasRelatedLooksSection() {
+            self.loadRelatedLooksIfNeeded()
+        }
+        let section = self.sectionIndex(forProductType: .relatedLooks)
+        self.collectionView?.reloadSections(IndexSet.init(integer: section))
+    }
+    func hasRelatedLooksSection() -> Bool {
+        if let error = self.relatedLooks?.error {
+            let e = error as NSError
+            if e.code == 0 && e.domain == "related_looks" {
+                return false
+            }
+        }
+        return self.products.count > 0
+    }
+    
+    func isErrorRetryable(error:Error) -> Bool {
+        let nsError = error as NSError
+        if let retryable = nsError.userInfo["retryable"] as? Bool {
+            return retryable
+        }else{
+            return true
+        }
     }
 }

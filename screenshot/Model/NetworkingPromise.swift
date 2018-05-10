@@ -56,15 +56,28 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
-        guard let imageData = imageData,
-            imageClassification != .unrecognized else {
+    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
+        guard imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
                 return Promise(error: emptyError)
         }
+        var httpBody:Data?
+        var payloadType:String = ""
+        if let url = orImageUrlString {
+            httpBody =  "[\"\(url)\"]".data(using: .utf8)
+            payloadType = ""
+        }else if let imageData = imageData {
+            httpBody = imageData
+            payloadType = "&payload_type=image_bin"
+        }else{
+            let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
+            return Promise(error: emptyError)
+        }
+        
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/offers/bb?account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU=&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)&payload_type=image_bin"
-            : "https://homedecor.syteapi.com/offers/bb?account_id=6722&sig=G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c=&feed=craze_home&payload_type=image_bin"
+            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
+            : "https://homedecor.syteapi.com/v1.1/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&features=related_looks,validate&feed=craze_home\(payloadType)"
+
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
             return Promise(error: malformedError)
@@ -73,7 +86,7 @@ class NetworkingPromise : NSObject {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.httpBody = imageData
+        request.httpBody = httpBody
         let sessionConfiguration = URLSessionConfiguration.default
 //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
         sessionConfiguration.timeoutIntervalForRequest = 60
@@ -81,8 +94,8 @@ class NetworkingPromise : NSObject {
         return promise
     }
 
-    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification, isUsc: isUsc)
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
+        return uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
             .then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
