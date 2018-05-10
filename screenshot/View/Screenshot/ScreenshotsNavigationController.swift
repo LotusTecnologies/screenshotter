@@ -123,9 +123,6 @@ extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegat
     func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
         Analytics.trackOnboardingCampainCreditCardLetsGo()
         
-        // TODO: if favorited, add favorite to cart
-        // goto cart
-        
         MainTabBarController.resetViewControllerHierarchy(viewController, select: .cart)
     }
 }

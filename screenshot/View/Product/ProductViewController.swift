@@ -279,7 +279,7 @@ fileprivate extension ProductViewControllerProductView {
         
         let isFavorited = productView.favoriteButton.isSelected
         product.setFavorited(toFavorited: isFavorited)
-
+        
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .product)
         }else{
