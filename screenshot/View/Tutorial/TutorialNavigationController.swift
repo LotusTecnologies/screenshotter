@@ -15,26 +15,27 @@ import UIKit
 class TutorialNavigationController : UINavigationController {
     weak var tutorialDelegate: TutorialNavigationControllerDelegate?
     
-   
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        Analytics.trackStartedTutorial()
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        
-        
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
         let welcomeSlide = TutorialWelcomeSlideViewController()
         self.viewControllers = [welcomeSlide]
         welcomeSlide.delegate = self
+        
         Analytics.trackStartedTutorialVideo()
+        
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
         self.delegate = self
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Analytics.trackStartedTutorial()
     }
 }
 
