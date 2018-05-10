@@ -239,7 +239,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.products.count > 0 && scrollView.contentSize.height > 0  {
+        if self.hasRelatedLooksSection() && scrollView.contentSize.height > 0  {
             let scrollViewHeight = scrollView.frame.size.height;
             let scrollContentSizeHeight = scrollView.contentSize.height;
             let scrollOffset = scrollView.contentOffset.y;
@@ -345,7 +345,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             return self.products.count
             
         } else {
-            if self.products.count > 0  {
+            if self.hasRelatedLooksSection()  {
 //                if product is not load then related looks does not appear at all
                 if let relatedLooks = self.relatedLooks?.value {
                     return relatedLooks.count
@@ -366,7 +366,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let sectionType = productSectionType(forSection: section)
 
         if sectionType == .relatedLooks {
-            if self.products.count > 0 {
+            if self.hasRelatedLooksSection() {
                 if let _ = self.products.first?.shoppable?.relatedImagesUrl() {
                     return CGSize.init(width: collectionView.bounds.size.width, height: 80)
                 }
@@ -461,11 +461,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             }else if let error = self.relatedLooks?.error {
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error", for: indexPath) as? ErrorCollectionViewCell {
                     if self.isErrorRetryable(error:error) {
-                        cell.button.isHidden = false
+                        cell.button.setTitle("generic.retry".localized, for: .normal)
                         cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
                         cell.label.text = "products.related_looks.error.connection".localized
                     }else{
-                        cell.button.isHidden = true
+                        cell.button.setTitle("generic.dismiss".localized, for: .normal)
+                        cell.button.addTarget(self, action: #selector(didPressDismissRelatedLooks(_:)), for: .touchUpInside)
                         cell.label.text = "products.related_looks.error.no_looks".localized
                     }
                     return cell
@@ -1059,12 +1060,12 @@ extension ProductsViewController {
     func loadRelatedLooksIfNeeded() {
         if self.relatedLooks == nil {
             let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
-                DispatchQueue.main.asyncAfter(deadline: .now()+2, execute: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: {
                     fulfil(true);
                 })
             })
             let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
-                
+
                 if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
                     let objectId = shopable.objectID
                     if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
@@ -1127,15 +1128,29 @@ extension ProductsViewController {
             
         }
     }
-    
+    @objc func didPressDismissRelatedLooks(_ sender:Any) {
+        let error = NSError.init(domain: "related_looks", code: 0, userInfo: [NSLocalizedDescriptionKey:"don't show section", "retryable":false])
+        self.relatedLooks = Promise.init(error: error)
+        let section = self.sectionIndex(forProductType: .relatedLooks)
+        self.collectionView?.reloadSections(IndexSet.init(integer: section))
+    }
     
     @objc func didPressRetryRelatedLooks(_ sender:Any) {
         self.relatedLooks = nil
-        if self.products.count > 0 {
+        if self.hasRelatedLooksSection() {
             self.loadRelatedLooksIfNeeded()
         }
         let section = self.sectionIndex(forProductType: .relatedLooks)
         self.collectionView?.reloadSections(IndexSet.init(integer: section))
+    }
+    func hasRelatedLooksSection() -> Bool {
+        if let error = self.relatedLooks?.error {
+            let e = error as NSError
+            if e.code == 0 && e.domain == "related_looks" {
+                return false
+            }
+        }
+        return self.products.count > 0
     }
     
     func isErrorRetryable(error:Error) -> Bool {

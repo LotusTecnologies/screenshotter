@@ -192,7 +192,7 @@ extension ScreenshotsNavigationControllerStateRestoration {
             return
         }
         
-        guard let persistentStoreCoordinator = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
+        guard let _ = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
             return
         }
         
