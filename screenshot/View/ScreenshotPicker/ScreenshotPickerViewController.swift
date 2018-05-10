@@ -72,7 +72,7 @@ class ScreenshotPickerViewController : BaseViewController {
     fileprivate var assets: PHFetchResult<PHAsset>?
     fileprivate var selectedIndexPaths: [IndexPath] = []
     fileprivate var isScreenshotsOnly = true
-    
+    var openScreenshots:Bool = true
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -103,7 +103,7 @@ class ScreenshotPickerViewController : BaseViewController {
             ])
         segments.translatesAutoresizingMaskIntoConstraints = false
         segments.tintColor = .crazeGreen
-        segments.selectedSegmentIndex = 1
+        segments.selectedSegmentIndex = (openScreenshots) ? 0 : 1
         segments.addTarget(self, action: #selector(segmentsChanged), for: .valueChanged)
         toolbar.items = [UIBarButtonItem(customView: segments)]
         syncIsScreenshotsOnly()

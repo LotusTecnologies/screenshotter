@@ -22,7 +22,7 @@ enum ScreenshotsSection : Int {
 protocol ScreenshotsViewControllerDelegate : NSObjectProtocol{
     func screenshotsViewController(_  viewController:ScreenshotsViewController, didSelectItemAt:IndexPath)
     func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController)
-    func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController)
+    func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool)
 }
 
 class ScreenshotsViewController: BaseViewController {
@@ -291,7 +291,7 @@ extension ScreenshotsViewController {
     
     @objc fileprivate func emptyListViewUploadAction() {
         if let navigationController = navigationController as? ScreenshotsNavigationController {
-            navigationController.presentPickerViewController()
+            self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: false)
         }
     }
     
@@ -709,10 +709,10 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
                 if let assetId = self.notificationCellAssetId() {
                     AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId], source: .screenshot)
                 }else{
-                    self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+                    self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: true)
                 }
             case .importMultipleScreenshots, .importVeryManyScreenshots:
-                self.delegate?.screenshotsViewControllerWantsToPresentPicker(self)
+                self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: true)
             case .none:
                 //huh?
                 break
