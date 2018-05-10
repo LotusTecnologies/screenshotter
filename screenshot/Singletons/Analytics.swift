@@ -94,7 +94,7 @@ class Analytics {
             properties["cart-dateSubmitted"] = dateSubmitted
         }
         properties["cart-isPastOrder"] = cart.isPastOrder
-                
+
         return properties
     }
     
