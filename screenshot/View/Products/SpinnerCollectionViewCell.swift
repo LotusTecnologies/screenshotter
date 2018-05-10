@@ -18,9 +18,9 @@ class SpinnerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         spinner.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(spinner)
-        spinner.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
-        spinner.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        self.contentView.addSubview(spinner)
+        spinner.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).isActive = true
+        spinner.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor).isActive = true
         spinner.startAnimating()
     }
     

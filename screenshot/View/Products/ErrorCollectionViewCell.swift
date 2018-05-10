@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ErrorRetryableCollectionViewCell: UICollectionViewCell {
+class ErrorCollectionViewCell: UICollectionViewCell {
     
     let label = UILabel.init()
     let button = MainButton()
@@ -20,20 +20,21 @@ class ErrorRetryableCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .center
         label.numberOfLines = 0
         label.textColor = .gray4
-        self.addSubview(label)
-        label.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant:padding).isActive = true
-        label.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -padding).isActive = true
+        self.contentView.addSubview(label)
+        label.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant:padding).isActive = true
+        label.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -padding).isActive = true
         
-        label.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        label.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
+        
 
         
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .crazeGreen
         button.setTitle("generic.retry".localized, for: .normal)
-        self.addSubview(button)
-        button.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        self.contentView.addSubview(button)
+        button.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).isActive = true
         button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
-        
+
         
         
     }

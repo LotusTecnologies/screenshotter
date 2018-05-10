@@ -119,8 +119,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
 
             collectionView.register(RelatedLooksCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks")
             collectionView.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
-            collectionView.register(ErrorRetryableCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error-retry")
-            collectionView.register(ErrorNotRetryableCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error-no-retry")
+            collectionView.register(ErrorCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error")
             collectionView.register(ProductsViewHeaderReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
             collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground, withReuseIdentifier: "background")
             
@@ -393,16 +392,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 let columns = CGFloat(numberOfCollectionViewProductColumns)
                 size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
                 size.height = size.width * CGFloat(Double.goldenRatio)
-            }else if let error = relatedLooks?.error {
+            }else{
+                // error or pending is the same size
                 size.width = collectionView.bounds.size.width
-                if self.isErrorRetryable(error: error){
-                    size.height = 300
-                }else{
-                    size.height = 300
-                }
-            }else { // is pending or nil
-                size.width = collectionView.bounds.size.width
-                size.height = 150
+                size.height = 200
             }
         }
         
@@ -466,29 +459,18 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     return cell
                 }
             }else if let error = self.relatedLooks?.error {
-                if self.isErrorRetryable(error:error) {
-                    if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-retry", for: indexPath) as? ErrorRetryableCollectionViewCell {
-                        
+                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error", for: indexPath) as? ErrorCollectionViewCell {
+                    if self.isErrorRetryable(error:error) {
+                        cell.button.isHidden = false
                         cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
                         cell.label.text = "products.related_looks.error.connection".localized
-                        
-                        
-                        return cell
+                    }else{
+                        cell.button.isHidden = true
+                        cell.label.text = "products.related_looks.error.no_looks".localized
                     }
-                }else{
-                    if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-no-retry", for: indexPath) as? ErrorNotRetryableCollectionViewCell {
-                        let e = error as NSError
-                        if e.code == 3 { // no results
-                            cell.label.text = "products.related_looks.error.no_looks".localized
-                        }else {
-                            //Shouldn't happen -  section shouldn't be here at all
-                            cell.label.text = ""
-                            
-                        }
-                        
-                        return cell
-                    }
+                    return cell
                 }
+               
             }else {
                 //show spinner cell
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
@@ -552,6 +534,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: url, callback: { (screenshot) in
                         Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
                         let productsViewController = ProductsViewController.init(screenshot: screenshot)
+                        //This is so 'back' doens't say 'shop photo' which looks weird when the tile is shop photo
+                        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
                         self.navigationController?.pushViewController(productsViewController, animated: true)
 
                     })
@@ -1080,6 +1064,7 @@ extension ProductsViewController {
                 })
             })
             let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
+                
                 if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
                     let objectId = shopable.objectID
                     if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
@@ -1099,7 +1084,7 @@ extension ProductsViewController {
                                         DispatchQueue.main.async {
                                             fulfil(array)
                                         }
-                                        
+
                                     })
                                 }else{
                                     let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])
