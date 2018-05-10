@@ -56,9 +56,8 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
-        guard let imageData = imageData,
-            imageClassification != .unrecognized else {
+    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
+        guard imageClassification != .unrecognized else {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
                 return Promise(error: emptyError)
         }
@@ -73,7 +72,15 @@ class NetworkingPromise : NSObject {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.httpBody = imageData
+        if let url = orImageUrlString {
+            request.httpBody = jsonDatafy(object: [url])
+        }else if let imageData = imageData {
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = imageData
+        }else{
+            let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
+            return Promise(error: emptyError)
+        }
         let sessionConfiguration = URLSessionConfiguration.default
 //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
         sessionConfiguration.timeoutIntervalForRequest = 60
@@ -81,8 +88,8 @@ class NetworkingPromise : NSObject {
         return promise
     }
 
-    func uploadToSyte(imageData: Data?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, imageClassification: imageClassification, isUsc: isUsc)
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
+        return uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
             .then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,

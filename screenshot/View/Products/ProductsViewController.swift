@@ -469,12 +469,22 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 if self.isErrorRetryable(error:error) {
                     if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-retry", for: indexPath) as? ErrorRetryableCollectionViewCell {
                         
+                        cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
+                        cell.label.text = "Unable to load. Please check your connection and try again."
+                        
                         
                         return cell
                     }
                 }else{
                     if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error-no-retry", for: indexPath) as? ErrorNotRetryableCollectionViewCell {
-                        
+                        let e = error as NSError
+                        if e.code == 3 { // no results
+                            cell.label.text = "We couldn't find anything simmilar to this image. It seems like your image is very unique."
+                        }else {
+                            //Shouldn't happen -  section shouldn't be here at all
+                            cell.label.text = "Not available for this image"
+                            
+                        }
                         
                         return cell
                     }
@@ -482,7 +492,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             }else {
                 //show spinner cell
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
-                    cell.spinner.color = .gray2
+                    cell.spinner.color = .gray3
                     return cell
                 }
                 
@@ -542,12 +552,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                     AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: url, callback: { (screenshot) in
                         Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
                         let productsViewController = ProductsViewController.init(screenshot: screenshot)
-                        self.present(productsViewController, animated: true, completion: {
-                            
-                        })
-                        if screenshot.isNew {
-                            screenshot.setViewed()
-                        }
+                        self.navigationController?.pushViewController(productsViewController, animated: true)
 
                     })
                 }
@@ -1081,7 +1086,7 @@ extension ProductsViewController {
                         fulfil(a)
                     }else{
                         URLSession.shared.dataTask(with: URLRequest.init(url: relatedlooksURL)).asDictionary().then(execute: { (dict) -> Void in
-                            
+
                             if let array = dict["related_looks"] as? [ String] {
                                 if array.count > 0 {
                                     DataModel.sharedInstance.performBackgroundTask({ (context) in
@@ -1097,19 +1102,19 @@ extension ProductsViewController {
                                     let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])
                                     reject(error)
                                 }
-                                
+
                             }else{
                                 let error = NSError.init(domain: "related_looks", code: 2, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
                                 reject(error)
 
                             }
-                            
+
                         }).catch(execute: { (error) in
                             reject(error)
                         })
-                        
+
                     }
-                    
+
                 }else{
                     let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
                     reject(error)
@@ -1136,7 +1141,7 @@ extension ProductsViewController {
     }
     
     
-    @objc func didPresetRetryRelatedLooks(_ sender:Any) {
+    @objc func didPressRetryRelatedLooks(_ sender:Any) {
         self.relatedLooks = nil
         if self.products.count > 0 {
             self.loadRelatedLooksIfNeeded()

@@ -37,7 +37,9 @@ class ShoppingCartModel {
                     print("populateVariants catch error:\(error)")
                     return Promise(error: error)
                 }
-        }
+            }.catch(execute: { (error) in
+                
+            })
     }
     
     public func update(variant: Variant, quantity: Int16) {

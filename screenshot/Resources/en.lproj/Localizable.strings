@@ -191,6 +191,7 @@
 "generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
+"generic.retry" = "Try Again";
 "generic.sale" = "SALE";
 "generic.save" = "Save";
 "generic.setup" = "Setup";
