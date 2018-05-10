@@ -164,42 +164,52 @@ extension AssetSyncModel {
     
     public func addFromRelatedLook(urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
-                
-                var imageData =  data
-                if imageData == nil {
-                    if let i = image {
-                        imageData = self.data(for: i)
-                    }
-                }
-                if let imageData = imageData {
-                    let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                                                  assetId: urlString,
-                                                                                  createdAt: Date(),
-                                                                                  isRecognized: true,
-                                                                                  source: .shuffle,
-                                                                                  isHidden: false,
-                                                                                  imageData: imageData,
-                                                                                  classification: nil)
-                    addedScreenshot.uploadedImageURL = urlString
-                    addedScreenshot.shoppablesCount = 0
-                    addedScreenshot.syteJson = "h"
-                    addedScreenshot.isNew = false //Always entered immediatly when added
-                    
-                    // download stye stuff for URL
-                    AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: imageData, orImageUrlString: nil, assetId: urlString)
-                    
-                    if let callback = callback {
-                        let addedScreenshotOID = addedScreenshot.objectID
-                        DispatchQueue.main.async {
-                            if let mainScreenshot = DataModel.sharedInstance.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
-                                callback(mainScreenshot)
-                            }
+            if let screenshot = managedObjectContext.screenshotWith(assetId: urlString) {
+                if let callback = callback {
+                    let addedScreenshotOID = screenshot.objectID
+                    DispatchQueue.main.async {
+                        if let mainScreenshot = DataModel.sharedInstance.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
+                            callback(mainScreenshot)
                         }
                     }
                 }
-            })
-            
+            }else{
+                SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
+                    
+                    var imageData =  data
+                    if imageData == nil {
+                        if let i = image {
+                            imageData = self.data(for: i)
+                        }
+                    }
+                    if let imageData = imageData {
+                        let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                                      assetId: urlString,
+                                                                                      createdAt: Date(),
+                                                                                      isRecognized: true,
+                                                                                      source: .shuffle,
+                                                                                      isHidden: false,
+                                                                                      imageData: imageData,
+                                                                                      classification: nil)
+                        addedScreenshot.uploadedImageURL = urlString
+                        addedScreenshot.shoppablesCount = 0
+                        addedScreenshot.syteJson = "h"
+                        addedScreenshot.isNew = false //Always entered immediatly when added
+                        
+                        // download stye stuff for URL
+                        AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: nil, orImageUrlString: urlString, assetId: urlString)
+                        
+                        if let callback = callback {
+                            let addedScreenshotOID = addedScreenshot.objectID
+                            DispatchQueue.main.async {
+                                if let mainScreenshot = DataModel.sharedInstance.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
+                                    callback(mainScreenshot)
+                                }
+                            }
+                        }
+                    }
+                })
+            }
         }
 
     }
@@ -714,15 +724,16 @@ extension AssetSyncModel {
                         switch nsError.code {
                         case 3, 4, 22:
                             // Syte returned no segments
-                            let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
-                            let imageUrl: String = uploadedURLString ?? ""
-                            DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                            Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
-                            Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
+                            print("Syte returned no segments:\(error)")
                         default:
                             break
                         }
                     }
+                    let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
+                    let imageUrl: String = uploadedURLString ?? ""
+                    DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
+                    Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
+                    Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
                     print("uploadScreenshot inner uploadToSyte catch error:\(error)")
             }
         }
@@ -975,7 +986,7 @@ extension AssetSyncModel {
             backgroundScreenshot?.shoppablesCount = 0
             managedObjectContext.saveIfNeeded()
             
-            self.syteProcessing(imageClassification: ClarifaiModel.ImageClassification.from(shortString:classificationString), imageData: backgroundScreenshot?.imageData, orImageUrlString: nil, assetId: assetId)
+            self.syteProcessing(imageClassification: ClarifaiModel.ImageClassification.from(shortString:classificationString), imageData: backgroundScreenshot?.imageData, orImageUrlString: backgroundScreenshot?.uploadedImageURL, assetId: assetId)
         }
     }
 }

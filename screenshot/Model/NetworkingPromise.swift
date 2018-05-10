@@ -61,9 +61,22 @@ class NetworkingPromise : NSObject {
                 let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
                 return Promise(error: emptyError)
         }
+        var httpBody:Data?
+        var payloadType:String = ""
+        if let url = orImageUrlString {
+            httpBody =  "[\"\(url)\"]".data(using: .utf8)
+            payloadType = ""
+        }else if let imageData = imageData {
+            httpBody = imageData
+            payloadType = "&payload_type=image_bin"
+        }else{
+            let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
+            return Promise(error: emptyError)
+        }
+        
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)&payload_type=image_bin"
-            : "https://homedecor.syteapi.com/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&feed=craze_home&payload_type=image_bin"
+            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
+            : "https://homedecor.syteapi.com/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&feed=craze_home\(payloadType)"
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
             return Promise(error: malformedError)
@@ -72,15 +85,7 @@ class NetworkingPromise : NSObject {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        if let url = orImageUrlString {
-            request.httpBody = jsonDatafy(object: [url])
-        }else if let imageData = imageData {
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = imageData
-        }else{
-            let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
-            return Promise(error: emptyError)
-        }
+        request.httpBody = httpBody
         let sessionConfiguration = URLSessionConfiguration.default
 //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
         sessionConfiguration.timeoutIntervalForRequest = 60
