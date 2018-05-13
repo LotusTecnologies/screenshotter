@@ -86,7 +86,11 @@ class Analytics {
 
         properties["cart-shippingTotal"] = cart.shippingTotal
         properties["cart-subtotal"] = cart.subtotal
+        properties["cart-taxEstimated"] = cart.estimatedTax
+        properties["cart-orderTotal"] = cart.estimatedTotalOrder
+        
         properties["cart-remoteId"] = cart.remoteId
+        
         if let dateModified = cart.dateModified {
             properties["cart-dateModified"] = dateModified
         }
@@ -94,7 +98,10 @@ class Analytics {
             properties["cart-dateSubmitted"] = dateSubmitted
         }
         properties["cart-isPastOrder"] = cart.isPastOrder
-        
+        if let orderNumber = cart.orderNumber {
+            properties["cart-orderNumber"] = orderNumber
+        }
+
         return properties
     }
     
@@ -402,7 +409,6 @@ class AnalyticsTrackers : NSObject {
                 KochavaTracker.shared.send(kEvent)
                 
             }
-            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
         
         func identify(_ user: AnalyticsUser) {

@@ -46,6 +46,10 @@ class ProductViewController : BaseViewController {
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
         productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
         productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        productView.addGestureRecognizer(pinchZoom)
+        
         view = productView
     }
     
@@ -89,9 +93,57 @@ class ProductViewController : BaseViewController {
         syncCartItemCount()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if #available(iOS 11.0, *) {} else {
+            if !hidesBottomBarWhenPushed, let height = tabBarController?.tabBar.bounds.height {
+                productView.controlContainerBottomConstraint?.constant = -height
+                
+                var contentInsets = productView.scrollView.contentInset
+                contentInsets.bottom = -height
+                productView.scrollView.contentInset = contentInsets
+                
+                var scrollIndicatorInsets = productView.scrollView.scrollIndicatorInsets
+                scrollIndicatorInsets.bottom = -height
+                productView.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+            }
+        }
+    }
+    
     func setup(with product: Product) {
         structuredProduct = StructuredProduct(product)
         applyStructuredProductIfPossible()
+    }
+    
+    // MARK:
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        var imageViewToZoom:UIImageView?
+        for v in productView.galleryScrollContentView.subviews {
+            if let imageView = v as? UIImageView {
+                let point = gesture.location(in: imageView)
+                if imageView.bounds.contains(point) {
+                    imageViewToZoom = imageView
+                }
+            }
+        }
+        
+        if imageViewToZoom == nil, let collectionView = productView.similarProductsCollectionView {
+            let point = gesture.location(in: collectionView)
+            if let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
+                imageViewToZoom = cell.productView?.imageView
+                
+            }
+        }
+        
+        if let i = imageViewToZoom {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: i)
+        }
     }
 }
 
@@ -155,12 +207,18 @@ fileprivate extension ProductViewControllerProductView {
                 return
             }
             
-            
             let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
             
             ShoppingCartModel.shared.update(variant: variant, quantity: Int16(quantity))
             
-            presentNextStep()
+            if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard),
+                let navigationController = navigationController as? ScreenshotsNavigationController
+            {
+                navigationController.presentGiftCardCampaign()
+            }
+            else {
+                presentNextStep()
+            }
         }
         else {
             func displayErrorItems() {
@@ -221,13 +279,12 @@ fileprivate extension ProductViewControllerProductView {
         
         let isFavorited = productView.favoriteButton.isSelected
         product.setFavorited(toFavorited: isFavorited)
-
+        
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .product)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
         }
-
     }
     
     // MARK: Web

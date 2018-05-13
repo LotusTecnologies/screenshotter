@@ -17,6 +17,8 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             self.titleLabel.text = newTitle
         }
     }
+    var buyLabel:UILabel?
+
     var price:String? {
         get {
             return self.priceLabel?.text
@@ -232,6 +234,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFont.Weight.medium)
             return label
         }()
+        self.buyLabel = buyLabel
         
         let saleView: SaleView = {
             let view = SaleView()
@@ -276,5 +279,8 @@ class ProductsCollectionViewCell : UICollectionViewCell {
                 externalPreviewImageViewWidthConstraint?.isActive = true
             }
         }
+    }
+    var productImageView: UIImageView? {
+        return self.productView?.imageView
     }
 }

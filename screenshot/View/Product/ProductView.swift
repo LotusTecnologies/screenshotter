@@ -28,6 +28,7 @@ class ProductView: UIView {
     fileprivate(set) var selectionColorItem: SegmentedDropDownItem?
     fileprivate(set) var selectionSizeItem: SegmentedDropDownItem?
     fileprivate(set) var selectionQuantityItem: SegmentedDropDownItem?
+    private(set) var controlContainerBottomConstraint: NSLayoutConstraint?
     let cartButton = MainButton()
 //    let buyButton = MainButton()
     
@@ -214,9 +215,11 @@ class ProductView: UIView {
         controlContainerView.topAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         controlContainerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         controlContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        let controlContainerBottomConstraint = controlContainerView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        self.controlContainerBottomConstraint = controlContainerBottomConstraint
         
         completeDetailsConstraints += [
-            controlContainerView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            controlContainerBottomConstraint
         ]
         
         controlContainerView.addSubview(BorderView(edge: .top))

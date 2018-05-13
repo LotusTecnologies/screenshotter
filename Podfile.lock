@@ -8,22 +8,22 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Branch (0.24.2):
-    - Branch/Core (= 0.24.2)
-  - Branch/Core (0.24.2)
+  - Branch (0.25.0):
+    - Branch/Core (= 0.25.0)
+  - Branch/Core (0.25.0)
   - CardIO (5.4.1)
   - Clarifai-Apple-SDK (3.0.0-beta14)
   - CreditCardValidator (0.4)
   - EggRating (0.1.5):
     - RateView
-  - FBSDKCoreKit (4.32.0):
+  - FBSDKCoreKit (4.33.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.32.0):
+  - FBSDKLoginKit (4.33.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.32.0):
-    - FBSDKCoreKit (~> 4.32.0)
-  - Intercom (5.0.0)
-  - KochavaTrackeriOS (3.4.1)
+  - FBSDKShareKit (4.33.0):
+    - FBSDKCoreKit (~> 4.33.0)
+  - Intercom (5.0.2)
+  - KochavaTrackeriOS (3.5.0)
   - lottie-ios (2.5.0)
   - PhoneNumberKit (2.1.0):
     - PhoneNumberKit/PhoneNumberKitCore (= 2.1.0)
@@ -69,7 +69,7 @@ DEPENDENCIES:
   - Whisper
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  https://github.com/cocoapods/specs.git:
     - Amplitude-iOS
     - Analytics
     - Appsee
@@ -98,16 +98,16 @@ SPEC CHECKSUMS:
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Branch: 0d98d22745a9b68bcb4fa6dc1c6a92b64d4fdd7b
+  Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
   CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
-  FBSDKCoreKit: 55d7f2ac45d9c4b9b6119f4e43900fe84b9b7b1b
-  FBSDKLoginKit: 32ac05c2a59952c363c2e85aafa8f73ba93bcbad
-  FBSDKShareKit: 658780d0d108b8ad590a54afb5ac1427bdc8de28
-  Intercom: 235c91e8c38bdf97c5a825078a07050362e556e7
-  KochavaTrackeriOS: 29e81e9d36a2426efa5b806a5f0bd77421f8d507
+  FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
+  FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
+  FBSDKShareKit: b7b5002833a4104fbecad75e8e4e082e91c7a08a
+  Intercom: 0fcb000a9eea9a8fe889ac1466972771ef8919f2
+  KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
@@ -119,4 +119,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: b703f5188a396eb1113d9876fb6187c35a27c1ef
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.5.2

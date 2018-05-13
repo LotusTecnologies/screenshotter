@@ -13,7 +13,11 @@ class ScreenshotDisplayNavigationController : UINavigationController {
     let screenshotDisplayViewController = ScreenshotDisplayViewController()
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    convenience init() {
+        self.init(nibName: nil, bundle: nil)
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -29,6 +33,10 @@ class ScreenshotDisplayNavigationController : UINavigationController {
 //        screenshotDisplayViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareAction))
         
         viewControllers = [screenshotDisplayViewController]
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
     
     @objc fileprivate func closeAction() {

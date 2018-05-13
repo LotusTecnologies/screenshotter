@@ -16,7 +16,6 @@ protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
 class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
-    var pickerNavigationController:ScreenshotPickerNavigationController?
     var activityBarButtonItem:UIBarButtonItem?
     
     fileprivate var restoredProductsViewController: ProductsViewController?
@@ -25,7 +24,7 @@ class ScreenshotsNavigationController: UINavigationController {
         super.init(nibName: nil, bundle: nil)
         screenshotsViewController.navigationItem.leftBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.navigationItem.rightBarButtonItem?.tintColor = .crazeRed
-        screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(presentPickerViewController))
+        screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(pickerButtonPresses(_:)))
         screenshotsViewController.delegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
@@ -60,12 +59,15 @@ extension ScreenshotsNavigationController {
         return navigationController
     }
     
-    @objc func presentPickerViewController() {
+    func presentPickerViewController(openScreenshots:Bool) {
         let picker = self.createScreenshotPickerNavigationController()
-        self.pickerNavigationController = picker // ???: is this needed?
+        picker.screenshotPickerViewController.openScreenshots = openScreenshots
         self.present(picker, animated: true, completion: nil)
         
         Analytics.trackOpenedPicker()
+    }
+    @objc func pickerButtonPresses(_ sender:Any) {
+        self.presentPickerViewController(openScreenshots: false)
     }
     
     @objc func pickerViewControllerDidCancel() {
@@ -75,8 +77,8 @@ extension ScreenshotsNavigationController {
             }
         }
     }
+    
     @objc func pickerViewControllerDidFinish(){
-        self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
     }
 }
@@ -84,6 +86,10 @@ extension ScreenshotsNavigationController {
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
         if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
+            let screenshotOID = screenshot.objectID
+            print("GMK tapped screenshot:\(screenshotOID)")
+            let _ = ShoppingCartModel.shared.checkStock(screenshotOID: screenshotOID)
+            
             let productsViewController = createProductsViewController(screenshot: screenshot)
             self.pushViewController(productsViewController, animated: true)
             
@@ -98,8 +104,30 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController){
         
     }
-    func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController){
-        self.presentPickerViewController()
+    func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool){
+        self.presentPickerViewController(openScreenshots:openScreenshots)
+    }
+}
+
+extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegate {
+    func presentGiftCardCampaign() {
+        let viewController = GiftCardCampaignViewController()
+        viewController.delegate = self
+        present(viewController, animated: true, completion: nil)
+        
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
+    }
+    
+    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
+        Analytics.trackOnboardingCampainCreditCardSkip()
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
+        Analytics.trackOnboardingCampainCreditCardLetsGo()
+        
+        MainTabBarController.resetViewControllerHierarchy(viewController, select: .cart)
     }
 }
 
@@ -194,7 +222,7 @@ extension ScreenshotsNavigationControllerStateRestoration {
             return
         }
         
-        guard let persistentStoreCoordinator = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
+        guard let _ = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
             return
         }
         

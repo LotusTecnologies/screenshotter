@@ -18,6 +18,7 @@ class CheckoutOrderViewController: BaseViewController {
     fileprivate var cardFrc: FetchedResultsControllerManager<Card>?
     fileprivate var shippingAddressFrc: FetchedResultsControllerManager<ShippingAddress>?
     var cvvMap: (url: URL, cvv: String)?
+    var isGiftCardRedeemable = false
     
     // MARK: View
     
@@ -80,15 +81,12 @@ class CheckoutOrderViewController: BaseViewController {
             return formatter.string(from: NSNumber(value: price))
         }
         
-        let shippingAndSubtotal = cart.subtotal + cart.shippingTotal
-        let tax: Float = 6
-        let taxTotal = (tax / 100) * shippingAndSubtotal
-        
+
         _view.itemsPriceLabel.text = formattedPrice(cart.subtotal)
         _view.shippingPriceLabel.text = formattedPrice(cart.shippingTotal)
-        _view.beforeTaxPriceLabel.text = formattedPrice(shippingAndSubtotal)
-        _view.estimateTaxLabel.text = formattedPrice(taxTotal)
-        _view.totalPriceLabel.text = formattedPrice(shippingAndSubtotal + taxTotal)
+        _view.beforeTaxPriceLabel.text = formattedPrice(cart.subtotal + cart.shippingTotal)
+        _view.estimateTaxLabel.text = formattedPrice(cart.estimatedTax)
+        _view.totalPriceLabel.text = formattedPrice(cart.estimatedTotalOrder)
         _view.legalTextView.delegate = self
         
         _view.paymentControl.addTarget(self, action: #selector(navigateToPaymentList), for: .touchUpInside)
@@ -99,6 +97,21 @@ class CheckoutOrderViewController: BaseViewController {
         // TODO: remove the tableview since its not being used for it reuse functionality. insert normal views
         tableView.dataSource = self
         tableView.register(CheckoutOrderItemTableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
+    }
+    
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.tableView)
+        if let indexPath = self.tableView.indexPathForRow(at: point), let cell = self.tableView.cellForRow(at: indexPath) as? CheckoutOrderItemTableViewCell{
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.productImageView.imageView)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -126,6 +139,8 @@ class CheckoutOrderViewController: BaseViewController {
     }
     
     @objc fileprivate func cancelAction() {
+        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+        Analytics.trackCartPressedCancelCheckout(cart: cart)
         if tabBarController != nil {
             MainTabBarController.resetViewControllerHierarchy(self, select: .screenshots)
         }
@@ -314,7 +329,6 @@ extension CheckoutOrderViewControllerOrder {
         guard let cvv = confirmPaymentViewController?.cvvTextField.text, !cvv.isEmpty else {
             Analytics.trackCartCvvEntered(cart: cart, result: .cvvInvalidOrEmpty)
             confirmPaymentViewController?.displayCVVError()
-            
             return
         }
         
@@ -331,6 +345,7 @@ extension CheckoutOrderViewControllerOrder {
             presentNeedsPrimaryShippingAddressAlert()
             return
         }
+        
         Analytics.trackCartCvvEntered(cart: cart, result: .continue)
         performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
     }
@@ -348,24 +363,37 @@ extension CheckoutOrderViewControllerOrder {
     private func performCheckout(with card: Card, cvv: String, shippingAddress: ShippingAddress, orderButton: MainButton?) {
         orderButton?.isLoading = true
         orderButton?.isEnabled = false
+        let cardEmail = card.email
+        let cardName = card.fullName
         
         ShoppingCartModel.shared.nativeCheckout(card: card, cvv: cvv, shippingAddress: shippingAddress)
-            .then { orderNumber -> Void in
+            .then { orderNumber, remoteId -> Void in
                 
-                Analytics.trackCartPurchaseCompleted(orderNumber: orderNumber)
+                DataModel.sharedInstance.performBackgroundTask({ (managedObjectContext) in
+                    let cart = DataModel.sharedInstance.retrieveCart(managedObjectContext: managedObjectContext, remoteId: remoteId)
+                    cart?.orderNumber = orderNumber //do not need ot save -- this assignement is just to ensure being passed ot anaytlics
+                    Analytics.trackCartPurchaseCompleted(cart: cart, cardEmail: cardEmail, cardFullName: cardName)
+                    
+                })
+                
+                
                 self.dismissConfirmPaymentViewController()
                 
                 let confirmationViewController = CheckoutConfirmationViewController()
                 confirmationViewController.email = card.email
                 confirmationViewController.orderNumber = orderNumber
-
+                
+                if self.isGiftCardRedeemable {
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
+                    confirmationViewController.shouldPresentGiftCardModal = true
+                }
+                
                 self.navigationController?.pushViewController(confirmationViewController, animated: true)
             }
             .catch { error in
                 let error = error as NSError
                 Analytics.trackCartError(cart: nil, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
                 
-
                 if let error = error as NSError?,
                     error.domain == "Shoppable",
                     let errors = error.userInfo["errors"] as? [[String: String]],

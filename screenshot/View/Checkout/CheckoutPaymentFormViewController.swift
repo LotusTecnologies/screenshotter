@@ -165,29 +165,47 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPayme
         
         self.confirmBeforeSave = confirmBeforeSave
         self.autoSaveBillAddressAsShippingAddress = autoSaveBillAddressAsShippingAddress
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "OCR", style: .plain, target: self, action: #selector(enterCreditCard(_:)))
+        if CardIOUtilities.canReadCardWithCamera() {
+            
+            let image = UIImage.init(named: "FABCamera")?.withRenderingMode(.alwaysTemplate)
+            let barButton =  UIBarButtonItem.init(image: image, style: .plain, target: self, action: #selector(enterCreditCard(_:)))
+            barButton.tintColor = .gray2
+            self.navigationItem.rightBarButtonItem = barButton
+        }
     }
     
     @objc func enterCreditCard(_ sender:Any){
         if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
+            scanner.suppressScanConfirmation = true
+            scanner.guideColor = .crazeGreen
+            scanner.suppressScannedCardImage = true
+            scanner.hideCardIOLogo = true
+            scanner.collectCardholderName = true
+            scanner.disableManualEntryButtons = true
             scanner.modalTransitionStyle = .crossDissolve
+            scanner.navigationBarStyle = .black
+            
             self.present(scanner, animated: true, completion: nil)
         }
     }
+    
     func userDidProvide(_ cardInfo: CardIOCreditCardInfo!, in paymentViewController: CardIOPaymentViewController!) {
         self.dismiss(animated: true, completion: nil)
         formRow(.cardName)?.value = cardInfo.cardholderName
-        formRow(.cardNumber)?.value = "4242424242424242";//cardInfo.cardNumber
-        let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
-        formRow(.cardCVV)?.value = cardInfo.cvv
-        formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
-        
+        if !cardInfo.cardNumber.isEmpty {
+            formRow(.cardNumber)?.value = CreditCardValidator.shared.formatNumber(cardInfo.cardNumber)
+        }
+        if cardInfo.expiryMonth != 0 && cardInfo.expiryYear != 0 {
+            let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
+            formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
+        }
+        self.tableView.delegate = nil
         self.tableView.reloadData()
+        self.tableView.delegate = self
     }
+    
     func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
         self.dismiss(animated: true, completion: nil)
-        formRow(.cardNumber)?.value = "4242424242424242";//cardInfo.cardNumber
-        
         self.tableView.reloadData()
 
     }
@@ -234,15 +252,25 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPayme
                         DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
                         
                         self.delegate?.checkoutFormViewControllerDidAdd(self)
+                        
+                        let numberOfCards = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjectsCount
+                        
+                        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                        if self.autoSaveBillAddressAsShippingAddress {
+                            Analytics.trackCartCreditCardAdded(cart: cart, source: .manual, numberOfCards: numberOfCards, isSave: saveCard)
+                        }else{
+                            Analytics.trackCartCreditCardAdded(cart: cart, source: .onboarding, numberOfCards: numberOfCards, isSave: saveCard)
+                        }
                     }
             }
             
             if isShipToSameAddressChecked || self.autoSaveBillAddressAsShippingAddress {
                 let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                let addressesCount = DataModel.sharedInstance.shippingAddressFrc(delegate: nil).fetchedObjectsCount
                 if self.autoSaveBillAddressAsShippingAddress {
-                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding)
+                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding, numberOfAddresses: addressesCount)
                 }else{
-                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling)
+                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling, numberOfAddresses: addressesCount)
                 }
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
@@ -292,7 +320,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPayme
         var newSecureNumber: String?
         var newBrand: String?
         
-        if cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
+        if !cardNumber.isEmpty && cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
             newCardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
             newSecureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             newBrand = CreditCardValidator.shared.brand(forNumber: cardNumber).rawValue

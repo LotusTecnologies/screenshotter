@@ -123,6 +123,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,7 +133,21 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncEmptyListViews()
     }
     
-    deinit {        
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let campaign = UserDefaultsKeys.CampaignCompleted.campaign_2018_04_20.rawValue
+        
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != campaign {
+            UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.lastCampaignCompleted)
+            
+            let campaign = CampaignPromotionViewController(modal: true)
+            campaign.delegate = self
+            present(campaign, animated: true, completion: nil)
+        }
+    }
+    
+    deinit {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = nil
         }
@@ -140,6 +156,18 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.delegate = nil
     }
     
+    // MARK:
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath) as? DiscoverScreenshotCollectionViewCell{
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView)
+        }
+    }
     
     fileprivate var currentIndexPath: IndexPath {
         return IndexPath(item: 0, section: 0)
@@ -552,6 +580,16 @@ extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDele
 extension DiscoverScreenshotViewController : DiscoverScreenshotCollectionViewLayoutDelegate {
     func discoverScreenshotCollectionViewLayoutIsAdding(_ layout: DiscoverScreenshotCollectionViewLayout) -> Bool {
         return isAdding
+    }
+}
+
+extension DiscoverScreenshotViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController: CampaignPromotionViewController) {
+        
+    }
+    
+    func campaignPromotionViewControllerDidPressSkip(_ viewController: CampaignPromotionViewController) {
+        dismiss(animated: true, completion: nil)
     }
 }
 

@@ -74,6 +74,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        Analytics.trackDevMemoryWarning()
+    }
+    
     func asyncLoadStore(){
         DataModel.sharedInstance.loadStore(multipleAttempts: 5).then(execute: { (success) -> Void in
             DispatchQueue.main.async {
@@ -94,11 +98,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        application.applicationIconBadgeNumber = 0
         
         frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -111,7 +116,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
-        
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
             
             if self.isSendToDebugURL(url) {
@@ -122,6 +126,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         
         return true
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     func isSendToDebugURL(_ url:URL) -> Bool{
@@ -587,6 +595,18 @@ extension AppDelegate {
         }
     }
     
+    @objc fileprivate func accumulatorModelNumberDidChange(_ notification: Notification) {
+        let count = AccumulatorModel.sharedInstance.getNewScreenshotsCount()
+        
+        // TODO: neither of the below approaches seem to work...
+        UIApplication.shared.applicationIconBadgeNumber = count
+        
+//        let content = UNMutableNotificationContent()
+//        content.badge = NSNumber(value: count)
+//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+//        let request = UNNotificationRequest(identifier: "UpdateBadge", content: content, trigger: trigger)
+//        UNUserNotificationCenter.current().add(request)
+    }
 }
 
 // MARK: - Settings
@@ -607,7 +627,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
                 openingScreen == Constants.openingScreenValueScreenshot,
                 let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
+                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
                 showScreenshotListTop()
             } else if let aps = userInfo["aps"] as? [String : Any],
                 let category = aps["category"] as? String,

@@ -27,7 +27,7 @@
 "2018_04_20_campaign.instructions.secondButton" = "back to video";
 
 // May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
-"2018_05_01_campaign.headline" = "Thanks for joining Screenshop!";
+"2018_05_01_campaign.headline" = "Start Shopping!";
 "2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase*";
 "2018_05_01_campaign.button" = "Let’s Go!";
 "2018_05_01_campaign.skip" = "No thanks, I don’t like free things";
@@ -38,6 +38,9 @@
 "2018_05_01_campaign.star" = "*Applicable for purchases of $50 or more";
 "2018_05_01_campaign.alert.message" = "Enter your credit card information and you’ll receive your gift card after you make your first purchase. ";
 "2018_05_01_campaign.alert.title" = "Almost There!";
+"2018_05_01_campaign.confirmation.title" = "$25 gift card, coming your way!";
+"2018_05_01_campaign.confirmation.detail" = "You’ll receive an email with redemption instructions shortly.";
+"2018_05_01_campaign.confirmation.button" = "Awesome!";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
@@ -48,6 +51,8 @@
 "cart.empty.title" = "No Items in Cart";
 "cart.favorite.add" = "Add to Favorites";
 "cart.favorite.remove" = "Added to Favorites";
+"cart.gift_card.available" = "You’ll receive your gift card after you make this purchase!";
+"cart.gift_card.unavailable" = "You need to make a purchase over $50 to redeem your gift card";
 "cart.header.title" = "Your Cart";
 "cart.header.item_count" = "Items: %d";
 "cart.item.error.price" = "Price has changed";
@@ -122,6 +127,7 @@
 "discover.screenshot.flag.inappropriate" = "Inappropriate Image";
 "discover.screenshot.flag.inappropriate.message" = "We’ll review this as soon as possible.";
 "discover.screenshot.flag.inappropriate.title" = "Thanks For Letting Us Know!";
+"discover.screenshot.flag.duplicate" = "Duplicate";
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
 "discover.screenshot.helper.swipe_left.0" = "Swipe Left";
@@ -182,6 +188,7 @@
 "generic.continue" = "Continue";
 "generic.delete" = "Delete";
 "generic.disabled" = "Disabled";
+"generic.dismiss" = "Dismiss";
 "generic.done" = "Done";
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
@@ -190,6 +197,7 @@
 "generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
+"generic.retry" = "Try Again";
 "generic.sale" = "SALE";
 "generic.save" = "Save";
 "generic.setup" = "Setup";
@@ -271,23 +279,25 @@
 "products.options.sort.price_des" = "Price (highest first)";
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
-"products.options.title" = "Sort & Filter";
 "products.rate.negative.help_finding_outfit" = "I need help finding this outfit... %@";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.talk_to_stylist" = "Talk to your stylist";
 "products.rate.unrated" = "Are these results relevant?";
-"products.title" = "Products";
+"products.title" = "Shop Photo";
+"products.related_looks.headline" = "Similar Looks";
+"products.related_looks.error.connection" = "Please check your connection and try again.";
+"products.related_looks.error.no_looks" = "No similar looks found";
 
-"screenshot.delete.title" = "Delete Screenshot";
-"screenshot.empty.detail" = "Add screenshots you want to shop by pressing the power & home buttons at the same time";
-"screenshot.empty.title" = "No Screenshots Yet";
+"screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
+"screenshot.empty.discover" = "Browse Looks";
+"screenshot.empty.title" = "Shop A Photo";
+"screenshot.empty.upload" = "Upload Photo";
 "screenshot.import.latest" = "Import your latest screenshot?";
 "screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
 "screenshot.import.very_many" = "You have many new screenshots, do you want to import them?";
-"screenshot.option.delete" = "DELETE";
-"screenshot.option.share" = "SHARE";
+"screenshot.shop" = "Shop Photo";
 "screenshot.permission.photo.allow" = "Allow Access";
 "screenshot.permission.photo.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.photo.title" = "Shop With Screenshop";
@@ -325,6 +335,7 @@
 "settings.region.other" = "Other";
 "settings.region.unknown" = "Unknown";
 "settings.region.us" = "United States";
+"settings.row.address.title" = "Shipping Addresses";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
@@ -336,6 +347,7 @@
 "settings.row.name.detail" = "Enter Your Name";
 "settings.row.open_in.title" = "Open Products In";
 "settings.row.partners.title" = "Our Technology";
+"settings.row.payment.title" = "Payment Methods";
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
@@ -369,7 +381,7 @@
 "tutorial.try.detail.x.0" = "Press the volume up & power buttons";
 "tutorial.try.detail.x.1" = " on your phone";
 "tutorial.try.detail.x.2" = " to take a screenshot";
-"tutorial.try.skip" = "Start Shopping";
+"tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";
