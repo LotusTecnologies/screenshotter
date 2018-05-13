@@ -237,7 +237,7 @@ class ProductView: UIView {
         
 //        buyButton.translatesAutoresizingMaskIntoConstraints = false
 //        buyButton.backgroundColor = .crazeGreen
-//        buyButton.setTitle("product.buy".localized, for: .normal)
+//        buyButton.setTitle("product.buy_now".localized, for: .normal)
 //        buyButton.setTitleColor(.white, for: .normal)
 //        controlContainerView.addSubview(buyButton)
 //        buyButton.topAnchor.constraint(equalTo: controlContainerView.layoutMarginsGuide.topAnchor).isActive = true
