@@ -363,7 +363,7 @@ class ShoppingCartModel {
                         fulfill("")
                     } else {
                         // Delete the old variants.
-                        dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct)
+                        dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct, shouldUpdateDateChecked: false)
                         managedObjectContext.saveIfNeeded()
                     }
                 }

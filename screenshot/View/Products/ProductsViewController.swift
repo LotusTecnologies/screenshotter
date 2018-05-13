@@ -444,7 +444,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.hasExternalPreview = (product.partNumber == nil)
-                cell.actionType = product.hasVariants ? .buy : .outStock
+                cell.actionType = product.hasVariants || product.dateCheckedStock == nil ? .buy : .outStock
                 return cell
             }
         }else if sectionType == .relatedLooks {
@@ -649,6 +649,16 @@ extension ProductsViewControllerProducts{
         }
     }
     
+    func stockOrder(a: Product, b: Product) -> Bool? {
+        if a.hasVariants && !b.hasVariants {
+            return true
+        } else if !a.hasVariants && b.hasVariants {
+            return false
+        } else {
+            return nil
+        }
+    }
+    
     func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
         if let mask = shoppable.getLast()?.rawValue,
           var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
@@ -659,14 +669,16 @@ extension ProductsViewControllerProducts{
             let productArray: [Product]
             switch self.productsOptions.sort {
             case .similar :
-                productArray = products.sorted { $0.order < $1.order }
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
             case .priceAsc :
-                productArray = products.sorted { $0.floatPrice < $1.floatPrice }
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
             case .priceDes :
-                productArray = products.sorted(by: { $0.floatPrice > $1.floatPrice })
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice > $1.floatPrice) }
             case .brands :
                 productArray = products.sorted { (a, b) -> Bool in
-                    if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
+                    if let stock = stockOrder(a: a, b: b) {
+                        return stock
+                    } else if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
                       let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
                       aDisplayTitle != bDisplayTitle {
                         return aDisplayTitle < bDisplayTitle
@@ -675,7 +687,7 @@ extension ProductsViewControllerProducts{
                     } else if a.calculatedDisplayTitle != nil && b.calculatedDisplayTitle == nil {
                         return true // Empty brands at end
                     }
-                    return a.order < b.order // Secondary sort
+                    return a.order < b.order // Tertiary sort
                 }
             }
             return productArray
