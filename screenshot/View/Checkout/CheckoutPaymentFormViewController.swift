@@ -26,7 +26,7 @@ enum CheckoutPaymentFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPaymentViewControllerDelegate {
+class CheckoutPaymentFormViewController: CheckoutFormViewController  {
     fileprivate var card: Card?
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
@@ -165,7 +165,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPayme
         
         self.confirmBeforeSave = confirmBeforeSave
         self.autoSaveBillAddressAsShippingAddress = autoSaveBillAddressAsShippingAddress
-        if CardIOUtilities.canReadCardWithCamera() {
+        if CardIOUtilities.canReadCardWithCamera() && card?.displayNumber == nil  {
             
             let image = UIImage.init(named: "FABCamera")?.withRenderingMode(.alwaysTemplate)
             let barButton =  UIBarButtonItem.init(image: image, style: .plain, target: self, action: #selector(enterCreditCard(_:)))
@@ -173,42 +173,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPayme
             self.navigationItem.rightBarButtonItem = barButton
         }
     }
-    
-    @objc func enterCreditCard(_ sender:Any){
-        if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
-            scanner.suppressScanConfirmation = true
-            scanner.guideColor = .crazeGreen
-            scanner.suppressScannedCardImage = true
-            scanner.hideCardIOLogo = true
-            scanner.collectCardholderName = true
-            scanner.disableManualEntryButtons = true
-            scanner.modalTransitionStyle = .crossDissolve
-            scanner.navigationBarStyle = .black
-            
-            self.present(scanner, animated: true, completion: nil)
-        }
-    }
-    
-    func userDidProvide(_ cardInfo: CardIOCreditCardInfo!, in paymentViewController: CardIOPaymentViewController!) {
-        self.dismiss(animated: true, completion: nil)
-        formRow(.cardName)?.value = cardInfo.cardholderName
-        if !cardInfo.cardNumber.isEmpty {
-            formRow(.cardNumber)?.value = CreditCardValidator.shared.formatNumber(cardInfo.cardNumber)
-        }
-        if cardInfo.expiryMonth != 0 && cardInfo.expiryYear != 0 {
-            let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
-            formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
-        }
-        self.tableView.delegate = nil
-        self.tableView.reloadData()
-        self.tableView.delegate = self
-    }
-    
-    func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
-        self.dismiss(animated: true, completion: nil)
-        self.tableView.reloadData()
-
-    }
+   
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
     }
@@ -349,5 +314,45 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController, CardIOPayme
         card.delete()
         
         delegate?.checkoutFormViewControllerDidRemove(self)
+    }
+}
+
+// Card OCR
+extension CheckoutPaymentFormViewController: CardIOPaymentViewControllerDelegate {
+    
+    @objc func enterCreditCard(_ sender:Any){
+        if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
+            scanner.suppressScanConfirmation = true
+            scanner.guideColor = .crazeGreen
+            scanner.suppressScannedCardImage = true
+            scanner.hideCardIOLogo = true
+            scanner.collectCardholderName = true
+            scanner.disableManualEntryButtons = true
+            scanner.modalTransitionStyle = .crossDissolve
+            scanner.navigationBarStyle = .black
+            scanner.view.backgroundColor = .clear
+            self.present(scanner, animated: true, completion: nil)
+        }
+    }
+    
+    func userDidProvide(_ cardInfo: CardIOCreditCardInfo!, in paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        formRow(.cardName)?.value = cardInfo.cardholderName
+        if !cardInfo.cardNumber.isEmpty {
+            formRow(.cardNumber)?.value = CreditCardValidator.shared.formatNumber(cardInfo.cardNumber)
+        }
+        if cardInfo.expiryMonth != 0 && cardInfo.expiryYear != 0 {
+            let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
+            formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
+        }
+        self.tableView.delegate = nil
+        self.tableView.reloadData()
+        self.tableView.delegate = self
+    }
+    
+    func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        self.tableView.reloadData()
+        
     }
 }
