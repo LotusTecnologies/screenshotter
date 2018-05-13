@@ -114,11 +114,11 @@ class TextFieldTableViewCell : TableViewCell {
         }
     }
     
-    @objc fileprivate func textFieldTextDidBeginEditing() {
+    @objc func textFieldTextDidBeginEditing() {
         textField.isUserInteractionEnabled = true
     }
     
-    @objc fileprivate func textFieldTextDidEndEditing() {
+    @objc func textFieldTextDidEndEditing() {
         textField.isUserInteractionEnabled = false
     }
     
