@@ -443,9 +443,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.isSale = product.isSale()
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-                cell.hasBuyLabel = true
                 cell.hasExternalPreview = (product.partNumber == nil)
-                cell.buyLabel?.text = product.hasVariants ? "BUY" : "OUT OF STOCK"
+                cell.actionType = product.hasVariants ? .buy : .outStock
                 return cell
             }
         }else if sectionType == .relatedLooks {
