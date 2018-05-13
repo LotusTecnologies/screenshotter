@@ -63,6 +63,19 @@ class FormCardTableViewCell: FormNumberTableViewCell {
         
         syncCameraButtonVisibility()
     }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if accessoryView == cameraButton {
+            let cameraHorizontalMargin = bounds.size.width - cameraButton.frame.maxX
+            let cameraRect = cameraButton.frame.insetBy(dx: -cameraHorizontalMargin, dy: 0)
+            
+            if cameraRect.contains(point) {
+                return cameraButton
+            }
+        }
+        
+        return super.hitTest(point, with: event)
+    }
 }
 
 class FormCheckboxTableViewCell: TableViewCell, FormErrorTableViewCellProtocol {
