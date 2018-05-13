@@ -258,7 +258,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     func syncScreenshotTabBadgeCount() {
-        let count = DataModel.sharedInstance.countNewScreenshots()
+        let count = AccumulatorModel.screenshot.uninformedCount
         screenshotsNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
     }
     

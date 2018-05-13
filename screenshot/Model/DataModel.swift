@@ -1112,11 +1112,6 @@ extension DataModel {
         return countScreenshotWorkhorse(predicate: predicate)
     }
     
-    func countNewScreenshots() -> Int {
-        let predicate = NSPredicate(format: "isNew > 0 AND isHidden == false")
-        return countScreenshotWorkhorse(predicate: predicate)
-    }
-    
     func countScreenshotWorkhorse(predicate: NSPredicate) -> Int {
         let managedObjectContext = mainMoc()
         let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()

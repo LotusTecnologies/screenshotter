@@ -102,6 +102,12 @@ class ScreenshotsViewController: BaseViewController {
         }
         
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
+        
+        AccumulatorModel.screenshot.resetUninformedCount()
+        
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.syncScreenshotTabBadgeCount()
+        }
     }
     
     @objc func applicationDidEnterBackground(_ notification:Notification) {
