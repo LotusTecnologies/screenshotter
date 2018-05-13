@@ -166,6 +166,12 @@ class FormViewController: BaseViewController {
         }
     }
     
+    // MARK: Camera
+    
+    @objc func presentViewfinder() {
+        fatalError("presentViewfinder() has not been overridden")
+    }
+    
     // MARK: Error Handling
     
     func highlightErrorFields() {
@@ -250,12 +256,8 @@ extension FormViewController: UITableViewDataSource {
         let identifier = String(describing: type(of: formRow))
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         
-        if let cell = cell as? FormExpirationPickerTableViewCell {
-            cell.pickerView.dataSource = self
-            cell.pickerView.delegate = self
-            cell.pickerView.tag = FormRow.ExpirationPicker.tag
-        }
-        else if let cell = cell as? FormSelectionPickerTableViewCell {
+        // Base cell classes
+        if let cell = cell as? FormSelectionPickerTableViewCell {
             cell.pickerView.dataSource = self
             cell.pickerView.delegate = self
             cell.pickerView.tag = FormRow.SelectionPicker.tag
@@ -265,6 +267,15 @@ extension FormViewController: UITableViewDataSource {
 
             cell.textField.delegate = self
             cell.textField.returnKeyType = isLastCell ? .done : .next
+        }
+        
+        // Inherited cell classes
+        if let cell = cell as? FormCardTableViewCell {
+            cell.syncCameraButtonVisibility()
+            cell.cameraButton.addTarget(self, action: #selector(presentViewfinder), for: .touchUpInside)
+        }
+        else if let cell = cell as? FormExpirationPickerTableViewCell {
+            cell.pickerView.tag = FormRow.ExpirationPicker.tag
         }
         
         syncError(for: cell, at: indexPath)

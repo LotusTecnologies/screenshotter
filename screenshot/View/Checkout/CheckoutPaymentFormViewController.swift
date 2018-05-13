@@ -165,15 +165,8 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController  {
         
         self.confirmBeforeSave = confirmBeforeSave
         self.autoSaveBillAddressAsShippingAddress = autoSaveBillAddressAsShippingAddress
-        if CardIOUtilities.canReadCardWithCamera() && card?.displayNumber == nil  {
-            
-            let image = UIImage.init(named: "FABCamera")?.withRenderingMode(.alwaysTemplate)
-            let barButton =  UIBarButtonItem.init(image: image, style: .plain, target: self, action: #selector(enterCreditCard(_:)))
-            barButton.tintColor = .gray2
-            self.navigationItem.rightBarButtonItem = barButton
-        }
     }
-   
+    
     func formRow(_ key: CheckoutPaymentFormKeys) -> FormRow? {
         return form.map?[key.rawValue]
     }
@@ -315,12 +308,14 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController  {
         
         delegate?.checkoutFormViewControllerDidRemove(self)
     }
+    
+    override func presentViewfinder() {
+        presentCardIOPayment()
+    }
 }
 
-// Card OCR
 extension CheckoutPaymentFormViewController: CardIOPaymentViewControllerDelegate {
-    
-    @objc func enterCreditCard(_ sender:Any){
+    fileprivate func presentCardIOPayment() {
         if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
             scanner.suppressScanConfirmation = true
             scanner.guideColor = .crazeGreen
@@ -328,7 +323,6 @@ extension CheckoutPaymentFormViewController: CardIOPaymentViewControllerDelegate
             scanner.hideCardIOLogo = true
             scanner.collectCardholderName = true
             scanner.disableManualEntryButtons = true
-            scanner.modalTransitionStyle = .crossDissolve
             scanner.navigationBarStyle = .black
             scanner.view.backgroundColor = .clear
             self.present(scanner, animated: true, completion: nil)
@@ -353,6 +347,5 @@ extension CheckoutPaymentFormViewController: CardIOPaymentViewControllerDelegate
     func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
         self.dismiss(animated: true, completion: nil)
         self.tableView.reloadData()
-        
     }
 }
