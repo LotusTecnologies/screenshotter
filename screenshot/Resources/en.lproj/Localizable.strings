@@ -254,10 +254,10 @@
 "product.next_step.cart" = "Go to Cart";
 "product.next_step.continue" = "Continue Shopping";
 "product.next_step.added" = "Product was added to your cart!";
+"product.out_of_stock" = "OUT OF STOCK";
 "product.similar_items" = "Related Items";
 "product.size.default" = "Size";
 "product.website" = "Go To %@";
-"product.out_of_stock" = "OUT OF STOCK";
 
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
