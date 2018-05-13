@@ -22,7 +22,6 @@ class CrazeImageZoom: NSObject {
     private var currentImageView:UIView?
     var hostedImageView:UIImageView?
     private var isAnimatingReset:Bool = false
-    private var firstCenterPoint:CGPoint?
     private var relativePositionOfTouchInView:CGPoint?
     private var startingRect:CGRect?
     var isHandlingGesture:Bool = false
@@ -54,7 +53,6 @@ class CrazeImageZoom: NSObject {
             NotificationCenter.default.post(name: .CrazeImageZoom_started_notification, object: nil)
             
             let currentWindow = UIApplication.shared.keyWindow
-            self.firstCenterPoint = gesture.location(in: currentWindow)
             let transform:((UIImageView)->UIView) = popViewTransform ?? { imageView in
                 let newImageView = UIImageView.init(image: imageView.image)
                 newImageView.contentMode = imageView.contentMode
@@ -114,7 +112,6 @@ class CrazeImageZoom: NSObject {
             self.hostedImageView?.isHidden = false
             self.hostedImageView = nil
             self.startingRect = nil
-            self.firstCenterPoint = nil
             self.isHandlingGesture = false
             self.isAnimatingReset = false
             NotificationCenter.default.post(name: .CrazeImageZoom_ended_notification, object: nil)
