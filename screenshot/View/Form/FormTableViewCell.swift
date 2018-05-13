@@ -185,7 +185,7 @@ class FormSelectionTableViewCell: TableViewCell, FormErrorTableViewCellProtocol 
             return rect
         }()
         imageViewContainer.addSubview(dropDownImageView)
-        //accessoryView = imageViewContainer
+        accessoryView = imageViewContainer
     }
     
     // MARK: First Responder
