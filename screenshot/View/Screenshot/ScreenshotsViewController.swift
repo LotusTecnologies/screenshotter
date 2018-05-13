@@ -683,12 +683,12 @@ extension ScreenshotsViewController {
 //Notification cell
 extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDelegate {
     func newScreenshotsCount() -> Int {
-        return AccumulatorModel.sharedInstance.getNewScreenshotsCount()
+        return AccumulatorModel.screenshot.newCount
     }
     
     func screenshotNotificationCollectionViewCellDidTapReject(_ cell: ScreenshotNotificationCollectionViewCell){
         let screenshotsCount = self.newScreenshotsCount()
-        AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
+        AccumulatorModel.screenshot.resetNewCount()
         
         self.dismissNotificationCell()
         syncEmptyListView()
@@ -697,12 +697,12 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     }
     
     func notificationCellAssetId() -> String?{
-        return AccumulatorModel.sharedInstance.assetIds.first
+        return AccumulatorModel.screenshot.assetIds.first
     }
     
     func screenshotNotificationCollectionViewCellDidTapConfirm(_ cell: ScreenshotNotificationCollectionViewCell){
         let screenshotsCount = self.newScreenshotsCount()
-        AccumulatorModel.sharedInstance.resetNewScreenshotsCount()
+        AccumulatorModel.screenshot.resetNewCount()
 
         switch cell.contentText {
             case .importSingleScreenshot:
@@ -726,7 +726,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     
     func updateHasNewScreenshot(){
         let hadSection = self.hasNewScreenshotSection
-        self.hasNewScreenshotSection = (AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0) && !self.isEditing
+        self.hasNewScreenshotSection = (AccumulatorModel.screenshot.newCount > 0) && !self.isEditing
         if hadSection != self.hasNewScreenshotSection {
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
             if self.hasNewScreenshotSection {
@@ -746,7 +746,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     }
     
     @objc func accumulatorModelNumberDidChange( _ notification: Notification) {
-        if self.hasNewScreenshotSection  && AccumulatorModel.sharedInstance.getNewScreenshotsCount() > 0 {  //Already has a new screenshot section -  just do an update
+        if self.hasNewScreenshotSection  && AccumulatorModel.screenshot.newCount > 0 {  //Already has a new screenshot section -  just do an update
             let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
             if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
                 self.collectionView.reloadItems(at: [indexPath])

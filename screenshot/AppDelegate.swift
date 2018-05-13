@@ -596,7 +596,7 @@ extension AppDelegate {
     }
     
     @objc fileprivate func accumulatorModelNumberDidChange(_ notification: Notification) {
-        let count = AccumulatorModel.sharedInstance.getNewScreenshotsCount()
+        let count = AccumulatorModel.screenshot.newCount
         
         // TODO: neither of the below approaches seem to work...
         UIApplication.shared.applicationIconBadgeNumber = count

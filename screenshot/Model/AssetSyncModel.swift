@@ -14,61 +14,6 @@ import PromiseKit
 import UserNotifications
 import SDWebImage
 
-class AccumulatorModel: NSObject {
-    
-    public static let sharedInstance = AccumulatorModel()
-    
-    public func getNewScreenshotsCount() -> Int {
-        return assetIds.count
-    }
-    
-    var assetIds:Set<String> = {
-        if let array = UserDefaults.standard.value(forKey: UserDefaultsKeys.newScreenshotsAssetIds) as? [String]{
-            return Set(array)
-        }else{
-            let a:[String] = []
-            UserDefaults.standard.setValue(a, forKey: UserDefaultsKeys.newScreenshotsAssetIds)
-            return Set(a)
-        }
-        
-    }()
-    
-    private func modifyCount(_ block:@escaping ()->()) {
-        DispatchQueue.main.async {  //we want to post the notification on the main queue
-            
-            let countBefore = self.getNewScreenshotsCount()
-            
-            block()
-            let countAfter = self.getNewScreenshotsCount()
-            if countBefore != countAfter {
-                UserDefaults.standard.set(Array(self.assetIds), forKey: UserDefaultsKeys.newScreenshotsAssetIds)
-                NotificationCenter.default.post(name: .accumulatorModelDidUpdate, object: self)
-            }
-        }
-    }
-    
-    public func resetNewScreenshotsCount() {
-        modifyCount {
-            self.assetIds.removeAll()
-        }
-    }
-    
-    fileprivate func removeAssetId(_ assetId:String){
-        modifyCount {
-            let isMany = self.getNewScreenshotsCount() > Constants.notificationProductToImportCountLimit
-            if !isMany { // once it is 'many' it can only be cleared by user interaction, ie `resetNewScreenshotsCount`
-                self.assetIds.remove(assetId)
-            }
-        }
-    }
-    
-    fileprivate func addAssetId(_ assetId:String){
-        modifyCount {
-            self.assetIds.insert(assetId)
-        }
-    }
-}
-
 class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
     let assetId: String
     var imageData: Data?
@@ -222,7 +167,7 @@ extension AssetSyncModel {
     
     func uploadPhoto(asset: PHAsset, source:ScreenshotSource) {
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0, completion: { (completeOperation) in
-            AccumulatorModel.sharedInstance.removeAssetId(asset.localIdentifier)
+            AccumulatorModel.screenshot.removeAssetId(asset.localIdentifier)
                 asset.image(allowFromICloud: true).then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                 Analytics.trackBypassedClarifai()
                 let imageData: Data? = self.data(for: image)
@@ -503,7 +448,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             }
                             self.syteProcessing(imageClassification: imageClassification, imageData: imageData, orImageUrlString:nil, assetId: asset.localIdentifier)
                         } else { // Screenshot taken while app in background (or killed)
-                            AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                            AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
                             if  ApplicationStateModel.sharedInstance.isBackground() {
                                 DispatchQueue.main.async {
                                     // The accumulator updates the count in an async block.
@@ -537,7 +482,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             }
                         }
                     }
-                    if AccumulatorModel.sharedInstance.getNewScreenshotsCount() > Constants.notificationProductToImportCountLimit && !self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction {
+                    if AccumulatorModel.screenshot.newCount > Constants.notificationProductToImportCountLimit && !self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction {
                         let error = NSError.init(domain: "Craze", code: -82, userInfo: [NSLocalizedDescriptionKey : "already have enough images"])
                         throw error
                     }
@@ -554,7 +499,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 if imageClassification != .unrecognized {
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
                         if managedObjectContext.screenshotWith(assetId: asset.localIdentifier) == nil {
-                            AccumulatorModel.sharedInstance.addAssetId(asset.localIdentifier)
+                            AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
                             if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
@@ -622,7 +567,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             }
         }
         
-        content.badge = NSNumber(value: AccumulatorModel.sharedInstance.getNewScreenshotsCount())
+        content.badge = NSNumber(value: AccumulatorModel.screenshot.newCount)
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let request = UNNotificationRequest(identifier: identifier,
