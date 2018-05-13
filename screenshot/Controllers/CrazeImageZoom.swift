@@ -23,6 +23,7 @@ class CrazeImageZoom: NSObject {
     var hostedImageView:UIImageView?
     private var isAnimatingReset:Bool = false
     private var firstCenterPoint:CGPoint?
+    private var relativePositionOfTouchInView:CGPoint?
     private var startingRect:CGRect?
     var isHandlingGesture:Bool = false
 
@@ -65,6 +66,7 @@ class CrazeImageZoom: NSObject {
             let popupView = transform(imageView)
             self.startingRect = popupView.frame
             self.currentImageView = popupView
+            self.relativePositionOfTouchInView = popupView.frame.relativePositionOf(point: gesture.location(in: popupView))
             currentWindow?.addSubview(popupView)
         }
         
@@ -74,21 +76,21 @@ class CrazeImageZoom: NSObject {
         }
         if gesture.state == .changed {
             // Calculate new image scale.
-            if let currentImageView = self.currentImageView, let startingRect = self.startingRect, let firstCenterPoint = self.firstCenterPoint, startingRect.size.width > 0 {
+            if let currentImageView = self.currentImageView, let startingRect = self.startingRect, startingRect.size.width > 0, let relativePositionOfTouchInView = self.relativePositionOfTouchInView {
                 let currentScale = currentImageView.frame.size.width / startingRect.size.width;
                 let newScale = currentScale * gesture.scale;
                 let newSize = CGSize.init(width: startingRect.size.width * newScale, height: startingRect.size.height * newScale)
-                currentImageView.frame = CGRect.init(origin: currentImageView.frame.origin, size: newSize)
+                let newFrameSize = CGRect.init(origin: .zero, size: newSize)
                 
                 
-                // Calculate new center
-                let currentWindow = UIApplication.shared.keyWindow
-                let centerXDif = firstCenterPoint.x - gesture.location(in: currentWindow).x
-                let centerYDif = firstCenterPoint.y -  gesture.location(in: currentWindow).y
+                //position the origin so that the location of the gesture stays in the same relative position of the image.
+                // ie if the user zoomed in the bottom left, keep the bottom left in the same area as his fingers.
+                let locationInWindow = gesture.location(in: UIApplication.shared.keyWindow)
+                let origin = CGPoint.init(
+                    x: locationInWindow.x - newFrameSize.absolutePositionOf(relativePoint: relativePositionOfTouchInView).x,
+                    y: locationInWindow.y - newFrameSize.absolutePositionOf(relativePoint: relativePositionOfTouchInView).y)
                 
-                currentImageView.center = CGPoint.init(x: (startingRect.origin.x+(startingRect.size.width/2))-centerXDif,
-                                                       y: (startingRect.origin.y+(startingRect.size.height/2))-centerYDif)
-                
+                currentImageView.frame = CGRect.init(origin: origin, size: newSize)
                 // Reset gesture scale
                 gesture.scale = 1;
             }
