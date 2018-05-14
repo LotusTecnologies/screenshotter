@@ -1433,7 +1433,7 @@ extension Screenshot {
 extension Shoppable {
     public func relatedImagesUrl() -> URL? {
         if let urlString = self.relatedImagesURLString {
-            return URL.urlWith(string: urlString, queryParameters: ["feed":"mns_ctl"])
+            return URL.urlWith(string: urlString, queryParameters: ["feed":"craze_ctl"])
         }
         return nil
     }
