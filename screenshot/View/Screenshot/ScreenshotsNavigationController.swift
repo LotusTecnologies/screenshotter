@@ -161,7 +161,8 @@ extension ScreenshotsNavigationControllerProducts {
 typealias ScreenshotsNavigationControllerPushPermission = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerPushPermission {
     fileprivate var needsToPresentPushPrompt: Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo)
+        
+        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo) && !PermissionsManager.shared.hasPermission(for: .push)
     }
     
     fileprivate func presentPushPrompt(){
