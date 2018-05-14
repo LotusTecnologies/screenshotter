@@ -10,17 +10,6 @@
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125448120972013009410D5 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447620972011009410D5 /* TutorialVideoOverlayView.swift */; };
-		3125448220972013009410D5 /* TutorialWelcomeSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447720972011009410D5 /* TutorialWelcomeSlideViewController.swift */; };
-		3125448320972013009410D5 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447820972011009410D5 /* TutorialTrySlideViewController.swift */; };
-		3125448420972013009410D5 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447920972011009410D5 /* VideoDisplayingViewControllerDelegate.swift */; };
-		3125448520972013009410D5 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447A20972012009410D5 /* GiftCardCampaignViewController.swift */; };
-		3125448620972013009410D5 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447B20972012009410D5 /* CampaignPromotionViewController.swift */; };
-		3125448720972013009410D5 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447C20972012009410D5 /* GiftCardDoneViewController.swift */; };
-		3125448820972013009410D5 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447D20972012009410D5 /* CampaignPromotionExplanationViewController.swift */; };
-		3125448920972013009410D5 /* TutorialNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447E20972012009410D5 /* TutorialNavigationController.swift */; };
-		3125448A20972013009410D5 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125447F20972012009410D5 /* TutorialEmailSlideViewController.swift */; };
-		3125448B20972013009410D5 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448020972013009410D5 /* TutorialVideoViewController.swift */; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
@@ -154,6 +143,18 @@
 		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
+		C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */; };
+		C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */; };
+		C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */; };
+		C58FA0F020A95FC300072966 /* TutorialWelcomeSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E420A95FC200072966 /* TutorialWelcomeSlideViewController.swift */; };
+		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
+		C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */; };
+		C58FA0F320A95FC300072966 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */; };
+		C58FA0F420A95FC300072966 /* TutorialNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */; };
+		C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */; };
+		C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */; };
+		C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */; };
+		C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */; };
 		C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
@@ -247,17 +248,6 @@
 /* Begin PBXFileReference section */
 		31107DA92098B20C006E8B86 /* Model 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 16.xcdatamodel"; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
-		3125447620972011009410D5 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
-		3125447720972011009410D5 /* TutorialWelcomeSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideViewController.swift; sourceTree = "<group>"; };
-		3125447820972011009410D5 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
-		3125447920972011009410D5 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
-		3125447A20972012009410D5 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
-		3125447B20972012009410D5 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
-		3125447C20972012009410D5 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
-		3125447D20972012009410D5 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
-		3125447E20972012009410D5 /* TutorialNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialNavigationController.swift; sourceTree = "<group>"; };
-		3125447F20972012009410D5 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
-		3125448020972013009410D5 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
@@ -398,6 +388,18 @@
 		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
+		C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
+		C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationPromptViewController.swift; sourceTree = "<group>"; };
+		C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
+		C58FA0E420A95FC200072966 /* TutorialWelcomeSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideViewController.swift; sourceTree = "<group>"; };
+		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
+		C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
+		C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
+		C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialNavigationController.swift; sourceTree = "<group>"; };
+		C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
+		C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
+		C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
+		C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
 		C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWhatIsCVVWebViewController.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
@@ -685,6 +687,7 @@
 				C54087F81FE90C8E00198955 /* Generic */,
 				C5F53D8C2014A57F003A57EC /* Legal */,
 				C54087C11FE90C8D00198955 /* Loading */,
+				C58FA0C820A95FB000072966 /* Onboarding */,
 				C55D89BE2021EF84004A5245 /* Partners */,
 				C54087EC1FE90C8E00198955 /* Product */,
 				C543695120453FE300599134 /* Products */,
@@ -696,7 +699,6 @@
 				319B030B2057AFCC00446054 /* ShareToDiscoverPrompt */,
 				C54087D61FE90C8D00198955 /* Shoppable */,
 				C54087E11FE90C8D00198955 /* TabBar */,
-				C54087C81FE90C8D00198955 /* Tutorial */,
 				C54087D21FE90C8D00198955 /* WebView */,
 			);
 			path = View;
@@ -718,24 +720,6 @@
 				C54087C71FE90C8D00198955 /* SettingsViewController.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		C54087C81FE90C8D00198955 /* Tutorial */ = {
-			isa = PBXGroup;
-			children = (
-				3125447D20972012009410D5 /* CampaignPromotionExplanationViewController.swift */,
-				3125447B20972012009410D5 /* CampaignPromotionViewController.swift */,
-				3125447A20972012009410D5 /* GiftCardCampaignViewController.swift */,
-				3125447C20972012009410D5 /* GiftCardDoneViewController.swift */,
-				3125447F20972012009410D5 /* TutorialEmailSlideViewController.swift */,
-				3125447820972011009410D5 /* TutorialTrySlideViewController.swift */,
-				3125447620972011009410D5 /* TutorialVideoOverlayView.swift */,
-				3125448020972013009410D5 /* TutorialVideoViewController.swift */,
-				3125447E20972012009410D5 /* TutorialNavigationController.swift */,
-				3125447720972011009410D5 /* TutorialWelcomeSlideViewController.swift */,
-				3125447920972011009410D5 /* VideoDisplayingViewControllerDelegate.swift */,
-			);
-			path = Tutorial;
 			sourceTree = "<group>";
 		};
 		C54087D21FE90C8D00198955 /* WebView */ = {
@@ -978,6 +962,25 @@
 				C501412B2061101100ABFB5C /* UITableView.swift */,
 			);
 			path = Extension;
+			sourceTree = "<group>";
+		};
+		C58FA0C820A95FB000072966 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */,
+				C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */,
+				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
+				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
+				C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */,
+				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
+				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
+				C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */,
+				C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */,
+				C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */,
+				C58FA0E420A95FC200072966 /* TutorialWelcomeSlideViewController.swift */,
+				C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		C5A1922A2057AD510046303C /* PresentationController */ = {
@@ -1431,9 +1434,11 @@
 				C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */,
 				31C0C81820A2CD14002EE95B /* SpinnerCollectionViewCell.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
+				C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
+				C58FA0F420A95FC300072966 /* TutorialNavigationController.swift in Sources */,
 				C50E25F0207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift in Sources */,
 				C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */,
 				31CE1111203BF055000156EE /* ProductsBarCollectionViewCell.swift in Sources */,
@@ -1451,12 +1456,10 @@
 				C5B19BF4209F21C60063CB69 /* CustomInputtableView.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
-				3125448A20972013009410D5 /* TutorialEmailSlideViewController.swift in Sources */,
 				C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
 				31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */,
-				3125448B20972013009410D5 /* TutorialVideoViewController.swift in Sources */,
 				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
@@ -1476,11 +1479,11 @@
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
+				C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */,
 				C5D57933203EDD7A00A076FE /* TableView.swift in Sources */,
 				319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */,
 				C5336D23203D553400A7B4B0 /* BarItem.swift in Sources */,
 				31C0C81C20A2CD14002EE95B /* ProductsViewHeaderReusableView.swift in Sources */,
-				3125448520972013009410D5 /* GiftCardCampaignViewController.swift in Sources */,
 				C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54369672046D6FD00599134 /* BaseViewController.swift in Sources */,
@@ -1518,25 +1521,23 @@
 				C5CF974E20861B17004F5F41 /* CheckoutFormViewController.swift in Sources */,
 				C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */,
 				C54088511FE90E2200198955 /* NotifyChangeView.swift in Sources */,
-				3125448320972013009410D5 /* TutorialTrySlideViewController.swift in Sources */,
 				319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */,
-				3125448620972013009410D5 /* CampaignPromotionViewController.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
 				C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */,
 				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
-				3125448720972013009410D5 /* GiftCardDoneViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
 				C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
+				C58FA0F320A95FC300072966 /* TutorialVideoViewController.swift in Sources */,
 				C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,
 				31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
+				C58FA0F020A95FC300072966 /* TutorialWelcomeSlideViewController.swift in Sources */,
 				C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */,
 				C54088591FE90E2200198955 /* MainButton.swift in Sources */,
-				3125448920972013009410D5 /* TutorialNavigationController.swift in Sources */,
 				C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */,
 				C5F8D63D1FA05AE40067C26A /* Notification.swift in Sources */,
 				C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */,
@@ -1545,10 +1546,10 @@
 				31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
-				3125448220972013009410D5 /* TutorialWelcomeSlideViewController.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
+				C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
 				C5014110205E7BF200ABFB5C /* Label.swift in Sources */,
 				C501410B205E702C00ABFB5C /* Font.swift in Sources */,
@@ -1557,16 +1558,21 @@
 				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				C51ED5BE1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift in Sources */,
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
+				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
+				C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
 				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
+				C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,
+				C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */,
 				31C0C81920A2CD14002EE95B /* RelatedLooksCollectionViewCell.swift in Sources */,
-				3125448120972013009410D5 /* TutorialVideoOverlayView.swift in Sources */,
+				C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */,
 				C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */,
 				C5D2E304204D1C6500B5BD92 /* CartItemCountView.swift in Sources */,
+				C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
 				C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */,
@@ -1583,7 +1589,6 @@
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5406A85206B7D85002977CE /* CheckoutShippingFormViewController.swift in Sources */,
 				C5E9241A2069149000D44FF9 /* FormView.swift in Sources */,
-				3125448820972013009410D5 /* CampaignPromotionExplanationViewController.swift in Sources */,
 				E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */,
 				C5D98CCD1FFA642300CC1A97 /* GameScene.swift in Sources */,
 				C5014130206283A200ABFB5C /* LoadingButton.swift in Sources */,
@@ -1599,7 +1604,6 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				31C0C81F20A2CD14002EE95B /* ProductsOptions.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
-				3125448420972013009410D5 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
 				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
@@ -1759,7 +1763,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 139;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1789,7 +1793,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 139;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1877,7 +1881,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 139;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1960,7 +1964,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 138;
+				CURRENT_PROJECT_VERSION = 139;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

@@ -525,7 +525,10 @@ extension DataModel {
         return nil
     }
     
-    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product) {
+    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product, shouldUpdateDateChecked: Bool = true) {
+        if shouldUpdateDateChecked {
+            product.dateCheckedStock = Date()
+        }
         if product.hasVariants {
             let variants = product.availableVariants as? Set<Variant>
             variants?.forEach { managedObjectContext.delete($0) }
@@ -544,20 +547,23 @@ extension DataModel {
                 fetchRequest.propertiesToFetch = ["partNumber"]
                 fetchRequest.fetchLimit = 600
                 let optionsMaskInt = ProductsOptionsMask.global.rawValue
-                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d", screenshotOID, optionsMaskInt, optionsMaskInt)
+                let anHourAgo = NSDate(timeIntervalSinceNow: -60 * 60)
+                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d AND ( dateCheckedStock == nil || dateCheckedStock < %@ )", screenshotOID, optionsMaskInt, optionsMaskInt, anHourAgo)
                 fetchRequest.sortDescriptors = nil
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
-                    if let partNumbers = results.compactMap({ $0["partNumber"] }) as? [String] {
-                        print("GMK count:\(partNumbers.count)  partNumbers:\(partNumbers)")
+                    let partNumbers = results.compactMap { $0["partNumber"] as? String }
+                    if partNumbers.count > 0 {
                         fulfill(partNumbers)
+                        return
                     }
                 } catch {
                     self.receivedCoreDataError(error: error)
                     print("partNumbers results with error:\(error)")
                 }
-                fulfill([])
+                let error = NSError(domain: "Craze", code: 78, userInfo: [NSLocalizedDescriptionKey : "No partNumbers to check."])
+                reject(error)
             }
         }
     }
@@ -614,7 +620,6 @@ extension DataModel {
         variantToSave.sku = sku
         variantToSave.url = url
         variantToSave.imageURLs = imageURLs
-        variantToSave.dateModified = Date()
         return variantToSave
     }
     
@@ -659,6 +664,7 @@ extension DataModel {
             }
         }
         rootProduct.hasVariants = hasVariants
+        rootProduct.dateCheckedStock = Date()
         if shouldSave {
             managedObjectContext.saveIfNeeded()
         }

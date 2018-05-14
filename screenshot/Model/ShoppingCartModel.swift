@@ -51,8 +51,6 @@ class ShoppingCartModel {
         }
         //
             .then { variantInfo, outOfStocks -> Void in
-                //print("GMK variantInfo:\(variantInfo)  outOfStocks:\(outOfStocks)")
-                print("GMK variantInfo.count:\(variantInfo.count)  outOfStocks.count:\(outOfStocks.count)")
                 dataModel.performBackgroundTask { managedObjectContext in
                     dataModel.markOutOfStock(managedObjectContext: managedObjectContext, partNumbers: outOfStocks)
                     variantInfo.forEach { dict in
@@ -356,16 +354,13 @@ class ShoppingCartModel {
                     reject(error)
                     return
                 }
-                if let variants = rootProduct.availableVariants as? Set<Variant>,
-                  let firstVariant = variants.first {
-                    if let dateModified = firstVariant.dateModified as Date?,
-                        -dateModified.timeIntervalSinceNow <= 60 * 60 {
-                        fulfill("")
-                    } else {
-                        // Delete the old variants.
-                        dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct)
-                        managedObjectContext.saveIfNeeded()
-                    }
+                if let dateModified = rootProduct.dateCheckedStock as Date?,
+                    -dateModified.timeIntervalSinceNow <= 60 * 60 {
+                    fulfill("")
+                } else {
+                    // Delete the old variants.
+                    dataModel.deleteVariants(managedObjectContext: managedObjectContext, product: rootProduct, shouldUpdateDateChecked: false)
+                    managedObjectContext.saveIfNeeded()
                 }
                 fulfill(partNumber)
             }

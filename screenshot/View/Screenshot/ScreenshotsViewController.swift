@@ -286,9 +286,7 @@ extension ScreenshotsViewController {
     }
     
     @objc fileprivate func emptyListViewUploadAction() {
-        if let navigationController = navigationController as? ScreenshotsNavigationController {
-            self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: false)
-        }
+        self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: false)
     }
     
     @objc fileprivate func emptyListViewDiscoverAction() {

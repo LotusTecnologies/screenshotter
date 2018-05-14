@@ -26,7 +26,7 @@ enum CheckoutPaymentFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutPaymentFormViewController: CheckoutFormViewController {
+class CheckoutPaymentFormViewController: CheckoutFormViewController  {
     fileprivate var card: Card?
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
@@ -307,5 +307,45 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         card.delete()
         
         delegate?.checkoutFormViewControllerDidRemove(self)
+    }
+    
+    override func presentViewfinder() {
+        presentCardIOPayment()
+    }
+}
+
+extension CheckoutPaymentFormViewController: CardIOPaymentViewControllerDelegate {
+    fileprivate func presentCardIOPayment() {
+        if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
+            scanner.suppressScanConfirmation = true
+            scanner.guideColor = .crazeGreen
+            scanner.suppressScannedCardImage = true
+            scanner.hideCardIOLogo = true
+            scanner.collectCardholderName = true
+            scanner.disableManualEntryButtons = true
+            scanner.navigationBarStyle = .black
+            scanner.view.backgroundColor = .clear
+            self.present(scanner, animated: true, completion: nil)
+        }
+    }
+    
+    func userDidProvide(_ cardInfo: CardIOCreditCardInfo!, in paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        formRow(.cardName)?.value = cardInfo.cardholderName
+        if !cardInfo.cardNumber.isEmpty {
+            formRow(.cardNumber)?.value = CreditCardValidator.shared.formatNumber(cardInfo.cardNumber)
+        }
+        if cardInfo.expiryMonth != 0 && cardInfo.expiryYear != 0 {
+            let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
+            formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
+        }
+        self.tableView.delegate = nil
+        self.tableView.reloadData()
+        self.tableView.delegate = self
+    }
+    
+    func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        self.tableView.reloadData()
     }
 }
