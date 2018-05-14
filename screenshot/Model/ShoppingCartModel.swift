@@ -51,8 +51,6 @@ class ShoppingCartModel {
         }
         //
             .then { variantInfo, outOfStocks -> Void in
-                //print("GMK variantInfo:\(variantInfo)  outOfStocks:\(outOfStocks)")
-                print("GMK variantInfo.count:\(variantInfo.count)  outOfStocks.count:\(outOfStocks.count)")
                 dataModel.performBackgroundTask { managedObjectContext in
                     dataModel.markOutOfStock(managedObjectContext: managedObjectContext, partNumbers: outOfStocks)
                     variantInfo.forEach { dict in
